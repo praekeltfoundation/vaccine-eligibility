@@ -6,6 +6,7 @@ import aioredis
 import pytest
 from aio_pika import DeliveryMode, Exchange
 from aio_pika import Message as AMQPMessage
+from aio_pika import Queue
 
 from vaccine import config
 from vaccine.models import Event, Message
@@ -38,6 +39,13 @@ async def send_inbound_amqp_message(exchange: Exchange, queue: str, message: byt
         ),
         routing_key=queue,
     )
+
+
+async def get_amqp_message(queue: Queue):
+    message = await queue.get(timeout=1)
+    assert message is not None
+    await message.ack()
+    return message
 
 
 @pytest.mark.asyncio
@@ -87,6 +95,10 @@ async def test_worker_valid_inbound(worker: Worker, redis: aioredis.Redis):
 
     user_data = await redis.get("user.27820001002", encoding="utf-8")
     assert json.loads(user_data)["addr"] == "27820001002"
+
+    queue = await worker.channel.declare_queue("whatsapp.outbound", durable=True)
+    await queue.bind(worker.exchange, "whatsapp.outbound")
+    await get_amqp_message(queue)
 
 
 @pytest.mark.asyncio

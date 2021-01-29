@@ -4,9 +4,13 @@ from json import JSONDecodeError
 from typing import Callable
 
 import aioredis
-from aio_pika import ExchangeType, IncomingMessage, connect_robust
+from aio_pika import ExchangeType, IncomingMessage
+from aio_pika import Message as AMQPMessage
+from aio_pika import connect_robust
+from aio_pika.message import DeliveryMode
 
 from vaccine import config
+from vaccine.application import Application
 from vaccine.models import Event, Message, User
 
 logging.basicConfig(level=config.LOG_LEVEL.upper())
@@ -56,8 +60,21 @@ class Worker:
             logger.debug(f"Processing inbound message {msg}")
             user_data = await self.redis.get(f"user.{msg.from_addr}", encoding="utf-8")
             user = User.get_or_create(msg.from_addr, user_data)
-            # TODO: Process user message
+            app = Application(user)
+            for outbound in await app.process_message(msg):
+                await self.publish_message(outbound)
             await self.redis.setex(f"user.{msg.from_addr}", config.TTL, user.to_json())
+
+    async def publish_message(self, msg: Message):
+        await self.exchange.publish(
+            AMQPMessage(
+                msg.to_json().encode("utf-8"),
+                delivery_mode=DeliveryMode.PERSISTENT,
+                content_type="application/json",
+                content_encoding="UTF-8",
+            ),
+            routing_key=f"{config.TRANSPORT_NAME}.outbound",
+        )
 
     async def process_event(self, amqp_msg: IncomingMessage):
         try:

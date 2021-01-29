@@ -100,6 +100,39 @@ class Message:
             data["from_addr_type"] = cls.ADDRESS_TYPE(data["from_addr_type"])
         return cls(**data)
 
+    def reply(self, content, continue_session=True, **kw):
+        """
+        Returns a new Message that's a reply to this message
+        """
+        for f in [
+            "to_addr",
+            "from_addr",
+            "group",
+            "in_reply_to",
+            "provider",
+            "transport_name",
+            "transport_type",
+            "transport_metadata",
+        ]:
+            if f in kw:
+                raise TypeError(f"{f} my not be overridden")
+        fields = {
+            "session_event": Message.SESSION_EVENT.NONE
+            if continue_session
+            else Message.SESSION_EVENT.CLOSE,
+            "to_addr": self.from_addr,
+            "from_addr": self.to_addr,
+            "group": self.group,
+            "in_reply_to": self.message_id,
+            "provider": self.provider,
+            "transport_name": self.transport_name,
+            "transport_type": self.transport_type,
+            "transport_metadata": self.transport_metadata,
+        }
+        fields.update(kw)
+
+        return Message(content=content, **fields)
+
 
 @dataclass
 class Event:

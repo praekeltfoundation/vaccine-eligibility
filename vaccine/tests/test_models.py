@@ -21,6 +21,41 @@ def test_message_serialisation():
     assert message == Message.from_json(message.to_json())
 
 
+def test_message_reply():
+    """
+    Should create a reply message from the original message
+    """
+    message = Message(
+        to_addr="27820001001",
+        from_addr="27820001002",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    reply = message.reply("test reply")
+    assert reply.to_addr == "27820001002"
+    assert reply.from_addr == "27820001001"
+    assert reply.content == "test reply"
+    assert reply.in_reply_to == message.message_id
+
+
+def test_message_reply_override():
+    """
+    Some fields may not be overridden
+    """
+    message = Message(
+        to_addr="27820001001",
+        from_addr="27820001002",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    error = None
+    try:
+        message.reply("test reply", to_addr="invalid")
+    except TypeError as e:
+        error = e
+    assert error is not None
+
+
 def test_event_serialization():
     """
     Event should be able to be serialised and deserialised with no changes
