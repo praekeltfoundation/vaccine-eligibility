@@ -3,10 +3,11 @@ from asyncio import get_event_loop
 from json import JSONDecodeError
 from typing import Callable
 
+import aioredis
 from aio_pika import ExchangeType, IncomingMessage, connect_robust
 
 from vaccine import config
-from vaccine.models import Event, Message
+from vaccine.models import Event, Message, User
 
 logging.basicConfig(level=config.LOG_LEVEL.upper())
 logger = logging.getLogger(__name__)
@@ -28,6 +29,8 @@ class Worker:
             f"{config.TRANSPORT_NAME}.event", self.process_event
         )
 
+        self.redis = await aioredis.create_redis_pool(config.REDIS_URL)
+
     async def setup_consume(self, routing_key: str, callback: Callable):
         queue = await self.channel.declare_queue(
             routing_key, durable=True, auto_delete=False
@@ -38,18 +41,23 @@ class Worker:
 
     async def teardown(self):
         await self.connection.close()
+        self.redis.close()
+        await self.redis.wait_closed()
 
     async def process_message(self, amqp_msg: IncomingMessage):
         try:
             msg = Message.from_json(amqp_msg.body.decode("utf-8"))
         except (UnicodeDecodeError, JSONDecodeError, TypeError, KeyError, ValueError):
-            print("invalid message body")
             logger.exception(f"Invalid message body {amqp_msg.body!r}")
             await amqp_msg.reject(requeue=False)
             return
 
         async with amqp_msg.process(requeue=True):
             logger.debug(f"Processing inbound message {msg}")
+            user_data = await self.redis.get(f"user.{msg.from_addr}", encoding="utf-8")
+            user = User.get_or_create(msg.from_addr, user_data)
+            # TODO: Process user message
+            await self.redis.setex(f"user.{msg.from_addr}", config.TTL, user.to_json())
 
     async def process_event(self, amqp_msg: IncomingMessage):
         try:

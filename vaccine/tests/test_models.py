@@ -1,4 +1,6 @@
-from vaccine.models import Event, Message
+import json
+
+from vaccine.models import Event, Message, StateData, User
 
 
 def test_message_serialisation():
@@ -83,3 +85,25 @@ def test_event_delivery_report():
         event_type=Event.EVENT_TYPE.DELIVERY_REPORT,
         delivery_status=Event.DELIVERY_STATUS.DELIVERED,
     )
+
+
+def test_user_serialization():
+    """
+    Users should be able to be serialised and deserialised with no changes
+    """
+    user = User("27820001001", state=StateData("state_start"))
+    assert user == User.from_json(user.to_json())
+
+
+def test_user_get_or_create():
+    """
+    If the data is valid, then return a user with that data, otherwise return a new user
+    """
+    user = User.get_or_create(
+        "27820001001",
+        json.dumps({"addr": "27820001001", "state": {"name": "state_start"}}),
+    )
+    assert user == User("27820001001", state=StateData("state_start"))
+
+    user = User.get_or_create("27820001001", "")
+    assert user == User("27820001001")

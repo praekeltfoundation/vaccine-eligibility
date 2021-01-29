@@ -1,10 +1,13 @@
+import json
 import logging
 from io import StringIO
 
+import aioredis
 import pytest
 from aio_pika import DeliveryMode, Exchange
 from aio_pika import Message as AMQPMessage
 
+from vaccine import config
 from vaccine.models import Event, Message
 from vaccine.worker import Worker, logger
 
@@ -15,6 +18,14 @@ async def worker():
     await worker.setup()
     yield worker
     await worker.teardown()
+
+
+@pytest.fixture
+async def redis():
+    redis = await aioredis.create_redis_pool(config.REDIS_URL)
+    yield redis
+    redis.close()
+    await redis.wait_closed()
 
 
 async def send_inbound_amqp_message(exchange: Exchange, queue: str, message: bytes):
@@ -55,7 +66,7 @@ async def test_worker_invalid_event(worker: Worker):
 
 
 @pytest.mark.asyncio
-async def test_worker_valid_inbound(worker: Worker):
+async def test_worker_valid_inbound(worker: Worker, redis: aioredis.Redis):
     """
     Should process message
     """
@@ -73,6 +84,9 @@ async def test_worker_valid_inbound(worker: Worker):
     )
     assert "Processing inbound message" in log_stream.getvalue()
     assert repr(msg) in log_stream.getvalue()
+
+    user_data = await redis.get("user.27820001002", encoding="utf-8")
+    assert json.loads(user_data)["addr"] == "27820001002"
 
 
 @pytest.mark.asyncio

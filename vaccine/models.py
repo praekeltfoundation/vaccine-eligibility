@@ -2,6 +2,7 @@ import json
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
+from json import JSONDecodeError
 from typing import Optional
 from uuid import uuid4
 
@@ -156,3 +157,42 @@ class Event:
         if data.get("delivery_status"):
             data["delivery_status"] = cls.DELIVERY_STATUS(data["delivery_status"])
         return cls(**data)
+
+
+@dataclass
+class StateData:
+    name: Optional[str] = None
+    metadata: dict = field(default_factory=dict)
+
+
+@dataclass
+class User:
+    addr: str
+    lang: Optional[str] = None
+    answers: dict = field(default_factory=dict)
+    state: StateData = field(default_factory=StateData)
+    metadata: dict = field(default_factory=dict)
+    in_session: bool = False
+
+    def to_json(self) -> str:
+        """
+        Converts the user data to JSON representation for storing in the store
+        """
+        return json.dumps(asdict(self))
+
+    @classmethod
+    def from_json(cls, json_string: str):
+        data = json.loads(json_string)
+        data["state"] = StateData(**data["state"])
+        return cls(**data)
+
+    @classmethod
+    def get_or_create(cls, address: str, json_string: str):
+        """
+        Either returns a user from the given data, or if the data is invalid or None,
+        returns a new user
+        """
+        try:
+            return cls.from_json(json_string)
+        except (UnicodeDecodeError, JSONDecodeError, TypeError, KeyError, ValueError):
+            return cls(address)
