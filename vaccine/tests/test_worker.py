@@ -104,7 +104,7 @@ async def test_worker_valid_inbound(worker: Worker, redis: aioredis.Redis):
             await sleep(0.1)
     await redis.delete("user.27820001002")
 
-    assert json.loads(user_data)["addr"] == "27820001002"
+    assert json.loads(user_data or "")["addr"] == "27820001002"
 
     assert "Processing inbound message" in log_stream.getvalue()
     assert repr(msg) in log_stream.getvalue()
