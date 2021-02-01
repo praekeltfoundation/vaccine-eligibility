@@ -1,7 +1,7 @@
 import json
 import logging
-from io import StringIO
 from asyncio import sleep
+from io import StringIO
 
 import aioredis
 import pytest
