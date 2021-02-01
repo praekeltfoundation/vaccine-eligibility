@@ -1,6 +1,7 @@
 import json
 import logging
 from io import StringIO
+from asyncio import sleep
 
 import aioredis
 import pytest
@@ -87,18 +88,27 @@ async def test_worker_valid_inbound(worker: Worker, redis: aioredis.Redis):
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
+    ob_queue = await worker.channel.declare_queue("whatsapp.outbound", durable=True)
+    await ob_queue.bind(worker.exchange, "whatsapp.outbound")
+
     await send_inbound_amqp_message(
         worker.exchange, "whatsapp.inbound", msg.to_json().encode("utf-8")
     )
-    assert "Processing inbound message" in log_stream.getvalue()
-    assert repr(msg) in log_stream.getvalue()
 
-    user_data = await redis.get("user.27820001002", encoding="utf-8")
+    # Setting the user data is the last action performed, so wait up to 1s for it to
+    # complete
+    user_data = None
+    for _ in range(10):
+        user_data = await redis.get("user.27820001002", encoding="utf-8")
+        if user_data is None:
+            await sleep(0.1)
+    await redis.delete("user.27820001002")
+
     assert json.loads(user_data)["addr"] == "27820001002"
 
-    queue = await worker.channel.declare_queue("whatsapp.outbound", durable=True)
-    await queue.bind(worker.exchange, "whatsapp.outbound")
-    await get_amqp_message(queue)
+    assert "Processing inbound message" in log_stream.getvalue()
+    assert repr(msg) in log_stream.getvalue()
+    await get_amqp_message(ob_queue)
 
 
 @pytest.mark.asyncio
