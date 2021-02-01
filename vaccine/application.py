@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Optional
 
 from vaccine.models import Message, User
-from vaccine.states import EndState, ChoiceState, Choice
+from vaccine.states import Choice, ChoiceState, EndState, ErrorMessage, FreeText
 
 
 class Application:
@@ -54,7 +54,25 @@ class Application:
                     "What is your current occupation?",
                 ]
             ),
+            next="state_age",
+        )
+
+    async def state_age(self):
+        async def check_age(content: Optional[str]):
+            try:
+                age = int(content or "")
+                assert age >= 0
+            except (ValueError, TypeError, AssertionError):
+                raise ErrorMessage(
+                    "Sorry, we don't understand your response. "
+                    "Please type the number that represents your age in years"
+                )
+
+        return FreeText(
+            self,
+            question="What is your current age, in years?",
             next="state_end",
+            check=check_age,
         )
 
     async def state_end(self):

@@ -1,5 +1,5 @@
-from typing import List, Optional
 from dataclasses import dataclass
+from typing import Awaitable, Callable, List, Optional
 
 from vaccine.models import Message
 
@@ -42,7 +42,7 @@ class ChoiceState:
         self.accept_labels = accept_labels
         self.next = next
 
-    def _get_choice(self, content: str) -> Optional[Choice]:
+    def _get_choice(self, content: Optional[str]) -> Optional[Choice]:
         content = (content or "").strip()
         try:
             choice_num = int(content)
@@ -55,6 +55,7 @@ class ChoiceState:
             for choice in self.choices:
                 if content.lower() == choice.label.strip().lower():
                     return choice
+        return None
 
     @property
     def _display_choices(self) -> str:
@@ -73,3 +74,33 @@ class ChoiceState:
 
     async def display(self, message: Message) -> List[Message]:
         return [message.reply(f"{self.question}\n{self._display_choices}")]
+
+
+class ErrorMessage(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+class FreeText:
+    def __init__(
+        self, app, question: str, next: str, check: Callable[[Optional[str]], Awaitable]
+    ):
+        self.app = app
+        self.question = question
+        self.next = next
+        self.check = check
+
+    async def process_message(self, message: Message) -> List[Message]:
+        self.app.user.in_session = True
+        if self.check is not None:
+            try:
+                await self.check(message.content)
+            except ErrorMessage as e:
+                return [message.reply(f"{e.message}")]
+        self.app.user.answers[self.app.user.state.name] = message.content
+        self.app.user.state.name = self.next
+        state = await self.app.get_current_state()
+        return await state.display(message)
+
+    async def display(self, message: Message) -> List[Message]:
+        return [message.reply(f"{self.question}")]
