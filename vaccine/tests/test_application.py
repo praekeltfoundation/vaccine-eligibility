@@ -20,22 +20,117 @@ async def test_new_user():
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
-    assert reply.content == "Welcome to the vaccine eligibility service."
-    assert u.state.name == "state_start"
+    assert reply.content == "\n".join(
+        [
+            "Welcome to the vaccine eligibility service.",
+            "Please answer a few questions so that we can determine your eligibility.",
+            "",
+            "What is your current occupation?",
+            "1. Unemployed",
+            "2. Retired",
+            "3. Healthcare",
+            "4. Essential",
+            "5. Software Engineer",
+            "6. Other",
+        ]
+    )
+    assert u.state.name == "state_occupation"
     assert u.in_session is True
 
 
 @pytest.mark.asyncio
 async def test_returning_user():
-    u = User(addr="27820001001", state=StateData(name="state_start"), in_session=True)
+    """
+    Returning user messages should be treated as responses to their current state
+    """
+    u = User(
+        addr="27820001001", state=StateData(name="state_occupation"), in_session=True
+    )
     app = Application(u)
     msg = Message(
+        content="9",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
-    assert reply.content == "Welcome to the vaccine eligibility service."
-    assert u.state.name == "state_start"
+    assert reply.content == "\n".join(
+        [
+            "Sorry we don't understand your response, please try again.",
+            "",
+            "What is your current occupation?",
+            "1. Unemployed",
+            "2. Retired",
+            "3. Healthcare",
+            "4. Essential",
+            "5. Software Engineer",
+            "6. Other",
+        ]
+    )
+    assert u.state.name == "state_occupation"
+    assert u.in_session is True
+
+
+@pytest.mark.asyncio
+async def test_occupation_number():
+    """
+    Replying with a number should select your occupation
+    """
+    u = User(
+        addr="27820001001", state=StateData(name="state_occupation"), in_session=True
+    )
+    app = Application(u)
+    msg = Message(
+        content="2",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "Thank you for answering those questions.",
+            "You are not currently eligible for a vaccine, but we will send you a "
+            "message notifying you when you are eligible.",
+            "",
+            "Type *MENU* to go back to the main menu, or *VACCINE* for more "
+            "information around vaccines",
+        ]
+    )
+    assert u.state.name == "state_occupation"
     assert u.in_session is False
+    assert u.answers["state_occupation"] == "retired"
+
+
+@pytest.mark.asyncio
+async def test_occupation_label():
+    """
+    Replying with a label should select your occupation
+    """
+    u = User(
+        addr="27820001001", state=StateData(name="state_occupation"), in_session=True
+    )
+    app = Application(u)
+    msg = Message(
+        content="essential",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "Thank you for answering those questions.",
+            "You are not currently eligible for a vaccine, but we will send you a "
+            "message notifying you when you are eligible.",
+            "",
+            "Type *MENU* to go back to the main menu, or *VACCINE* for more "
+            "information around vaccines",
+        ]
+    )
+    assert u.state.name == "state_occupation"
+    assert u.in_session is False
+    assert u.answers["state_occupation"] == "essential"

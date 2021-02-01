@@ -1,4 +1,5 @@
-from typing import List
+from typing import List, Optional
+from dataclasses import dataclass
 
 from vaccine.models import Message
 
@@ -12,8 +13,63 @@ class EndState:
     async def process_message(self, message: Message) -> List[Message]:
         self.app.user.in_session = False
         self.app.user.state.name = self.next
-        return await self.display(message)
+        return [message.reply(self.text, continue_session=False)]
 
     async def display(self, message: Message) -> List[Message]:
-        # TODO: send message
-        return [message.reply(self.text, continue_session=False)]
+        return await self.process_message(message)
+
+
+@dataclass
+class Choice:
+    value: str
+    label: str
+
+
+class ChoiceState:
+    def __init__(
+        self,
+        app,
+        question: str,
+        choices: List[Choice],
+        error: str,
+        next: str,
+        accept_labels: bool = True,
+    ):
+        self.app = app
+        self.question = question
+        self.choices = choices
+        self.error = error
+        self.accept_labels = accept_labels
+        self.next = next
+
+    def _get_choice(self, content: str) -> Optional[Choice]:
+        content = (content or "").strip()
+        try:
+            choice_num = int(content)
+            if choice_num > 0 and choice_num <= len(self.choices):
+                return self.choices[choice_num - 1]
+        except ValueError:
+            pass
+
+        if self.accept_labels:
+            for choice in self.choices:
+                if content.lower() == choice.label.strip().lower():
+                    return choice
+
+    @property
+    def _display_choices(self) -> str:
+        return "\n".join(f"{i + 1}. {c.label}" for i, c in enumerate(self.choices))
+
+    async def process_message(self, message: Message) -> List[Message]:
+        self.app.user.in_session = True
+        choice = self._get_choice(message.content)
+        if choice is None:
+            return [message.reply(f"{self.error}\n{self._display_choices}")]
+        else:
+            self.app.user.answers[self.app.user.state.name] = choice.value
+            self.app.user.state.name = self.next
+            state = await self.app.get_current_state()
+            return await state.display(message)
+
+    async def display(self, message: Message) -> List[Message]:
+        return [message.reply(f"{self.question}\n{self._display_choices}")]
