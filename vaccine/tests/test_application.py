@@ -163,3 +163,33 @@ async def test_age_invalid():
         "represents your age in years"
     )
     assert "state_age" not in u.answers
+
+
+@pytest.mark.asyncio
+async def test_user_end_sesssion():
+    """
+    If the user has ended the session, then we should send them the session end message
+    """
+    u = User(
+        addr="27820001001", state=StateData(name="state_occupation"), in_session=True
+    )
+    app = Application(u)
+    msg = Message(
+        to_addr="27820001002",
+        from_addr="27820001002",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.CLOSE,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.in_session is False
+    assert reply.content == "\n".join(
+        [
+            "We're sorry, but you've taken too long to reply and your session has "
+            "expired.",
+            "If you would like to continue, you can at anytime by typing the word "
+            "*VACCINE*.",
+            "",
+            "Reply *MENU* to return to the main menu",
+        ]
+    )
