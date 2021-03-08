@@ -2,7 +2,7 @@ from prometheus_client import CONTENT_TYPE_LATEST
 from prometheus_client.exposition import generate_latest
 from sanic import Sanic
 from sanic.request import Request
-from sanic.response import HTTPResponse, raw
+from sanic.response import HTTPResponse, json, raw
 
 from vaccine import config
 from vaccine.metrics import setup_metrics_middleware
@@ -22,6 +22,11 @@ async def setup_worker(app, loop):
 @app.listener("after_server_stop")
 async def shutdown_worker(app, loop):
     await app.worker.teardown()
+
+
+@app.route("/")
+async def health(request: Request) -> HTTPResponse:
+    return json({"status": "ok"})
 
 
 @app.route("/metrics")
