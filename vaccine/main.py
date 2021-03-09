@@ -1,3 +1,5 @@
+import time
+
 from prometheus_client import CONTENT_TYPE_LATEST
 from prometheus_client.exposition import generate_latest
 from sanic import Sanic
@@ -26,17 +28,26 @@ async def shutdown_worker(app, loop):
 
 @app.route("/")
 async def health(request: Request) -> HTTPResponse:
-    result: dict = {"status": "ok", "amqp": {}}
+    result: dict = {"status": "ok", "amqp": {}, "redis": {}}
     worker: Worker = app.worker  # type: ignore
 
-    if worker.connection.connection is None:
+    if worker.connection.connection is None:  # pragma: no cover
         result["amqp"]["connection"] = False
         result["status"] = "down"
     else:
-        result["amqp"]["connection"] = True
         result["amqp"]["time_since_last_heartbeat"] = (
             worker.connection.loop.time() - worker.connection.heartbeat_last
         )
+        result["amqp"]["connection"] = True
+
+    try:
+        start = time.monotonic()
+        await worker.redis.ping()
+        result["redis"]["response_time"] = time.monotonic() - start
+        result["redis"]["connection"] = True
+    except ConnectionError:  # pragma: no cover
+        result["status"] = "down"
+        result["redis"]["connection"] = False
 
     return json(result, status=200 if result["status"] == "ok" else 500)
 
