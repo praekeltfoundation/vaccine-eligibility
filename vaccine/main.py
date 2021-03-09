@@ -26,7 +26,19 @@ async def shutdown_worker(app, loop):
 
 @app.route("/")
 async def health(request: Request) -> HTTPResponse:
-    return json({"status": "ok"})
+    result: dict = {"status": "ok", "amqp": {}}
+    worker: Worker = app.worker  # type: ignore
+
+    if worker.connection.connection is None:
+        result["amqp"]["connection"] = False
+        result["status"] = "down"
+    else:
+        result["amqp"]["connection"] = True
+        result["amqp"]["time_since_last_heartbeat"] = (
+            worker.connection.loop.time() - worker.connection.heartbeat_last
+        )
+
+    return json(result, status=200 if result["status"] == "ok" else 500)
 
 
 @app.route("/metrics")
