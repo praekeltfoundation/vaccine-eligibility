@@ -12,7 +12,7 @@ class EndState:
 
     async def process_message(self, message: Message) -> List[Message]:
         self.app.user.in_session = False
-        self.app.user.state.name = self.next
+        self.app.state_name = self.next
         return [message.reply(self.text, continue_session=False)]
 
     async def display(self, message: Message) -> List[Message]:
@@ -67,8 +67,8 @@ class ChoiceState:
         if choice is None:
             return [message.reply(f"{self.error}\n{self._display_choices}")]
         else:
-            self.app.user.answers[self.app.user.state.name] = choice.value
-            self.app.user.state.name = self.next
+            self.app.user.answers[self.app.state] = choice.value
+            self.app.state_name = self.next
             state = await self.app.get_current_state()
             return await state.display(message)
 
@@ -97,8 +97,8 @@ class FreeText:
                 await self.check(message.content)
             except ErrorMessage as e:
                 return [message.reply(f"{e.message}")]
-        self.app.user.answers[self.app.user.state.name] = message.content
-        self.app.user.state.name = self.next
+        self.app.user.answers[self.app.state] = message.content
+        self.app.state_name = self.next
         state = await self.app.get_current_state()
         return await state.display(message)
 
