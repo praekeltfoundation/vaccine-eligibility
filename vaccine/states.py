@@ -67,7 +67,7 @@ class ChoiceState:
         if choice is None:
             return [message.reply(f"{self.error}\n{self._display_choices}")]
         else:
-            self.app.user.answers[self.app.state] = choice.value
+            self.app.user.answers[self.app.state_name] = choice.value
             self.app.state_name = self.next
             state = await self.app.get_current_state()
             return await state.display(message)
@@ -97,7 +97,7 @@ class FreeText:
                 await self.check(message.content)
             except ErrorMessage as e:
                 return [message.reply(f"{e.message}")]
-        self.app.user.answers[self.app.state] = message.content
+        self.app.user.answers[self.app.state_name] = message.content
         self.app.state_name = self.next
         state = await self.app.get_current_state()
         return await state.display(message)
