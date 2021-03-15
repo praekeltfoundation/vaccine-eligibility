@@ -101,7 +101,7 @@ async def test_worker_valid_inbound(worker: Worker, redis: aioredis.Redis):
     for _ in range(10):
         user_data = await redis.get("user.27820001002", encoding="utf-8")
         if user_data is None:
-            await sleep(0.1)
+            await sleep(0.1)  # pragma: no cover
     await redis.delete("user.27820001002")
 
     assert json.loads(user_data or "")["addr"] == "27820001002"

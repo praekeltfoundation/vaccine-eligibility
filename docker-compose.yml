@@ -7,6 +7,8 @@ services:
     environment:
       - AMQP_URL=amqp://guest:guest@rabbitmq/
       - REDIS_URL=redis://redis
+    ports:
+      - 8000:8000
     restart: always
   rabbitmq:
     image: rabbitmq:3.8

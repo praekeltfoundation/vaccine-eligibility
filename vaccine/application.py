@@ -1,7 +1,13 @@
 from typing import List, Optional
 
+from prometheus_client import Counter
+
 from vaccine.models import Message, User
 from vaccine.states import Choice, ChoiceState, EndState, ErrorMessage, FreeText
+
+STATE_CHANGE = Counter(
+    "state_change", "Whenever a user's state gets changed", ("from_state", "to_state")
+)
 
 
 class Application:
@@ -11,10 +17,19 @@ class Application:
         self.user = user
 
     async def get_current_state(self):
-        if not self.user.state.name:
-            self.user.state.name = self.START_STATE
-        state_func = getattr(self, self.user.state.name)
+        if not self.state_name:
+            self.state_name = self.START_STATE
+        state_func = getattr(self, self.state_name)
         return await state_func()
+
+    @property
+    def state_name(self):
+        return self.user.state.name
+
+    @state_name.setter
+    def state_name(self, state):
+        STATE_CHANGE.labels(self.state_name, state).inc()
+        self.user.state.name = state
 
     async def process_message(self, message: Message) -> List[Message]:
         """
