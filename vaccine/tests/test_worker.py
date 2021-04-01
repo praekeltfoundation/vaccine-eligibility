@@ -1,17 +1,18 @@
 import json
 import logging
-from asyncio import sleep
+from asyncio import Future, sleep
+from datetime import datetime, timezone
 from io import StringIO
 
 import aioredis
 import pytest
 from aio_pika import DeliveryMode, Exchange
 from aio_pika import Message as AMQPMessage
-from aio_pika import Queue
+from aio_pika import Queue, connect_robust
+from sanic import Sanic, response
 
-from vaccine import config
 from vaccine.models import Answer, Event, Message, StateData, User
-from vaccine.worker import Worker, logger
+from vaccine.worker import AnswerWorker, Worker, config, logger
 
 
 @pytest.fixture
@@ -127,6 +128,7 @@ async def test_worker_valid_answer(worker: Worker, redis: aioredis.Redis):
     await ob_queue.bind(worker.exchange, "whatsapp.outbound")
     ans_queue = await worker.channel.declare_queue("whatsapp.answer", durable=True)
     await ans_queue.bind(worker.exchange, "whatsapp.answer")
+    worker.answer_worker = "not none"
 
     user = User(
         addr="27820001002", state=StateData(name="state_occupation"), session_id="1"
@@ -151,6 +153,26 @@ async def test_worker_valid_answer(worker: Worker, redis: aioredis.Redis):
     answer = Answer.from_json(answer.body.decode())
     assert answer.question == "state_occupation"
     assert answer.response == "unemployed"
+    worker.answer_worker = None
+
+
+@pytest.mark.asyncio
+async def test_setup_answer_worker():
+    """
+    If the required config fields are set, then the answer worker should be set up
+    """
+    config.ANSWER_API_URL = "http://example.org"
+    config.ANSWER_API_TOKEN = "testtoken"
+    config.ANSWER_RESOURCE_ID = "96ac814d-b9b4-48ae-bcef-997a724cdacf"
+    config.ANSWER_BATCH_TIME = 0.1
+    worker = Worker()
+    await worker.setup()
+    assert worker.answer_worker is not None
+    await worker.teardown()
+    config.ANSWER_API_URL = None
+    config.ANSWER_API_TOKEN = None
+    config.ANSWER_BATCH_TIME = 5
+    config.ANSWER_RESOURCE_ID = None
 
 
 @pytest.mark.asyncio
@@ -171,3 +193,139 @@ async def test_worker_valid_event(worker: Worker):
     )
     assert "Processing event" in log_stream.getvalue()
     assert repr(event) in log_stream.getvalue()
+
+
+@pytest.fixture
+async def flow_results_mock_server(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("mock_whatsapp")
+    app.future = Future()
+
+    @app.route("flow-results/packages/invalid/responses", methods=["POST"])
+    def invalid(request):
+        app.future.set_result(request)
+        return response.json({}, status=500)
+
+    @app.route("flow-results/packages/<flow_id:uuid>/responses", methods=["POST"])
+    async def messages(request, flow_id):
+        app.future.set_result(request)
+        return response.json({})
+
+    return await sanic_client(app)
+
+
+@pytest.fixture
+async def connection():
+    connection = await connect_robust(config.AMQP_URL)
+    yield connection
+    await connection.close()
+
+
+@pytest.fixture
+async def answer_worker(connection, flow_results_mock_server):
+    config.ANSWER_API_URL = (
+        f"http://{flow_results_mock_server.host}:{flow_results_mock_server.port}"
+    )
+    config.ANSWER_API_TOKEN = "testtoken"
+    config.ANSWER_RESOURCE_ID = "96ac814d-b9b4-48ae-bcef-997a724cdacf"
+    config.ANSWER_BATCH_TIME = 0.1
+    worker = AnswerWorker(connection)
+    await worker.setup()
+    yield worker
+    await worker.teardown()
+    config.ANSWER_API_URL = None
+    config.ANSWER_API_TOKEN = None
+    config.ANSWER_BATCH_TIME = 5
+    config.ANSWER_RESOURCE_ID = None
+
+
+@pytest.mark.asyncio
+async def test_answer_worker_push_results(answer_worker, flow_results_mock_server):
+    """
+    If there are any results, should push results to the configured API endpoint
+    """
+    await send_inbound_amqp_message(
+        answer_worker.exchange,
+        "whatsapp.answer",
+        Answer(
+            question="question",
+            response="response",
+            address="27820001001",
+            session_id="session_id",
+            row_id="1",
+            timestamp=datetime(2021, 2, 3, 4, 5, 6, tzinfo=timezone.utc),
+        )
+        .to_json()
+        .encode(),
+    )
+
+    request = await flow_results_mock_server.app.future
+    assert request.json["data"]["attributes"]["responses"] == [
+        [
+            "2021-02-03T04:05:06+00:00",
+            "1",
+            "27820001001",
+            "session_id",
+            "question",
+            "response",
+            {},
+        ]
+    ]
+
+    # Allow answers to be acked
+    await sleep(0.1)
+
+
+@pytest.mark.asyncio
+async def test_answer_worker_push_results_server_down(
+    answer_worker, flow_results_mock_server
+):
+    """
+    If the server is down, then we should log the error and carry on
+    """
+    log_stream = StringIO()
+    logger.addHandler(logging.StreamHandler(log_stream))
+    logger.setLevel(logging.DEBUG)
+    config.ANSWER_RESOURCE_ID = "invalid"
+    await send_inbound_amqp_message(
+        answer_worker.exchange,
+        "whatsapp.answer",
+        Answer(
+            question="question",
+            response="response",
+            address="27820001001",
+            session_id="session_id",
+            row_id="1",
+            timestamp=datetime(2021, 2, 3, 4, 5, 6, tzinfo=timezone.utc),
+        )
+        .to_json()
+        .encode(),
+    )
+
+    await flow_results_mock_server.app.future
+    # wait for worker to log error
+    await sleep(0.1)
+    assert "Error sending results to flow results server" in log_stream.getvalue()
+
+    assert len(answer_worker.answers) == 1
+
+    for msg in answer_worker.answers:
+        msg.ack()
+
+
+@pytest.mark.asyncio
+async def test_answer_worker_invalid_message_body(answer_worker):
+    """
+    If the server is down, then we should log the error and carry on
+    """
+    log_stream = StringIO()
+    logger.addHandler(logging.StreamHandler(log_stream))
+    logger.setLevel(logging.DEBUG)
+    config.ANSWER_RESOURCE_ID = "invalid"
+    await send_inbound_amqp_message(answer_worker.exchange, "whatsapp.answer", b"{}")
+
+    # wait for worker to log error
+    await sleep(0.1)
+    assert "Invalid answer body" in log_stream.getvalue()
+
+    assert len(answer_worker.answers) == 0
