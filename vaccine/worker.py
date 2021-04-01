@@ -11,7 +11,7 @@ from aio_pika.message import DeliveryMode
 
 from vaccine import config
 from vaccine.application import Application
-from vaccine.models import Event, Message, User
+from vaccine.models import Answer, Event, Message, User
 
 logging.basicConfig(level=config.LOG_LEVEL.upper())
 logger = logging.getLogger(__name__)
@@ -63,6 +63,8 @@ class Worker:
             app = Application(user)
             for outbound in await app.process_message(msg):
                 await self.publish_message(outbound)
+            for answer in app.answer_events:
+                await self.publish_answer(answer)
             await self.redis.setex(f"user.{msg.from_addr}", config.TTL, user.to_json())
 
     async def publish_message(self, msg: Message):
@@ -74,6 +76,17 @@ class Worker:
                 content_encoding="UTF-8",
             ),
             routing_key=f"{config.TRANSPORT_NAME}.outbound",
+        )
+
+    async def publish_answer(self, answer: Answer):
+        await self.exchange.publish(
+            AMQPMessage(
+                answer.to_json().encode("utf-8"),
+                delivery_mode=DeliveryMode.PERSISTENT,
+                content_type="application/json",
+                content_encoding="UTF-8",
+            ),
+            routing_key=f"{config.TRANSPORT_NAME}.answer",
         )
 
     async def process_event(self, amqp_msg: IncomingMessage):

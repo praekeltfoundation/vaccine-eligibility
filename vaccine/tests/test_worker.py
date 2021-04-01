@@ -10,7 +10,7 @@ from aio_pika import Message as AMQPMessage
 from aio_pika import Queue
 
 from vaccine import config
-from vaccine.models import Event, Message
+from vaccine.models import Answer, Event, Message, StateData, User
 from vaccine.worker import Worker, logger
 
 
@@ -109,6 +109,48 @@ async def test_worker_valid_inbound(worker: Worker, redis: aioredis.Redis):
     assert "Processing inbound message" in log_stream.getvalue()
     assert repr(msg) in log_stream.getvalue()
     await get_amqp_message(ob_queue)
+
+
+@pytest.mark.asyncio
+async def test_worker_valid_answer(worker: Worker, redis: aioredis.Redis):
+    """
+    If the application generates an answer, should put it on the queue
+    """
+    msg = Message(
+        to_addr="27820001001",
+        from_addr="27820001002",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        content="1",
+    )
+    ob_queue = await worker.channel.declare_queue("whatsapp.outbound", durable=True)
+    await ob_queue.bind(worker.exchange, "whatsapp.outbound")
+    ans_queue = await worker.channel.declare_queue("whatsapp.answer", durable=True)
+    await ans_queue.bind(worker.exchange, "whatsapp.answer")
+
+    user = User(
+        addr="27820001002", state=StateData(name="state_occupation"), session_id="1"
+    )
+    await redis.set("user.27820001002", user.to_json())
+
+    await send_inbound_amqp_message(
+        worker.exchange, "whatsapp.inbound", msg.to_json().encode("utf-8")
+    )
+
+    # Setting the user data is the last action performed, so wait up to 1s for it to
+    # complete
+    user_data = None
+    for _ in range(10):
+        user_data = await redis.get("user.27820001002", encoding="utf-8")
+        if user_data is None:
+            await sleep(0.1)  # pragma: no cover
+    await redis.delete("user.27820001002")
+
+    await get_amqp_message(ob_queue)
+    answer = await get_amqp_message(ans_queue)
+    answer = Answer.from_json(answer.body.decode())
+    assert answer.question == "state_occupation"
+    assert answer.response == "unemployed"
 
 
 @pytest.mark.asyncio
