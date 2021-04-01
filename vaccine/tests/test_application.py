@@ -11,7 +11,7 @@ async def test_new_user():
     """
     u = User.get_or_create("27820001001", "")
     assert u.state.name is None
-    assert u.in_session is False
+    assert u.session_id is None
     app = Application(u)
     msg = Message(
         to_addr="27820001002",
@@ -35,7 +35,7 @@ async def test_new_user():
         ]
     )
     assert u.state.name == "state_occupation"
-    assert u.in_session is True
+    assert u.session_id is not None
 
 
 @pytest.mark.asyncio
@@ -44,7 +44,7 @@ async def test_returning_user():
     Returning user messages should be treated as responses to their current state
     """
     u = User(
-        addr="27820001001", state=StateData(name="state_occupation"), in_session=True
+        addr="27820001001", state=StateData(name="state_occupation"), session_id="1"
     )
     app = Application(u)
     msg = Message(
@@ -69,16 +69,16 @@ async def test_returning_user():
         ]
     )
     assert u.state.name == "state_occupation"
-    assert u.in_session is True
+    assert u.session_id == "1"
 
 
 @pytest.mark.asyncio
 async def test_occupation_number():
     """
-    Replying with a number should select your occupation
+    Replying with a number should select your occupation, and save the result
     """
     u = User(
-        addr="27820001001", state=StateData(name="state_occupation"), in_session=True
+        addr="27820001001", state=StateData(name="state_occupation"), session_id="1"
     )
     app = Application(u)
     msg = Message(
@@ -90,6 +90,11 @@ async def test_occupation_number():
     )
     [reply] = await app.process_message(msg)
     assert u.answers["state_occupation"] == "retired"
+    [answer] = app.answer_events
+    assert answer.question == "state_occupation"
+    assert answer.response == "retired"
+    assert answer.address == "27820001001"
+    assert answer.session_id == "1"
 
 
 @pytest.mark.asyncio
@@ -98,7 +103,7 @@ async def test_occupation_label():
     Replying with a label should select your occupation
     """
     u = User(
-        addr="27820001001", state=StateData(name="state_occupation"), in_session=True
+        addr="27820001001", state=StateData(name="state_occupation"), session_id="1"
     )
     app = Application(u)
     msg = Message(
@@ -118,7 +123,7 @@ async def test_age_valid():
     """
     If the age is valid, should save the value for age
     """
-    u = User(addr="27820001001", state=StateData(name="state_age"), in_session=True)
+    u = User(addr="27820001001", state=StateData(name="state_age"), session_id="1")
     app = Application(u)
     msg = Message(
         content="12",
@@ -139,6 +144,11 @@ async def test_age_valid():
         ]
     )
     assert u.answers["state_age"] == "12"
+    [answer] = app.answer_events
+    assert answer.question == "state_age"
+    assert answer.response == "12"
+    assert answer.address == "27820001001"
+    assert answer.session_id == "1"
 
 
 @pytest.mark.asyncio
@@ -146,7 +156,7 @@ async def test_age_invalid():
     """
     If the age is invalid, should display an error message
     """
-    u = User(addr="27820001001", state=StateData(name="state_age"), in_session=True)
+    u = User(addr="27820001001", state=StateData(name="state_age"), session_id="1")
     app = Application(u)
     msg = Message(
         content="abc123",
@@ -171,7 +181,7 @@ async def test_user_end_sesssion():
     If the user has ended the session, then we should send them the session end message
     """
     u = User(
-        addr="27820001001", state=StateData(name="state_occupation"), in_session=True
+        addr="27820001001", state=StateData(name="state_occupation"), session_id="1"
     )
     app = Application(u)
     msg = Message(
@@ -182,7 +192,7 @@ async def test_user_end_sesssion():
         session_event=Message.SESSION_EVENT.CLOSE,
     )
     [reply] = await app.process_message(msg)
-    assert u.in_session is False
+    assert u.session_id is None
     assert reply.content == "\n".join(
         [
             "We're sorry, but you've taken too long to reply and your session has "

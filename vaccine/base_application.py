@@ -2,7 +2,8 @@ from typing import List
 
 from prometheus_client import Counter
 
-from vaccine.models import Message, User
+from vaccine.models import Answer, Message, User
+from vaccine.utils import random_id
 
 STATE_CHANGE = Counter(
     "state_change", "Whenever a user's state gets changed", ("from_state", "to_state")
@@ -12,6 +13,7 @@ STATE_CHANGE = Counter(
 class BaseApplication:
     def __init__(self, user: User):
         self.user = user
+        self.answer_events: List[Answer] = []
 
     async def get_current_state(self):
         if not self.state_name:
@@ -33,7 +35,7 @@ class BaseApplication:
         Processes the message, and returns a list of messages to return to the user
         """
         if message.session_event == Message.SESSION_EVENT.CLOSE:
-            self.user.in_session = False
+            self.user.session_id = None
             return [
                 message.reply(
                     content="\n".join(
@@ -50,8 +52,19 @@ class BaseApplication:
                 )
             ]
         state = await self.get_current_state()
-        if self.user.in_session:
+        if self.user.session_id is not None:
             return await state.process_message(message)
         else:
-            self.user.in_session = True
+            self.user.session_id = random_id()
             return await state.display(message)
+
+    def save_answer(self, name: str, value: str):
+        self.user.answers[name] = value
+        self.answer_events.append(
+            Answer(
+                question=name,
+                response=value,
+                address=self.user.addr,
+                session_id=self.user.session_id or random_id(),
+            )
+        )
