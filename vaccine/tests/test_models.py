@@ -1,6 +1,7 @@
 import json
+from datetime import date, datetime, timezone
 
-from vaccine.models import Event, Message, StateData, User
+from vaccine.models import Answer, Event, Message, StateData, User
 
 
 def test_message_serialisation():
@@ -142,3 +143,37 @@ def test_user_get_or_create():
 
     user = User.get_or_create("27820001001", "")
     assert user == User("27820001001")
+
+
+def test_answer_serialization():
+    """
+    Answers should be serialised and deserialised with no changes
+    """
+    answer = Answer(
+        question="state_start", response="1", address="27820001001", session_id="1"
+    )
+    assert answer == Answer.from_json(answer.to_json())
+
+    answer = Answer(
+        question="state_start",
+        response=datetime.now(tz=timezone.utc),
+        address="27820001001",
+        session_id="1",
+    )
+    assert answer == Answer.from_json(answer.to_json())
+
+    answer = Answer(
+        question="state_start",
+        response=date.today(),
+        address="27820001001",
+        session_id="1",
+    )
+    assert answer == Answer.from_json(answer.to_json())
+
+    answer = Answer(
+        question="state_start",
+        response=datetime.now().time(),
+        address="27820001001",
+        session_id="1",
+    )
+    assert answer == Answer.from_json(answer.to_json())

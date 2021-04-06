@@ -1,21 +1,14 @@
 import json
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import date, datetime, time, timezone
 from enum import Enum
 from json import JSONDecodeError
-from typing import Optional
-from uuid import uuid4
+from typing import List, Optional, Union
+
+from vaccine.utils import current_timestamp, random_id
 
 VUMI_DATE_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 _VUMI_DATE_FORMAT_NO_MICROSECONDS = "%Y-%m-%d %H:%M:%S"
-
-
-def generate_id() -> str:
-    return uuid4().hex
-
-
-def generate_timestamp() -> datetime:
-    return datetime.now(tz=timezone.utc)
 
 
 def format_timestamp(timestamp: datetime) -> str:
@@ -56,10 +49,10 @@ class Message:
     transport_type: TRANSPORT_TYPE
     message_version: str = "20110921"
     message_type: str = "user_message"
-    timestamp: datetime = field(default_factory=generate_timestamp)
+    timestamp: datetime = field(default_factory=current_timestamp)
     routing_metadata: dict = field(default_factory=dict)
     helper_metadata: dict = field(default_factory=dict)
-    message_id: str = field(default_factory=generate_id)
+    message_id: str = field(default_factory=random_id)
     in_reply_to: Optional[str] = None
     provider: Optional[str] = None
     session_event: SESSION_EVENT = SESSION_EVENT.NONE
@@ -148,10 +141,10 @@ class Event:
 
     user_message_id: str
     event_type: EVENT_TYPE
-    event_id: str = field(default_factory=generate_id)
+    event_id: str = field(default_factory=random_id)
     message_type: str = "event"
     message_version: str = "20110921"
-    timestamp: datetime = field(default_factory=generate_timestamp)
+    timestamp: datetime = field(default_factory=current_timestamp)
     routing_metadata: dict = field(default_factory=dict)
     helper_metadata: dict = field(default_factory=dict)
     sent_message_id: Optional[str] = None
@@ -205,7 +198,7 @@ class User:
     answers: dict = field(default_factory=dict)
     state: StateData = field(default_factory=StateData)
     metadata: dict = field(default_factory=dict)
-    in_session: bool = False
+    session_id: Optional[Union[str, int]] = None
 
     def to_json(self) -> str:
         """
@@ -229,3 +222,42 @@ class User:
             return cls.from_json(json_string)
         except (UnicodeDecodeError, JSONDecodeError, TypeError, KeyError, ValueError):
             return cls(address)
+
+
+@dataclass
+class Answer:
+    question: str
+    response: Union[str, int, List[str], float, List[float], datetime, date, time]
+    address: Union[str, int]
+    session_id: Union[str, int]
+    timestamp: datetime = field(default_factory=current_timestamp)
+    row_id: Union[str, int] = field(default_factory=random_id)
+    response_metadata: dict = field(default_factory=dict)
+
+    def to_json(self) -> str:
+        """
+        Converts the user data to JSON representation for storing in the store
+        """
+        data = asdict(self)
+        data["timestamp"] = self.timestamp.isoformat()
+        if isinstance(self.response, datetime):
+            data["response"] = {"_datetime": self.response.isoformat()}
+        elif isinstance(self.response, date):
+            data["response"] = {"_date": self.response.isoformat()}
+        elif isinstance(self.response, time):
+            data["response"] = {"_time": self.response.isoformat()}
+
+        return json.dumps(data)
+
+    @classmethod
+    def from_json(cls, json_string: str):
+        data = json.loads(json_string)
+        if isinstance(data["response"], dict):
+            if "_datetime" in data["response"]:
+                data["response"] = datetime.fromisoformat(data["response"]["_datetime"])
+            elif "_date" in data["response"]:
+                data["response"] = date.fromisoformat(data["response"]["_date"])
+            elif "_time" in data["response"]:
+                data["response"] = time.fromisoformat(data["response"]["_time"])
+        data["timestamp"] = datetime.fromisoformat(data["timestamp"])
+        return cls(**data)

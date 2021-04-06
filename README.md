@@ -46,3 +46,19 @@ Configuration is done through the following environment variables:
 
 `TTL` - The number of time, in seconds, to keep user state data in redis. Defaults to
 3600 or 1 hour
+
+`ANSWER_BATCH_SIZE` - The maximum amount of answers to batch per request to the flow
+results service. Defaults to 500 answers.
+
+`ANSWER_BATCH_TIME` - Time between requests to the flow results service. Note that this
+is the time from the end of the last request the beginning of the next request. Defaults
+to 5 seconds
+
+`ANSWER_API_URL` - URL for the flow results service. If all of `ANSWER_API_URL`,
+`ANSWER_API_TOKEN` and `ANSWER_RESOURCE_ID` are specified, then answers will be sent
+to the specified flow results service.
+
+`ANSWER_API_TOKEN` - Auth token to use for requests to the flow results service
+
+`ANSWER_RESOURCE_ID` - The flow resource ID to store answers under in the flow results
+service.
