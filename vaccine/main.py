@@ -1,14 +1,21 @@
 import time
 
+import sentry_sdk
 from prometheus_client import CONTENT_TYPE_LATEST
 from prometheus_client.exposition import generate_latest
 from sanic import Sanic
 from sanic.request import Request
 from sanic.response import HTTPResponse, json, raw
+from sentry_sdk.integrations.sanic import SanicIntegration
 
 from vaccine import config
 from vaccine.metrics import setup_metrics_middleware
 from vaccine.worker import Worker
+
+sentry_sdk.init(
+    integrations=[SanicIntegration()],
+    traces_sample_rate=config.SENTRY_TRACES_SAMPLE_RATE,
+)
 
 app = Sanic("vaccine")
 app.update_config(config)
