@@ -177,7 +177,7 @@ class AnswerWorker:
             await self.session.post(
                 url=urljoin(
                     config.ANSWER_API_URL,
-                    f"flow-results/packages/{config.ANSWER_RESOURCE_ID}/responses",
+                    f"flow-results/packages/{config.ANSWER_RESOURCE_ID}/responses/",
                 ),
                 json={
                     "data": {
