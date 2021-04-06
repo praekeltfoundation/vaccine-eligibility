@@ -125,7 +125,7 @@ class AnswerWorker:
             timeout=aiohttp.ClientTimeout(total=10),
             connector=aiohttp.TCPConnector(limit=1),
             headers={
-                "Authorization": f"Bearer {config.ANSWER_API_TOKEN}",
+                "Authorization": f"Token {config.ANSWER_API_TOKEN}",
                 "Content-Type": "application/vnd.api+json",
             },
         )
