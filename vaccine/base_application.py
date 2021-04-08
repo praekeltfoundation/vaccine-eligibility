@@ -23,6 +23,13 @@ class BaseApplication:
         state_func = getattr(self, self.state_name)
         return await state_func()
 
+    async def go_to_state(self, name):
+        """
+        Go to another state and have it process the user message instead
+        """
+        self.state_name = name
+        return await self.get_current_state()
+
     @property
     def state_name(self):
         return self.user.state.name

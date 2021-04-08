@@ -5,7 +5,15 @@ from vaccine.states import Choice, ChoiceState, EndState, ErrorMessage, FreeText
 
 
 class Application(BaseApplication):
-    START_STATE = "state_occupation"
+    START_STATE = "state_start"
+
+    async def state_start(self):
+        self.send_message(
+            "Thank you for your interest in the getting the COVID-19 vaccine. The "
+            "South African national vaccine rollout is being done over 3 phases. "
+            "Answer these questions to find out which phase you are in:"
+        )
+        return await self.go_to_state("state_occupation")
 
     async def state_occupation(self):
         return ChoiceState(

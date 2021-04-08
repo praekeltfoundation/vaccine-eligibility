@@ -19,7 +19,13 @@ async def test_new_user():
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
-    [reply] = await app.process_message(msg)
+    [welcome, reply] = await app.process_message(msg)
+    assert (
+        welcome.content
+        == "Thank you for your interest in the getting the COVID-19 vaccine. The South "
+        "African national vaccine rollout is being done over 3 phases. Answer these "
+        "questions to find out which phase you are in:"
+    )
     assert reply.content == "\n".join(
         [
             "Welcome to the vaccine eligibility service.",
