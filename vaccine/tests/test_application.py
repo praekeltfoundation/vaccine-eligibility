@@ -28,16 +28,15 @@ async def test_new_user():
     )
     assert reply.content == "\n".join(
         [
-            "Welcome to the vaccine eligibility service.",
-            "Please answer a few questions so that we can determine your eligibility.",
+            "◼️◻️◻️◻️◻️",
             "",
-            "What is your current occupation?",
-            "1. Unemployed",
-            "2. Retired",
-            "3. Healthcare",
-            "4. Essential",
-            "5. Software Engineer",
-            "6. Other",
+            "Which of these positions or job titles describes your current "
+            "employment:",
+            "",
+            "1. Health Care Worker",
+            "2. Essential Worker",
+            "3. Other",
+            "4. Not Sure",
         ]
     )
     assert u.state.name == "state_occupation"
@@ -63,15 +62,12 @@ async def test_returning_user():
     [reply] = await app.process_message(msg)
     assert reply.content == "\n".join(
         [
-            "Sorry we don't understand your response, please try again.",
+            "⚠️ This service works best when you use the numbered options available",
             "",
-            "What is your current occupation?",
-            "1. Unemployed",
-            "2. Retired",
-            "3. Healthcare",
-            "4. Essential",
-            "5. Software Engineer",
-            "6. Other",
+            "1. Health Care Worker",
+            "2. Essential Worker",
+            "3. Other",
+            "4. Not Sure",
         ]
     )
     assert u.state.name == "state_occupation"
@@ -95,10 +91,10 @@ async def test_occupation_number():
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
-    assert u.answers["state_occupation"] == "retired"
+    assert u.answers["state_occupation"] == "essential"
     [answer] = app.answer_events
     assert answer.question == "state_occupation"
-    assert answer.response == "retired"
+    assert answer.response == "essential"
     assert answer.address == "27820001001"
     assert answer.session_id == "1"
 
@@ -113,7 +109,7 @@ async def test_occupation_label():
     )
     app = Application(u)
     msg = Message(
-        content="essential",
+        content="essential worker",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -122,6 +118,52 @@ async def test_occupation_label():
     [reply] = await app.process_message(msg)
     assert reply.content == "What is your current age, in years?"
     assert u.answers["state_occupation"] == "essential"
+
+
+@pytest.mark.asyncio
+async def test_occupation_not_sure():
+    """
+    Selecting not sure should give a description, then ask the question again
+    """
+    u = User(
+        addr="27820001001", state=StateData(name="state_occupation"), session_id="1"
+    )
+    app = Application(u)
+    msg = Message(
+        content="not sure",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [info, reply] = await app.process_message(msg)
+    assert info.content == "\n".join(
+        [
+            "*Health Care Workers* include doctors, nurses, dentists, pharmacists, "
+            "medical specialists and all people involved in providing health "
+            "services such as cleaning, security, medical waste disposal and "
+            "administrative work.",
+            "",
+            "*Essential Workers* include police officers, miners, teachers, people "
+            "working in security, retail, food, funeral, banking and essential "
+            "muncipal and home affairs, border control and port health services.",
+        ]
+    )
+    assert reply.content == "\n".join(
+        [
+            "◼️◻️◻️◻️◻️",
+            "",
+            "Which of these positions or job titles describes your current "
+            "employment:",
+            "",
+            "1. Health Care Worker",
+            "2. Essential Worker",
+            "3. Other",
+            "4. Not Sure",
+        ]
+    )
+    assert u.state.name == "state_occupation"
+    assert u.session_id == "1"
 
 
 @pytest.mark.asyncio

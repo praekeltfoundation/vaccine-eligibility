@@ -16,33 +16,45 @@ class Application(BaseApplication):
         return await self.go_to_state("state_occupation")
 
     async def state_occupation(self):
+        not_sure = "\n".join(
+            [
+                "*Health Care Workers* include doctors, nurses, dentists, pharmacists, "
+                "medical specialists and all people involved in providing health "
+                "services such as cleaning, security, medical waste disposal and "
+                "administrative work.",
+                "",
+                "*Essential Workers* include police officers, miners, teachers, people "
+                "working in security, retail, food, funeral, banking and essential "
+                "muncipal and home affairs, border control and port health services.",
+            ]
+        )
+
+        async def next_state(choice: Choice):
+            if choice.value == "not_sure":
+                self.send_message(not_sure)
+                return "state_occupation"
+            return "state_age"
+
         return ChoiceState(
             self,
             question="\n".join(
                 [
-                    "Welcome to the vaccine eligibility service.",
-                    "Please answer a few questions so that we can determine your "
-                    "eligibility.",
+                    "◼️◻️◻️◻️◻️",
                     "",
-                    "What is your current occupation?",
+                    "Which of these positions or job titles describes your current "
+                    "employment:",
+                    "",
                 ]
             ),
             choices=[
-                Choice("unemployed", "Unemployed"),
-                Choice("retired", "Retired"),
-                Choice("healthcare", "Healthcare"),
-                Choice("essential", "Essential"),
-                Choice("software", "Software Engineer"),
+                Choice("hcw", "Health Care Worker"),
+                Choice("essential", "Essential Worker"),
                 Choice("other", "Other"),
+                Choice("not_sure", "Not Sure"),
             ],
-            error="\n".join(
-                [
-                    "Sorry we don't understand your response, please try again.",
-                    "",
-                    "What is your current occupation?",
-                ]
-            ),
-            next="state_age",
+            error="⚠️ This service works best when you use the numbered options "
+            "available\n",
+            next=next_state,
         )
 
     async def state_age(self):

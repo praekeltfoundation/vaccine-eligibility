@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import Awaitable, Callable, List, Optional
+from inspect import iscoroutinefunction
+from typing import Awaitable, Callable, List, Optional, Union
 
 from vaccine.base_application import BaseApplication
 from vaccine.models import Message
@@ -33,7 +34,7 @@ class ChoiceState:
         question: str,
         choices: List[Choice],
         error: str,
-        next: str,
+        next: Union[str, Callable],
         accept_labels: bool = True,
     ):
         self.app = app
@@ -62,13 +63,18 @@ class ChoiceState:
     def _display_choices(self) -> str:
         return "\n".join(f"{i + 1}. {c.label}" for i, c in enumerate(self.choices))
 
+    async def _get_next(self, choice):
+        if iscoroutinefunction(self.next):
+            return await self.next(choice)
+        return self.next
+
     async def process_message(self, message: Message):
         choice = self._get_choice(message.content)
         if choice is None:
             return self.app.send_message(f"{self.error}\n{self._display_choices}")
         else:
             self.app.save_answer(self.app.state_name, choice.value)
-            self.app.state_name = self.next
+            self.app.state_name = await self._get_next(choice)
             state = await self.app.get_current_state()
             return await state.display(message)
 
