@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from prometheus_client import Counter
 
@@ -14,6 +14,8 @@ class BaseApplication:
     def __init__(self, user: User):
         self.user = user
         self.answer_events: List[Answer] = []
+        self.messages: List[Message] = []
+        self.inbound: Optional[Message] = None
 
     async def get_current_state(self):
         if not self.state_name:
@@ -34,6 +36,7 @@ class BaseApplication:
         """
         Processes the message, and returns a list of messages to return to the user
         """
+        self.inbound = message
         if message.session_event == Message.SESSION_EVENT.CLOSE:
             self.user.session_id = None
             return [
@@ -53,12 +56,16 @@ class BaseApplication:
             ]
         state = await self.get_current_state()
         if self.user.session_id is not None:
-            return await state.process_message(message)
+            await state.process_message(message)
         else:
             self.user.session_id = random_id()
-            return await state.display(message)
+            await state.display(message)
+        return self.messages
 
     def save_answer(self, name: str, value: str):
+        """
+        Saves an answer from the user
+        """
         self.user.answers[name] = value
         self.answer_events.append(
             Answer(
@@ -68,3 +75,9 @@ class BaseApplication:
                 session_id=self.user.session_id or random_id(),
             )
         )
+
+    def send_message(self, content, continue_session=True, **kw):
+        """
+        Sends a reply to the user
+        """
+        self.messages.append(self.inbound.reply(content, continue_session, **kw))
