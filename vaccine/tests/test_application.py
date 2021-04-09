@@ -318,6 +318,30 @@ async def test_location():
 
 
 @pytest.mark.asyncio
+async def test_location_pin():
+    """
+    Location pins should also be accepted, their coordinates should be stored
+    Value in response to location should be saved
+    """
+    u = User(addr="27820001001", state=StateData(name="state_location"), session_id="1")
+    app = Application(u)
+    msg = Message(
+        content="test location",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        transport_metadata={
+            "msg": {"location": {"longitude": 12.34, "latitude": 56.78}}
+        },
+    )
+    await app.process_message(msg)
+    assert u.answers["state_location"] == "test location"
+    assert u.answers["location_geopoint"] == [56.78, 12.34]
+    assert u.state.name == "state_comorbidities"
+
+
+@pytest.mark.asyncio
 async def test_comorbidities_valid():
     """
     A valid response should save the answer and go to the next stage

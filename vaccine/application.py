@@ -130,17 +130,38 @@ class Application(BaseApplication):
         )
 
     async def state_location(self):
+        async def store_location_coords(content: Optional[str]):
+            if not self.inbound:  # pragma: no cover
+                return
+            loc = self.inbound.transport_metadata.get("msg", {}).get("location", {})
+            latitude = loc.get("latitude")
+            longitude = loc.get("longitude")
+            if isinstance(latitude, float) and isinstance(longitude, float):
+                self.save_answer("location_geopoint", [latitude, longitude])
+
         return FreeText(
             self,
             question="\n".join(
                 [
                     "◼️◼️◼️◼️◻️",
                     "",
-                    "Where do you live? (Reply with name of suburb, town, settlement "
-                    "or nearest)",
+                    "Please tell us where you live.",
+                    "",
+                    "You can share your location 📍 using WhatsApp by following these "
+                    "steps:",
+                    "",
+                    "Tap the attach icon (+ or 📎) on the bottom of WhatsApp.",
+                    "Select location",
+                    "This will bring up a map with a pin showing your current "
+                    "location. Tap Send Your Current Location if this is your address.",
+                    "You can also choose from various other nearby locations if you "
+                    "think that the GPS is a bit off.",
+                    "Or TYPE the name of your Suburb, Township, Town or Village (or "
+                    "nearest)?",
                 ]
             ),
             next="state_comorbidities",
+            check=store_location_coords,
         )
 
     async def state_comorbidities(self):

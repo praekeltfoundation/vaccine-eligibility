@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from prometheus_client import Counter
 
@@ -52,7 +52,7 @@ class BaseApplication:
             await state.display(message)
         return self.messages
 
-    def save_answer(self, name: str, value: str):
+    def save_answer(self, name: str, value: Any):
         """
         Saves an answer from the user
         """
