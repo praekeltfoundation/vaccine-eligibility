@@ -1,19 +1,21 @@
 from dataclasses import dataclass
-from typing import Awaitable, Callable, List, Optional
+from inspect import iscoroutinefunction
+from typing import Awaitable, Callable, List, Optional, Union
 
+from vaccine.base_application import BaseApplication
 from vaccine.models import Message
 
 
 class EndState:
-    def __init__(self, app, text: str, next: str):
+    def __init__(self, app: BaseApplication, text: str, next: str):
         self.app = app
         self.text = text
         self.next = next
 
     async def process_message(self, message: Message) -> List[Message]:
-        self.app.user.in_session = False
+        self.app.user.session_id = None
         self.app.state_name = self.next
-        return [message.reply(self.text, continue_session=False)]
+        return self.app.send_message(self.text, continue_session=False)
 
     async def display(self, message: Message) -> List[Message]:
         return await self.process_message(message)
@@ -28,11 +30,11 @@ class Choice:
 class ChoiceState:
     def __init__(
         self,
-        app,
+        app: BaseApplication,
         question: str,
         choices: List[Choice],
         error: str,
-        next: str,
+        next: Union[str, Callable],
         accept_labels: bool = True,
     ):
         self.app = app
@@ -61,19 +63,23 @@ class ChoiceState:
     def _display_choices(self) -> str:
         return "\n".join(f"{i + 1}. {c.label}" for i, c in enumerate(self.choices))
 
-    async def process_message(self, message: Message) -> List[Message]:
-        self.app.user.in_session = True
+    async def _get_next(self, choice):
+        if iscoroutinefunction(self.next):
+            return await self.next(choice)
+        return self.next
+
+    async def process_message(self, message: Message):
         choice = self._get_choice(message.content)
         if choice is None:
-            return [message.reply(f"{self.error}\n{self._display_choices}")]
+            return self.app.send_message(f"{self.error}\n{self._display_choices}")
         else:
             self.app.save_answer(self.app.state_name, choice.value)
-            self.app.state_name = self.next
+            self.app.state_name = await self._get_next(choice)
             state = await self.app.get_current_state()
             return await state.display(message)
 
-    async def display(self, message: Message) -> List[Message]:
-        return [message.reply(f"{self.question}\n{self._display_choices}")]
+    async def display(self, message: Message):
+        return self.app.send_message(f"{self.question}\n{self._display_choices}")
 
 
 class ErrorMessage(Exception):
@@ -83,24 +89,27 @@ class ErrorMessage(Exception):
 
 class FreeText:
     def __init__(
-        self, app, question: str, next: str, check: Callable[[Optional[str]], Awaitable]
+        self,
+        app: BaseApplication,
+        question: str,
+        next: str,
+        check: Optional[Callable[[Optional[str]], Awaitable]] = None,
     ):
         self.app = app
         self.question = question
         self.next = next
         self.check = check
 
-    async def process_message(self, message: Message) -> List[Message]:
-        self.app.user.in_session = True
+    async def process_message(self, message: Message):
         if self.check is not None:
             try:
                 await self.check(message.content)
             except ErrorMessage as e:
-                return [message.reply(f"{e.message}")]
-        self.app.save_answer(self.app.state_name, message.content)
+                return self.app.send_message(e.message)
+        self.app.save_answer(self.app.state_name, message.content or "")
         self.app.state_name = self.next
         state = await self.app.get_current_state()
         return await state.display(message)
 
-    async def display(self, message: Message) -> List[Message]:
-        return [message.reply(f"{self.question}")]
+    async def display(self, message: Message):
+        return self.app.send_message(self.question)

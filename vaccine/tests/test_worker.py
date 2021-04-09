@@ -152,7 +152,7 @@ async def test_worker_valid_answer(worker: Worker, redis: aioredis.Redis):
     answer = await get_amqp_message(ans_queue)
     answer = Answer.from_json(answer.body.decode())
     assert answer.question == "state_occupation"
-    assert answer.response == "unemployed"
+    assert answer.response == "hcw"
     worker.answer_worker = None
 
 

@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List, Optional
 
 from prometheus_client import Counter
 
@@ -14,12 +14,21 @@ class BaseApplication:
     def __init__(self, user: User):
         self.user = user
         self.answer_events: List[Answer] = []
+        self.messages: List[Message] = []
+        self.inbound: Optional[Message] = None
 
     async def get_current_state(self):
         if not self.state_name:
             self.state_name = self.START_STATE
         state_func = getattr(self, self.state_name)
         return await state_func()
+
+    async def go_to_state(self, name):
+        """
+        Go to another state and have it process the user message instead
+        """
+        self.state_name = name
+        return await self.get_current_state()
 
     @property
     def state_name(self):
@@ -34,31 +43,19 @@ class BaseApplication:
         """
         Processes the message, and returns a list of messages to return to the user
         """
-        if message.session_event == Message.SESSION_EVENT.CLOSE:
-            self.user.session_id = None
-            return [
-                message.reply(
-                    content="\n".join(
-                        [
-                            "We're sorry, but you've taken too long to reply and your "
-                            "session has expired.",
-                            "If you would like to continue, you can at anytime by "
-                            "typing the word *VACCINE*.",
-                            "",
-                            "Reply *MENU* to return to the main menu",
-                        ]
-                    ),
-                    continue_session=False,
-                )
-            ]
+        self.inbound = message
         state = await self.get_current_state()
         if self.user.session_id is not None:
-            return await state.process_message(message)
+            await state.process_message(message)
         else:
             self.user.session_id = random_id()
-            return await state.display(message)
+            await state.display(message)
+        return self.messages
 
-    def save_answer(self, name: str, value: str):
+    def save_answer(self, name: str, value: Any):
+        """
+        Saves an answer from the user
+        """
         self.user.answers[name] = value
         self.answer_events.append(
             Answer(
@@ -68,3 +65,9 @@ class BaseApplication:
                 session_id=self.user.session_id or random_id(),
             )
         )
+
+    def send_message(self, content, continue_session=True, **kw):
+        """
+        Sends a reply to the user
+        """
+        self.messages.append(self.inbound.reply(content, continue_session, **kw))
