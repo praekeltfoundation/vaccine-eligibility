@@ -93,7 +93,7 @@ class FreeText:
         app: BaseApplication,
         question: str,
         next: str,
-        check: Callable[[Optional[str]], Awaitable],
+        check: Optional[Callable[[Optional[str]], Awaitable]] = None,
     ):
         self.app = app
         self.question = question

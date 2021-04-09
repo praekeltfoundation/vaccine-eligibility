@@ -115,8 +115,7 @@ async def test_occupation_label():
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "What is your current age, in years?"
+    await app.process_message(msg)
     assert u.answers["state_occupation"] == "essential"
 
 
@@ -167,6 +166,95 @@ async def test_occupation_not_sure():
 
 
 @pytest.mark.asyncio
+async def test_congregate_valid():
+    """
+    A valid response should save the answer and go to the next stage
+    """
+    u = User(
+        addr="27820001001", state=StateData(name="state_congregate"), session_id="1"
+    )
+    app = Application(u)
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    await app.process_message(msg)
+    assert u.state.name == "state_age"
+    assert u.answers["state_congregate"] == "yes"
+
+
+@pytest.mark.asyncio
+async def test_congregate_invalid():
+    """
+    No answer saved, reply with error text
+    """
+    u = User(
+        addr="27820001001", state=StateData(name="state_congregate"), session_id="1"
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "⚠️ This service works best when you use the numbered options available",
+            "",
+            "1. Yes",
+            "2. No",
+            "3. Not Sure",
+        ]
+    )
+    assert u.state.name == "state_congregate"
+    assert "state_congregate" not in u.answers
+
+
+@pytest.mark.asyncio
+async def test_congregate_not_sure():
+    """
+    Selecting not sure should give a description, then ask the question again
+    """
+    u = User(
+        addr="27820001001", state=StateData(name="state_congregate"), session_id="1"
+    )
+    app = Application(u)
+    msg = Message(
+        content="not sure",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [info, reply] = await app.process_message(msg)
+    assert (
+        info.content
+        == "Examples of places where you may be exposed to large numbers of people "
+        "include care homes, detention centers, shelters, prisons, hospitality "
+        "settings, tourism settings and educational institutions"
+    )
+    assert reply.content == "\n".join(
+        [
+            "◼️◼️◻️◻️◻️",
+            "",
+            "Are you often in contact with lots of people or are you often in a closed "
+            "space with lots of people?",
+            "",
+            "1. Yes",
+            "2. No",
+            "3. Not Sure",
+        ]
+    )
+    assert u.state.name == "state_congregate"
+
+
+@pytest.mark.asyncio
 async def test_age_valid():
     """
     If the age is valid, should save the value for age
@@ -180,23 +268,14 @@ async def test_age_valid():
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "\n".join(
-        [
-            "Thank you for answering those questions.",
-            "You are not currently eligible for a vaccine, but we will send you a "
-            "message notifying you when you are eligible.",
-            "",
-            "Type *MENU* to go back to the main menu, or *VACCINE* for more "
-            "information around vaccines",
-        ]
-    )
+    await app.process_message(msg)
     assert u.answers["state_age"] == "12"
     [answer] = app.answer_events
     assert answer.question == "state_age"
     assert answer.response == "12"
     assert answer.address == "27820001001"
     assert answer.session_id == "1"
+    assert u.state.name == "state_location"
 
 
 @pytest.mark.asyncio
@@ -215,12 +294,360 @@ async def test_age_invalid():
     )
     [reply] = await app.process_message(msg)
     assert u.state.name == "state_age"
-    assert (
-        reply.content
-        == "Sorry, we don't understand your response. Please type the number that "
-        "represents your age in years"
-    )
+    assert reply.content == "⚠️  Reply using numbers only. Example *27*"
     assert "state_age" not in u.answers
+
+
+@pytest.mark.asyncio
+async def test_location():
+    """
+    Value in response to location should be saved
+    """
+    u = User(addr="27820001001", state=StateData(name="state_location"), session_id="1")
+    app = Application(u)
+    msg = Message(
+        content="test location",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    await app.process_message(msg)
+    assert u.answers["state_location"] == "test location"
+    assert u.state.name == "state_comorbidities"
+
+
+@pytest.mark.asyncio
+async def test_comorbidities_valid():
+    """
+    A valid response should save the answer and go to the next stage
+    """
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_comorbidities"),
+        session_id="1",
+        answers={"state_age": "12"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    await app.process_message(msg)
+    assert u.state.name == "state_start"
+    assert u.session_id is None
+    assert u.answers["state_comorbidities"] == "yes"
+
+
+@pytest.mark.asyncio
+async def test_comorbidities_invalid():
+    """
+    No answer saved, reply with error text
+    """
+    u = User(
+        addr="27820001001", state=StateData(name="state_comorbidities"), session_id="1"
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "⚠️ This service works best when you use the numbered options available",
+            "",
+            "1. Yes",
+            "2. No",
+            "3. Not Sure",
+        ]
+    )
+    assert u.state.name == "state_comorbidities"
+    assert "state_comorbidities" not in u.answers
+
+
+@pytest.mark.asyncio
+async def test_comorbidities_not_sure():
+    """
+    Selecting not sure should give a description, then ask the question again
+    """
+    u = User(
+        addr="27820001001", state=StateData(name="state_comorbidities"), session_id="1"
+    )
+    app = Application(u)
+    msg = Message(
+        content="not sure",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [info, reply] = await app.process_message(msg)
+    assert info.content == "\n".join(
+        [
+            "Having one or more specific chronic conditions could impact which phase "
+            "you are in. These conditions include:",
+            "Chronic Lung Disease (such as Emphysema or Chronic Bronchitis)",
+            "Cardiovascular disease / Heart Disease",
+            "Renal Disease / Chronic Kidney Disease",
+            "HIV",
+            "TB (Turboculosis)",
+            "Obesity (diagnosed overweight)",
+        ]
+    )
+    assert reply.content == "\n".join(
+        [
+            "◼️◼️◼️◼️◼️",
+            "",
+            "Has a doctor ever diagnosed you with diabetes, chronic lung disease, "
+            "cardiovascular(heart) disease, renal disease, HIV, TB, or Obesity?",
+            "",
+            "1. Yes",
+            "2. No",
+            "3. Not Sure",
+        ]
+    )
+    assert u.state.name == "state_comorbidities"
+
+
+@pytest.mark.asyncio
+async def test_result_ineligible():
+    """
+    Under 18 years old should be ineligible
+    """
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_comorbidities"),
+        session_id="1",
+        answers={"state_age": "16"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="no",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "Based on your age you are currently NOT able to get the vaccine. "
+            "This may change when more vaccine trials are completed.",
+            "",
+            "----",
+            "Reply:",
+            "💉 *VACCINE* for info and updates",
+            "📌 *0* to go to the main *MENU*",
+        ]
+    )
+    assert u.session_id is None
+    assert u.state.name == "state_start"
+
+
+@pytest.mark.asyncio
+async def test_result_1():
+    """
+    Health Care Workers should be in phase 1
+    """
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_comorbidities"),
+        session_id="1",
+        answers={"state_age": "27", "state_occupation": "hcw"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="no",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "✅ *PHASE 1*",
+            "🟥 *PHASE 2*",
+            "🟥 *PHASE 3*",
+            "",
+            "*Congratulations!* Based on your responses you could be in *PHASE 1* and "
+            "possibly get vaccinated now.",
+            "",
+            "*What to do next:*",
+            "To confirm this and get an appointment, you need to register online at "
+            "https://vaccine.enroll.health.gov.za",
+            "",
+            "Registration does not guarentee that you will get the vaccine "
+            "immediately. It helps us check that you fall into this phase and plan for "
+            "your vaccine appointment.",
+            "",
+            "*To register, you will need:* ",
+            "👉🏽 Access to the internet on any device ",
+            "👉🏽 Your ID number or Passport (non-RSA)",
+            "👉🏽 General contact information (your cellphone number will be used as the "
+            "primary mode of communication).",
+            "👉🏽 Employment information (who you work for and where)",
+            "👉🏽 Where relevant, your professional registration details, and medical "
+            "aid are also requested.",
+            "",
+            "If you have all this information available, the 3-step registration "
+            "should take 2-3 minutes.",
+            "",
+            "----",
+            "Reply:",
+            "💉 *VACCINE* for info and updates",
+            "📌 *0* to go to the main *MENU*",
+        ]
+    )
+    assert u.state.name == "state_start"
+
+
+@pytest.mark.asyncio
+async def test_result_2():
+    """
+    Essential Workers, congregate, age >= 60, or comorbidities should be in phase 2
+    """
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_comorbidities"),
+        session_id="1",
+        answers={"state_age": "27", "state_occupation": "essential"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="no",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "🟥 *PHASE 1*",
+            "✅ *PHASE 2*",
+            "🟥 *PHASE 3*",
+            "",
+            "Your answers show that you could be part of *PHASE 2*.",
+            "",
+            "Would you like to be notified when registration for *PHASE 2* is "
+            "available?",
+            "",
+            "1. Yes",
+            "2. No",
+        ]
+    )
+    assert u.state.name == "state_result_2"
+
+
+@pytest.mark.asyncio
+async def test_result_3():
+    """
+    Everyone else should be in phase 3
+    """
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_comorbidities"),
+        session_id="1",
+        answers={
+            "state_age": "27",
+            "state_occupation": "other",
+            "state_congregate": "no",
+            "state_comorbidities": "no",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="no",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "🟥 *PHASE 1*",
+            "🟥 *PHASE 2*",
+            "✅ *PHASE 3*",
+            "",
+            "Your answers show that you could be part of *PHASE 3*.",
+            "",
+            "Would you like to be notified when registration for *PHASE 3* is "
+            "available?",
+            "",
+            "1. Yes",
+            "2. No",
+        ]
+    )
+    assert u.state.name == "state_result_3"
+
+
+@pytest.mark.asyncio
+async def test_confirm_notification_yes():
+    """
+    If the user selects to get a notification, should save and display result to user
+    """
+    u = User(addr="27820001001", state=StateData(name="state_result_2"), session_id="1")
+    app = Application(u)
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "Thank you for confirming. We will contact you.",
+            "",
+            "----",
+            "Reply:",
+            "💉 *VACCINE* for info and updates",
+            "📌 *0* to go to the main *MENU*",
+        ]
+    )
+    assert u.state.name == "state_start"
+    assert u.session_id is None
+    assert u.answers["state_result_2"] == "yes"
+
+
+@pytest.mark.asyncio
+async def test_confirm_notification_no():
+    """
+    If the user selects to not get a notification, should save and display result
+    """
+    u = User(addr="27820001001", state=StateData(name="state_result_3"), session_id="1")
+    app = Application(u)
+    msg = Message(
+        content="no",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "Thank you for confirming. We won't contact you.",
+            "",
+            "----",
+            "Reply:",
+            "💉 *VACCINE* for info and updates",
+            "📌 *0* to go to the main *MENU*",
+        ]
+    )
+    assert u.state.name == "state_start"
+    assert u.session_id is None
+    assert u.answers["state_result_3"] == "no"
 
 
 @pytest.mark.asyncio

@@ -44,23 +44,6 @@ class BaseApplication:
         Processes the message, and returns a list of messages to return to the user
         """
         self.inbound = message
-        if message.session_event == Message.SESSION_EVENT.CLOSE:
-            self.user.session_id = None
-            return [
-                message.reply(
-                    content="\n".join(
-                        [
-                            "We're sorry, but you've taken too long to reply and your "
-                            "session has expired.",
-                            "If you would like to continue, you can at anytime by "
-                            "typing the word *VACCINE*.",
-                            "",
-                            "Reply *MENU* to return to the main menu",
-                        ]
-                    ),
-                    continue_session=False,
-                )
-            ]
         state = await self.get_current_state()
         if self.user.session_id is not None:
             await state.process_message(message)
