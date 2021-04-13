@@ -82,3 +82,17 @@ class Application(BaseApplication):
             next="state_gender",
             check=validate_identification_number,
         )
+
+    async def state_gender(self):
+        return ChoiceState(
+            self,
+            question="What is your gender?",
+            choices=[
+                Choice("male", "Male"),
+                Choice("female", "Female"),
+                Choice("other", "Other"),
+                Choice("unknown", "Unknown"),
+            ],
+            error="Please select your gender using one of the numbers below",
+            next="state_dob_year",
+        )
