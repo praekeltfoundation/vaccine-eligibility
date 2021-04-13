@@ -1,16 +1,24 @@
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, MenuState, ChoiceState, EndState
+from vaccine.states import (
+    Choice,
+    MenuState,
+    ChoiceState,
+    EndState,
+    FreeText,
+    ErrorMessage,
+)
+from enum import Enum
+from vaccine.utils import luhn_checksum
 
 
 class Application(BaseApplication):
     START_STATE = "state_age_gate"
 
-    ID_TYPES = {
-        "rsa_id": "RSA ID Number",
-        "passport": "Passport Number",
-        "asylum_seeker": "Asylum Seeker Permit number",
-        "refugee": "Refugee Number Permit number",
-    }
+    class ID_TYPES(Enum):
+        rsa_id = "RSA ID Number"
+        passport = "Passport Number"
+        asylum_seeker = "Asylum Seeker Permit number"
+        refugee = "Refugee Number Permit number"
 
     async def state_age_gate(self):
         return MenuState(
@@ -49,7 +57,28 @@ class Application(BaseApplication):
         return ChoiceState(
             self,
             question="How would you like to register?",
-            choices=[Choice(k, v) for k, v in self.ID_TYPES.items()],
+            choices=[Choice(i.name, i.value) for i in self.ID_TYPES],
             error="Please choose 1 of the following ways to register",
             next="state_identification_number",
+        )
+
+    async def state_identification_number(self):
+        idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
+        idtype_label = idtype.value
+
+        async def validate_identification_number(value):
+            value = value.strip()
+            if idtype == self.ID_TYPES.rsa_id or idtype == self.ID_TYPES.refugee:
+                try:
+                    assert value.isdigit()
+                    assert len(value) == 13
+                    assert luhn_checksum(value) == 0
+                except AssertionError:
+                    raise ErrorMessage(f"Invalid {idtype_label}. Please try again")
+
+        return FreeText(
+            self,
+            question=f"Please enter your {idtype_label}",
+            next="state_gender",
+            check=validate_identification_number,
         )

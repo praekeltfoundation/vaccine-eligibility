@@ -125,3 +125,64 @@ async def test_identification_type():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_identification_type"
+
+
+@pytest.mark.asyncio
+async def test_identification_type_invalid():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_identification_type"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_identification_type"
+
+
+@pytest.mark.asyncio
+async def test_identification_number():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_identification_type"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="rsa id number",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_identification_number"
+
+
+@pytest.mark.asyncio
+async def test_identification_number_invalid():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_identification_number"),
+        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="9001010001089",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_identification_number"
