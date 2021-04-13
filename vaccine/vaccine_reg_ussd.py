@@ -283,3 +283,17 @@ class Application(BaseApplication):
             error=f"ERROR: Please try again confirming the number entered: {number} is "
             "correct?",
         )
+
+    async def state_vaccination_time(self):
+        return ChoiceState(
+            self,
+            question="Please select your prefferred time to get vaccinacted?",
+            choices=[
+                Choice("weekday_morning", "Weekday Morning"),
+                Choice("weekday_afternoon", "Weekday Afternoon"),
+                Choice("weekend_morning", "Weekend Morning"),
+            ],
+            error="When would you prefer your vaccine appointment to take place based "
+            "on the options below?",
+            next="state_medical_aid",
+        )

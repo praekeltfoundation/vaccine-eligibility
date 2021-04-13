@@ -643,3 +643,41 @@ async def test_phone_number_confirm_invalid():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_confirm_phone_number"
+
+
+@pytest.mark.asyncio
+async def test_vaccination_time():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_self_registration"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_vaccination_time"
+
+
+@pytest.mark.asyncio
+async def test_vaccination_time_invalid():
+    u = User(
+        addr="27820001001", state=StateData(name="state_vaccination_time"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_vaccination_time"
