@@ -1,14 +1,15 @@
 from datetime import date
+from enum import Enum
+
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
-    MenuState,
     ChoiceState,
     EndState,
-    FreeText,
     ErrorMessage,
+    FreeText,
+    MenuState,
 )
-from enum import Enum
 from vaccine.utils import luhn_checksum
 
 MAX_AGE = 122
