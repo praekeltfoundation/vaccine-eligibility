@@ -350,3 +350,13 @@ class Application(BaseApplication):
             choices=[Choice("state_success", "Accept")],
             error="If you ACCEPT these Terms and Conditions, please type 1",
         )
+
+    async def state_success(self):
+        # TODO: Submit to EVDS
+        return EndState(
+            self,
+            text=":) You have been SUCCESSFULLY registered for getting vaccinated. "
+            "Additonal information and appointment confirmation details will be sent "
+            "via SMS",
+            next=self.START_STATE,
+        )

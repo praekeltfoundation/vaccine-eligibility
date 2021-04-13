@@ -835,3 +835,29 @@ async def test_terms_and_conditions_3_invalid():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_terms_and_conditions_3"
+
+
+@pytest.mark.asyncio
+async def test_state_success():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_terms_and_conditions_3"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="accept",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert (
+        reply.content
+        == ":) You have been SUCCESSFULLY registered for getting vaccinated. Additonal "
+        "information and appointment confirmation details will be sent via SMS"
+    )
+    assert reply.session_event == Message.SESSION_EVENT.CLOSE
+    assert u.state.name == "state_age_gate"
