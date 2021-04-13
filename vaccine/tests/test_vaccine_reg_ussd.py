@@ -681,3 +681,157 @@ async def test_vaccination_time_invalid():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_vaccination_time"
+
+
+@pytest.mark.asyncio
+async def test_medical_aid():
+    u = User(
+        addr="27820001001", state=StateData(name="state_vaccination_time"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        content="weekday morning",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_medical_aid"
+
+
+@pytest.mark.asyncio
+async def test_medical_aid_invalid():
+    u = User(
+        addr="27820001001", state=StateData(name="state_medical_aid"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_medical_aid"
+
+
+@pytest.mark.asyncio
+async def test_terms_and_conditions():
+    u = User(
+        addr="27820001001", state=StateData(name="state_medical_aid"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_terms_and_conditions"
+
+
+@pytest.mark.asyncio
+async def test_terms_and_conditions_invalid():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_terms_and_conditions"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_terms_and_conditions"
+
+
+@pytest.mark.asyncio
+async def test_terms_and_conditions_2():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_terms_and_conditions"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="next",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_terms_and_conditions_2"
+
+
+@pytest.mark.asyncio
+async def test_terms_and_conditions_2_invalid():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_terms_and_conditions_2"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_terms_and_conditions_2"
+
+
+@pytest.mark.asyncio
+async def test_terms_and_conditions_3():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_terms_and_conditions_2"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="next",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_terms_and_conditions_3"
+
+
+@pytest.mark.asyncio
+async def test_terms_and_conditions_3_invalid():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_terms_and_conditions_3"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_terms_and_conditions_3"

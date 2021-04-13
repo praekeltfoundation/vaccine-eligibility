@@ -297,3 +297,56 @@ class Application(BaseApplication):
             "on the options below?",
             next="state_medical_aid",
         )
+
+    async def state_medical_aid(self):
+        return ChoiceState(
+            self,
+            question="Do you belong to a Medical Aid Scheme?",
+            choices=[Choice("yes", "Yes"), Choice("no", "No")],
+            error="ERROR: Please try again. Do you belong to a Medical Aid Scheme?",
+            next="state_terms_and_conditions",
+        )
+
+    async def state_terms_and_conditions(self):
+        return MenuState(
+            self,
+            question="\n".join(
+                [
+                    "Please read and accept our TERMS and CONDITIONS:",
+                    "",
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
+                    "eiusmod tempor incididunt ut labore",
+                ]
+            ),
+            choices=[Choice("state_terms_and_conditions_2", "Next")],
+            error="\n".join(
+                [
+                    "Please type 1 to proceed",
+                    "",
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
+                    "eiusmod tempor incididunt ut labore",
+                ]
+            ),
+        )
+
+    async def state_terms_and_conditions_2(self):
+        return MenuState(
+            self,
+            question="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
+            "eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad "
+            "minim veniam",
+            choices=[Choice("state_terms_and_conditions_3", "Next")],
+            error="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
+            "eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad "
+            "minim veniam",
+        )
+
+    async def state_terms_and_conditions_3(self):
+        return MenuState(
+            self,
+            question="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
+            "eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad "
+            "minim veniam",
+            choices=[Choice("state_success", "Accept")],
+            error="If you ACCEPT these Terms and Conditions, please type 1",
+        )
