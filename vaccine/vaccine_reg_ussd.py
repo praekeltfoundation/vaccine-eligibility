@@ -159,3 +159,13 @@ class Application(BaseApplication):
             next="state_first_name",
             check=validate_dob_day,
         )
+
+    async def state_first_name(self):
+        return FreeText(
+            self, question="Please enter your FIRST name", next="state_surname"
+        )
+
+    async def state_surname(self):
+        return FreeText(
+            self, question="Please enter your SURNAME", next="state_confirm_profile"
+        )

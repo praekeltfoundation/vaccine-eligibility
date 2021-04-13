@@ -324,3 +324,41 @@ async def test_dob_day_invalid():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_dob_day"
+
+
+@pytest.mark.asyncio
+async def test_first_name():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_dob_day"),
+        session_id=1,
+        answers={"state_dob_year": "1990", "state_dob_month": "2"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="2",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_first_name"
+
+
+@pytest.mark.asyncio
+async def test_surname():
+    u = User(addr="27820001001", state=StateData(name="state_first_name"), session_id=1)
+    app = Application(u)
+    msg = Message(
+        content="firstname",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_surname"
+    assert u.answers["state_first_name"] == "firstname"
