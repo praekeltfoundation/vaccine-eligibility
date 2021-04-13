@@ -482,3 +482,69 @@ async def test_province_invalid():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_province"
+
+
+@pytest.mark.asyncio
+async def test_suburb_search():
+    u = User(addr="27820001001", state=StateData(name="state_province"), session_id=1)
+    app = Application(u)
+    msg = Message(
+        content="western cape",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_suburb_search"
+
+
+@pytest.mark.asyncio
+async def test_suburb():
+    u = User(
+        addr="27820001001", state=StateData(name="state_suburb_search"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        content="tableview",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_suburb"
+
+
+@pytest.mark.asyncio
+async def test_suburb_error():
+    u = User(addr="27820001001", state=StateData(name="state_suburb"), session_id=1)
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_suburb"
+
+
+@pytest.mark.asyncio
+async def test_suburb_other():
+    u = User(addr="27820001001", state=StateData(name="state_suburb"), session_id=1)
+    app = Application(u)
+    msg = Message(
+        content="other",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_province"

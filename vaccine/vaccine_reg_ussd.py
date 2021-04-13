@@ -142,6 +142,7 @@ class Application(BaseApplication):
         )
 
     async def state_dob_day(self):
+        # TODO: stop <40 year olds from continuing
         async def validate_dob_day(value):
             dob_year = int(self.user.answers["state_dob_year"])
             dob_month = int(self.user.answers["state_dob_month"])
@@ -217,5 +218,32 @@ class Application(BaseApplication):
                 Choice("wc", "Western Cape"),
             ],
             error="Reply with a NUMBER:",
+            next="state_suburb_search",
+        )
+
+    async def state_suburb_search(self):
+        return FreeText(
+            self,
+            question="Please TYPE the name of the Suburb where you live",
             next="state_suburb",
+        )
+
+    async def state_suburb(self):
+        # TODO: Implement suburb search
+        async def next_state(choice: Choice):
+            if choice.value == "other":
+                return "state_province"
+            return "state_self_registration"
+
+        return ChoiceState(
+            self,
+            question="Please select your location from matched results:",
+            choices=[
+                Choice("suburb1", "Municipality, Suburb 1"),
+                Choice("suburb2", "Municipality, Suburb 2"),
+                Choice("suburb3", "Municipality, Suburb 3"),
+                Choice("other", "Other"),
+            ],
+            error="Do any of these match your location:",
+            next=next_state,
         )
