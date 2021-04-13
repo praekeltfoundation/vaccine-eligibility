@@ -200,3 +200,22 @@ class Application(BaseApplication):
                 ]
             ),
         )
+
+    async def state_province(self):
+        return ChoiceState(
+            self,
+            question="Select Your Province",
+            choices=[
+                Choice("ec", "Eastern Cape"),
+                Choice("fs", "Free State"),
+                Choice("gp", "Gauteng"),
+                Choice("kzn", "Kwazulu Natal"),
+                Choice("lp", "Limpopo"),
+                Choice("mp", "Mpumalanga"),
+                Choice("nw", "North West"),
+                Choice("nc", "Northern Cape"),
+                Choice("wc", "Western Cape"),
+            ],
+            error="Reply with a NUMBER:",
+            next="state_suburb",
+        )
