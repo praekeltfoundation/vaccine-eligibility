@@ -1,3 +1,4 @@
+from datetime import date
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
@@ -9,6 +10,8 @@ from vaccine.states import (
 )
 from enum import Enum
 from vaccine.utils import luhn_checksum
+
+MAX_AGE = 122
 
 
 class Application(BaseApplication):
@@ -95,4 +98,64 @@ class Application(BaseApplication):
             ],
             error="Please select your gender using one of the numbers below",
             next="state_dob_year",
+        )
+
+    async def state_dob_year(self):
+        async def validate_dob_year(value):
+            try:
+                assert value.isdigit()
+                assert int(value) > date.today().year - MAX_AGE
+                assert int(value) <= date.today().year
+            except AssertionError:
+                raise ErrorMessage(
+                    "REQUIRED: Please TYPE the 4 digits of the year you were born in "
+                    "(Example: 1980)"
+                )
+
+        return FreeText(
+            self,
+            question="DOB: In what year were you born? (Please type)",
+            next="state_dob_month",
+            check=validate_dob_year,
+        )
+
+    async def state_dob_month(self):
+        return ChoiceState(
+            self,
+            question="DOB: Select your month",
+            choices=[
+                Choice("1", "Jan"),
+                Choice("2", "Feb"),
+                Choice("3", "Mar"),
+                Choice("4", "Apr"),
+                Choice("5", "May"),
+                Choice("6", "June"),
+                Choice("7", "July"),
+                Choice("8", "Aug"),
+                Choice("9", "Sep"),
+                Choice("10", "Oct"),
+                Choice("11", "Nov"),
+                Choice("12", "Dec"),
+            ],
+            next="state_dob_day",
+            error="REQUIRED: In which month were you born?",
+        )
+
+    async def state_dob_day(self):
+        async def validate_dob_day(value):
+            dob_year = int(self.user.answers["state_dob_year"])
+            dob_month = int(self.user.answers["state_dob_month"])
+            try:
+                assert value.isdigit()
+                date(dob_year, dob_month, int(value))
+            except (AssertionError, ValueError):
+                raise ErrorMessage(
+                    "ERROR: Please reply with DAY of your birthday Example: 20"
+                )
+
+        return FreeText(
+            self,
+            question="DOB: Which day of the month were you born on",
+            next="state_first_name",
+            check=validate_dob_day,
         )

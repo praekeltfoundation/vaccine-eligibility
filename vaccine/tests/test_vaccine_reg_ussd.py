@@ -189,7 +189,7 @@ async def test_identification_number_invalid():
 
 
 @pytest.mark.asyncio
-async def test_identification_gender():
+async def test_gender():
     u = User(
         addr="27820001001",
         state=StateData(name="state_identification_number"),
@@ -210,13 +210,8 @@ async def test_identification_gender():
 
 
 @pytest.mark.asyncio
-async def test_identification_gender_invalid():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_gender"),
-        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
-        session_id=1,
-    )
+async def test_gender_invalid():
+    u = User(addr="27820001001", state=StateData(name="state_gender"), session_id=1)
     app = Application(u)
     msg = Message(
         content="invalid",
@@ -228,3 +223,104 @@ async def test_identification_gender_invalid():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_gender"
+
+
+@pytest.mark.asyncio
+async def test_dob_year():
+    u = User(addr="27820001001", state=StateData(name="state_gender"), session_id=1)
+    app = Application(u)
+    msg = Message(
+        content="male",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_dob_year"
+
+
+@pytest.mark.asyncio
+async def test_dob_year_invalid():
+    u = User(addr="27820001001", state=StateData(name="state_dob_year"), session_id=1)
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_dob_year"
+
+
+@pytest.mark.asyncio
+async def test_dob_month():
+    u = User(addr="27820001001", state=StateData(name="state_dob_year"), session_id=1)
+    app = Application(u)
+    msg = Message(
+        content="1990",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_dob_month"
+
+
+@pytest.mark.asyncio
+async def test_dob_month_error():
+    u = User(addr="27820001001", state=StateData(name="state_dob_month"), session_id=1)
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_dob_month"
+
+
+@pytest.mark.asyncio
+async def test_dob_day():
+    u = User(addr="27820001001", state=StateData(name="state_dob_month"), session_id=1)
+    app = Application(u)
+    msg = Message(
+        content="jan",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_dob_day"
+
+
+@pytest.mark.asyncio
+async def test_dob_day_invalid():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_dob_day"),
+        session_id=1,
+        answers={"state_dob_year": "1990", "state_dob_month": "2"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="29",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_dob_day"
