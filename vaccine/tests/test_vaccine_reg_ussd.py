@@ -548,3 +548,98 @@ async def test_suburb_other():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_province"
+
+
+@pytest.mark.asyncio
+async def test_self_registration():
+    u = User(addr="27820001001", state=StateData(name="state_suburb"), session_id=1)
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_self_registration"
+
+
+@pytest.mark.asyncio
+async def test_self_registration_invalid():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_self_registration"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_self_registration"
+
+
+@pytest.mark.asyncio
+async def test_phone_number():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_self_registration"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="no",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_phone_number"
+
+
+@pytest.mark.asyncio
+async def test_phone_number_confirm():
+    u = User(
+        addr="27820001001", state=StateData(name="state_phone_number"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        content="0820001001",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_confirm_phone_number"
+
+
+@pytest.mark.asyncio
+async def test_phone_number_confirm_invalid():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_confirm_phone_number"),
+        session_id=1,
+        answers={"state_phone_number": "0820001001"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_confirm_phone_number"

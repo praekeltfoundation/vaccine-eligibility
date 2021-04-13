@@ -247,3 +247,39 @@ class Application(BaseApplication):
             error="Do any of these match your location:",
             next=next_state,
         )
+
+    async def state_self_registration(self):
+        number = self.inbound.from_addr
+        return MenuState(
+            self,
+            question=f"Can we use this number: {number} to send you SMS appointment "
+            "information?",
+            choices=[
+                Choice("state_vaccination_time", "Yes"),
+                Choice("state_phone_number", "No"),
+            ],
+            error="Please reply with a number 1 or 2 to confirm if we can use this "
+            f"number: {number} to send you SMS appointment information?",
+        )
+
+    async def state_phone_number(self):
+        # TODO: validate phone number
+        return FreeText(
+            self,
+            question="Please TYPE a number we can reach you on to send you SMS "
+            "appointment information",
+            next="state_confirm_phone_number",
+        )
+
+    async def state_confirm_phone_number(self):
+        number = self.user.answers["state_phone_number"]
+        return MenuState(
+            self,
+            question=f"Please confirm the number entered: {number} is correct?",
+            choices=[
+                Choice("state_vaccination_time", "Yes"),
+                Choice("state_phone_number", "No"),
+            ],
+            error=f"ERROR: Please try again confirming the number entered: {number} is "
+            "correct?",
+        )
