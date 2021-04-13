@@ -1,5 +1,5 @@
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, MenuState
+from vaccine.states import Choice, MenuState, ChoiceState, EndState
 
 
 class Application(BaseApplication):
@@ -19,8 +19,21 @@ class Application(BaseApplication):
             ),
             choices=[
                 Choice("state_identification_type", "Yes"),
-                Choice("state_under40_sms", "No"),
+                Choice("state_under40_notification", "No"),
             ],
             error="Self registration is currently only available to those 40 years or "
             "older. Please tell us if you are 40 years of age or older?",
         )
+
+    async def state_under40_notification(self):
+        return ChoiceState(
+            self,
+            question="Self registration is only available to those 40 years or older. "
+            "Can we notifify you by SMS on this number when this changes?",
+            choices=[Choice("yes", "Yes"), Choice("no", "No")],
+            error="Can we notifify you via SMS to let you know when you can register?",
+            next="state_confirm_notification",
+        )
+
+    async def state_confirm_notification(self):
+        return EndState(self, text="Thank you for confirming", next=self.START_STATE)
