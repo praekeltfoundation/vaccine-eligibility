@@ -5,6 +5,13 @@ from vaccine.states import Choice, MenuState, ChoiceState, EndState
 class Application(BaseApplication):
     START_STATE = "state_age_gate"
 
+    ID_TYPES = {
+        "rsa_id": "RSA ID Number",
+        "passport": "Passport Number",
+        "asylum_seeker": "Asylum Seeker Permit number",
+        "refugee": "Refugee Number Permit number",
+    }
+
     async def state_age_gate(self):
         return MenuState(
             self,
@@ -37,3 +44,12 @@ class Application(BaseApplication):
 
     async def state_confirm_notification(self):
         return EndState(self, text="Thank you for confirming", next=self.START_STATE)
+
+    async def state_identification_type(self):
+        return ChoiceState(
+            self,
+            question="How would you like to register?",
+            choices=[Choice(k, v) for k, v in self.ID_TYPES.items()],
+            error="Please choose 1 of the following ways to register",
+            next="state_identification_number",
+        )

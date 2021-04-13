@@ -109,3 +109,19 @@ async def test_under40_notification_confirm():
     assert u.answers["state_under40_notification"] == "yes"
     assert u.state.name == "state_age_gate"
     assert reply.session_event == Message.SESSION_EVENT.CLOSE
+
+
+@pytest.mark.asyncio
+async def test_identification_type():
+    u = User(addr="27820001001", state=StateData(name="state_age_gate"), session_id=1)
+    app = Application(u)
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_identification_type"
