@@ -169,3 +169,34 @@ class Application(BaseApplication):
         return FreeText(
             self, question="Please enter your SURNAME", next="state_confirm_profile"
         )
+
+    async def state_confirm_profile(self):
+        first_name = self.user.answers["state_first_name"][:27]
+        surname = self.user.answers["state_surname"][:27]
+        id_type = self.ID_TYPES[self.user.answers["state_identification_type"]].value
+        id_number = self.user.answers["state_identification_number"][:20]
+        return MenuState(
+            self,
+            question="\n".join(
+                [
+                    "Confirm the following:",
+                    "",
+                    f"{first_name} {surname}",
+                    id_type,
+                    id_number,
+                ]
+            ),
+            choices=[
+                Choice("state_province", "Yes"),
+                Choice("state_identification_type", "No"),
+            ],
+            error="\n".join(
+                [
+                    "Is the information you shared correct?",
+                    "",
+                    f"{first_name} {surname}",
+                    id_type,
+                    id_number,
+                ]
+            ),
+        )

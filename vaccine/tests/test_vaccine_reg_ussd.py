@@ -362,3 +362,81 @@ async def test_surname():
     assert len(reply.content) < 160
     assert u.state.name == "state_surname"
     assert u.answers["state_first_name"] == "firstname"
+
+
+@pytest.mark.asyncio
+async def test_state_confirm_profile():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_surname"),
+        session_id=1,
+        answers={
+            "state_first_name": "reallyreallylongfirstname",
+            "state_identification_type": Application.ID_TYPES.refugee.name,
+            "state_identification_number": "012345678901234567890123456789",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="reallyreallylongsurname",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_confirm_profile"
+    assert u.answers["state_surname"] == "reallyreallylongsurname"
+
+
+@pytest.mark.asyncio
+async def test_state_confirm_profile_invalid():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_confirm_profile"),
+        session_id=1,
+        answers={
+            "state_first_name": "reallyreallylongfirstname1234567890",
+            "state_surname": "reallyreallylongsurname124567890",
+            "state_identification_type": Application.ID_TYPES.refugee.name,
+            "state_identification_number": "012345678901234567890123456789",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_confirm_profile"
+
+
+@pytest.mark.asyncio
+async def test_state_confirm_profile_no():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_confirm_profile"),
+        session_id=1,
+        answers={
+            "state_first_name": "reallyreallylongfirstname1234567890",
+            "state_surname": "reallyreallylongsurname124567890",
+            "state_identification_type": Application.ID_TYPES.refugee.name,
+            "state_identification_number": "012345678901234567890123456789",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="no",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_identification_type"
