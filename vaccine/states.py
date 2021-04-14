@@ -82,6 +82,27 @@ class ChoiceState:
         return self.app.send_message(f"{self.question}\n{self._display_choices}")
 
 
+class MenuState(ChoiceState):
+    def __init__(
+        self,
+        app: BaseApplication,
+        question: str,
+        choices: List[Choice],
+        error: str,
+        accept_labels: bool = True,
+    ):
+        self.app = app
+        self.question = question
+        self.choices = choices
+        self.error = error
+        self.accept_labels = accept_labels
+
+    async def _next(self, choice: Choice):
+        return choice.value
+
+    next = _next
+
+
 class ErrorMessage(Exception):
     def __init__(self, message):
         self.message = message
