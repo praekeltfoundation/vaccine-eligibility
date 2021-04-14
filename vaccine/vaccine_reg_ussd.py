@@ -50,7 +50,7 @@ class Application(BaseApplication):
             question="Self registration is only available to those 40 years or older. "
             "Can we notifify you by SMS on this number when this changes?",
             choices=[Choice("yes", "Yes"), Choice("no", "No")],
-            error="Can we notifify you via SMS to let you know when you can register?",
+            error="Can we notify you via SMS to let you know when you can register?",
             next="state_confirm_notification",
         )
 
