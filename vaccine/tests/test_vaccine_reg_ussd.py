@@ -397,10 +397,10 @@ async def test_state_confirm_profile_invalid():
         state=StateData(name="state_confirm_profile"),
         session_id=1,
         answers={
-            "state_first_name": "reallyreallylongfirstname1234567890",
-            "state_surname": "reallyreallylongsurname124567890",
+            "state_first_name": "reallyreallylongfirstname12345678901234567890",
+            "state_surname": "reallyreallylongsurname1245678901234567890",
             "state_identification_type": Application.ID_TYPES.refugee.name,
-            "state_identification_number": "012345678901234567890123456789",
+            "state_identification_number": "0123456789012345678901234567891234567890",
         },
     )
     app = Application(u)
