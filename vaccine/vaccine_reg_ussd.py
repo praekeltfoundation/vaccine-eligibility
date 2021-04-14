@@ -204,6 +204,7 @@ class Application(BaseApplication):
         )
 
     async def state_province(self):
+        # TODO: Change this to use the EVDS UUIDs for province selection
         return ChoiceState(
             self,
             question="Select Your Province",
