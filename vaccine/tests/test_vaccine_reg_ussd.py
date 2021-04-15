@@ -498,12 +498,16 @@ async def test_suburb_search():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_suburb_search"
+    assert u.answers["state_province"] == "e32298eb-17b4-471e-8d9b-ba093c6afc7c"
 
 
 @pytest.mark.asyncio
 async def test_suburb():
     u = User(
-        addr="27820001001", state=StateData(name="state_suburb_search"), session_id=1
+        addr="27820001001",
+        state=StateData(name="state_suburb_search"),
+        session_id=1,
+        answers={"state_province": "e32298eb-17b4-471e-8d9b-ba093c6afc7c"},
     )
     app = Application(u)
     msg = Message(
@@ -515,12 +519,29 @@ async def test_suburb():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
+    assert reply.content == "\n".join(
+        [
+            "Please choose the best match for your location:",
+            "1. Table View",
+            "2. Bayview",
+            "3. Ballotsview",
+            "4. Other",
+        ]
+    )
     assert u.state.name == "state_suburb"
 
 
 @pytest.mark.asyncio
 async def test_suburb_error():
-    u = User(addr="27820001001", state=StateData(name="state_suburb"), session_id=1)
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_suburb"),
+        session_id=1,
+        answers={
+            "state_province": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_suburb_search": "tableview",
+        },
+    )
     app = Application(u)
     msg = Message(
         content="invalid",
@@ -536,7 +557,15 @@ async def test_suburb_error():
 
 @pytest.mark.asyncio
 async def test_suburb_other():
-    u = User(addr="27820001001", state=StateData(name="state_suburb"), session_id=1)
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_suburb"),
+        session_id=1,
+        answers={
+            "state_province": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_suburb_search": "tableview",
+        },
+    )
     app = Application(u)
     msg = Message(
         content="other",
@@ -552,7 +581,15 @@ async def test_suburb_other():
 
 @pytest.mark.asyncio
 async def test_self_registration():
-    u = User(addr="27820001001", state=StateData(name="state_suburb"), session_id=1)
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_suburb"),
+        session_id=1,
+        answers={
+            "state_province": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_suburb_search": "tableview",
+        },
+    )
     app = Application(u)
     msg = Message(
         content="1",

@@ -2,6 +2,7 @@ from datetime import date
 from enum import Enum
 
 from vaccine.base_application import BaseApplication
+from vaccine.data.suburbs import suburbs
 from vaccine.states import (
     Choice,
     ChoiceState,
@@ -11,7 +12,6 @@ from vaccine.states import (
     MenuState,
 )
 from vaccine.utils import luhn_checksum
-from vaccine.data.suburbs import suburbs
 
 MAX_AGE = 122
 
@@ -235,21 +235,22 @@ class Application(BaseApplication):
         )
 
     async def state_suburb(self):
-        # TODO: Implement suburb search
         async def next_state(choice: Choice):
             if choice.value == "other":
                 return "state_province"
             return "state_self_registration"
 
+        province = self.user.answers["state_province"]
+        search = self.user.answers["state_suburb_search"] or ""
+        choices = [
+            Choice(suburb[0], suburb[1][:30])
+            for suburb in suburbs.search_for_suburbs(province, search)
+        ]
+        choices.append(Choice("other", "Other"))
         return ChoiceState(
             self,
             question="Please choose the best match for your location:",
-            choices=[
-                Choice("suburb1", "Municipality, Suburb 1"),
-                Choice("suburb2", "Municipality, Suburb 2"),
-                Choice("suburb3", "Municipality, Suburb 3"),
-                Choice("other", "Other"),
-            ],
+            choices=choices,
             error="Do any of these match your location:",
             next=next_state,
         )
