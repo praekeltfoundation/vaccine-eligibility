@@ -62,3 +62,6 @@ to the specified flow results service.
 
 `ANSWER_RESOURCE_ID` - The flow resource ID to store answers under in the flow results
 service.
+
+`APPLICATION_CLASS` - Python path to the application that you want to run. Defaults to
+`vaccine.vaccine_eligibility.Application`

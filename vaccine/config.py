@@ -12,3 +12,6 @@ ANSWER_API_TOKEN = environ.get("ANSWER_API_TOKEN")
 ANSWER_API_URL = environ.get("ANSWER_API_URL")
 ANSWER_RESOURCE_ID = environ.get("ANSWER_RESOURCE_ID")
 SENTRY_TRACES_SAMPLE_RATE = float(environ.get("SENTRY_TRACES_SAMPLE_RATE", 0.0))
+APPLICATION_CLASS = environ.get(
+    "APPLICATION_CLASS", "vaccine.vaccine_eligibility.Application"
+)
