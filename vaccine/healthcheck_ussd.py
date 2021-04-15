@@ -187,6 +187,21 @@ class Application(BaseApplication):
             ],
         )
 
+    async def state_end(self):
+        if self.user.answers.get("confirmed_contact") == "yes":
+            text = (
+                "You can return to this service at any time. Remember, if you think "
+                "you have COVID-19 STAY HOME, avoid contact with other people and "
+                "self-quarantine."
+            )
+        else:
+            text = (
+                "You can return to this service at any time. Remember, if you think "
+                "you have COVID-19 STAY HOME, avoid contact with other people and "
+                "self-isolate."
+            )
+        return EndState(self, text=text, next=self.START_STATE)
+
     async def state_more_info_pg1(self):
         return MenuState(
             self,

@@ -462,3 +462,50 @@ async def test_state_terms_confirmed_contact():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_fever"
+
+
+@pytest.mark.asyncio
+async def test_state_end():
+    u = User(addr="27820001003", state=StateData(name="state_terms"), session_id=1)
+    app = Application(u)
+    msg = Message(
+        content="no",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert (
+        reply.content
+        == "You can return to this service at any time. Remember, if you think you "
+        "have COVID-19 STAY HOME, avoid contact with other people and self-isolate."
+    )
+    assert u.state.name == "state_start"
+
+
+@pytest.mark.asyncio
+async def test_state_end_confirmed_contact():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_terms"),
+        session_id=1,
+        answers={"confirmed_contact": "yes"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="no",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert (
+        reply.content
+        == "You can return to this service at any time. Remember, if you think you "
+        "have COVID-19 STAY HOME, avoid contact with other people and self-quarantine."
+    )
+    assert u.state.name == "state_start"
