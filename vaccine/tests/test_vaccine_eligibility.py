@@ -1,7 +1,7 @@
 import pytest
 
-from vaccine.application import Application
 from vaccine.models import Message, StateData, User
+from vaccine.vaccine_eligibility import Application
 
 
 @pytest.mark.asyncio

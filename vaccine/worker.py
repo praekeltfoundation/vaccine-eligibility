@@ -1,4 +1,5 @@
 import asyncio
+import importlib
 import logging
 from typing import Callable, List
 from urllib.parse import urljoin
@@ -11,7 +12,6 @@ from aio_pika import connect_robust
 from aio_pika.message import DeliveryMode
 
 from vaccine import config
-from vaccine.application import Application
 from vaccine.models import Answer, Event, Message, User
 from vaccine.utils import DECODE_MESSAGE_EXCEPTIONS
 
@@ -20,6 +20,11 @@ logger = logging.getLogger(__name__)
 
 
 class Worker:
+    def __init__(self):
+        modname, clsname = config.APPLICATION_CLASS.rsplit(".", maxsplit=1)
+        module = importlib.import_module(modname)
+        self.ApplicationClass = getattr(module, clsname)
+
     async def setup(self):
         self.connection = await connect_robust(config.AMQP_URL)
         self.channel = await self.connection.channel()
@@ -74,7 +79,7 @@ class Worker:
             logger.debug(f"Processing inbound message {msg}")
             user_data = await self.redis.get(f"user.{msg.from_addr}", encoding="utf-8")
             user = User.get_or_create(msg.from_addr, user_data)
-            app = Application(user)
+            app = self.ApplicationClass(user)
             for outbound in await app.process_message(msg):
                 await self.publish_message(outbound)
             if self.answer_worker:
