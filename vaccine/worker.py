@@ -33,14 +33,14 @@ class Worker:
             "vumi", type=ExchangeType.DIRECT, durable=True, auto_delete=False
         )
 
+        self.redis = await aioredis.create_redis_pool(config.REDIS_URL)
+
         self.inbound_queue = await self.setup_consume(
             f"{config.TRANSPORT_NAME}.inbound", self.process_message
         )
         self.event_queue = await self.setup_consume(
             f"{config.TRANSPORT_NAME}.event", self.process_event
         )
-
-        self.redis = await aioredis.create_redis_pool(config.REDIS_URL)
 
         if (
             config.ANSWER_API_URL
