@@ -348,34 +348,35 @@ class Application(BaseApplication):
         )
 
     async def state_google_places_lookup(self):
-        try:
-            response = await get_google_api().get(
-                "https://maps.googleapis.com/maps/api/place/autocomplete/json",
-                params={
-                    "input": self.user.answers.get("state_city"),
-                    "key": config.GOOGLE_PLACES_KEY,
-                    "sessiontoken": self.user.answers.get("google_session_token"),
-                    "language": "en",
-                    "components": "country:za",
-                },
-            )
-            response.raise_for_status()
-            data = await response.json()
+        for i in range(3):
+            try:
+                response = await get_google_api().get(
+                    "https://maps.googleapis.com/maps/api/place/autocomplete/json",
+                    params={
+                        "input": self.user.answers.get("state_city"),
+                        "key": config.GOOGLE_PLACES_KEY,
+                        "sessiontoken": self.user.answers.get("google_session_token"),
+                        "language": "en",
+                        "components": "country:za",
+                    },
+                )
+                response.raise_for_status()
+                data = await response.json()
 
-            if data["status"] != "OK":
-                return await self.go_to_state("state_city")
+                if data["status"] != "OK":
+                    return await self.go_to_state("state_city")
 
-            first_result = data["predictions"][0]
-            self.save_answer("place_id", first_result["place_id"])
-            self.save_answer("state_city", first_result["description"])
+                first_result = data["predictions"][0]
+                self.save_answer("place_id", first_result["place_id"])
+                self.save_answer("state_city", first_result["description"])
 
-            return await self.go_to_state("state_confirm_city")
-        except aiohttp.ClientError as e:
-            if i == 2:
-                logger.exception(e)
-                return await self.go_to_state("state_error")
-            else:
-                continue
+                return await self.go_to_state("state_confirm_city")
+            except aiohttp.ClientError as e:
+                if i == 2:
+                    logger.exception(e)
+                    return await self.go_to_state("state_error")
+                else:
+                    continue
 
     async def state_confirm_city(self):
         address = self.user.answers.get("state_city")[0, 160 - 79]
@@ -396,39 +397,40 @@ class Application(BaseApplication):
         )
 
     async def state_place_details_lookup(self):
-        try:
-            response = await get_google_api().get(
-                "https://maps.googleapis.com/maps/api/place/details/json",
-                params={
-                    "key": config.GOOGLE_PLACES_KEY,
-                    "place_id": self.user.answers.get("place_id"),
-                    "sessiontoken": self.user.answers.get("google_session_token"),
-                    "language": "en",
-                    "fields": "geometry",
-                },
-            )
-            response.raise_for_status()
-            data = await response.json()
+        for i in range(3):
+            try:
+                response = await get_google_api().get(
+                    "https://maps.googleapis.com/maps/api/place/details/json",
+                    params={
+                        "key": config.GOOGLE_PLACES_KEY,
+                        "place_id": self.user.answers.get("place_id"),
+                        "sessiontoken": self.user.answers.get("google_session_token"),
+                        "language": "en",
+                        "fields": "geometry",
+                    },
+                )
+                response.raise_for_status()
+                data = await response.json()
 
-            if data["status"] != "OK":
-                return await self.go_to_state("state_city")
+                if data["status"] != "OK":
+                    return await self.go_to_state("state_city")
 
-            location = data["result"]["geometry"]["location"]
+                location = data["result"]["geometry"]["location"]
 
-            lat = self.pad_location(location["lat"], 2)
-            lng = self.pad_location(location["lng"], 3)
+                lat = self.pad_location(location["lat"], 2)
+                lng = self.pad_location(location["lng"], 3)
 
-            self.save_answer("city_location", f"{lat}{lng}/")
+                self.save_answer("city_location", f"{lat}{lng}/")
 
-            if self.user.answers.get("confirmed_contact"):
-                return await self.go_to_state("state_tracing")
-            return await self.go_to_state("state_age")
-        except aiohttp.ClientError as e:
-            if i == 2:
-                logger.exception(e)
-                return await self.go_to_state("state_error")
-            else:
-                continue
+                if self.user.answers.get("confirmed_contact"):
+                    return await self.go_to_state("state_tracing")
+                return await self.go_to_state("state_age")
+            except aiohttp.ClientError as e:
+                if i == 2:
+                    logger.exception(e)
+                    return await self.go_to_state("state_error")
+                else:
+                    continue
 
     async def state_age(self):
         if self.user.answers.get("state_age"):
