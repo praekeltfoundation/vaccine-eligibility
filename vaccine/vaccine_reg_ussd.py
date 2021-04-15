@@ -1,6 +1,7 @@
 from datetime import date
 from enum import Enum
 
+from vaccine import config
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
@@ -33,21 +34,21 @@ class Application(BaseApplication):
                     "The SA Department of Health thanks you for helping to defeat "
                     "COVID-19!",
                     "",
-                    "Are you 40 years or older?",
+                    f"Are you {config.ELIGIBILITY_AGE_GATE_MIN} years or older?",
                 ]
             ),
             choices=[
                 Choice("state_identification_type", "Yes"),
-                Choice("state_under40_notification", "No"),
+                Choice("state_under_age_notification", "No"),
             ],
-            error="Self-registration is currently only available to those 40 years of "
-            "age or older. Please tell us if you are 40 or older?",
+            error=f"Self-registration is currently only available to those {config.ELIGIBILITY_AGE_GATE_MIN} years of "
+            f"age or older. Please tell us if you are {config.ELIGIBILITY_AGE_GATE_MIN} or older?",
         )
 
-    async def state_under40_notification(self):
+    async def state_under_age_notification(self):
         return ChoiceState(
             self,
-            question="Self-registration is only available to people 40 years or older. "
+            question=f"Self-registration is only available to people {config.ELIGIBILITY_AGE_GATE_MIN} years or older. "
             "Can we SMS you on this number when this changes?",
             choices=[Choice("yes", "Yes"), Choice("no", "No")],
             error="Can we notify you via SMS to let you know when you can register?",
@@ -146,7 +147,7 @@ class Application(BaseApplication):
         )
 
     async def state_dob_day(self):
-        # TODO: stop <40 year olds from continuing
+        # TODO: stop <age_limit year olds from continuing
         async def validate_dob_day(value):
             dob_year = int(self.user.answers["state_dob_year"])
             dob_month = int(self.user.answers["state_dob_month"])

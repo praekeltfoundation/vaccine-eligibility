@@ -15,3 +15,4 @@ SENTRY_TRACES_SAMPLE_RATE = float(environ.get("SENTRY_TRACES_SAMPLE_RATE", 0.0))
 APPLICATION_CLASS = environ.get(
     "APPLICATION_CLASS", "vaccine.vaccine_eligibility.Application"
 )
+ELIGIBILITY_AGE_GATE_MIN = int(environ.get("ELIGIBILITY_AGE_GATE_MIN", "60"))

@@ -7,7 +7,7 @@ from vaccine.vaccine_reg_ussd import Application
 @pytest.mark.asyncio
 async def test_age_gate():
     """
-    Should ask the user if they're over 40
+    Should ask the user if they're over 60
     """
     u = User(addr="27820001001", state=StateData())
     app = Application(u)
@@ -44,7 +44,7 @@ async def test_age_gate_error():
 
 
 @pytest.mark.asyncio
-async def test_under40_notification():
+async def test_under_age_notification():
     """
     Should ask the user if they want a notification when it opens up
     """
@@ -59,17 +59,17 @@ async def test_under40_notification():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_under40_notification"
+    assert u.state.name == "state_under_age_notification"
 
 
 @pytest.mark.asyncio
-async def test_under40_notification_error():
+async def test_under_age_notification_error():
     """
     Should show the error message on incorrect input
     """
     u = User(
         addr="27820001001",
-        state=StateData(name="state_under40_notification"),
+        state=StateData(name="state_under_age_notification"),
         session_id=1,
     )
     app = Application(u)
@@ -82,17 +82,17 @@ async def test_under40_notification_error():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_under40_notification"
+    assert u.state.name == "state_under_age_notification"
 
 
 @pytest.mark.asyncio
-async def test_under40_notification_confirm():
+async def test_under_age_notification_confirm():
     """
     Should confirm the selection and end the session
     """
     u = User(
         addr="27820001001",
-        state=StateData(name="state_under40_notification"),
+        state=StateData(name="state_under_age_notification"),
         session_id=1,
     )
     app = Application(u)
@@ -106,7 +106,7 @@ async def test_under40_notification_confirm():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert reply.content == "Thank you for confirming"
-    assert u.answers["state_under40_notification"] == "yes"
+    assert u.answers["state_under_age_notification"] == "yes"
     assert u.state.name == "state_age_gate"
     assert reply.session_event == Message.SESSION_EVENT.CLOSE
 
