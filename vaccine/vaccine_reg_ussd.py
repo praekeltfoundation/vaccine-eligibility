@@ -2,6 +2,7 @@ from datetime import date
 from enum import Enum
 
 from vaccine.base_application import BaseApplication
+from vaccine.data.suburbs import suburbs
 from vaccine.states import (
     Choice,
     ChoiceState,
@@ -67,6 +68,8 @@ class Application(BaseApplication):
         )
 
     async def state_identification_number(self):
+        # TODO: Capture passport country for passport
+        # TODO: Validate age >= 40 for SAID and Refugee
         idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
         idtype_label = idtype.value
 
@@ -89,6 +92,7 @@ class Application(BaseApplication):
         )
 
     async def state_gender(self):
+        # TODO: Extract from SAID/Refugee
         return ChoiceState(
             self,
             question="What is your gender?",
@@ -103,6 +107,7 @@ class Application(BaseApplication):
         )
 
     async def state_dob_year(self):
+        # TODO: Extract for SAID/Refugee if non-ambiguous
         async def validate_dob_year(value):
             try:
                 assert isinstance(value, str)
@@ -147,6 +152,7 @@ class Application(BaseApplication):
 
     async def state_dob_day(self):
         # TODO: stop <40 year olds from continuing
+        # TODO: confirm what happens if date doesn't match ID date
         async def validate_dob_day(value):
             dob_year = int(self.user.answers["state_dob_year"])
             dob_month = int(self.user.answers["state_dob_month"])
@@ -213,21 +219,10 @@ class Application(BaseApplication):
         )
 
     async def state_province(self):
-        # TODO: Change this to use the EVDS UUIDs for province selection
         return ChoiceState(
             self,
             question="Select Your Province",
-            choices=[
-                Choice("ec", "Eastern Cape"),
-                Choice("fs", "Free State"),
-                Choice("gp", "Gauteng"),
-                Choice("kzn", "Kwazulu Natal"),
-                Choice("lp", "Limpopo"),
-                Choice("mp", "Mpumalanga"),
-                Choice("nw", "North West"),
-                Choice("nc", "Northern Cape"),
-                Choice("wc", "Western Cape"),
-            ],
+            choices=[Choice(*province) for province in suburbs.provinces],
             error="Reply with a NUMBER:",
             next="state_suburb_search",
         )
@@ -240,21 +235,22 @@ class Application(BaseApplication):
         )
 
     async def state_suburb(self):
-        # TODO: Implement suburb search
         async def next_state(choice: Choice):
             if choice.value == "other":
                 return "state_province"
             return "state_self_registration"
 
+        province = self.user.answers["state_province"]
+        search = self.user.answers["state_suburb_search"] or ""
+        choices = [
+            Choice(suburb[0], suburb[1][:30])
+            for suburb in suburbs.search_for_suburbs(province, search)
+        ]
+        choices.append(Choice("other", "Other"))
         return ChoiceState(
             self,
             question="Please choose the best match for your location:",
-            choices=[
-                Choice("suburb1", "Municipality, Suburb 1"),
-                Choice("suburb2", "Municipality, Suburb 2"),
-                Choice("suburb3", "Municipality, Suburb 3"),
-                Choice("other", "Other"),
-            ],
+            choices=choices,
             error="Do any of these match your location:",
             next=next_state,
         )
