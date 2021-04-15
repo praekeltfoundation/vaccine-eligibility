@@ -25,13 +25,15 @@ class Suburbs:
         for municipality in province["children"]:
             for city in municipality["children"]:
                 for suburb in city["children"]:
-                    suburbs[suburb["text"]] = suburb["value"]
-        return suburbs
+                    suburbs[suburb["value"]] = suburb["text"]
+        lowercase = {v.strip().lower(): k for k, v in suburbs.items()}
+        return suburbs, lowercase
 
     def search_for_suburbs(self, province_id, search_text):
-        suburbs = self.suburbs_for_province(province_id)
-        possibilities = difflib.get_close_matches(search_text, suburbs.keys(), n=3)
-        return [(suburbs[p], p) for p in possibilities]
+        search_text = search_text.strip().lower()
+        suburbs, lowercase = self.suburbs_for_province(province_id)
+        possibilities = difflib.get_close_matches(search_text, lowercase.keys(), n=3)
+        return [(lowercase[p], suburbs[lowercase[p]]) for p in possibilities]
 
 
 suburbs = Suburbs()
