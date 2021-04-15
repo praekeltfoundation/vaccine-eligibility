@@ -39,6 +39,7 @@ class Message:
 
     class TRANSPORT_TYPE(Enum):
         HTTP_API = "http_api"
+        USSD = "ussd"
 
     class ADDRESS_TYPE(Enum):
         MSISDN = "msisdn"
