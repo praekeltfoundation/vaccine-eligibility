@@ -431,7 +431,7 @@ async def test_state_confirm_profile_no():
     )
     app = Application(u)
     msg = Message(
-        content="no",
+        content="wrong",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -457,7 +457,7 @@ async def test_province():
     )
     app = Application(u)
     msg = Message(
-        content="yes",
+        content="correct",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -856,8 +856,8 @@ async def test_state_success():
     assert len(reply.content) < 160
     assert (
         reply.content
-        == ":) You have been SUCCESSFULLY registered for getting vaccinated. Additonal "
-        "information and appointment confirmation details will be sent via SMS"
+        == ":) You have SUCCESSFULLY registered to get vaccinated. Additional "
+        "information and appointment details will be sent via SMS."
     )
     assert reply.session_event == Message.SESSION_EVENT.CLOSE
     assert u.state.name == "state_age_gate"
