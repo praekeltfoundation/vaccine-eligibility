@@ -30,8 +30,8 @@ class Application(BaseApplication):
             question="\n".join(
                 [
                     "VACCINE REGISTRATION",
-                    "The SA Department of Health thanks you for helping to defeat the "
-                    "coronavirus!",
+                    "The SA Department of Health thanks you for helping to defeat "
+                    "COVID-19!",
                     "",
                     "Are you 40 years or older?",
                 ]
@@ -40,15 +40,15 @@ class Application(BaseApplication):
                 Choice("state_identification_type", "Yes"),
                 Choice("state_under40_notification", "No"),
             ],
-            error="Self registration is currently only available to those 40 years or "
-            "older. Please tell us if you are 40 years of age or older?",
+            error="Self-registration is currently only available to those 40 years of "
+            "age or older. Please tell us if you are 40 or older?",
         )
 
     async def state_under40_notification(self):
         return ChoiceState(
             self,
-            question="Self registration is only available to those 40 years or older. "
-            "Can we notifify you by SMS on this number when this changes?",
+            question="Self-registration is only available to people 40 years or older. "
+            "Can we SMS you on this number when this changes?",
             choices=[Choice("yes", "Yes"), Choice("no", "No")],
             error="Can we notify you via SMS to let you know when you can register?",
             next="state_confirm_notification",
@@ -62,7 +62,7 @@ class Application(BaseApplication):
             self,
             question="How would you like to register?",
             choices=[Choice(i.name, i.value) for i in self.ID_TYPES],
-            error="Please choose 1 of the following ways to register",
+            error="Please choose 1 of the following ways to register:",
             next="state_identification_number",
         )
 
@@ -111,13 +111,14 @@ class Application(BaseApplication):
                 assert int(value) <= date.today().year
             except AssertionError:
                 raise ErrorMessage(
-                    "REQUIRED: Please TYPE the 4 digits of the year you were born in "
+                    "REQUIRED: Please TYPE the 4 digits of the year you were born "
                     "(Example: 1980)"
                 )
 
         return FreeText(
             self,
-            question="DOB: In what year were you born? (Please type)",
+            question="Date of birth: In which year were you born? (Please type just "
+            "the year)",
             next="state_dob_month",
             check=validate_dob_year,
         )
@@ -125,7 +126,7 @@ class Application(BaseApplication):
     async def state_dob_month(self):
         return ChoiceState(
             self,
-            question="DOB: Select your month",
+            question="Date of birth: In which month were you born?",
             choices=[
                 Choice("1", "Jan"),
                 Choice("2", "Feb"),
@@ -141,7 +142,7 @@ class Application(BaseApplication):
                 Choice("12", "Dec"),
             ],
             next="state_dob_day",
-            error="REQUIRED: In which month were you born?",
+            error="REQUIRED: Choose your birthday month using the numbers below:",
         )
 
     async def state_dob_day(self):
@@ -155,24 +156,37 @@ class Application(BaseApplication):
                 date(dob_year, dob_month, int(value))
             except (AssertionError, ValueError):
                 raise ErrorMessage(
-                    "ERROR: Please reply with DAY of your birthday Example: 20"
+                    "\n".join(
+                        [
+                            "ERROR: Please reply with just the DAY of your birthday.",
+                            "",
+                            "Example: If you were born on 31 May, type _31_",
+                        ]
+                    )
                 )
 
         return FreeText(
             self,
-            question="DOB: Which day of the month were you born on",
+            question="Date of birth: On which day of the month were you born? (Please "
+            "type just the day)",
             next="state_first_name",
             check=validate_dob_day,
         )
 
     async def state_first_name(self):
         return FreeText(
-            self, question="Please enter your FIRST name", next="state_surname"
+            self,
+            question="Please TYPE your FIRST NAME as it appears in your identification "
+            "document",
+            next="state_surname",
         )
 
     async def state_surname(self):
         return FreeText(
-            self, question="Please enter your SURNAME", next="state_confirm_profile"
+            self,
+            question="Please TYPE your SURNAME as it appears in your identification "
+            "document.",
+            next="state_confirm_profile",
         )
 
     async def state_confirm_profile(self):
@@ -185,8 +199,8 @@ class Application(BaseApplication):
                 ["Confirm the following:", "", f"{first_name} {surname}", id_number]
             ),
             choices=[
-                Choice("state_province", "Yes"),
-                Choice("state_identification_type", "No"),
+                Choice("state_province", "Correct"),
+                Choice("state_identification_type", "Wrong"),
             ],
             error="\n".join(
                 [
@@ -221,7 +235,7 @@ class Application(BaseApplication):
     async def state_suburb_search(self):
         return FreeText(
             self,
-            question="Please TYPE the name of the Suburb where you live",
+            question="Please type the name of the SUBURB where you live.",
             next="state_suburb",
         )
 
@@ -234,7 +248,7 @@ class Application(BaseApplication):
 
         return ChoiceState(
             self,
-            question="Please select your location from matched results:",
+            question="Please choose the best match for your location:",
             choices=[
                 Choice("suburb1", "Municipality, Suburb 1"),
                 Choice("suburb2", "Municipality, Suburb 2"),
@@ -263,7 +277,7 @@ class Application(BaseApplication):
         # TODO: validate phone number
         return FreeText(
             self,
-            question="Please TYPE a number we can reach you on to send you SMS "
+            question="Please type a CELL NUMBER we can send an SMS to with your "
             "appointment information",
             next="state_confirm_phone_number",
         )
@@ -272,26 +286,25 @@ class Application(BaseApplication):
         number = self.user.answers["state_phone_number"]
         return MenuState(
             self,
-            question=f"Please confirm the number entered: {number} is correct?",
+            question=f"Please confirm that your number is {number}.",
             choices=[
-                Choice("state_vaccination_time", "Yes"),
-                Choice("state_phone_number", "No"),
+                Choice("state_vaccination_time", "Correct"),
+                Choice("state_phone_number", "Wrong"),
             ],
-            error=f"ERROR: Please try again confirming the number entered: {number} is "
-            "correct?",
+            error=f"ERROR: Please try again. Is the number {number} correct?",
         )
 
     async def state_vaccination_time(self):
         return ChoiceState(
             self,
-            question="Please select your prefferred time to get vaccinacted?",
+            question="In which time slot would you prefer to get your vaccination?",
             choices=[
                 Choice("weekday_morning", "Weekday Morning"),
                 Choice("weekday_afternoon", "Weekday Afternoon"),
                 Choice("weekend_morning", "Weekend Morning"),
             ],
-            error="When would you prefer your vaccine appointment to take place based "
-            "on the options below?",
+            error="When would you prefer your vaccine appointment based on the options "
+            "below?",
             next="state_medical_aid",
         )
 
@@ -309,51 +322,42 @@ class Application(BaseApplication):
             self,
             question="\n".join(
                 [
-                    "Please read and accept our TERMS and CONDITIONS:",
+                    "TERMS & CONDITIONS",
                     "",
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
-                    "eiusmod tempor incididunt ut labore",
+                    "EVDS is POPI compliant. Your personal, contact, medical aid & "
+                    "vaccine details are kept private & are processed with your "
+                    "consent",
                 ]
             ),
             choices=[Choice("state_terms_and_conditions_2", "Next")],
-            error="\n".join(
-                [
-                    "Please type 1 to proceed",
-                    "",
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
-                    "eiusmod tempor incididunt ut labore",
-                ]
-            ),
+            error="TYPE 1 to continue",
         )
 
     async def state_terms_and_conditions_2(self):
         return MenuState(
             self,
-            question="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
-            "eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad "
-            "minim veniam",
+            question="EVDS uses your data to check eligibility & inform you of your "
+            "vaccination date & venue. Registration is voluntary & does not guarantee "
+            "vaccination.",
             choices=[Choice("state_terms_and_conditions_3", "Next")],
-            error="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
-            "eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad "
-            "minim veniam",
+            error="TYPE 1 to continue",
         )
 
     async def state_terms_and_conditions_3(self):
         return MenuState(
             self,
-            question="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
-            "eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad "
-            "minim veniam",
-            choices=[Choice("state_success", "Accept")],
-            error="If you ACCEPT these Terms and Conditions, please type 1",
+            question="All security measures are taken to make sure your information is "
+            "safe. No personal data will be transferred from EVDS without legal "
+            "authorisation.",
+            choices=[Choice("state_success", "ACCEPT")],
+            error="TYPE 1 to ACCEPT our terms and conditions",
         )
 
     async def state_success(self):
         # TODO: Submit to EVDS
         return EndState(
             self,
-            text=":) You have been SUCCESSFULLY registered for getting vaccinated. "
-            "Additonal information and appointment confirmation details will be sent "
-            "via SMS",
+            text=":) You have SUCCESSFULLY registered to get vaccinated. Additional "
+            "information and appointment details will be sent via SMS.",
             next=self.START_STATE,
         )
