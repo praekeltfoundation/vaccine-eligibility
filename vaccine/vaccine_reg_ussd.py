@@ -190,9 +190,9 @@ class Application(BaseApplication):
         )
 
     async def state_confirm_profile(self):
-        first_name = self.user.answers["state_first_name"][:38]
-        surname = self.user.answers["state_surname"][:38]
-        id_number = self.user.answers["state_identification_number"][:28]
+        first_name = self.user.answers["state_first_name"][:36]
+        surname = self.user.answers["state_surname"][:36]
+        id_number = self.user.answers["state_identification_number"][:25]
         return MenuState(
             self,
             question="\n".join(
