@@ -21,9 +21,9 @@ logger = logging.getLogger(__name__)
 
 class Worker:
     def __init__(self):
-        parts = config.APPLICATION_CLASS.split(".")
-        module = importlib.import_module(".".join(parts[:-1]))
-        self.ApplicationClass = getattr(module, parts[-1])
+        modname, clsname = config.APPLICATION_CLASS.rsplit(".", maxsplit=1)
+        module = importlib.import_module(modname)
+        self.ApplicationClass = getattr(module, clsname)
 
     async def setup(self):
         self.connection = await connect_robust(config.AMQP_URL)
