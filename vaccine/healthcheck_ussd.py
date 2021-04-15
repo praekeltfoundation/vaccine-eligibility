@@ -5,7 +5,14 @@ import aiohttp
 
 import vaccine.healthcheck_config as config
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, ChoiceState, EndState, MenuState
+from vaccine.states import (
+    Choice,
+    ChoiceState,
+    EndState,
+    ErrorMessage,
+    FreeText,
+    MenuState,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -245,6 +252,27 @@ class Application(BaseApplication):
                 Choice("ZA-WC", "WESTERN CAPE"),
             ],
             next="state_city",
+        )
+
+    async def state_city(self):
+        if self.user.answers.get("state_city") and self.user.answers.get(
+            "city_location"
+        ):
+            if self.user.answers.get("confirmed_contact") == "yes":
+                return await self.go_to_state("state_tracing")
+            return await self.go_to_state("state_age")
+
+        text = (
+            "Please TYPE the name of your Suburb, Township, Town or Village (or "
+            "nearest)"
+        )
+
+        def validate_city(content):
+            if not content.strip():
+                raise ErrorMessage(text)
+
+        return FreeText(
+            self, question=text, check=validate_city, next="state_google_places_lookup"
         )
 
     async def state_fever(self):
