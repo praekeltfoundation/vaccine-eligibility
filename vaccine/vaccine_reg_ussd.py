@@ -71,9 +71,10 @@ class Application(BaseApplication):
         idtype_label = idtype.value
 
         async def validate_identification_number(value):
-            value = value.strip()
             if idtype == self.ID_TYPES.rsa_id or idtype == self.ID_TYPES.refugee:
                 try:
+                    assert isinstance(value, str)
+                    value = value.strip()
                     assert value.isdigit()
                     assert len(value) == 13
                     assert luhn_checksum(value) == 0
@@ -104,6 +105,7 @@ class Application(BaseApplication):
     async def state_dob_year(self):
         async def validate_dob_year(value):
             try:
+                assert isinstance(value, str)
                 assert value.isdigit()
                 assert int(value) > date.today().year - MAX_AGE
                 assert int(value) <= date.today().year
@@ -148,6 +150,7 @@ class Application(BaseApplication):
             dob_year = int(self.user.answers["state_dob_year"])
             dob_month = int(self.user.answers["state_dob_month"])
             try:
+                assert isinstance(value, str)
                 assert value.isdigit()
                 date(dob_year, dob_month, int(value))
             except (AssertionError, ValueError):
