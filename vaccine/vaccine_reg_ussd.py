@@ -41,15 +41,17 @@ class Application(BaseApplication):
                 Choice("state_identification_type", "Yes"),
                 Choice("state_under_age_notification", "No"),
             ],
-            error=f"Self-registration is currently only available to those {config.ELIGIBILITY_AGE_GATE_MIN} years of "
-            f"age or older. Please tell us if you are {config.ELIGIBILITY_AGE_GATE_MIN} or older?",
+            error="Self-registration is currently only available to those "
+            f"{config.ELIGIBILITY_AGE_GATE_MIN} years of age or older. Please tell us "
+            f"if you are {config.ELIGIBILITY_AGE_GATE_MIN} or older?",
         )
 
     async def state_under_age_notification(self):
         return ChoiceState(
             self,
-            question=f"Self-registration is only available to people {config.ELIGIBILITY_AGE_GATE_MIN} years or older. "
-            "Can we SMS you on this number when this changes?",
+            question="Self-registration is only available to people "
+            f"{config.ELIGIBILITY_AGE_GATE_MIN} years or older. Can we SMS you on this "
+            "number when this changes?",
             choices=[Choice("yes", "Yes"), Choice("no", "No")],
             error="Can we notify you via SMS to let you know when you can register?",
             next="state_confirm_notification",
