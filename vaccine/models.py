@@ -151,6 +151,8 @@ class Event:
     sent_message_id: Optional[str] = None
     nack_reason: Optional[str] = None
     delivery_status: Optional[DELIVERY_STATUS] = None
+    transport_name: Optional[str] = None
+    transport_metadata: dict = field(default_factory=dict)
 
     def __post_init__(self):
         if self.event_type == self.EVENT_TYPE.ACK:
