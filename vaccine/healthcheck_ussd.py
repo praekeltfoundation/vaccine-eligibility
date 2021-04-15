@@ -5,7 +5,7 @@ import aiohttp
 
 import vaccine.healthcheck_config as config
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, EndState, MenuState
+from vaccine.states import Choice, ChoiceState, EndState, MenuState
 
 logger = logging.getLogger(__name__)
 
@@ -119,7 +119,7 @@ class Application(BaseApplication):
 
     async def state_welcome(self):
         error = "This service works best when you select numbers from the list"
-        if self.user.answers["returning_user"] == "yes":
+        if self.user.answers.get("returning_user") == "yes":
             question = "\n".join(
                 [
                     "Welcome back to HealthCheck, your weekly COVID-19 Risk Assesment "
@@ -137,7 +137,7 @@ class Application(BaseApplication):
                     "Reply",
                 ]
             )
-        if self.user.answers["confirmed_contact"] == "yes":
+        if self.user.answers.get("confirmed_contact") == "yes":
             question = "\n".join(
                 [
                     "The National Department of Health thanks you for contributing to "
@@ -152,6 +152,108 @@ class Application(BaseApplication):
             question=question,
             choices=[Choice("state_terms", "START")],
             error=error,
+        )
+
+    async def state_terms(self):
+        if self.user.answers.get("confirmed_contact") == "yes":
+            next_state = "state_fever"
+        else:
+            next_state = "state_province"
+        if self.user.answers.get("returning_user") == "yes":
+            return await self.go_to_state(next_state)
+
+        return MenuState(
+            self,
+            question="\n".join(
+                [
+                    "Confirm that you're responsible for your medical care & "
+                    "treatment. This service only provides info.",
+                    "",
+                    "Reply",
+                ]
+            ),
+            error="\n".join(
+                [
+                    "Please use numbers from list. Confirm that u're responsible for "
+                    "ur medical care & treatment. This service only provides info.",
+                    "",
+                    "Reply",
+                ]
+            ),
+            choices=[
+                Choice(next_state, "YES"),
+                Choice("state_end", "NO"),
+                Choice("state_more_info_pg1", "MORE INFO"),
+            ],
+        )
+
+    async def state_more_info_pg1(self):
+        return MenuState(
+            self,
+            question="It's not a substitute for professional medical "
+            "advice/diagnosis/treatment. Get a qualified health provider's advice "
+            "about your medical condition/care.",
+            error="It's not a substitute for professional medical "
+            "advice/diagnosis/treatment. Get a qualified health provider's advice "
+            "about your medical condition/care.",
+            choices=[Choice("state_more_info_pg2", "Next")],
+        )
+
+    async def state_more_info_pg2(self):
+        return MenuState(
+            self,
+            question="You confirm that you shouldn't disregard/delay seeking medical "
+            "advice about treatment/care because of this service. Rely on info at your "
+            "own risk.",
+            error="You confirm that you shouldn't disregard/delay seeking medical "
+            "advice about treatment/care because of this service. Rely on info at your "
+            "own risk.",
+            choices=[Choice("state_terms", "Next")],
+        )
+
+    async def state_province(self):
+        if self.user.answers.get("state_province"):
+            return await self.go_to_state("state_city")
+        return ChoiceState(
+            self,
+            question="\n".join(["Select your province", "", "Reply:"]),
+            error="\n".join(["Select your province", "", "Reply:"]),
+            choices=[
+                Choice("ZA-EC", "EASTERN CAPE"),
+                Choice("ZA-FS", "FREE STATE"),
+                Choice("ZA-GT", "GAUTENG"),
+                Choice("ZA-NL", "KWAZULU NATAL"),
+                Choice("ZA-LP", "LIMPOPO"),
+                Choice("ZA-MP", "MPUMALANGA"),
+                Choice("ZA-NW", "NORTH WEST"),
+                Choice("ZA-NC", "NORTHERN CAPE"),
+                Choice("ZA-WC", "WESTERN CAPE"),
+            ],
+            next="state_city",
+        )
+
+    async def state_fever(self):
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "Do you feel very hot or cold? Are you sweating or shivering? When "
+                    "you touch your forehead, does it feel hot?",
+                    "",
+                    "Reply",
+                ]
+            ),
+            error="\n".join(
+                [
+                    "Please use numbers from list. Do you feel very hot or cold? Are "
+                    "you sweating or shivering? When you touch your forehead, does it "
+                    "feel hot?",
+                    "",
+                    "Reply",
+                ]
+            ),
+            choices=[Choice("yes", "Yes"), Choice("no", "No")],
+            next="state_cough",
         )
 
     async def state_error(self):
