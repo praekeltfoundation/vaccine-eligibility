@@ -249,7 +249,7 @@ class Application(BaseApplication):
         return MenuState(
             self,
             question="\n".join(
-                ["Confirm the following:", "", f"{first_name} {surname}", id_number]
+                ["Confirm the following:", "", f"{first_name} {surname}", id_number, "\n"]
             ),
             choices=[
                 Choice("state_province", "Correct"),
@@ -340,7 +340,7 @@ class Application(BaseApplication):
     async def state_vaccination_time(self):
         return ChoiceState(
             self,
-            question="In which time slot would you prefer to get your vaccination?",
+            question="In which time slot would you prefer to get your vaccination?\n",
             choices=[
                 Choice("weekday_morning", "Weekday Morning"),
                 Choice("weekday_afternoon", "Weekday Afternoon"),
@@ -369,7 +369,7 @@ class Application(BaseApplication):
                     "",
                     "EVDS is POPI compliant. Your personal, contact, medical aid & "
                     "vaccine details are kept private & are processed with your "
-                    "consent",
+                    "consent\n",
                 ]
             ),
             choices=[Choice("state_terms_and_conditions_2", "Next")],
@@ -381,7 +381,7 @@ class Application(BaseApplication):
             self,
             question="EVDS uses your data to check eligibility & inform you of your "
             "vaccination date & venue. Registration is voluntary & does not guarantee "
-            "vaccination.",
+            "vaccination.\n",
             choices=[Choice("state_terms_and_conditions_3", "Next")],
             error="TYPE 1 to continue",
         )
@@ -391,7 +391,7 @@ class Application(BaseApplication):
             self,
             question="All security measures are taken to make sure your information is "
             "safe. No personal data will be transferred from EVDS without legal "
-            "authorisation.",
+            "authorisation.\n",
             choices=[Choice("state_submit_to_evds", "ACCEPT")],
             error="TYPE 1 to ACCEPT our terms and conditions",
         )
