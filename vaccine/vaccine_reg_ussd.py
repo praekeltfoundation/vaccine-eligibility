@@ -94,7 +94,6 @@ class Application(BaseApplication):
         )
 
     async def state_identification_number(self):
-        # TODO: Capture passport country for passport
         # TODO: Validate age >= 40 for SAID and Refugee
         idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
         idtype_label = idtype.value
