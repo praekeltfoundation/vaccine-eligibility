@@ -14,6 +14,8 @@ async def eventstore_mock(sanic_client):
     app.userprofile_errors = 0
     app.start_errormax = 0
     app.start_errors = 0
+    app.triage_errormax = 0
+    app.triage_errors = 0
 
     @app.route("/api/v2/healthcheckuserprofile/27820001001/", methods=["GET"])
     @app.route("/api/v2/healthcheckuserprofile/27820001004/", methods=["GET"])
@@ -49,6 +51,15 @@ async def eventstore_mock(sanic_client):
         if app.start_errormax:
             if app.start_errors < app.start_errormax:
                 app.start_errors += 1
+                return response.json({}, status=500)
+        return response.json({})
+
+    @app.route("/api/v3/covid19triage/", methods=["POST"])
+    def valid_triage(request):
+        app.requests.append(request)
+        if app.triage_errormax:
+            if app.triage_errors < app.triage_errormax:
+                app.triage_errors += 1
                 return response.json({}, status=500)
         return response.json({})
 
@@ -790,6 +801,269 @@ async def test_state_age():
 
 
 @pytest.mark.asyncio
+async def test_state_fever():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_fever"),
+        session_id=1,
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_fever"
+
+    assert reply.content == "\n".join(
+        [
+            "Please use numbers from list. Do you feel very hot or cold? Are you "
+            + "sweating or shivering? When you touch your forehead, does it feel hot?",
+            "",
+            "Reply",
+            "1. Yes",
+            "2. No",
+        ]
+    )
+
+    app.messages = []
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_cough"
+    assert reply.content == "\n".join(
+        ["Do you have a cough that recently started?", "", "Reply", "1. Yes", "2. No"]
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_cough():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_cough"),
+        session_id=1,
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_cough"
+
+    assert reply.content == "\n".join(
+        [
+            "Please use numbers from list.",
+            "Do you have a cough that recently started?",
+            "",
+            "Reply",
+            "1. Yes",
+            "2. No",
+        ]
+    )
+
+    app.messages = []
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_sore_throat"
+    assert reply.content == "\n".join(
+        [
+            "Do you have a sore throat, or pain when swallowing?",
+            "",
+            "Reply",
+            "1. Yes",
+            "2. No",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_sore_throat():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_sore_throat"),
+        session_id=1,
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_sore_throat"
+
+    assert reply.content == "\n".join(
+        [
+            "Please use numbers from list.",
+            "Do you have a sore throat, or pain when swallowing?",
+            "",
+            "Reply",
+            "1. Yes",
+            "2. No",
+        ]
+    )
+
+    app.messages = []
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_breathing"
+    assert reply.content == "\n".join(
+        [
+            "Do you have breathlessness or a difficulty breathing, that you've "
+            "noticed recently?",
+            "Reply",
+            "1. Yes",
+            "2. No",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_breathing():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_breathing"),
+        session_id=1,
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_breathing"
+
+    assert reply.content == "\n".join(
+        [
+            "Please use numbers from list. Do you have breathlessness or a "
+            "difficulty breathing, that you've noticed recently?",
+            "Reply",
+            "1. Yes",
+            "2. No",
+        ]
+    )
+
+    app.messages = []
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_exposure"
+    assert reply.content == "\n".join(
+        [
+            "Have you been in close contact to someone confirmed to be "
+            "infected with COVID19?",
+            "",
+            "Reply",
+            "1. Yes",
+            "2. No",
+            "3. NOT SURE",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_exposure():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_exposure"),
+        session_id=1,
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_exposure"
+
+    assert reply.content == "\n".join(
+        [
+            "Please use numbers from list. Have u been in contact with someone"
+            " with COVID19 or been where COVID19 patients are treated?",
+            "",
+            "Reply",
+            "1. Yes",
+            "2. No",
+            "3. NOT SURE",
+        ]
+    )
+
+    app.messages = []
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_tracing"
+    assert reply.content == "\n".join(
+        [
+            "Please confirm that the information you shared is correct & that the "
+            "National Department of Health can contact you if necessary?",
+            "",
+            "Reply",
+            "1. YES",
+            "2. NO",
+            "3. RESTART",
+        ]
+    )
+
+
+@pytest.mark.asyncio
 async def test_state_age_skip(google_api_mock):
     u = User(
         addr="27820001003",
@@ -891,7 +1165,7 @@ async def test_state_age_years_skip():
 
 
 @pytest.mark.asyncio
-async def test_state_tracing():
+async def test_state_tracing(eventstore_mock):
     u = User(
         addr="27820001003",
         state=StateData(name="state_tracing"),
@@ -899,6 +1173,31 @@ async def test_state_tracing():
         answers={},
     )
     app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) <= 160
+    assert u.state.name == "state_tracing"
+
+    assert reply.content == "\n".join(
+        [
+            "Please reply with numbers",
+            "Is the information you shared correct & can the National Department "
+            "of Health contact you if necessary?",
+            "",
+            "Reply",
+            "1. YES",
+            "2. NO",
+            "3. RESTART",
+        ]
+    )
+
+    app.messages = []
     msg = Message(
         content="yes",
         to_addr="27820001002",
@@ -909,6 +1208,8 @@ async def test_state_tracing():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_start"
+
+    assert [r.path for r in eventstore_mock.app.requests] == ["/api/v3/covid19triage/"]
 
 
 def test_calculate_risk():

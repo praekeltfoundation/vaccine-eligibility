@@ -535,18 +535,12 @@ class Application(BaseApplication):
 
     async def state_cough(self):
         question = "\n".join(
-            [
-                "Do you feel very hot or cold? Are you sweating or shivering? When "
-                "you touch your forehead, does it feel hot?",
-                "",
-                "Reply",
-            ]
+            ["Do you have a cough that recently started?", "", "Reply"]
         )
         error = "\n".join(
             [
-                "Please use numbers from list. Do you feel very hot or cold? Are "
-                "you sweating or shivering? When you touch your forehead, does it "
-                "feel hot?",
+                "Please use numbers from list.",
+                "Do you have a cough that recently started?",
                 "",
                 "Reply",
             ]
@@ -740,6 +734,7 @@ class Application(BaseApplication):
                 "Reply",
             ]
         )
+        # TODO: handle the restart from here
         choices = [Choice("yes", "YES"), Choice("no", "NO"), Choice(None, "RESTART")]
         if self.user.answers.get("confirmed_contact") == "yes":
             question = "\n".join(
@@ -813,6 +808,60 @@ class Application(BaseApplication):
                 else:
                     continue
         return await self.go_to_state("state_display_risk")
+
+    async def state_display_risk(self):
+        answers = self.user.answers
+        risk = self.calculate_risk()
+        text = ""
+        if answers.get("confirmed_contact"):
+            if risk == "moderate":
+                text = (
+                    "We recommend you SELF-QUARANTINE for the next 10 days and do this "
+                    "HealthCheck daily to monitor your symptoms. Stay/sleep alone in a "
+                    "room with good air flow."
+                )
+
+            if risk == "high":
+                text = (
+                    "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing center "
+                    "or Call 0800029999 or visit your healthcare practitioner for info"
+                    " on what to do & how to test."
+                )
+            return EndState(self, text, next=self.START_STATE)
+
+        if answers.get("state_tracing") == "yes":
+            if risk == "low":
+                text = (
+                    "Complete this HealthCheck again in 7 days or sooner if you feel "
+                    "ill or you come into contact with someone infected with COVID-19"
+                )
+            if risk == "moderate":
+                text = (
+                    "We recommend you SELF-QUARANTINE for the next 10 days and do "
+                    "this HealthCheck daily to monitor your symptoms. Stay/sleep "
+                    "alone in a room with good air flow."
+                )
+
+            if risk == "high":
+                text = (
+                    "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing center "
+                    "or Call 0800029999 or visit your healthcare practitioner for "
+                    "info on what to do & how to test."
+                )
+        else:
+            if risk == "low":
+                # This needs to be a separate state because it needs timeout handling
+                return await self.go_to_state("state_no_tracing_low_risk")
+            if risk == "moderate":
+                # This needs to be a separate state because it needs timeout handling
+                return await self.go_to_state("state_no_tracing_moderate_risk")
+            if risk == "high":
+                text = (
+                    "You will not be contacted. You may be ELIGIBLE FOR COVID-19 "
+                    "TESTING. Go to a testing center or Call 0800029999 or your "
+                    "healthcare practitioner for info."
+                )
+        return EndState(self, text, next=self.START_STATE)
 
     async def state_error(self):
         return EndState(
