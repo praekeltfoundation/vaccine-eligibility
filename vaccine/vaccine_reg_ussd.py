@@ -453,12 +453,15 @@ class Application(BaseApplication):
             "value": suburb_id,
             "text": suburbs.suburb_name(suburb_id, province_id),
         }
+        phonenumber = self.user.answers.get(
+            "state_phone_number", self.inbound.from_addr
+        )
         data = {
             "gender": self.user.answers["state_gender"],
             "surname": self.user.answers["state_surname"],
             "firstName": self.user.answers["state_first_name"],
             "dateOfBirth": date_of_birth.isoformat(),
-            "mobileNumber": self.inbound.from_addr,
+            "mobileNumber": normalise_phonenumber(phonenumber),
             "preferredVaccineScheduleTimeOfDay": vac_time,
             "preferredVaccineScheduleTimeOfWeek": vac_day,
             "preferredVaccineLocation": location,

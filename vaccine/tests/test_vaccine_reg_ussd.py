@@ -1173,7 +1173,7 @@ async def test_state_success(evds_mock):
         "surname": "test surname",
         "firstName": "test first name",
         "dateOfBirth": "1960-01-01",
-        "mobileNumber": "27820001001",
+        "mobileNumber": "+27820001001",
         "preferredVaccineScheduleTimeOfDay": "morning",
         "preferredVaccineScheduleTimeOfWeek": "weekday",
         "preferredVaccineLocation": {
@@ -1236,7 +1236,7 @@ async def test_state_success_temporary_failure(evds_mock):
         "surname": "test surname",
         "firstName": "test first name",
         "dateOfBirth": "1960-01-01",
-        "mobileNumber": "27820001001",
+        "mobileNumber": "+27820001001",
         "preferredVaccineScheduleTimeOfDay": "morning",
         "preferredVaccineScheduleTimeOfWeek": "weekday",
         "preferredVaccineLocation": {
@@ -1299,7 +1299,7 @@ async def test_state_error(evds_mock):
         "surname": "test surname",
         "firstName": "test first name",
         "dateOfBirth": "1960-01-01",
-        "mobileNumber": "27820001001",
+        "mobileNumber": "+27820001001",
         "preferredVaccineScheduleTimeOfDay": "morning",
         "preferredVaccineScheduleTimeOfWeek": "weekday",
         "preferredVaccineLocation": {
