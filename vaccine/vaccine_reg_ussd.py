@@ -16,7 +16,12 @@ from vaccine.states import (
     FreeText,
     MenuState,
 )
-from vaccine.utils import SAIDNumber, calculate_age, normalise_phonenumber
+from vaccine.utils import (
+    SAIDNumber,
+    calculate_age,
+    display_phonenumber,
+    normalise_phonenumber,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -333,7 +338,7 @@ class Application(BaseApplication):
         )
 
     async def state_self_registration(self):
-        number = self.inbound.from_addr
+        number = display_phonenumber(self.inbound.from_addr)
         return MenuState(
             self,
             question=f"Can we use this number: {number} to send you SMS appointment "

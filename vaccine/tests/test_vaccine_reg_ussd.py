@@ -829,6 +829,14 @@ async def test_self_registration():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
+    assert reply.content == "\n".join(
+        [
+            "Can we use this number: 082 000 1001 to send you SMS appointment "
+            "information?",
+            "1. Yes",
+            "2. No",
+        ]
+    )
     assert u.state.name == "state_self_registration"
 
 

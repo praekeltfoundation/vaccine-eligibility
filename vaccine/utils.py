@@ -99,3 +99,11 @@ def normalise_phonenumber(phonenumber):
         return phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.E164)
     except (phonenumbers.phonenumberutil.NumberParseException, AssertionError):
         raise ValueError("Invalid phone number")
+
+
+def display_phonenumber(phonenumber):
+    try:
+        pn = phonenumbers.parse(phonenumber, "ZA")
+        return phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.NATIONAL)
+    except phonenumbers.phonenumberutil.NumberParseException:
+        return phonenumber

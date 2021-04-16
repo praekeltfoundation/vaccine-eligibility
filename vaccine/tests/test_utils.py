@@ -1,7 +1,7 @@
 from datetime import date
 from unittest import TestCase, mock
 
-from vaccine.utils import SAIDNumber
+from vaccine.utils import SAIDNumber, display_phonenumber
 
 
 class SAIDNumberTests(TestCase):
@@ -42,3 +42,11 @@ class SAIDNumberTests(TestCase):
     def test_sex(self):
         assert SAIDNumber("9001010001088").sex == SAIDNumber.SEX.female
         assert SAIDNumber("9001015001083").sex == SAIDNumber.SEX.male
+
+
+class DisplayPhoneNumberTests(TestCase):
+    def test_valid(self):
+        assert display_phonenumber("27820001001") == "082 000 1001"
+
+    def test_invalid(self):
+        assert display_phonenumber("invalid") == "invalid"
