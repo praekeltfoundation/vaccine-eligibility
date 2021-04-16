@@ -38,3 +38,7 @@ class SAIDNumberTests(TestCase):
         assert SAIDNumber("2001010001085").date_of_birth == date(1920, 1, 1)
         assert SAIDNumber("1912310001081").age == 0
         assert SAIDNumber("2001010001085").age == 99
+
+    def test_sex(self):
+        assert SAIDNumber("9001010001088").sex == SAIDNumber.SEX.female
+        assert SAIDNumber("9001015001083").sex == SAIDNumber.SEX.male

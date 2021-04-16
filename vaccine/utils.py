@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from enum import Enum
 from json import JSONDecodeError
 from uuid import uuid4
 
@@ -38,6 +39,10 @@ def get_today():
 
 
 class SAIDNumber:
+    class SEX(Enum):
+        male = "Male"
+        female = "Female"
+
     @staticmethod
     def _validate_format(value):
         try:
@@ -74,3 +79,10 @@ class SAIDNumber:
         ):
             years -= 1
         return years
+
+    @property
+    def sex(self):
+        n = int(self.id_number[6])
+        if n < 5:
+            return self.SEX.female
+        return self.SEX.male

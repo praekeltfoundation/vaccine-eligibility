@@ -50,6 +50,8 @@ class Application(BaseApplication):
         refugee = "Refugee Number Permit number"
 
     async def state_age_gate(self):
+        self.user.answers = {}
+
         return MenuState(
             self,
             question="\n".join(
@@ -112,6 +114,7 @@ class Application(BaseApplication):
                         self.save_answer("state_dob_year", str(dob.year))
                     self.save_answer("state_dob_month", str(dob.month))
                     self.save_answer("state_dob_day", str(dob.day))
+                    self.save_answer("state_gender", id_number.sex.value)
                 except ValueError:
                     raise ErrorMessage(f"Invalid {idtype_label}. Please try again")
 
@@ -141,7 +144,9 @@ class Application(BaseApplication):
         )
 
     async def state_gender(self):
-        # TODO: Extract from SAID/Refugee
+        if self.user.answers.get("state_gender"):
+            return await self.go_to_state("state_dob_year")
+
         return ChoiceState(
             self,
             question="What is your gender?",

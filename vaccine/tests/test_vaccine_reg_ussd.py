@@ -262,7 +262,7 @@ async def test_passport_country_invalid():
 
 
 @pytest.mark.asyncio
-async def test_said_date_extraction():
+async def test_said_date_and_sex_extraction():
     u = User(
         addr="27820001001",
         state=StateData(name="state_identification_number"),
@@ -281,6 +281,7 @@ async def test_said_date_extraction():
     assert u.answers["state_dob_year"] == "1990"
     assert u.answers["state_dob_month"] == "1"
     assert u.answers["state_dob_day"] == "1"
+    assert u.answers["state_gender"] == "Female"
 
 
 @pytest.mark.asyncio
@@ -312,7 +313,7 @@ async def test_gender():
     u = User(
         addr="27820001001",
         state=StateData(name="state_identification_number"),
-        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
+        answers={"state_identification_type": Application.ID_TYPES.asylum_seeker.name},
         session_id=1,
     )
     app = Application(u)
@@ -345,20 +346,18 @@ async def test_gender_invalid():
 
 
 @pytest.mark.asyncio
-async def test_dob_skipped():
+@mock.patch("vaccine.utils.get_today")
+async def test_dob_and_gender_skipped(get_today):
+    get_today.return_value = date(2020, 1, 1)
     u = User(
         addr="27820001001",
-        state=StateData(name="state_gender"),
+        state=StateData(name="state_identification_number"),
         session_id=1,
-        answers={
-            "state_dob_year": "1990",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-        },
+        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
     )
     app = Application(u)
     msg = Message(
-        content="male",
+        content="9001010001088",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
