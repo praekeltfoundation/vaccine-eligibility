@@ -1,3 +1,6 @@
+from datetime import date
+from unittest import mock
+
 import pytest
 from sanic import Sanic, response
 
@@ -259,6 +262,52 @@ async def test_passport_country_invalid():
 
 
 @pytest.mark.asyncio
+async def test_said_date_extraction():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_identification_number"),
+        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="9001010001088",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    await app.process_message(msg)
+    assert u.answers["state_dob_year"] == "1990"
+    assert u.answers["state_dob_month"] == "1"
+    assert u.answers["state_dob_day"] == "1"
+
+
+@pytest.mark.asyncio
+@mock.patch("vaccine.utils.get_today")
+async def test_said_date_extraction_ambiguous(get_today):
+    get_today.return_value = date(2020, 1, 1)
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_identification_number"),
+        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="0001010001087",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    await app.process_message(msg)
+    assert "state_dob_year" not in u.answers
+    assert u.answers["state_dob_month"] == "1"
+    assert u.answers["state_dob_day"] == "1"
+
+
+@pytest.mark.asyncio
 async def test_gender():
     u = User(
         addr="27820001001",
@@ -293,6 +342,31 @@ async def test_gender_invalid():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_gender"
+
+
+@pytest.mark.asyncio
+async def test_dob_skipped():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_gender"),
+        session_id=1,
+        answers={
+            "state_dob_year": "1990",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="male",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_first_name"
 
 
 @pytest.mark.asyncio
