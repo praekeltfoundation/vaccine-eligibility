@@ -1,6 +1,7 @@
 import logging
 from datetime import date
 from enum import Enum
+from typing import List
 from urllib.parse import urljoin
 
 import aiohttp
@@ -8,6 +9,7 @@ import aiohttp
 from vaccine import vacreg_config as config
 from vaccine.base_application import BaseApplication
 from vaccine.data.suburbs import suburbs
+from vaccine.models import Message
 from vaccine.states import (
     Choice,
     ChoiceState,
@@ -53,6 +55,30 @@ class Application(BaseApplication):
         passport = "Passport Number"
         asylum_seeker = "Asylum Seeker Permit number"
         refugee = "Refugee Number Permit number"
+
+    async def process_message(self, message: Message) -> List[Message]:
+        if (
+            message.session_event == Message.SESSION_EVENT.NEW
+            and self.state_name is not None
+            and self.state_name != self.START_STATE
+        ):
+            self.user.session_id = None
+            self.save_answer("resume_state", self.state_name)
+            self.state_name = "state_timed_out"
+        return await super().process_message(message)
+
+    async def state_timed_out(self):
+        return MenuState(
+            self,
+            question="Welcome back to the NDOH's COVID-19 service",
+            error="Welcome back to the NDOH's COVID-19 service",
+            choices=[
+                Choice(
+                    self.user.answers["resume_state"], "Continue Vaccine Registration"
+                ),
+                Choice(self.START_STATE, "Restart Vaccine Registration"),
+            ],
+        )
 
     async def state_age_gate(self):
         self.user.answers = {}
