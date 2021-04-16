@@ -991,19 +991,6 @@ async def test_terms_and_conditions(evds_mock):
         addr="27820001001",
         state=StateData(name="state_terms_and_conditions_3"),
         session_id=1,
-        answers={
-            "state_dob_year": "1960",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-            "state_vaccination_time": "weekday_morning",
-            "state_suburb": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "state_province": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
-            "state_gender": "Other",
-            "state_surname": "test surname",
-            "state_first_name": "test first name",
-            "state_identification_type": "rsa_id",
-            "state_identification_number": "6001010001081",
-        },
     )
     app = Application(u)
     msg = Message(
