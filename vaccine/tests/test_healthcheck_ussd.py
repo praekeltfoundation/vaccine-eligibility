@@ -874,7 +874,7 @@ async def test_state_age_years_skip():
         addr="27820001003",
         state=StateData(name="state_preexisting_conditions"),
         session_id=1,
-        answers={"state_age": "<18", "state_age_years": "17"}
+        answers={"state_age": "<18", "state_age_years": "17"},
     )
     app = Application(u)
 
