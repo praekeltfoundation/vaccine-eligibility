@@ -1141,6 +1141,7 @@ async def test_state_success(evds_mock):
         "information and appointment details will be sent via SMS."
     )
     assert reply.session_event == Message.SESSION_EVENT.CLOSE
+    assert u.state.name == "state_age_gate"
 
     [requests] = evds_mock.app.requests
     assert requests.json == {
