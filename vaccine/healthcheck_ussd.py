@@ -104,7 +104,7 @@ class Application(BaseApplication):
 
         return "high"
 
-    def format_location(latitude, longitude):
+    def format_location(self, latitude, longitude):
         """
         Returns the location in ISO6709 format
         """
@@ -345,7 +345,7 @@ class Application(BaseApplication):
             "nearest)"
         )
 
-        def validate_city(content):
+        async def validate_city(content):
             if not content or not content.strip():
                 raise ErrorMessage(text)
 
@@ -357,7 +357,10 @@ class Application(BaseApplication):
         for i in range(3):
             try:
                 response = await get_google_api().get(
-                    "https://maps.googleapis.com/maps/api/place/autocomplete/json",
+                    urljoin(
+                        config.GOOGLE_PLACES_URL,
+                        "/maps/api/place/autocomplete/json",
+                    ),
                     params={
                         "input": self.user.answers.get("state_city"),
                         "key": config.GOOGLE_PLACES_KEY,
@@ -396,6 +399,14 @@ class Application(BaseApplication):
                     "Reply",
                 ]
             ),
+            error="\n".join(
+                [
+                    "Please confirm the address below based on info you shared:",
+                    f"{address}",
+                    "",
+                    "Reply",
+                ]
+            ),
             choices=[
                 Choice("state_place_details_lookup", "Yes"),
                 Choice("state_city", "No"),
@@ -406,7 +417,10 @@ class Application(BaseApplication):
         for i in range(3):
             try:
                 response = await get_google_api().get(
-                    "https://maps.googleapis.com/maps/api/place/details/json",
+                    urljoin(
+                        config.GOOGLE_PLACES_URL,
+                        "/maps/api/place/details/json",
+                    ),
                     params={
                         "key": config.GOOGLE_PLACES_KEY,
                         "place_id": self.user.answers.get("place_id"),
@@ -469,7 +483,7 @@ class Application(BaseApplication):
 
         question = "Please TYPE your age in years (eg. 35)"
 
-        def validate_age(content):
+        async def validate_age(content):
             try:
                 age = int(content)
             except DECODE_MESSAGE_EXCEPTIONS:
