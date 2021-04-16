@@ -16,7 +16,12 @@ from vaccine.states import (
     FreeText,
     MenuState,
 )
-from vaccine.utils import SAIDNumber, calculate_age
+from vaccine.utils import (
+    SAIDNumber,
+    calculate_age,
+    display_phonenumber,
+    normalise_phonenumber,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -279,13 +284,7 @@ class Application(BaseApplication):
         return MenuState(
             self,
             question="\n".join(
-                [
-                    "Confirm the following:",
-                    "",
-                    f"{first_name} {surname}",
-                    id_number,
-                    "",
-                ]
+                ["Confirm the following:", "", f"{first_name} {surname}", id_number, ""]
             ),
             choices=[
                 Choice("state_province", "Correct"),
@@ -339,7 +338,7 @@ class Application(BaseApplication):
         )
 
     async def state_self_registration(self):
-        number = self.inbound.from_addr
+        number = display_phonenumber(self.inbound.from_addr)
         return MenuState(
             self,
             question=f"Can we use this number: {number} to send you SMS appointment "
@@ -353,12 +352,20 @@ class Application(BaseApplication):
         )
 
     async def state_phone_number(self):
-        # TODO: validate phone number
+        async def phone_number_validation(content):
+            try:
+                normalise_phonenumber(content)
+            except ValueError:
+                raise ErrorMessage(
+                    "ERROR: Please enter a valid mobile number (do not use spaces)"
+                )
+
         return FreeText(
             self,
             question="Please TYPE a CELL NUMBER we can send an SMS to with your "
             "appointment information",
             next="state_confirm_phone_number",
+            check=phone_number_validation,
         )
 
     async def state_confirm_phone_number(self):
@@ -446,12 +453,15 @@ class Application(BaseApplication):
             "value": suburb_id,
             "text": suburbs.suburb_name(suburb_id, province_id),
         }
+        phonenumber = self.user.answers.get(
+            "state_phone_number", self.inbound.from_addr
+        )
         data = {
             "gender": self.user.answers["state_gender"],
             "surname": self.user.answers["state_surname"],
             "firstName": self.user.answers["state_first_name"],
             "dateOfBirth": date_of_birth.isoformat(),
-            "mobileNumber": self.inbound.from_addr,
+            "mobileNumber": normalise_phonenumber(phonenumber),
             "preferredVaccineScheduleTimeOfDay": vac_time,
             "preferredVaccineScheduleTimeOfWeek": vac_day,
             "preferredVaccineLocation": location,
