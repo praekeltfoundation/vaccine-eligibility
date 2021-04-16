@@ -249,7 +249,13 @@ class Application(BaseApplication):
         return MenuState(
             self,
             question="\n".join(
-                ["Confirm the following:", "", f"{first_name} {surname}", id_number, "\n"]
+                [
+                    "Confirm the following:",
+                    "",
+                    f"{first_name} {surname}",
+                    id_number,
+                    "\n",
+                ]
             ),
             choices=[
                 Choice("state_province", "Correct"),
