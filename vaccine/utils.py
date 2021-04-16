@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from enum import Enum
 from json import JSONDecodeError
 from uuid import uuid4
@@ -38,6 +38,14 @@ def get_today():
     return datetime.now(tz=timezone(timedelta(hours=2))).date()
 
 
+def calculate_age(date_of_birth: date):
+    today = get_today()
+    years = today.year - date_of_birth.year
+    if (today.month, today.day) < (date_of_birth.month, date_of_birth.year):
+        years -= 1
+    return years
+
+
 class SAIDNumber:
     class SEX(Enum):
         male = "Male"
@@ -71,14 +79,7 @@ class SAIDNumber:
 
     @property
     def age(self):
-        today = get_today()
-        years = today.year - self.date_of_birth.year
-        if (today.month, today.day) < (
-            self.date_of_birth.month,
-            self.date_of_birth.year,
-        ):
-            years -= 1
-        return years
+        return calculate_age(self.date_of_birth)
 
     @property
     def sex(self):

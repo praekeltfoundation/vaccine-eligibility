@@ -16,7 +16,7 @@ from vaccine.states import (
     FreeText,
     MenuState,
 )
-from vaccine.utils import SAIDNumber
+from vaccine.utils import SAIDNumber, calculate_age
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +96,6 @@ class Application(BaseApplication):
         )
 
     async def state_identification_number(self):
-        # TODO: Validate age >= 40 for SAID and Refugee
         idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
         idtype_label = idtype.value
 
@@ -224,8 +223,6 @@ class Application(BaseApplication):
         if self.user.answers.get("state_dob_day"):
             return await self.go_to_state("state_first_name")
 
-        # TODO: stop <age_limit year olds from continuing
-        # TODO: confirm what happens if date doesn't match ID date
         async def validate_dob_day(value):
             dob_year = int(self.user.answers["state_dob_year"])
             dob_month = int(self.user.answers["state_dob_month"])
@@ -253,6 +250,13 @@ class Application(BaseApplication):
         )
 
     async def state_first_name(self):
+        year = int(self.user.answers["state_dob_year"])
+        month = int(self.user.answers["state_dob_month"])
+        day = int(self.user.answers["state_dob_day"])
+        age = calculate_age(date(year, month, day))
+        if age < config.ELIGIBILITY_AGE_GATE_MIN:
+            return await self.go_to_state("state_under_age_notification")
+
         return FreeText(
             self,
             question="Please TYPE your FIRST NAME as it appears in your identification "
