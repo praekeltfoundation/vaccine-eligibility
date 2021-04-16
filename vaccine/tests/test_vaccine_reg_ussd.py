@@ -400,7 +400,7 @@ async def test_dob_year_invalid():
     assert u.state.name == "state_dob_year"
     assert (
         reply.content
-        == "REQUIRED: Please TYPE the 4 digits of the year you were born (Example: "
+        == "REQUIRED: Please TYPE the 4 digits of the YEAR you were born (Example: "
         "1980)"
     )
 
