@@ -400,7 +400,7 @@ async def test_dob_year_invalid():
     assert u.state.name == "state_dob_year"
     assert (
         reply.content
-        == "REQUIRED: Please TYPE the 4 digits of the year you were born (Example: "
+        == "REQUIRED: Please TYPE the 4 digits of the YEAR you were born (Example: "
         "1980)"
     )
 
@@ -570,6 +570,17 @@ async def test_state_confirm_profile():
     assert len(reply.content) < 160
     assert u.state.name == "state_confirm_profile"
     assert u.answers["state_surname"] == "reallyreallylongsurname"
+    assert reply.content == "\n".join(
+        [
+            "Confirm the following:",
+            "",
+            "reallyreallylongfirstname reallyreallylongsurname",
+            "0123456789012345678901234",
+            "",
+            "1. Correct",
+            "2. Wrong",
+        ]
+    )
 
 
 @pytest.mark.asyncio
