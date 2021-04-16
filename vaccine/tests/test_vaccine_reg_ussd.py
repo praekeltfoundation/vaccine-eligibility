@@ -989,12 +989,12 @@ async def test_medical_aid_invalid():
 async def test_terms_and_conditions():
     u = User(
         addr="27820001001",
-        state=StateData(name="state_terms_and_conditions_3"),
+        state=StateData(name="state_age_gate"),
         session_id=1,
     )
     app = Application(u)
     msg = Message(
-        content="accept",
+        content="yes",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -1002,7 +1002,7 @@ async def test_terms_and_conditions():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_identification_type"
+    assert u.state.name == "state_terms_and_conditions"
 
 
 @pytest.mark.asyncio
