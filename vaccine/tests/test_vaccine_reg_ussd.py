@@ -829,6 +829,14 @@ async def test_self_registration():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
+    assert reply.content == "\n".join(
+        [
+            "Can we use this number: 082 000 1001 to send you SMS appointment "
+            "information?",
+            "1. Yes",
+            "2. No",
+        ]
+    )
     assert u.state.name == "state_self_registration"
 
 
@@ -862,6 +870,24 @@ async def test_phone_number():
     app = Application(u)
     msg = Message(
         content="no",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_phone_number"
+
+
+@pytest.mark.asyncio
+async def test_phone_number_invalid():
+    u = User(
+        addr="27820001001", state=StateData(name="state_phone_number"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -1149,7 +1175,7 @@ async def test_state_success(evds_mock):
         "surname": "test surname",
         "firstName": "test first name",
         "dateOfBirth": "1960-01-01",
-        "mobileNumber": "27820001001",
+        "mobileNumber": "+27820001001",
         "preferredVaccineScheduleTimeOfDay": "morning",
         "preferredVaccineScheduleTimeOfWeek": "weekday",
         "preferredVaccineLocation": {
@@ -1212,7 +1238,7 @@ async def test_state_success_temporary_failure(evds_mock):
         "surname": "test surname",
         "firstName": "test first name",
         "dateOfBirth": "1960-01-01",
-        "mobileNumber": "27820001001",
+        "mobileNumber": "+27820001001",
         "preferredVaccineScheduleTimeOfDay": "morning",
         "preferredVaccineScheduleTimeOfWeek": "weekday",
         "preferredVaccineLocation": {
@@ -1275,7 +1301,7 @@ async def test_state_error(evds_mock):
         "surname": "test surname",
         "firstName": "test first name",
         "dateOfBirth": "1960-01-01",
-        "mobileNumber": "27820001001",
+        "mobileNumber": "+27820001001",
         "preferredVaccineScheduleTimeOfDay": "morning",
         "preferredVaccineScheduleTimeOfWeek": "weekday",
         "preferredVaccineLocation": {

@@ -3,6 +3,8 @@ from enum import Enum
 from json import JSONDecodeError
 from uuid import uuid4
 
+import phonenumbers
+
 DECODE_MESSAGE_EXCEPTIONS = (
     UnicodeDecodeError,
     JSONDecodeError,
@@ -87,3 +89,21 @@ class SAIDNumber:
         if n < 5:
             return self.SEX.female
         return self.SEX.male
+
+
+def normalise_phonenumber(phonenumber):
+    try:
+        pn = phonenumbers.parse(phonenumber, "ZA")
+        assert phonenumbers.is_possible_number(pn)
+        assert phonenumbers.is_valid_number(pn)
+        return phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.E164)
+    except (phonenumbers.phonenumberutil.NumberParseException, AssertionError):
+        raise ValueError("Invalid phone number")
+
+
+def display_phonenumber(phonenumber):
+    try:
+        pn = phonenumbers.parse(phonenumber, "ZA")
+        return phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.NATIONAL)
+    except phonenumbers.phonenumberutil.NumberParseException:
+        return phonenumber
