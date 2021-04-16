@@ -70,13 +70,13 @@ class Application(BaseApplication):
     async def state_timed_out(self):
         return MenuState(
             self,
-            question="Welcome back to the NDOH's COVID-19 service",
-            error="Welcome back to the NDOH's COVID-19 service",
+            question="Welcome back to the NATIONAL DEPARTMENT OF HEALTH's COVID-19 "
+            "Vaccine Registration service",
+            error="Welcome back to the NATIONAL DEPARTMENT OF HEALTH's COVID-19 "
+            "Vaccine Registration service",
             choices=[
-                Choice(
-                    self.user.answers["resume_state"], "Continue Vaccine Registration"
-                ),
-                Choice(self.START_STATE, "Restart Vaccine Registration"),
+                Choice(self.user.answers["resume_state"], "Continue where I left off"),
+                Choice(self.START_STATE, "Start over"),
             ],
         )
 

@@ -1344,7 +1344,7 @@ async def test_state_timed_out_restart():
     )
     app = Application(u)
     msg = Message(
-        content="restart vaccine registration",
+        content="start over",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -1363,7 +1363,7 @@ async def test_state_timed_out_resume():
     )
     app = Application(u)
     msg = Message(
-        content="continue vaccine registration",
+        content="continue where i left off",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
