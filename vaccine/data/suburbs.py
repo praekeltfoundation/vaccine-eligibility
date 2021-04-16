@@ -2,6 +2,7 @@ import difflib
 import gzip
 import json
 from functools import cache, cached_property
+from operator import itemgetter
 
 
 class Suburbs:
@@ -14,7 +15,9 @@ class Suburbs:
 
     @cached_property
     def provinces(self):
-        return [(i["value"], i["text"]) for i in self.data]
+        provinces = [(i["value"], i["text"]) for i in self.data]
+        provinces.sort(key=itemgetter(1))
+        return provinces
 
     @cache
     def suburbs_for_province(self, province_id):
