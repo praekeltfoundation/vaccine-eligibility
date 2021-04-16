@@ -398,11 +398,50 @@ async def test_dob_year_invalid():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_dob_year"
+    assert (
+        reply.content
+        == "REQUIRED: Please TYPE the 4 digits of the year you were born (Example: "
+        "1980)"
+    )
+
+
+@pytest.mark.asyncio
+async def test_dob_year_not_match_id():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_dob_year"),
+        session_id=1,
+        answers={
+            "state_identification_type": Application.ID_TYPES.rsa_id.value,
+            "state_identification_number": "9001010001088",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="1991",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_dob_year"
+    assert (
+        reply.content
+        == "The YEAR you have given does not match the YEAR of your ID number. Please "
+        "try again"
+    )
 
 
 @pytest.mark.asyncio
 async def test_dob_month():
-    u = User(addr="27820001001", state=StateData(name="state_dob_year"), session_id=1)
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_dob_year"),
+        session_id=1,
+        answers={"state_identification_type": Application.ID_TYPES.asylum_seeker.value},
+    )
     app = Application(u)
     msg = Message(
         content="1990",

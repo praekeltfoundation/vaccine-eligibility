@@ -175,6 +175,18 @@ class Application(BaseApplication):
                     "(Example: 1980)"
                 )
 
+            idtype = self.user.answers["state_identification_type"]
+            if (
+                idtype == self.ID_TYPES.rsa_id.value
+                or idtype == self.ID_TYPES.refugee.value
+            ):
+                idno = self.user.answers["state_identification_number"]
+                if value[-2:] != idno[:2]:
+                    raise ErrorMessage(
+                        "The YEAR you have given does not match the YEAR of your ID "
+                        "number. Please try again"
+                    )
+
         return FreeText(
             self,
             question="Date of birth: In which year were you born? (Please type just "
