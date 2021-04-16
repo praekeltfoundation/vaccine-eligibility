@@ -16,7 +16,7 @@ from vaccine.states import (
     FreeText,
     MenuState,
 )
-from vaccine.utils import SAIDNumber, calculate_age
+from vaccine.utils import SAIDNumber, calculate_age, normalise_phonenumber
 
 logger = logging.getLogger(__name__)
 
@@ -279,13 +279,7 @@ class Application(BaseApplication):
         return MenuState(
             self,
             question="\n".join(
-                [
-                    "Confirm the following:",
-                    "",
-                    f"{first_name} {surname}",
-                    id_number,
-                    "",
-                ]
+                ["Confirm the following:", "", f"{first_name} {surname}", id_number, ""]
             ),
             choices=[
                 Choice("state_province", "Correct"),
@@ -353,12 +347,20 @@ class Application(BaseApplication):
         )
 
     async def state_phone_number(self):
-        # TODO: validate phone number
+        async def phone_number_validation(content):
+            try:
+                normalise_phonenumber(content)
+            except ValueError:
+                raise ErrorMessage(
+                    "ERROR: Please enter a valid mobile number (do not use spaces)"
+                )
+
         return FreeText(
             self,
             question="Please TYPE a CELL NUMBER we can send an SMS to with your "
             "appointment information",
             next="state_confirm_phone_number",
+            check=phone_number_validation,
         )
 
     async def state_confirm_phone_number(self):
