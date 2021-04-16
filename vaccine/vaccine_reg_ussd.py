@@ -1,7 +1,11 @@
+import logging
 from datetime import date
 from enum import Enum
+from urllib.parse import urljoin
 
-from vaccine import config
+import aiohttp
+
+from vaccine import vacreg_config as config
 from vaccine.base_application import BaseApplication
 from vaccine.data.suburbs import suburbs
 from vaccine.states import (
@@ -14,7 +18,26 @@ from vaccine.states import (
 )
 from vaccine.utils import luhn_checksum
 
+logger = logging.getLogger(__name__)
+
 MAX_AGE = 122
+
+
+def get_evds():
+    # TODO: Cache the session globally. Things that don't work:
+    # - Declaring the session at the top of the file
+    #   You get a `Timeout context manager should be used inside a task` error
+    # - Declaring it here but caching it in a global variable for reuse
+    #   You get a `Event loop is closed` error
+    return aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=5),
+        headers={
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "User-Agent": "healthcheck-ussd",
+        },
+        auth=aiohttp.BasicAuth(config.EVDS_USERNAME, config.EVDS_PASSWORD),
+    )
 
 
 class Application(BaseApplication):
@@ -76,6 +99,11 @@ class Application(BaseApplication):
         idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
         idtype_label = idtype.value
 
+        if idtype == self.ID_TYPES.passport:
+            next_state = "state_passport_country"
+        else:
+            next_state = "state_gender"
+
         async def validate_identification_number(value):
             if idtype == self.ID_TYPES.rsa_id or idtype == self.ID_TYPES.refugee:
                 try:
@@ -90,8 +118,26 @@ class Application(BaseApplication):
         return FreeText(
             self,
             question=f"Please enter your {idtype_label}",
-            next="state_gender",
+            next=next_state,
             check=validate_identification_number,
+        )
+
+    async def state_passport_country(self):
+        return ChoiceState(
+            self,
+            question="Which country issued your passport?",
+            error="Which country issued your passport?",
+            choices=[
+                Choice("ZA", "South Africa"),
+                Choice("ZW", "Zimbabwe"),
+                Choice("MZ", "Mozambique"),
+                Choice("MW", "Malawi"),
+                Choice("NG", "Nigeria"),
+                Choice("CD", "DRC"),
+                Choice("SO", "Somalia"),
+                Choice("other", "Other"),
+            ],
+            next="state_gender",
         )
 
     async def state_gender(self):
@@ -100,10 +146,9 @@ class Application(BaseApplication):
             self,
             question="What is your gender?",
             choices=[
-                Choice("male", "Male"),
-                Choice("female", "Female"),
-                Choice("other", "Other"),
-                Choice("unknown", "Unknown"),
+                Choice("Male", "Male"),
+                Choice("Female", "Female"),
+                Choice("Other", "Other"),
             ],
             error="Please select your gender using one of the numbers below",
             next="state_dob_year",
@@ -348,15 +393,81 @@ class Application(BaseApplication):
             question="All security measures are taken to make sure your information is "
             "safe. No personal data will be transferred from EVDS without legal "
             "authorisation.",
-            choices=[Choice("state_success", "ACCEPT")],
+            choices=[Choice("state_submit_to_evds", "ACCEPT")],
             error="TYPE 1 to ACCEPT our terms and conditions",
         )
 
+    async def state_submit_to_evds(self):
+        evds = get_evds()
+        date_of_birth = date(
+            int(self.user.answers["state_dob_year"]),
+            int(self.user.answers["state_dob_month"]),
+            int(self.user.answers["state_dob_day"]),
+        )
+        vac_day, vac_time = self.user.answers["state_vaccination_time"].split("_")
+        suburb_id = self.user.answers["state_suburb"]
+        province_id = self.user.answers["state_province"]
+        location = {
+            "value": suburb_id,
+            "text": suburbs.suburb_name(suburb_id, province_id),
+        }
+        data = {
+            "gender": self.user.answers["state_gender"],
+            "surname": self.user.answers["state_surname"],
+            "firstName": self.user.answers["state_first_name"],
+            "dateOfBirth": date_of_birth.isoformat(),
+            "mobileNumber": self.inbound.from_addr,
+            "preferredVaccineScheduleTimeOfDay": vac_time,
+            "preferredVaccineScheduleTimeOfWeek": vac_day,
+            "preferredVaccineLocation": location,
+            "residentialLocation": location,
+            "termsAndConditionsAccepted": True,
+        }
+        id_type = self.user.answers["state_identification_type"]
+        if id_type == self.ID_TYPES.rsa_id.name:
+            data["iDNumber"] = self.user.answers["state_identification_number"]
+        if (
+            id_type == self.ID_TYPES.refugee.name
+            or id_type == self.ID_TYPES.asylum_seeker.name
+        ):
+            data["refugeeNumber"] = self.user.answers["state_identification_number"]
+        if id_type == self.ID_TYPES.passport.name:
+            data["passportNumber"] = self.user.answers["state_identification_number"]
+            data["passportCountry"] = self.user.answers["state_passport_country"]
+
+        for i in range(3):
+            try:
+                response = await evds.post(
+                    url=urljoin(
+                        config.EVDS_URL,
+                        f"/api/private/{config.EVDS_DATASET}/person/"
+                        f"{config.EVDS_VERSION}/record",
+                    ),
+                    json=data,
+                )
+                response.raise_for_status()
+                break
+            except aiohttp.ClientError as e:
+                if i == 2:
+                    logger.exception(e)
+                    return await self.go_to_state("state_error")
+                else:
+                    continue
+
+        return await self.go_to_state("state_success")
+
     async def state_success(self):
-        # TODO: Submit to EVDS
         return EndState(
             self,
             text=":) You have SUCCESSFULLY registered to get vaccinated. Additional "
             "information and appointment details will be sent via SMS.",
+            next=self.START_STATE,
+        )
+
+    async def state_error(self):
+        return EndState(
+            self,
+            text="Something went wrong with your registration session. Your "
+            "registration was not able to be processed. Please try again later",
             next=self.START_STATE,
         )
