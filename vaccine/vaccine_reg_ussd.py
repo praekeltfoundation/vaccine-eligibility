@@ -434,24 +434,25 @@ class Application(BaseApplication):
             data["passportNumber"] = self.user.answers["state_identification_number"]
             data["passportCountry"] = self.user.answers["state_passport_country"]
 
-        for i in range(3):
-            try:
-                response = await evds.post(
-                    url=urljoin(
-                        config.EVDS_URL,
-                        f"/api/private/{config.EVDS_DATASET}/person/"
-                        f"{config.EVDS_VERSION}/record",
-                    ),
-                    json=data,
-                )
-                response.raise_for_status()
-                break
-            except aiohttp.ClientError as e:
-                if i == 2:
-                    logger.exception(e)
-                    return await self.go_to_state("state_error")
-                else:
-                    continue
+        async with evds as session:
+            for i in range(3):
+                try:
+                    response = await session.post(
+                        url=urljoin(
+                            config.EVDS_URL,
+                            f"/api/private/{config.EVDS_DATASET}/person/"
+                            f"{config.EVDS_VERSION}/record",
+                        ),
+                        json=data,
+                    )
+                    response.raise_for_status()
+                    break
+                except aiohttp.ClientError as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
 
         return await self.go_to_state("state_success")
 
