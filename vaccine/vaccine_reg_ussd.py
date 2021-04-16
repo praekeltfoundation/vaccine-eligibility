@@ -16,7 +16,7 @@ from vaccine.states import (
     FreeText,
     MenuState,
 )
-from vaccine.utils import luhn_checksum
+from vaccine.utils import SAIDNumber
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +50,8 @@ class Application(BaseApplication):
         refugee = "Refugee Number Permit number"
 
     async def state_age_gate(self):
+        self.user.answers = {}
+
         return MenuState(
             self,
             question="\n".join(
@@ -106,12 +108,14 @@ class Application(BaseApplication):
         async def validate_identification_number(value):
             if idtype == self.ID_TYPES.rsa_id or idtype == self.ID_TYPES.refugee:
                 try:
-                    assert isinstance(value, str)
-                    value = value.strip()
-                    assert value.isdigit()
-                    assert len(value) == 13
-                    assert luhn_checksum(value) == 0
-                except AssertionError:
+                    id_number = SAIDNumber(value)
+                    dob = id_number.date_of_birth
+                    if id_number.age > MAX_AGE - 100:
+                        self.save_answer("state_dob_year", str(dob.year))
+                    self.save_answer("state_dob_month", str(dob.month))
+                    self.save_answer("state_dob_day", str(dob.day))
+                    self.save_answer("state_gender", id_number.sex.value)
+                except ValueError:
                     raise ErrorMessage(f"Invalid {idtype_label}. Please try again")
 
         return FreeText(
@@ -140,7 +144,9 @@ class Application(BaseApplication):
         )
 
     async def state_gender(self):
-        # TODO: Extract from SAID/Refugee
+        if self.user.answers.get("state_gender"):
+            return await self.go_to_state("state_dob_year")
+
         return ChoiceState(
             self,
             question="What is your gender?",
@@ -154,7 +160,9 @@ class Application(BaseApplication):
         )
 
     async def state_dob_year(self):
-        # TODO: Extract for SAID/Refugee if non-ambiguous
+        if self.user.answers.get("state_dob_year"):
+            return await self.go_to_state("state_dob_month")
+
         async def validate_dob_year(value):
             try:
                 assert isinstance(value, str)
@@ -167,6 +175,18 @@ class Application(BaseApplication):
                     "(Example: 1980)"
                 )
 
+            idtype = self.user.answers["state_identification_type"]
+            if (
+                idtype == self.ID_TYPES.rsa_id.value
+                or idtype == self.ID_TYPES.refugee.value
+            ):
+                idno = self.user.answers["state_identification_number"]
+                if value[-2:] != idno[:2]:
+                    raise ErrorMessage(
+                        "The YEAR you have given does not match the YEAR of your ID "
+                        "number. Please try again"
+                    )
+
         return FreeText(
             self,
             question="Date of birth: In which YEAR were you born? (Please TYPE just "
@@ -176,6 +196,9 @@ class Application(BaseApplication):
         )
 
     async def state_dob_month(self):
+        if self.user.answers.get("state_dob_month"):
+            return await self.go_to_state("state_dob_day")
+
         return ChoiceState(
             self,
             question="Date of birth: In which MONTH were you born?",
@@ -198,6 +221,9 @@ class Application(BaseApplication):
         )
 
     async def state_dob_day(self):
+        if self.user.answers.get("state_dob_day"):
+            return await self.go_to_state("state_first_name")
+
         # TODO: stop <age_limit year olds from continuing
         # TODO: confirm what happens if date doesn't match ID date
         async def validate_dob_day(value):
