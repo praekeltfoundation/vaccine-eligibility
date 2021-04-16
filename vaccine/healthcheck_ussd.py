@@ -14,6 +14,7 @@ from vaccine.states import (
     FreeText,
     MenuState,
 )
+from vaccine.utils import DECODE_MESSAGE_EXCEPTIONS
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ def get_google_api():
         timeout=aiohttp.ClientTimeout(total=5),
         headers={
             "Content-Type": "application/json",
-            "User-Agent": "Jsbox/Covid19-Triage-USSD",
+            "User-Agent": "healthcheck-ussd",
         },
     )
 
@@ -103,20 +104,25 @@ class Application(BaseApplication):
 
         return "high"
 
-    def pad_location(self, location, places):
-        # Pads the integer part of the number to places
-        # Ensures that there's always a sign
-        # Ensures that there's always a decimal part
-        sign = "+"
-        if location < 0:
-            sign = "-"
-            location = location * -1
+    def format_location(latitude, longitude):
+        """
+        Returns the location in ISO6709 format
+        """
 
-        location = location.split(".")[2]
-        integer = str(location[0])
-        decimal = location[1] or 0
+        def fractional_part(f):
+            if not f % 1:
+                return ""
+            parts = str(f).split(".")
+            return f".{parts[1]}"
 
-        return f"{sign}{integer.zfill(places)}.{decimal}"
+        # latitude integer part must be fixed width 2, longitude 3
+        return (
+            f"{int(latitude):+03d}"
+            f"{fractional_part(latitude)}"
+            f"{int(longitude):+04d}"
+            f"{fractional_part(longitude)}"
+            "/"
+        )
 
     async def state_start(self):
         # TODO: normalise msisdn
@@ -340,7 +346,7 @@ class Application(BaseApplication):
         )
 
         def validate_city(content):
-            if not content.strip():
+            if not content or not content.strip():
                 raise ErrorMessage(text)
 
         return FreeText(
@@ -379,13 +385,13 @@ class Application(BaseApplication):
                     continue
 
     async def state_confirm_city(self):
-        address = self.user.answers.get("state_city")[0, 160 - 79]
+        address = self.user.answers.get("state_city")[: 160 - 79]
         return MenuState(
             self,
             question="\n".join(
                 [
                     "Please confirm the address below based on info you shared:",
-                    f"{{ address }}",
+                    f"{address}",
                     "",
                     "Reply",
                 ]
@@ -417,10 +423,10 @@ class Application(BaseApplication):
 
                 location = data["result"]["geometry"]["location"]
 
-                lat = self.pad_location(location["lat"], 2)
-                lng = self.pad_location(location["lng"], 3)
-
-                self.save_answer("city_location", f"{lat}{lng}/")
+                self.save_answer(
+                    "city_location",
+                    self.format_location(location["lat"], location["lng"]),
+                )
 
                 if self.user.answers.get("confirmed_contact"):
                     return await self.go_to_state("state_tracing")
@@ -461,11 +467,16 @@ class Application(BaseApplication):
         ):
             return await self.go_to_state("state_province")
 
+        question = "Please TYPE your age in years (eg. 35)"
+
         def validate_age(content):
-            age = int(content)
+            try:
+                age = int(content)
+            except DECODE_MESSAGE_EXCEPTIONS:
+                raise ErrorMessage(question)
 
             if age < 1:
-                return question
+                raise ErrorMessage(question)
             elif age < 18:
                 self.save_answer("state_age", "<18")
             elif age < 40:
@@ -475,11 +486,11 @@ class Application(BaseApplication):
             elif age < 150:
                 self.save_answer("state_age", ">65")
             else:
-                return question
+                raise ErrorMessage(question)
 
         return FreeText(
             self,
-            question="Please TYPE your age in years (eg. 35)",
+            question=question,
             check=validate_age,
             next="state_province",
         )
@@ -489,8 +500,8 @@ class Application(BaseApplication):
             self,
             question="\n".join(
                 [
-                    "Do you feel very hot or cold? Are you sweating or shivering? When "
-                    "you touch your forehead, does it feel hot?",
+                    "Do you feel very hot or cold? Are you sweating or shivering? "
+                    "When you touch your forehead, does it feel hot?",
                     "",
                     "Reply",
                 ]
@@ -572,14 +583,15 @@ class Application(BaseApplication):
     async def state_breathing(self):
         question = "\n".join(
             [
-                "Do you have breathlessness or a difficulty breathing, that you've noticed recently?",
+                "Do you have breathlessness or a difficulty breathing, that you've "
+                "noticed recently?",
                 "Reply",
             ]
         )
         error = "\n".join(
             [
-                "Please use numbers from list. Do you have breathlessness or a difficulty breathing, "
-                + "that you've noticed recently?",
+                "Please use numbers from list. Do you have breathlessness or a "
+                "difficulty breathing, that you've noticed recently?",
                 "Reply",
             ]
         )
@@ -587,8 +599,8 @@ class Application(BaseApplication):
         if self.user.answers.get("confirmed_contact") == "yes":
             question = "\n".join(
                 [
-                    "Do you have shortness of breath while resting or difficulty breathing, that you've "
-                    + "noticed recently?",
+                    "Do you have shortness of breath while resting or difficulty "
+                    "breathing, that you've noticed recently?",
                     "",
                     "Reply",
                 ]
@@ -597,8 +609,8 @@ class Application(BaseApplication):
                 [
                     "Please use numbers from list.",
                     "",
-                    "Do you have shortness of breath while resting or difficulty breathing, that you've "
-                    + "noticed recently?",
+                    "Do you have shortness of breath while resting or difficulty "
+                    "breathing, that you've noticed recently?",
                     "",
                     "Reply",
                 ]
@@ -618,7 +630,8 @@ class Application(BaseApplication):
             self,
             question="\n".join(
                 [
-                    "Have you noticed any recent changes in your ability to taste or smell things?",
+                    "Have you noticed any recent changes in your ability to taste or "
+                    "smell things?",
                     "",
                     "Reply",
                 ]
@@ -626,7 +639,8 @@ class Application(BaseApplication):
             error="\n".join(
                 [
                     "This service works best when you select numbers from the list.",
-                    "Have you noticed any recent changes in your ability to taste or smell things?",
+                    "Have you noticed any recent changes in your ability to taste or "
+                    "smell things?",
                     "",
                     "Reply",
                 ]
@@ -643,8 +657,8 @@ class Application(BaseApplication):
             self,
             question="\n".join(
                 [
-                    "Have you been diagnosed with either Obesity, Diabetes, Hypertension or Cardiovascular "
-                    + "disease?",
+                    "Have you been diagnosed with either Obesity, Diabetes, "
+                    "Hypertension or Cardiovascular disease?",
                     "",
                     "Reply",
                 ]
@@ -653,8 +667,8 @@ class Application(BaseApplication):
                 [
                     "Please use numbers from list.",
                     "",
-                    "Have you been diagnosed with either Obesity, Diabetes, Hypertension or Cardiovascular "
-                    + "disease?",
+                    "Have you been diagnosed with either Obesity, Diabetes, "
+                    "Hypertension or Cardiovascular disease?",
                     "",
                     "Reply",
                 ]
@@ -672,15 +686,16 @@ class Application(BaseApplication):
             self,
             question="\n".join(
                 [
-                    "Have you been in close contact to someone confirmed to be infected with COVID19?",
+                    "Have you been in close contact to someone confirmed to be "
+                    "infected with COVID19?",
                     "",
                     "Reply",
                 ]
             ),
             error="\n".join(
                 [
-                    "Please use numbers from list. Have u been in contact with someone with COVID19 or "
-                    + "been where COVID19 patients are treated?",
+                    "Please use numbers from list. Have u been in contact with someone"
+                    " with COVID19 or been where COVID19 patients are treated?",
                     "",
                     "Reply",
                 ]
@@ -696,8 +711,8 @@ class Application(BaseApplication):
     async def state_tracing(self):
         question = "\n".join(
             [
-                "Please confirm that the information you shared is correct & that the National "
-                + "Department of Health can contact you if necessary?",
+                "Please confirm that the information you shared is correct & that the "
+                "National Department of Health can contact you if necessary?",
                 "",
                 "Reply",
             ]
@@ -705,8 +720,8 @@ class Application(BaseApplication):
         error = "\n".join(
             [
                 "Please reply with numbers",
-                "Is the information you shared correct & can the National Department of Health contact "
-                + "you if necessary?",
+                "Is the information you shared correct & can the National Department "
+                "of Health contact you if necessary?",
                 "",
                 "Reply",
             ]
@@ -715,8 +730,8 @@ class Application(BaseApplication):
         if self.user.answers.get("confirmed_contact") == "yes":
             question = "\n".join(
                 [
-                    "Finally, please confirm that the information you shared is ACCURATE to the best of "
-                    + "your knowledge?",
+                    "Finally, please confirm that the information you shared is "
+                    "ACCURATE to the best of your knowledge?",
                     "",
                     "Reply",
                 ]
@@ -725,8 +740,8 @@ class Application(BaseApplication):
                 [
                     "Please use numbers from the list.",
                     "",
-                    "Finally, please confirm that the information you shared is ACCURATE to the best of "
-                    + "your knowledge?",
+                    "Finally, please confirm that the information you shared is "
+                    "ACCURATE to the best of your knowledge?",
                     "",
                     "Reply",
                 ]
@@ -749,7 +764,7 @@ class Application(BaseApplication):
                 response = await get_eventstore().post(
                     urljoin(
                         config.EVENTSTORE_API_URL,
-                        f"/api/v3/covid19triage/",
+                        "/api/v3/covid19triage/",
                     ),
                     json={
                         "msisdn": self.inbound.from_addr,
@@ -775,11 +790,7 @@ class Application(BaseApplication):
                         "data": {"age_years": self.user.answers.get("state_age_years")},
                     },
                 )
-                if response.status == 404:
-                    self.save_answer("returning_user", "no")
-                    return await self.go_to_state("state_save_healthcheck_start")
                 response.raise_for_status()
-                data = await response.json()
                 break
             except aiohttp.ClientError as e:
                 if i == 2:
