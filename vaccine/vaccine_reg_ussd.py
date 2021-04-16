@@ -34,7 +34,7 @@ def get_evds():
         headers={
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "User-Agent": "healthcheck-ussd",
+            "User-Agent": "vaccine-registration-ussd",
         },
         auth=aiohttp.BasicAuth(config.EVDS_USERNAME, config.EVDS_PASSWORD),
     )
