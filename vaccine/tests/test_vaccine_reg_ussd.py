@@ -986,7 +986,7 @@ async def test_medical_aid_invalid():
 
 
 @pytest.mark.asyncio
-async def test_terms_and_conditions(evds_mock):
+async def test_terms_and_conditions():
     u = User(
         addr="27820001001",
         state=StateData(name="state_terms_and_conditions_3"),
