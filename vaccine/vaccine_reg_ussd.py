@@ -163,14 +163,14 @@ class Application(BaseApplication):
                 assert int(value) <= date.today().year
             except AssertionError:
                 raise ErrorMessage(
-                    "REQUIRED: Please TYPE the 4 digits of the year you were born "
+                    "REQUIRED: Please TYPE the 4 digits of the YEAR you were born "
                     "(Example: 1980)"
                 )
 
         return FreeText(
             self,
-            question="Date of birth: In which year were you born? (Please type just "
-            "the year)",
+            question="Date of birth: In which YEAR were you born? (Please TYPE just "
+            "the YEAR)",
             next="state_dob_month",
             check=validate_dob_year,
         )
@@ -178,7 +178,7 @@ class Application(BaseApplication):
     async def state_dob_month(self):
         return ChoiceState(
             self,
-            question="Date of birth: In which month were you born?",
+            question="Date of birth: In which MONTH were you born?",
             choices=[
                 Choice("1", "Jan"),
                 Choice("2", "Feb"),
@@ -194,7 +194,7 @@ class Application(BaseApplication):
                 Choice("12", "Dec"),
             ],
             next="state_dob_day",
-            error="REQUIRED: Choose your birthday month using the numbers below:",
+            error="REQUIRED: Choose your birthday MONTH using the numbers below:",
         )
 
     async def state_dob_day(self):
@@ -220,8 +220,8 @@ class Application(BaseApplication):
 
         return FreeText(
             self,
-            question="Date of birth: On which day of the month were you born? (Please "
-            "type just the day)",
+            question="Date of birth: On which DAY of the month were you born? (Please "
+            "type just the DAY)",
             next="state_first_name",
             check=validate_dob_day,
         )
@@ -277,7 +277,7 @@ class Application(BaseApplication):
     async def state_suburb_search(self):
         return FreeText(
             self,
-            question="Please type the name of the SUBURB where you live.",
+            question="Please TYPE the name of the SUBURB where you live.",
             next="state_suburb",
         )
 
@@ -320,7 +320,7 @@ class Application(BaseApplication):
         # TODO: validate phone number
         return FreeText(
             self,
-            question="Please type a CELL NUMBER we can send an SMS to with your "
+            question="Please TYPE a CELL NUMBER we can send an SMS to with your "
             "appointment information",
             next="state_confirm_phone_number",
         )
@@ -354,9 +354,9 @@ class Application(BaseApplication):
     async def state_medical_aid(self):
         return ChoiceState(
             self,
-            question="Do you belong to a Medical Aid Scheme?",
+            question="Do you belong to a Medical Aid?",
             choices=[Choice("yes", "Yes"), Choice("no", "No")],
-            error="ERROR: Please try again. Do you belong to a Medical Aid Scheme?",
+            error="ERROR: Please try again. Do you belong to a Medical Aid?",
             next="state_terms_and_conditions",
         )
 
