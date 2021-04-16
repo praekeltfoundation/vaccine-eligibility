@@ -158,7 +158,7 @@ async def test_identification_type():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_identification_type"
+    assert u.state.name == "state_terms_and_conditions"
 
 
 @pytest.mark.asyncio
@@ -1014,7 +1014,9 @@ async def test_medical_aid_invalid():
 @pytest.mark.asyncio
 async def test_terms_and_conditions():
     u = User(
-        addr="27820001001", state=StateData(name="state_medical_aid"), session_id=1
+        addr="27820001001",
+        state=StateData(name="state_age_gate"),
+        session_id=1,
     )
     app = Application(u)
     msg = Message(
@@ -1133,7 +1135,7 @@ async def test_terms_and_conditions_3_invalid():
 async def test_state_success(evds_mock):
     u = User(
         addr="27820001001",
-        state=StateData(name="state_terms_and_conditions_3"),
+        state=StateData(name="state_medical_aid"),
         session_id=1,
         answers={
             "state_dob_year": "1960",
@@ -1151,7 +1153,7 @@ async def test_state_success(evds_mock):
     )
     app = Application(u)
     msg = Message(
-        content="accept",
+        content="yes",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -1167,8 +1169,8 @@ async def test_state_success(evds_mock):
     assert reply.session_event == Message.SESSION_EVENT.CLOSE
     assert u.state.name == "state_age_gate"
 
-    [request] = evds_mock.app.requests
-    assert request.json == {
+    [requests] = evds_mock.app.requests
+    assert requests.json == {
         "gender": "Other",
         "surname": "test surname",
         "firstName": "test first name",
@@ -1194,7 +1196,7 @@ async def test_state_success_temporary_failure(evds_mock):
     evds_mock.app.errormax = 1
     u = User(
         addr="27820001001",
-        state=StateData(name="state_terms_and_conditions_3"),
+        state=StateData(name="state_medical_aid"),
         session_id=1,
         answers={
             "state_dob_year": "1960",
@@ -1213,7 +1215,7 @@ async def test_state_success_temporary_failure(evds_mock):
     )
     app = Application(u)
     msg = Message(
-        content="accept",
+        content="yes",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -1258,7 +1260,7 @@ async def test_state_error(evds_mock):
     evds_mock.app.errormax = 3
     u = User(
         addr="27820001001",
-        state=StateData(name="state_terms_and_conditions_3"),
+        state=StateData(name="state_medical_aid"),
         session_id=1,
         answers={
             "state_dob_year": "1960",
@@ -1276,7 +1278,7 @@ async def test_state_error(evds_mock):
     )
     app = Application(u)
     msg = Message(
-        content="accept",
+        content="yes",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",

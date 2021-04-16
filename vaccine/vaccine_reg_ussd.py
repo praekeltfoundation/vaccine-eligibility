@@ -69,7 +69,7 @@ class Application(BaseApplication):
                 ]
             ),
             choices=[
-                Choice("state_identification_type", "Yes"),
+                Choice("state_terms_and_conditions", "Yes"),
                 Choice("state_under_age_notification", "No"),
             ],
             error="Self-registration is currently only available to those "
@@ -90,6 +90,41 @@ class Application(BaseApplication):
 
     async def state_confirm_notification(self):
         return EndState(self, text="Thank you for confirming", next=self.START_STATE)
+
+    async def state_terms_and_conditions(self):
+        return MenuState(
+            self,
+            question="\n".join(
+                [
+                    "PRIVACY POLICY",
+                    "EVDS is POPIA compliant. Your data is kept private + confidential"
+                    " & only used with your consent for the purpose of "
+                    "getting vaccinated.\n",
+                ]
+            ),
+            choices=[Choice("state_terms_and_conditions_2", "Next")],
+            error="TYPE 1 to continue",
+        )
+
+    async def state_terms_and_conditions_2(self):
+        return MenuState(
+            self,
+            question="EVDS uses your data to check eligibility & inform you  of your "
+            "vaccination date & venue. Registration is voluntary & does not guarantee "
+            "vaccination.\n",
+            choices=[Choice("state_terms_and_conditions_3", "Next")],
+            error="TYPE 1 to continue",
+        )
+
+    async def state_terms_and_conditions_3(self):
+        return MenuState(
+            self,
+            question="All security measures are taken to make sure your information is"
+            " safe. No personal data will be transferred from EVDS authorisation "
+            "through POPIA.\n",
+            choices=[Choice("state_identification_type", "ACCEPT")],
+            error="TYPE 1 to ACCEPT our Privacy Policy",
+        )
 
     async def state_identification_type(self):
         return ChoiceState(
@@ -400,43 +435,7 @@ class Application(BaseApplication):
             question="Do you belong to a Medical Aid?",
             choices=[Choice("yes", "Yes"), Choice("no", "No")],
             error="ERROR: Please try again. Do you belong to a Medical Aid?",
-            next="state_terms_and_conditions",
-        )
-
-    async def state_terms_and_conditions(self):
-        return MenuState(
-            self,
-            question="\n".join(
-                [
-                    "TERMS & CONDITIONS",
-                    "",
-                    "EVDS is POPI compliant. Your personal, contact, medical aid & "
-                    "vaccine details are kept private & are processed with your "
-                    "consent\n",
-                ]
-            ),
-            choices=[Choice("state_terms_and_conditions_2", "Next")],
-            error="TYPE 1 to continue",
-        )
-
-    async def state_terms_and_conditions_2(self):
-        return MenuState(
-            self,
-            question="EVDS uses your data to check eligibility & inform you of your "
-            "vaccination date & venue. Registration is voluntary & does not guarantee "
-            "vaccination.\n",
-            choices=[Choice("state_terms_and_conditions_3", "Next")],
-            error="TYPE 1 to continue",
-        )
-
-    async def state_terms_and_conditions_3(self):
-        return MenuState(
-            self,
-            question="All security measures are taken to make sure your information is "
-            "safe. No personal data will be transferred from EVDS without legal "
-            "authorisation.\n",
-            choices=[Choice("state_submit_to_evds", "ACCEPT")],
-            error="TYPE 1 to ACCEPT our terms and conditions",
+            next="state_submit_to_evds",
         )
 
     async def state_submit_to_evds(self):
