@@ -1107,7 +1107,6 @@ async def test_terms_and_conditions_3_invalid():
 
 @pytest.mark.asyncio
 async def test_state_success(evds_mock):
-    evds_mock.app.errormax = 1
     u = User(
         addr="27820001001",
         state=StateData(name="state_medical_aid"),
@@ -1143,9 +1142,8 @@ async def test_state_success(evds_mock):
     )
     assert reply.session_event == Message.SESSION_EVENT.CLOSE
 
-    requests = evds_mock.app.requests
-    assert len(requests) == 2
-    assert requests[-1].json == {
+    [requests] = evds_mock.app.requests
+    assert requests.json == {
         "gender": "Other",
         "surname": "test surname",
         "firstName": "test first name",
