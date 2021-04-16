@@ -91,11 +91,10 @@ class Application(BaseApplication):
             self,
             question="\n".join(
                 [
-                    "TERMS & CONDITIONS",
-                    "",
-                    "EVDS is POPI compliant. Your personal, contact, medical aid & "
-                    "vaccine details are kept private & are processed with your "
-                    "consent\n",
+                    "PRIVACY POLICY",
+                    "EVDS is POPIA compliant. Your data is kept private + confidential"
+                    " & only used with your consent for the purpose of "
+                    "getting vaccinated.\n",
                 ]
             ),
             choices=[Choice("state_terms_and_conditions_2", "Next")],
@@ -105,7 +104,7 @@ class Application(BaseApplication):
     async def state_terms_and_conditions_2(self):
         return MenuState(
             self,
-            question="EVDS uses your data to check eligibility & inform you of your "
+            question="EVDS uses your data to check eligibility & inform you  of your "
             "vaccination date & venue. Registration is voluntary & does not guarantee "
             "vaccination.\n",
             choices=[Choice("state_terms_and_conditions_3", "Next")],
@@ -115,11 +114,11 @@ class Application(BaseApplication):
     async def state_terms_and_conditions_3(self):
         return MenuState(
             self,
-            question="All security measures are taken to make sure your information is "
-            "safe. No personal data will be transferred from EVDS without legal "
-            "authorisation.\n",
+            question="All security measures are taken to make sure your information is"
+            " safe. No personal data will be transferred from EVDS authorisation "
+            "through POPIA.\n",
             choices=[Choice("state_identification_type", "ACCEPT")],
-            error="TYPE 1 to ACCEPT our terms and conditions",
+            error="TYPE 1 to ACCEPT our Privacy Policy",
         )
 
     async def state_identification_type(self):
