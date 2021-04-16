@@ -570,6 +570,17 @@ async def test_state_confirm_profile():
     assert len(reply.content) < 160
     assert u.state.name == "state_confirm_profile"
     assert u.answers["state_surname"] == "reallyreallylongsurname"
+    assert reply.content == "\n".join(
+        [
+            "Confirm the following:",
+            "",
+            "reallyreallylongfirstname reallyreallylongsurname",
+            "0123456789012345678901234",
+            "",
+            "1. Correct",
+            "2. Wrong",
+        ]
+    )
 
 
 @pytest.mark.asyncio

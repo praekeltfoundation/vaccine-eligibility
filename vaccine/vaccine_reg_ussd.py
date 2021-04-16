@@ -280,7 +280,7 @@ class Application(BaseApplication):
                     "",
                     f"{first_name} {surname}",
                     id_number,
-                    "\n",
+                    "",
                 ]
             ),
             choices=[
