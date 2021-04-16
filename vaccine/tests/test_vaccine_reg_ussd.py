@@ -1123,10 +1123,7 @@ async def test_state_success(evds_mock):
             "state_surname": "test surname",
             "state_first_name": "test first name",
             "state_identification_type": "rsa_id",
-            "state_identification_number": "6001010001081",
-            "state_terms_and_conditions": "next",
-            "state_terms_and_conditions_2": "next",
-            "state_terms_and_conditions_3": "accept",
+            "state_identification_number": "6001010001081"
         },
     )
     app = Application(u)
