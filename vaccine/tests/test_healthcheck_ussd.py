@@ -420,6 +420,18 @@ async def test_state_terms_new_contact():
     assert len(reply.content) < 160
     assert u.state.name == "state_terms"
 
+    assert reply.content == "\n".join(
+        [
+            "Confirm that you're responsible for your medical care & "
+            "treatment. This service only provides info.",
+            "",
+            "Reply",
+            "1. YES",
+            "2. NO",
+            "3. MORE INFO",
+        ]
+    )
+
     app.messages = []
     msg = Message(
         content="invalid",
@@ -430,6 +442,18 @@ async def test_state_terms_new_contact():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
+
+    assert reply.content == "\n".join(
+        [
+            "Please use numbers from list. Confirm that u're responsible for "
+            "ur medical care & treatment. This service only provides info.",
+            "",
+            "Reply",
+            "1. YES",
+            "2. NO",
+            "3. MORE INFO",
+        ]
+    )
 
 
 @pytest.mark.asyncio
@@ -447,6 +471,15 @@ async def test_state_more_info_pg1():
     assert len(reply.content) < 160
     assert u.state.name == "state_more_info_pg1"
 
+    assert reply.content == "\n".join(
+        [
+            "It's not a substitute for professional medical "
+            "advice/diagnosis/treatment. Get a qualified health provider's advice "
+            "about your medical condition/care.",
+            "1. Next",
+        ]
+    )
+
     app.messages = []
     msg = Message(
         content="invalid",
@@ -457,6 +490,15 @@ async def test_state_more_info_pg1():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
+
+    assert reply.content == "\n".join(
+        [
+            "It's not a substitute for professional medical "
+            "advice/diagnosis/treatment. Get a qualified health provider's advice "
+            "about your medical condition/care.",
+            "1. Next",
+        ]
+    )
 
 
 @pytest.mark.asyncio
@@ -475,6 +517,14 @@ async def test_state_more_info_pg2():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_more_info_pg2"
+    assert reply.content == "\n".join(
+        [
+            "You confirm that you shouldn't disregard/delay seeking medical "
+            "advice about treatment/care because of this service. Rely on info at your "
+            "own risk.",
+            "1. Next",
+        ]
+    )
 
     app.messages = []
     msg = Message(
@@ -486,6 +536,14 @@ async def test_state_more_info_pg2():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
+    assert reply.content == "\n".join(
+        [
+            "You confirm that you shouldn't disregard/delay seeking medical "
+            "advice about treatment/care because of this service. Rely on info at your "
+            "own risk.",
+            "1. Next",
+        ]
+    )
 
 
 @pytest.mark.asyncio
@@ -591,6 +649,22 @@ async def test_state_province():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_province"
+    assert reply.content == "\n".join(
+        [
+            "Select your province",
+            "",
+            "Reply:",
+            "1. EASTERN CAPE",
+            "2. FREE STATE",
+            "3. GAUTENG",
+            "4. KWAZULU NATAL",
+            "5. LIMPOPO",
+            "6. MPUMALANGA",
+            "7. NORTH WEST",
+            "8. NORTHERN CAPE",
+            "9. WESTERN CAPE",
+        ]
+    )
 
     app.messages = []
     msg = Message(
@@ -603,6 +677,22 @@ async def test_state_province():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_province"
+    assert reply.content == "\n".join(
+        [
+            "Select your province",
+            "",
+            "Reply:",
+            "1. EASTERN CAPE",
+            "2. FREE STATE",
+            "3. GAUTENG",
+            "4. KWAZULU NATAL",
+            "5. LIMPOPO",
+            "6. MPUMALANGA",
+            "7. NORTH WEST",
+            "8. NORTHERN CAPE",
+            "9. WESTERN CAPE",
+        ]
+    )
 
 
 @pytest.mark.asyncio
@@ -624,6 +714,9 @@ async def test_state_city():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_city"
+    assert reply.content == (
+        "Please TYPE the name of your Suburb, Township, Town or " "Village (or nearest)"
+    )
 
     app.messages = []
     msg = Message(
@@ -636,6 +729,34 @@ async def test_state_city():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_city"
+    assert reply.content == (
+        "Please TYPE the name of your Suburb, Township, Town or " "Village (or nearest)"
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_city_skip():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_terms"),
+        session_id=1,
+        answers={
+            "state_province": "ZA-WC",
+            "state_city": "Cape Town",
+            "city_location": "+1+1/",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_age"
 
 
 @pytest.mark.asyncio
@@ -658,6 +779,16 @@ async def test_state_confirm_city(google_api_mock):
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_confirm_city"
+    assert reply.content == "\n".join(
+        [
+            "Please confirm the address below based on info you shared:",
+            "Cape Town, South Africa",
+            "",
+            "Reply",
+            "1. Yes",
+            "2. No",
+        ]
+    )
 
     assert [r.path for r in google_api_mock.app.requests] == [
         "/maps/api/place/autocomplete/json",
@@ -901,6 +1032,62 @@ async def test_state_cough():
 
 
 @pytest.mark.asyncio
+async def test_state_cough_confirmed_contact():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_fever"),
+        session_id=1,
+        answers={"confirmed_contact": "yes"},
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_cough"
+
+    assert reply.content == "\n".join(
+        [
+            "Do you have a cough that recently started in the last week?",
+            "",
+            "Reply",
+            "1. Yes",
+            "2. No",
+        ]
+    )
+
+    app.messages = []
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_cough"
+
+    assert reply.content == "\n".join(
+        [
+            "This service works best when you select numbers from the list.",
+            "",
+            "Do you have a cough that recently started in the last week?",
+            "",
+            "Reply",
+            "1. Yes",
+            "2. No",
+        ]
+    )
+
+
+@pytest.mark.asyncio
 async def test_state_sore_throat():
     u = User(
         addr="27820001003",
@@ -1005,6 +1192,189 @@ async def test_state_breathing():
             "3. NOT SURE",
         ]
     )
+
+
+@pytest.mark.asyncio
+async def test_state_breathing_confirmed_contact():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_sore_throat"),
+        session_id=1,
+        answers={"confirmed_contact": "yes"},
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_breathing"
+
+    assert reply.content == "\n".join(
+        [
+            "Do you have shortness of breath while resting or difficulty "
+            "breathing, that you've noticed recently?",
+            "",
+            "Reply",
+            "1. Yes",
+            "2. No",
+        ]
+    )
+    app.messages = []
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_breathing"
+
+    assert reply.content == "\n".join(
+        [
+            "Please use numbers from list.",
+            "",
+            "Do you have shortness of breath while resting or difficulty "
+            "breathing, that you've noticed recently?",
+            "",
+            "Reply",
+            "1. Yes",
+            "2. No",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_taste_and_smell():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_taste_and_smell"),
+        session_id=1,
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) <= 160
+    assert u.state.name == "state_taste_and_smell"
+
+    assert reply.content == "\n".join(
+        [
+            "This service works best when you select numbers from the list.",
+            "Have you noticed any recent changes in your ability to taste or "
+            "smell things?",
+            "",
+            "Reply",
+            "1. Yes",
+            "2. No",
+        ]
+    )
+
+    app.messages = []
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_preexisting_conditions"
+
+
+@pytest.mark.asyncio
+async def test_state_preexisting_conditions():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_taste_and_smell"),
+        session_id=1,
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) <= 160
+    assert u.state.name == "state_preexisting_conditions"
+
+    assert reply.content == "\n".join(
+        [
+            "Have you been diagnosed with either Obesity, Diabetes, "
+            "Hypertension or Cardiovascular disease?",
+            "",
+            "Reply",
+            "1. YES",
+            "2. NO",
+            "3. NOT SURE",
+        ]
+    )
+
+    app.messages = []
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_preexisting_conditions"
+
+    assert reply.content == "\n".join(
+        [
+            "Please use numbers from list.",
+            "",
+            "Have you been diagnosed with either Obesity, Diabetes, "
+            "Hypertension or Cardiovascular disease?",
+            "",
+            "Reply",
+            "1. YES",
+            "2. NO",
+            "3. NOT SURE",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_preexisting_conditions_skip():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_taste_and_smell"),
+        session_id=1,
+        answers={"state_preexisting_conditions": "yes"},
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) <= 160
+    assert u.state.name == "state_age_years"
 
 
 @pytest.mark.asyncio
@@ -1123,23 +1493,6 @@ async def test_state_age_years():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_province"
-
-    assert reply.content == "\n".join(
-        [
-            "Select your province",
-            "",
-            "Reply:",
-            "1. EASTERN CAPE",
-            "2. FREE STATE",
-            "3. GAUTENG",
-            "4. KWAZULU NATAL",
-            "5. LIMPOPO",
-            "6. MPUMALANGA",
-            "7. NORTH WEST",
-            "8. NORTHERN CAPE",
-            "9. WESTERN CAPE",
-        ]
-    )
 
 
 @pytest.mark.asyncio
@@ -1275,6 +1628,72 @@ async def test_state_tracing(eventstore_mock):
 
 
 @pytest.mark.asyncio
+async def test_state_tracing_confirmed_contact(eventstore_mock):
+    def get_user(answers={}):
+        answers["confirmed_contact"] = "yes"
+        return User(
+            addr="27820001003",
+            state=StateData(name="state_tracing"),
+            session_id=1,
+            answers=answers,
+        )
+
+    def get_message(content):
+        return Message(
+            content=content,
+            to_addr="27820001002",
+            from_addr="27820001003",
+            transport_name="whatsapp",
+            transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        )
+
+    u = get_user()
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) <= 160
+    assert u.state.name == "state_tracing"
+
+    assert reply.content == "\n".join(
+        [
+            "Please use numbers from the list.",
+            "",
+            "Finally, please confirm that the information you shared is "
+            "ACCURATE to the best of your knowledge?",
+            "",
+            "Reply",
+            "1. YES",
+            "2. NO",
+        ]
+    )
+
+    app = Application(get_user({"state_fever": "yes", "state_exposure": "yes"}))
+    [reply] = await app.process_message(get_message("yes"))
+    assert len(reply.content) < 160
+    assert (
+        reply.content
+        == "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing center "
+        "or Call 0800029999 or visit your healthcare practitioner for "
+        "info on what to do & how to test."
+    )
+
+    app = Application(get_user({"state_exposure": "yes"}))
+    [reply] = await app.process_message(get_message("yes"))
+    assert len(reply.content) < 160
+    assert (
+        reply.content == "We recommend you SELF-QUARANTINE for the next 10 days and do "
+        "this HealthCheck daily to monitor your symptoms. Stay/sleep "
+        "alone in a room with good air flow."
+    )
+
+
+@pytest.mark.asyncio
 async def test_state_tracing_restart(eventstore_mock):
     u = User(
         addr="27820001003",
@@ -1388,3 +1807,15 @@ def test_calculate_risk():
     )
     test = app.calculate_risk()
     assert test == "high"
+
+
+def test_format_location():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_tracing"),
+        session_id=1,
+        answers={},
+    )
+    app = Application(u)
+    location = app.format_location(-3.86665100000, 51.19582700000)
+    assert location == "-03.866651+051.195827/"
