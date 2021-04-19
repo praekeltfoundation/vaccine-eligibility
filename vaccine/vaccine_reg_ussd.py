@@ -1,7 +1,6 @@
 import logging
 from datetime import date
 from enum import Enum
-from typing import List
 from urllib.parse import urljoin
 
 import aiohttp
@@ -9,7 +8,6 @@ import aiohttp
 from vaccine import vacreg_config as config
 from vaccine.base_application import BaseApplication
 from vaccine.data.suburbs import suburbs
-from vaccine.models import Message
 from vaccine.states import (
     Choice,
     ChoiceState,
@@ -55,29 +53,6 @@ class Application(BaseApplication):
         passport = "Passport Number"
         asylum_seeker = "Asylum Seeker Permit number"
         refugee = "Refugee Number Permit number"
-
-    async def process_message(self, message: Message) -> List[Message]:
-        if (
-            message.session_event == Message.SESSION_EVENT.NEW
-            and self.state_name is not None
-            and self.state_name != self.START_STATE
-        ):
-            self.save_answer("resume_state", self.state_name)
-            self.state_name = "state_timed_out"
-        return await super().process_message(message)
-
-    async def state_timed_out(self):
-        return MenuState(
-            self,
-            question="Welcome back to the NATIONAL DEPARTMENT OF HEALTH's COVID-19 "
-            "Vaccine Registration service",
-            error="Welcome back to the NATIONAL DEPARTMENT OF HEALTH's COVID-19 "
-            "Vaccine Registration service",
-            choices=[
-                Choice(self.user.answers["resume_state"], "Continue where I left off"),
-                Choice(self.START_STATE, "Start over"),
-            ],
-        )
 
     async def state_age_gate(self):
         self.user.answers = {}
@@ -347,7 +322,7 @@ class Application(BaseApplication):
                 ["Confirm the following:", "", f"{first_name} {surname}", id_number, ""]
             ),
             choices=[
-                Choice("state_province", "Correct"),
+                Choice("state_province_id", "Correct"),
                 Choice("state_identification_type", "Wrong"),
             ],
             error="\n".join(
@@ -360,7 +335,7 @@ class Application(BaseApplication):
             ),
         )
 
-    async def state_province(self):
+    async def state_province_id(self):
         return ChoiceState(
             self,
             question="Select Your Province",
@@ -379,10 +354,10 @@ class Application(BaseApplication):
     async def state_suburb(self):
         async def next_state(choice: Choice):
             if choice.value == "other":
-                return "state_province"
+                return "state_province_id"
             return "state_self_registration"
 
-        province = self.user.answers["state_province"]
+        province = self.user.answers["state_province_id"]
         search = self.user.answers["state_suburb_search"] or ""
         choices = [
             Choice(suburb[0], suburb[1][:30])
@@ -472,7 +447,7 @@ class Application(BaseApplication):
         )
         vac_day, vac_time = self.user.answers["state_vaccination_time"].split("_")
         suburb_id = self.user.answers["state_suburb"]
-        province_id = self.user.answers["state_province"]
+        province_id = self.user.answers["state_province_id"]
         location = {
             "value": suburb_id,
             "text": suburbs.suburb_name(suburb_id, province_id),
@@ -520,7 +495,7 @@ class Application(BaseApplication):
                 except aiohttp.ClientError as e:
                     if i == 2:
                         logger.exception(e)
-                        return await self.go_to_state("state_error")
+                        return await self.go_to_state("state_err")
                     else:
                         continue
 
@@ -533,7 +508,7 @@ class Application(BaseApplication):
             "information and appointment details will be sent via SMS.",
         )
 
-    async def state_error(self):
+    async def state_err(self):
         return EndState(
             self,
             text="Something went wrong with your registration session. Your "
