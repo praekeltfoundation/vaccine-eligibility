@@ -45,7 +45,7 @@ class BaseApplication:
         """
         self.inbound = message
         if message.content == "!reset":
-            self.user.state.name = self.START_STATE
+            self.state_name = self.START_STATE
             self.user.answers = {}
             self.user.session_id = None
         state = await self.get_current_state()
