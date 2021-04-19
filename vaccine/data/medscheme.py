@@ -17,17 +17,19 @@ class MedicalAids:
     def schemes(self):
         schemes = [(i["value"], i["text"]) for i in self.data]
         schemes.sort(key=itemgetter(1))
-        return schemes
+        lowercase = {v.strip().lower(): k for k, v in schemes}
+        schemes_kv = {k: v for k, v in schemes}
+        return lowercase, schemes_kv
 
     def search_for_scheme(self, search_text):
         search_text = search_text.strip().lower()
-        schemes = {v.strip().lower(): k for k, v in self.schemes}
-        possibilities = difflib.get_close_matches(search_text, schemes.keys(), n=3)
-        return [(schemes[p], self.scheme_name(schemes[p])) for p in possibilities]
+        lowercase, _ = self.schemes
+        possibilities = difflib.get_close_matches(search_text, lowercase.keys(), n=3)
+        return [(lowercase[p], self.scheme_name(lowercase[p])) for p in possibilities]
 
     def scheme_name(self, scheme_id):
-        schemes = {k: v for k, v in self.schemes}
-        return schemes[scheme_id]
+        _, schemes_kv = self.schemes
+        return schemes_kv[scheme_id]
 
 
 medical_aids = MedicalAids()
