@@ -347,7 +347,7 @@ class Application(BaseApplication):
                 ["Confirm the following:", "", f"{first_name} {surname}", id_number, ""]
             ),
             choices=[
-                Choice("state_province", "Correct"),
+                Choice("state_province_id", "Correct"),
                 Choice("state_identification_type", "Wrong"),
             ],
             error="\n".join(
@@ -360,7 +360,7 @@ class Application(BaseApplication):
             ),
         )
 
-    async def state_province(self):
+    async def state_province_id(self):
         return ChoiceState(
             self,
             question="Select Your Province",
@@ -379,10 +379,10 @@ class Application(BaseApplication):
     async def state_suburb(self):
         async def next_state(choice: Choice):
             if choice.value == "other":
-                return "state_province"
+                return "state_province_id"
             return "state_self_registration"
 
-        province = self.user.answers["state_province"]
+        province = self.user.answers["state_province_id"]
         search = self.user.answers["state_suburb_search"] or ""
         choices = [
             Choice(suburb[0], suburb[1][:30])
@@ -472,7 +472,7 @@ class Application(BaseApplication):
         )
         vac_day, vac_time = self.user.answers["state_vaccination_time"].split("_")
         suburb_id = self.user.answers["state_suburb"]
-        province_id = self.user.answers["state_province"]
+        province_id = self.user.answers["state_province_id"]
         location = {
             "value": suburb_id,
             "text": suburbs.suburb_name(suburb_id, province_id),
@@ -520,7 +520,7 @@ class Application(BaseApplication):
                 except aiohttp.ClientError as e:
                     if i == 2:
                         logger.exception(e)
-                        return await self.go_to_state("state_error")
+                        return await self.go_to_state("state_err")
                     else:
                         continue
 
@@ -533,7 +533,7 @@ class Application(BaseApplication):
             "information and appointment details will be sent via SMS.",
         )
 
-    async def state_error(self):
+    async def state_err(self):
         return EndState(
             self,
             text="Something went wrong with your registration session. Your "

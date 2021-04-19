@@ -692,12 +692,14 @@ async def test_province():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_province"
+    assert u.state.name == "state_province_id"
 
 
 @pytest.mark.asyncio
 async def test_province_invalid():
-    u = User(addr="27820001001", state=StateData(name="state_province"), session_id=1)
+    u = User(
+        addr="27820001001", state=StateData(name="state_province_id"), session_id=1
+    )
     app = Application(u)
     msg = Message(
         content="invalid",
@@ -708,12 +710,14 @@ async def test_province_invalid():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_province"
+    assert u.state.name == "state_province_id"
 
 
 @pytest.mark.asyncio
 async def test_suburb_search():
-    u = User(addr="27820001001", state=StateData(name="state_province"), session_id=1)
+    u = User(
+        addr="27820001001", state=StateData(name="state_province_id"), session_id=1
+    )
     app = Application(u)
     msg = Message(
         content="western cape",
@@ -725,7 +729,7 @@ async def test_suburb_search():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_suburb_search"
-    assert u.answers["state_province"] == "e32298eb-17b4-471e-8d9b-ba093c6afc7c"
+    assert u.answers["state_province_id"] == "e32298eb-17b4-471e-8d9b-ba093c6afc7c"
 
 
 @pytest.mark.asyncio
@@ -734,7 +738,7 @@ async def test_suburb():
         addr="27820001001",
         state=StateData(name="state_suburb_search"),
         session_id=1,
-        answers={"state_province": "e32298eb-17b4-471e-8d9b-ba093c6afc7c"},
+        answers={"state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c"},
     )
     app = Application(u)
     msg = Message(
@@ -765,7 +769,7 @@ async def test_suburb_error():
         state=StateData(name="state_suburb"),
         session_id=1,
         answers={
-            "state_province": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
             "state_suburb_search": "tableview",
         },
     )
@@ -789,7 +793,7 @@ async def test_suburb_other():
         state=StateData(name="state_suburb"),
         session_id=1,
         answers={
-            "state_province": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
             "state_suburb_search": "tableview",
         },
     )
@@ -803,7 +807,7 @@ async def test_suburb_other():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_province"
+    assert u.state.name == "state_province_id"
 
 
 @pytest.mark.asyncio
@@ -813,7 +817,7 @@ async def test_self_registration():
         state=StateData(name="state_suburb"),
         session_id=1,
         answers={
-            "state_province": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
             "state_suburb_search": "tableview",
         },
     )
@@ -1137,7 +1141,7 @@ async def test_state_success(evds_mock):
             "state_dob_day": "1",
             "state_vaccination_time": "weekday_morning",
             "state_suburb": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "state_province": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
             "state_gender": "Other",
             "state_surname": "test surname",
             "state_first_name": "test first name",
@@ -1197,7 +1201,7 @@ async def test_state_success_temporary_failure(evds_mock):
             "state_dob_day": "1",
             "state_vaccination_time": "weekday_morning",
             "state_suburb": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "state_province": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
             "state_gender": "Other",
             "state_surname": "test surname",
             "state_first_name": "test first name",
@@ -1260,7 +1264,7 @@ async def test_state_error(evds_mock):
             "state_dob_day": "1",
             "state_vaccination_time": "weekday_morning",
             "state_suburb": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "state_province": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
             "state_gender": "Other",
             "state_surname": "test surname",
             "state_first_name": "test first name",
