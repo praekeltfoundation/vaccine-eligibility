@@ -734,8 +734,11 @@ class Application(BaseApplication):
                 "Reply",
             ]
         )
-        # TODO: handle the restart from here
-        choices = [Choice("yes", "YES"), Choice("no", "NO"), Choice(None, "RESTART")]
+        choices = [
+            Choice("yes", "YES"),
+            Choice("no", "NO"),
+            Choice("restart", "RESTART"),
+        ]
         if self.user.answers.get("confirmed_contact") == "yes":
             question = "\n".join(
                 [
@@ -768,6 +771,8 @@ class Application(BaseApplication):
         )
 
     async def state_submit_data(self):
+        if self.user.answers.get("state_tracing") == "restart":
+            return await self.go_to_state("state_start")
         for i in range(3):
             try:
                 response = await get_eventstore().post(
@@ -862,6 +867,31 @@ class Application(BaseApplication):
                     "healthcare practitioner for info."
                 )
         return EndState(self, text, next=self.START_STATE)
+
+    async def state_no_tracing_low_risk(self):
+        question = (
+            "You will not be contacted. If you think you have COVID-19 please"
+            " STAY HOME, avoid contact with other people in your community and "
+            "self-quarantine."
+        )
+        return MenuState(
+            self,
+            question=question,
+            choices=[Choice("state_start", "START OVER")],
+            error=question,
+        )
+
+    async def state_no_tracing_moderate_risk(self):
+        question = (
+            "You won't be contacted. SELF-QUARANTINE for 10 days, do this HealthCheck "
+            "daily to monitor symptoms. Stay/sleep alone in a room with good air flow."
+        )
+        return MenuState(
+            self,
+            question=question,
+            choices=[Choice("state_start", "START OVER")],
+            error=question,
+        )
 
     async def state_error(self):
         return EndState(
