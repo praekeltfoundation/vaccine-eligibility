@@ -50,7 +50,7 @@ def get_turn():
         timeout=aiohttp.ClientTimeout(total=5),
         headers={
             "Authorization": f"Bearer {config.TURN_API_TOKEN}",
-            "Content-Type": "application/vnd.v1+json",
+            "Accept": "application/vnd.v1+json",
             "User-Agent": "healthcheck-ussd",
         },
     )
