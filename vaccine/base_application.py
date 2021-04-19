@@ -44,6 +44,10 @@ class BaseApplication:
         Processes the message, and returns a list of messages to return to the user
         """
         self.inbound = message
+        if message.content == "!reset":
+            self.user.state.name = self.START_STATE
+            self.user.answers = {}
+            self.user.session_id = None
         state = await self.get_current_state()
         if self.user.session_id is not None:
             await state.process_message(message)
