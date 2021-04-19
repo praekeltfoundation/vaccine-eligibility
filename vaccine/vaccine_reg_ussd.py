@@ -114,7 +114,7 @@ class Application(BaseApplication):
         )
 
     async def state_confirm_notification(self):
-        return EndState(self, text="Thank you for confirming", next=self.START_STATE)
+        return EndState(self, text="Thank you for confirming")
 
     async def state_terms_and_conditions(self):
         return MenuState(
@@ -531,7 +531,6 @@ class Application(BaseApplication):
             self,
             text=":) You have SUCCESSFULLY registered to get vaccinated. Additional "
             "information and appointment details will be sent via SMS.",
-            next=self.START_STATE,
         )
 
     async def state_error(self):
@@ -539,5 +538,4 @@ class Application(BaseApplication):
             self,
             text="Something went wrong with your registration session. Your "
             "registration was not able to be processed. Please try again later",
-            next=self.START_STATE,
         )

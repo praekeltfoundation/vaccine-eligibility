@@ -7,9 +7,11 @@ from vaccine.models import Message
 
 
 class EndState:
-    def __init__(self, app: BaseApplication, text: str, next: str):
+    def __init__(self, app: BaseApplication, text: str, next: Optional[str] = None):
         self.app = app
         self.text = text
+        if next is None:
+            next = app.START_STATE
         self.next = next
 
     async def process_message(self, message: Message) -> List[Message]:
