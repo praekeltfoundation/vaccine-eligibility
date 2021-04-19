@@ -816,14 +816,7 @@ async def test_phone_number_invalid(get_today):
 async def test_vaccination_time(get_today):
     get_today.return_value = date(2100, 1, 1)
     u = User(
-        addr="27820001001",
-        state=StateData(name="state_self_registration"),
-        session_id=1,
-        answers={
-            "state_dob_year": "1990",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-        },
+        addr="27820001001", state=StateData(name="state_medical_aid"), session_id=1
     )
     app = Application(u)
     msg = Message(

@@ -529,7 +529,7 @@ class Application(BaseApplication):
                 ]
             ),
             choices=[
-                Choice("state_vaccination_time", "Yes"),
+                Choice("state_medical_aid", "Yes"),
                 Choice("state_phone_number", "No"),
             ],
             error="\n".join(
