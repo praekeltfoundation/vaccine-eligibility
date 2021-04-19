@@ -279,16 +279,18 @@ async def test_said_date_extraction_ambiguous(get_today):
 
 
 @pytest.mark.asyncio
-async def test_gender():
+@mock.patch("vaccine.utils.get_today")
+async def test_gender(get_today):
+    get_today.return_value = date(2120, 1, 1)
     u = User(
         addr="27820001001",
-        state=StateData(name="state_identification_number"),
-        answers={"state_identification_type": Application.ID_TYPES.asylum_seeker.name},
+        state=StateData(name="state_dob_day"),
+        answers={"state_dob_year": "1990", "state_dob_month": "1"},
         session_id=1,
     )
     app = Application(u)
     msg = Message(
-        content="9001010001088",
+        content="1",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -299,8 +301,19 @@ async def test_gender():
 
 
 @pytest.mark.asyncio
-async def test_gender_invalid():
-    u = User(addr="27820001001", state=StateData(name="state_gender"), session_id=1)
+@mock.patch("vaccine.utils.get_today")
+async def test_gender_invalid(get_today):
+    get_today.return_value = date(2120, 1, 1)
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_gender"),
+        session_id=1,
+        answers={
+            "state_dob_year": "1990",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+        },
+    )
     app = Application(u)
     msg = Message(
         content="invalid",
@@ -341,10 +354,10 @@ async def test_too_young(get_today):
 
 @pytest.mark.asyncio
 async def test_dob_year():
-    u = User(addr="27820001001", state=StateData(name="state_gender"), session_id=1)
+    u = User(addr="27820001001", state=StateData(name="state_surname"), session_id=1)
     app = Application(u)
     msg = Message(
-        content="male",
+        content="test surname",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -501,6 +514,33 @@ async def test_surname():
     [reply] = await app.process_message(msg)
     assert u.state.name == "state_surname"
     assert u.answers["state_first_name"] == "firstname"
+
+
+@pytest.mark.asyncio
+@mock.patch("vaccine.utils.get_today")
+async def test_skip_dob_and_gender(get_today):
+    get_today.return_value = date(2120, 1, 1)
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_surname"),
+        session_id=1,
+        answers={
+            "state_dob_day": "1",
+            "state_dob_month": "1",
+            "state_dob_year": "1990",
+            "state_gender": "male",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="test surname",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_self_registration"
 
 
 @pytest.mark.asyncio
@@ -662,13 +702,17 @@ async def test_self_registration(get_today):
     get_today.return_value = date(2100, 1, 1)
     u = User(
         addr="27820001001",
-        state=StateData(name="state_dob_day"),
+        state=StateData(name="state_gender"),
         session_id=1,
-        answers={"state_dob_year": "1990", "state_dob_month": "1"},
+        answers={
+            "state_dob_year": "1990",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+        },
     )
     app = Application(u)
     msg = Message(
-        content="1",
+        content="male",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",

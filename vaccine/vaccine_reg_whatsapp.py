@@ -290,7 +290,7 @@ class Application(BaseApplication):
         if idtype == self.ID_TYPES.passport:
             next_state = "state_passport_country"
         else:
-            next_state = "state_gender"
+            next_state = "state_first_name"
 
         async def validate_identification_number(value):
             if idtype == self.ID_TYPES.rsa_id or idtype == self.ID_TYPES.refugee:
@@ -357,31 +357,6 @@ class Application(BaseApplication):
                     "",
                     "Please TYPE your SURNAME as it appears in your identification "
                     "document.",
-                ]
-            ),
-            next="state_gender",
-        )
-
-    async def state_gender(self):
-        if self.user.answers.get("state_gender"):
-            return await self.go_to_state("state_dob_year")
-
-        return ChoiceState(
-            self,
-            question="\n".join(
-                ["*VACCINE REGISTRATION SECURE CHAT* 🔐", "", "What is your GENDER?"]
-            ),
-            choices=[
-                Choice("Male", "Male"),
-                Choice("Female", "Female"),
-                Choice("Other", "Other"),
-            ],
-            error="\n".join(
-                [
-                    "⚠️ This service works best when you reply with one of the numbers "
-                    "next to the options provided."
-                    "",
-                    "REPLY with the NUMBER next to your gender in the list below.",
                 ]
             ),
             next="state_dob_year",
@@ -472,7 +447,7 @@ class Application(BaseApplication):
 
     async def state_dob_day(self):
         if self.user.answers.get("state_dob_day"):
-            return await self.go_to_state("state_self_registration")
+            return await self.go_to_state("state_gender")
 
         async def validate_dob_day(value):
             dob_year = int(self.user.answers["state_dob_year"])
@@ -504,11 +479,11 @@ class Application(BaseApplication):
                     "Example: If you were born on 31 May, type _31_",
                 ]
             ),
-            next="state_self_registration",
+            next="state_gender",
             check=validate_dob_day,
         )
 
-    async def state_self_registration(self):
+    async def state_gender(self):
         year = int(self.user.answers["state_dob_year"])
         month = int(self.user.answers["state_dob_month"])
         day = int(self.user.answers["state_dob_day"])
@@ -516,6 +491,31 @@ class Application(BaseApplication):
         if age < config.ELIGIBILITY_AGE_GATE_MIN:
             return await self.go_to_state("state_under_age_notification")
 
+        if self.user.answers.get("state_gender"):
+            return await self.go_to_state("state_self_registration")
+
+        return ChoiceState(
+            self,
+            question="\n".join(
+                ["*VACCINE REGISTRATION SECURE CHAT* 🔐", "", "What is your GENDER?"]
+            ),
+            choices=[
+                Choice("Male", "Male"),
+                Choice("Female", "Female"),
+                Choice("Other", "Other"),
+            ],
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided."
+                    "",
+                    "REPLY with the NUMBER next to your gender in the list below.",
+                ]
+            ),
+            next="state_self_registration",
+        )
+
+    async def state_self_registration(self):
         number = display_phonenumber(self.inbound.from_addr)
         return MenuState(
             self,
