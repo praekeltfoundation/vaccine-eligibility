@@ -127,26 +127,27 @@ class Application(BaseApplication):
     async def state_start(self):
         # TODO: normalise msisdn
         msisdn = self.inbound.from_addr
-        for i in range(3):
-            try:
-                response = await get_eventstore().get(
-                    urljoin(
-                        config.EVENTSTORE_API_URL,
-                        f"/api/v2/healthcheckuserprofile/{msisdn}/",
+        async with get_eventstore() as session:
+            for i in range(3):
+                try:
+                    response = await session.get(
+                        urljoin(
+                            config.EVENTSTORE_API_URL,
+                            f"/api/v2/healthcheckuserprofile/{msisdn}/",
+                        )
                     )
-                )
-                if response.status == 404:
-                    self.save_answer("returning_user", "no")
-                    return await self.go_to_state("state_save_healthcheck_start")
-                response.raise_for_status()
-                data = await response.json()
-                break
-            except aiohttp.ClientError as e:
-                if i == 2:
-                    logger.exception(e)
-                    return await self.go_to_state("state_error")
-                else:
-                    continue
+                    if response.status == 404:
+                        self.save_answer("returning_user", "no")
+                        return await self.go_to_state("state_save_healthcheck_start")
+                    response.raise_for_status()
+                    data = await response.json()
+                    break
+                except aiohttp.ClientError as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
 
         self.save_answer("returning_user", "yes")
         self.save_answer("state_province", data["province"])
@@ -184,20 +185,21 @@ class Application(BaseApplication):
         # TODO: normalise msisdn
         msisdn = self.inbound.from_addr
         whatsapp_id = msisdn.lstrip("+")
-        for i in range(3):
-            try:
-                response = await get_turn().get(
-                    urljoin(config.TURN_API_URL, f"/v1/contacts/{whatsapp_id}/profile")
-                )
-                response.raise_for_status()
-                data = await response.json()
-                break
-            except aiohttp.ClientError as e:
-                if i == 2:
-                    logger.exception(e)
-                    return await self.go_to_state("state_error")
-                else:
-                    continue
+        async with get_turn() as session:
+            for i in range(3):
+                try:
+                    response = await session.get(
+                        urljoin(config.TURN_API_URL, f"/v1/contacts/{whatsapp_id}/profile")
+                    )
+                    response.raise_for_status()
+                    data = await response.json()
+                    break
+                except aiohttp.ClientError as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
         confirmed_contact = data.get("fields", {}).get("confirmed_contact", False)
         self.save_answer("confirmed_contact", "yes" if confirmed_contact else "no")
         return await self.go_to_state("state_welcome")
@@ -354,38 +356,40 @@ class Application(BaseApplication):
         )
 
     async def state_google_places_lookup(self):
-        for i in range(3):
-            try:
-                response = await get_google_api().get(
-                    urljoin(
-                        config.GOOGLE_PLACES_URL,
-                        "/maps/api/place/autocomplete/json",
-                    ),
-                    params={
-                        "input": self.user.answers.get("state_city"),
-                        "key": config.GOOGLE_PLACES_KEY,
-                        "sessiontoken": self.user.answers.get("google_session_token"),
-                        "language": "en",
-                        "components": "country:za",
-                    },
-                )
-                response.raise_for_status()
-                data = await response.json()
 
-                if data["status"] != "OK":
-                    return await self.go_to_state("state_city")
+        async with get_google_api() as session:
+            for i in range(3):
+                try:
+                    response = await session.get(
+                        urljoin(
+                            config.GOOGLE_PLACES_URL,
+                            "/maps/api/place/autocomplete/json",
+                        ),
+                        params={
+                            "input": self.user.answers.get("state_city"),
+                            "key": config.GOOGLE_PLACES_KEY,
+                            "sessiontoken": self.user.answers.get("google_session_token"),
+                            "language": "en",
+                            "components": "country:za",
+                        },
+                    )
+                    response.raise_for_status()
+                    data = await response.json()
 
-                first_result = data["predictions"][0]
-                self.save_answer("place_id", first_result["place_id"])
-                self.save_answer("state_city", first_result["description"])
+                    if data["status"] != "OK":
+                        return await self.go_to_state("state_city")
 
-                return await self.go_to_state("state_confirm_city")
-            except aiohttp.ClientError as e:
-                if i == 2:
-                    logger.exception(e)
-                    return await self.go_to_state("state_error")
-                else:
-                    continue
+                    first_result = data["predictions"][0]
+                    self.save_answer("place_id", first_result["place_id"])
+                    self.save_answer("state_city", first_result["description"])
+
+                    return await self.go_to_state("state_confirm_city")
+                except aiohttp.ClientError as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
 
     async def state_confirm_city(self):
         address = self.user.answers.get("state_city")[: 160 - 79]
@@ -414,43 +418,44 @@ class Application(BaseApplication):
         )
 
     async def state_place_details_lookup(self):
-        for i in range(3):
-            try:
-                response = await get_google_api().get(
-                    urljoin(
-                        config.GOOGLE_PLACES_URL,
-                        "/maps/api/place/details/json",
-                    ),
-                    params={
-                        "key": config.GOOGLE_PLACES_KEY,
-                        "place_id": self.user.answers.get("place_id"),
-                        "sessiontoken": self.user.answers.get("google_session_token"),
-                        "language": "en",
-                        "fields": "geometry",
-                    },
-                )
-                response.raise_for_status()
-                data = await response.json()
+        async with get_google_api() as session:
+            for i in range(3):
+                try:
+                    response = await session.get(
+                        urljoin(
+                            config.GOOGLE_PLACES_URL,
+                            "/maps/api/place/details/json",
+                        ),
+                        params={
+                            "key": config.GOOGLE_PLACES_KEY,
+                            "place_id": self.user.answers.get("place_id"),
+                            "sessiontoken": self.user.answers.get("google_session_token"),
+                            "language": "en",
+                            "fields": "geometry",
+                        },
+                    )
+                    response.raise_for_status()
+                    data = await response.json()
 
-                if data["status"] != "OK":
-                    return await self.go_to_state("state_city")
+                    if data["status"] != "OK":
+                        return await self.go_to_state("state_city")
 
-                location = data["result"]["geometry"]["location"]
+                    location = data["result"]["geometry"]["location"]
 
-                self.save_answer(
-                    "city_location",
-                    self.format_location(location["lat"], location["lng"]),
-                )
+                    self.save_answer(
+                        "city_location",
+                        self.format_location(location["lat"], location["lng"]),
+                    )
 
-                if self.user.answers.get("confirmed_contact"):
-                    return await self.go_to_state("state_tracing")
-                return await self.go_to_state("state_age")
-            except aiohttp.ClientError as e:
-                if i == 2:
-                    logger.exception(e)
-                    return await self.go_to_state("state_error")
-                else:
-                    continue
+                    if self.user.answers.get("confirmed_contact"):
+                        return await self.go_to_state("state_tracing")
+                    return await self.go_to_state("state_age")
+                except aiohttp.ClientError as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
 
     async def state_age(self):
         if self.user.answers.get("state_age"):
@@ -773,45 +778,47 @@ class Application(BaseApplication):
     async def state_submit_data(self):
         if self.user.answers.get("state_tracing") == "restart":
             return await self.go_to_state("state_start")
-        for i in range(3):
-            try:
-                response = await get_eventstore().post(
-                    urljoin(
-                        config.EVENTSTORE_API_URL,
-                        "/api/v3/covid19triage/",
-                    ),
-                    json={
-                        "msisdn": self.inbound.from_addr,
-                        "source": f"USSD {self.inbound.to_addr}",
-                        "province": self.user.answers.get("state_province"),
-                        "city": self.user.answers.get("state_city"),
-                        "city_location": self.user.answers.get("city_location"),
-                        "age": self.user.answers.get("state_age"),
-                        "fever": self.user.answers.get("state_fever"),
-                        "cough": self.user.answers.get("state_cough"),
-                        "sore_throat": self.user.answers.get("state_sore_throat"),
-                        "difficulty_breathing": self.user.answers.get(
-                            "state_breathing"
+
+        async with get_eventstore() as session:
+            for i in range(3):
+                try:
+                    response = await session.post(
+                        urljoin(
+                            config.EVENTSTORE_API_URL,
+                            "/api/v3/covid19triage/",
                         ),
-                        "smell": self.user.answers.get("state_taste_and_smell"),
-                        "preexisting_condition": self.user.answers.get(
-                            "state_preexisting_conditions"
-                        ),
-                        "exposure": self.user.answers.get("state_exposure"),
-                        "tracing": self.user.answers.get("state_tracing"),
-                        "confirmed_contact": self.user.answers.get("confirmed_contact"),
-                        "risk": self.calculate_risk(),
-                        "data": {"age_years": self.user.answers.get("state_age_years")},
-                    },
-                )
-                response.raise_for_status()
-                break
-            except aiohttp.ClientError as e:
-                if i == 2:
-                    logger.exception(e)
-                    return await self.go_to_state("state_error")
-                else:
-                    continue
+                        json={
+                            "msisdn": self.inbound.from_addr,
+                            "source": f"USSD {self.inbound.to_addr}",
+                            "province": self.user.answers.get("state_province"),
+                            "city": self.user.answers.get("state_city"),
+                            "city_location": self.user.answers.get("city_location"),
+                            "age": self.user.answers.get("state_age"),
+                            "fever": self.user.answers.get("state_fever"),
+                            "cough": self.user.answers.get("state_cough"),
+                            "sore_throat": self.user.answers.get("state_sore_throat"),
+                            "difficulty_breathing": self.user.answers.get(
+                                "state_breathing"
+                            ),
+                            "smell": self.user.answers.get("state_taste_and_smell"),
+                            "preexisting_condition": self.user.answers.get(
+                                "state_preexisting_conditions"
+                            ),
+                            "exposure": self.user.answers.get("state_exposure"),
+                            "tracing": self.user.answers.get("state_tracing"),
+                            "confirmed_contact": self.user.answers.get("confirmed_contact"),
+                            "risk": self.calculate_risk(),
+                            "data": {"age_years": self.user.answers.get("state_age_years")},
+                        },
+                    )
+                    response.raise_for_status()
+                    break
+                except aiohttp.ClientError as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
         return await self.go_to_state("state_display_risk")
 
     async def state_display_risk(self):
