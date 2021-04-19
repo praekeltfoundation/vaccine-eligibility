@@ -62,7 +62,6 @@ class Application(BaseApplication):
             and self.state_name is not None
             and self.state_name != self.START_STATE
         ):
-            self.user.session_id = None
             self.save_answer("resume_state", self.state_name)
             self.state_name = "state_timed_out"
         return await super().process_message(message)
