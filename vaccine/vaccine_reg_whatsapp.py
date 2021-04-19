@@ -330,6 +330,35 @@ class Application(BaseApplication):
                     "Example _Zimbabwe_",
                 ]
             ),
+            next="state_first_name",
+        )
+
+    async def state_first_name(self):
+
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE your FIRST NAME as it appears in your identification "
+                    "document.",
+                ]
+            ),
+            next="state_surname",
+        )
+
+    async def state_surname(self):
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE your SURNAME as it appears in your identification "
+                    "document.",
+                ]
+            ),
             next="state_gender",
         )
 
@@ -443,7 +472,7 @@ class Application(BaseApplication):
 
     async def state_dob_day(self):
         if self.user.answers.get("state_dob_day"):
-            return await self.go_to_state("state_first_name")
+            return await self.go_to_state("state_self_registration")
 
         async def validate_dob_day(value):
             dob_year = int(self.user.answers["state_dob_year"])
@@ -475,11 +504,11 @@ class Application(BaseApplication):
                     "Example: If you were born on 31 May, type _31_",
                 ]
             ),
-            next="state_first_name",
+            next="state_self_registration",
             check=validate_dob_day,
         )
 
-    async def state_first_name(self):
+    async def state_self_registration(self):
         year = int(self.user.answers["state_dob_year"])
         month = int(self.user.answers["state_dob_month"])
         day = int(self.user.answers["state_dob_day"])
@@ -487,34 +516,6 @@ class Application(BaseApplication):
         if age < config.ELIGIBILITY_AGE_GATE_MIN:
             return await self.go_to_state("state_under_age_notification")
 
-        return FreeText(
-            self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-                    "",
-                    "Please TYPE your FIRST NAME as it appears in your identification "
-                    "document.",
-                ]
-            ),
-            next="state_surname",
-        )
-
-    async def state_surname(self):
-        return FreeText(
-            self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-                    "",
-                    "Please TYPE your SURNAME as it appears in your identification "
-                    "document.",
-                ]
-            ),
-            next="state_self_registration",
-        )
-
-    async def state_self_registration(self):
         number = display_phonenumber(self.inbound.from_addr)
         return MenuState(
             self,

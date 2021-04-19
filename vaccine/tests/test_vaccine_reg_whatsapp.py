@@ -315,39 +315,21 @@ async def test_gender_invalid():
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.utils.get_today")
-async def test_dob_and_gender_skipped(get_today):
-    get_today.return_value = date(2100, 1, 1)
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_identification_number"),
-        session_id=1,
-        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
-    )
-    app = Application(u)
-    msg = Message(
-        content="9001010001088",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_first_name"
-
-
-@pytest.mark.asyncio
-@mock.patch("vaccine.utils.get_today")
 async def test_too_young(get_today):
     get_today.return_value = date(2020, 1, 1)
     u = User(
         addr="27820001001",
-        state=StateData(name="state_identification_number"),
+        state=StateData(name="state_dob_year"),
         session_id=1,
-        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
+        answers={
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+            "state_identification_type": "passport",
+        },
     )
     app = Application(u)
     msg = Message(
-        content="9001010001088",
+        content="1990",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -489,18 +471,13 @@ async def test_dob_day_invalid():
 
 
 @pytest.mark.asyncio
-@mock.patch("vaccine.utils.get_today")
-async def test_first_name(get_today):
-    get_today.return_value = date(2100, 1, 1)
+async def test_first_name():
     u = User(
-        addr="27820001001",
-        state=StateData(name="state_dob_day"),
-        session_id=1,
-        answers={"state_dob_year": "1990", "state_dob_month": "2"},
+        addr="27820001001", state=StateData(name="state_passport_country"), session_id=1
     )
     app = Application(u)
     msg = Message(
-        content="2",
+        content="test country",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -511,19 +488,8 @@ async def test_first_name(get_today):
 
 
 @pytest.mark.asyncio
-@mock.patch("vaccine.utils.get_today")
-async def test_surname(get_today):
-    get_today.return_value = date(2100, 1, 1)
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_first_name"),
-        session_id=1,
-        answers={
-            "state_dob_year": "1990",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-        },
-    )
+async def test_surname():
+    u = User(addr="27820001001", state=StateData(name="state_first_name"), session_id=1)
     app = Application(u)
     msg = Message(
         content="firstname",
@@ -668,11 +634,41 @@ async def test_suburb_other():
 
 
 @pytest.mark.asyncio
-async def test_self_registration():
-    u = User(addr="27820001001", state=StateData(name="state_surname"), session_id=1)
+async def test_suburb_value():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_suburb"),
+        session_id=1,
+        answers={
+            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_suburb_search": "tableview",
+        },
+    )
     app = Application(u)
     msg = Message(
-        content="test surname",
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_identification_type"
+
+
+@pytest.mark.asyncio
+@mock.patch("vaccine.utils.get_today")
+async def test_self_registration(get_today):
+    get_today.return_value = date(2100, 1, 1)
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_dob_day"),
+        session_id=1,
+        answers={"state_dob_year": "1990", "state_dob_month": "1"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="1",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -694,11 +690,18 @@ async def test_self_registration():
 
 
 @pytest.mark.asyncio
-async def test_self_registration_invalid():
+@mock.patch("vaccine.utils.get_today")
+async def test_self_registration_invalid(get_today):
+    get_today.return_value = date(2100, 1, 1)
     u = User(
         addr="27820001001",
         state=StateData(name="state_self_registration"),
         session_id=1,
+        answers={
+            "state_dob_year": "1990",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+        },
     )
     app = Application(u)
     msg = Message(
@@ -713,11 +716,18 @@ async def test_self_registration_invalid():
 
 
 @pytest.mark.asyncio
-async def test_phone_number():
+@mock.patch("vaccine.utils.get_today")
+async def test_phone_number(get_today):
+    get_today.return_value = date(2100, 1, 1)
     u = User(
         addr="27820001001",
         state=StateData(name="state_self_registration"),
         session_id=1,
+        answers={
+            "state_dob_year": "1990",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+        },
     )
     app = Application(u)
     msg = Message(
@@ -732,9 +742,18 @@ async def test_phone_number():
 
 
 @pytest.mark.asyncio
-async def test_phone_number_invalid():
+@mock.patch("vaccine.utils.get_today")
+async def test_phone_number_invalid(get_today):
+    get_today.return_value = date(2100, 1, 1)
     u = User(
-        addr="27820001001", state=StateData(name="state_phone_number"), session_id=1
+        addr="27820001001",
+        state=StateData(name="state_phone_number"),
+        session_id=1,
+        answers={
+            "state_dob_year": "1990",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+        },
     )
     app = Application(u)
     msg = Message(
@@ -749,11 +768,18 @@ async def test_phone_number_invalid():
 
 
 @pytest.mark.asyncio
-async def test_vaccination_time():
+@mock.patch("vaccine.utils.get_today")
+async def test_vaccination_time(get_today):
+    get_today.return_value = date(2100, 1, 1)
     u = User(
         addr="27820001001",
         state=StateData(name="state_self_registration"),
         session_id=1,
+        answers={
+            "state_dob_year": "1990",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+        },
     )
     app = Application(u)
     msg = Message(
