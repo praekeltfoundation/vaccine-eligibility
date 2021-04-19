@@ -1166,12 +1166,24 @@ async def test_state_age_years_skip():
 
 @pytest.mark.asyncio
 async def test_state_tracing(eventstore_mock):
-    u = User(
-        addr="27820001003",
-        state=StateData(name="state_tracing"),
-        session_id=1,
-        answers={},
-    )
+    def get_user(answers={}):
+        return User(
+            addr="27820001003",
+            state=StateData(name="state_tracing"),
+            session_id=1,
+            answers=answers,
+        )
+
+    def get_message(content):
+        return Message(
+            content=content,
+            to_addr="27820001002",
+            from_addr="27820001003",
+            transport_name="whatsapp",
+            transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        )
+
+    u = get_user()
     app = Application(u)
     msg = Message(
         content="invalid",
@@ -1198,18 +1210,89 @@ async def test_state_tracing(eventstore_mock):
     )
 
     app.messages = []
+    [reply] = await app.process_message(get_message("yes"))
+    assert len(reply.content) < 160
+
+    assert (
+        reply.content
+        == "Complete this HealthCheck again in 7 days or sooner if you feel "
+        "ill or you come into contact with someone infected with COVID-19"
+    )
+    assert reply.session_event == Message.SESSION_EVENT.CLOSE
+
+    assert u.state.name == "state_start"
+
+    assert [r.path for r in eventstore_mock.app.requests] == ["/api/v3/covid19triage/"]
+
+    app = Application(get_user({"state_exposure": "yes"}))
+    [reply] = await app.process_message(get_message("yes"))
+    assert len(reply.content) < 160
+    assert (
+        reply.content == "We recommend you SELF-QUARANTINE for the next 10 days and do "
+        "this HealthCheck daily to monitor your symptoms. Stay/sleep "
+        "alone in a room with good air flow."
+    )
+
+    app = Application(get_user({"state_fever": "yes", "state_exposure": "yes"}))
+    [reply] = await app.process_message(get_message("yes"))
+    assert len(reply.content) < 160
+    assert (
+        reply.content
+        == "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing center "
+        "or Call 0800029999 or visit your healthcare practitioner for "
+        "info on what to do & how to test."
+    )
+
+    app = Application(get_user({}))
+    [reply] = await app.process_message(get_message("no"))
+    assert len(reply.content) <= 160
+
+    assert reply.content == (
+        "You will not be contacted. If you think you have COVID-19 please STAY "
+        "HOME, avoid contact with other people in your community and self-quarantine."
+        "\n1. START OVER"
+    )
+
+    app = Application(get_user({"state_exposure": "yes"}))
+    [reply] = await app.process_message(get_message("no"))
+    assert len(reply.content) <= 160
+
+    assert reply.content == (
+        "You won't be contacted. SELF-QUARANTINE for 10 days, do this HealthCheck "
+        "daily to monitor symptoms. Stay/sleep alone in a room with good air flow."
+        "\n1. START OVER"
+    )
+
+    app = Application(get_user({"state_fever": "yes", "state_exposure": "yes"}))
+    [reply] = await app.process_message(get_message("no"))
+    assert len(reply.content) <= 160
+
+    assert reply.content == (
+        "You will not be contacted. You may be ELIGIBLE FOR COVID-19 "
+        "TESTING. Go to a testing center or Call 0800029999 or your "
+        "healthcare practitioner for info."
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_tracing_restart(eventstore_mock):
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_tracing"),
+        session_id=1,
+        answers={},
+    )
+    app = Application(u)
     msg = Message(
-        content="yes",
+        content="restart",
         to_addr="27820001002",
         from_addr="27820001003",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
-    assert len(reply.content) < 160
+    assert len(reply.content) <= 160
     assert u.state.name == "state_start"
-
-    assert [r.path for r in eventstore_mock.app.requests] == ["/api/v3/covid19triage/"]
 
 
 def test_calculate_risk():
