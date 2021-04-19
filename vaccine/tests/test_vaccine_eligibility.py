@@ -702,3 +702,28 @@ async def test_user_end_sesssion():
             "Reply *MENU* to return to the main menu",
         ]
     )
+
+
+@pytest.mark.asyncio
+async def test_reset_keyword():
+    """
+    The reset keyword should reset all state and start the user from the beginning
+    """
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_occupation"),
+        session_id="1",
+        answers={"test": "answers"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="!reset",
+        to_addr="27820001002",
+        from_addr="27820001002",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    await app.process_message(msg)
+    assert u.session_id != "1"
+    assert u.answers == {}
+    assert u.state.name == "state_occupation"

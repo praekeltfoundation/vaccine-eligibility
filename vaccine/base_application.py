@@ -11,6 +11,8 @@ STATE_CHANGE = Counter(
 
 
 class BaseApplication:
+    START_STATE = "state_start"
+
     def __init__(self, user: User):
         self.user = user
         self.answer_events: List[Answer] = []
@@ -44,6 +46,10 @@ class BaseApplication:
         Processes the message, and returns a list of messages to return to the user
         """
         self.inbound = message
+        if message.content == "!reset":
+            self.state_name = self.START_STATE
+            self.user.answers = {}
+            self.user.session_id = None
         state = await self.get_current_state()
         if self.user.session_id is not None:
             await state.process_message(message)
