@@ -565,8 +565,30 @@ class Application(BaseApplication):
                     "Please TYPE the CELL PHONE NUMBER we can contact you on.",
                 ]
             ),
-            next="state_vaccination_time",
+            next="state_medical_aid",
             check=phone_number_validation,
+        )
+
+    async def state_medical_aid(self):
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Do you belong to a Medical Aid?",
+                ]
+            ),
+            choices=[Choice("yes", "Yes"), Choice("no", "No")],
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided.",
+                    "",
+                    "Please confirm if you belong to a Medical Aid.",
+                ]
+            ),
+            next="state_vaccination_time",
         )
 
     async def state_vaccination_time(self):
@@ -590,28 +612,6 @@ class Application(BaseApplication):
                     "next to the options provided.",
                     "",
                     "When would you be available for a vaccination appointment?",
-                ]
-            ),
-            next="state_medical_aid",
-        )
-
-    async def state_medical_aid(self):
-        return ChoiceState(
-            self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-                    "",
-                    "Do you belong to a Medical Aid?",
-                ]
-            ),
-            choices=[Choice("yes", "Yes"), Choice("no", "No")],
-            error="\n".join(
-                [
-                    "⚠️ This service works best when you reply with one of the numbers "
-                    "next to the options provided.",
-                    "",
-                    "Please confirm if you belong to a Medical Aid.",
                 ]
             ),
             next="state_submit_to_evds",

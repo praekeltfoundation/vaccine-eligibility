@@ -857,11 +857,11 @@ async def test_vaccination_time_invalid():
 @pytest.mark.asyncio
 async def test_medical_aid():
     u = User(
-        addr="27820001001", state=StateData(name="state_vaccination_time"), session_id=1
+        addr="27820001001", state=StateData(name="state_phone_number"), session_id=1
     )
     app = Application(u)
     msg = Message(
-        content="weekday morning",
+        content="0820001001",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -972,7 +972,7 @@ async def test_no_terms():
 async def test_state_success(evds_mock):
     u = User(
         addr="27820001001",
-        state=StateData(name="state_medical_aid"),
+        state=StateData(name="state_vaccination_time"),
         session_id=1,
         answers={
             "state_dob_year": "1960",
@@ -990,7 +990,7 @@ async def test_state_success(evds_mock):
     )
     app = Application(u)
     msg = Message(
-        content="yes",
+        content="1",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -1038,7 +1038,7 @@ async def test_state_success_temporary_failure(evds_mock):
     evds_mock.app.errormax = 1
     u = User(
         addr="27820001001",
-        state=StateData(name="state_medical_aid"),
+        state=StateData(name="state_vaccination_time"),
         session_id=1,
         answers={
             "state_dob_year": "1960",
@@ -1057,7 +1057,7 @@ async def test_state_success_temporary_failure(evds_mock):
     )
     app = Application(u)
     msg = Message(
-        content="yes",
+        content="1",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -1107,13 +1107,13 @@ async def test_state_error(evds_mock):
     evds_mock.app.errormax = 3
     u = User(
         addr="27820001001",
-        state=StateData(name="state_medical_aid"),
+        state=StateData(name="state_vaccination_time"),
         session_id=1,
         answers={
             "state_dob_year": "1960",
             "state_dob_month": "1",
             "state_dob_day": "1",
-            "state_vaccination_time": "weekday_morning",
+            "state_gender": "Other",
             "state_suburb": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
             "state_gender": "Other",
@@ -1125,7 +1125,7 @@ async def test_state_error(evds_mock):
     )
     app = Application(u)
     msg = Message(
-        content="yes",
+        content="1",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
