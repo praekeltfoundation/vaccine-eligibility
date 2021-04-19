@@ -453,7 +453,7 @@ class Application(BaseApplication):
                         self.format_location(location["lat"], location["lng"]),
                     )
 
-                    if self.user.answers.get("confirmed_contact"):
+                    if self.user.answers.get("confirmed_contact") == "yes":
                         return await self.go_to_state("state_tracing")
                     return await self.go_to_state("state_age")
                 except aiohttp.ClientError as e:
@@ -835,7 +835,7 @@ class Application(BaseApplication):
         answers = self.user.answers
         risk = self.calculate_risk()
         text = ""
-        if answers.get("confirmed_contact"):
+        if answers.get("confirmed_contact") == "yes":
             if risk == "moderate":
                 text = (
                     "We recommend you SELF-QUARANTINE for the next 10 days and do this "
