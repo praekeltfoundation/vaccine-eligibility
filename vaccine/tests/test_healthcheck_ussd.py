@@ -820,6 +820,7 @@ async def test_state_place_details_lookup(google_api_mock):
             "state_city": "Cape Town",
             "google_session_token": "123",
             "place_id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
+            "confirmed_contact": "no",
         },
     )
     app = Application(u)
