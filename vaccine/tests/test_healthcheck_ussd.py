@@ -1194,9 +1194,7 @@ async def test_state_breathing():
     )
 
 
-pytest.mark.asyncio
-
-
+@pytest.mark.asyncio
 async def test_state_breathing_confirmed_contact():
     u = User(
         addr="27820001003",
