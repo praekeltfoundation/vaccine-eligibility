@@ -620,7 +620,13 @@ class Application(BaseApplication):
     async def state_medical_aid_search(self):
         return FreeText(
             self,
-            question="Please TYPE the name of the MEDICAL AID.",
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE the name of your Medical Aid PROVIDER.",
+                ]
+            ),
             next="state_medical_aid_list",
         )
 
@@ -628,7 +634,7 @@ class Application(BaseApplication):
         async def next_state(choice: Choice):
             if choice.value == "other":
                 return "state_medical_aid_search"
-            return "state_submit_to_evds"
+            return "state_medical_aid_number"
 
         search = self.user.answers["state_medical_aid_search"] or ""
         choices = [
@@ -638,10 +644,30 @@ class Application(BaseApplication):
         choices.append(Choice("other", "Other"))
         return ChoiceState(
             self,
-            question="Please choose the best match for your Medical Aid:",
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please confirm your Medical Aid Provider. REPLY with a NUMBER "
+                    "from the list below:",
+                ]
+            ),
             choices=choices,
             error="Do any of these match your Medical Aid:",
             next=next_state,
+        )
+
+    async def state_medical_aid_number(self):
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE your Medical Aid NUMBER.",
+                ]
+            ),
+            next="state_submit_to_evds",
         )
 
     async def state_submit_to_evds(self):

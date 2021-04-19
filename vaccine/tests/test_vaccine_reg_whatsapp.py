@@ -906,7 +906,7 @@ async def test_no_terms():
 async def test_state_success(evds_mock):
     u = User(
         addr="27820001001",
-        state=StateData(name="state_medical_aid_list"),
+        state=StateData(name="state_medical_aid_number"),
         session_id=1,
         answers={
             "state_dob_year": "1960",
@@ -922,11 +922,12 @@ async def test_state_success(evds_mock):
             "state_identification_number": "6001010001081",
             "state_medical_aid": "yes",
             "state_medical_aid_search": "discovery",
+            "state_medical_aid_list": "1",
         },
     )
     app = Application(u)
     msg = Message(
-        content="1",
+        content="DISC100011111",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -974,7 +975,7 @@ async def test_state_success_temporary_failure(evds_mock):
     evds_mock.app.errormax = 1
     u = User(
         addr="27820001001",
-        state=StateData(name="state_medical_aid_list"),
+        state=StateData(name="state_medical_aid_number"),
         session_id=1,
         answers={
             "state_dob_year": "1960",
@@ -991,11 +992,12 @@ async def test_state_success_temporary_failure(evds_mock):
             "state_passport_country": "other",
             "state_medical_aid": "yes",
             "state_medical_aid_search": "discovery",
+            "state_medical_aid_list": "1",
         },
     )
     app = Application(u)
     msg = Message(
-        content="1",
+        content="DISC100011111",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -1045,7 +1047,7 @@ async def test_state_error(evds_mock):
     evds_mock.app.errormax = 3
     u = User(
         addr="27820001001",
-        state=StateData(name="state_medical_aid_list"),
+        state=StateData(name="state_medical_aid_number"),
         session_id=1,
         answers={
             "state_dob_year": "1960",
@@ -1061,11 +1063,12 @@ async def test_state_error(evds_mock):
             "state_identification_number": "6001010001081",
             "state_medical_aid": "yes",
             "state_medical_aid_search": "discovery",
+            "state_medical_aid_list": "1",
         },
     )
     app = Application(u)
     msg = Message(
-        content="1",
+        content="DISC100011111",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
