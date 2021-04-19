@@ -1,0 +1,704 @@
+import logging
+from datetime import date
+from enum import Enum
+from urllib.parse import urljoin
+
+import aiohttp
+
+from vaccine import vacreg_config as config
+from vaccine.base_application import BaseApplication
+from vaccine.data.suburbs import suburbs
+from vaccine.states import (
+    Choice,
+    ChoiceState,
+    EndState,
+    ErrorMessage,
+    FreeText,
+    MenuState,
+)
+from vaccine.utils import (
+    SAIDNumber,
+    calculate_age,
+    display_phonenumber,
+    normalise_phonenumber,
+)
+
+logger = logging.getLogger(__name__)
+
+MAX_AGE = 122
+
+
+def get_evds():
+    # TODO: Cache the session globally. Things that don't work:
+    # - Declaring the session at the top of the file
+    #   You get a `Timeout context manager should be used inside a task` error
+    # - Declaring it here but caching it in a global variable for reuse
+    #   You get a `Event loop is closed` error
+    return aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=5),
+        headers={
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "User-Agent": "vaccine-registration-ussd",
+        },
+        auth=aiohttp.BasicAuth(config.EVDS_USERNAME, config.EVDS_PASSWORD),
+    )
+
+
+class Application(BaseApplication):
+    START_STATE = "state_age_gate"
+
+    class ID_TYPES(Enum):
+        rsa_id = "RSA ID Number"
+        passport = "Passport Number"
+        asylum_seeker = "Asylum Seeker Permit number"
+        refugee = "Refugee Number Permit number"
+
+    async def state_age_gate(self):
+        self.user.answers = {}
+
+        return MenuState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Welcome to the official Phase 2&3 COVID-19 Vaccination "
+                    "Self-registration Portal from the National Department of Health. "
+                    "Registration will take about 5 minutes. Please have your ID, "
+                    "Passport, Refugee Permit or Asylum Seeker Permit *Number* on "
+                    "hand. If you have Medical Aid, we will also ask for your Medical "
+                    "Aid Number.",
+                    "",
+                    "Note: If you are a health professional, register for Phase 1 at "
+                    "https://vaccine.enroll.health.gov.za/",
+                    "",
+                    "Registration is currently only open to those "
+                    f"{config.ELIGIBILITY_AGE_GATE_MIN} years and older. Are you "
+                    f"{config.ELIGIBILITY_AGE_GATE_MIN} or older?",
+                    "",
+                ]
+            ),
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you use the numbered options "
+                    "available",
+                    "",
+                    f"Please confirm that you are {config.ELIGIBILITY_AGE_GATE_MIN} "
+                    "years or older by typing 1 (or 2 if you are NOT "
+                    f"{config.ELIGIBILITY_AGE_GATE_MIN} years or older)",
+                ]
+            ),
+            choices=[
+                Choice(
+                    "state_terms_and_conditions",
+                    f"Yes, I am {config.ELIGIBILITY_AGE_GATE_MIN} or older",
+                ),
+                Choice("state_under_age_notification", "No"),
+            ],
+        )
+
+    async def state_under_age_notification(self):
+        return ChoiceState(
+            self,
+            question="Can we notify you via Whatsapp on this number when updates about "
+            "getting vaccinated become available?",
+            choices=[Choice("yes", "Yes"), Choice("no", "No")],
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you use the numbered options "
+                    "available.",
+                    "",
+                    "Please let us know if we can notify you via Whatsapp on this "
+                    "number when updates about getting vaccinated become available?",
+                ]
+            ),
+            next="state_confirm_notification",
+        )
+
+    async def state_confirm_notification(self):
+        return EndState(self, text="Thank you for confirming")
+
+    async def state_terms_and_conditions(self):
+        # TODO: Send PDF
+        return MenuState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Do you agree to the attached Electronic Vaccine Data System "
+                    "PRIVACY POLICY that explains how your data is used and protected?",
+                ]
+            ),
+            choices=[
+                Choice("state_terms_and_conditions_summary", "Read summary"),
+                Choice("state_identification_type", "Accept"),
+            ],
+            error="⚠️ This service works best when you reply with one of the numbers "
+            "next to the options provided.",
+        )
+
+    async def state_terms_and_conditions_summary(self):
+        return MenuState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "*Electronic Vaccine Data System DATA PROTECTION & PRIVACY POLICY "
+                    "(“EVDS Privacy Policy) SUMMARY*",
+                    "",
+                    "The EVDS Privacy Policy complies with the POPI Act.",
+                    "",
+                    "Your personal data including: contact, medical aid & vaccine "
+                    "protocol details are processed with your consent for the agreed "
+                    "purpose (to support the COVID-19 Vaccination roll out in South "
+                    "Africa) and remain confidential.",
+                    "",
+                    "EVDS uses your data to check your eligibility & inform you of the "
+                    "date & venue of your vaccination.",
+                    "",
+                    "Registration is voluntary & does not guarantee vaccination.",
+                    "",
+                    "All security measures have been taken to keep your information "
+                    "safe. No personal data will be transferred from EVDS without "
+                    "legislative authorisation in compliance with the Popi Act.",
+                    "",
+                    "Do you accept the EVDS Privacy Notice?",
+                ]
+            ),
+            choices=[
+                Choice("state_identification_type", "Yes, I accept"),
+                Choice("state_no_terms", "No"),
+            ],
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided.",
+                    "",
+                    "Do you accept the EVDS Privacy Notice?",
+                ]
+            ),
+        )
+
+    async def state_no_terms(self):
+        return EndState(
+            self,
+            text="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Thank you. If you change your mind, type *REGISTER* to restart "
+                    "your registration session",
+                ]
+            ),
+        )
+
+    async def state_identification_type(self):
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Which method would you like to use for identification?",
+                ]
+            ),
+            choices=[Choice(i.name, i.value) for i in self.ID_TYPES],
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided.",
+                    "",
+                    "Please choose the type of identification document you have from "
+                    "the list below?",
+                ]
+            ),
+            next="state_identification_number",
+        )
+
+    async def state_identification_number(self):
+        idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
+        idtype_label = idtype.value
+
+        if idtype == self.ID_TYPES.passport:
+            next_state = "state_passport_country"
+        else:
+            next_state = "state_gender"
+
+        async def validate_identification_number(value):
+            if idtype == self.ID_TYPES.rsa_id or idtype == self.ID_TYPES.refugee:
+                try:
+                    id_number = SAIDNumber(value)
+                    dob = id_number.date_of_birth
+                    if id_number.age > MAX_AGE - 100:
+                        self.save_answer("state_dob_year", str(dob.year))
+                    self.save_answer("state_dob_month", str(dob.month))
+                    self.save_answer("state_dob_day", str(dob.day))
+                    self.save_answer("state_gender", id_number.sex.value)
+                except ValueError:
+                    raise ErrorMessage(f"⚠️ Please enter a valid {idtype_label}")
+
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    f"Please TYPE in your {idtype_label}",
+                ]
+            ),
+            next=next_state,
+            check=validate_identification_number,
+        )
+
+    async def state_passport_country(self):
+        # TODO: Implement country search
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE in your passport's COUNTRY of origin.",
+                    "Example _Zimbabwe_",
+                ]
+            ),
+            next="state_gender",
+        )
+
+    async def state_gender(self):
+        if self.user.answers.get("state_gender"):
+            return await self.go_to_state("state_dob_year")
+
+        return ChoiceState(
+            self,
+            question="\n".join(
+                ["*VACCINE REGISTRATION SECURE CHAT* 🔐", "", "What is your GENDER?"]
+            ),
+            choices=[
+                Choice("Male", "Male"),
+                Choice("Female", "Female"),
+                Choice("Other", "Other"),
+            ],
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided."
+                    "",
+                    "REPLY with the NUMBER next to your gender in the list below.",
+                ]
+            ),
+            next="state_dob_year",
+        )
+
+    async def state_dob_year(self):
+        if self.user.answers.get("state_dob_year"):
+            return await self.go_to_state("state_dob_month")
+
+        async def validate_dob_year(value):
+            try:
+                assert isinstance(value, str)
+                assert value.isdigit()
+                assert int(value) > date.today().year - MAX_AGE
+                assert int(value) <= date.today().year
+            except AssertionError:
+                raise ErrorMessage(
+                    "\n".join(
+                        [
+                            "⚠️  Please TYPE in only the YEAR you were born.",
+                            "Example _1980_",
+                        ]
+                    )
+                )
+
+            idtype = self.user.answers["state_identification_type"]
+            if (
+                idtype == self.ID_TYPES.rsa_id.value
+                or idtype == self.ID_TYPES.refugee.value
+            ):
+                idno = self.user.answers["state_identification_number"]
+                if value[-2:] != idno[:2]:
+                    raise ErrorMessage(
+                        "The YEAR you have given does not match the YEAR of your ID "
+                        "number. Please try again"
+                    )
+
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE in the YEAR you were born?",
+                ]
+            ),
+            next="state_dob_month",
+            check=validate_dob_year,
+        )
+
+    async def state_dob_month(self):
+        if self.user.answers.get("state_dob_month"):
+            return await self.go_to_state("state_dob_day")
+
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "In which MONTH were you born?",
+                ]
+            ),
+            choices=[
+                Choice("1", "January"),
+                Choice("2", "February"),
+                Choice("3", "March"),
+                Choice("4", "April"),
+                Choice("5", "May"),
+                Choice("6", "June"),
+                Choice("7", "July"),
+                Choice("8", "August"),
+                Choice("9", "September"),
+                Choice("10", "October"),
+                Choice("11", "November"),
+                Choice("12", "December"),
+            ],
+            next="state_dob_day",
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided."
+                    "",
+                    "In which MONTH were you born? ",
+                ]
+            ),
+        )
+
+    async def state_dob_day(self):
+        if self.user.answers.get("state_dob_day"):
+            return await self.go_to_state("state_first_name")
+
+        async def validate_dob_day(value):
+            dob_year = int(self.user.answers["state_dob_year"])
+            dob_month = int(self.user.answers["state_dob_month"])
+            try:
+                assert isinstance(value, str)
+                assert value.isdigit()
+                date(dob_year, dob_month, int(value))
+            except (AssertionError, ValueError):
+                raise ErrorMessage(
+                    "\n".join(
+                        [
+                            "⚠️ Please enter a valid calendar DAY for your birth date. "
+                            "Type in only the day.",
+                            "",
+                            "Example: If you were born on 20 May, type _20_",
+                        ]
+                    )
+                )
+
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE the DAY of your birth date.",
+                    "",
+                    "Example: If you were born on 31 May, type _31_",
+                ]
+            ),
+            next="state_first_name",
+            check=validate_dob_day,
+        )
+
+    async def state_first_name(self):
+        year = int(self.user.answers["state_dob_year"])
+        month = int(self.user.answers["state_dob_month"])
+        day = int(self.user.answers["state_dob_day"])
+        age = calculate_age(date(year, month, day))
+        if age < config.ELIGIBILITY_AGE_GATE_MIN:
+            return await self.go_to_state("state_under_age_notification")
+
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE your FIRST NAME as it appears in your identification "
+                    "document.",
+                ]
+            ),
+            next="state_surname",
+        )
+
+    async def state_surname(self):
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE your SURNAME as it appears in your identification "
+                    "document.",
+                ]
+            ),
+            next="state_province_id",
+        )
+
+    async def state_province_id(self):
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "We need your location to help us match you with a nearby "
+                    "vaccination site",
+                    "",
+                    "Select your province",
+                ]
+            ),
+            choices=[Choice(*province) for province in suburbs.provinces],
+            error="Reply with a NUMBER:",
+            next="state_suburb_search",
+        )
+
+    async def state_suburb_search(self):
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE the name of the SUBURB where you live.",
+                ]
+            ),
+            next="state_suburb",
+        )
+
+    async def state_suburb(self):
+        async def next_state(choice: Choice):
+            if choice.value == "other":
+                return "state_province_id"
+            return "state_self_registration"
+
+        province = self.user.answers["state_province_id"]
+        search = self.user.answers["state_suburb_search"] or ""
+        choices = [
+            Choice(suburb[0], suburb[1][:30])
+            for suburb in suburbs.search_for_suburbs(province, search)
+        ]
+        choices.append(Choice("other", "Other"))
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐" "",
+                    "Please REPLY with a NUMBER to confirm your location:",
+                ]
+            ),
+            choices=choices,
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided.",
+                    "",
+                    "Please REPLY with a NUMBER from the list below to confirm the "
+                    "location you have shared:",
+                ]
+            ),
+            next=next_state,
+        )
+
+    async def state_self_registration(self):
+        number = display_phonenumber(self.inbound.from_addr)
+        return MenuState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "We will use your cell phone number to send you notifications and "
+                    "updates via WhatsApp and/or SMS about getting vaccinated.",
+                    "" f"Can we use {number}?",
+                ]
+            ),
+            choices=[
+                Choice("state_vaccination_time", "Yes"),
+                Choice("state_phone_number", "No"),
+            ],
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided.",
+                    "",
+                    f"Please confirm that we can use {number} to contact you.",
+                ]
+            ),
+        )
+
+    async def state_phone_number(self):
+        async def phone_number_validation(content):
+            try:
+                normalise_phonenumber(content)
+            except ValueError:
+                raise ErrorMessage(
+                    "\n".join(
+                        [
+                            "⚠️ Please type a valid cell phone number.",
+                            "Example _081234567_",
+                        ]
+                    )
+                )
+
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE the CELL PHONE NUMBER we can contact you on.",
+                ]
+            ),
+            next="state_vaccination_time",
+            check=phone_number_validation,
+        )
+
+    async def state_vaccination_time(self):
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Which option do you prefer for your vaccination appointment?",
+                ]
+            ),
+            choices=[
+                Choice("weekday_morning", "Weekday Morning"),
+                Choice("weekday_afternoon", "Weekday Afternoon"),
+                Choice("weekend_morning", "Weekend Morning"),
+            ],
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided.",
+                    "",
+                    "When would you be available for a vaccination appointment?",
+                ]
+            ),
+            next="state_medical_aid",
+        )
+
+    async def state_medical_aid(self):
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Do you belong to a Medical Aid?",
+                ]
+            ),
+            choices=[Choice("yes", "Yes"), Choice("no", "No")],
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided.",
+                    "",
+                    "Please confirm if you belong to a Medical Aid.",
+                ]
+            ),
+            next="state_submit_to_evds",
+        )
+
+    async def state_submit_to_evds(self):
+        evds = get_evds()
+        date_of_birth = date(
+            int(self.user.answers["state_dob_year"]),
+            int(self.user.answers["state_dob_month"]),
+            int(self.user.answers["state_dob_day"]),
+        )
+        vac_day, vac_time = self.user.answers["state_vaccination_time"].split("_")
+        suburb_id = self.user.answers["state_suburb"]
+        province_id = self.user.answers["state_province_id"]
+        location = {
+            "value": suburb_id,
+            "text": suburbs.suburb_name(suburb_id, province_id),
+        }
+        phonenumber = self.user.answers.get(
+            "state_phone_number", self.inbound.from_addr
+        )
+        data = {
+            "gender": self.user.answers["state_gender"],
+            "surname": self.user.answers["state_surname"],
+            "firstName": self.user.answers["state_first_name"],
+            "dateOfBirth": date_of_birth.isoformat(),
+            "mobileNumber": normalise_phonenumber(phonenumber),
+            "preferredVaccineScheduleTimeOfDay": vac_time,
+            "preferredVaccineScheduleTimeOfWeek": vac_day,
+            "preferredVaccineLocation": location,
+            "residentialLocation": location,
+            "termsAndConditionsAccepted": True,
+        }
+        id_type = self.user.answers["state_identification_type"]
+        if id_type == self.ID_TYPES.rsa_id.name:
+            data["iDNumber"] = self.user.answers["state_identification_number"]
+        if (
+            id_type == self.ID_TYPES.refugee.name
+            or id_type == self.ID_TYPES.asylum_seeker.name
+        ):
+            data["refugeeNumber"] = self.user.answers["state_identification_number"]
+        if id_type == self.ID_TYPES.passport.name:
+            data["passportNumber"] = self.user.answers["state_identification_number"]
+            data["passportCountry"] = self.user.answers["state_passport_country"]
+
+        async with evds as session:
+            for i in range(3):
+                try:
+                    response = await session.post(
+                        url=urljoin(
+                            config.EVDS_URL,
+                            f"/api/private/{config.EVDS_DATASET}/person/"
+                            f"{config.EVDS_VERSION}/record",
+                        ),
+                        json=data,
+                    )
+                    response.raise_for_status()
+                    break
+                except aiohttp.ClientError as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_err")
+                    else:
+                        continue
+
+        return await self.go_to_state("state_success")
+
+    async def state_success(self):
+        return EndState(
+            self,
+            text="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Congratulations! You successfully registered with the National "
+                    "Department of Health to get a COVID-19 vaccine.",
+                    "",
+                    "Look out for messages from this number (060 012 3456) on WhatsApp "
+                    "OR on SMS/email. We will update you with important information "
+                    "about your appointment and what to expect.",
+                ]
+            ),
+        )
+
+    async def state_err(self):
+        return EndState(
+            self,
+            text="Something went wrong with your registration session. Your "
+            "registration was not able to be processed. Please try again later",
+        )
