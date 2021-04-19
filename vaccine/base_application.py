@@ -11,6 +11,8 @@ STATE_CHANGE = Counter(
 
 
 class BaseApplication:
+    START_STATE = "state_start"
+
     def __init__(self, user: User):
         self.user = user
         self.answer_events: List[Answer] = []
