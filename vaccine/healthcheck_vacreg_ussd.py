@@ -43,7 +43,7 @@ class Application(VacRegApp, HealthCheckApp):
             "Vaccine Registration service",
             choices=[
                 Choice(self.user.answers["resume_state"], "Continue where I left off"),
-                Choice(self.START_STATE, "Start over"),
+                Choice(VacRegApp.START_STATE, "Start over"),
             ],
         )
 
@@ -68,6 +68,6 @@ class Application(VacRegApp, HealthCheckApp):
             ),
             choices=[
                 Choice(self.user.answers["resume_state"], "Continue where I left off"),
-                Choice(self.START_STATE, "Start over"),
+                Choice(HealthCheckApp.START_STATE, "Start over"),
             ],
         )
