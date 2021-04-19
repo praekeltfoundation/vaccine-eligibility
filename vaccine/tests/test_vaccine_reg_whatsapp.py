@@ -539,10 +539,14 @@ async def test_surname(get_today):
 
 @pytest.mark.asyncio
 async def test_province():
-    u = User(addr="27820001001", state=StateData(name="state_surname"), session_id=1)
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_terms_and_conditions"),
+        session_id=1,
+    )
     app = Application(u)
     msg = Message(
-        content="test surname",
+        content="accept",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -665,18 +669,10 @@ async def test_suburb_other():
 
 @pytest.mark.asyncio
 async def test_self_registration():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_suburb"),
-        session_id=1,
-        answers={
-            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
-            "state_suburb_search": "tableview",
-        },
-    )
+    u = User(addr="27820001001", state=StateData(name="state_surname"), session_id=1)
     app = Application(u)
     msg = Message(
-        content="1",
+        content="test surname",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",

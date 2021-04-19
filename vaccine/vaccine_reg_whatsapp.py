@@ -133,7 +133,7 @@ class Application(BaseApplication):
             ),
             choices=[
                 Choice("state_terms_and_conditions_summary", "Read summary"),
-                Choice("state_identification_type", "Accept"),
+                Choice("state_province_id", "Accept"),
             ],
             error="⚠️ This service works best when you reply with one of the numbers "
             "next to the options provided.",
@@ -169,7 +169,7 @@ class Application(BaseApplication):
                 ]
             ),
             choices=[
-                Choice("state_identification_type", "Yes, I accept"),
+                Choice("state_province_id", "Yes, I accept"),
                 Choice("state_no_terms", "No"),
             ],
             error="\n".join(
@@ -193,6 +193,71 @@ class Application(BaseApplication):
                     "your registration session",
                 ]
             ),
+        )
+
+    async def state_province_id(self):
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "We need your location to help us match you with a nearby "
+                    "vaccination site",
+                    "",
+                    "Select your province",
+                ]
+            ),
+            choices=[Choice(*province) for province in suburbs.provinces],
+            error="Reply with a NUMBER:",
+            next="state_suburb_search",
+        )
+
+    async def state_suburb_search(self):
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE the name of the SUBURB where you live.",
+                ]
+            ),
+            next="state_suburb",
+        )
+
+    async def state_suburb(self):
+        async def next_state(choice: Choice):
+            if choice.value == "other":
+                return "state_province_id"
+            return "state_identification_type"
+
+        province = self.user.answers["state_province_id"]
+        search = self.user.answers["state_suburb_search"] or ""
+        choices = [
+            Choice(suburb[0], suburb[1][:30])
+            for suburb in suburbs.search_for_suburbs(province, search)
+        ]
+        choices.append(Choice("other", "Other"))
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐" "",
+                    "Please REPLY with a NUMBER to confirm your location:",
+                ]
+            ),
+            choices=choices,
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided.",
+                    "",
+                    "Please REPLY with a NUMBER from the list below to confirm the "
+                    "location you have shared:",
+                ]
+            ),
+            next=next_state,
         )
 
     async def state_identification_type(self):
@@ -446,72 +511,7 @@ class Application(BaseApplication):
                     "document.",
                 ]
             ),
-            next="state_province_id",
-        )
-
-    async def state_province_id(self):
-        return ChoiceState(
-            self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-                    "",
-                    "We need your location to help us match you with a nearby "
-                    "vaccination site",
-                    "",
-                    "Select your province",
-                ]
-            ),
-            choices=[Choice(*province) for province in suburbs.provinces],
-            error="Reply with a NUMBER:",
-            next="state_suburb_search",
-        )
-
-    async def state_suburb_search(self):
-        return FreeText(
-            self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-                    "",
-                    "Please TYPE the name of the SUBURB where you live.",
-                ]
-            ),
-            next="state_suburb",
-        )
-
-    async def state_suburb(self):
-        async def next_state(choice: Choice):
-            if choice.value == "other":
-                return "state_province_id"
-            return "state_self_registration"
-
-        province = self.user.answers["state_province_id"]
-        search = self.user.answers["state_suburb_search"] or ""
-        choices = [
-            Choice(suburb[0], suburb[1][:30])
-            for suburb in suburbs.search_for_suburbs(province, search)
-        ]
-        choices.append(Choice("other", "Other"))
-        return ChoiceState(
-            self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐" "",
-                    "Please REPLY with a NUMBER to confirm your location:",
-                ]
-            ),
-            choices=choices,
-            error="\n".join(
-                [
-                    "⚠️ This service works best when you reply with one of the numbers "
-                    "next to the options provided.",
-                    "",
-                    "Please REPLY with a NUMBER from the list below to confirm the "
-                    "location you have shared:",
-                ]
-            ),
-            next=next_state,
+            next="state_self_registration",
         )
 
     async def state_self_registration(self):
