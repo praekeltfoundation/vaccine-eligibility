@@ -7,6 +7,7 @@ import aiohttp
 
 from vaccine import vacreg_config as config
 from vaccine.base_application import BaseApplication
+from vaccine.data.medscheme import medical_aids
 from vaccine.data.suburbs import suburbs
 from vaccine.states import (
     Choice,
@@ -613,7 +614,34 @@ class Application(BaseApplication):
                     "Please confirm if you belong to a Medical Aid.",
                 ]
             ),
-            next="state_submit_to_evds",
+            next="state_medical_aid_search",
+        )
+
+    async def state_medical_aid_search(self):
+        return FreeText(
+            self,
+            question="Please TYPE the name of the MEDICAL AID.",
+            next="state_medical_aid_list",
+        )
+
+    async def state_medical_aid_list(self):
+        async def next_state(choice: Choice):
+            if choice.value == "other":
+                return "state_medical_aid_search"
+            return "state_submit_to_evds"
+
+        search = self.user.answers["state_medical_aid_search"] or ""
+        choices = [
+            Choice(medical_aid[0], medical_aid[1][:30])
+            for medical_aid in medical_aids.search_for_scheme(search)
+        ]
+        choices.append(Choice("other", "Other"))
+        return ChoiceState(
+            self,
+            question="Please choose the best match for your Medical Aid:",
+            choices=choices,
+            error="Do any of these match your Medical Aid:",
+            next=next_state,
         )
 
     async def state_submit_to_evds(self):
