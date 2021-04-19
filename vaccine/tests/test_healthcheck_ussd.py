@@ -1695,7 +1695,6 @@ async def test_state_tracing_confirmed_contact(eventstore_mock):
     )
 
 
-
 @pytest.mark.asyncio
 async def test_state_tracing_restart(eventstore_mock):
     u = User(
