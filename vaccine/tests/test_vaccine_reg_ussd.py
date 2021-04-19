@@ -140,8 +140,6 @@ async def test_under_age_notification_confirm():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert reply.content == "Thank you for confirming"
-    assert u.answers["state_under_age_notification"] == "yes"
-    assert u.state.name == "state_age_gate"
     assert reply.session_event == Message.SESSION_EVENT.CLOSE
 
 
@@ -1013,11 +1011,7 @@ async def test_medical_aid_invalid():
 
 @pytest.mark.asyncio
 async def test_terms_and_conditions():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_age_gate"),
-        session_id=1,
-    )
+    u = User(addr="27820001001", state=StateData(name="state_age_gate"), session_id=1)
     app = Application(u)
     msg = Message(
         content="yes",
@@ -1167,7 +1161,6 @@ async def test_state_success(evds_mock):
         "information and appointment details will be sent via SMS."
     )
     assert reply.session_event == Message.SESSION_EVENT.CLOSE
-    assert u.state.name == "state_age_gate"
 
     [requests] = evds_mock.app.requests
     assert requests.json == {
@@ -1229,7 +1222,6 @@ async def test_state_success_temporary_failure(evds_mock):
         "information and appointment details will be sent via SMS."
     )
     assert reply.session_event == Message.SESSION_EVENT.CLOSE
-    assert u.state.name == "state_age_gate"
 
     requests = evds_mock.app.requests
     assert len(requests) == 2
@@ -1292,7 +1284,6 @@ async def test_state_error(evds_mock):
         "not able to be processed. Please try again later"
     )
     assert reply.session_event == Message.SESSION_EVENT.CLOSE
-    assert u.state.name == "state_age_gate"
 
     requests = evds_mock.app.requests
     assert len(requests) == 3

@@ -51,11 +51,14 @@ class BaseApplication:
             self.user.answers = {}
             self.user.session_id = None
         state = await self.get_current_state()
-        if self.user.session_id is not None:
-            await state.process_message(message)
-        else:
+        if (
+            message.session_event == Message.SESSION_EVENT.NEW
+            or self.user.session_id is None
+        ):
             self.user.session_id = random_id()
             await state.display(message)
+        else:
+            await state.process_message(message)
         return self.messages
 
     def save_answer(self, name: str, value: Any):
