@@ -7,16 +7,23 @@ from vaccine.models import Message
 
 
 class EndState:
-    def __init__(self, app: BaseApplication, text: str, next: Optional[str] = None):
+    def __init__(
+        self,
+        app: BaseApplication,
+        text: str,
+        next: Optional[str] = None,
+        clear_state: bool = True,
+    ):
         self.app = app
         self.text = text
-        if next is None:
-            next = app.START_STATE
         self.next = next
+        self.clear_state = clear_state
 
     async def process_message(self, message: Message) -> List[Message]:
         self.app.user.session_id = None
         self.app.state_name = self.next
+        if self.clear_state:
+            self.app.user.answers = {}
         return self.app.send_message(self.text, continue_session=False)
 
     async def display(self, message: Message) -> List[Message]:

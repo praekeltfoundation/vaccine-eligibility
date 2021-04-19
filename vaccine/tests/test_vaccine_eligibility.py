@@ -344,7 +344,7 @@ async def test_location_pin():
 @pytest.mark.asyncio
 async def test_comorbidities_valid():
     """
-    A valid response should save the answer and go to the next stage
+    A valid response should finish the questionairre
     """
     u = User(
         addr="27820001001",
@@ -363,7 +363,6 @@ async def test_comorbidities_valid():
     await app.process_message(msg)
     assert u.state.name == "state_start"
     assert u.session_id is None
-    assert u.answers["state_comorbidities"] == "yes"
 
 
 @pytest.mark.asyncio
@@ -617,7 +616,8 @@ async def test_result_3():
 @pytest.mark.asyncio
 async def test_confirm_notification_yes():
     """
-    If the user selects to get a notification, should save and display result to user
+    If the user selects to get a notification, should display result to user and end
+    session
     """
     u = User(addr="27820001001", state=StateData(name="state_result_2"), session_id="1")
     app = Application(u)
@@ -641,13 +641,12 @@ async def test_confirm_notification_yes():
     )
     assert u.state.name == "state_start"
     assert u.session_id is None
-    assert u.answers["state_result_2"] == "yes"
 
 
 @pytest.mark.asyncio
 async def test_confirm_notification_no():
     """
-    If the user selects to not get a notification, should save and display result
+    If the user selects to not get a notification, should display result and end session
     """
     u = User(addr="27820001001", state=StateData(name="state_result_3"), session_id="1")
     app = Application(u)
@@ -671,7 +670,6 @@ async def test_confirm_notification_no():
     )
     assert u.state.name == "state_start"
     assert u.session_id is None
-    assert u.answers["state_result_3"] == "no"
 
 
 @pytest.mark.asyncio
