@@ -189,7 +189,9 @@ class Application(BaseApplication):
             for i in range(3):
                 try:
                     response = await session.get(
-                        urljoin(config.TURN_API_URL, f"/v1/contacts/{whatsapp_id}/profile")
+                        urljoin(
+                            config.TURN_API_URL, f"/v1/contacts/{whatsapp_id}/profile"
+                        )
                     )
                     response.raise_for_status()
                     data = await response.json()
@@ -368,7 +370,9 @@ class Application(BaseApplication):
                         params={
                             "input": self.user.answers.get("state_city"),
                             "key": config.GOOGLE_PLACES_KEY,
-                            "sessiontoken": self.user.answers.get("google_session_token"),
+                            "sessiontoken": self.user.answers.get(
+                                "google_session_token"
+                            ),
                             "language": "en",
                             "components": "country:za",
                         },
@@ -429,7 +433,9 @@ class Application(BaseApplication):
                         params={
                             "key": config.GOOGLE_PLACES_KEY,
                             "place_id": self.user.answers.get("place_id"),
-                            "sessiontoken": self.user.answers.get("google_session_token"),
+                            "sessiontoken": self.user.answers.get(
+                                "google_session_token"
+                            ),
                             "language": "en",
                             "fields": "geometry",
                         },
@@ -806,9 +812,13 @@ class Application(BaseApplication):
                             ),
                             "exposure": self.user.answers.get("state_exposure"),
                             "tracing": self.user.answers.get("state_tracing"),
-                            "confirmed_contact": self.user.answers.get("confirmed_contact"),
+                            "confirmed_contact": self.user.answers.get(
+                                "confirmed_contact"
+                            ),
                             "risk": self.calculate_risk(),
-                            "data": {"age_years": self.user.answers.get("state_age_years")},
+                            "data": {
+                                "age_years": self.user.answers.get("state_age_years")
+                            },
                         },
                     )
                     response.raise_for_status()
