@@ -145,7 +145,7 @@ class Application(BaseApplication):
             next_state = "state_gender"
 
         async def validate_identification_number(value):
-            if idtype == self.ID_TYPES.rsa_id or idtype == self.ID_TYPES.refugee:
+            if idtype == self.ID_TYPES.rsa_id:
                 try:
                     id_number = SAIDNumber(value)
                     dob = id_number.date_of_birth
