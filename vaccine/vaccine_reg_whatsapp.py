@@ -1,5 +1,6 @@
 import logging
 from datetime import date
+from email.utils import parseaddr
 from enum import Enum
 from urllib.parse import urljoin
 
@@ -21,6 +22,7 @@ from vaccine.utils import (
     HTTP_EXCEPTIONS,
     SAIDNumber,
     calculate_age,
+    countries,
     display_phonenumber,
     normalise_phonenumber,
 )
@@ -338,7 +340,6 @@ class Application(BaseApplication):
         )
 
     async def state_passport_country(self):
-        # TODO: Implement country search
         return FreeText(
             self,
             question="\n".join(
@@ -349,7 +350,34 @@ class Application(BaseApplication):
                     "Example _Zimbabwe_",
                 ]
             ),
-            next="state_first_name",
+            next="state_passport_country_list",
+        )
+
+    async def state_passport_country_list(self):
+        async def next_state(choice: Choice):
+            if choice.value == "other":
+                return "state_passport_country"
+            return "state_first_name"
+
+        search = self.user.answers["state_passport_country"] or ""
+        choices = [
+            Choice(country[0], country[1][:30])
+            for country in countries.search_for_country(search)
+        ]
+        choices.append(Choice("other", "Other"))
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please confirm your passport's COUNTRY of origin. REPLY with a "
+                    "NUMBER from the list below:",
+                ]
+            ),
+            choices=choices,
+            error="Do any of these match your COUNTRY:",
+            next=next_state,
         )
 
     async def state_first_name(self):
@@ -545,7 +573,7 @@ class Application(BaseApplication):
                 ]
             ),
             choices=[
-                Choice("state_medical_aid", "Yes"),
+                Choice("state_email_address", "Yes"),
                 Choice("state_phone_number", "No"),
             ],
             error="\n".join(
@@ -581,12 +609,37 @@ class Application(BaseApplication):
                     "Please TYPE the CELL PHONE NUMBER we can contact you on.",
                 ]
             ),
-            next="state_medical_aid",
+            next="state_email_address",
             check=phone_number_validation,
         )
 
+    async def state_email_address(self):
+        async def email_validation(content):
+            if content and content.lower() == "skip":
+                return
+
+            if parseaddr(content) == ("", ""):
+                raise ErrorMessage(
+                    "⚠️ Please TYPE a valid EMAIL address. (Or type SKIP if you are "
+                    "unable to share an email address.)"
+                )
+
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE your EMAIL address. (Or type SKIP if you are unable "
+                    "to share an email address.)",
+                ]
+            ),
+            check=email_validation,
+            next="state_medical_aid",
+        )
+
     async def state_medical_aid(self):
-        return ChoiceState(
+        return MenuState(
             self,
             question="\n".join(
                 [
@@ -595,7 +648,10 @@ class Application(BaseApplication):
                     "Do you belong to a Medical Aid?",
                 ]
             ),
-            choices=[Choice("yes", "Yes"), Choice("no", "No")],
+            choices=[
+                Choice("state_medical_aid_search", "Yes"),
+                Choice("state_vaccination_time", "No"),
+            ],
             error="\n".join(
                 [
                     "⚠️ This service works best when you reply with one of the numbers "
@@ -604,33 +660,6 @@ class Application(BaseApplication):
                     "Please confirm if you belong to a Medical Aid.",
                 ]
             ),
-            next="state_vaccination_time",
-        )
-
-    async def state_vaccination_time(self):
-        return ChoiceState(
-            self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-                    "",
-                    "Which option do you prefer for your vaccination appointment?",
-                ]
-            ),
-            choices=[
-                Choice("weekday_morning", "Weekday Morning"),
-                Choice("weekday_afternoon", "Weekday Afternoon"),
-                Choice("weekend_morning", "Weekend Morning"),
-            ],
-            error="\n".join(
-                [
-                    "⚠️ This service works best when you reply with one of the numbers "
-                    "next to the options provided.",
-                    "",
-                    "When would you be available for a vaccination appointment?",
-                ]
-            ),
-            next="state_medical_aid_search",
         )
 
     async def state_medical_aid_search(self):
@@ -683,6 +712,32 @@ class Application(BaseApplication):
                     "Please TYPE your Medical Aid NUMBER.",
                 ]
             ),
+            next="state_vaccination_time",
+        )
+
+    async def state_vaccination_time(self):
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Which option do you prefer for your vaccination appointment?",
+                ]
+            ),
+            choices=[
+                Choice("weekday_morning", "Weekday Morning"),
+                Choice("weekday_afternoon", "Weekday Afternoon"),
+                Choice("weekend_morning", "Weekend Morning"),
+            ],
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided.",
+                    "",
+                    "When would you be available for a vaccination appointment?",
+                ]
+            ),
             next="state_submit_to_evds",
         )
 
@@ -712,7 +767,11 @@ class Application(BaseApplication):
             "preferredVaccineScheduleTimeOfDay": vac_time,
             "preferredVaccineScheduleTimeOfWeek": vac_day,
             "preferredVaccineLocation": location,
+            "residentialLocation": location,
             "termsAndConditionsAccepted": True,
+            "medicalAidMember": self.user.answers["state_medical_aid"]
+            == "state_medical_aid_search",
+            "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
         }
         id_type = self.user.answers["state_identification_type"]
         if id_type == self.ID_TYPES.rsa_id.name:
@@ -724,7 +783,15 @@ class Application(BaseApplication):
             data["refugeeNumber"] = self.user.answers["state_identification_number"]
         if id_type == self.ID_TYPES.passport.name:
             data["passportNumber"] = self.user.answers["state_identification_number"]
-            data["passportCountry"] = self.user.answers["state_passport_country"]
+            data["passportCountry"] = self.user.answers["state_passport_country_list"]
+        email_addr = self.user.answers["state_email_address"]
+        if email_addr.lower() != "skip":
+            data["emailAddress"] = email_addr
+        if self.user.answers["state_medical_aid"] == "state_medical_aid_search":
+            data["medicalAidScheme"] = self.user.answers["state_medical_aid_list"]
+            data["medicalAidSchemeNumber"] = self.user.answers[
+                "state_medical_aid_number"
+            ]
 
         async with evds as session:
             for i in range(3):

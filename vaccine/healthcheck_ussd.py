@@ -38,10 +38,7 @@ def get_eventstore():
 def get_google_api():
     return aiohttp.ClientSession(
         timeout=aiohttp.ClientTimeout(total=5),
-        headers={
-            "Content-Type": "application/json",
-            "User-Agent": "healthcheck-ussd",
-        },
+        headers={"Content-Type": "application/json", "User-Agent": "healthcheck-ussd"},
     )
 
 
@@ -161,23 +158,26 @@ class Application(BaseApplication):
         return await self.go_to_state("state_save_healthcheck_start")
 
     async def state_save_healthcheck_start(self):
-        for i in range(3):
-            try:
-                response = await get_eventstore().post(
-                    urljoin(config.EVENTSTORE_API_URL, "/api/v2/covid19triagestart/"),
-                    json={
-                        "msisdn": self.inbound.from_addr,
-                        "source": f"USSD {self.inbound.to_addr}",
-                    },
-                )
-                response.raise_for_status()
-                break
-            except HTTP_EXCEPTIONS as e:
-                if i == 2:
-                    logger.exception(e)
-                    return await self.go_to_state("state_error")
-                else:
-                    continue
+        async with get_eventstore() as session:
+            for i in range(3):
+                try:
+                    response = await session.post(
+                        urljoin(
+                            config.EVENTSTORE_API_URL, "/api/v2/covid19triagestart/"
+                        ),
+                        json={
+                            "msisdn": self.inbound.from_addr,
+                            "source": f"USSD {self.inbound.to_addr}",
+                        },
+                    )
+                    response.raise_for_status()
+                    break
+                except HTTP_EXCEPTIONS as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
         return await self.go_to_state("state_get_confirmed_contact")
 
     async def state_get_confirmed_contact(self):
@@ -427,8 +427,7 @@ class Application(BaseApplication):
                 try:
                     response = await session.get(
                         urljoin(
-                            config.GOOGLE_PLACES_URL,
-                            "/maps/api/place/details/json",
+                            config.GOOGLE_PLACES_URL, "/maps/api/place/details/json"
                         ),
                         params={
                             "key": config.GOOGLE_PLACES_KEY,
@@ -470,13 +469,7 @@ class Application(BaseApplication):
         return ChoiceState(
             self,
             question="How old are you?",
-            error="\n".join(
-                [
-                    "Please use numbers from list.",
-                    "",
-                    "How old are you?",
-                ]
-            ),
+            error="\n".join(["Please use numbers from list.", "", "How old are you?"]),
             choices=[
                 Choice("<18", "<18"),
                 Choice("18-40", "18-39"),
@@ -514,10 +507,7 @@ class Application(BaseApplication):
                 raise ErrorMessage(question)
 
         return FreeText(
-            self,
-            question=question,
-            check=validate_age,
-            next="state_province",
+            self, question=question, check=validate_age, next="state_province"
         )
 
     async def state_fever(self):
@@ -769,10 +759,7 @@ class Application(BaseApplication):
                     "Reply",
                 ]
             )
-            choices = [
-                Choice("yes", "YES"),
-                Choice("no", "NO"),
-            ]
+            choices = [Choice("yes", "YES"), Choice("no", "NO")]
         return ChoiceState(
             self,
             question=question,
@@ -816,10 +803,7 @@ class Application(BaseApplication):
                     logger.info(config.EVENTSTORE_API_URL)
                     logger.info(data)
                     response = await session.post(
-                        urljoin(
-                            config.EVENTSTORE_API_URL,
-                            "/api/v3/covid19triage/",
-                        ),
+                        urljoin(config.EVENTSTORE_API_URL, "/api/v3/covid19triage/"),
                         json=data,
                     )
                     response.raise_for_status()
