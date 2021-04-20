@@ -804,7 +804,7 @@ class Application(BaseApplication):
                         ),
                         "smell": self.user.answers.get("state_taste_and_smell"),
                         "preexisting_condition": self.user.answers.get(
-                            "state_preexisting_conditions"
+                            "state_preexisting_conditions", ""
                         ),
                         "exposure": self.user.answers.get("state_exposure"),
                         "tracing": self.user.answers.get("state_tracing"),
