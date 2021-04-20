@@ -136,7 +136,7 @@ class Application(BaseApplication):
             ),
             choices=[
                 Choice(
-                    "state_terms_and_conditions",
+                    "state_terms_pdf",
                     f"Yes, I am {config.ELIGIBILITY_AGE_GATE_MIN} or older",
                 ),
                 Choice("state_under_age_notification", "No"),
@@ -164,8 +164,20 @@ class Application(BaseApplication):
     async def state_confirm_notification(self):
         return EndState(self, text="Thank you for confirming")
 
+    async def state_terms_pdf(self):
+        self.messages.append(
+            self.inbound.reply(
+                None,
+                helper_metadata={
+                    "document": "https://healthcheck-rasa-images.s3.af-south-1.amazonaw"
+                    "s.com/ELECTRONIC+VACCINATION+DATA+SYSTEM+(EVDS)+%E2%80%93+DATA+"
+                    "PROTECTION+%26+PRIVACY+POLICY.pdf"
+                },
+            )
+        )
+        return await self.go_to_state("state_terms_and_conditions")
+
     async def state_terms_and_conditions(self):
-        # TODO: Send PDF
         return MenuState(
             self,
             question="\n".join(
@@ -884,8 +896,7 @@ class Application(BaseApplication):
                 try:
                     response = await session.post(
                         url=urljoin(
-                            config.VACREG_EVENTSTORE_URL,
-                            "/v2/vaccineregistration/",
+                            config.VACREG_EVENTSTORE_URL, "/v2/vaccineregistration/"
                         ),
                         json=data,
                     )

@@ -173,7 +173,7 @@ async def test_identification_type():
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
-    [reply] = await app.process_message(msg)
+    [pdf, reply] = await app.process_message(msg)
     assert u.state.name == "state_terms_and_conditions"
 
 
@@ -1129,7 +1129,8 @@ async def test_terms_and_conditions():
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
-    [reply] = await app.process_message(msg)
+    [pdf, reply] = await app.process_message(msg)
+    assert "document" in pdf.helper_metadata
     assert u.state.name == "state_terms_and_conditions"
 
 
