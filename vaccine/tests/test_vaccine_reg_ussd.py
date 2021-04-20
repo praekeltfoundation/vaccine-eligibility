@@ -266,6 +266,25 @@ async def test_passport_country():
 
 
 @pytest.mark.asyncio
+async def test_passport_country_by_choosing():
+    u = User(
+        addr="27820001001", state=StateData(name="state_passport_country"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        content="2",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_gender"
+    assert u.answers["state_passport_country"] == "ZW"
+
+
+@pytest.mark.asyncio
 async def test_passport_country_invalid():
     u = User(
         addr="27820001001", state=StateData(name="state_passport_country"), session_id=1
@@ -281,6 +300,84 @@ async def test_passport_country_invalid():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_passport_country"
+
+
+@pytest.mark.asyncio
+async def test_passport_country_search():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_passport_country_search"),
+        session_id=1,
+        answers={"state_passport_country": "other"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="cote d'ivory",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_passport_country_list"
+    assert u.answers["state_passport_country_search"] == "cote d'ivory"
+
+    assert reply.content == "\n".join(
+        [
+            "Please choose the best match for your COUNTRY of origin:",
+            "1. Republic of Côte d'Ivoire",
+            "2. Plurinational State of Bolivia",
+            "3. Swiss Confederation",
+            "4. Other",
+        ]
+    )
+    assert len(reply.content) < 160
+
+
+@pytest.mark.asyncio
+async def test_passport_country_search_other():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_passport_country_list"),
+        session_id=1,
+        answers={
+            "state_passport_country": "other",
+            "state_passport_country_search": "cote d'ivoire",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="other",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_passport_country_search"
+
+
+@pytest.mark.asyncio
+async def test_passport_country_search_list_invalid():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_passport_country_list"),
+        session_id=1,
+        answers={
+            "state_passport_country": "other",
+            "state_passport_country_search": "Côte d'Ivoire",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_passport_country_list"
 
 
 @pytest.mark.asyncio
@@ -1230,6 +1327,133 @@ async def test_state_success(evds_mock, eventstore_mock):
 
 
 @pytest.mark.asyncio
+async def test_state_success_passport(evds_mock):
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid"),
+        session_id=1,
+        answers={
+            "state_dob_year": "1960",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+            "state_vaccination_time": "weekday_morning",
+            "state_suburb": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_gender": "Other",
+            "state_surname": "test surname",
+            "state_first_name": "test first name",
+            "state_identification_type": "passport",
+            "state_identification_number": "A1234567890",
+            "state_passport_country": "other",
+            "state_passport_country_list": "ZA",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert (
+        reply.content
+        == ":) You have SUCCESSFULLY registered to get vaccinated. Additional "
+        "information and appointment details will be sent via SMS."
+    )
+    assert reply.session_event == Message.SESSION_EVENT.CLOSE
+
+    [requests] = evds_mock.app.requests
+    assert requests.json == {
+        "gender": "Other",
+        "surname": "test surname",
+        "firstName": "test first name",
+        "dateOfBirth": "1960-01-01",
+        "mobileNumber": "+27820001001",
+        "preferredVaccineScheduleTimeOfDay": "morning",
+        "preferredVaccineScheduleTimeOfWeek": "weekday",
+        "preferredVaccineLocation": {
+            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "text": "Diep River",
+        },
+        "residentialLocation": {
+            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "text": "Diep River",
+        },
+        "termsAndConditionsAccepted": True,
+        "passportNumber": "A1234567890",
+        "passportCountry": "ZA",
+        "sourceId": "008c0f09-db09-4d60-83c5-63505c7f05ba",
+        "medicalAidMember": True,
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_success_passport_from_choosing(evds_mock):
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid"),
+        session_id=1,
+        answers={
+            "state_dob_year": "1960",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+            "state_vaccination_time": "weekday_morning",
+            "state_suburb": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_gender": "Other",
+            "state_surname": "test surname",
+            "state_first_name": "test first name",
+            "state_identification_type": "passport",
+            "state_identification_number": "A1234567890",
+            "state_passport_country": "ZW",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert (
+        reply.content
+        == ":) You have SUCCESSFULLY registered to get vaccinated. Additional "
+        "information and appointment details will be sent via SMS."
+    )
+    assert reply.session_event == Message.SESSION_EVENT.CLOSE
+
+    [requests] = evds_mock.app.requests
+    assert requests.json == {
+        "gender": "Other",
+        "surname": "test surname",
+        "firstName": "test first name",
+        "dateOfBirth": "1960-01-01",
+        "mobileNumber": "+27820001001",
+        "preferredVaccineScheduleTimeOfDay": "morning",
+        "preferredVaccineScheduleTimeOfWeek": "weekday",
+        "preferredVaccineLocation": {
+            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "text": "Diep River",
+        },
+        "residentialLocation": {
+            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "text": "Diep River",
+        },
+        "termsAndConditionsAccepted": True,
+        "passportNumber": "A1234567890",
+        "passportCountry": "ZW",
+        "sourceId": "008c0f09-db09-4d60-83c5-63505c7f05ba",
+        "medicalAidMember": True,
+    }
+
+
+@pytest.mark.asyncio
 async def test_state_success_temporary_failure(evds_mock):
     evds_mock.app.errormax = 1
     u = User(
@@ -1249,6 +1473,7 @@ async def test_state_success_temporary_failure(evds_mock):
             "state_identification_type": "passport",
             "state_identification_number": "A1234567890",
             "state_passport_country": "other",
+            "state_passport_country_list": "ZA",
         },
     )
     app = Application(u)
@@ -1288,7 +1513,7 @@ async def test_state_success_temporary_failure(evds_mock):
         },
         "termsAndConditionsAccepted": True,
         "passportNumber": "A1234567890",
-        "passportCountry": "other",
+        "passportCountry": "ZA",
         "sourceId": "008c0f09-db09-4d60-83c5-63505c7f05ba",
         "medicalAidMember": True,
     }

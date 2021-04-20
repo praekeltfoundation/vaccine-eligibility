@@ -20,6 +20,7 @@ from vaccine.utils import (
     HTTP_EXCEPTIONS,
     SAIDNumber,
     calculate_age,
+    countries,
     display_phonenumber,
     normalise_phonenumber,
 )
@@ -182,6 +183,11 @@ class Application(BaseApplication):
         )
 
     async def state_passport_country(self):
+        async def next_state(choice: Choice):
+            if choice.value == "other":
+                return "state_passport_country_search"
+            return "state_gender"
+
         return ChoiceState(
             self,
             question="Which country issued your passport?",
@@ -196,7 +202,34 @@ class Application(BaseApplication):
                 Choice("SO", "Somalia"),
                 Choice("other", "Other"),
             ],
-            next="state_gender",
+            next=next_state,
+        )
+
+    async def state_passport_country_search(self):
+        return FreeText(
+            self,
+            question="Please TYPE in your passport's COUNTRY of origin.",
+            next="state_passport_country_list",
+        )
+
+    async def state_passport_country_list(self):
+        async def next_state(choice: Choice):
+            if choice.value == "other":
+                return "state_passport_country_search"
+            return "state_gender"
+
+        search = self.user.answers["state_passport_country_search"] or ""
+        choices = [
+            Choice(country[0], country[1][:30])
+            for country in countries.search_for_country(search)
+        ]
+        choices.append(Choice("other", "Other"))
+        return ChoiceState(
+            self,
+            question="Please choose the best match for your COUNTRY of origin:",
+            choices=choices,
+            error="Do any of these match your COUNTRY:",
+            next=next_state,
         )
 
     async def state_gender(self):
@@ -493,7 +526,12 @@ class Application(BaseApplication):
             data["refugeeNumber"] = self.user.answers["state_identification_number"]
         if id_type == self.ID_TYPES.passport.name:
             data["passportNumber"] = self.user.answers["state_identification_number"]
-            data["passportCountry"] = self.user.answers["state_passport_country"]
+            if self.user.answers["state_passport_country"] != "other":
+                data["passportCountry"] = self.user.answers["state_passport_country"]
+            else:
+                data["passportCountry"] = self.user.answers[
+                    "state_passport_country_list"
+                ]
 
         async with evds as session:
             for i in range(3):
