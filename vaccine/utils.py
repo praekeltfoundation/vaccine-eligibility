@@ -5,6 +5,11 @@ from uuid import uuid4
 
 import phonenumbers
 
+from functools import cached_property
+
+import pycountry
+from fuzzywuzzy import process
+
 DECODE_MESSAGE_EXCEPTIONS = (
     UnicodeDecodeError,
     JSONDecodeError,
@@ -107,3 +112,27 @@ def display_phonenumber(phonenumber):
         return phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.NATIONAL)
     except phonenumbers.phonenumberutil.NumberParseException:
         return phonenumber
+
+
+class Countries:
+    @cached_property
+    def countries(self):
+        countries = sorted(
+            [
+                (country.alpha_2, getattr(country, 'official_name', '') or country.name)
+                for country in pycountry.countries
+            ],
+            key=lambda x: x[1],
+        )
+        return {v.strip().lower(): k for k, v in countries}
+
+    def search_for_country(self, search_text):
+        search_text = search_text.strip().lower()
+        lowercase = self.countries
+        possibilities = process.extract(search_text, lowercase.keys(), limit=3)
+        return [
+            (lowercase[p], self.country_name(lowercase[p])) for p, _ in possibilities
+        ]
+
+    def country_name(self, alpha_2):
+        return pycountry.countries.get(alpha_2=alpha_2).name
