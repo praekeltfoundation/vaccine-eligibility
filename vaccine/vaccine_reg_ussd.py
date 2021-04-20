@@ -215,10 +215,7 @@ class Application(BaseApplication):
                 )
 
             idtype = self.user.answers["state_identification_type"]
-            if (
-                idtype == self.ID_TYPES.rsa_id.value
-                or idtype == self.ID_TYPES.refugee.value
-            ):
+            if idtype == self.ID_TYPES.rsa_id.value:
                 idno = self.user.answers["state_identification_number"]
                 if value[-2:] != idno[:2]:
                     raise ErrorMessage(
