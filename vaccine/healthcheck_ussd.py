@@ -782,6 +782,7 @@ class Application(BaseApplication):
         )
 
     async def state_submit_data(self):
+
         if self.user.answers.get("state_tracing") == "restart":
             return await self.go_to_state("state_start")
 
@@ -811,6 +812,9 @@ class Application(BaseApplication):
                         "risk": self.calculate_risk(),
                         "data": {"age_years": self.user.answers.get("state_age_years")},
                     }
+                    logger.info(">>>> state_submit_data /api/v3/covid19triage/")
+                    logger.info(config.EVENTSTORE_API_URL)
+                    logger.info(data)
                     response = await session.post(
                         urljoin(
                             config.EVENTSTORE_API_URL,
@@ -818,7 +822,6 @@ class Application(BaseApplication):
                         ),
                         data=data,
                     )
-                    logger.info(response.content)
                     response.raise_for_status()
                     break
                 except aiohttp.ClientError as e:
