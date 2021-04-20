@@ -751,6 +751,8 @@ class Application(BaseApplication):
             "preferredVaccineScheduleTimeOfWeek": vac_day,
             "preferredVaccineLocation": location,
             "termsAndConditionsAccepted": True,
+            "medicalAidMember": self.user.answers["state_medical_aid"]
+            == "state_medical_aid_search",
         }
         id_type = self.user.answers["state_identification_type"]
         if id_type == self.ID_TYPES.rsa_id.name:
@@ -763,7 +765,14 @@ class Application(BaseApplication):
         if id_type == self.ID_TYPES.passport.name:
             data["passportNumber"] = self.user.answers["state_identification_number"]
             data["passportCountry"] = self.user.answers["state_passport_country_list"]
-        # TODO: Add medical aid to data @rudi
+        email_addr = self.user.answers["state_email_address"]
+        if email_addr.lower() != "skip":
+            data["emailAddress"] = email_addr
+        if self.user.answers["state_medical_aid"] == "state_medical_aid_search":
+            data["medicalAidScheme"] = self.user.answers["state_medical_aid_list"]
+            data["medicalAidSchemeNumber"] = self.user.answers[
+                "state_medical_aid_number"
+            ]
 
         async with evds as session:
             for i in range(3):

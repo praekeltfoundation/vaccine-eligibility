@@ -1195,6 +1195,7 @@ async def test_state_success(evds_mock):
             "state_medical_aid": "yes",
             "state_medical_aid_search": "discovery",
             "state_medical_aid_list": "1",
+            "state_email_address": "SKIP",
         },
     )
     app = Application(u)
@@ -1235,6 +1236,7 @@ async def test_state_success(evds_mock):
         },
         "termsAndConditionsAccepted": True,
         "iDNumber": "6001010001081",
+        "medicalAidMember": False,
     }
 
 
@@ -1261,6 +1263,7 @@ async def test_state_success_passport(evds_mock):
             "state_medical_aid": "yes",
             "state_medical_aid_search": "discovery",
             "state_medical_aid_list": "1",
+            "state_email_address": "SKIP",
         },
     )
     app = Application(u)
@@ -1302,6 +1305,7 @@ async def test_state_success_passport(evds_mock):
         "termsAndConditionsAccepted": True,
         "passportNumber": "A1234567890",
         "passportCountry": "ZA",
+        "medicalAidMember": False,
     }
 
 
@@ -1329,6 +1333,7 @@ async def test_state_success_temporary_failure(evds_mock):
             "state_medical_aid": "yes",
             "state_medical_aid_search": "discovery",
             "state_medical_aid_list": "1",
+            "state_email_address": "test@example.org",
         },
     )
     app = Application(u)
@@ -1371,6 +1376,8 @@ async def test_state_success_temporary_failure(evds_mock):
         "termsAndConditionsAccepted": True,
         "passportNumber": "A1234567890",
         "passportCountry": "ZA",
+        "emailAddress": "test@example.org",
+        "medicalAidMember": False,
     }
 
 
@@ -1393,10 +1400,12 @@ async def test_state_error(evds_mock):
             "state_first_name": "test first name",
             "state_identification_type": "refugee",
             "state_identification_number": "6001010001081",
-            "state_medical_aid": "yes",
+            "state_medical_aid": "state_medical_aid_search",
             "state_medical_aid_search": "discovery",
             "state_medical_aid_list": "1",
+            "state_medical_aid_number": "M1234567890",
             "state_vaccination_time": "weekday_morning",
+            "state_email_address": "SKIP",
         },
     )
     app = Application(u)
@@ -1431,4 +1440,7 @@ async def test_state_error(evds_mock):
         },
         "termsAndConditionsAccepted": True,
         "refugeeNumber": "6001010001081",
+        "medicalAidMember": True,
+        "medicalAidScheme": "1",
+        "medicalAidSchemeNumber": "M1234567890",
     }
