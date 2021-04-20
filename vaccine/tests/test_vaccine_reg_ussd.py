@@ -307,6 +307,7 @@ async def test_passport_country_search():
             "4. Other",
         ]
     )
+    assert len(reply.content) < 160
 
 
 @pytest.mark.asyncio
