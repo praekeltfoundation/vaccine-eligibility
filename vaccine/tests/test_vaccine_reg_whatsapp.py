@@ -1268,6 +1268,21 @@ async def test_state_success(evds_mock, eventstore_mock):
         "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
     }
 
+    [requests] = eventstore_mock.app.requests
+    assert requests.json == {
+        "msisdn": "+27820001001",
+        "source": "WhatsApp 27820001002",
+        "gender": "Other",
+        "first_name": "test first name",
+        "last_name": "test surname",
+        "date_of_birth": "1960-01-01",
+        "preferred_time": "morning",
+        "preferred_date": "weekday",
+        "preferred_location_id": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+        "preferred_location_name": "Diep River",
+        "id_number": "6001010001081",
+    }
+
 
 @pytest.mark.asyncio
 async def test_state_success_passport(evds_mock):
@@ -1340,21 +1355,6 @@ async def test_state_success_passport(evds_mock):
         "passportCountry": "ZA",
         "medicalAidMember": False,
         "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
-    }
-
-    [requests] = eventstore_mock.app.requests
-    assert requests.json == {
-        "msisdn": "+27820001001",
-        "source": "WhatsApp 27820001002",
-        "gender": "Other",
-        "first_name": "test first name",
-        "last_name": "test surname",
-        "date_of_birth": "1960-01-01",
-        "preferred_time": "morning",
-        "preferred_date": "weekday",
-        "preferred_location_id": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-        "preferred_location_name": "Diep River",
-        "id_number": "6001010001081",
     }
 
 
