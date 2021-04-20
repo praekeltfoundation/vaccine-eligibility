@@ -529,7 +529,9 @@ class Application(BaseApplication):
             if self.user.answers["state_passport_country"] != "other":
                 data["passportCountry"] = self.user.answers["state_passport_country"]
             else:
-                data["passportCountry"] = self.user.answers["state_passport_country_list"]
+                data["passportCountry"] = self.user.answers[
+                    "state_passport_country_list"
+                ]
 
         async with evds as session:
             for i in range(3):
