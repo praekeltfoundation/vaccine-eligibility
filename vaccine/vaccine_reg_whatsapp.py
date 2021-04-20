@@ -7,6 +7,7 @@ import aiohttp
 
 from vaccine import vacreg_config as config
 from vaccine.base_application import BaseApplication
+from vaccine.data.medscheme import medical_aids
 from vaccine.data.suburbs import suburbs
 from vaccine.states import (
     Choice,
@@ -612,6 +613,59 @@ class Application(BaseApplication):
                     "next to the options provided.",
                     "",
                     "When would you be available for a vaccination appointment?",
+                ]
+            ),
+            next="state_medical_aid_search",
+        )
+
+    async def state_medical_aid_search(self):
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE the name of your Medical Aid PROVIDER.",
+                ]
+            ),
+            next="state_medical_aid_list",
+        )
+
+    async def state_medical_aid_list(self):
+        async def next_state(choice: Choice):
+            if choice.value == "other":
+                return "state_medical_aid_search"
+            return "state_medical_aid_number"
+
+        search = self.user.answers["state_medical_aid_search"] or ""
+        choices = [
+            Choice(medical_aid[0], medical_aid[1][:30])
+            for medical_aid in medical_aids.search_for_scheme(search)
+        ]
+        choices.append(Choice("other", "Other"))
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please confirm your Medical Aid Provider. REPLY with a NUMBER "
+                    "from the list below:",
+                ]
+            ),
+            choices=choices,
+            error="Do any of these match your Medical Aid:",
+            next=next_state,
+        )
+
+    async def state_medical_aid_number(self):
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE your Medical Aid NUMBER.",
                 ]
             ),
             next="state_submit_to_evds",
