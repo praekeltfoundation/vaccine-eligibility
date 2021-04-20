@@ -122,14 +122,13 @@ class Countries:
             ],
             key=lambda x: x[1],
         )
-        return {v.strip().lower(): k for k, v in countries}
+        return {v: k for k, v in countries}
 
     def search_for_country(self, search_text):
-        search_text = search_text.strip().lower()
-        lowercase = self.countries
-        possibilities = process.extract(search_text, lowercase.keys(), limit=3)
+        possibilities = process.extract(search_text, self.countries.keys(), limit=3)
         return [
-            (lowercase[p], self.country_name(lowercase[p])) for p, _ in possibilities
+            (self.countries[p], self.country_name(self.countries[p]))
+            for p, _ in possibilities
         ]
 
     def country_name(self, alpha_2):
