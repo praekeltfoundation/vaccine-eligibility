@@ -38,6 +38,30 @@ async def evds_mock(sanic_client):
     config.EVDS_PASSWORD = password
 
 
+@pytest.fixture
+async def eventstore_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("mock_eventstore")
+    app.requests = []
+    app.registration_errormax = 0
+    app.registration_errors = 0
+
+    @app.route("/v2/vaccineregistration/", methods=["POST"])
+    def valid_registration(request):
+        app.requests.append(request)
+        if app.registration_errormax:
+            if app.registration_errors < app.registration_errormax:
+                app.registration_errors += 1
+                return response.json({}, status=500)
+        return response.json({})
+
+    client = await sanic_client(app)
+    url = config.VACREG_EVENTSTORE_URL
+    config.VACREG_EVENTSTORE_URL = f"http://{client.host}:{client.port}"
+    yield client
+    config.VACREG_EVENTSTORE_URL = url
+
+
 @pytest.mark.asyncio
 async def test_age_gate():
     """
@@ -1130,7 +1154,7 @@ async def test_terms_and_conditions_3_invalid():
 
 
 @pytest.mark.asyncio
-async def test_state_success(evds_mock):
+async def test_state_success(evds_mock, eventstore_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_medical_aid"),
@@ -1187,6 +1211,21 @@ async def test_state_success(evds_mock):
         "iDNumber": "6001010001081",
         "sourceId": "008c0f09-db09-4d60-83c5-63505c7f05ba",
         "medicalAidMember": True,
+    }
+
+    [requests] = eventstore_mock.app.requests
+    assert requests.json == {
+        "msisdn": "+27820001001",
+        "source": "USSD 27820001002",
+        "gender": "Other",
+        "first_name": "test first name",
+        "last_name": "test surname",
+        "date_of_birth": "1960-01-01",
+        "preferred_time": "morning",
+        "preferred_date": "weekday",
+        "preferred_location_id": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+        "preferred_location_name": "Diep River",
+        "id_number": "6001010001081",
     }
 
 

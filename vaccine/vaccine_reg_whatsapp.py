@@ -49,6 +49,22 @@ def get_evds():
     )
 
 
+def get_eventstore():
+    # TODO: Cache the session globally. Things that don't work:
+    # - Declaring the session at the top of the file
+    #   You get a `Timeout context manager should be used inside a task` error
+    # - Declaring it here but caching it in a global variable for reuse
+    #   You get a `Event loop is closed` error
+    return aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=5),
+        headers={
+            "Authorization": f"Token {config.VACREG_EVENTSTORE_TOKEN}",
+            "Content-Type": "application/json",
+            "User-Agent": "healthcheck-ussd",
+        },
+    )
+
+
 class Application(BaseApplication):
     START_STATE = "state_age_gate"
 
@@ -794,6 +810,65 @@ class Application(BaseApplication):
                     if i == 2:
                         logger.exception(e)
                         return await self.go_to_state("state_err")
+                    else:
+                        continue
+
+        return await self.go_to_state("state_submit_to_eventstore")
+
+    async def state_submit_to_eventstore(self):
+        eventstore = get_eventstore()
+        date_of_birth = date(
+            int(self.user.answers["state_dob_year"]),
+            int(self.user.answers["state_dob_month"]),
+            int(self.user.answers["state_dob_day"]),
+        )
+        vac_day, vac_time = self.user.answers["state_vaccination_time"].split("_")
+        suburb_id = self.user.answers["state_suburb"]
+        province_id = self.user.answers["state_province_id"]
+        phonenumber = self.user.answers.get(
+            "state_phone_number", self.inbound.from_addr
+        )
+
+        data = {
+            "msisdn": normalise_phonenumber(phonenumber),
+            "source": f"WhatsApp {self.inbound.to_addr}",
+            "gender": self.user.answers["state_gender"],
+            "first_name": self.user.answers["state_first_name"],
+            "last_name": self.user.answers["state_surname"],
+            "date_of_birth": date_of_birth.isoformat(),
+            "preferred_time": vac_time,
+            "preferred_date": vac_day,
+            "preferred_location_id": suburb_id,
+            "preferred_location_name": suburbs.suburb_name(suburb_id, province_id),
+        }
+        id_type = self.user.answers["state_identification_type"]
+        if id_type == self.ID_TYPES.rsa_id.name:
+            data["id_number"] = self.user.answers["state_identification_number"]
+        if id_type == self.ID_TYPES.asylum_seeker.name:
+            data["asylum_seeker_number"] = self.user.answers[
+                "state_identification_number"
+            ]
+        if id_type == self.ID_TYPES.refugee.name:
+            data["refugee_number"] = self.user.answers["state_identification_number"]
+        if id_type == self.ID_TYPES.passport.name:
+            data["passport_number"] = self.user.answers["state_identification_number"]
+            data["passport_country"] = self.user.answers["state_passport_country"]
+
+        async with eventstore as session:
+            for i in range(3):
+                try:
+                    response = await session.post(
+                        url=urljoin(
+                            config.VACREG_EVENTSTORE_URL,
+                            "/v2/vaccineregistration/",
+                        ),
+                        json=data,
+                    )
+                    response.raise_for_status()
+                    break
+                except HTTP_EXCEPTIONS as e:
+                    if i == 2:
+                        logger.exception(e)
                     else:
                         continue
 
