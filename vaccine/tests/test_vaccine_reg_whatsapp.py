@@ -279,16 +279,18 @@ async def test_said_date_extraction_ambiguous(get_today):
 
 
 @pytest.mark.asyncio
-async def test_gender():
+@mock.patch("vaccine.utils.get_today")
+async def test_gender(get_today):
+    get_today.return_value = date(2120, 1, 1)
     u = User(
         addr="27820001001",
-        state=StateData(name="state_identification_number"),
-        answers={"state_identification_type": Application.ID_TYPES.asylum_seeker.name},
+        state=StateData(name="state_dob_day"),
+        answers={"state_dob_year": "1990", "state_dob_month": "1"},
         session_id=1,
     )
     app = Application(u)
     msg = Message(
-        content="9001010001088",
+        content="1",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -299,8 +301,19 @@ async def test_gender():
 
 
 @pytest.mark.asyncio
-async def test_gender_invalid():
-    u = User(addr="27820001001", state=StateData(name="state_gender"), session_id=1)
+@mock.patch("vaccine.utils.get_today")
+async def test_gender_invalid(get_today):
+    get_today.return_value = date(2120, 1, 1)
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_gender"),
+        session_id=1,
+        answers={
+            "state_dob_year": "1990",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+        },
+    )
     app = Application(u)
     msg = Message(
         content="invalid",
@@ -315,39 +328,21 @@ async def test_gender_invalid():
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.utils.get_today")
-async def test_dob_and_gender_skipped(get_today):
-    get_today.return_value = date(2100, 1, 1)
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_identification_number"),
-        session_id=1,
-        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
-    )
-    app = Application(u)
-    msg = Message(
-        content="9001010001088",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_first_name"
-
-
-@pytest.mark.asyncio
-@mock.patch("vaccine.utils.get_today")
 async def test_too_young(get_today):
     get_today.return_value = date(2020, 1, 1)
     u = User(
         addr="27820001001",
-        state=StateData(name="state_identification_number"),
+        state=StateData(name="state_dob_year"),
         session_id=1,
-        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
+        answers={
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+            "state_identification_type": "passport",
+        },
     )
     app = Application(u)
     msg = Message(
-        content="9001010001088",
+        content="1990",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -359,10 +354,10 @@ async def test_too_young(get_today):
 
 @pytest.mark.asyncio
 async def test_dob_year():
-    u = User(addr="27820001001", state=StateData(name="state_gender"), session_id=1)
+    u = User(addr="27820001001", state=StateData(name="state_surname"), session_id=1)
     app = Application(u)
     msg = Message(
-        content="male",
+        content="test surname",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -489,18 +484,13 @@ async def test_dob_day_invalid():
 
 
 @pytest.mark.asyncio
-@mock.patch("vaccine.utils.get_today")
-async def test_first_name(get_today):
-    get_today.return_value = date(2100, 1, 1)
+async def test_first_name():
     u = User(
-        addr="27820001001",
-        state=StateData(name="state_dob_day"),
-        session_id=1,
-        answers={"state_dob_year": "1990", "state_dob_month": "2"},
+        addr="27820001001", state=StateData(name="state_passport_country"), session_id=1
     )
     app = Application(u)
     msg = Message(
-        content="2",
+        content="test country",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -511,19 +501,8 @@ async def test_first_name(get_today):
 
 
 @pytest.mark.asyncio
-@mock.patch("vaccine.utils.get_today")
-async def test_surname(get_today):
-    get_today.return_value = date(2100, 1, 1)
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_first_name"),
-        session_id=1,
-        answers={
-            "state_dob_year": "1990",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-        },
-    )
+async def test_surname():
+    u = User(addr="27820001001", state=StateData(name="state_first_name"), session_id=1)
     app = Application(u)
     msg = Message(
         content="firstname",
@@ -538,11 +517,42 @@ async def test_surname(get_today):
 
 
 @pytest.mark.asyncio
-async def test_province():
-    u = User(addr="27820001001", state=StateData(name="state_surname"), session_id=1)
+@mock.patch("vaccine.utils.get_today")
+async def test_skip_dob_and_gender(get_today):
+    get_today.return_value = date(2120, 1, 1)
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_surname"),
+        session_id=1,
+        answers={
+            "state_dob_day": "1",
+            "state_dob_month": "1",
+            "state_dob_year": "1990",
+            "state_gender": "male",
+        },
+    )
     app = Application(u)
     msg = Message(
         content="test surname",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_self_registration"
+
+
+@pytest.mark.asyncio
+async def test_province():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_terms_and_conditions"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="accept",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -664,7 +674,7 @@ async def test_suburb_other():
 
 
 @pytest.mark.asyncio
-async def test_self_registration():
+async def test_suburb_value():
     u = User(
         addr="27820001001",
         state=StateData(name="state_suburb"),
@@ -677,6 +687,32 @@ async def test_self_registration():
     app = Application(u)
     msg = Message(
         content="1",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_identification_type"
+
+
+@pytest.mark.asyncio
+@mock.patch("vaccine.utils.get_today")
+async def test_self_registration(get_today):
+    get_today.return_value = date(2100, 1, 1)
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_gender"),
+        session_id=1,
+        answers={
+            "state_dob_year": "1990",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="male",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -698,11 +734,18 @@ async def test_self_registration():
 
 
 @pytest.mark.asyncio
-async def test_self_registration_invalid():
+@mock.patch("vaccine.utils.get_today")
+async def test_self_registration_invalid(get_today):
+    get_today.return_value = date(2100, 1, 1)
     u = User(
         addr="27820001001",
         state=StateData(name="state_self_registration"),
         session_id=1,
+        answers={
+            "state_dob_year": "1990",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+        },
     )
     app = Application(u)
     msg = Message(
@@ -717,11 +760,18 @@ async def test_self_registration_invalid():
 
 
 @pytest.mark.asyncio
-async def test_phone_number():
+@mock.patch("vaccine.utils.get_today")
+async def test_phone_number(get_today):
+    get_today.return_value = date(2100, 1, 1)
     u = User(
         addr="27820001001",
         state=StateData(name="state_self_registration"),
         session_id=1,
+        answers={
+            "state_dob_year": "1990",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+        },
     )
     app = Application(u)
     msg = Message(
@@ -736,9 +786,18 @@ async def test_phone_number():
 
 
 @pytest.mark.asyncio
-async def test_phone_number_invalid():
+@mock.patch("vaccine.utils.get_today")
+async def test_phone_number_invalid(get_today):
+    get_today.return_value = date(2100, 1, 1)
     u = User(
-        addr="27820001001", state=StateData(name="state_phone_number"), session_id=1
+        addr="27820001001",
+        state=StateData(name="state_phone_number"),
+        session_id=1,
+        answers={
+            "state_dob_year": "1990",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+        },
     )
     app = Application(u)
     msg = Message(
@@ -753,11 +812,11 @@ async def test_phone_number_invalid():
 
 
 @pytest.mark.asyncio
-async def test_vaccination_time():
+@mock.patch("vaccine.utils.get_today")
+async def test_vaccination_time(get_today):
+    get_today.return_value = date(2100, 1, 1)
     u = User(
-        addr="27820001001",
-        state=StateData(name="state_self_registration"),
-        session_id=1,
+        addr="27820001001", state=StateData(name="state_medical_aid"), session_id=1
     )
     app = Application(u)
     msg = Message(
@@ -789,13 +848,99 @@ async def test_vaccination_time_invalid():
 
 
 @pytest.mark.asyncio
-async def test_medical_aid():
+async def test_medical_aid_search():
     u = User(
         addr="27820001001", state=StateData(name="state_vaccination_time"), session_id=1
     )
     app = Application(u)
     msg = Message(
-        content="weekday morning",
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_medical_aid_search"
+
+
+@pytest.mark.asyncio
+async def test_medical_aid_list():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid_search"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="discovery",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_medical_aid_list"
+    assert reply.content == "\n".join(
+        [
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "",
+            "Please confirm your Medical Aid Provider. REPLY with a NUMBER from the "
+            "list below:",
+            "1. Discovery Health",
+            "2. Other",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_medical_aid_list_other():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid_list"),
+        session_id=1,
+        answers={"state_medical_aid_search": "discovery"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="other",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_medical_aid_search"
+
+
+@pytest.mark.asyncio
+async def test_medical_aid_number():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid_list"),
+        session_id=1,
+        answers={"state_medical_aid_search": "discovery"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_medical_aid_number"
+
+
+@pytest.mark.asyncio
+async def test_medical_aid():
+    u = User(
+        addr="27820001001", state=StateData(name="state_phone_number"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        content="0820001001",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -906,7 +1051,7 @@ async def test_no_terms():
 async def test_state_success(evds_mock):
     u = User(
         addr="27820001001",
-        state=StateData(name="state_medical_aid"),
+        state=StateData(name="state_medical_aid_number"),
         session_id=1,
         answers={
             "state_dob_year": "1960",
@@ -920,11 +1065,14 @@ async def test_state_success(evds_mock):
             "state_first_name": "test first name",
             "state_identification_type": "rsa_id",
             "state_identification_number": "6001010001081",
+            "state_medical_aid": "yes",
+            "state_medical_aid_search": "discovery",
+            "state_medical_aid_list": "1",
         },
     )
     app = Application(u)
     msg = Message(
-        content="yes",
+        content="A1234567890",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -958,10 +1106,6 @@ async def test_state_success(evds_mock):
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },
-        "residentialLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "text": "Diep River",
-        },
         "termsAndConditionsAccepted": True,
         "iDNumber": "6001010001081",
     }
@@ -972,7 +1116,7 @@ async def test_state_success_temporary_failure(evds_mock):
     evds_mock.app.errormax = 1
     u = User(
         addr="27820001001",
-        state=StateData(name="state_medical_aid"),
+        state=StateData(name="state_medical_aid_number"),
         session_id=1,
         answers={
             "state_dob_year": "1960",
@@ -987,11 +1131,14 @@ async def test_state_success_temporary_failure(evds_mock):
             "state_identification_type": "passport",
             "state_identification_number": "A1234567890",
             "state_passport_country": "other",
+            "state_medical_aid": "yes",
+            "state_medical_aid_search": "discovery",
+            "state_medical_aid_list": "1",
         },
     )
     app = Application(u)
     msg = Message(
-        content="yes",
+        content="A1234567890",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -1026,10 +1173,6 @@ async def test_state_success_temporary_failure(evds_mock):
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },
-        "residentialLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "text": "Diep River",
-        },
         "termsAndConditionsAccepted": True,
         "passportNumber": "A1234567890",
         "passportCountry": "other",
@@ -1041,13 +1184,13 @@ async def test_state_error(evds_mock):
     evds_mock.app.errormax = 3
     u = User(
         addr="27820001001",
-        state=StateData(name="state_medical_aid"),
+        state=StateData(name="state_medical_aid_number"),
         session_id=1,
         answers={
             "state_dob_year": "1960",
             "state_dob_month": "1",
             "state_dob_day": "1",
-            "state_vaccination_time": "weekday_morning",
+            "state_gender": "Other",
             "state_suburb": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
             "state_gender": "Other",
@@ -1055,11 +1198,15 @@ async def test_state_error(evds_mock):
             "state_first_name": "test first name",
             "state_identification_type": "refugee",
             "state_identification_number": "6001010001081",
+            "state_medical_aid": "yes",
+            "state_medical_aid_search": "discovery",
+            "state_medical_aid_list": "1",
+            "state_vaccination_time": "weekday_morning",
         },
     )
     app = Application(u)
     msg = Message(
-        content="yes",
+        content="A1234567890",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -1084,10 +1231,6 @@ async def test_state_error(evds_mock):
         "preferredVaccineScheduleTimeOfDay": "morning",
         "preferredVaccineScheduleTimeOfWeek": "weekday",
         "preferredVaccineLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "text": "Diep River",
-        },
-        "residentialLocation": {
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },

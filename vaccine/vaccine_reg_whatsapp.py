@@ -7,6 +7,7 @@ import aiohttp
 
 from vaccine import vacreg_config as config
 from vaccine.base_application import BaseApplication
+from vaccine.data.medscheme import medical_aids
 from vaccine.data.suburbs import suburbs
 from vaccine.states import (
     Choice,
@@ -133,7 +134,7 @@ class Application(BaseApplication):
             ),
             choices=[
                 Choice("state_terms_and_conditions_summary", "Read summary"),
-                Choice("state_identification_type", "Accept"),
+                Choice("state_province_id", "Accept"),
             ],
             error="⚠️ This service works best when you reply with one of the numbers "
             "next to the options provided.",
@@ -169,7 +170,7 @@ class Application(BaseApplication):
                 ]
             ),
             choices=[
-                Choice("state_identification_type", "Yes, I accept"),
+                Choice("state_province_id", "Yes, I accept"),
                 Choice("state_no_terms", "No"),
             ],
             error="\n".join(
@@ -193,6 +194,72 @@ class Application(BaseApplication):
                     "your registration session",
                 ]
             ),
+        )
+
+    async def state_province_id(self):
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "We need your location to help us match you with a nearby "
+                    "vaccination site",
+                    "",
+                    "Select your province",
+                ]
+            ),
+            choices=[Choice(*province) for province in suburbs.provinces],
+            error="Reply with a NUMBER:",
+            next="state_suburb_search",
+        )
+
+    async def state_suburb_search(self):
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE the name of the SUBURB where you want to get "
+                    "vaccinated",
+                ]
+            ),
+            next="state_suburb",
+        )
+
+    async def state_suburb(self):
+        async def next_state(choice: Choice):
+            if choice.value == "other":
+                return "state_province_id"
+            return "state_identification_type"
+
+        province = self.user.answers["state_province_id"]
+        search = self.user.answers["state_suburb_search"] or ""
+        choices = [
+            Choice(suburb[0], suburb[1][:30])
+            for suburb in suburbs.search_for_suburbs(province, search)
+        ]
+        choices.append(Choice("other", "Other"))
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐" "",
+                    "Please REPLY with a NUMBER to confirm your location:",
+                ]
+            ),
+            choices=choices,
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided.",
+                    "",
+                    "Please REPLY with a NUMBER from the list below to confirm the "
+                    "location you have shared:",
+                ]
+            ),
+            next=next_state,
         )
 
     async def state_identification_type(self):
@@ -225,10 +292,10 @@ class Application(BaseApplication):
         if idtype == self.ID_TYPES.passport:
             next_state = "state_passport_country"
         else:
-            next_state = "state_gender"
+            next_state = "state_first_name"
 
         async def validate_identification_number(value):
-            if idtype == self.ID_TYPES.rsa_id or idtype == self.ID_TYPES.refugee:
+            if idtype == self.ID_TYPES.rsa_id:
                 try:
                     id_number = SAIDNumber(value)
                     dob = id_number.date_of_birth
@@ -265,29 +332,33 @@ class Application(BaseApplication):
                     "Example _Zimbabwe_",
                 ]
             ),
-            next="state_gender",
+            next="state_first_name",
         )
 
-    async def state_gender(self):
-        if self.user.answers.get("state_gender"):
-            return await self.go_to_state("state_dob_year")
+    async def state_first_name(self):
 
-        return ChoiceState(
+        return FreeText(
             self,
             question="\n".join(
-                ["*VACCINE REGISTRATION SECURE CHAT* 🔐", "", "What is your GENDER?"]
-            ),
-            choices=[
-                Choice("Male", "Male"),
-                Choice("Female", "Female"),
-                Choice("Other", "Other"),
-            ],
-            error="\n".join(
                 [
-                    "⚠️ This service works best when you reply with one of the numbers "
-                    "next to the options provided."
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
                     "",
-                    "REPLY with the NUMBER next to your gender in the list below.",
+                    "Please TYPE your FIRST NAME as it appears in your identification "
+                    "document.",
+                ]
+            ),
+            next="state_surname",
+        )
+
+    async def state_surname(self):
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE your SURNAME as it appears in your identification "
+                    "document.",
                 ]
             ),
             next="state_dob_year",
@@ -314,10 +385,7 @@ class Application(BaseApplication):
                 )
 
             idtype = self.user.answers["state_identification_type"]
-            if (
-                idtype == self.ID_TYPES.rsa_id.value
-                or idtype == self.ID_TYPES.refugee.value
-            ):
+            if idtype == self.ID_TYPES.rsa_id.value:
                 idno = self.user.answers["state_identification_number"]
                 if value[-2:] != idno[:2]:
                     raise ErrorMessage(
@@ -378,7 +446,7 @@ class Application(BaseApplication):
 
     async def state_dob_day(self):
         if self.user.answers.get("state_dob_day"):
-            return await self.go_to_state("state_first_name")
+            return await self.go_to_state("state_gender")
 
         async def validate_dob_day(value):
             dob_year = int(self.user.answers["state_dob_year"])
@@ -410,11 +478,11 @@ class Application(BaseApplication):
                     "Example: If you were born on 31 May, type _31_",
                 ]
             ),
-            next="state_first_name",
+            next="state_gender",
             check=validate_dob_day,
         )
 
-    async def state_first_name(self):
+    async def state_gender(self):
         year = int(self.user.answers["state_dob_year"])
         month = int(self.user.answers["state_dob_month"])
         day = int(self.user.answers["state_dob_day"])
@@ -422,96 +490,28 @@ class Application(BaseApplication):
         if age < config.ELIGIBILITY_AGE_GATE_MIN:
             return await self.go_to_state("state_under_age_notification")
 
-        return FreeText(
-            self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-                    "",
-                    "Please TYPE your FIRST NAME as it appears in your identification "
-                    "document.",
-                ]
-            ),
-            next="state_surname",
-        )
+        if self.user.answers.get("state_gender"):
+            return await self.go_to_state("state_self_registration")
 
-    async def state_surname(self):
-        return FreeText(
-            self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-                    "",
-                    "Please TYPE your SURNAME as it appears in your identification "
-                    "document.",
-                ]
-            ),
-            next="state_province_id",
-        )
-
-    async def state_province_id(self):
         return ChoiceState(
             self,
             question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-                    "",
-                    "We need your location to help us match you with a nearby "
-                    "vaccination site",
-                    "",
-                    "Select your province",
-                ]
+                ["*VACCINE REGISTRATION SECURE CHAT* 🔐", "", "What is your GENDER?"]
             ),
-            choices=[Choice(*province) for province in suburbs.provinces],
-            error="Reply with a NUMBER:",
-            next="state_suburb_search",
-        )
-
-    async def state_suburb_search(self):
-        return FreeText(
-            self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-                    "",
-                    "Please TYPE the name of the SUBURB where you live.",
-                ]
-            ),
-            next="state_suburb",
-        )
-
-    async def state_suburb(self):
-        async def next_state(choice: Choice):
-            if choice.value == "other":
-                return "state_province_id"
-            return "state_self_registration"
-
-        province = self.user.answers["state_province_id"]
-        search = self.user.answers["state_suburb_search"] or ""
-        choices = [
-            Choice(suburb[0], suburb[1][:30])
-            for suburb in suburbs.search_for_suburbs(province, search)
-        ]
-        choices.append(Choice("other", "Other"))
-        return ChoiceState(
-            self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐" "",
-                    "Please REPLY with a NUMBER to confirm your location:",
-                ]
-            ),
-            choices=choices,
+            choices=[
+                Choice("Male", "Male"),
+                Choice("Female", "Female"),
+                Choice("Other", "Other"),
+            ],
             error="\n".join(
                 [
                     "⚠️ This service works best when you reply with one of the numbers "
-                    "next to the options provided.",
+                    "next to the options provided."
                     "",
-                    "Please REPLY with a NUMBER from the list below to confirm the "
-                    "location you have shared:",
+                    "REPLY with the NUMBER next to your gender in the list below.",
                 ]
             ),
-            next=next_state,
+            next="state_self_registration",
         )
 
     async def state_self_registration(self):
@@ -528,7 +528,7 @@ class Application(BaseApplication):
                 ]
             ),
             choices=[
-                Choice("state_vaccination_time", "Yes"),
+                Choice("state_medical_aid", "Yes"),
                 Choice("state_phone_number", "No"),
             ],
             error="\n".join(
@@ -564,8 +564,30 @@ class Application(BaseApplication):
                     "Please TYPE the CELL PHONE NUMBER we can contact you on.",
                 ]
             ),
-            next="state_vaccination_time",
+            next="state_medical_aid",
             check=phone_number_validation,
+        )
+
+    async def state_medical_aid(self):
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Do you belong to a Medical Aid?",
+                ]
+            ),
+            choices=[Choice("yes", "Yes"), Choice("no", "No")],
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided.",
+                    "",
+                    "Please confirm if you belong to a Medical Aid.",
+                ]
+            ),
+            next="state_vaccination_time",
         )
 
     async def state_vaccination_time(self):
@@ -591,26 +613,57 @@ class Application(BaseApplication):
                     "When would you be available for a vaccination appointment?",
                 ]
             ),
-            next="state_medical_aid",
+            next="state_medical_aid_search",
         )
 
-    async def state_medical_aid(self):
+    async def state_medical_aid_search(self):
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE the name of your Medical Aid PROVIDER.",
+                ]
+            ),
+            next="state_medical_aid_list",
+        )
+
+    async def state_medical_aid_list(self):
+        async def next_state(choice: Choice):
+            if choice.value == "other":
+                return "state_medical_aid_search"
+            return "state_medical_aid_number"
+
+        search = self.user.answers["state_medical_aid_search"] or ""
+        choices = [
+            Choice(medical_aid[0], medical_aid[1][:30])
+            for medical_aid in medical_aids.search_for_scheme(search)
+        ]
+        choices.append(Choice("other", "Other"))
         return ChoiceState(
             self,
             question="\n".join(
                 [
                     "*VACCINE REGISTRATION SECURE CHAT* 🔐",
                     "",
-                    "Do you belong to a Medical Aid?",
+                    "Please confirm your Medical Aid Provider. REPLY with a NUMBER "
+                    "from the list below:",
                 ]
             ),
-            choices=[Choice("yes", "Yes"), Choice("no", "No")],
-            error="\n".join(
+            choices=choices,
+            error="Do any of these match your Medical Aid:",
+            next=next_state,
+        )
+
+    async def state_medical_aid_number(self):
+        return FreeText(
+            self,
+            question="\n".join(
                 [
-                    "⚠️ This service works best when you reply with one of the numbers "
-                    "next to the options provided.",
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
                     "",
-                    "Please confirm if you belong to a Medical Aid.",
+                    "Please TYPE your Medical Aid NUMBER.",
                 ]
             ),
             next="state_submit_to_evds",
@@ -642,7 +695,6 @@ class Application(BaseApplication):
             "preferredVaccineScheduleTimeOfDay": vac_time,
             "preferredVaccineScheduleTimeOfWeek": vac_day,
             "preferredVaccineLocation": location,
-            "residentialLocation": location,
             "termsAndConditionsAccepted": True,
         }
         id_type = self.user.answers["state_identification_type"]

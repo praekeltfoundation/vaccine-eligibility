@@ -145,7 +145,7 @@ class Application(BaseApplication):
             next_state = "state_gender"
 
         async def validate_identification_number(value):
-            if idtype == self.ID_TYPES.rsa_id or idtype == self.ID_TYPES.refugee:
+            if idtype == self.ID_TYPES.rsa_id:
                 try:
                     id_number = SAIDNumber(value)
                     dob = id_number.date_of_birth
@@ -215,10 +215,7 @@ class Application(BaseApplication):
                 )
 
             idtype = self.user.answers["state_identification_type"]
-            if (
-                idtype == self.ID_TYPES.rsa_id.value
-                or idtype == self.ID_TYPES.refugee.value
-            ):
+            if idtype == self.ID_TYPES.rsa_id.value:
                 idno = self.user.answers["state_identification_number"]
                 if value[-2:] != idno[:2]:
                     raise ErrorMessage(
@@ -464,7 +461,6 @@ class Application(BaseApplication):
             "preferredVaccineScheduleTimeOfDay": vac_time,
             "preferredVaccineScheduleTimeOfWeek": vac_day,
             "preferredVaccineLocation": location,
-            "residentialLocation": location,
             "termsAndConditionsAccepted": True,
         }
         id_type = self.user.answers["state_identification_type"]
