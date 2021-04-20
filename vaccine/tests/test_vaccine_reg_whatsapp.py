@@ -254,9 +254,9 @@ async def test_passport_country_search():
             "",
             "Please confirm your passport's COUNTRY of origin. REPLY with a "
             "NUMBER from the list below:",
-            "1. Côte d'Ivoire",
-            "2. British Indian Ocean Territory",
-            "3. Congo, The Democratic Republic",
+            "1. Republic of Côte d'Ivoire",
+            "2. Plurinational State of Bolivia",
+            "3. Swiss Confederation",
             "4. Other",
         ]
     )

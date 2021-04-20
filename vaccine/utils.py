@@ -115,24 +115,14 @@ def display_phonenumber(phonenumber):
 class Countries:
     @cached_property
     def countries(self):
-        countries = sorted(
-            [
-                (country.alpha_2, getattr(country, "official_name", "") or country.name)
-                for country in pycountry.countries
-            ],
-            key=lambda x: x[1],
-        )
-        return {v: k for k, v in countries}
+        return {
+            country.alpha_2: getattr(country, "official_name", "") or country.name
+            for country in pycountry.countries
+        }
 
     def search_for_country(self, search_text):
-        possibilities = process.extract(search_text, self.countries.keys(), limit=3)
-        return [
-            (self.countries[p], self.country_name(self.countries[p]))
-            for p, _ in possibilities
-        ]
-
-    def country_name(self, alpha_2):
-        return pycountry.countries.get(alpha_2=alpha_2).name
+        possibilities = process.extract(search_text, self.countries, limit=3)
+        return [(code, name) for name, _, code in possibilities]
 
 
 countries = Countries()
