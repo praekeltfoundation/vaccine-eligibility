@@ -221,7 +221,8 @@ class Application(BaseApplication):
                 [
                     "*VACCINE REGISTRATION SECURE CHAT* 🔐",
                     "",
-                    "Please TYPE the name of the SUBURB where you live.",
+                    "Please TYPE the name of the SUBURB where you want to get "
+                    "vaccinated",
                 ]
             ),
             next="state_suburb",
