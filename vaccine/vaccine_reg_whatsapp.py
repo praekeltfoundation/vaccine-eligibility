@@ -20,6 +20,7 @@ from vaccine.states import (
 from vaccine.utils import (
     SAIDNumber,
     calculate_age,
+    countries,
     display_phonenumber,
     normalise_phonenumber,
 )
@@ -321,7 +322,6 @@ class Application(BaseApplication):
         )
 
     async def state_passport_country(self):
-        # TODO: Implement country search
         return FreeText(
             self,
             question="\n".join(
@@ -332,7 +332,34 @@ class Application(BaseApplication):
                     "Example _Zimbabwe_",
                 ]
             ),
-            next="state_first_name",
+            next="state_passport_country_list",
+        )
+
+    async def state_passport_country_list(self):
+        async def next_state(choice: Choice):
+            if choice.value == "other":
+                return "state_passport_country"
+            return "state_first_name"
+
+        search = self.user.answers["state_passport_country"] or ""
+        choices = [
+            Choice(country[0], country[1][:30])
+            for country in countries.search_for_country(search)
+        ]
+        choices.append(Choice("other", "Other"))
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please confirm your passport's COUNTRY of origin. REPLY with a "
+                    "NUMBER from the list below:",
+                ]
+            ),
+            choices=choices,
+            error="Do any of these match your COUNTRY:",
+            next=next_state,
         )
 
     async def state_first_name(self):
@@ -707,7 +734,8 @@ class Application(BaseApplication):
             data["refugeeNumber"] = self.user.answers["state_identification_number"]
         if id_type == self.ID_TYPES.passport.name:
             data["passportNumber"] = self.user.answers["state_identification_number"]
-            data["passportCountry"] = self.user.answers["state_passport_country"]
+            data["passportCountry"] = self.user.answers["state_passport_country_list"]
+        # TODO: Add medical aid to data @rudi
 
         async with evds as session:
             for i in range(3):

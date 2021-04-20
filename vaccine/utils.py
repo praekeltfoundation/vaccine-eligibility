@@ -1,9 +1,12 @@
 from datetime import date, datetime, timedelta, timezone
 from enum import Enum
+from functools import cached_property
 from json import JSONDecodeError
 from uuid import uuid4
 
 import phonenumbers
+import pycountry
+from fuzzywuzzy import process
 
 DECODE_MESSAGE_EXCEPTIONS = (
     UnicodeDecodeError,
@@ -107,3 +110,19 @@ def display_phonenumber(phonenumber):
         return phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.NATIONAL)
     except phonenumbers.phonenumberutil.NumberParseException:
         return phonenumber
+
+
+class Countries:
+    @cached_property
+    def countries(self):
+        return {
+            country.alpha_2: getattr(country, "official_name", "") or country.name
+            for country in pycountry.countries
+        }
+
+    def search_for_country(self, search_text):
+        possibilities = process.extract(search_text, self.countries, limit=3)
+        return [(code, name) for name, _, code in possibilities]
+
+
+countries = Countries()
