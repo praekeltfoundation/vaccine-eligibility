@@ -462,6 +462,7 @@ class Application(BaseApplication):
             "preferredVaccineScheduleTimeOfDay": vac_time,
             "preferredVaccineScheduleTimeOfWeek": vac_day,
             "preferredVaccineLocation": location,
+            "residentialLocation": location,
             "termsAndConditionsAccepted": True,
         }
         id_type = self.user.answers["state_identification_type"]
