@@ -821,6 +821,7 @@ class Application(BaseApplication):
                             },
                         },
                     )
+                    logger.info(response.content)
                     response.raise_for_status()
                     break
                 except aiohttp.ClientError as e:
