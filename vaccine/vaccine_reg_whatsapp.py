@@ -622,7 +622,7 @@ class Application(BaseApplication):
         )
 
     async def state_medical_aid(self):
-        return ChoiceState(
+        return MenuState(
             self,
             question="\n".join(
                 [
@@ -631,7 +631,10 @@ class Application(BaseApplication):
                     "Do you belong to a Medical Aid?",
                 ]
             ),
-            choices=[Choice("yes", "Yes"), Choice("no", "No")],
+            choices=[
+                Choice("state_medical_aid_search", "Yes"),
+                Choice("state_vaccination_time", "No"),
+            ],
             error="\n".join(
                 [
                     "⚠️ This service works best when you reply with one of the numbers "
@@ -640,33 +643,6 @@ class Application(BaseApplication):
                     "Please confirm if you belong to a Medical Aid.",
                 ]
             ),
-            next="state_vaccination_time",
-        )
-
-    async def state_vaccination_time(self):
-        return ChoiceState(
-            self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-                    "",
-                    "Which option do you prefer for your vaccination appointment?",
-                ]
-            ),
-            choices=[
-                Choice("weekday_morning", "Weekday Morning"),
-                Choice("weekday_afternoon", "Weekday Afternoon"),
-                Choice("weekend_morning", "Weekend Morning"),
-            ],
-            error="\n".join(
-                [
-                    "⚠️ This service works best when you reply with one of the numbers "
-                    "next to the options provided.",
-                    "",
-                    "When would you be available for a vaccination appointment?",
-                ]
-            ),
-            next="state_medical_aid_search",
         )
 
     async def state_medical_aid_search(self):
@@ -717,6 +693,32 @@ class Application(BaseApplication):
                     "*VACCINE REGISTRATION SECURE CHAT* 🔐",
                     "",
                     "Please TYPE your Medical Aid NUMBER.",
+                ]
+            ),
+            next="state_vaccination_time",
+        )
+
+    async def state_vaccination_time(self):
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Which option do you prefer for your vaccination appointment?",
+                ]
+            ),
+            choices=[
+                Choice("weekday_morning", "Weekday Morning"),
+                Choice("weekday_afternoon", "Weekday Afternoon"),
+                Choice("weekend_morning", "Weekend Morning"),
+            ],
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided.",
+                    "",
+                    "When would you be available for a vaccination appointment?",
                 ]
             ),
             next="state_submit_to_evds",
