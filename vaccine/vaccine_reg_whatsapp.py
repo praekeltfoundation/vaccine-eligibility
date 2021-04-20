@@ -2,6 +2,7 @@ import logging
 from datetime import date
 from email.utils import parseaddr
 from enum import Enum
+from typing import List
 from urllib.parse import urljoin
 
 import aiohttp
@@ -10,6 +11,7 @@ from vaccine import vacreg_config as config
 from vaccine.base_application import BaseApplication
 from vaccine.data.medscheme import medical_aids
 from vaccine.data.suburbs import suburbs
+from vaccine.models import Message
 from vaccine.states import (
     Choice,
     ChoiceState,
@@ -57,6 +59,29 @@ class Application(BaseApplication):
         passport = "Passport Number"
         asylum_seeker = "Asylum Seeker Permit number"
         refugee = "Refugee Number Permit number"
+
+    async def process_message(self, message: Message) -> List[Message]:
+        if message.session_event == Message.SESSION_EVENT.CLOSE:
+            self.state_name = "state_timeout"
+        return await super().process_message(message)
+
+    async def state_timeout(self):
+        return EndState(
+            self,
+            text="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "We haven’t heard from you in a while!",
+                    "",
+                    "The registration session has timed out due to inactivity. You "
+                    "will need to start again. Just TYPE the word REGISTER.",
+                    "",
+                    "-----",
+                    "📌 Reply *0* to return to the main *MENU*",
+                ]
+            ),
+        )
 
     async def state_age_gate(self):
         self.user.answers = {}
