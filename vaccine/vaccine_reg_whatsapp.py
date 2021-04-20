@@ -22,6 +22,7 @@ from vaccine.utils import (
     calculate_age,
     display_phonenumber,
     normalise_phonenumber,
+    HTTP_EXCEPTIONS,
 )
 
 logger = logging.getLogger(__name__)
@@ -722,7 +723,7 @@ class Application(BaseApplication):
                     )
                     response.raise_for_status()
                     break
-                except aiohttp.ClientError as e:
+                except HTTP_EXCEPTIONS as e:
                     if i == 2:
                         logger.exception(e)
                         return await self.go_to_state("state_err")

@@ -13,7 +13,7 @@ from aio_pika.message import DeliveryMode
 
 from vaccine import config
 from vaccine.models import Answer, Event, Message, User
-from vaccine.utils import DECODE_MESSAGE_EXCEPTIONS
+from vaccine.utils import DECODE_MESSAGE_EXCEPTIONS, HTTP_EXCEPTIONS
 
 logging.basicConfig(level=config.LOG_LEVEL.upper())
 logger = logging.getLogger(__name__)
@@ -205,7 +205,7 @@ class AnswerWorker:
                     }
                 },
             )
-        except aiohttp.ClientError:
+        except HTTP_EXCEPTIONS:
             logger.exception("Error sending results to flow results server")
             self.answers.extend(msgs)
             return

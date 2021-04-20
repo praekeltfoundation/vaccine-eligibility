@@ -14,7 +14,7 @@ from vaccine.states import (
     FreeText,
     MenuState,
 )
-from vaccine.utils import DECODE_MESSAGE_EXCEPTIONS
+from vaccine.utils import DECODE_MESSAGE_EXCEPTIONS, HTTP_EXCEPTIONS
 
 logger = logging.getLogger(__name__)
 
@@ -142,7 +142,7 @@ class Application(BaseApplication):
                     response.raise_for_status()
                     data = await response.json()
                     break
-                except aiohttp.ClientError as e:
+                except HTTP_EXCEPTIONS as e:
                     if i == 2:
                         logger.exception(e)
                         return await self.go_to_state("state_error")
@@ -172,7 +172,7 @@ class Application(BaseApplication):
                 )
                 response.raise_for_status()
                 break
-            except aiohttp.ClientError as e:
+            except HTTP_EXCEPTIONS as e:
                 if i == 2:
                     logger.exception(e)
                     return await self.go_to_state("state_error")
@@ -196,7 +196,7 @@ class Application(BaseApplication):
                     response.raise_for_status()
                     data = await response.json()
                     break
-                except aiohttp.ClientError as e:
+                except HTTP_EXCEPTIONS as e:
                     if i == 2:
                         logger.exception(e)
                         return await self.go_to_state("state_error")
@@ -388,7 +388,7 @@ class Application(BaseApplication):
                     self.save_answer("state_city", first_result["description"])
 
                     return await self.go_to_state("state_confirm_city")
-                except aiohttp.ClientError as e:
+                except HTTP_EXCEPTIONS as e:
                     if i == 2:
                         logger.exception(e)
                         return await self.go_to_state("state_error")
@@ -456,7 +456,7 @@ class Application(BaseApplication):
                     if self.user.answers.get("confirmed_contact") == "yes":
                         return await self.go_to_state("state_tracing")
                     return await self.go_to_state("state_age")
-                except aiohttp.ClientError as e:
+                except HTTP_EXCEPTIONS as e:
                     if i == 2:
                         logger.exception(e)
                         return await self.go_to_state("state_error")
@@ -824,7 +824,7 @@ class Application(BaseApplication):
                     )
                     response.raise_for_status()
                     break
-                except aiohttp.ClientError as e:
+                except HTTP_EXCEPTIONS as e:
                     if i == 2:
                         logger.exception(e)
                         return await self.go_to_state("state_error")
