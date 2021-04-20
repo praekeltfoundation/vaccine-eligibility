@@ -541,7 +541,6 @@ class Application(BaseApplication):
             "preferredVaccineScheduleTimeOfDay": vac_time,
             "preferredVaccineScheduleTimeOfWeek": vac_day,
             "preferredVaccineLocation": location,
-            "residentialLocation": location,
             "termsAndConditionsAccepted": True,
             "sourceId": "008c0f09-db09-4d60-83c5-63505c7f05ba",
             "medicalAidMember": self.user.answers["state_medical_aid"] == "yes",

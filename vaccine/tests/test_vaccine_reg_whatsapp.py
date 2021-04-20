@@ -1350,10 +1350,6 @@ async def test_state_success(evds_mock, eventstore_mock):
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },
-        "residentialLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "text": "Diep River",
-        },
         "termsAndConditionsAccepted": True,
         "iDNumber": "6001010001081",
         "medicalAidMember": False,
@@ -1511,10 +1507,6 @@ async def test_state_success_temporary_failure(evds_mock):
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },
-        "residentialLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "text": "Diep River",
-        },
         "termsAndConditionsAccepted": True,
         "passportNumber": "A1234567890",
         "passportCountry": "ZA",
@@ -1578,10 +1570,6 @@ async def test_state_error(evds_mock):
         "preferredVaccineScheduleTimeOfDay": "morning",
         "preferredVaccineScheduleTimeOfWeek": "weekday",
         "preferredVaccineLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "text": "Diep River",
-        },
-        "residentialLocation": {
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },

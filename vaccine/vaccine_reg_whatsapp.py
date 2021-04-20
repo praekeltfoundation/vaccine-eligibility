@@ -818,7 +818,6 @@ class Application(BaseApplication):
             "preferredVaccineScheduleTimeOfDay": vac_time,
             "preferredVaccineScheduleTimeOfWeek": vac_day,
             "preferredVaccineLocation": location,
-            "residentialLocation": location,
             "termsAndConditionsAccepted": True,
             "medicalAidMember": self.user.answers["state_medical_aid"]
             == "state_medical_aid_search",
