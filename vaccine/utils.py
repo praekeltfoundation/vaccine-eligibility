@@ -1,11 +1,10 @@
+import asyncio
 from datetime import date, datetime, timedelta, timezone
 from enum import Enum
 from json import JSONDecodeError
 from uuid import uuid4
 
 import aiohttp
-import asyncio
-
 import phonenumbers
 
 DECODE_MESSAGE_EXCEPTIONS = (

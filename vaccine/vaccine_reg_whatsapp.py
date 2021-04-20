@@ -18,11 +18,11 @@ from vaccine.states import (
     MenuState,
 )
 from vaccine.utils import (
+    HTTP_EXCEPTIONS,
     SAIDNumber,
     calculate_age,
     display_phonenumber,
     normalise_phonenumber,
-    HTTP_EXCEPTIONS,
 )
 
 logger = logging.getLogger(__name__)
