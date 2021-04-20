@@ -848,6 +848,92 @@ async def test_vaccination_time_invalid():
 
 
 @pytest.mark.asyncio
+async def test_medical_aid_search():
+    u = User(
+        addr="27820001001", state=StateData(name="state_vaccination_time"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_medical_aid_search"
+
+
+@pytest.mark.asyncio
+async def test_medical_aid_list():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid_search"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="discovery",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_medical_aid_list"
+    assert reply.content == "\n".join(
+        [
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "",
+            "Please confirm your Medical Aid Provider. REPLY with a NUMBER from the "
+            "list below:",
+            "1. Discovery Health",
+            "2. Other",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_medical_aid_list_other():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid_list"),
+        session_id=1,
+        answers={"state_medical_aid_search": "discovery"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="other",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_medical_aid_search"
+
+
+@pytest.mark.asyncio
+async def test_medical_aid_number():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid_list"),
+        session_id=1,
+        answers={"state_medical_aid_search": "discovery"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_medical_aid_number"
+
+
+@pytest.mark.asyncio
 async def test_medical_aid():
     u = User(
         addr="27820001001", state=StateData(name="state_phone_number"), session_id=1
