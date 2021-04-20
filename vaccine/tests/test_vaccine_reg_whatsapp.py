@@ -232,6 +232,77 @@ async def test_passport_country():
 
 
 @pytest.mark.asyncio
+async def test_passport_country_search():
+    u = User(
+        addr="27820001001", state=StateData(name="state_passport_country"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        content="cote d'ivory",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_passport_country_list"
+    assert u.answers["state_passport_country"] == "cote d'ivory"
+
+    assert reply.content == "\n".join(
+        [
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "",
+            "Please confirm your passport's COUNTRY of origin. REPLY with a "
+            "NUMBER from the list below:",
+            "1. Côte d'Ivoire",
+            "2. British Indian Ocean Territory",
+            "3. Congo, The Democratic Republic",
+            "4. Other",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_passport_country_search_other():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_passport_country_list"),
+        session_id=1,
+        answers={"state_passport_country": "CI"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="other",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_passport_country"
+
+
+@pytest.mark.asyncio
+async def test_passport_country_search_list_invalid():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_passport_country_list"),
+        session_id=1,
+        answers={"state_passport_country": "Côte d'Ivoire"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_passport_country_list"
+
+
+@pytest.mark.asyncio
 async def test_said_date_and_sex_extraction():
     u = User(
         addr="27820001001",
@@ -486,11 +557,14 @@ async def test_dob_day_invalid():
 @pytest.mark.asyncio
 async def test_first_name():
     u = User(
-        addr="27820001001", state=StateData(name="state_passport_country"), session_id=1
+        addr="27820001001",
+        state=StateData(name="state_passport_country_list"),
+        session_id=1,
+        answers={"state_passport_country": "south africa"},
     )
     app = Application(u)
     msg = Message(
-        content="test country",
+        content="1",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -1112,6 +1186,73 @@ async def test_state_success(evds_mock):
 
 
 @pytest.mark.asyncio
+async def test_state_success_passport(evds_mock):
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid_number"),
+        session_id=1,
+        answers={
+            "state_dob_year": "1960",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+            "state_vaccination_time": "weekday_morning",
+            "state_suburb": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_gender": "Other",
+            "state_surname": "test surname",
+            "state_first_name": "test first name",
+            "state_identification_type": "passport",
+            "state_identification_number": "A1234567890",
+            "state_passport_country": "south africa",
+            "state_passport_country_list": "ZA",
+            "state_medical_aid": "yes",
+            "state_medical_aid_search": "discovery",
+            "state_medical_aid_list": "1",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="A1234567890",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "",
+            "Congratulations! You successfully registered with the National Department "
+            "of Health to get a COVID-19 vaccine.",
+            "",
+            "Look out for messages from this number (060 012 3456) on WhatsApp OR on "
+            "SMS/email. We will update you with important information about your "
+            "appointment and what to expect.",
+        ]
+    )
+    assert reply.session_event == Message.SESSION_EVENT.CLOSE
+
+    [requests] = evds_mock.app.requests
+    assert requests.json == {
+        "gender": "Other",
+        "surname": "test surname",
+        "firstName": "test first name",
+        "dateOfBirth": "1960-01-01",
+        "mobileNumber": "+27820001001",
+        "preferredVaccineScheduleTimeOfDay": "morning",
+        "preferredVaccineScheduleTimeOfWeek": "weekday",
+        "preferredVaccineLocation": {
+            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "text": "Diep River",
+        },
+        "termsAndConditionsAccepted": True,
+        "passportNumber": "A1234567890",
+        "passportCountry": "ZA",
+    }
+
+
+@pytest.mark.asyncio
 async def test_state_success_temporary_failure(evds_mock):
     evds_mock.app.errormax = 1
     u = User(
@@ -1130,7 +1271,8 @@ async def test_state_success_temporary_failure(evds_mock):
             "state_first_name": "test first name",
             "state_identification_type": "passport",
             "state_identification_number": "A1234567890",
-            "state_passport_country": "other",
+            "state_passport_country": "south africa",
+            "state_passport_country_list": "ZA",
             "state_medical_aid": "yes",
             "state_medical_aid_search": "discovery",
             "state_medical_aid_list": "1",
@@ -1175,7 +1317,7 @@ async def test_state_success_temporary_failure(evds_mock):
         },
         "termsAndConditionsAccepted": True,
         "passportNumber": "A1234567890",
-        "passportCountry": "other",
+        "passportCountry": "ZA",
     }
 
 

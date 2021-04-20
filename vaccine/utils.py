@@ -133,3 +133,6 @@ class Countries:
 
     def country_name(self, alpha_2):
         return pycountry.countries.get(alpha_2=alpha_2).name
+
+
+countries = Countries()
