@@ -1234,9 +1234,14 @@ async def test_state_success(evds_mock):
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },
+        "residentialLocation": {
+            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "text": "Diep River",
+        },
         "termsAndConditionsAccepted": True,
         "iDNumber": "6001010001081",
         "medicalAidMember": False,
+        "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
     }
 
 
@@ -1302,10 +1307,15 @@ async def test_state_success_passport(evds_mock):
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },
+        "residentialLocation": {
+            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "text": "Diep River",
+        },
         "termsAndConditionsAccepted": True,
         "passportNumber": "A1234567890",
         "passportCountry": "ZA",
         "medicalAidMember": False,
+        "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
     }
 
 
@@ -1373,11 +1383,16 @@ async def test_state_success_temporary_failure(evds_mock):
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },
+        "residentialLocation": {
+            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "text": "Diep River",
+        },
         "termsAndConditionsAccepted": True,
         "passportNumber": "A1234567890",
         "passportCountry": "ZA",
         "emailAddress": "test@example.org",
         "medicalAidMember": False,
+        "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
     }
 
 
@@ -1438,9 +1453,14 @@ async def test_state_error(evds_mock):
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },
+        "residentialLocation": {
+            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "text": "Diep River",
+        },
         "termsAndConditionsAccepted": True,
         "refugeeNumber": "6001010001081",
         "medicalAidMember": True,
         "medicalAidScheme": "1",
         "medicalAidSchemeNumber": "M1234567890",
+        "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
     }

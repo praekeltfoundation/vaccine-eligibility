@@ -751,9 +751,11 @@ class Application(BaseApplication):
             "preferredVaccineScheduleTimeOfDay": vac_time,
             "preferredVaccineScheduleTimeOfWeek": vac_day,
             "preferredVaccineLocation": location,
+            "residentialLocation": location,
             "termsAndConditionsAccepted": True,
             "medicalAidMember": self.user.answers["state_medical_aid"]
             == "state_medical_aid_search",
+            "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
         }
         id_type = self.user.answers["state_identification_type"]
         if id_type == self.ID_TYPES.rsa_id.name:

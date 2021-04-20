@@ -462,7 +462,9 @@ class Application(BaseApplication):
             "preferredVaccineScheduleTimeOfDay": vac_time,
             "preferredVaccineScheduleTimeOfWeek": vac_day,
             "preferredVaccineLocation": location,
+            "residentialLocation": location,
             "termsAndConditionsAccepted": True,
+            "sourceId": "008c0f09-db09-4d60-83c5-63505c7f05ba",
         }
         id_type = self.user.answers["state_identification_type"]
         if id_type == self.ID_TYPES.rsa_id.name:
