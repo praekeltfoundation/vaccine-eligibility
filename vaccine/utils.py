@@ -1,9 +1,11 @@
+import asyncio
 from datetime import date, datetime, timedelta, timezone
 from enum import Enum
 from functools import cached_property
 from json import JSONDecodeError
 from uuid import uuid4
 
+import aiohttp
 import phonenumbers
 import pycountry
 from fuzzywuzzy import process
@@ -15,6 +17,8 @@ DECODE_MESSAGE_EXCEPTIONS = (
     KeyError,
     ValueError,
 )
+
+HTTP_EXCEPTIONS = (aiohttp.ClientError, asyncio.TimeoutError)
 
 
 def random_id():

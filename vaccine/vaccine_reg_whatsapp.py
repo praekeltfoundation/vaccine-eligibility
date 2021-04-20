@@ -18,6 +18,7 @@ from vaccine.states import (
     MenuState,
 )
 from vaccine.utils import (
+    HTTP_EXCEPTIONS,
     SAIDNumber,
     calculate_age,
     countries,
@@ -750,7 +751,7 @@ class Application(BaseApplication):
                     )
                     response.raise_for_status()
                     break
-                except aiohttp.ClientError as e:
+                except HTTP_EXCEPTIONS as e:
                     if i == 2:
                         logger.exception(e)
                         return await self.go_to_state("state_err")
