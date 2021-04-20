@@ -1185,6 +1185,7 @@ async def test_state_success(evds_mock):
         },
         "termsAndConditionsAccepted": True,
         "iDNumber": "6001010001081",
+        "sourceId": "008c0f09-db09-4d60-83c5-63505c7f05ba",
     }
 
 
@@ -1248,6 +1249,7 @@ async def test_state_success_temporary_failure(evds_mock):
         "termsAndConditionsAccepted": True,
         "passportNumber": "A1234567890",
         "passportCountry": "other",
+        "sourceId": "008c0f09-db09-4d60-83c5-63505c7f05ba",
     }
 
 
@@ -1309,4 +1311,5 @@ async def test_state_error(evds_mock):
         },
         "termsAndConditionsAccepted": True,
         "refugeeNumber": "6001010001081",
+        "sourceId": "008c0f09-db09-4d60-83c5-63505c7f05ba",
     }
