@@ -1,12 +1,10 @@
 from datetime import date, datetime, timedelta, timezone
 from enum import Enum
+from functools import cached_property
 from json import JSONDecodeError
 from uuid import uuid4
 
 import phonenumbers
-
-from functools import cached_property
-
 import pycountry
 from fuzzywuzzy import process
 
@@ -119,7 +117,7 @@ class Countries:
     def countries(self):
         countries = sorted(
             [
-                (country.alpha_2, getattr(country, 'official_name', '') or country.name)
+                (country.alpha_2, getattr(country, "official_name", "") or country.name)
                 for country in pycountry.countries
             ],
             key=lambda x: x[1],

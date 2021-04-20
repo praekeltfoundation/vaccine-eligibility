@@ -1,7 +1,7 @@
 from datetime import date
 from unittest import TestCase, mock
 
-from vaccine.utils import SAIDNumber, display_phonenumber, Countries
+from vaccine.utils import Countries, SAIDNumber, display_phonenumber
 
 
 class SAIDNumberTests(TestCase):
@@ -54,20 +54,20 @@ class DisplayPhoneNumberTests(TestCase):
 
 class CountriesTests(TestCase):
     def test_search_united_states(self):
-        assert Countries().search_for_country('united states')[0][0] == "UM"
-        assert Countries().search_for_country('united states')[1][0] == "US"
+        assert Countries().search_for_country("united states")[0][0] == "UM"
+        assert Countries().search_for_country("united states")[1][0] == "US"
 
     def test_search_ireland(self):
-        assert Countries().search_for_country('ireland')[0][0] == "IE"
-        assert Countries().search_for_country('ireland')[1][0] == "GB"
+        assert Countries().search_for_country("ireland")[0][0] == "IE"
+        assert Countries().search_for_country("ireland")[1][0] == "GB"
 
     def test_search_eswatini(self):
-        assert Countries().search_for_country('eswatini')[0][0] == "SZ"
+        assert Countries().search_for_country("eswatini")[0][0] == "SZ"
 
     def test_search_hong_kong(self):
-        assert Countries().search_for_country('hong kong')[0][0] == "HK"
+        assert Countries().search_for_country("hong kong")[0][0] == "HK"
 
     def test_search_ivory_coast(self):
-        assert Countries().search_for_country('ivory coast')[2][0] == "CI"
-        assert Countries().search_for_country('cote d ivory')[0][0] == "CI"
+        assert Countries().search_for_country("ivory coast")[2][0] == "CI"
+        assert Countries().search_for_country("cote d ivory")[0][0] == "CI"
         assert Countries().search_for_country("cote d'ivory")[0][0] == "CI"
