@@ -1,5 +1,6 @@
 import logging
 from datetime import date
+from email.utils import parseaddr
 from enum import Enum
 from urllib.parse import urljoin
 
@@ -555,7 +556,7 @@ class Application(BaseApplication):
                 ]
             ),
             choices=[
-                Choice("state_medical_aid", "Yes"),
+                Choice("state_email_address", "Yes"),
                 Choice("state_phone_number", "No"),
             ],
             error="\n".join(
@@ -591,8 +592,33 @@ class Application(BaseApplication):
                     "Please TYPE the CELL PHONE NUMBER we can contact you on.",
                 ]
             ),
-            next="state_medical_aid",
+            next="state_email_address",
             check=phone_number_validation,
+        )
+
+    async def state_email_address(self):
+        async def email_validation(content):
+            if content and content.lower() == "skip":
+                return
+
+            if parseaddr(content) == ("", ""):
+                raise ErrorMessage(
+                    "⚠️ Please TYPE a valid EMAIL address. (Or type SKIP if you are "
+                    "unable to share an email address.)"
+                )
+
+        return FreeText(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                    "",
+                    "Please TYPE your EMAIL address. (Or type SKIP if you are unable "
+                    "to share an email address.)",
+                ]
+            ),
+            check=email_validation,
+            next="state_medical_aid",
         )
 
     async def state_medical_aid(self):

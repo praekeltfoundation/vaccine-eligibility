@@ -1010,11 +1010,11 @@ async def test_medical_aid_number():
 @pytest.mark.asyncio
 async def test_medical_aid():
     u = User(
-        addr="27820001001", state=StateData(name="state_phone_number"), session_id=1
+        addr="27820001001", state=StateData(name="state_email_address"), session_id=1
     )
     app = Application(u)
     msg = Message(
-        content="0820001001",
+        content="test@example.org",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -1039,6 +1039,59 @@ async def test_medical_aid_invalid():
     )
     [reply] = await app.process_message(msg)
     assert u.state.name == "state_medical_aid"
+
+
+@pytest.mark.asyncio
+async def test_email_address():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_self_registration"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_email_address"
+
+
+@pytest.mark.asyncio
+async def test_email_skip():
+    u = User(
+        addr="27820001001", state=StateData(name="state_email_address"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        content="skip",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_medical_aid"
+
+
+@pytest.mark.asyncio
+async def test_email_invalid():
+    u = User(
+        addr="27820001001", state=StateData(name="state_email_address"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid@",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_email_address"
 
 
 @pytest.mark.asyncio
