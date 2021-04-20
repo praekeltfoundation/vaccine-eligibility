@@ -1503,3 +1503,33 @@ async def test_state_error(evds_mock):
         "medicalAidSchemeNumber": "M1234567890",
         "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
     }
+
+
+@pytest.mark.asyncio
+async def test_timeout():
+    u = User(
+        addr="27820001001", state=StateData(name="state_passport_country"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.CLOSE,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "",
+            "We haven’t heard from you in a while!",
+            "",
+            "The registration session has timed out due to inactivity. You will need "
+            "to start again. Just TYPE the word REGISTER.",
+            "",
+            "-----",
+            "📌 Reply *0* to return to the main *MENU*",
+        ]
+    )
+    assert reply.session_event == Message.SESSION_EVENT.CLOSE
