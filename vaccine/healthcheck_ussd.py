@@ -820,7 +820,7 @@ class Application(BaseApplication):
                             config.EVENTSTORE_API_URL,
                             "/api/v3/covid19triage/",
                         ),
-                        data=data,
+                        json=data,
                     )
                     response.raise_for_status()
                     break
