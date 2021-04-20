@@ -788,38 +788,35 @@ class Application(BaseApplication):
         async with get_eventstore() as session:
             for i in range(3):
                 try:
+                    data = {
+                        "msisdn": self.inbound.from_addr,
+                        "source": f"USSD {self.inbound.to_addr}",
+                        "province": self.user.answers.get("state_province"),
+                        "city": self.user.answers.get("state_city"),
+                        "city_location": self.user.answers.get("city_location"),
+                        "age": self.user.answers.get("state_age"),
+                        "fever": self.user.answers.get("state_fever"),
+                        "cough": self.user.answers.get("state_cough"),
+                        "sore_throat": self.user.answers.get("state_sore_throat"),
+                        "difficulty_breathing": self.user.answers.get(
+                            "state_breathing"
+                        ),
+                        "smell": self.user.answers.get("state_taste_and_smell"),
+                        "preexisting_condition": self.user.answers.get(
+                            "state_preexisting_conditions"
+                        ),
+                        "exposure": self.user.answers.get("state_exposure"),
+                        "tracing": self.user.answers.get("state_tracing"),
+                        "confirmed_contact": self.user.answers.get("confirmed_contact"),
+                        "risk": self.calculate_risk(),
+                        "data": {"age_years": self.user.answers.get("state_age_years")},
+                    }
                     response = await session.post(
                         urljoin(
                             config.EVENTSTORE_API_URL,
                             "/api/v3/covid19triage/",
                         ),
-                        json={
-                            "msisdn": self.inbound.from_addr,
-                            "source": f"USSD {self.inbound.to_addr}",
-                            "province": self.user.answers.get("state_province"),
-                            "city": self.user.answers.get("state_city"),
-                            "city_location": self.user.answers.get("city_location"),
-                            "age": self.user.answers.get("state_age"),
-                            "fever": self.user.answers.get("state_fever"),
-                            "cough": self.user.answers.get("state_cough"),
-                            "sore_throat": self.user.answers.get("state_sore_throat"),
-                            "difficulty_breathing": self.user.answers.get(
-                                "state_breathing"
-                            ),
-                            "smell": self.user.answers.get("state_taste_and_smell"),
-                            "preexisting_condition": self.user.answers.get(
-                                "state_preexisting_conditions"
-                            ),
-                            "exposure": self.user.answers.get("state_exposure"),
-                            "tracing": self.user.answers.get("state_tracing"),
-                            "confirmed_contact": self.user.answers.get(
-                                "confirmed_contact"
-                            ),
-                            "risk": self.calculate_risk(),
-                            "data": {
-                                "age_years": self.user.answers.get("state_age_years")
-                            },
-                        },
+                        data=data,
                     )
                     logger.info(response.content)
                     response.raise_for_status()
