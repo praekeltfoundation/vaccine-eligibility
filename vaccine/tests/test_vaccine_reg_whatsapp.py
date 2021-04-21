@@ -963,7 +963,7 @@ async def test_medical_aid_search():
 
 
 @pytest.mark.asyncio
-async def test_medical_aid_list():
+async def test_medical_aid_list_1():
     u = User(
         addr="27820001001",
         state=StateData(name="state_medical_aid_search"),
@@ -988,6 +988,68 @@ async def test_medical_aid_list():
             "1. Discovery Health Medical Scheme",
             "2. Aeci Medical Aid Society",
             "3. BMW Employees Medical Aid Society",
+            "4. Other",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_medical_aid_list_2():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid_search"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="tsogo sun",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_medical_aid_list"
+    assert reply.content == "\n".join(
+        [
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "",
+            "Please confirm your Medical Aid Provider. REPLY with a NUMBER from the "
+            "list below:",
+            "1. Tsogo Sun Group Medical Scheme",
+            "2. Suremed Health",
+            "3. Golden Arrows Employees Medical Benefit Fund",
+            "4. Other",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_medical_aid_list_3():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid_search"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="de beers",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_medical_aid_list"
+    assert reply.content == "\n".join(
+        [
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "",
+            "Please confirm your Medical Aid Provider. REPLY with a NUMBER from the "
+            "list below:",
+            "1. De Beers Benefit Society",
+            "2. Sedmed",
+            "3. Bankmed",
             "4. Other",
         ]
     )
