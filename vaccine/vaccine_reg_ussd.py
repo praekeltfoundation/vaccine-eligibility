@@ -317,7 +317,7 @@ class Application(BaseApplication):
                 assert isinstance(value, str)
                 assert value.isdigit()
                 date(dob_year, dob_month, int(value))
-            except (AssertionError, ValueError):
+            except (AssertionError, ValueError, OverflowError):
                 raise ErrorMessage(
                     "\n".join(
                         [
@@ -599,8 +599,7 @@ class Application(BaseApplication):
                 try:
                     response = await session.post(
                         url=urljoin(
-                            config.VACREG_EVENTSTORE_URL,
-                            "/v2/vaccineregistration/",
+                            config.VACREG_EVENTSTORE_URL, "/v2/vaccineregistration/"
                         ),
                         json=data,
                     )

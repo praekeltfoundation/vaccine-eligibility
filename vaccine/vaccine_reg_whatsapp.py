@@ -537,7 +537,7 @@ class Application(BaseApplication):
                 assert isinstance(value, str)
                 assert value.isdigit()
                 date(dob_year, dob_month, int(value))
-            except (AssertionError, ValueError):
+            except (AssertionError, ValueError, OverflowError):
                 raise ErrorMessage(
                     "\n".join(
                         [
