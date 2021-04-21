@@ -841,7 +841,7 @@ async def test_suburb_search():
     )
     app = Application(u)
     msg = Message(
-        content="western cape",
+        content="9",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -850,7 +850,7 @@ async def test_suburb_search():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_suburb_search"
-    assert u.answers["state_province_id"] == "e32298eb-17b4-471e-8d9b-ba093c6afc7c"
+    assert u.answers["state_province_id"] == "western cape"
 
 
 @pytest.mark.asyncio
@@ -859,7 +859,7 @@ async def test_suburb():
         addr="27820001001",
         state=StateData(name="state_suburb_search"),
         session_id=1,
-        answers={"state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c"},
+        answers={"state_province_id": "western cape"},
     )
     app = Application(u)
     msg = Message(
@@ -890,7 +890,7 @@ async def test_suburb_error():
         state=StateData(name="state_suburb"),
         session_id=1,
         answers={
-            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_province_id": "western cape",
             "state_suburb_search": "tableview",
         },
     )
@@ -914,7 +914,7 @@ async def test_suburb_other():
         state=StateData(name="state_suburb"),
         session_id=1,
         answers={
-            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_province_id": "western cape",
             "state_suburb_search": "tableview",
         },
     )
@@ -938,7 +938,7 @@ async def test_self_registration():
         state=StateData(name="state_suburb"),
         session_id=1,
         answers={
-            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_province_id": "western cape",
             "state_suburb_search": "tableview",
         },
     )

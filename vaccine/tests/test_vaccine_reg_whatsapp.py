@@ -684,7 +684,7 @@ async def test_suburb_search():
     )
     app = Application(u)
     msg = Message(
-        content="western cape",
+        content="9",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -692,7 +692,7 @@ async def test_suburb_search():
     )
     [reply] = await app.process_message(msg)
     assert u.state.name == "state_suburb_search"
-    assert u.answers["state_province_id"] == "e32298eb-17b4-471e-8d9b-ba093c6afc7c"
+    assert u.answers["state_province_id"] == "western cape"
 
 
 @pytest.mark.asyncio
@@ -701,7 +701,7 @@ async def test_suburb():
         addr="27820001001",
         state=StateData(name="state_suburb_search"),
         session_id=1,
-        answers={"state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c"},
+        answers={"state_province_id": "western cape"},
     )
     app = Application(u)
     msg = Message(
@@ -732,7 +732,7 @@ async def test_suburb_error():
         state=StateData(name="state_suburb"),
         session_id=1,
         answers={
-            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_province_id": "western cape",
             "state_suburb_search": "tableview",
         },
     )
@@ -755,7 +755,7 @@ async def test_suburb_other():
         state=StateData(name="state_suburb"),
         session_id=1,
         answers={
-            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_province_id": "western cape",
             "state_suburb_search": "tableview",
         },
     )
@@ -778,7 +778,7 @@ async def test_suburb_value():
         state=StateData(name="state_suburb"),
         session_id=1,
         answers={
-            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_province_id": "western cape",
             "state_suburb_search": "tableview",
         },
     )
@@ -963,7 +963,7 @@ async def test_medical_aid_search():
 
 
 @pytest.mark.asyncio
-async def test_medical_aid_list():
+async def test_medical_aid_list_1():
     u = User(
         addr="27820001001",
         state=StateData(name="state_medical_aid_search"),
@@ -985,8 +985,72 @@ async def test_medical_aid_list():
             "",
             "Please confirm your Medical Aid Provider. REPLY with a NUMBER from the "
             "list below:",
-            "1. Discovery Health",
-            "2. Other",
+            "1. Discovery Health Medical Scheme",
+            "2. Aeci Medical Aid Society",
+            "3. BMW Employees Medical Aid Society",
+            "4. Other",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_medical_aid_list_2():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid_search"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="tsogo sun",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_medical_aid_list"
+    assert reply.content == "\n".join(
+        [
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "",
+            "Please confirm your Medical Aid Provider. REPLY with a NUMBER from the "
+            "list below:",
+            "1. Tsogo Sun Group Medical Scheme",
+            "2. Suremed Health",
+            "3. Golden Arrows Employees Medical Benefit Fund",
+            "4. Other",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_medical_aid_list_3():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid_search"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="de beers",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_medical_aid_list"
+    assert reply.content == "\n".join(
+        [
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "",
+            "Please confirm your Medical Aid Provider. REPLY with a NUMBER from the "
+            "list below:",
+            "1. De Beers Benefit Society",
+            "2. Sedmed",
+            "3. Bankmed",
+            "4. Other",
         ]
     )
 
@@ -1496,7 +1560,7 @@ async def test_state_error(evds_mock):
         "refugeeNumber": "6001010001081",
         "medicalAidMember": True,
         "medicalAidScheme": {
-            "text": "Discovery Health",
+            "text": "Discovery Health Medical Scheme",
             "value": "971672ba-bb31-4fca-945a-7c530b8b5558",
         },
         "medicalAidSchemeNumber": "M1234567890",
