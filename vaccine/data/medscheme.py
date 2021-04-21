@@ -15,7 +15,7 @@ class MedicalAids:
 
     @cached_property
     def schemes(self):
-        return {k: v for k, v in self.data}
+        return {i["value"]: i["text"] for i in self.data}
 
     def search_for_scheme(self, search_text):
         possibilities = process.extract(search_text, self.data, limit=3)
