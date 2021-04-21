@@ -720,7 +720,7 @@ class Application(BaseApplication):
 
         search = self.user.answers["state_medical_aid_search"] or ""
         choices = [
-            Choice(medical_aid[0], medical_aid[1][:30])
+            Choice(medical_aid[0], medical_aid[1][:100])
             for medical_aid in medical_aids.search_for_scheme(search)
         ]
         choices.append(Choice("other", "Other"))
