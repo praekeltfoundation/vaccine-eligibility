@@ -146,8 +146,13 @@ class Application(BaseApplication):
     async def state_under_age_notification(self):
         return ChoiceState(
             self,
-            question="Can we notify you via Whatsapp on this number when updates about "
-            "getting vaccinated become available?",
+            question="\n".join(
+                [
+                    "Can we notify you via Whatsapp on this number when updates about "
+                    "getting vaccinated become available?",
+                    "",
+                ]
+            ),
             choices=[Choice("yes", "Yes"), Choice("no", "No")],
             error="\n".join(
                 [
@@ -519,7 +524,7 @@ class Application(BaseApplication):
             error="\n".join(
                 [
                     "⚠️ This service works best when you reply with one of the numbers "
-                    "next to the options provided."
+                    "next to the options provided.",
                     "",
                     "In which MONTH were you born? ",
                 ]
@@ -723,7 +728,7 @@ class Application(BaseApplication):
             Choice(medical_aid[0], medical_aid[1][:100])
             for medical_aid in medical_aids.search_for_scheme(search)
         ]
-        choices.append(Choice("other", "Other"))
+        choices.append(Choice("other", "None of these"))
         return ChoiceState(
             self,
             question="\n".join(
@@ -735,7 +740,15 @@ class Application(BaseApplication):
                 ]
             ),
             choices=choices,
-            error="Do any of these match your Medical Aid:",
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided.",
+                    "",
+                    "REPLY with the NUMBER next to the name of your "
+                    "Medical Aid Provider:",
+                ]
+            ),
             next=next_state,
         )
 
