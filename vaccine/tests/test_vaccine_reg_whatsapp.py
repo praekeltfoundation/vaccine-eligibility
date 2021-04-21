@@ -1003,7 +1003,7 @@ async def test_medical_aid_list_1(evds_mock):
             "1. Discovery Health Medical Scheme",
             "2. Aeci Medical Aid Society",
             "3. BMW Employees Medical Aid Society",
-            "4. Other",
+            "4. None of these",
         ]
     )
 
@@ -1034,7 +1034,7 @@ async def test_medical_aid_list_2(evds_mock):
             "1. Tsogo Sun Group Medical Scheme",
             "2. Golden Arrows Employees Medical Benefit Fund",
             "3. Government Employees Medical Scheme (GEMS)",
-            "4. Other",
+            "4. None of these",
         ]
     )
 
@@ -1065,7 +1065,7 @@ async def test_medical_aid_list_3(evds_mock):
             "1. De Beers Benefit Society",
             "2. South African Breweries Medical Aid Scheme (SABMAS)",
             "3. BMW Employees Medical Aid Society",
-            "4. Other",
+            "4. None of these",
         ]
     )
 
@@ -1080,7 +1080,7 @@ async def test_medical_aid_list_other(evds_mock):
     )
     app = Application(u)
     msg = Message(
-        content="other",
+        content="4",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
