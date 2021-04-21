@@ -1,6 +1,7 @@
 import gzip
 import json
 from functools import cached_property
+
 from fuzzywuzzy import process
 
 
@@ -18,7 +19,7 @@ class MedicalAids:
 
     def search_for_scheme(self, search_text):
         possibilities = process.extract(search_text, self.data, limit=3)
-        return [(p['value'], p['text']) for p, _ in possibilities]
+        return [(p["value"], p["text"]) for p, _ in possibilities]
 
     def scheme_name(self, scheme_id):
         return self.schemes[scheme_id]
