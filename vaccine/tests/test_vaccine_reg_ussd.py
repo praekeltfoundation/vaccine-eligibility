@@ -1323,6 +1323,7 @@ async def test_state_success(evds_mock, eventstore_mock):
         "preferred_location_id": "f4cba53d-a757-45a7-93ca-895b010e60c2",
         "preferred_location_name": "Diep River",
         "id_number": "6001010001081",
+        "data": {},
     }
 
 
