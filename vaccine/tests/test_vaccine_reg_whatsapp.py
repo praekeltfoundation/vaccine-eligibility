@@ -1217,9 +1217,7 @@ async def test_state_success(evds_mock, eventstore_mock):
             "state_first_name": "test first name",
             "state_identification_type": "rsa_id",
             "state_identification_number": "6001010001081",
-            "state_medical_aid": "yes",
-            "state_medical_aid_search": "discovery",
-            "state_medical_aid_list": "1",
+            "state_medical_aid": "state_vaccination_time",
             "state_email_address": "SKIP",
         },
     )
@@ -1306,9 +1304,7 @@ async def test_state_success_passport(evds_mock):
             "state_identification_number": "A1234567890",
             "state_passport_country": "south africa",
             "state_passport_country_list": "ZA",
-            "state_medical_aid": "yes",
-            "state_medical_aid_search": "discovery",
-            "state_medical_aid_list": "1",
+            "state_medical_aid": "state_vaccination_time",
             "state_email_address": "SKIP",
         },
     )
@@ -1381,9 +1377,7 @@ async def test_state_success_temporary_failure(evds_mock):
             "state_identification_number": "A1234567890",
             "state_passport_country": "south africa",
             "state_passport_country_list": "ZA",
-            "state_medical_aid": "yes",
-            "state_medical_aid_search": "discovery",
-            "state_medical_aid_list": "1",
+            "state_medical_aid": "state_vaccination_time",
             "state_email_address": "test@example.org",
         },
     )
@@ -1458,7 +1452,7 @@ async def test_state_error(evds_mock):
             "state_identification_number": "6001010001081",
             "state_medical_aid": "state_medical_aid_search",
             "state_medical_aid_search": "discovery",
-            "state_medical_aid_list": "1",
+            "state_medical_aid_list": "971672ba-bb31-4fca-945a-7c530b8b5558",
             "state_medical_aid_number": "M1234567890",
             "state_vaccination_time": "weekday_morning",
             "state_email_address": "SKIP",
@@ -1501,7 +1495,10 @@ async def test_state_error(evds_mock):
         "termsAndConditionsAccepted": True,
         "refugeeNumber": "6001010001081",
         "medicalAidMember": True,
-        "medicalAidScheme": "1",
+        "medicalAidScheme": {
+            "text": "Discovery Health",
+            "value": "971672ba-bb31-4fca-945a-7c530b8b5558",
+        },
         "medicalAidSchemeNumber": "M1234567890",
         "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
     }
