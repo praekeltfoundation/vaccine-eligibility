@@ -988,7 +988,7 @@ async def test_medical_aid_list_1():
             "1. Discovery Health Medical Scheme",
             "2. Aeci Medical Aid Society",
             "3. BMW Employees Medical Aid Society",
-            "4. Other",
+            "4. None of these",
         ]
     )
 
@@ -1019,7 +1019,7 @@ async def test_medical_aid_list_2():
             "1. Tsogo Sun Group Medical Scheme",
             "2. Suremed Health",
             "3. Golden Arrows Employees Medical Benefit Fund",
-            "4. Other",
+            "4. None of these",
         ]
     )
 
@@ -1050,7 +1050,7 @@ async def test_medical_aid_list_3():
             "1. De Beers Benefit Society",
             "2. Sedmed",
             "3. Bankmed",
-            "4. Other",
+            "4. None of these",
         ]
     )
 
@@ -1065,7 +1065,7 @@ async def test_medical_aid_list_other():
     )
     app = Application(u)
     msg = Message(
-        content="other",
+        content="4",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
