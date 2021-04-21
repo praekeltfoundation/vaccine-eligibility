@@ -825,7 +825,11 @@ class Application(BaseApplication):
         if email_addr.lower() != "skip":
             data["emailAddress"] = email_addr
         if self.user.answers["state_medical_aid"] == "state_medical_aid_search":
-            data["medicalAidScheme"] = self.user.answers["state_medical_aid_list"]
+            scheme_id = self.user.answers["state_medical_aid_list"]
+            data["medicalAidScheme"] = {
+                "value": scheme_id,
+                "text": medical_aids.scheme_name(scheme_id),
+            }
             data["medicalAidSchemeNumber"] = self.user.answers[
                 "state_medical_aid_number"
             ]
