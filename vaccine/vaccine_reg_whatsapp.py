@@ -265,7 +265,7 @@ class Application(BaseApplication):
                     "Select your province",
                 ]
             ),
-            choices=[Choice(*province) for province in suburbs.provinces],
+            choices=[Choice(*province) for province in await suburbs.provinces()],
             error="Reply with a NUMBER:",
             next="state_suburb_search",
         )
@@ -294,7 +294,7 @@ class Application(BaseApplication):
         search = self.user.answers["state_suburb_search"] or ""
         choices = [
             Choice(suburb[0], suburb[1][:30])
-            for suburb in suburbs.search_for_suburbs(province, search)
+            for suburb in await suburbs.search_for_suburbs(province, search)
         ]
         choices.append(Choice("other", "Other"))
         return ChoiceState(
@@ -790,7 +790,7 @@ class Application(BaseApplication):
         province_id = self.user.answers["state_province_id"]
         location = {
             "value": suburb_id,
-            "text": suburbs.suburb_name(suburb_id, province_id),
+            "text": await suburbs.suburb_name(suburb_id, province_id),
         }
         phonenumber = self.user.answers.get(
             "state_phone_number", self.inbound.from_addr
@@ -882,7 +882,9 @@ class Application(BaseApplication):
             "preferred_time": vac_time,
             "preferred_date": vac_day,
             "preferred_location_id": suburb_id,
-            "preferred_location_name": suburbs.suburb_name(suburb_id, province_id),
+            "preferred_location_name": await suburbs.suburb_name(
+                suburb_id, province_id
+            ),
             "data": self.evds_response,
         }
         id_type = self.user.answers["state_identification_type"]
