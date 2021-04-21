@@ -544,6 +544,8 @@ class Application(BaseApplication):
                         ),
                         json=data,
                     )
+                    response_data = await response.json()
+                    self.evds_response = response_data
                     response.raise_for_status()
                     break
                 except HTTP_EXCEPTIONS as e:
@@ -580,6 +582,7 @@ class Application(BaseApplication):
             "preferred_date": vac_day,
             "preferred_location_id": suburb_id,
             "preferred_location_name": suburbs.suburb_name(suburb_id, province_id),
+            "data": self.evds_response,
         }
         id_type = self.user.answers["state_identification_type"]
         if id_type == self.ID_TYPES.rsa_id.name:
