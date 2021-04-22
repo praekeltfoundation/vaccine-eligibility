@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from operator import itemgetter
 from urllib.parse import urljoin
 
@@ -6,6 +7,14 @@ from aiohttp_client_cache import CacheBackend, CachedSession
 from fuzzywuzzy import process
 
 from vaccine import vacreg_config as config
+
+
+@dataclass
+class Suburb:
+    name: str
+    city: str
+    municipality_id: str
+    municipality: str
 
 
 class Suburbs:
@@ -47,25 +56,66 @@ class Suburbs:
         for municipality in province["children"]:
             for city in municipality["children"]:
                 for suburb in city["children"]:
-                    suburbs[
-                        suburb["value"]
-                    ] = f"{suburb['text']}, {city['text']}, {municipality['text']}"
+                    suburbs[suburb["value"]] = Suburb(
+                        suburb["text"],
+                        city["text"],
+                        municipality["value"],
+                        municipality["text"],
+                    )
         return suburbs
 
-    async def search_for_suburbs(self, province_id, search_text):
+    async def whatsapp_search(self, province_id, search_text):
+        """
+        WhatsApp displays and searches name, city, and municipality
+        """
         suburbs = await self.suburbs_for_province(province_id)
-        possibilities = process.extract(search_text, suburbs, limit=3)
+        suburbs_search = {
+            k: f"{v.name}, {v.city}, {v.municipality}" for k, v in suburbs.items()
+        }
+        possibilities = process.extract(search_text, suburbs_search, limit=3)
         return [(id, value) for value, _, id in possibilities]
 
+    async def ussd_search(self, province_id, search_text, municipality_id=None):
+        """
+        USSD displays name and city, and if there are too many close matches, we confirm
+        municipality first
+        """
+        suburbs = await self.suburbs_for_province(province_id)
+        if municipality_id is not None:
+            suburbs_search = {
+                k: f"{v.name}, {v.city}"
+                for k, v in suburbs.items()
+                if v.municipality_id == municipality_id
+            }
+        else:
+            suburbs_search = {k: f"{v.name}, {v.city}" for k, v in suburbs.items()}
+        possibilities = process.extract(search_text, suburbs_search, limit=5)
+        possibilities = [
+            (id, value) for value, score, id in possibilities if score >= 80
+        ]
+        if municipality_id is not None:
+            return (
+                False,
+                [
+                    p
+                    for p in possibilities
+                    if suburbs[p[0]].municipality_id == municipality_id
+                ][:3],
+            )
+        elif len(possibilities) > 3:
+            return (
+                True,
+                {
+                    suburbs[id].municipality_id: suburbs[id].municipality
+                    for id, _ in possibilities
+                },
+            )
+        else:
+            return (False, possibilities)
+
     async def suburb_name(self, suburb_id, province_id):
-        for province in await self.data():
-            if province["value"] == province_id:
-                break
-        for municipality in province["children"]:
-            for city in municipality["children"]:
-                for suburb in city["children"]:
-                    if suburb["value"] == suburb_id:
-                        return suburb["text"]
+        suburbs = await self.suburbs_for_province(province_id)
+        return suburbs[suburb_id].name
 
 
 suburbs = Suburbs()
