@@ -731,9 +731,9 @@ async def test_suburb(evds_mock):
         [
             "*VACCINE REGISTRATION SECURE CHAT* 🔐",
             "Please REPLY with a NUMBER to confirm your location:",
-            "1. Table View, Milnerton",
-            "2. Mountainview, Cape Town",
-            "3. Mountainview, Strand",
+            "1. Table View, Milnerton, City Of Cape Town",
+            "2. Mountainview, Cape Town, City Of Cape Town",
+            "3. Mountainview, Strand, City Of Cape Town",
             "4. Other",
         ]
     )

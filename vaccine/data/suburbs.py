@@ -47,7 +47,9 @@ class Suburbs:
         for municipality in province["children"]:
             for city in municipality["children"]:
                 for suburb in city["children"]:
-                    suburbs[suburb["value"]] = f"{suburb['text']}, {city['text']}"
+                    suburbs[
+                        suburb["value"]
+                    ] = f"{suburb['text']}, {city['text']}, {municipality['text']}"
         return suburbs
 
     async def search_for_suburbs(self, province_id, search_text):

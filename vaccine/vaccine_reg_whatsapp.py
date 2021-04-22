@@ -298,7 +298,7 @@ class Application(BaseApplication):
         province = self.user.answers["state_province_id"]
         search = self.user.answers["state_suburb_search"] or ""
         choices = [
-            Choice(suburb[0], suburb[1][:30])
+            Choice(suburb[0], suburb[1][:200])
             for suburb in await suburbs.search_for_suburbs(province, search)
         ]
         choices.append(Choice("other", "Other"))

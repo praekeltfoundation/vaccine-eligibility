@@ -880,9 +880,9 @@ async def test_suburb(evds_mock):
     assert reply.content == "\n".join(
         [
             "Please choose the best match for your location:",
-            "1. Table View, Milnerton",
-            "2. Mountainview, Cape Town",
-            "3. Mountainview, Strand",
+            "1. Table View, Milnerton, City Of",
+            "2. Mountainview, Cape Town, City ",
+            "3. Mountainview, Strand, City Of ",
             "4. Other",
         ]
     )
