@@ -47,7 +47,7 @@ class Suburbs:
         for municipality in province["children"]:
             for city in municipality["children"]:
                 for suburb in city["children"]:
-                    suburbs[suburb["value"]] = suburb["text"]
+                    suburbs[suburb["value"]] = f"{suburb['text']}, {city['text']}"
         return suburbs
 
     async def search_for_suburbs(self, province_id, search_text):
@@ -56,8 +56,14 @@ class Suburbs:
         return [(id, value) for value, _, id in possibilities]
 
     async def suburb_name(self, suburb_id, province_id):
-        suburbs = await self.suburbs_for_province(province_id)
-        return suburbs[suburb_id]
+        for province in await self.data():
+            if province["value"] == province_id:
+                break
+        for municipality in province["children"]:
+            for city in municipality["children"]:
+                for suburb in city["children"]:
+                    if suburb["value"] == suburb_id:
+                        return suburb["text"]
 
 
 suburbs = Suburbs()
