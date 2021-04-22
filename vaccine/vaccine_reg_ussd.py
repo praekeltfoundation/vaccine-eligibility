@@ -395,6 +395,21 @@ class Application(BaseApplication):
         return FreeText(
             self,
             question="Please TYPE the name of the SUBURB where you live.",
+            next="state_municipality",
+        )
+
+    async def state_municipality(self):
+        province = self.user.answers["state_province_id"]
+        search = self.user.answers["state_suburb_search"] or ""
+        required, results = await suburbs.ussd_search(province, search)
+        if not required:
+            return await self.go_to_state("state_suburb")
+
+        return ChoiceState(
+            self,
+            question="Please select your municipality",
+            error="Please select your municipality",
+            choices=[Choice(k, v[:30]) for k, v in results.items()],
             next="state_suburb",
         )
 
@@ -406,10 +421,9 @@ class Application(BaseApplication):
 
         province = self.user.answers["state_province_id"]
         search = self.user.answers["state_suburb_search"] or ""
-        choices = [
-            Choice(suburb[0], suburb[1][:30])
-            for suburb in await suburbs.search_for_suburbs(province, search)
-        ]
+        municipality = self.user.answers.get("state_municipality")
+        _, results = await suburbs.ussd_search(province, search, municipality)
+        choices = [Choice(suburb[0], suburb[1][:30]) for suburb in results]
         choices.append(Choice("other", "Other"))
         return ChoiceState(
             self,
