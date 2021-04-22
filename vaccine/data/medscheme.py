@@ -1,28 +1,47 @@
-import gzip
-import json
-from functools import cached_property
+from urllib.parse import urljoin
 
+import aiohttp
+from aiohttp_client_cache import CacheBackend, CachedSession
 from fuzzywuzzy import process
+
+from vaccine import vacreg_config as config
 
 
 class MedicalAids:
-    @cached_property
-    def data(self):
-        # TODO: Get and cache this from the API
-        with gzip.open("vaccine/data/medscheme.json.gz", "r") as f:
-            data = json.load(f)
-        return data["data"]["items"]
+    def __init__(self):
+        self.cache_backend = CacheBackend(cache_control=True)
 
-    @cached_property
-    def schemes(self):
-        return {i["value"]: i["text"] for i in self.data}
+    async def data(self):
+        async with CachedSession(cache=self.cache_backend) as session:
+            url = urljoin(
+                config.EVDS_URL,
+                f"/api/private/{config.EVDS_DATASET}/person/{config.EVDS_VERSION}/"
+                "lookup/medscheme/1",
+            )
+            response = await session.get(
+                url,
+                timeout=aiohttp.ClientTimeout(total=5),
+                headers={
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "User-Agent": "vaccine-registration",
+                },
+                auth=aiohttp.BasicAuth(config.EVDS_USERNAME, config.EVDS_PASSWORD),
+            )
+            response.raise_for_status()
+            return (await response.json())["data"]["items"]
 
-    def search_for_scheme(self, search_text):
-        possibilities = process.extract(search_text, self.data, limit=3)
-        return [(p["value"], p["text"]) for p, _ in possibilities]
+    async def schemes(self):
+        return {i["value"]: i["text"] for i in await self.data()}
 
-    def scheme_name(self, scheme_id):
-        return self.schemes[scheme_id]
+    async def search_for_scheme(self, search_text):
+        schemes = await self.schemes()
+        possibilities = process.extract(search_text, schemes, limit=3)
+        return [(id, value) for value, _, id in possibilities]
+
+    async def scheme_name(self, scheme_id):
+        schemes = await self.schemes()
+        return schemes[scheme_id]
 
 
 medical_aids = MedicalAids()

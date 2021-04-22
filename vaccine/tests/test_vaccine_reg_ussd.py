@@ -1,3 +1,4 @@
+import gzip
 from datetime import date
 from unittest import mock
 
@@ -24,6 +25,11 @@ async def evds_mock(sanic_client):
                 app.errors += 1
                 return response.json({}, status=500)
         return response.json({}, status=200)
+
+    @app.route("/api/private/evds-sa/person/1/lookup/location/1", methods=["GET"])
+    def get_suburbs(request):
+        with gzip.open("vaccine/data/suburbs.json.gz") as f:
+            return response.raw(f.read(), content_type="application/json")
 
     client = await sanic_client(app)
     url = config.EVDS_URL
@@ -791,7 +797,7 @@ async def test_state_confirm_profile_no():
 
 
 @pytest.mark.asyncio
-async def test_province():
+async def test_province(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_confirm_profile"),
@@ -817,7 +823,7 @@ async def test_province():
 
 
 @pytest.mark.asyncio
-async def test_province_invalid():
+async def test_province_invalid(evds_mock):
     u = User(
         addr="27820001001", state=StateData(name="state_province_id"), session_id=1
     )
@@ -835,7 +841,7 @@ async def test_province_invalid():
 
 
 @pytest.mark.asyncio
-async def test_suburb_search():
+async def test_suburb_search(evds_mock):
     u = User(
         addr="27820001001", state=StateData(name="state_province_id"), session_id=1
     )
@@ -854,7 +860,7 @@ async def test_suburb_search():
 
 
 @pytest.mark.asyncio
-async def test_suburb():
+async def test_suburb(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_suburb_search"),
@@ -884,7 +890,7 @@ async def test_suburb():
 
 
 @pytest.mark.asyncio
-async def test_suburb_error():
+async def test_suburb_error(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_suburb"),
@@ -908,7 +914,7 @@ async def test_suburb_error():
 
 
 @pytest.mark.asyncio
-async def test_suburb_other():
+async def test_suburb_other(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_suburb"),
@@ -932,7 +938,7 @@ async def test_suburb_other():
 
 
 @pytest.mark.asyncio
-async def test_self_registration():
+async def test_self_registration(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_suburb"),

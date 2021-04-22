@@ -1,9 +1,12 @@
+import gzip
 from datetime import date
 from unittest import mock
 
 import pytest
 from sanic import Sanic, response
 
+from vaccine.data.medscheme import config as m_config
+from vaccine.data.suburbs import config as s_config
 from vaccine.models import Message, StateData, User
 from vaccine.vaccine_reg_whatsapp import Application, config
 
@@ -25,17 +28,29 @@ async def evds_mock(sanic_client):
                 return response.json({}, status=500)
         return response.json({}, status=200)
 
+    @app.route("/api/private/evds-sa/person/1/lookup/medscheme/1", methods=["GET"])
+    def get_medschemes(request):
+        with gzip.open("vaccine/data/medscheme.json.gz") as f:
+            return response.raw(f.read(), content_type="application/json")
+
+    @app.route("/api/private/evds-sa/person/1/lookup/location/1", methods=["GET"])
+    def get_suburbs(request):
+        with gzip.open("vaccine/data/suburbs.json.gz") as f:
+            return response.raw(f.read(), content_type="application/json")
+
     client = await sanic_client(app)
     url = config.EVDS_URL
     username = config.EVDS_USERNAME
     password = config.EVDS_PASSWORD
-    config.EVDS_URL = f"http://{client.host}:{client.port}"
-    config.EVDS_USERNAME = "test"
-    config.EVDS_PASSWORD = "test"
+    s_config.EVDS_URL = (
+        m_config.EVDS_URL
+    ) = config.EVDS_URL = f"http://{client.host}:{client.port}"
+    s_config.EVDS_USERNAME = m_config.EVDS_USERNAME = config.EVDS_USERNAME = "test"
+    s_config.EVDS_PASSWORD = m_config.EVDS_PASSWORD = config.EVDS_PASSWORD = "test"
     yield client
-    config.EVDS_URL = url
-    config.EVDS_USERNAME = username
-    config.EVDS_PASSWORD = password
+    s_config.EVDS_URL = m_config.EVDS_URL = config.EVDS_URL = url
+    s_config.EVDS_USERNAME = m_config.EVDS_USERNAME = config.EVDS_USERNAME = username
+    s_config.EVDS_PASSWORD = m_config.EVDS_PASSWORD = config.EVDS_PASSWORD = password
 
 
 @pytest.fixture
@@ -642,7 +657,7 @@ async def test_skip_dob_and_gender(get_today):
 
 
 @pytest.mark.asyncio
-async def test_province():
+async def test_province(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_terms_and_conditions"),
@@ -661,7 +676,7 @@ async def test_province():
 
 
 @pytest.mark.asyncio
-async def test_province_invalid():
+async def test_province_invalid(evds_mock):
     u = User(
         addr="27820001001", state=StateData(name="state_province_id"), session_id=1
     )
@@ -678,7 +693,7 @@ async def test_province_invalid():
 
 
 @pytest.mark.asyncio
-async def test_suburb_search():
+async def test_suburb_search(evds_mock):
     u = User(
         addr="27820001001", state=StateData(name="state_province_id"), session_id=1
     )
@@ -696,7 +711,7 @@ async def test_suburb_search():
 
 
 @pytest.mark.asyncio
-async def test_suburb():
+async def test_suburb(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_suburb_search"),
@@ -726,7 +741,7 @@ async def test_suburb():
 
 
 @pytest.mark.asyncio
-async def test_suburb_error():
+async def test_suburb_error(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_suburb"),
@@ -749,7 +764,7 @@ async def test_suburb_error():
 
 
 @pytest.mark.asyncio
-async def test_suburb_other():
+async def test_suburb_other(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_suburb"),
@@ -772,7 +787,7 @@ async def test_suburb_other():
 
 
 @pytest.mark.asyncio
-async def test_suburb_value():
+async def test_suburb_value(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_suburb"),
@@ -963,7 +978,7 @@ async def test_medical_aid_search():
 
 
 @pytest.mark.asyncio
-async def test_medical_aid_list_1():
+async def test_medical_aid_list_1(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_medical_aid_search"),
@@ -994,7 +1009,7 @@ async def test_medical_aid_list_1():
 
 
 @pytest.mark.asyncio
-async def test_medical_aid_list_2():
+async def test_medical_aid_list_2(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_medical_aid_search"),
@@ -1017,15 +1032,15 @@ async def test_medical_aid_list_2():
             "Please confirm your Medical Aid Provider. REPLY with a NUMBER from the "
             "list below:",
             "1. Tsogo Sun Group Medical Scheme",
-            "2. Suremed Health",
-            "3. Golden Arrows Employees Medical Benefit Fund",
+            "2. Golden Arrows Employees Medical Benefit Fund",
+            "3. Government Employees Medical Scheme (GEMS)",
             "4. None of these",
         ]
     )
 
 
 @pytest.mark.asyncio
-async def test_medical_aid_list_3():
+async def test_medical_aid_list_3(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_medical_aid_search"),
@@ -1048,15 +1063,15 @@ async def test_medical_aid_list_3():
             "Please confirm your Medical Aid Provider. REPLY with a NUMBER from the "
             "list below:",
             "1. De Beers Benefit Society",
-            "2. Sedmed",
-            "3. Bankmed",
+            "2. South African Breweries Medical Aid Scheme (SABMAS)",
+            "3. BMW Employees Medical Aid Society",
             "4. None of these",
         ]
     )
 
 
 @pytest.mark.asyncio
-async def test_medical_aid_list_other():
+async def test_medical_aid_list_other(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_medical_aid_list"),
@@ -1076,7 +1091,7 @@ async def test_medical_aid_list_other():
 
 
 @pytest.mark.asyncio
-async def test_medical_aid_number():
+async def test_medical_aid_number(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_medical_aid_list"),
