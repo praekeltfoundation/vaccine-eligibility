@@ -660,7 +660,8 @@ class Application(BaseApplication):
             if content and content.lower() == "skip":
                 return
 
-            if parseaddr(content) == ("", ""):
+            realname, email_address = parseaddr(content)
+            if (realname, email_address) == ("", "") or "@" not in email_address:
                 raise ErrorMessage(
                     "⚠️ Please TYPE a valid EMAIL address. (Or type SKIP if you are "
                     "unable to share an email address.)"
