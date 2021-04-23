@@ -413,8 +413,10 @@ class Application(BaseApplication):
 
         question = "Please select your municipality"
         choices = [Choice(k, v[:30]) for k, v in results]
+        choices = enforce_character_limit_in_choices(
+            choices, 160 - len(question) - len("1. Other ")
+        )
         choices.append(Choice("other", "Other"))
-        choices = enforce_character_limit_in_choices(choices, 160 - len(question))
         return ChoiceState(
             self,
             question=question,
@@ -434,10 +436,14 @@ class Application(BaseApplication):
         municipality = self.user.answers.get("state_municipality")
         _, results = await suburbs.ussd_search(province, search, municipality)
         choices = [Choice(suburb[0], suburb[1][:30]) for suburb in results]
+        question = "Please choose the best match for your location:"
+        choices = enforce_character_limit_in_choices(
+            choices, 160 - len(question) - len("1. Other ")
+        )
         choices.append(Choice("other", "Other"))
         return ChoiceState(
             self,
-            question="Please choose the best match for your location:",
+            question=question,
             choices=choices,
             error="Do any of these match your location:",
             next=next_state,
