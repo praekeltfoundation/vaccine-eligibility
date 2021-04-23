@@ -731,10 +731,106 @@ async def test_suburb(evds_mock):
         [
             "*VACCINE REGISTRATION SECURE CHAT* 🔐",
             "Please REPLY with a NUMBER to confirm your location:",
-            "1. Table View, Milnerton, City Of Cape Town",
-            "2. Mountainview, Cape Town, City Of Cape Town",
-            "3. Mountainview, Strand, City Of Cape Town",
-            "4. Other",
+            "1. Table View, Milnerton",
+            "2. Other",
+        ]
+    )
+    assert u.state.name == "state_suburb"
+
+
+@pytest.mark.asyncio
+async def test_municipality(evds_mock):
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_suburb_search"),
+        session_id=1,
+        answers={"state_province_id": "eastern cape"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="Amazizi yethu",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == "\n".join(
+        [
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "Please REPLY with a NUMBER to confirm your MUNICIPALITY:",
+            "1. Amahlathi",
+            "2. Elundini",
+            "3. Intsika Yethu",
+            "4. Mhlontlo",
+            "5. Mnquma",
+            "6. Other",
+        ]
+    )
+    assert u.state.name == "state_municipality"
+
+
+@pytest.mark.asyncio
+async def test_municipality_plumstead(evds_mock):
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_suburb_search"),
+        session_id=1,
+        answers={"state_province_id": "western cape"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="plumstead",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == "\n".join(
+        [
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "Please REPLY with a NUMBER to confirm your location:",
+            "1. Plumstead, Cape Town",
+            "2. Other",
+        ]
+    )
+    assert u.state.name == "state_suburb"
+
+
+@pytest.mark.asyncio
+async def test_suburb_with_municipality(evds_mock):
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_municipality"),
+        session_id=1,
+        answers={
+            "state_province_id": "eastern cape",
+            "state_suburb_search": "Amazizi yethu",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="intsika yethu",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "Please REPLY with a NUMBER to confirm your location:",
+            "1. Amazizi, Amazizi",
+            "2. Kwadukatole, Amazizi",
+            "3. Kwamgwenyane, Amazizi",
+            "4. Mgwatyuzeni, Amazizi",
+            "5. Upper Mbulukweza, Amazizi",
+            "6. Cofimvaba, Intsika Yethu",
+            "7. Other",
         ]
     )
     assert u.state.name == "state_suburb"

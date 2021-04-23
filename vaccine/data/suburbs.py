@@ -64,17 +64,6 @@ class Suburbs:
                     )
         return suburbs
 
-    async def whatsapp_search(self, province_id, search_text):
-        """
-        WhatsApp displays and searches name, city, and municipality
-        """
-        suburbs = await self.suburbs_for_province(province_id)
-        suburbs_search = {
-            k: f"{v.name}, {v.city}, {v.municipality}" for k, v in suburbs.items()
-        }
-        possibilities = process.extract(search_text, suburbs_search, limit=3)
-        return [(id, value) for value, _, id in possibilities]
-
     @staticmethod
     def _filter_duplicate_municipalities(municipalities):
         seen = set()
@@ -85,7 +74,7 @@ class Suburbs:
                 deduped.append((id, name))
         return deduped
 
-    async def ussd_search(self, province_id, search_text, municipality_id=None):
+    async def search(self, province_id, search_text, municipality_id=None, m_limit=3):
         """
         USSD displays name and city, and if there are too many close matches, we confirm
         municipality first
@@ -103,7 +92,7 @@ class Suburbs:
             search_text, suburbs_search, score_cutoff=80, limit=None
         )
 
-        if municipality_id is None and len(possibilities) > 3:
+        if municipality_id is None and len(possibilities) > m_limit:
             municipalities = [
                 (suburbs[id].municipality_id, suburbs[id].municipality)
                 for _, _, id in possibilities
