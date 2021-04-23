@@ -950,7 +950,8 @@ async def test_suburb_with_municipality(evds_mock):
             "1. Amazizi, Amazizi",
             "2. Kwadukatole, Amazizi",
             "3. Kwamgwenyane, Amazizi",
-            "4. Other",
+            "4. Mgwatyuzeni, Amazizi",
+            "5. Other",
         ]
     )
     assert u.state.name == "state_suburb"
