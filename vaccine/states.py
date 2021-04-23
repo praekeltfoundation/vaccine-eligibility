@@ -4,6 +4,7 @@ from typing import Awaitable, Callable, List, Optional, Union
 
 from vaccine.base_application import BaseApplication
 from vaccine.models import Message
+from vaccine.utils import get_display_choices
 
 
 class EndState:
@@ -70,7 +71,7 @@ class ChoiceState:
 
     @property
     def _display_choices(self) -> str:
-        return "\n".join(f"{i + 1}. {c.label}" for i, c in enumerate(self.choices))
+        return get_display_choices(self.choices)
 
     async def _get_next(self, choice):
         if iscoroutinefunction(self.next):

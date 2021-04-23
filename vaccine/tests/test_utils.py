@@ -1,7 +1,14 @@
 from datetime import date
 from unittest import TestCase, mock
 
-from vaccine.utils import Countries, SAIDNumber, display_phonenumber
+from vaccine.states import Choice
+from vaccine.utils import (
+    Countries,
+    SAIDNumber,
+    display_phonenumber,
+    enforce_character_limit_in_choices,
+    get_display_choices,
+)
 
 
 class SAIDNumberTests(TestCase):
@@ -71,3 +78,20 @@ class CountriesTests(TestCase):
         assert Countries().search_for_country("ivory coast")[2][0] == "CI"
         assert Countries().search_for_country("cote d ivory")[0][0] == "CI"
         assert Countries().search_for_country("cote d'ivory")[0][0] == "CI"
+
+
+class MiscellaneousTests(TestCase):
+    def test_char_limit_enforcement_for_long_list_of_choices(self):
+        choices = [
+            Choice("a", "0123456789012345678901234567890123456789"),
+            Choice("b", "0123456789012345678901234567890123456789"),
+            Choice("c", "0123456789012345678901234567890123456789"),
+            Choice("d", "0123456789012345678901234567890123456789"),
+            Choice("e", "0123456789012345678901234567890123456789"),
+            Choice("f", "0123456789012345678901234567890123456789"),
+        ]
+        assert len(get_display_choices(choices)) > 160
+
+        reduced_choices = enforce_character_limit_in_choices(choices)
+        assert len(reduced_choices) == 3
+        assert len(get_display_choices(reduced_choices)) < 160

@@ -22,6 +22,7 @@ from vaccine.utils import (
     calculate_age,
     countries,
     display_phonenumber,
+    enforce_character_limit_in_choices,
     normalise_phonenumber,
 )
 
@@ -405,11 +406,15 @@ class Application(BaseApplication):
         if not required:
             return await self.go_to_state("state_suburb")
 
+        question = "Please select your municipality"
+        choices = enforce_character_limit_in_choices(
+            [Choice(k, v[:30]) for k, v in results.items()], 160 - len(question)
+        )
         return ChoiceState(
             self,
-            question="Please select your municipality",
-            error="Please select your municipality",
-            choices=[Choice(k, v[:30]) for k, v in results.items()[:5]],
+            question=question,
+            error=question,
+            choices=choices,
             next="state_suburb",
         )
 
