@@ -772,6 +772,35 @@ async def test_municipality(evds_mock):
 
 
 @pytest.mark.asyncio
+async def test_municipality_plumstead(evds_mock):
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_suburb_search"),
+        session_id=1,
+        answers={"state_province_id": "western cape"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="plumstead",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == "\n".join(
+        [
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "Please REPLY with a NUMBER to confirm your location:",
+            "1. Plumstead, Cape Town",
+            "2. Other",
+        ]
+    )
+    assert u.state.name == "state_suburb"
+
+
+@pytest.mark.asyncio
 async def test_suburb_with_municipality(evds_mock):
     u = User(
         addr="27820001001",
