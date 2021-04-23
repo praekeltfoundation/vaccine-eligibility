@@ -1,10 +1,11 @@
-from faker import Faker
-import json
 import gzip
-from datetime import date
-from vaccine.utils import luhn_checksum
+import json
 import string
+from datetime import date
 
+from faker import Faker
+
+from vaccine.utils import luhn_checksum
 
 faker = Faker()
 
@@ -53,9 +54,10 @@ for _ in range(100):
         data["surname"] = faker.last_name_nonbinary()
     data["dateOfBirth"] = faker.date_between("-100y", "-60y").isoformat()
     data["mobileNumber"] = faker.numerify("2782#######")
-    data["preferredVaccineScheduleTimeOfWeek"], data[
-        "preferredVacchineScheduleTimeOfDay"
-    ] = faker.random_element(
+    (
+        data["preferredVaccineScheduleTimeOfWeek"],
+        data["preferredVacchineScheduleTimeOfDay"],
+    ) = faker.random_element(
         (("weekday", "morning"), ("weekday", "afternoon"), ("weekend", "morning"))
     )
     data["preferredVaccineLocation"] = faker.random_element(suburbs)
