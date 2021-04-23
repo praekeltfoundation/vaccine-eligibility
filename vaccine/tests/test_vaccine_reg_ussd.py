@@ -957,6 +957,30 @@ async def test_suburb_with_municipality(evds_mock):
 
 
 @pytest.mark.asyncio
+async def test_suburb_with_municipality_other(evds_mock):
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_municipality"),
+        session_id=1,
+        answers={
+            "state_province_id": "eastern cape",
+            "state_suburb_search": "Amazizi yethu",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="other",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_suburb_search"
+
+
+@pytest.mark.asyncio
 async def test_suburb(evds_mock):
     u = User(
         addr="27820001001",

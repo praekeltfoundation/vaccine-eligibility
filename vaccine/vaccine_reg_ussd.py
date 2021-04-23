@@ -406,6 +406,11 @@ class Application(BaseApplication):
         if not required:
             return await self.go_to_state("state_suburb")
 
+        async def next_state(choice: Choice):
+            if choice.value == "other":
+                return "state_suburb_search"
+            return "state_suburb"
+
         question = "Please select your municipality"
         choices = [Choice(k, v[:30]) for k, v in results]
         choices.append(Choice("other", "Other"))
@@ -415,7 +420,7 @@ class Application(BaseApplication):
             question=question,
             error=question,
             choices=choices,
-            next="state_suburb",
+            next=next_state,
         )
 
     async def state_suburb(self):
