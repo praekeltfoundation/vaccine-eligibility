@@ -71,7 +71,7 @@ class Application(BaseApplication):
         rsa_id = "RSA ID Number"
         passport = "Passport Number"
         asylum_seeker = "Asylum Seeker Permit number"
-        refugee = "Refugee Number Permit number"
+        refugee = "Refugee Permit number"
 
     async def state_age_gate(self):
         self.user.answers = {}
