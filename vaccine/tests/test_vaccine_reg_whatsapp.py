@@ -19,7 +19,7 @@ async def evds_mock(sanic_client):
     app.errors = 0
     app.errormax = 0
 
-    @app.route("/api/private/evds-sa/person/1/record", methods=["POST"])
+    @app.route("/api/private/evds-sa/person/4/record", methods=["POST"])
     def submit_record(request):
         app.requests.append(request)
         if app.errormax:
@@ -28,12 +28,12 @@ async def evds_mock(sanic_client):
                 return response.json({}, status=500)
         return response.json({}, status=200)
 
-    @app.route("/api/private/evds-sa/person/1/lookup/medscheme/1", methods=["GET"])
+    @app.route("/api/private/evds-sa/person/4/lookup/medscheme/1", methods=["GET"])
     def get_medschemes(request):
         with gzip.open("vaccine/data/medscheme.json.gz") as f:
             return response.raw(f.read(), content_type="application/json")
 
-    @app.route("/api/private/evds-sa/person/1/lookup/location/1", methods=["GET"])
+    @app.route("/api/private/evds-sa/person/4/lookup/location/1", methods=["GET"])
     def get_suburbs(request):
         with gzip.open("vaccine/data/suburbs.json.gz") as f:
             return response.raw(f.read(), content_type="application/json")
@@ -1350,10 +1350,6 @@ async def test_state_success(evds_mock, eventstore_mock):
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },
-        "residentialLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "text": "Diep River",
-        },
         "termsAndConditionsAccepted": True,
         "iDNumber": "6001010001081",
         "medicalAidMember": False,
@@ -1437,10 +1433,6 @@ async def test_state_success_passport(evds_mock):
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },
-        "residentialLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "text": "Diep River",
-        },
         "termsAndConditionsAccepted": True,
         "passportNumber": "A1234567890",
         "passportCountry": "ZA",
@@ -1511,10 +1503,6 @@ async def test_state_success_temporary_failure(evds_mock):
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },
-        "residentialLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "text": "Diep River",
-        },
         "termsAndConditionsAccepted": True,
         "passportNumber": "A1234567890",
         "passportCountry": "ZA",
@@ -1578,10 +1566,6 @@ async def test_state_error(evds_mock):
         "preferredVaccineScheduleTimeOfDay": "morning",
         "preferredVaccineScheduleTimeOfWeek": "weekday",
         "preferredVaccineLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "text": "Diep River",
-        },
-        "residentialLocation": {
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },
