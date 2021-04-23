@@ -414,7 +414,7 @@ class Application(BaseApplication):
         question = "Please select your municipality"
         choices = [Choice(k, v[:30]) for k, v in results]
         choices = enforce_character_limit_in_choices(
-            choices, 160 - len(question) - len("X. Other ")
+            choices, 160 - len(question) - len("X. Other\n\n")
         )
         choices.append(Choice("other", "Other"))
         return ChoiceState(
@@ -438,7 +438,7 @@ class Application(BaseApplication):
         choices = [Choice(suburb[0], suburb[1][:30]) for suburb in results]
         question = "Please choose the best match for your location:"
         choices = enforce_character_limit_in_choices(
-            choices, 160 - len(question) - len("X. Other ")
+            choices, 160 - len(question) - len("X. Other\n\n")
         )
         choices.append(Choice("other", "Other"))
         return ChoiceState(
