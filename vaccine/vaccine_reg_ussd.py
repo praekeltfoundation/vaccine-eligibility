@@ -428,6 +428,7 @@ class Application(BaseApplication):
         search = self.user.answers["state_suburb_search"] or ""
         municipality = self.user.answers.get("state_municipality")
         _, results = await suburbs.ussd_search(province, search, municipality)
+        print(results)
         choices = [Choice(suburb[0], suburb[1][:30]) for suburb in results]
         choices.append(Choice("other", "Other"))
         return ChoiceState(

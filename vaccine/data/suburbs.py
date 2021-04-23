@@ -89,30 +89,20 @@ class Suburbs:
             }
         else:
             suburbs_search = {k: f"{v.name}, {v.city}" for k, v in suburbs.items()}
-        possibilities = process.extract(search_text, suburbs_search, limit=100)
+        possibilities = process.extractBests(
+            search_text, suburbs_search, score_cutoff=80, limit=None
+        )
 
-        possibilities = [
-            (id, value) for value, score, id in possibilities if score >= 80
-        ]
-        if municipality_id is not None:
-            return (
-                False,
-                [
-                    p
-                    for p in possibilities
-                    if suburbs[p[0]].municipality_id == municipality_id
-                ][:3],
-            )
-        elif len(possibilities) > 3:
+        if municipality_id is None and len(possibilities) > 3:
             return (
                 True,
                 {
                     suburbs[id].municipality_id: suburbs[id].municipality
-                    for id, _ in possibilities
+                    for _, _, id in possibilities
                 },
             )
         else:
-            return (False, possibilities)
+            return (False, [(id, name) for name, _, id in possibilities[:3]])
 
     async def suburb_name(self, suburb_id, province_id):
         suburbs = await self.suburbs_for_province(province_id)
