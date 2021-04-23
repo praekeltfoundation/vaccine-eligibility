@@ -885,6 +885,7 @@ async def test_municipality(evds_mock):
             "3. Intsika Yethu",
             "4. Mhlontlo",
             "5. Mnquma",
+            "6. Other",
         ]
     )
     assert u.state.name == "state_municipality"
@@ -916,6 +917,7 @@ async def test_municipality_for_amazizi(evds_mock):
             "3. Intsika Yethu",
             "4. Mhlontlo",
             "5. Mnquma",
+            "6. Other",
         ]
     )
     assert u.state.name == "state_municipality"

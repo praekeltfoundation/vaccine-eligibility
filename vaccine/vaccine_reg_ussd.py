@@ -407,9 +407,9 @@ class Application(BaseApplication):
             return await self.go_to_state("state_suburb")
 
         question = "Please select your municipality"
-        choices = enforce_character_limit_in_choices(
-            [Choice(k, v[:30]) for k, v in results], 160 - len(question)
-        )
+        choices = [Choice(k, v[:30]) for k, v in results]
+        choices.append(Choice("other", "Other"))
+        choices = enforce_character_limit_in_choices(choices, 160 - len(question))
         return ChoiceState(
             self,
             question=question,
