@@ -75,6 +75,16 @@ class Suburbs:
         possibilities = process.extract(search_text, suburbs_search, limit=3)
         return [(id, value) for value, _, id in possibilities]
 
+    @staticmethod
+    def _filter_duplicate_municipalities(municipalities):
+        seen = set()
+        deduped = []
+        for id, name in municipalities:
+            if id not in seen:
+                seen.add(id)
+                deduped.append((id, name))
+        return deduped
+
     async def ussd_search(self, province_id, search_text, municipality_id=None):
         """
         USSD displays name and city, and if there are too many close matches, we confirm
@@ -94,13 +104,11 @@ class Suburbs:
         )
 
         if municipality_id is None and len(possibilities) > 3:
-            return (
-                True,
-                {
-                    suburbs[id].municipality_id: suburbs[id].municipality
-                    for _, _, id in possibilities
-                },
-            )
+            municipalities = [
+                (suburbs[id].municipality_id, suburbs[id].municipality)
+                for _, _, id in possibilities
+            ]
+            return (True, self._filter_duplicate_municipalities(municipalities))
         else:
             return (False, [(id, name) for name, _, id in possibilities[:3]])
 
