@@ -74,7 +74,7 @@ class Application(BaseApplication):
         rsa_id = "RSA ID Number"
         passport = "Passport Number"
         asylum_seeker = "Asylum Seeker Permit number"
-        refugee = "Refugee Number Permit number"
+        refugee = "Refugee Permit number"
 
     async def process_message(self, message: Message) -> List[Message]:
         if message.session_event == Message.SESSION_EVENT.CLOSE:
