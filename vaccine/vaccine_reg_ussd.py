@@ -408,7 +408,7 @@ class Application(BaseApplication):
 
         question = "Please select your municipality"
         choices = enforce_character_limit_in_choices(
-            [Choice(k, v[:30]) for k, v in results.items()], 160 - len(question)
+            [Choice(k, v[:30]) for k, v in results], 160 - len(question)
         )
         return ChoiceState(
             self,
