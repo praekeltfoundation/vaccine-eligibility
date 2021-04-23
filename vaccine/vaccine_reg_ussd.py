@@ -409,7 +409,7 @@ class Application(BaseApplication):
             self,
             question="Please select your municipality",
             error="Please select your municipality",
-            choices=[Choice(k, v[:30]) for k, v in results.items()],
+            choices=[Choice(k, v[:30]) for k, v in results.items()[:5]],
             next="state_suburb",
         )
 
