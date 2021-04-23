@@ -195,7 +195,7 @@ class Application(BaseApplication):
             ),
             choices=[
                 Choice("state_terms_and_conditions_summary", "Read summary"),
-                Choice("state_province_id", "Accept"),
+                Choice("state_identification_type", "Accept"),
             ],
             error="⚠️ This service works best when you reply with one of the numbers "
             "next to the options provided.",

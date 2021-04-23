@@ -657,7 +657,7 @@ async def test_skip_dob_and_gender(get_today, evds_mock):
 
 
 @pytest.mark.asyncio
-async def test_province(evds_mock):
+async def test_state_after_terms_and_conditions(evds_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_terms_and_conditions"),
@@ -672,7 +672,7 @@ async def test_province(evds_mock):
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
-    assert u.state.name == "state_province_id"
+    assert u.state.name == "state_identification_type"
 
 
 @pytest.mark.asyncio
