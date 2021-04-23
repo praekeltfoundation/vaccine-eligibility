@@ -231,7 +231,7 @@ class Application(BaseApplication):
                 ]
             ),
             choices=[
-                Choice("state_province_id", "Yes, I accept"),
+                Choice("state_identification_type", "Yes, I accept"),
                 Choice("state_no_terms", "No"),
             ],
             error="\n".join(
@@ -293,7 +293,7 @@ class Application(BaseApplication):
         async def next_state(choice: Choice):
             if choice.value == "other":
                 return "state_province_id"
-            return "state_identification_type"
+            return "state_self_registration"
 
         province = self.user.answers["state_province_id"]
         search = self.user.answers["state_suburb_search"] or ""
@@ -578,7 +578,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_under_age_notification")
 
         if self.user.answers.get("state_gender"):
-            return await self.go_to_state("state_self_registration")
+            return await self.go_to_state("state_province_id")
 
         return ChoiceState(
             self,
@@ -598,7 +598,7 @@ class Application(BaseApplication):
                     "REPLY with the NUMBER next to your gender in the list below.",
                 ]
             ),
-            next="state_self_registration",
+            next="state_province_id",
         )
 
     async def state_self_registration(self):

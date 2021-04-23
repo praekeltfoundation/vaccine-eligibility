@@ -631,7 +631,7 @@ async def test_surname():
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.utils.get_today")
-async def test_skip_dob_and_gender(get_today):
+async def test_skip_dob_and_gender(get_today, evds_mock):
     get_today.return_value = date(2120, 1, 1)
     u = User(
         addr="27820001001",
@@ -653,7 +653,7 @@ async def test_skip_dob_and_gender(get_today):
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
-    assert u.state.name == "state_self_registration"
+    assert u.state.name == "state_province_id"
 
 
 @pytest.mark.asyncio
@@ -806,26 +806,23 @@ async def test_suburb_value(evds_mock):
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
-    assert u.state.name == "state_identification_type"
+    assert u.state.name == "state_self_registration"
 
 
 @pytest.mark.asyncio
-@mock.patch("vaccine.utils.get_today")
-async def test_self_registration(get_today):
-    get_today.return_value = date(2100, 1, 1)
+async def test_self_registration(evds_mock):
     u = User(
         addr="27820001001",
-        state=StateData(name="state_gender"),
+        state=StateData(name="state_suburb"),
         session_id=1,
         answers={
-            "state_dob_year": "1990",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
+            "state_province_id": "western cape",
+            "state_suburb_search": "tableview",
         },
     )
     app = Application(u)
     msg = Message(
-        content="male",
+        content="1",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
