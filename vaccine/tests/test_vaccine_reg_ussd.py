@@ -1501,10 +1501,6 @@ async def test_state_success_passport(evds_mock):
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },
-        "residentialLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "text": "Diep River",
-        },
         "termsAndConditionsAccepted": True,
         "passportNumber": "A1234567890",
         "passportCountry": "ZA",
@@ -1561,10 +1557,6 @@ async def test_state_success_passport_from_choosing(evds_mock):
         "preferredVaccineScheduleTimeOfDay": "morning",
         "preferredVaccineScheduleTimeOfWeek": "weekday",
         "preferredVaccineLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
-            "text": "Diep River",
-        },
-        "residentialLocation": {
             "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
             "text": "Diep River",
         },
