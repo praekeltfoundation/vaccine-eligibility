@@ -26,6 +26,7 @@ from vaccine.utils import (
     calculate_age,
     countries,
     display_phonenumber,
+    enforce_character_limit_in_choices,
     normalise_phonenumber,
 )
 
@@ -286,7 +287,44 @@ class Application(BaseApplication):
                     "vaccinated",
                 ]
             ),
-            next="state_suburb",
+            next="state_municipality",
+        )
+
+    async def state_municipality(self):
+        province = self.user.answers["state_province_id"]
+        search = self.user.answers["state_suburb_search"] or ""
+        required, results = await suburbs.search(province, search, m_limit=10)
+        if not required:
+            return await self.go_to_state("state_suburb")
+
+        async def next_state(choice: Choice):
+            if choice.value == "other":
+                return "state_suburb_search"
+            return "state_suburb"
+
+        choices = [Choice(k, v[:200]) for k, v in results]
+        choices = enforce_character_limit_in_choices(choices, 1000)
+        choices.append(Choice("other", "Other"))
+
+        return ChoiceState(
+            self,
+            question="\n".join(
+                [
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐" "",
+                    "Please REPLY with a NUMBER to confirm your MUNICIPALITY:",
+                ]
+            ),
+            choices=choices,
+            error="\n".join(
+                [
+                    "⚠️ This service works best when you reply with one of the numbers "
+                    "next to the options provided.",
+                    "",
+                    "Please REPLY with a NUMBER from the list below to confirm the "
+                    "MUNICIPALITY:",
+                ]
+            ),
+            next=next_state,
         )
 
     async def state_suburb(self):
@@ -297,10 +335,10 @@ class Application(BaseApplication):
 
         province = self.user.answers["state_province_id"]
         search = self.user.answers["state_suburb_search"] or ""
-        choices = [
-            Choice(suburb[0], suburb[1][:200])
-            for suburb in await suburbs.whatsapp_search(province, search)
-        ]
+        municipality = self.user.answers.get("state_municipality")
+        _, results = await suburbs.search(province, search, municipality, m_limit=10)
+        choices = [Choice(suburb[0], suburb[1][:200]) for suburb in results]
+        choices = enforce_character_limit_in_choices(choices, 1000)
         choices.append(Choice("other", "Other"))
         return ChoiceState(
             self,

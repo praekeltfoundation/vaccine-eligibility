@@ -402,7 +402,7 @@ class Application(BaseApplication):
     async def state_municipality(self):
         province = self.user.answers["state_province_id"]
         search = self.user.answers["state_suburb_search"] or ""
-        required, results = await suburbs.ussd_search(province, search)
+        required, results = await suburbs.search(province, search)
         if not required:
             return await self.go_to_state("state_suburb")
 
@@ -434,7 +434,7 @@ class Application(BaseApplication):
         province = self.user.answers["state_province_id"]
         search = self.user.answers["state_suburb_search"] or ""
         municipality = self.user.answers.get("state_municipality")
-        _, results = await suburbs.ussd_search(province, search, municipality)
+        _, results = await suburbs.search(province, search, municipality)
         choices = [Choice(suburb[0], suburb[1][:30]) for suburb in results]
         question = "Please choose the best match for your location:"
         choices = enforce_character_limit_in_choices(
