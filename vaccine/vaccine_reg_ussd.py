@@ -406,16 +406,23 @@ class Application(BaseApplication):
         if not required:
             return await self.go_to_state("state_suburb")
 
+        async def next_state(choice: Choice):
+            if choice.value == "other":
+                return "state_suburb_search"
+            return "state_suburb"
+
         question = "Please select your municipality"
+        choices = [Choice(k, v[:30]) for k, v in results]
         choices = enforce_character_limit_in_choices(
-            [Choice(k, v[:30]) for k, v in results], 160 - len(question)
+            choices, 160 - len(question) - len("X. Other\n\n")
         )
+        choices.append(Choice("other", "Other"))
         return ChoiceState(
             self,
             question=question,
             error=question,
             choices=choices,
-            next="state_suburb",
+            next=next_state,
         )
 
     async def state_suburb(self):
@@ -429,10 +436,14 @@ class Application(BaseApplication):
         municipality = self.user.answers.get("state_municipality")
         _, results = await suburbs.ussd_search(province, search, municipality)
         choices = [Choice(suburb[0], suburb[1][:30]) for suburb in results]
+        question = "Please choose the best match for your location:"
+        choices = enforce_character_limit_in_choices(
+            choices, 160 - len(question) - len("X. Other\n\n")
+        )
         choices.append(Choice("other", "Other"))
         return ChoiceState(
             self,
-            question="Please choose the best match for your location:",
+            question=question,
             choices=choices,
             error="Do any of these match your location:",
             next=next_state,

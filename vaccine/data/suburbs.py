@@ -110,7 +110,7 @@ class Suburbs:
             ]
             return (True, self._filter_duplicate_municipalities(municipalities))
         else:
-            return (False, [(id, name) for name, _, id in possibilities[:3]])
+            return (False, [(id, name) for name, _, id in possibilities])
 
     async def suburb_name(self, suburb_id, province_id):
         suburbs = await self.suburbs_for_province(province_id)
