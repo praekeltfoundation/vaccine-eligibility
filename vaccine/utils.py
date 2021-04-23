@@ -55,6 +55,17 @@ def calculate_age(date_of_birth: date):
     return years
 
 
+def get_display_choices(choices) -> str:
+    return "\n".join(f"{i + 1}. {c.label}" for i, c in enumerate(choices))
+
+
+def enforce_character_limit_in_choices(choices, char_limit=160):
+    _choices = choices
+    while len(get_display_choices(_choices)) > char_limit:
+        _choices.pop()
+    return _choices
+
+
 class SAIDNumber:
     class SEX(Enum):
         male = "Male"
