@@ -136,12 +136,24 @@ class Application(BaseApplication):
         )
 
     async def state_terms_and_conditions_3(self):
+        def next_state():
+            if (
+                self.user.answers.get("state_identification_type")
+                and self.user.answers.get("state_identification_number")
+                and self.user.answers.get("state_dob_year")
+                and self.user.answers.get("state_dob_month")
+                and self.user.answers.get("state_dob_day")
+                and self.user.answers.get("state_gender")
+            ):
+                return "state_first_name"
+            return "state_identification_type"
+
         return MenuState(
             self,
             question="All security measures are taken to make sure your information is"
             " safe. No personal data will be transferred from EVDS authorisation "
             "through POPIA.\n",
-            choices=[Choice("state_identification_type", "ACCEPT")],
+            choices=[Choice(next_state(), "ACCEPT")],
             error="TYPE 1 to ACCEPT our Privacy Policy",
         )
 

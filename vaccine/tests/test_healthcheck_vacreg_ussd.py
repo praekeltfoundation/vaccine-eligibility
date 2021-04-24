@@ -81,6 +81,19 @@ async def test_menu_with_id_number(get_today):
     assert len(reply.content) < 160
     assert u.state.name == "state_terms_and_conditions_3"
 
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="*123*456*6001210001089#",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    print(reply.content)
+    assert u.state.name == "state_first_name"
+
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.utils.get_today")
