@@ -1,3 +1,6 @@
+from datetime import date
+from unittest import mock
+
 import pytest
 
 from vaccine.healthcheck_ussd import Application as HealthCheckApp
@@ -19,6 +22,113 @@ async def test_menu():
     app = Application(u)
     msg = Message(
         to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_menu"
+
+
+@pytest.mark.asyncio
+@mock.patch("vaccine.utils.get_today")
+async def test_menu_with_id_number(get_today):
+    get_today.return_value = date(2021, 1, 1)
+
+    u = User(addr="27820001001")
+    app = Application(u)
+    msg = Message(
+        to_addr="*123*456*6001210001089#",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_terms_and_conditions"
+    assert u.answers["state_identification_type"] == "rsa_id"
+    assert u.answers["state_identification_number"] == "6001210001089"
+    assert u.answers["state_dob_year"] == "1960"
+    assert u.answers["state_dob_month"] == "1"
+    assert u.answers["state_dob_day"] == "21"
+    assert u.answers["state_gender"] == "Female"
+
+    # Accept All Terms Screens
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="*123*456*6001210001089#",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_terms_and_conditions_2"
+
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="*123*456*6001210001089#",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_terms_and_conditions_3"
+
+
+@pytest.mark.asyncio
+@mock.patch("vaccine.utils.get_today")
+async def test_menu_with_id_number_not_eligible(get_today):
+    get_today.return_value = date(2021, 1, 1)
+
+    u = User(addr="27820001001")
+    app = Application(u)
+    msg = Message(
+        to_addr="*123*456*9001010001088#",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_under_age_notification"
+
+
+@pytest.mark.asyncio
+@mock.patch("vaccine.utils.get_today")
+async def test_menu_with_id_number_invalid(get_today):
+    get_today.return_value = date(2021, 1, 1)
+
+    u = User(addr="27820001001")
+    app = Application(u)
+    msg = Message(
+        to_addr="*123*456*9001010001000#",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_menu"
+
+
+@pytest.mark.asyncio
+@mock.patch("vaccine.utils.get_today")
+async def test_menu_with_no_id_number(get_today):
+    get_today.return_value = date(2021, 1, 1)
+
+    u = User(addr="27820001001")
+    app = Application(u)
+    msg = Message(
+        to_addr="*123*456*7#",
         from_addr="27820001001",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
