@@ -7,9 +7,6 @@ from vaccine.states import Choice, MenuState
 from vaccine.utils import SAIDNumber
 from vaccine.vaccine_reg_ussd import Application as VacRegApp
 
-# TODO: Move to config
-MAX_AGE = 122
-
 
 class Application(VacRegApp, HealthCheckApp):
     START_STATE = "state_menu"
@@ -25,7 +22,7 @@ class Application(VacRegApp, HealthCheckApp):
                 )
                 self.save_answer("state_identification_number", id_number.id_number)
 
-                is_ambiguous_age = id_number.age <= MAX_AGE - 100
+                is_ambiguous_age = id_number.age <= config.AMBIGUOUS_MAX_AGE - 100
 
                 if (
                     id_number.age < config.ELIGIBILITY_AGE_GATE_MIN
