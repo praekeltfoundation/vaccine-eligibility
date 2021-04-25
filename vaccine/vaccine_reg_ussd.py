@@ -146,6 +146,15 @@ class Application(BaseApplication):
                 and self.user.answers.get("state_gender")
             ):
                 return "state_first_name"
+            elif (
+                self.user.answers.get("state_identification_type")
+                and self.user.answers.get("state_identification_number")
+                and "state_dob_year" not in self.user.answers
+                and self.user.answers.get("state_dob_month")
+                and self.user.answers.get("state_dob_day")
+                and self.user.answers.get("state_gender")
+            ):
+                return "state_dob_year"
             return "state_identification_type"
 
         return MenuState(

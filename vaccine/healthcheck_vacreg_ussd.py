@@ -25,12 +25,16 @@ class Application(VacRegApp, HealthCheckApp):
                 )
                 self.save_answer("state_identification_number", id_number.id_number)
 
-                # TODO: handle ambiguios age cases
-                if id_number.age < config.ELIGIBILITY_AGE_GATE_MIN:
+                is_ambiguous_age = id_number.age <= MAX_AGE - 100
+
+                if (
+                    id_number.age < config.ELIGIBILITY_AGE_GATE_MIN
+                    and not is_ambiguous_age
+                ):
                     return await self.go_to_state("state_under_age_notification")
 
                 dob = id_number.date_of_birth
-                if id_number.age > MAX_AGE - 100:
+                if not is_ambiguous_age:
                     self.save_answer("state_dob_year", str(dob.year))
                 self.save_answer("state_dob_month", str(dob.month))
                 self.save_answer("state_dob_day", str(dob.day))
