@@ -134,37 +134,18 @@ class Application(BaseApplication):
         )
 
     async def state_terms_and_conditions_3(self):
-        def next_state():
-            if (
-                self.user.answers.get("state_identification_type")
-                and self.user.answers.get("state_identification_number")
-                and self.user.answers.get("state_dob_year")
-                and self.user.answers.get("state_dob_month")
-                and self.user.answers.get("state_dob_day")
-                and self.user.answers.get("state_gender")
-            ):
-                return "state_first_name"
-            elif (
-                self.user.answers.get("state_identification_type")
-                and self.user.answers.get("state_identification_number")
-                and "state_dob_year" not in self.user.answers
-                and self.user.answers.get("state_dob_month")
-                and self.user.answers.get("state_dob_day")
-                and self.user.answers.get("state_gender")
-            ):
-                return "state_dob_year"
-            return "state_identification_type"
-
         return MenuState(
             self,
             question="All security measures are taken to make sure your information is"
             " safe. No personal data will be transferred from EVDS authorisation "
             "through POPIA.\n",
-            choices=[Choice(next_state(), "ACCEPT")],
+            choices=[Choice("state_identification_type", "ACCEPT")],
             error="TYPE 1 to ACCEPT our Privacy Policy",
         )
 
     async def state_identification_type(self):
+        if self.user.answers.get("state_identification_type"):
+            return await self.go_to_state("state_identification_number")
         return ChoiceState(
             self,
             question="How would you like to register?",
@@ -181,6 +162,9 @@ class Application(BaseApplication):
             next_state = "state_passport_country"
         else:
             next_state = "state_gender"
+
+        if self.user.answers.get("state_identification_number"):
+            return await self.go_to_state(next_state)
 
         async def validate_identification_number(value):
             if idtype == self.ID_TYPES.rsa_id:
