@@ -40,7 +40,7 @@ def random_alphanumeric():
     )
 
 
-for _ in range(100):
+def generate_vaccine_registration():
     data = {}
     data["gender"] = faker.random_element(("Male", "Female", "Other"))
     if data["gender"] == "Male":
@@ -72,5 +72,9 @@ for _ in range(100):
     elif reg_type == "passport":
         data["passportNumber"] = random_alphanumeric()
         data["passportCountry"] = faker.country_code()
+    return data
 
-    print(json.dumps(data))
+
+if __name__ == "__main__":
+    for _ in range(100):
+        print(json.dumps(generate_vaccine_registration))
