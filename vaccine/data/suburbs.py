@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from functools import cache, lru_cache
 from operator import itemgetter
 from urllib.parse import urljoin
 
@@ -21,7 +22,7 @@ class Suburbs:
     def __init__(self):
         self.cache_backend = CacheBackend(cache_control=True)
 
-    async def data(self):
+    async def fetch(self):
         async with CachedSession(cache=self.cache_backend) as session:
             url = urljoin(
                 config.EVDS_URL,
@@ -40,15 +41,29 @@ class Suburbs:
                 auth=aiohttp.BasicAuth(config.EVDS_USERNAME, config.EVDS_PASSWORD),
             )
             response.raise_for_status()
-            return (await response.json())["data"]["items"]
+            if not response.from_cache:
+                self.data = (await response.json())["data"]["items"]
+                self._provinces.cache_clear()
+                self._suburbs_for_province.cache_clear()
+                self._search.cache_clear()
 
     async def provinces(self):
-        provinces = [(i["value"], i["text"]) for i in await self.data()]
+        await self.fetch()
+        return self._provinces()
+
+    @cache
+    def _provinces(self):
+        provinces = [(i["value"], i["text"]) for i in self.data]
         provinces.sort(key=itemgetter(1))
         return provinces
 
     async def suburbs_for_province(self, province_id):
-        for province in await self.data():
+        await self.fetch()
+        return self._suburbs_for_province(province_id)
+
+    @cache
+    def _suburbs_for_province(self, province_id):
+        for province in self.data:
             if province["value"] == province_id:
                 break
 
@@ -76,10 +91,18 @@ class Suburbs:
 
     async def search(self, province_id, search_text, municipality_id=None, m_limit=3):
         """
-        USSD displays name and city, and if there are too many close matches, we confirm
-        municipality first
+        If there are too many close matches `m_limit`, we confirm municipality first
         """
-        suburbs = await self.suburbs_for_province(province_id)
+        await self.fetch()
+        return self._search(province_id, search_text, municipality_id, m_limit)
+
+    # It might seem like it's unlikely that we'll have the same search term twice, but
+    # we call this once when we generate the list of options for the user, and again
+    # when we get the user's selection. This caching stops doing that expensive search
+    # twice
+    @lru_cache
+    def _search(self, province_id, search_text, municipality_id=None, m_limit=3):
+        suburbs = self._suburbs_for_province(province_id)
         if municipality_id is not None:
             suburbs_search = {
                 k: f"{v.name}, {v.city}"
