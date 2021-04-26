@@ -1,9 +1,10 @@
-from vaccine.tests.generate_test_ussd_data import generate_vaccine_registration
-from datetime import date
 import gzip
 import json
+from datetime import date
 
-from locust import HttpUser, task, between
+from locust import HttpUser, between, task
+
+from vaccine.tests.generate_test_ussd_data import generate_vaccine_registration
 
 PATH = "/aat/ussd"
 ADDRESS = "*120*4216*2#"
