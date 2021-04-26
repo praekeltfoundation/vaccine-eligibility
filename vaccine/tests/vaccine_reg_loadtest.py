@@ -1,14 +1,15 @@
 import gzip
 import json
+import os
 from datetime import date
 
 from locust import HttpUser, between, task
 
 from vaccine.tests.generate_test_ussd_data import generate_vaccine_registration
 
-PATH = "/aat/ussd"
-ADDRESS = "*120*4216*2#"
-PROVIDER = "telkom"
+PATH = os.environ["HTTP_PATH"]
+ADDRESS = os.environ["ADDRESS"]
+PROVIDER = os.environ["PROVIDER"]
 
 suburbs = {}
 with gzip.open("vaccine/data/suburbs.json.gz") as f:
