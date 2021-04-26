@@ -793,7 +793,7 @@ async def test_state_confirm_profile_no():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_identification_type"
+    assert u.state.name == "state_gender"
 
 
 @pytest.mark.asyncio

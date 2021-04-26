@@ -28,8 +28,6 @@ from vaccine.utils import (
 
 logger = logging.getLogger(__name__)
 
-MAX_AGE = 122
-
 
 def get_evds():
     # TODO: Cache the session globally. Things that don't work:
@@ -146,6 +144,8 @@ class Application(BaseApplication):
         )
 
     async def state_identification_type(self):
+        if self.user.answers.get("state_identification_type"):
+            return await self.go_to_state("state_identification_number")
         return ChoiceState(
             self,
             question="How would you like to register?",
@@ -163,12 +163,15 @@ class Application(BaseApplication):
         else:
             next_state = "state_gender"
 
+        if self.user.answers.get("state_identification_number"):
+            return await self.go_to_state(next_state)
+
         async def validate_identification_number(value):
             if idtype == self.ID_TYPES.rsa_id:
                 try:
                     id_number = SAIDNumber(value)
                     dob = id_number.date_of_birth
-                    if id_number.age > MAX_AGE - 100:
+                    if id_number.age > config.AMBIGUOUS_MAX_AGE - 100:
                         self.save_answer("state_dob_year", str(dob.year))
                     self.save_answer("state_dob_month", str(dob.month))
                     self.save_answer("state_dob_day", str(dob.day))
@@ -257,7 +260,7 @@ class Application(BaseApplication):
             try:
                 assert isinstance(value, str)
                 assert value.isdigit()
-                assert int(value) > date.today().year - MAX_AGE
+                assert int(value) > date.today().year - config.AMBIGUOUS_MAX_AGE
                 assert int(value) <= date.today().year
             except AssertionError:
                 raise ErrorMessage(
