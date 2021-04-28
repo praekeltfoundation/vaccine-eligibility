@@ -102,7 +102,7 @@ class Application(BaseApplication):
     async def state_age_gate(self):
         self.user.answers = {}
 
-        if random.random() <= config.THROTTLE_PERCENTAGE / 100.0:
+        if random.random() < config.THROTTLE_PERCENTAGE / 100.0:
             return await self.go_to_state("state_throttle")
 
         return MenuState(
