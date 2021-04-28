@@ -922,7 +922,7 @@ class Application(BaseApplication):
         )
 
         data = {
-            "msisdn": normalise_phonenumber(phonenumber),
+            "msisdn": normalise_phonenumber(phonenumber).lstrip("+"),
             "source": f"WhatsApp {self.inbound.to_addr}",
             "gender": self.user.answers["state_gender"],
             "first_name": self.user.answers["state_first_name"],

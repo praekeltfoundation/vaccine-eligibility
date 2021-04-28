@@ -540,7 +540,7 @@ class Application(BaseApplication):
             "surname": self.user.answers["state_surname"],
             "firstName": self.user.answers["state_first_name"],
             "dateOfBirth": date_of_birth.isoformat(),
-            "mobileNumber": normalise_phonenumber(phonenumber),
+            "mobileNumber": normalise_phonenumber(phonenumber).lstrip("+"),
             "preferredVaccineScheduleTimeOfDay": vac_time,
             "preferredVaccineScheduleTimeOfWeek": vac_day,
             "preferredVaccineLocation": location,
