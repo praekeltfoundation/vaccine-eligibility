@@ -1,4 +1,5 @@
 import logging
+import random
 from datetime import date
 from email.utils import parseaddr
 from enum import Enum
@@ -101,6 +102,9 @@ class Application(BaseApplication):
     async def state_age_gate(self):
         self.user.answers = {}
 
+        if random.random() <= config.THROTTLE_PERCENTAGE * 100:
+            return await self.go_to_state("state_throttle")
+
         return MenuState(
             self,
             question="\n".join(
@@ -140,6 +144,19 @@ class Application(BaseApplication):
                 ),
                 Choice("state_under_age_notification", "No"),
             ],
+        )
+
+    async def state_throttle(self):
+        return EndState(
+            self,
+            text="\n".join(
+                [
+                    "We are currently experiencing high volumes of registrations.",
+                    "",
+                    "Your registration is important! Please try again in 15 minutes",
+                ]
+            ),
+            next=self.START_STATE,
         )
 
     async def state_under_age_notification(self):

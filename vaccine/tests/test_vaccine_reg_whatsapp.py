@@ -1705,3 +1705,28 @@ async def test_timeout():
         ]
     )
     assert reply.session_event == Message.SESSION_EVENT.CLOSE
+
+
+@pytest.mark.asyncio
+async def test_throttle():
+    throttle = config.THROTTLE_PERCENTAGE
+    config.THROTTLE_PERCENTAGE = 100.0
+
+    u = User(addr="27820001001")
+    app = Application(u)
+    msg = Message(
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "We are currently experiencing high volumes of registrations.",
+            "",
+            "Your registration is important! Please try again in 15 minutes",
+        ]
+    )
+
+    config.THROTTLE_PERCENTAGE = throttle
