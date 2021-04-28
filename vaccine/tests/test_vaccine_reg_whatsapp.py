@@ -1454,7 +1454,7 @@ async def test_state_success(evds_mock, eventstore_mock):
 
     [requests] = eventstore_mock.app.requests
     assert requests.json == {
-        "msisdn": "+27820001001",
+        "msisdn": "27820001001",
         "source": "WhatsApp 27820001002",
         "gender": "Other",
         "first_name": "test first name",
