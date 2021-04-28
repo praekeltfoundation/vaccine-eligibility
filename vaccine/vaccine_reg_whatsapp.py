@@ -151,9 +151,14 @@ class Application(BaseApplication):
             self,
             text="\n".join(
                 [
-                    "We are currently experiencing high volumes of registrations.",
+                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
                     "",
-                    "Your registration is important! Please try again in 15 minutes",
+                    "⚠️ We are currently experiencing high volumes of registrations.",
+                    "",
+                    "Your registration is important! Please try again in 15 minutes.",
+                    "",
+                    "-----",
+                    "📌 Reply *0* to return to the main *MENU*",
                 ]
             ),
             next=self.START_STATE,
