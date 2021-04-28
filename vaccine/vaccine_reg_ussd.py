@@ -1,4 +1,5 @@
 import logging
+import random
 from datetime import date
 from enum import Enum
 from urllib.parse import urljoin
@@ -74,6 +75,9 @@ class Application(BaseApplication):
     async def state_age_gate(self):
         self.user.answers = {}
 
+        if random.random() < config.THROTTLE_PERCENTAGE / 100.0:
+            return await self.go_to_state("state_throttle")
+
         return MenuState(
             self,
             question="\n".join(
@@ -92,6 +96,19 @@ class Application(BaseApplication):
             error="Self-registration is currently only available to those "
             f"{config.ELIGIBILITY_AGE_GATE_MIN} years of age or older. Please tell us "
             f"if you are {config.ELIGIBILITY_AGE_GATE_MIN} or older?",
+        )
+
+    async def state_throttle(self):
+        return EndState(
+            self,
+            text="\n".join(
+                [
+                    "We are currently experiencing high volumes of registrations.",
+                    "",
+                    "Your registration is important! Please try again in 15 minutes",
+                ]
+            ),
+            next=self.START_STATE,
         )
 
     async def state_under_age_notification(self):
@@ -421,11 +438,7 @@ class Application(BaseApplication):
         )
         choices.append(Choice("other", "Other"))
         return ChoiceState(
-            self,
-            question=question,
-            error=question,
-            choices=choices,
-            next=next_state,
+            self, question=question, error=question, choices=choices, next=next_state
         )
 
     async def state_suburb(self):
