@@ -872,7 +872,7 @@ class Application(BaseApplication):
             "surname": self.user.answers["state_surname"],
             "firstName": self.user.answers["state_first_name"],
             "dateOfBirth": date_of_birth.isoformat(),
-            "mobileNumber": normalise_phonenumber(phonenumber),
+            "mobileNumber": normalise_phonenumber(phonenumber).lstrip("+"),
             "preferredVaccineScheduleTimeOfDay": vac_time,
             "preferredVaccineScheduleTimeOfWeek": vac_day,
             "preferredVaccineLocation": location,
@@ -944,7 +944,7 @@ class Application(BaseApplication):
         )
 
         data = {
-            "msisdn": normalise_phonenumber(phonenumber).lstrip("+"),
+            "msisdn": normalise_phonenumber(phonenumber),
             "source": f"WhatsApp {self.inbound.to_addr}",
             "gender": self.user.answers["state_gender"],
             "first_name": self.user.answers["state_first_name"],
