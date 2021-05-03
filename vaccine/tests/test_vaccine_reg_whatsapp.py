@@ -19,7 +19,7 @@ async def evds_mock(sanic_client):
     app.errors = 0
     app.errormax = 0
 
-    @app.route("/api/private/evds-sa/person/4/record", methods=["POST"])
+    @app.route("/api/private/evds-sa/person/5/record", methods=["POST"])
     def submit_record(request):
         app.requests.append(request)
         if app.errormax:
@@ -28,12 +28,12 @@ async def evds_mock(sanic_client):
                 return response.json({}, status=500)
         return response.json({}, status=200)
 
-    @app.route("/api/private/evds-sa/person/4/lookup/medscheme/1", methods=["GET"])
+    @app.route("/api/private/evds-sa/person/5/lookup/medscheme/1", methods=["GET"])
     def get_medschemes(request):
         with gzip.open("vaccine/data/medscheme.json.gz") as f:
             return response.raw(f.read(), content_type="application/json")
 
-    @app.route("/api/private/evds-sa/person/4/lookup/location/1", methods=["GET"])
+    @app.route("/api/private/evds-sa/person/5/lookup/location/1", methods=["GET"])
     def get_suburbs(request):
         with gzip.open("vaccine/data/suburbs.json.gz") as f:
             return response.raw(f.read(), content_type="application/json")
