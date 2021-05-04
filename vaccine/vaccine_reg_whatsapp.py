@@ -1,5 +1,6 @@
 import logging
 import random
+import re
 from datetime import date
 from email.utils import parseaddr
 from enum import Enum
@@ -79,6 +80,15 @@ class Application(BaseApplication):
     async def process_message(self, message: Message) -> List[Message]:
         if message.session_event == Message.SESSION_EVENT.CLOSE:
             self.state_name = "state_timeout"
+        if re.sub(r"\W+", " ", message.content or "").strip().lower() in {"menu", "0"}:
+            return [
+                message.reply(
+                    None,
+                    continue_session=False,
+                    helper_metadata={"automation_handle": True},
+                )
+            ]
+
         return await super().process_message(message)
 
     async def state_timeout(self):
