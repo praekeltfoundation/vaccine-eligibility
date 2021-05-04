@@ -14,18 +14,23 @@ class EndState:
         text: str,
         next: Optional[str] = None,
         clear_state: bool = True,
+        helper_metadata: Optional[dict] = None,
     ):
         self.app = app
         self.text = text
         self.next = next
         self.clear_state = clear_state
+        self.helper_metadata = helper_metadata
 
     async def process_message(self, message: Message) -> List[Message]:
         self.app.user.session_id = None
         self.app.state_name = self.next
         if self.clear_state:
             self.app.user.answers = {}
-        return self.app.send_message(self.text, continue_session=False)
+        kwargs = {"content": self.text, "continue_session": False}
+        if self.helper_metadata is not None:
+            kwargs["helper_metadata"] = self.helper_metadata
+        return self.app.send_message(**kwargs)
 
     async def display(self, message: Message) -> List[Message]:
         return await self.process_message(message)

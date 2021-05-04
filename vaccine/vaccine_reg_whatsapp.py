@@ -81,13 +81,7 @@ class Application(BaseApplication):
         if message.session_event == Message.SESSION_EVENT.CLOSE:
             self.state_name = "state_timeout"
         if re.sub(r"\W+", " ", message.content or "").strip().lower() in {"menu", "0"}:
-            return [
-                message.reply(
-                    None,
-                    continue_session=False,
-                    helper_metadata={"automation_handle": True},
-                )
-            ]
+            self.state_name = "state_exit"
 
         return await super().process_message(message)
 
@@ -108,6 +102,9 @@ class Application(BaseApplication):
                 ]
             ),
         )
+
+    async def state_exit(self):
+        return EndState(self, "", helper_metadata={"automation_handle": True})
 
     async def state_age_gate(self):
         self.user.answers = {}
