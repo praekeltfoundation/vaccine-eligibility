@@ -1735,3 +1735,24 @@ async def test_throttle():
     )
 
     config.THROTTLE_PERCENTAGE = throttle
+
+
+@pytest.mark.asyncio
+async def test_exit_keywords():
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_terms_and_conditions_summary"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="menu",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content is None
+    assert reply.session_event == Message.SESSION_EVENT.CLOSE
+    assert reply.helper_metadata["automation_handle"]
