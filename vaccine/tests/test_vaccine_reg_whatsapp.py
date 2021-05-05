@@ -19,7 +19,7 @@ async def evds_mock(sanic_client):
     app.errors = 0
     app.errormax = 0
 
-    @app.route("/api/private/evds-sa/person/5/record", methods=["POST"])
+    @app.route("/api/private/evds-sa/person/6/record", methods=["POST"])
     def submit_record(request):
         app.requests.append(request)
         if app.errormax:
@@ -28,12 +28,12 @@ async def evds_mock(sanic_client):
                 return response.json({}, status=500)
         return response.json({}, status=200)
 
-    @app.route("/api/private/evds-sa/person/5/lookup/medscheme/1", methods=["GET"])
+    @app.route("/api/private/evds-sa/person/6/lookup/medscheme/1", methods=["GET"])
     def get_medschemes(request):
         with gzip.open("vaccine/data/medscheme.json.gz") as f:
             return response.raw(f.read(), content_type="application/json")
 
-    @app.route("/api/private/evds-sa/person/5/lookup/location/1", methods=["GET"])
+    @app.route("/api/private/evds-sa/person/6/lookup/location/1", methods=["GET"])
     def get_suburbs(request):
         with gzip.open("vaccine/data/suburbs.json.gz") as f:
             return response.raw(f.read(), content_type="application/json")
@@ -731,7 +731,7 @@ async def test_suburb(evds_mock):
         [
             "*VACCINE REGISTRATION SECURE CHAT* 🔐",
             "Please REPLY with a NUMBER to confirm your location:",
-            "1. Table View, Milnerton",
+            "1. Table View, Blouberg",
             "2. Other",
         ]
     )
@@ -748,7 +748,7 @@ async def test_municipality(evds_mock):
     )
     app = Application(u)
     msg = Message(
-        content="Amazizi yethu",
+        content="mandela",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -760,12 +760,16 @@ async def test_municipality(evds_mock):
         [
             "*VACCINE REGISTRATION SECURE CHAT* 🔐",
             "Please REPLY with a NUMBER to confirm your MUNICIPALITY:",
-            "1. Amahlathi",
-            "2. Elundini",
-            "3. Intsika Yethu",
-            "4. Mhlontlo",
-            "5. Mnquma",
-            "6. Other",
+            "1. Buffalo City",
+            "2. Enoch Mgijima",
+            "3. Great Kei",
+            "4. King Sabata Dalindyebo",
+            "5. Nelson Mandela Bay",
+            "6. Raymond Mhlaba",
+            "7. Umzimvubu",
+            "8. Mbizana",
+            "9. Mnquma",
+            "10. Other",
         ]
     )
     assert u.state.name == "state_municipality"
@@ -806,14 +810,11 @@ async def test_suburb_with_municipality(evds_mock):
         addr="27820001001",
         state=StateData(name="state_municipality"),
         session_id=1,
-        answers={
-            "state_province_id": "eastern cape",
-            "state_suburb_search": "Amazizi yethu",
-        },
+        answers={"state_province_id": "eastern cape", "state_suburb_search": "mandela"},
     )
     app = Application(u)
     msg = Message(
-        content="intsika yethu",
+        content="Buffalo City",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -824,13 +825,8 @@ async def test_suburb_with_municipality(evds_mock):
         [
             "*VACCINE REGISTRATION SECURE CHAT* 🔐",
             "Please REPLY with a NUMBER to confirm your location:",
-            "1. Amazizi, Amazizi",
-            "2. Kwadukatole, Amazizi",
-            "3. Kwamgwenyane, Amazizi",
-            "4. Mgwatyuzeni, Amazizi",
-            "5. Upper Mbulukweza, Amazizi",
-            "6. Cofimvaba, Intsika Yethu",
-            "7. Other",
+            "1. Mandela Park, Mandela Park",
+            "2. Other",
         ]
     )
     assert u.state.name == "state_suburb"
@@ -1399,7 +1395,7 @@ async def test_state_success(evds_mock, eventstore_mock):
             "state_dob_month": "1",
             "state_dob_day": "1",
             "state_vaccination_time": "weekday_morning",
-            "state_suburb": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "state_suburb": "d114778e-c590-4a08-894e-0ddaefc5759e",
             "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
             "state_gender": "Other",
             "state_surname": "test surname",
@@ -1443,7 +1439,7 @@ async def test_state_success(evds_mock, eventstore_mock):
         "preferredVaccineScheduleTimeOfDay": "morning",
         "preferredVaccineScheduleTimeOfWeek": "weekday",
         "preferredVaccineLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "value": "d114778e-c590-4a08-894e-0ddaefc5759e",
             "text": "Diep River",
         },
         "termsAndConditionsAccepted": True,
@@ -1462,7 +1458,7 @@ async def test_state_success(evds_mock, eventstore_mock):
         "date_of_birth": "1960-01-01",
         "preferred_time": "morning",
         "preferred_date": "weekday",
-        "preferred_location_id": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+        "preferred_location_id": "d114778e-c590-4a08-894e-0ddaefc5759e",
         "preferred_location_name": "Diep River",
         "id_number": "6001010001081",
         "data": {},
@@ -1480,7 +1476,7 @@ async def test_state_success_passport(evds_mock):
             "state_dob_month": "1",
             "state_dob_day": "1",
             "state_vaccination_time": "weekday_morning",
-            "state_suburb": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "state_suburb": "d114778e-c590-4a08-894e-0ddaefc5759e",
             "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
             "state_gender": "Other",
             "state_surname": "test surname",
@@ -1526,7 +1522,7 @@ async def test_state_success_passport(evds_mock):
         "preferredVaccineScheduleTimeOfDay": "morning",
         "preferredVaccineScheduleTimeOfWeek": "weekday",
         "preferredVaccineLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "value": "d114778e-c590-4a08-894e-0ddaefc5759e",
             "text": "Diep River",
         },
         "termsAndConditionsAccepted": True,
@@ -1549,7 +1545,7 @@ async def test_state_success_temporary_failure(evds_mock):
             "state_dob_month": "1",
             "state_dob_day": "1",
             "state_vaccination_time": "weekday_morning",
-            "state_suburb": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "state_suburb": "d114778e-c590-4a08-894e-0ddaefc5759e",
             "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
             "state_gender": "Other",
             "state_surname": "test surname",
@@ -1596,7 +1592,7 @@ async def test_state_success_temporary_failure(evds_mock):
         "preferredVaccineScheduleTimeOfDay": "morning",
         "preferredVaccineScheduleTimeOfWeek": "weekday",
         "preferredVaccineLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "value": "d114778e-c590-4a08-894e-0ddaefc5759e",
             "text": "Diep River",
         },
         "termsAndConditionsAccepted": True,
@@ -1620,7 +1616,7 @@ async def test_state_error(evds_mock):
             "state_dob_month": "1",
             "state_dob_day": "1",
             "state_gender": "Other",
-            "state_suburb": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "state_suburb": "d114778e-c590-4a08-894e-0ddaefc5759e",
             "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
             "state_gender": "Other",
             "state_surname": "test surname",
@@ -1662,7 +1658,7 @@ async def test_state_error(evds_mock):
         "preferredVaccineScheduleTimeOfDay": "morning",
         "preferredVaccineScheduleTimeOfWeek": "weekday",
         "preferredVaccineLocation": {
-            "value": "f4cba53d-a757-45a7-93ca-895b010e60c2",
+            "value": "d114778e-c590-4a08-894e-0ddaefc5759e",
             "text": "Diep River",
         },
         "termsAndConditionsAccepted": True,
