@@ -1,16 +1,18 @@
 from dataclasses import dataclass
 from inspect import iscoroutinefunction
-from typing import Awaitable, Callable, List, Optional, Union
+from typing import TYPE_CHECKING, Awaitable, Callable, List, Optional, Union
 
-from vaccine.base_application import BaseApplication
 from vaccine.models import Message
 from vaccine.utils import get_display_choices
+
+if TYPE_CHECKING:  # pragma: no cover
+    from vaccine.base_application import BaseApplication
 
 
 class EndState:
     def __init__(
         self,
-        app: BaseApplication,
+        app: "BaseApplication",
         text: str,
         next: Optional[str] = None,
         clear_state: bool = True,
@@ -45,7 +47,7 @@ class Choice:
 class ChoiceState:
     def __init__(
         self,
-        app: BaseApplication,
+        app: "BaseApplication",
         question: str,
         choices: List[Choice],
         error: str,
@@ -100,7 +102,7 @@ class ChoiceState:
 class MenuState(ChoiceState):
     def __init__(
         self,
-        app: BaseApplication,
+        app: "BaseApplication",
         question: str,
         choices: List[Choice],
         error: str,
@@ -126,7 +128,7 @@ class ErrorMessage(Exception):
 class FreeText:
     def __init__(
         self,
-        app: BaseApplication,
+        app: "BaseApplication",
         question: str,
         next: str,
         check: Optional[Callable[[Optional[str]], Awaitable]] = None,

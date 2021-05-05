@@ -1,17 +1,22 @@
+import logging
 from typing import Any, List, Optional
 
 from prometheus_client import Counter
 
 from vaccine.models import Answer, Message, User
+from vaccine.states import EndState
 from vaccine.utils import random_id
 
 STATE_CHANGE = Counter(
     "state_change", "Whenever a user's state gets changed", ("from_state", "to_state")
 )
 
+logger = logging.getLogger(__name__)
+
 
 class BaseApplication:
     START_STATE = "state_start"
+    ERROR_STATE = "state_error"
 
     def __init__(self, user: User):
         self.user = user
@@ -45,19 +50,25 @@ class BaseApplication:
         """
         Processes the message, and returns a list of messages to return to the user
         """
-        self.inbound = message
-        if message.content == "!reset":
-            self.state_name = self.START_STATE
-            self.user.answers = {}
-            self.user.session_id = None
-        state = await self.get_current_state()
-        if (
-            message.session_event == Message.SESSION_EVENT.NEW
-            or self.user.session_id is None
-        ):
-            self.user.session_id = random_id()
-            await state.display(message)
-        else:
+        try:
+            self.inbound = message
+            if message.content == "!reset":
+                self.state_name = self.START_STATE
+                self.user.answers = {}
+                self.user.session_id = None
+            state = await self.get_current_state()
+            if (
+                message.session_event == Message.SESSION_EVENT.NEW
+                or self.user.session_id is None
+            ):
+                self.user.session_id = random_id()
+                await state.display(message)
+            else:
+                await state.process_message(message)
+        except Exception:
+            logger.exception("Application error")
+            self.state_name = self.ERROR_STATE
+            state = await self.get_current_state()
             await state.process_message(message)
         return self.messages
 
@@ -80,3 +91,6 @@ class BaseApplication:
         Sends a reply to the user
         """
         self.messages.append(self.inbound.reply(content, continue_session, **kw))
+
+    async def state_error(self):
+        return EndState(self, text="Something went wrong. Please try again later.")
