@@ -1176,7 +1176,7 @@ async def test_medical_aid_list_other(evds_mock):
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
-    assert u.state.name == "state_medical_aid_search"
+    assert u.state.name == "state_medical_aid"
 
 
 @pytest.mark.asyncio

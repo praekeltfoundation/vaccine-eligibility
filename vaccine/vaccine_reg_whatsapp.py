@@ -753,7 +753,7 @@ class Application(BaseApplication):
                 [
                     "*VACCINE REGISTRATION SECURE CHAT* 🔐",
                     "",
-                    "Do you belong to a Medical Aid?",
+                    "Do you belong to a South African Medical Aid?",
                 ]
             ),
             choices=[
@@ -786,7 +786,7 @@ class Application(BaseApplication):
     async def state_medical_aid_list(self):
         async def next_state(choice: Choice):
             if choice.value == "other":
-                return "state_medical_aid_search"
+                return "state_medical_aid"
             return "state_medical_aid_number"
 
         search = self.user.answers["state_medical_aid_search"] or ""
