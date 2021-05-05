@@ -1753,6 +1753,8 @@ async def test_exit_keywords():
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
-    assert reply.content is None
+    assert reply.content == ""
     assert reply.session_event == Message.SESSION_EVENT.CLOSE
-    assert reply.helper_metadata["automation_handle"]
+    assert reply.helper_metadata["automation_handle"] is True
+    assert u.answers == {}
+    assert u.state.name is None
