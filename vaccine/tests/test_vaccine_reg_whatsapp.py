@@ -1754,3 +1754,23 @@ async def test_exit_keywords():
     assert reply.helper_metadata["automation_handle"] is True
     assert u.answers == {}
     assert u.state.name is None
+
+
+@pytest.mark.asyncio
+async def test_uncaught_exception():
+    u = User(
+        addr="27820001001", state=StateData(name="state_vaccination_time"), session_id=1
+    )
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "Something went wrong. Please try again later."
+    assert reply.session_event == Message.SESSION_EVENT.CLOSE
+    assert u.answers == {}
+    assert u.state.name is None
