@@ -1466,6 +1466,87 @@ async def test_state_success(evds_mock, eventstore_mock):
 
 
 @pytest.mark.asyncio
+async def test_state_success_international_phonenumber(evds_mock, eventstore_mock):
+    u = User(
+        addr="32470001001",
+        state=StateData(name="state_vaccination_time"),
+        session_id=1,
+        answers={
+            "state_dob_year": "1960",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+            "state_vaccination_time": "weekday_morning",
+            "state_suburb": "d114778e-c590-4a08-894e-0ddaefc5759e",
+            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_gender": "Other",
+            "state_surname": "test surname",
+            "state_first_name": "test first name",
+            "state_identification_type": "rsa_id",
+            "state_identification_number": "6001010001081",
+            "state_medical_aid": "state_vaccination_time",
+            "state_email_address": "SKIP",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="32470001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert reply.content == "\n".join(
+        [
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "",
+            "Congratulations! You successfully registered with the National Department "
+            "of Health to get a COVID-19 vaccine.",
+            "",
+            "Look out for messages from this number (060 012 3456) on WhatsApp OR on "
+            "SMS/email. We will update you with important information about your "
+            "appointment and what to expect.",
+        ]
+    )
+    assert reply.session_event == Message.SESSION_EVENT.CLOSE
+
+    [requests] = evds_mock.app.requests
+    assert requests.json == {
+        "gender": "Other",
+        "surname": "test surname",
+        "firstName": "test first name",
+        "dateOfBirth": "1960-01-01",
+        "mobileNumber": "32470001001",
+        "preferredVaccineScheduleTimeOfDay": "morning",
+        "preferredVaccineScheduleTimeOfWeek": "weekday",
+        "preferredVaccineLocation": {
+            "value": "d114778e-c590-4a08-894e-0ddaefc5759e",
+            "text": "Diep River",
+        },
+        "termsAndConditionsAccepted": True,
+        "iDNumber": "6001010001081",
+        "medicalAidMember": False,
+        "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
+    }
+
+    [requests] = eventstore_mock.app.requests
+    assert requests.json == {
+        "msisdn": "+32470001001",
+        "source": "WhatsApp 27820001002",
+        "gender": "Other",
+        "first_name": "test first name",
+        "last_name": "test surname",
+        "date_of_birth": "1960-01-01",
+        "preferred_time": "morning",
+        "preferred_date": "weekday",
+        "preferred_location_id": "d114778e-c590-4a08-894e-0ddaefc5759e",
+        "preferred_location_name": "Diep River",
+        "id_number": "6001010001081",
+        "data": {},
+    }
+
+
+@pytest.mark.asyncio
 async def test_state_success_passport(evds_mock):
     u = User(
         addr="27820001001",

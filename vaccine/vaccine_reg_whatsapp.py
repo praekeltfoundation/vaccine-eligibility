@@ -947,7 +947,7 @@ class Application(BaseApplication):
         suburb_id = self.user.answers["state_suburb"]
         province_id = self.user.answers["state_province_id"]
         phonenumber = self.user.answers.get(
-            "state_phone_number", self.inbound.from_addr
+            "state_phone_number", f"+{self.inbound.from_addr.lstrip('+')}"
         )
 
         data = {
