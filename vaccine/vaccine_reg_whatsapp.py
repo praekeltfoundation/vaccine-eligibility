@@ -435,7 +435,7 @@ class Application(BaseApplication):
                 except ValueError:
                     raise ErrorMessage(error_msg)
             else:
-                nonempty_validator(error_msg)(value)
+                await nonempty_validator(error_msg)(value)
 
         return FreeText(
             self,
