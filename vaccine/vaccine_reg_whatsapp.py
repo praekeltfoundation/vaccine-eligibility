@@ -667,7 +667,7 @@ class Application(BaseApplication):
         )
 
     async def state_self_registration(self):
-        number = display_phonenumber(self.inbound.from_addr)
+        number = display_phonenumber(f"+{self.inbound.from_addr.lstrip('+')}")
         return MenuState(
             self,
             question="\n".join(
