@@ -58,16 +58,10 @@ async def eventstore_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_eventstore")
     app.requests = []
-    app.registration_errormax = 0
-    app.registration_errors = 0
 
     @app.route("/v2/vaccineregistration/", methods=["POST"])
     def valid_registration(request):
         app.requests.append(request)
-        if app.registration_errormax:
-            if app.registration_errors < app.registration_errormax:
-                app.registration_errors += 1
-                return response.json({}, status=500)
         return response.json({})
 
     client = await sanic_client(app)
