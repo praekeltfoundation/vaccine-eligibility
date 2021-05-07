@@ -31,6 +31,7 @@ from vaccine.utils import (
     enforce_character_limit_in_choices,
     normalise_phonenumber,
 )
+from vaccine.validators import nonempty_validator
 
 logger = logging.getLogger(__name__)
 
@@ -421,6 +422,7 @@ class Application(BaseApplication):
             next_state = "state_first_name"
 
         async def validate_identification_number(value):
+            error_msg = f"⚠️ Please enter a valid {idtype_label}"
             if idtype == self.ID_TYPES.rsa_id:
                 try:
                     id_number = SAIDNumber(value)
@@ -431,7 +433,9 @@ class Application(BaseApplication):
                     self.save_answer("state_dob_day", str(dob.day))
                     self.save_answer("state_gender", id_number.sex.value)
                 except ValueError:
-                    raise ErrorMessage(f"⚠️ Please enter a valid {idtype_label}")
+                    raise ErrorMessage(error_msg)
+            else:
+                await nonempty_validator(error_msg)(value)
 
         return FreeText(
             self,
@@ -488,31 +492,54 @@ class Application(BaseApplication):
         )
 
     async def state_first_name(self):
+        question = "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Please TYPE your FIRST NAME as it appears in your identification "
+                "document.",
+            ]
+        )
 
+        error = "\n".join(
+            [
+                "⚠️ Please try again",
+                "",
+                "TYPE your FIRST NAME as it appears in your identification document.",
+                "",
+                "📌 Or reply *0* to end this session and return to the main *MENU*",
+            ]
+        )
         return FreeText(
             self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-                    "",
-                    "Please TYPE your FIRST NAME as it appears in your identification "
-                    "document.",
-                ]
-            ),
+            question=question,
+            check=nonempty_validator(error),
             next="state_surname",
         )
 
     async def state_surname(self):
+        question = "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Please TYPE your SURNAME as it appears in your identification "
+                "document.",
+            ]
+        )
+        error = "\n".join(
+            [
+                "⚠️ Please try again",
+                "",
+                "TYPE your SURNAME as it appears in your identification document.",
+                "",
+                "📌 Or reply *0* to end this session and return to the main *MENU*",
+            ]
+        )
+
         return FreeText(
             self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-                    "",
-                    "Please TYPE your SURNAME as it appears in your identification "
-                    "document.",
-                ]
-            ),
+            question=question,
+            check=nonempty_validator(error),
             next="state_dob_year",
         )
 
@@ -819,15 +846,27 @@ class Application(BaseApplication):
         )
 
     async def state_medical_aid_number(self):
+        question = "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Please TYPE your Medical Aid NUMBER.",
+            ]
+        )
+        error = "\n".join(
+            [
+                "⚠️ Please try again",
+                "",
+                "Reply with your Medical Aid NUMBER",
+                "",
+                "📌 Or reply *0* to end this session and return to the main *MENU*",
+            ]
+        )
+
         return FreeText(
             self,
-            question="\n".join(
-                [
-                    "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-                    "",
-                    "Please TYPE your Medical Aid NUMBER.",
-                ]
-            ),
+            question=question,
+            check=nonempty_validator(error),
             next="state_vaccination_time",
         )
 

@@ -26,6 +26,7 @@ from vaccine.utils import (
     enforce_character_limit_in_choices,
     normalise_phonenumber,
 )
+from vaccine.validators import nonempty_validator
 
 logger = logging.getLogger(__name__)
 
@@ -184,6 +185,7 @@ class Application(BaseApplication):
             return await self.go_to_state(next_state)
 
         async def validate_identification_number(value):
+            error_msg = f"Invalid {idtype_label}. Please try again"
             if idtype == self.ID_TYPES.rsa_id:
                 try:
                     id_number = SAIDNumber(value)
@@ -194,7 +196,9 @@ class Application(BaseApplication):
                     self.save_answer("state_dob_day", str(dob.day))
                     self.save_answer("state_gender", id_number.sex.value)
                 except ValueError:
-                    raise ErrorMessage(f"Invalid {idtype_label}. Please try again")
+                    raise ErrorMessage(error_msg)
+            else:
+                await nonempty_validator(error_msg)(value)
 
         return FreeText(
             self,
@@ -369,6 +373,10 @@ class Application(BaseApplication):
             self,
             question="Please TYPE your FIRST NAME as it appears in your identification "
             "document",
+            check=nonempty_validator(
+                "ERROR: Reply with your FIRST NAME as it appears in your "
+                "identification document"
+            ),
             next="state_surname",
         )
 
@@ -377,6 +385,10 @@ class Application(BaseApplication):
             self,
             question="Please TYPE your SURNAME as it appears in your identification "
             "document.",
+            check=nonempty_validator(
+                "ERROR: Reply with your SURNAME as it appears in your identification "
+                "document"
+            ),
             next="state_confirm_profile",
         )
 
