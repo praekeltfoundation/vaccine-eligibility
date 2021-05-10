@@ -25,10 +25,9 @@ async def worker():
 
 @pytest.fixture
 async def redis():
-    redis = await aioredis.create_redis_pool(config.REDIS_URL)
+    redis = aioredis.from_url(config.REDIS_URL, encoding="utf-8", decode_responses=True)
     yield redis
-    redis.close()
-    await redis.wait_closed()
+    await redis.close()
 
 
 async def send_inbound_amqp_message(exchange: Exchange, queue: str, message: bytes):
@@ -100,7 +99,7 @@ async def test_worker_valid_inbound(worker: Worker, redis: aioredis.Redis):
     # complete
     user_data = None
     for _ in range(10):
-        user_data = await redis.get("user.27820001002", encoding="utf-8")
+        user_data = await redis.get("user.27820001002")
         if user_data is None:
             await sleep(0.1)  # pragma: no cover
     await redis.delete("user.27820001002")
@@ -143,7 +142,7 @@ async def test_worker_valid_answer(worker: Worker, redis: aioredis.Redis):
     # complete
     user_data = None
     for _ in range(10):
-        user_data = await redis.get("user.27820001002", encoding="utf-8")
+        user_data = await redis.get("user.27820001002")
         if user_data is None:
             await sleep(0.1)  # pragma: no cover
     await redis.delete("user.27820001002")
