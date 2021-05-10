@@ -1015,7 +1015,7 @@ class Application(BaseApplication):
             data["refugee_number"] = self.user.answers["state_identification_number"]
         if id_type == self.ID_TYPES.passport.name:
             data["passport_number"] = self.user.answers["state_identification_number"]
-            data["passport_country"] = self.user.answers["state_passport_country"]
+            data["passport_country"] = self.user.answers["state_passport_country_list"]
 
         async with eventstore as session:
             for i in range(3):

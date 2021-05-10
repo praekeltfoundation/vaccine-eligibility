@@ -49,16 +49,10 @@ async def eventstore_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_eventstore")
     app.requests = []
-    app.registration_errormax = 0
-    app.registration_errors = 0
 
     @app.route("/v2/vaccineregistration/", methods=["POST"])
     def valid_registration(request):
         app.requests.append(request)
-        if app.registration_errormax:
-            if app.registration_errors < app.registration_errormax:
-                app.registration_errors += 1
-                return response.json({}, status=500)
         return response.json({})
 
     client = await sanic_client(app)
@@ -311,12 +305,22 @@ async def test_passport_country_invalid():
 @pytest.mark.asyncio
 async def test_passport_country_search():
     u = User(
-        addr="27820001001",
-        state=StateData(name="state_passport_country_search"),
-        session_id=1,
-        answers={"state_passport_country": "other"},
+        addr="27820001001", state=StateData(name="state_passport_country"), session_id=1
     )
     app = Application(u)
+    msg = Message(
+        content="other",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert u.state.name == "state_passport_country_search"
+    assert reply.content == "Please TYPE in your passport's COUNTRY of origin."
+    assert len(reply.content) < 160
+
+    app.messages = []
     msg = Message(
         content="cote d'ivory",
         to_addr="27820001002",
@@ -338,6 +342,16 @@ async def test_passport_country_search():
         ]
     )
     assert len(reply.content) < 160
+
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    await app.process_message(msg)
+    assert u.answers["state_passport_country_list"] == "CI"
 
 
 @pytest.mark.asyncio
@@ -1410,7 +1424,7 @@ async def test_state_success(evds_mock, eventstore_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_success_passport(evds_mock):
+async def test_state_success_passport(evds_mock, eventstore_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_medical_aid"),
@@ -1467,10 +1481,26 @@ async def test_state_success_passport(evds_mock):
         "sourceId": "008c0f09-db09-4d60-83c5-63505c7f05ba",
         "medicalAidMember": True,
     }
+    [requests] = eventstore_mock.app.requests
+    assert requests.json == {
+        "msisdn": "+27820001001",
+        "source": "USSD 27820001002",
+        "gender": "Other",
+        "first_name": "test first name",
+        "last_name": "test surname",
+        "date_of_birth": "1960-01-01",
+        "preferred_time": "morning",
+        "preferred_date": "weekday",
+        "preferred_location_id": "d114778e-c590-4a08-894e-0ddaefc5759e",
+        "preferred_location_name": "Diep River",
+        "passport_number": "A1234567890",
+        "passport_country": "ZA",
+        "data": {},
+    }
 
 
 @pytest.mark.asyncio
-async def test_state_success_passport_from_choosing(evds_mock):
+async def test_state_success_passport_from_choosing(evds_mock, eventstore_mock):
     u = User(
         addr="27820001001",
         state=StateData(name="state_medical_aid"),
@@ -1525,6 +1555,168 @@ async def test_state_success_passport_from_choosing(evds_mock):
         "passportCountry": "ZW",
         "sourceId": "008c0f09-db09-4d60-83c5-63505c7f05ba",
         "medicalAidMember": True,
+    }
+    [requests] = eventstore_mock.app.requests
+    assert requests.json == {
+        "msisdn": "+27820001001",
+        "source": "USSD 27820001002",
+        "gender": "Other",
+        "first_name": "test first name",
+        "last_name": "test surname",
+        "date_of_birth": "1960-01-01",
+        "preferred_time": "morning",
+        "preferred_date": "weekday",
+        "preferred_location_id": "d114778e-c590-4a08-894e-0ddaefc5759e",
+        "preferred_location_name": "Diep River",
+        "passport_number": "A1234567890",
+        "passport_country": "ZW",
+        "data": {},
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_success_asylum_seeker(evds_mock, eventstore_mock):
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid"),
+        session_id=1,
+        answers={
+            "state_dob_year": "1960",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+            "state_vaccination_time": "weekday_morning",
+            "state_suburb": "d114778e-c590-4a08-894e-0ddaefc5759e",
+            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_gender": "Other",
+            "state_surname": "test surname",
+            "state_first_name": "test first name",
+            "state_identification_type": "asylum_seeker",
+            "state_identification_number": "A1234567890",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert (
+        reply.content
+        == ":) You have SUCCESSFULLY registered to get vaccinated. Additional "
+        "information and appointment details will be sent via SMS."
+    )
+    assert reply.session_event == Message.SESSION_EVENT.CLOSE
+
+    [requests] = evds_mock.app.requests
+    assert requests.json == {
+        "gender": "Other",
+        "surname": "test surname",
+        "firstName": "test first name",
+        "dateOfBirth": "1960-01-01",
+        "mobileNumber": "27820001001",
+        "preferredVaccineScheduleTimeOfDay": "morning",
+        "preferredVaccineScheduleTimeOfWeek": "weekday",
+        "preferredVaccineLocation": {
+            "value": "d114778e-c590-4a08-894e-0ddaefc5759e",
+            "text": "Diep River",
+        },
+        "termsAndConditionsAccepted": True,
+        "refugeeNumber": "A1234567890",
+        "sourceId": "008c0f09-db09-4d60-83c5-63505c7f05ba",
+        "medicalAidMember": True,
+    }
+
+    [requests] = eventstore_mock.app.requests
+    assert requests.json == {
+        "msisdn": "+27820001001",
+        "source": "USSD 27820001002",
+        "gender": "Other",
+        "first_name": "test first name",
+        "last_name": "test surname",
+        "date_of_birth": "1960-01-01",
+        "preferred_time": "morning",
+        "preferred_date": "weekday",
+        "preferred_location_id": "d114778e-c590-4a08-894e-0ddaefc5759e",
+        "preferred_location_name": "Diep River",
+        "asylum_seeker_number": "A1234567890",
+        "data": {},
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_success_refugee(evds_mock, eventstore_mock):
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_medical_aid"),
+        session_id=1,
+        answers={
+            "state_dob_year": "1960",
+            "state_dob_month": "1",
+            "state_dob_day": "1",
+            "state_vaccination_time": "weekday_morning",
+            "state_suburb": "d114778e-c590-4a08-894e-0ddaefc5759e",
+            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
+            "state_gender": "Other",
+            "state_surname": "test surname",
+            "state_first_name": "test first name",
+            "state_identification_type": "refugee",
+            "state_identification_number": "A1234567890",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert (
+        reply.content
+        == ":) You have SUCCESSFULLY registered to get vaccinated. Additional "
+        "information and appointment details will be sent via SMS."
+    )
+    assert reply.session_event == Message.SESSION_EVENT.CLOSE
+
+    [requests] = evds_mock.app.requests
+    assert requests.json == {
+        "gender": "Other",
+        "surname": "test surname",
+        "firstName": "test first name",
+        "dateOfBirth": "1960-01-01",
+        "mobileNumber": "27820001001",
+        "preferredVaccineScheduleTimeOfDay": "morning",
+        "preferredVaccineScheduleTimeOfWeek": "weekday",
+        "preferredVaccineLocation": {
+            "value": "d114778e-c590-4a08-894e-0ddaefc5759e",
+            "text": "Diep River",
+        },
+        "termsAndConditionsAccepted": True,
+        "refugeeNumber": "A1234567890",
+        "sourceId": "008c0f09-db09-4d60-83c5-63505c7f05ba",
+        "medicalAidMember": True,
+    }
+
+    [requests] = eventstore_mock.app.requests
+    assert requests.json == {
+        "msisdn": "+27820001001",
+        "source": "USSD 27820001002",
+        "gender": "Other",
+        "first_name": "test first name",
+        "last_name": "test surname",
+        "date_of_birth": "1960-01-01",
+        "preferred_time": "morning",
+        "preferred_date": "weekday",
+        "preferred_location_id": "d114778e-c590-4a08-894e-0ddaefc5759e",
+        "preferred_location_name": "Diep River",
+        "refugee_number": "A1234567890",
+        "data": {},
     }
 
 
