@@ -8,6 +8,7 @@ from typing import List
 from urllib.parse import urljoin
 
 import aiohttp
+import sentry_sdk
 
 from vaccine import vacreg_config as config
 from vaccine.base_application import BaseApplication
@@ -964,6 +965,9 @@ class Application(BaseApplication):
                     )
                     response_data = await response.json()
                     self.evds_response = response_data
+                    sentry_sdk.set_context(
+                        "evds", {"request_data": data, "response_data": response_data}
+                    )
                     response.raise_for_status()
                     break
                 except HTTP_EXCEPTIONS as e:
