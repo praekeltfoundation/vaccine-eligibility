@@ -930,7 +930,7 @@ class Application(BaseApplication):
         }
         id_type = self.user.answers["state_identification_type"]
         if id_type == self.ID_TYPES.rsa_id.name:
-            data["iDNumber"] = self.user.answers["state_identification_number"]
+            data["iDNumber"] = self.user.answers["state_identification_number"].strip()
         if (
             id_type == self.ID_TYPES.refugee.name
             or id_type == self.ID_TYPES.asylum_seeker.name
@@ -1010,7 +1010,7 @@ class Application(BaseApplication):
         }
         id_type = self.user.answers["state_identification_type"]
         if id_type == self.ID_TYPES.rsa_id.name:
-            data["id_number"] = self.user.answers["state_identification_number"]
+            data["id_number"] = self.user.answers["state_identification_number"].strip()
         if id_type == self.ID_TYPES.asylum_seeker.name:
             data["asylum_seeker_number"] = self.user.answers[
                 "state_identification_number"
