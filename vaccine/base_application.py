@@ -1,3 +1,4 @@
+import gettext
 import logging
 from typing import Any, List, Optional
 
@@ -23,6 +24,17 @@ class BaseApplication:
         self.answer_events: List[Answer] = []
         self.messages: List[Message] = []
         self.inbound: Optional[Message] = None
+        self.set_language(self.user.lang)
+
+    def set_language(self, language):
+        self.user.lang = language
+        self.translation = gettext.translation(
+            "messages",
+            localedir="locales",
+            languages=[self.user.lang or ""],
+            fallback=True,
+        )
+        self._ = self.translation.gettext
 
     async def get_current_state(self):
         if not self.state_name:
@@ -93,4 +105,6 @@ class BaseApplication:
         self.messages.append(self.inbound.reply(content, continue_session, **kw))
 
     async def state_error(self):
-        return EndState(self, text="Something went wrong. Please try again later.")
+        return EndState(
+            self, text=self._("Something went wrong. Please try again later.")
+        )
