@@ -209,37 +209,31 @@ class Application(BaseApplication):
     async def state_welcome(self):
         error = "This service works best when you select numbers from the list"
         if self.user.answers.get("returning_user") == "yes":
-            question = "\n".join(
-                [
-                    "Welcome back to HealthCheck, your weekly COVID-19 Risk Assesment "
-                    "tool. Let's see how you are feeling today.",
-                    "",
-                    "Reply",
-                ]
+            question = self._(
+                "Welcome back to HealthCheck, your weekly COVID-19 Risk Assesment "
+                "tool. Let's see how you are feeling today.\n"
+                "\n"
+                "Reply"
             )
         else:
-            question = "\n".join(
-                [
-                    "The National Department of Health thanks you for contributing to "
-                    "the health of all citizens. Stop the spread of COVID-19",
-                    "",
-                    "Reply",
-                ]
+            question = self._(
+                "The National Department of Health thanks you for contributing to "
+                "the health of all citizens. Stop the spread of COVID-19\n"
+                "\n"
+                "Reply"
             )
         if self.user.answers.get("confirmed_contact") == "yes":
-            question = "\n".join(
-                [
-                    "The National Department of Health thanks you for contributing to "
-                    "the health of all citizens. Stop the spread of COVID-19",
-                    "",
-                    "Reply",
-                ]
+            question = self._(
+                "The National Department of Health thanks you for contributing to "
+                "the health of all citizens. Stop the spread of COVID-19\n"
+                "\n"
+                "Reply"
             )
             error = question
         return MenuState(
             self,
             question=question,
-            choices=[Choice("state_terms", "START")],
+            choices=[Choice("state_terms", self._("START"))],
             error=error,
         )
 
@@ -253,38 +247,34 @@ class Application(BaseApplication):
 
         return MenuState(
             self,
-            question="\n".join(
-                [
-                    "Confirm that you're responsible for your medical care & "
-                    "treatment. This service only provides info.",
-                    "",
-                    "Reply",
-                ]
+            question=self._(
+                "Confirm that you're responsible for your medical care & treatment. "
+                "This service only provides info.\n"
+                "\n"
+                "Reply"
             ),
-            error="\n".join(
-                [
-                    "Please use numbers from list. Confirm that u're responsible for "
-                    "ur medical care & treatment. This service only provides info.",
-                    "",
-                    "Reply",
-                ]
+            error=self._(
+                "Please use numbers from list. Confirm that u're responsible for ur "
+                "medical care & treatment. This service only provides info.\n"
+                "\n"
+                "Reply"
             ),
             choices=[
-                Choice(next_state, "YES"),
-                Choice("state_end", "NO"),
-                Choice("state_more_info_pg1", "MORE INFO"),
+                Choice(next_state, self._("YES")),
+                Choice("state_end", self._("NO")),
+                Choice("state_more_info_pg1", self._("MORE INFO")),
             ],
         )
 
     async def state_end(self):
         if self.user.answers.get("confirmed_contact") == "yes":
-            text = (
+            text = self._(
                 "You can return to this service at any time. Remember, if you think "
                 "you have COVID-19 STAY HOME, avoid contact with other people and "
                 "self-quarantine."
             )
         else:
-            text = (
+            text = self._(
                 "You can return to this service at any time. Remember, if you think "
                 "you have COVID-19 STAY HOME, avoid contact with other people and "
                 "self-isolate."
@@ -294,25 +284,33 @@ class Application(BaseApplication):
     async def state_more_info_pg1(self):
         return MenuState(
             self,
-            question="It's not a substitute for professional medical "
-            "advice/diagnosis/treatment. Get a qualified health provider's advice "
-            "about your medical condition/care.",
-            error="It's not a substitute for professional medical "
-            "advice/diagnosis/treatment. Get a qualified health provider's advice "
-            "about your medical condition/care.",
-            choices=[Choice("state_more_info_pg2", "Next")],
+            question=self._(
+                "It's not a substitute for professional medical advice/diagnosis/"
+                "treatment. Get a qualified health provider's advice about your "
+                "medical condition/care."
+            ),
+            error=self._(
+                "It's not a substitute for professional medical advice/diagnosis/"
+                "treatment. Get a qualified health provider's advice about your "
+                "medical condition/care."
+            ),
+            choices=[Choice("state_more_info_pg2", self._("Next"))],
         )
 
     async def state_more_info_pg2(self):
         return MenuState(
             self,
-            question="You confirm that you shouldn't disregard/delay seeking medical "
-            "advice about treatment/care because of this service. Rely on info at your "
-            "own risk.",
-            error="You confirm that you shouldn't disregard/delay seeking medical "
-            "advice about treatment/care because of this service. Rely on info at your "
-            "own risk.",
-            choices=[Choice("state_terms", "Next")],
+            question=self._(
+                "You confirm that you shouldn't disregard/delay seeking medical advice "
+                "about treatment/care because of this service. Rely on info at your "
+                "own risk."
+            ),
+            error=self._(
+                "You confirm that you shouldn't disregard/delay seeking medical advice "
+                "about treatment/care because of this service. Rely on info at your "
+                "own risk."
+            ),
+            choices=[Choice("state_terms", self._("Next"))],
         )
 
     async def state_province(self):
@@ -320,18 +318,18 @@ class Application(BaseApplication):
             return await self.go_to_state("state_city")
         return ChoiceState(
             self,
-            question="\n".join(["Select your province", "", "Reply:"]),
-            error="\n".join(["Select your province", "", "Reply:"]),
+            question=self._("Select your province\n" "\n" "Reply:"),
+            error=self._("Select your province\n" "\n" "Reply:"),
             choices=[
-                Choice("ZA-EC", "EASTERN CAPE"),
-                Choice("ZA-FS", "FREE STATE"),
-                Choice("ZA-GT", "GAUTENG"),
-                Choice("ZA-NL", "KWAZULU NATAL"),
-                Choice("ZA-LP", "LIMPOPO"),
-                Choice("ZA-MP", "MPUMALANGA"),
-                Choice("ZA-NW", "NORTH WEST"),
-                Choice("ZA-NC", "NORTHERN CAPE"),
-                Choice("ZA-WC", "WESTERN CAPE"),
+                Choice("ZA-EC", self._("EASTERN CAPE")),
+                Choice("ZA-FS", self._("FREE STATE")),
+                Choice("ZA-GT", self._("GAUTENG")),
+                Choice("ZA-NL", self._("KWAZULU NATAL")),
+                Choice("ZA-LP", self._("LIMPOPO")),
+                Choice("ZA-MP", self._("MPUMALANGA")),
+                Choice("ZA-NW", self._("NORTH WEST")),
+                Choice("ZA-NC", self._("NORTHERN CAPE")),
+                Choice("ZA-WC", self._("WESTERN CAPE")),
             ],
             next="state_city",
         )
@@ -344,7 +342,7 @@ class Application(BaseApplication):
                 return await self.go_to_state("state_tracing")
             return await self.go_to_state("state_age")
 
-        text = (
+        text = self._(
             "Please TYPE the name of your Suburb, Township, Town or Village (or "
             "nearest)"
         )
@@ -399,25 +397,21 @@ class Application(BaseApplication):
         address = self.user.answers.get("state_city")[: 160 - 79]
         return MenuState(
             self,
-            question="\n".join(
-                [
-                    "Please confirm the address below based on info you shared:",
-                    f"{address}",
-                    "",
-                    "Reply",
-                ]
-            ),
-            error="\n".join(
-                [
-                    "Please confirm the address below based on info you shared:",
-                    f"{address}",
-                    "",
-                    "Reply",
-                ]
-            ),
+            question=self._(
+                "Please confirm the address below based on info you shared:\n"
+                "{address}\n"
+                "\n"
+                "Reply"
+            ).format(address=address),
+            error=self._(
+                "Please confirm the address below based on info you shared:\n"
+                "{address}\n"
+                "\n"
+                "Reply"
+            ).format(address=address),
             choices=[
-                Choice("state_place_details_lookup", "Yes"),
-                Choice("state_city", "No"),
+                Choice("state_place_details_lookup", self._("Yes")),
+                Choice("state_city", self._("No")),
             ],
         )
 
@@ -468,8 +462,8 @@ class Application(BaseApplication):
 
         return ChoiceState(
             self,
-            question="How old are you?",
-            error="\n".join(["Please use numbers from list.", "", "How old are you?"]),
+            question=self._("How old are you?"),
+            error=self._("Please use numbers from list.\n" "\n" "How old are you?"),
             choices=[
                 Choice("<18", "<18"),
                 Choice("18-40", "18-39"),
@@ -485,7 +479,7 @@ class Application(BaseApplication):
         ):
             return await self.go_to_state("state_province")
 
-        question = "Please TYPE your age in years (eg. 35)"
+        question = self._("Please TYPE your age in years (eg. 35)")
 
         async def validate_age(content):
             try:
@@ -513,116 +507,94 @@ class Application(BaseApplication):
     async def state_fever(self):
         return ChoiceState(
             self,
-            question="\n".join(
-                [
-                    "Do you feel very hot or cold? Are you sweating or shivering? "
-                    "When you touch your forehead, does it feel hot?",
-                    "",
-                    "Reply",
-                ]
+            question=self._(
+                "Do you feel very hot or cold? Are you sweating or shivering? When you "
+                "touch your forehead, does it feel hot?\n"
+                "\n"
+                "Reply"
             ),
-            error="\n".join(
-                [
-                    "Please use numbers from list. Do you feel very hot or cold? Are "
-                    "you sweating or shivering? When you touch your forehead, does it "
-                    "feel hot?",
-                    "",
-                    "Reply",
-                ]
+            error=self._(
+                "Please use numbers from list. Do you feel very hot or cold? Are you "
+                "sweating or shivering? When you touch your forehead, does it feel "
+                "hot?\n"
+                "\n"
+                "Reply"
             ),
-            choices=[Choice("yes", "Yes"), Choice("no", "No")],
+            choices=[Choice("yes", self._("Yes")), Choice("no", self._("No"))],
             next="state_cough",
         )
 
     async def state_cough(self):
-        question = "\n".join(
-            ["Do you have a cough that recently started?", "", "Reply"]
-        )
-        error = "\n".join(
-            [
-                "Please use numbers from list.",
-                "Do you have a cough that recently started?",
-                "",
-                "Reply",
-            ]
+        question = self._("Do you have a cough that recently started?\n" "\n" "Reply")
+        error = self._(
+            "Please use numbers from list.\n"
+            "Do you have a cough that recently started?\n"
+            "\n"
+            "Reply"
         )
         if self.user.answers.get("confirmed_contact") == "yes":
-            question = "\n".join(
-                [
-                    "Do you have a cough that recently started in the last week?",
-                    "",
-                    "Reply",
-                ]
+            question = self._(
+                "Do you have a cough that recently started in the last week?\n"
+                "\n"
+                "Reply"
             )
-            error = "\n".join(
-                [
-                    "This service works best when you select numbers from the list.",
-                    "",
-                    "Do you have a cough that recently started in the last week?",
-                    "",
-                    "Reply",
-                ]
+            error = self._(
+                "This service works best when you select numbers from the list.\n"
+                "\n"
+                "Do you have a cough that recently started in the last week?\n"
+                "\n"
+                "Reply"
             )
         return ChoiceState(
             self,
             question=question,
             error=error,
-            choices=[Choice("yes", "Yes"), Choice("no", "No")],
+            choices=[Choice("yes", self._("Yes")), Choice("no", self._("No"))],
             next="state_sore_throat",
         )
 
     async def state_sore_throat(self):
         return ChoiceState(
             self,
-            question="\n".join(
-                ["Do you have a sore throat, or pain when swallowing?", "", "Reply"]
+            question=self._(
+                "Do you have a sore throat, or pain when swallowing?\n" "\n" "Reply"
             ),
-            error="\n".join(
-                [
-                    "Please use numbers from list.",
-                    "Do you have a sore throat, or pain when swallowing?",
-                    "",
-                    "Reply",
-                ]
+            error=self._(
+                "Please use numbers from list.\n"
+                "Do you have a sore throat, or pain when swallowing?\n"
+                "\n"
+                "Reply"
             ),
-            choices=[Choice("yes", "Yes"), Choice("no", "No")],
+            choices=[Choice("yes", self._("Yes")), Choice("no", self._("No"))],
             next="state_breathing",
         )
 
     async def state_breathing(self):
-        question = "\n".join(
-            [
-                "Do you have breathlessness or a difficulty breathing, that you've "
-                "noticed recently?",
-                "Reply",
-            ]
+        question = self._(
+            "Do you have breathlessness or a difficulty breathing, that you've "
+            "noticed recently?\n"
+            "Reply"
         )
-        error = "\n".join(
-            [
-                "Please use numbers from list. Do you have breathlessness or a "
-                "difficulty breathing, that you've noticed recently?",
-                "Reply",
-            ]
+        error = self._(
+            "Please use numbers from list. Do you have breathlessness or a "
+            "difficulty breathing, that you've noticed recently?\n"
+            "Reply"
         )
         next_state = "state_exposure"
         if self.user.answers.get("confirmed_contact") == "yes":
-            question = "\n".join(
-                [
-                    "Do you have shortness of breath while resting or difficulty "
-                    "breathing, that you've noticed recently?",
-                    "",
-                    "Reply",
-                ]
+            question = self._(
+                "Do you have shortness of breath while resting or difficulty "
+                "breathing, that you've noticed recently?\n"
+                "\n"
+                "Reply"
             )
-            error = "\n".join(
-                [
-                    "Please use numbers from list.",
-                    "",
-                    "Do you have shortness of breath while resting or difficulty "
-                    "breathing, that you've noticed recently?",
-                    "",
-                    "Reply",
-                ]
+            error = self._(
+                "Please use numbers from list.\n"
+                "\n"
+                "Do you have shortness of breath while resting or difficulty "
+                "breathing, that you've noticed recently?\n"
+                "\n"
+                "Reply"
             )
             self.save_answer("state_exposure", "yes")
             next_state = "state_taste_and_smell"
@@ -630,31 +602,27 @@ class Application(BaseApplication):
             self,
             question=question,
             error=error,
-            choices=[Choice("yes", "Yes"), Choice("no", "No")],
+            choices=[Choice("yes", self._("Yes")), Choice("no", self._("No"))],
             next=next_state,
         )
 
     async def state_taste_and_smell(self):
         return ChoiceState(
             self,
-            question="\n".join(
-                [
-                    "Have you noticed any recent changes in your ability to taste or "
-                    "smell things?",
-                    "",
-                    "Reply",
-                ]
+            question=self._(
+                "Have you noticed any recent changes in your ability to taste or "
+                "smell things?\n"
+                "\n"
+                "Reply"
             ),
-            error="\n".join(
-                [
-                    "This service works best when you select numbers from the list.",
-                    "Have you noticed any recent changes in your ability to taste or "
-                    "smell things?",
-                    "",
-                    "Reply",
-                ]
+            error=self._(
+                "This service works best when you select numbers from the list.\n"
+                "Have you noticed any recent changes in your ability to taste or "
+                "smell things?\n"
+                "\n"
+                "Reply"
             ),
-            choices=[Choice("yes", "Yes"), Choice("no", "No")],
+            choices=[Choice("yes", self._("Yes")), Choice("no", self._("No"))],
             next="state_preexisting_conditions",
         )
 
@@ -664,28 +632,24 @@ class Application(BaseApplication):
 
         return ChoiceState(
             self,
-            question="\n".join(
-                [
-                    "Have you been diagnosed with either Obesity, Diabetes, "
-                    "Hypertension or Cardiovascular disease?",
-                    "",
-                    "Reply",
-                ]
+            question=self._(
+                "Have you been diagnosed with either Obesity, Diabetes, "
+                "Hypertension or Cardiovascular disease?\n"
+                "\n"
+                "Reply"
             ),
-            error="\n".join(
-                [
-                    "Please use numbers from list.",
-                    "",
-                    "Have you been diagnosed with either Obesity, Diabetes, "
-                    "Hypertension or Cardiovascular disease?",
-                    "",
-                    "Reply",
-                ]
+            error=self._(
+                "Please use numbers from list.\n"
+                "\n"
+                "Have you been diagnosed with either Obesity, Diabetes, "
+                "Hypertension or Cardiovascular disease?\n"
+                "\n"
+                "Reply"
             ),
             choices=[
-                Choice("yes", "YES"),
-                Choice("no", "NO"),
-                Choice("not_sure", "NOT SURE"),
+                Choice("yes", self._("YES")),
+                Choice("no", self._("NO")),
+                Choice("not_sure", self._("NOT SURE")),
             ],
             next="state_age_years",
         )
@@ -693,73 +657,61 @@ class Application(BaseApplication):
     async def state_exposure(self):
         return ChoiceState(
             self,
-            question="\n".join(
-                [
-                    "Have you been in close contact to someone confirmed to be "
-                    "infected with COVID19?",
-                    "",
-                    "Reply",
-                ]
+            question=self._(
+                "Have you been in close contact to someone confirmed to be "
+                "infected with COVID19?\n"
+                "\n"
+                "Reply"
             ),
-            error="\n".join(
-                [
-                    "Please use numbers from list. Have u been in contact with someone"
-                    " with COVID19 or been where COVID19 patients are treated?",
-                    "",
-                    "Reply",
-                ]
+            error=self._(
+                "Please use numbers from list. Have u been in contact with someone"
+                " with COVID19 or been where COVID19 patients are treated?\n"
+                "\n"
+                "Reply"
             ),
             choices=[
-                Choice("yes", "Yes"),
-                Choice("no", "No"),
-                Choice("not_sure", "NOT SURE"),
+                Choice("yes", self._("Yes")),
+                Choice("no", self._("No")),
+                Choice("not_sure", self._("NOT SURE")),
             ],
             next="state_tracing",
         )
 
     async def state_tracing(self):
-        question = "\n".join(
-            [
-                "Please confirm that the information you shared is correct & that the "
-                "National Department of Health can contact you if necessary?",
-                "",
-                "Reply",
-            ]
+        question = self._(
+            "Please confirm that the information you shared is correct & that the "
+            "National Department of Health can contact you if necessary?\n"
+            "\n"
+            "Reply"
         )
-        error = "\n".join(
-            [
-                "Please reply with numbers",
-                "Is the information you shared correct & can the National Department "
-                "of Health contact you if necessary?",
-                "",
-                "Reply",
-            ]
+        error = self._(
+            "Please reply with numbers\n"
+            "Is the information you shared correct & can the National Department "
+            "of Health contact you if necessary?\n"
+            "\n"
+            "Reply"
         )
         choices = [
-            Choice("yes", "YES"),
-            Choice("no", "NO"),
-            Choice("restart", "RESTART"),
+            Choice("yes", self._("YES")),
+            Choice("no", self._("NO")),
+            Choice("restart", self._("RESTART")),
         ]
         if self.user.answers.get("confirmed_contact") == "yes":
-            question = "\n".join(
-                [
-                    "Finally, please confirm that the information you shared is "
-                    "ACCURATE to the best of your knowledge?",
-                    "",
-                    "Reply",
-                ]
+            question = self._(
+                "Finally, please confirm that the information you shared is "
+                "ACCURATE to the best of your knowledge?\n"
+                "\n"
+                "Reply"
             )
-            error = "\n".join(
-                [
-                    "Please use numbers from the list.",
-                    "",
-                    "Finally, please confirm that the information you shared is "
-                    "ACCURATE to the best of your knowledge?",
-                    "",
-                    "Reply",
-                ]
+            error = self._(
+                "Please use numbers from the list.\n"
+                "\n"
+                "Finally, please confirm that the information you shared is "
+                "ACCURATE to the best of your knowledge?\n"
+                "\n"
+                "Reply"
             )
-            choices = [Choice("yes", "YES"), Choice("no", "NO")]
+            choices = [Choice("yes", self._("YES")), Choice("no", self._("NO"))]
         return ChoiceState(
             self,
             question=question,
@@ -822,14 +774,14 @@ class Application(BaseApplication):
         text = ""
         if answers.get("confirmed_contact") == "yes":
             if risk == "moderate":
-                text = (
+                text = self._(
                     "We recommend you SELF-QUARANTINE for the next 10 days and do this "
                     "HealthCheck daily to monitor your symptoms. Stay/sleep alone in a "
                     "room with good air flow."
                 )
 
             if risk == "high":
-                text = (
+                text = self._(
                     "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing center "
                     "or Call 0800029999 or visit your healthcare practitioner for info"
                     " on what to do & how to test."
@@ -838,19 +790,19 @@ class Application(BaseApplication):
 
         if answers.get("state_tracing") == "yes":
             if risk == "low":
-                text = (
+                text = self._(
                     "Complete this HealthCheck again in 7 days or sooner if you feel "
                     "ill or you come into contact with someone infected with COVID-19"
                 )
             if risk == "moderate":
-                text = (
+                text = self._(
                     "We recommend you SELF-QUARANTINE for the next 10 days and do "
                     "this HealthCheck daily to monitor your symptoms. Stay/sleep "
                     "alone in a room with good air flow."
                 )
 
             if risk == "high":
-                text = (
+                text = self._(
                     "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing center "
                     "or Call 0800029999 or visit your healthcare practitioner for "
                     "info on what to do & how to test."
@@ -863,7 +815,7 @@ class Application(BaseApplication):
                 # This needs to be a separate state because it needs timeout handling
                 return await self.go_to_state("state_no_tracing_moderate_risk")
             if risk == "high":
-                text = (
+                text = self._(
                     "You will not be contacted. You may be ELIGIBLE FOR COVID-19 "
                     "TESTING. Go to a testing center or Call 0800029999 or your "
                     "healthcare practitioner for info."
@@ -871,7 +823,7 @@ class Application(BaseApplication):
         return EndState(self, text, next=self.START_STATE)
 
     async def state_no_tracing_low_risk(self):
-        question = (
+        question = self._(
             "You will not be contacted. If you think you have COVID-19 please"
             " STAY HOME, avoid contact with other people in your community and "
             "self-quarantine."
@@ -884,7 +836,7 @@ class Application(BaseApplication):
         )
 
     async def state_no_tracing_moderate_risk(self):
-        question = (
+        question = self._(
             "You won't be contacted. SELF-QUARANTINE for 10 days, do this HealthCheck "
             "daily to monitor symptoms. Stay/sleep alone in a room with good air flow."
         )
@@ -898,7 +850,9 @@ class Application(BaseApplication):
     async def state_error(self):
         return EndState(
             self,
-            "Sorry, something went wrong. We have been notified. Please try again "
-            "later",
+            self._(
+                "Sorry, something went wrong. We have been notified. Please try again "
+                "later"
+            ),
             next=self.START_STATE,
         )
