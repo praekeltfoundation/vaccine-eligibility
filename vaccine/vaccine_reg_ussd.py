@@ -68,12 +68,6 @@ def get_eventstore():
 class Application(BaseApplication):
     START_STATE = "state_age_gate"
 
-    class ID_TYPES(Enum):
-        rsa_id = "RSA ID Number"
-        passport = "Passport Number"
-        asylum_seeker = "Asylum Seeker Permit number"
-        refugee = "Refugee Permit number"
-
     def __init__(self, user):
         super().__init__(user)
 

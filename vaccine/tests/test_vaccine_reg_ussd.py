@@ -232,10 +232,10 @@ async def test_identification_number_invalid():
     u = User(
         addr="27820001001",
         state=StateData(name="state_identification_number"),
-        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
         session_id=1,
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.name
     msg = Message(
         content="9001010001089",
         to_addr="27820001002",
@@ -254,9 +254,9 @@ async def test_passport_country():
         addr="27820001001",
         state=StateData(name="state_identification_number"),
         session_id=1,
-        answers={"state_identification_type": Application.ID_TYPES.passport.name},
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.passport.name
     msg = Message(
         content="A1234567890",
         to_addr="27820001002",
@@ -409,10 +409,10 @@ async def test_said_date_and_sex_extraction():
     u = User(
         addr="27820001001",
         state=StateData(name="state_identification_number"),
-        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
         session_id=1,
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.name
     msg = Message(
         content="9001010001088",
         to_addr="27820001002",
@@ -434,10 +434,10 @@ async def test_said_date_extraction_ambiguous(get_today):
     u = User(
         addr="27820001001",
         state=StateData(name="state_identification_number"),
-        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
         session_id=1,
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.name
     msg = Message(
         content="0001010001087",
         to_addr="27820001002",
@@ -456,10 +456,10 @@ async def test_gender():
     u = User(
         addr="27820001001",
         state=StateData(name="state_identification_number"),
-        answers={"state_identification_type": Application.ID_TYPES.asylum_seeker.name},
         session_id=1,
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.asylum_seeker.name
     msg = Message(
         content="9001010001088",
         to_addr="27820001002",
@@ -496,9 +496,9 @@ async def test_dob_and_gender_skipped(get_today):
         addr="27820001001",
         state=StateData(name="state_identification_number"),
         session_id=1,
-        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.name
     msg = Message(
         content="9001010001088",
         to_addr="27820001002",
@@ -519,9 +519,9 @@ async def test_too_young(get_today):
         addr="27820001001",
         state=StateData(name="state_identification_number"),
         session_id=1,
-        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.name
     msg = Message(
         content="9001010001088",
         to_addr="27820001002",
@@ -577,12 +577,10 @@ async def test_dob_year_not_match_id():
         addr="27820001001",
         state=StateData(name="state_dob_year"),
         session_id=1,
-        answers={
-            "state_identification_type": Application.ID_TYPES.rsa_id.value,
-            "state_identification_number": "9001010001088",
-        },
+        answers={"state_identification_number": "9001010001088"},
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.value
     msg = Message(
         content="1991",
         to_addr="27820001002",
@@ -602,13 +600,9 @@ async def test_dob_year_not_match_id():
 
 @pytest.mark.asyncio
 async def test_dob_month():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_dob_year"),
-        session_id=1,
-        answers={"state_identification_type": Application.ID_TYPES.asylum_seeker.value},
-    )
+    u = User(addr="27820001001", state=StateData(name="state_dob_year"), session_id=1)
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.asylum_seeker.value
     msg = Message(
         content="1990",
         to_addr="27820001002",
@@ -733,11 +727,11 @@ async def test_state_confirm_profile():
         session_id=1,
         answers={
             "state_first_name": "reallyreallylongfirstname",
-            "state_identification_type": Application.ID_TYPES.refugee.name,
             "state_identification_number": "012345678901234567890123456789",
         },
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.refugee.name
     msg = Message(
         content="reallyreallylongsurname",
         to_addr="27820001002",
@@ -771,11 +765,11 @@ async def test_state_confirm_profile_invalid():
         answers={
             "state_first_name": "reallyreallylongfirstname12345678901234567890",
             "state_surname": "reallyreallylongsurname1245678901234567890",
-            "state_identification_type": Application.ID_TYPES.refugee.name,
             "state_identification_number": "0123456789012345678901234567891234567890",
         },
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.refugee.name
     msg = Message(
         content="invalid",
         to_addr="27820001002",
@@ -797,11 +791,11 @@ async def test_state_confirm_profile_no():
         answers={
             "state_first_name": "reallyreallylongfirstname1234567890",
             "state_surname": "reallyreallylongsurname124567890",
-            "state_identification_type": Application.ID_TYPES.refugee.name,
             "state_identification_number": "012345678901234567890123456789",
         },
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.refugee.name
     msg = Message(
         content="wrong",
         to_addr="27820001002",
@@ -823,11 +817,11 @@ async def test_province(evds_mock):
         answers={
             "state_first_name": "reallyreallylongfirstname1234567890",
             "state_surname": "reallyreallylongsurname124567890",
-            "state_identification_type": Application.ID_TYPES.refugee.name,
             "state_identification_number": "012345678901234567890123456789",
         },
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.refugee.name
     msg = Message(
         content="correct",
         to_addr="27820001002",

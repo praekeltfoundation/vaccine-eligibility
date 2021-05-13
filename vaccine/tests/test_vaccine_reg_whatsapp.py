@@ -229,10 +229,10 @@ async def test_identification_number_invalid():
     u = User(
         addr="27820001001",
         state=StateData(name="state_identification_number"),
-        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
         session_id=1,
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.name
     msg = Message(
         content="9001010001089",
         to_addr="27820001002",
@@ -250,9 +250,9 @@ async def test_passport_country():
         addr="27820001001",
         state=StateData(name="state_identification_number"),
         session_id=1,
-        answers={"state_identification_type": Application.ID_TYPES.passport.name},
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.passport.name
     msg = Message(
         content="A1234567890",
         to_addr="27820001002",
@@ -340,10 +340,10 @@ async def test_said_date_and_sex_extraction():
     u = User(
         addr="27820001001",
         state=StateData(name="state_identification_number"),
-        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
         session_id=1,
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.name
     msg = Message(
         content="9001010001088",
         to_addr="27820001002",
@@ -365,10 +365,10 @@ async def test_said_date_extraction_ambiguous(get_today):
     u = User(
         addr="27820001001",
         state=StateData(name="state_identification_number"),
-        answers={"state_identification_type": Application.ID_TYPES.rsa_id.name},
         session_id=1,
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.name
     msg = Message(
         content="0001010001087",
         to_addr="27820001002",
@@ -495,12 +495,10 @@ async def test_dob_year_not_match_id():
         addr="27820001001",
         state=StateData(name="state_dob_year"),
         session_id=1,
-        answers={
-            "state_identification_type": Application.ID_TYPES.rsa_id.value,
-            "state_identification_number": "9001010001088",
-        },
+        answers={"state_identification_number": "9001010001088"},
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.value
     msg = Message(
         content="1991",
         to_addr="27820001002",
@@ -519,13 +517,9 @@ async def test_dob_year_not_match_id():
 
 @pytest.mark.asyncio
 async def test_dob_month():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_dob_year"),
-        session_id=1,
-        answers={"state_identification_type": Application.ID_TYPES.asylum_seeker.value},
-    )
+    u = User(addr="27820001001", state=StateData(name="state_dob_year"), session_id=1)
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.asylum_seeker.value
     msg = Message(
         content="1990",
         to_addr="27820001002",
@@ -724,6 +718,7 @@ async def test_suburb(evds_mock):
     assert reply.content == "\n".join(
         [
             "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "",
             "Please REPLY with a NUMBER to confirm your location:",
             "1. Table View, Blouberg",
             "2. Other",
@@ -753,6 +748,7 @@ async def test_municipality(evds_mock):
     assert reply.content == "\n".join(
         [
             "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "",
             "Please REPLY with a NUMBER to confirm your MUNICIPALITY:",
             "1. Buffalo City",
             "2. Enoch Mgijima",
@@ -810,6 +806,7 @@ async def test_municipality_plumstead(evds_mock):
     assert reply.content == "\n".join(
         [
             "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "",
             "Please REPLY with a NUMBER to confirm your location:",
             "1. Plumstead, Cape Town",
             "2. Other",
@@ -838,6 +835,7 @@ async def test_suburb_with_municipality(evds_mock):
     assert reply.content == "\n".join(
         [
             "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+            "",
             "Please REPLY with a NUMBER to confirm your location:",
             "1. Mandela Park, Mandela Park",
             "2. Other",
@@ -941,6 +939,7 @@ async def test_self_registration(evds_mock):
             "",
             "We will use your cell phone number to send you notifications and updates "
             "via WhatsApp and/or SMS about getting vaccinated.",
+            "",
             "Can we use 082 000 1001?",
             "1. Yes",
             "2. No",
