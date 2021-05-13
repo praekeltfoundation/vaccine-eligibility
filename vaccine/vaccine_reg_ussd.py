@@ -290,8 +290,8 @@ class Application(BaseApplication):
                     "(Example: 1980)"
                 )
 
-            idtype = self.user.answers["state_identification_type"]
-            if idtype == self.ID_TYPES.rsa_id.value:
+            idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
+            if idtype == self.ID_TYPES.rsa_id:
                 idno = self.user.answers["state_identification_number"]
                 if value[-2:] != idno[:2]:
                     raise ErrorMessage(
