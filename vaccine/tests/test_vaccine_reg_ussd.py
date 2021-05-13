@@ -87,7 +87,7 @@ async def test_age_gate_error():
     """
     Should show the error message on incorrect input
     """
-    u = User(addr="27820001001", state=StateData(name="state_age_gate"))
+    u = User(addr="27820001001", state=StateData(name="state_age_gate"), session_id=1)
     app = Application(u)
     msg = Message(
         content="invalid",
@@ -169,10 +169,14 @@ async def test_under_age_notification_confirm():
 
 @pytest.mark.asyncio
 async def test_identification_type():
-    u = User(addr="27820001001", state=StateData(name="state_age_gate"), session_id=1)
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_terms_and_conditions_3"),
+        session_id=1,
+    )
     app = Application(u)
     msg = Message(
-        content="yes",
+        content="accept",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -180,7 +184,7 @@ async def test_identification_type():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_terms_and_conditions"
+    assert u.state.name == "state_identification_type"
 
 
 @pytest.mark.asyncio
