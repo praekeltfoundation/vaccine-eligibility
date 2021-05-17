@@ -574,7 +574,7 @@ async def test_dob_year_not_match_id():
         state=StateData(name="state_dob_year"),
         session_id=1,
         answers={
-            "state_identification_type": Application.ID_TYPES.rsa_id.value,
+            "state_identification_type": Application.ID_TYPES.rsa_id.name,
             "state_identification_number": "9001010001088",
         },
     )
@@ -602,7 +602,7 @@ async def test_dob_month():
         addr="27820001001",
         state=StateData(name="state_dob_year"),
         session_id=1,
-        answers={"state_identification_type": Application.ID_TYPES.asylum_seeker.value},
+        answers={"state_identification_type": Application.ID_TYPES.asylum_seeker.name},
     )
     app = Application(u)
     msg = Message(
