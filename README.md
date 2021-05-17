@@ -65,3 +65,17 @@ service.
 
 `APPLICATION_CLASS` - Python path to the application that you want to run. Defaults to
 `vaccine.vaccine_eligibility.Application`
+
+
+## Translations
+To extract all the strings for translations, run
+```bash
+pygettext.py -o locales/base.pot <input files>
+```
+This will create a template file, which you can use to create the PO files. PO files
+should be located inside `locales/<language>/LC_MESSAGES/messages.po`
+
+To compile the translations, run
+```bash
+msgfmt.py <po files>
+```

@@ -68,11 +68,16 @@ def get_eventstore():
 class Application(BaseApplication):
     START_STATE = "state_age_gate"
 
-    class ID_TYPES(Enum):
-        rsa_id = "RSA ID Number"
-        passport = "Passport Number"
-        asylum_seeker = "Asylum Seeker Permit number"
-        refugee = "Refugee Permit number"
+    def __init__(self, user):
+        super().__init__(user)
+
+        class ID_TYPES(Enum):
+            rsa_id = self._("RSA ID Number")
+            passport = self._("Passport Number")
+            asylum_seeker = self._("Asylum Seeker Permit number")
+            refugee = self._("Refugee Permit number")
+
+        self.ID_TYPES = ID_TYPES
 
     async def state_age_gate(self):
         self.user.answers = {}
@@ -82,33 +87,31 @@ class Application(BaseApplication):
 
         return MenuState(
             self,
-            question="\n".join(
-                [
-                    "VACCINE REGISTRATION",
-                    "The SA Department of Health thanks you for helping to defeat "
-                    "COVID-19!",
-                    "",
-                    f"Are you {config.ELIGIBILITY_AGE_GATE_MIN} years or older?",
-                ]
-            ),
+            question=self._(
+                "VACCINE REGISTRATION\n"
+                "The SA Department of Health thanks you for helping to defeat "
+                "COVID-19!\n"
+                "\n"
+                "Are you {minimum_age} years or older?"
+            ).format(minimum_age=config.ELIGIBILITY_AGE_GATE_MIN),
             choices=[
                 Choice("state_terms_and_conditions", "Yes"),
                 Choice("state_under_age_notification", "No"),
             ],
-            error="Self-registration is currently only available to those "
-            f"{config.ELIGIBILITY_AGE_GATE_MIN} years of age or older. Please tell us "
-            f"if you are {config.ELIGIBILITY_AGE_GATE_MIN} or older?",
+            error=self._(
+                "Self-registration is currently only available to those {minimum_age} "
+                "years of age or older. Please tell us if you are {minimum_age} or "
+                "older?"
+            ).format(minimum_age=config.ELIGIBILITY_AGE_GATE_MIN),
         )
 
     async def state_throttle(self):
         return EndState(
             self,
-            text="\n".join(
-                [
-                    "We are currently experiencing high volumes of registrations.",
-                    "",
-                    "Your registration is important! Please try again in 15 minutes",
-                ]
+            text=self._(
+                "We are currently experiencing high volumes of registrations.\n"
+                "\n"
+                "Your registration is important! Please try again in 15 minutes"
             ),
             next=self.START_STATE,
         )
@@ -116,11 +119,14 @@ class Application(BaseApplication):
     async def state_under_age_notification(self):
         return ChoiceState(
             self,
-            question="Self-registration is only available to people "
-            f"{config.ELIGIBILITY_AGE_GATE_MIN} years or older. Can we SMS you on this "
-            "number when this changes?",
-            choices=[Choice("yes", "Yes"), Choice("no", "No")],
-            error="Can we notify you via SMS to let you know when you can register?",
+            question=self._(
+                "Self-registration is only available to people {minimum_age} years or "
+                "older. Can we SMS you on this number when this changes?"
+            ).format(minimum_age=config.ELIGIBILITY_AGE_GATE_MIN),
+            choices=[Choice("yes", self._("Yes")), Choice("no", self._("No"))],
+            error=self._(
+                "Can we notify you via SMS to let you know when you can register?"
+            ),
             next="state_confirm_notification",
         )
 
@@ -130,36 +136,38 @@ class Application(BaseApplication):
     async def state_terms_and_conditions(self):
         return MenuState(
             self,
-            question="\n".join(
-                [
-                    "PRIVACY POLICY",
-                    "EVDS is POPIA compliant. Your data is kept private + confidential"
-                    " & only used with your consent for the purpose of "
-                    "getting vaccinated.\n",
-                ]
+            question=self._(
+                "PRIVACY POLICY\n"
+                "EVDS is POPIA compliant. Your data is kept private + confidential"
+                " & only used with your consent for the purpose of "
+                "getting vaccinated.\n"
             ),
-            choices=[Choice("state_terms_and_conditions_2", "Next")],
-            error="TYPE 1 to continue",
+            choices=[Choice("state_terms_and_conditions_2", self._("Next"))],
+            error=self._("TYPE 1 to continue"),
         )
 
     async def state_terms_and_conditions_2(self):
         return MenuState(
             self,
-            question="EVDS uses your data to check eligibility & inform you  of your "
-            "vaccination date & venue. Registration is voluntary & does not guarantee "
-            "vaccination.\n",
-            choices=[Choice("state_terms_and_conditions_3", "Next")],
-            error="TYPE 1 to continue",
+            question=self._(
+                "EVDS uses your data to check eligibility & inform you  of your "
+                "vaccination date & venue. Registration is voluntary & does not "
+                "guarantee vaccination.\n"
+            ),
+            choices=[Choice("state_terms_and_conditions_3", self._("Next"))],
+            error=self._("TYPE 1 to continue"),
         )
 
     async def state_terms_and_conditions_3(self):
         return MenuState(
             self,
-            question="All security measures are taken to make sure your information is"
-            " safe. No personal data will be transferred from EVDS authorisation "
-            "through POPIA.\n",
-            choices=[Choice("state_identification_type", "ACCEPT")],
-            error="TYPE 1 to ACCEPT our Privacy Policy",
+            question=self._(
+                "All security measures are taken to make sure your information is "
+                "safe. No personal data will be transferred from EVDS authorisation "
+                "through POPIA.\n"
+            ),
+            choices=[Choice("state_identification_type", self._("ACCEPT"))],
+            error=self._("TYPE 1 to ACCEPT our Privacy Policy"),
         )
 
     async def state_identification_type(self):
@@ -167,9 +175,9 @@ class Application(BaseApplication):
             return await self.go_to_state("state_identification_number")
         return ChoiceState(
             self,
-            question="How would you like to register?",
+            question=self._("How would you like to register?"),
             choices=[Choice(i.name, i.value) for i in self.ID_TYPES],
-            error="Please choose 1 of the following ways to register:",
+            error=self._("Please choose 1 of the following ways to register:"),
             next="state_identification_number",
         )
 
@@ -186,7 +194,9 @@ class Application(BaseApplication):
             return await self.go_to_state(next_state)
 
         async def validate_identification_number(value):
-            error_msg = f"Invalid {idtype_label}. Please try again"
+            error_msg = self._("Invalid {id_type}. Please try again").format(
+                id_type=idtype_label
+            )
             if idtype == self.ID_TYPES.rsa_id:
                 try:
                     id_number = SAIDNumber(value)
@@ -203,7 +213,7 @@ class Application(BaseApplication):
 
         return FreeText(
             self,
-            question=f"Please enter your {idtype_label}",
+            question=self._("Please enter your {id_type}").format(id_type=idtype_label),
             next=next_state,
             check=validate_identification_number,
         )
@@ -216,17 +226,17 @@ class Application(BaseApplication):
 
         return ChoiceState(
             self,
-            question="Which country issued your passport?",
-            error="Which country issued your passport?",
+            question=self._("Which country issued your passport?"),
+            error=self._("Which country issued your passport?"),
             choices=[
-                Choice("ZA", "South Africa"),
-                Choice("ZW", "Zimbabwe"),
-                Choice("MZ", "Mozambique"),
-                Choice("MW", "Malawi"),
-                Choice("NG", "Nigeria"),
-                Choice("CD", "DRC"),
-                Choice("SO", "Somalia"),
-                Choice("other", "Other"),
+                Choice("ZA", self._("South Africa")),
+                Choice("ZW", self._("Zimbabwe")),
+                Choice("MZ", self._("Mozambique")),
+                Choice("MW", self._("Malawi")),
+                Choice("NG", self._("Nigeria")),
+                Choice("CD", self._("DRC")),
+                Choice("SO", self._("Somalia")),
+                Choice("other", self._("Other")),
             ],
             next=next_state,
         )
@@ -234,7 +244,7 @@ class Application(BaseApplication):
     async def state_passport_country_search(self):
         return FreeText(
             self,
-            question="Please TYPE in your passport's COUNTRY of origin.",
+            question=self._("Please TYPE in your passport's COUNTRY of origin."),
             next="state_passport_country_list",
         )
 
@@ -249,12 +259,12 @@ class Application(BaseApplication):
             Choice(country[0], country[1][:30])
             for country in countries.search_for_country(search)
         ]
-        choices.append(Choice("other", "Other"))
+        choices.append(Choice("other", self._("Other")))
         return ChoiceState(
             self,
-            question="Please choose the best match for your COUNTRY of origin:",
+            question=self._("Please choose the best match for your COUNTRY of origin:"),
             choices=choices,
-            error="Do any of these match your COUNTRY:",
+            error=self._("Do any of these match your COUNTRY:"),
             next=next_state,
         )
 
@@ -264,13 +274,13 @@ class Application(BaseApplication):
 
         return ChoiceState(
             self,
-            question="What is your gender?",
+            question=self._("What is your gender?"),
             choices=[
-                Choice("Male", "Male"),
-                Choice("Female", "Female"),
-                Choice("Other", "Other"),
+                Choice("Male", self._("Male")),
+                Choice("Female", self._("Female")),
+                Choice("Other", self._("Other")),
             ],
-            error="Please select your gender using one of the numbers below",
+            error=self._("Please select your gender using one of the numbers below"),
             next="state_dob_year",
         )
 
@@ -286,8 +296,10 @@ class Application(BaseApplication):
                 assert int(value) <= date.today().year
             except AssertionError:
                 raise ErrorMessage(
-                    "REQUIRED: Please TYPE the 4 digits of the YEAR you were born "
-                    "(Example: 1980)"
+                    self._(
+                        "REQUIRED: Please TYPE the 4 digits of the YEAR you were born "
+                        "(Example: 1980)"
+                    )
                 )
 
             idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
@@ -295,14 +307,18 @@ class Application(BaseApplication):
                 idno = self.user.answers["state_identification_number"]
                 if value[-2:] != idno[:2]:
                     raise ErrorMessage(
-                        "The YEAR you have given does not match the YEAR of your ID "
-                        "number. Please try again"
+                        self._(
+                            "The YEAR you have given does not match the YEAR of your "
+                            "ID number. Please try again"
+                        )
                     )
 
         return FreeText(
             self,
-            question="Date of birth: In which YEAR were you born? (Please TYPE just "
-            "the YEAR)",
+            question=self._(
+                "Date of birth: In which YEAR were you born? (Please TYPE just the "
+                "YEAR)"
+            ),
             next="state_dob_month",
             check=validate_dob_year,
         )
@@ -313,23 +329,25 @@ class Application(BaseApplication):
 
         return ChoiceState(
             self,
-            question="Date of birth: In which MONTH were you born?",
+            question=self._("Date of birth: In which MONTH were you born?"),
             choices=[
-                Choice("1", "Jan"),
-                Choice("2", "Feb"),
-                Choice("3", "Mar"),
-                Choice("4", "Apr"),
-                Choice("5", "May"),
-                Choice("6", "June"),
-                Choice("7", "July"),
-                Choice("8", "Aug"),
-                Choice("9", "Sep"),
-                Choice("10", "Oct"),
-                Choice("11", "Nov"),
-                Choice("12", "Dec"),
+                Choice("1", self._("Jan")),
+                Choice("2", self._("Feb")),
+                Choice("3", self._("Mar")),
+                Choice("4", self._("Apr")),
+                Choice("5", self._("May")),
+                Choice("6", self._("June")),
+                Choice("7", self._("July")),
+                Choice("8", self._("Aug")),
+                Choice("9", self._("Sep")),
+                Choice("10", self._("Oct")),
+                Choice("11", self._("Nov")),
+                Choice("12", self._("Dec")),
             ],
             next="state_dob_day",
-            error="REQUIRED: Choose your birthday MONTH using the numbers below:",
+            error=self._(
+                "REQUIRED: Choose your birthday MONTH using the numbers below:"
+            ),
         )
 
     async def state_dob_day(self):
@@ -345,19 +363,19 @@ class Application(BaseApplication):
                 date(dob_year, dob_month, int(value))
             except (AssertionError, ValueError, OverflowError):
                 raise ErrorMessage(
-                    "\n".join(
-                        [
-                            "ERROR: Please reply with just the DAY of your birthday.",
-                            "",
-                            "Example: If you were born on 31 May, type _31_",
-                        ]
+                    self._(
+                        "ERROR: Please reply with just the DAY of your birthday.\n"
+                        "\n"
+                        "Example: If you were born on 31 May, type _31_"
                     )
                 )
 
         return FreeText(
             self,
-            question="Date of birth: On which DAY of the month were you born? (Please "
-            "type just the DAY)",
+            question=self._(
+                "Date of birth: On which DAY of the month were you born? (Please type "
+                "just the DAY)"
+            ),
             next="state_first_name",
             check=validate_dob_day,
         )
@@ -372,11 +390,15 @@ class Application(BaseApplication):
 
         return FreeText(
             self,
-            question="Please TYPE your FIRST NAME as it appears in your identification "
-            "document",
+            question=self._(
+                "Please TYPE your FIRST NAME as it appears in your identification "
+                "document"
+            ),
             check=nonempty_validator(
-                "ERROR: Reply with your FIRST NAME as it appears in your "
-                "identification document"
+                self._(
+                    "ERROR: Reply with your FIRST NAME as it appears in your "
+                    "identification document"
+                )
             ),
             next="state_surname",
         )
@@ -384,11 +406,15 @@ class Application(BaseApplication):
     async def state_surname(self):
         return FreeText(
             self,
-            question="Please TYPE your SURNAME as it appears in your identification "
-            "document.",
+            question=self._(
+                "Please TYPE your SURNAME as it appears in your identification "
+                "document."
+            ),
             check=nonempty_validator(
-                "ERROR: Reply with your SURNAME as it appears in your identification "
-                "document"
+                self._(
+                    "ERROR: Reply with your SURNAME as it appears in your "
+                    "identification document"
+                )
             ),
             next="state_confirm_profile",
         )
@@ -399,36 +425,37 @@ class Application(BaseApplication):
         id_number = self.user.answers["state_identification_number"][:25]
         return MenuState(
             self,
-            question="\n".join(
-                ["Confirm the following:", "", f"{first_name} {surname}", id_number, ""]
-            ),
+            question=self._(
+                "Confirm the following:\n"
+                "\n"
+                "{first_name} {surname}\n"
+                "{id_number}\n"
+            ).format(first_name=first_name, surname=surname, id_number=id_number),
             choices=[
-                Choice("state_province_id", "Correct"),
-                Choice("state_identification_type", "Wrong"),
+                Choice("state_province_id", self._("Correct")),
+                Choice("state_identification_type", self._("Wrong")),
             ],
-            error="\n".join(
-                [
-                    "Is the information you shared correct?",
-                    "",
-                    f"{first_name} {surname}",
-                    id_number,
-                ]
-            ),
+            error=self._(
+                "Is the information you shared correct?\n"
+                "\n"
+                "{first_name} {surname}\n"
+                "{id_number}"
+            ).format(first_name=first_name, surname=surname, id_number=id_number),
         )
 
     async def state_province_id(self):
         return ChoiceState(
             self,
-            question="Select Your Province",
+            question=self._("Select Your Province"),
             choices=[Choice(*province) for province in await suburbs.provinces()],
-            error="Reply with a NUMBER:",
+            error=self._("Reply with a NUMBER:"),
             next="state_suburb_search",
         )
 
     async def state_suburb_search(self):
         return FreeText(
             self,
-            question="Please TYPE the name of the SUBURB where you live.",
+            question=self._("Please TYPE the name of the SUBURB where you live."),
             next="state_municipality",
         )
 
@@ -444,12 +471,12 @@ class Application(BaseApplication):
                 return "state_suburb_search"
             return "state_suburb"
 
-        question = "Please select your municipality"
+        question = self._("Please select your municipality")
         choices = [Choice(k, v[:30]) for k, v in results]
         choices = enforce_character_limit_in_choices(
-            choices, 160 - len(question) - len("X. Other\n\n")
+            choices, 160 - len(question) - len(f"X. {self._('Other')}\n\n")
         )
-        choices.append(Choice("other", "Other"))
+        choices.append(Choice("other", self._("Other")))
         return ChoiceState(
             self, question=question, error=question, choices=choices, next=next_state
         )
@@ -465,16 +492,16 @@ class Application(BaseApplication):
         municipality = self.user.answers.get("state_municipality")
         _, results = await suburbs.search(province, search, municipality)
         choices = [Choice(suburb[0], suburb[1][:30]) for suburb in results]
-        question = "Please choose the best match for your location:"
+        question = self._("Please choose the best match for your location:")
         choices = enforce_character_limit_in_choices(
-            choices, 160 - len(question) - len("X. Other\n\n")
+            choices, 160 - len(question) - len(f"X. {self._('Other')}\n\n")
         )
-        choices.append(Choice("other", "Other"))
+        choices.append(Choice("other", self._("Other")))
         return ChoiceState(
             self,
             question=question,
             choices=choices,
-            error="Do any of these match your location:",
+            error=self._("Do any of these match your location:"),
             next=next_state,
         )
 
@@ -482,14 +509,18 @@ class Application(BaseApplication):
         number = display_phonenumber(self.inbound.from_addr)
         return MenuState(
             self,
-            question=f"Can we use this number: {number} to send you SMS appointment "
-            "information?",
+            question=self._(
+                "Can we use this number: {number} to send you SMS appointment "
+                "information?"
+            ).format(number=number),
             choices=[
-                Choice("state_vaccination_time", "Yes"),
-                Choice("state_phone_number", "No"),
+                Choice("state_vaccination_time", self._("Yes")),
+                Choice("state_phone_number", self._("No")),
             ],
-            error="Please reply with a number 1 or 2 to confirm if we can use this "
-            f"number: {number} to send you SMS appointment information?",
+            error=self._(
+                "Please reply with a number 1 or 2 to confirm if we can use this "
+                "number: {number} to send you SMS appointment information?"
+            ).format(number=number),
         )
 
     async def state_phone_number(self):
@@ -498,13 +529,17 @@ class Application(BaseApplication):
                 normalise_phonenumber(content)
             except ValueError:
                 raise ErrorMessage(
-                    "ERROR: Please enter a valid mobile number (do not use spaces)"
+                    self._(
+                        "ERROR: Please enter a valid mobile number (do not use spaces)"
+                    )
                 )
 
         return FreeText(
             self,
-            question="Please TYPE a CELL NUMBER we can send an SMS to with your "
-            "appointment information",
+            question=self._(
+                "Please TYPE a CELL NUMBER we can send an SMS to with your appointment "
+                "information"
+            ),
             next="state_confirm_phone_number",
             check=phone_number_validation,
         )
@@ -513,34 +548,42 @@ class Application(BaseApplication):
         number = self.user.answers["state_phone_number"]
         return MenuState(
             self,
-            question=f"Please confirm that your number is {number}.",
+            question=self._("Please confirm that your number is {number}.").format(
+                number=number
+            ),
             choices=[
-                Choice("state_vaccination_time", "Correct"),
-                Choice("state_phone_number", "Wrong"),
+                Choice("state_vaccination_time", self._("Correct")),
+                Choice("state_phone_number", self._("Wrong")),
             ],
-            error=f"ERROR: Please try again. Is the number {number} correct?",
+            error=self._(
+                "ERROR: Please try again. Is the number {number} correct?"
+            ).format(number=number),
         )
 
     async def state_vaccination_time(self):
         return ChoiceState(
             self,
-            question="In which time slot would you prefer to get your vaccination?\n",
+            question=self._(
+                "In which time slot would you prefer to get your vaccination?\n"
+            ),
             choices=[
-                Choice("weekday_morning", "Weekday Morning"),
-                Choice("weekday_afternoon", "Weekday Afternoon"),
-                Choice("weekend_morning", "Weekend Morning"),
+                Choice("weekday_morning", self._("Weekday Morning")),
+                Choice("weekday_afternoon", self._("Weekday Afternoon")),
+                Choice("weekend_morning", self._("Weekend Morning")),
             ],
-            error="When would you prefer your vaccine appointment based on the options "
-            "below?",
+            error=self._(
+                "When would you prefer your vaccine appointment based on the options "
+                "below?"
+            ),
             next="state_medical_aid",
         )
 
     async def state_medical_aid(self):
         return ChoiceState(
             self,
-            question="Do you belong to a Medical Aid?",
-            choices=[Choice("yes", "Yes"), Choice("no", "No")],
-            error="ERROR: Please try again. Do you belong to a Medical Aid?",
+            question=self._("Do you belong to a Medical Aid?"),
+            choices=[Choice("yes", self._("Yes")), Choice("no", self._("No"))],
+            error=self._("ERROR: Please try again. Do you belong to a Medical Aid?"),
             next="state_submit_to_evds",
         )
 
@@ -687,13 +730,17 @@ class Application(BaseApplication):
     async def state_success(self):
         return EndState(
             self,
-            text=":) You have SUCCESSFULLY registered to get vaccinated. Additional "
-            "information and appointment details will be sent via SMS.",
+            text=self._(
+                ":) You have SUCCESSFULLY registered to get vaccinated. Additional "
+                "information and appointment details will be sent via SMS."
+            ),
         )
 
     async def state_err(self):
         return EndState(
             self,
-            text="Something went wrong with your registration session. Your "
-            "registration was not able to be processed. Please try again later",
+            text=self._(
+                "Something went wrong with your registration session. Your "
+                "registration was not able to be processed. Please try again later"
+            ),
         )

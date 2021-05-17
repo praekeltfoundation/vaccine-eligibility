@@ -17,9 +17,7 @@ class Application(VacRegApp, HealthCheckApp):
             try:
                 id_number = SAIDNumber(ussd_parts[3][:13])
 
-                self.save_answer(
-                    "state_identification_type", VacRegApp.ID_TYPES.rsa_id.name
-                )
+                self.save_answer("state_identification_type", self.ID_TYPES.rsa_id.name)
                 self.save_answer("state_identification_number", id_number.id_number)
 
                 if (
@@ -40,12 +38,16 @@ class Application(VacRegApp, HealthCheckApp):
 
         return MenuState(
             self,
-            question="Welcome to the NATIONAL DEPARTMENT OF HEALTH's COVID-19 Response "
-            "service",
-            error="ERROR: Please try again",
+            question=self._(
+                "Welcome to the NATIONAL DEPARTMENT OF HEALTH's COVID-19 Response "
+                "service"
+            ),
+            error=self._("ERROR: Please try again"),
             choices=[
-                Choice(VacRegApp.START_STATE, "Vaccine Registration"),
-                Choice(HealthCheckApp.START_STATE, "HealthCheck Symptom checker"),
+                Choice(VacRegApp.START_STATE, self._("Vaccine Registration")),
+                Choice(
+                    HealthCheckApp.START_STATE, self._("HealthCheck Symptom checker")
+                ),
             ],
         )
 
@@ -65,37 +67,41 @@ class Application(VacRegApp, HealthCheckApp):
     async def state_timed_out_vacreg(self):
         return MenuState(
             self,
-            question="Welcome back to the NATIONAL DEPARTMENT OF HEALTH's COVID-19 "
-            "Vaccine Registration service",
-            error="Welcome back to the NATIONAL DEPARTMENT OF HEALTH's COVID-19 "
-            "Vaccine Registration service",
+            question=self._(
+                "Welcome back to the NATIONAL DEPARTMENT OF HEALTH's COVID-19 Vaccine "
+                "Registration service"
+            ),
+            error=self._(
+                "Welcome back to the NATIONAL DEPARTMENT OF HEALTH's COVID-19 Vaccine "
+                "Registration service"
+            ),
             choices=[
-                Choice(self.user.answers["resume_state"], "Continue where I left off"),
-                Choice(VacRegApp.START_STATE, "Start over"),
+                Choice(
+                    self.user.answers["resume_state"],
+                    self._("Continue where I left off"),
+                ),
+                Choice(VacRegApp.START_STATE, self._("Start over")),
             ],
         )
 
     async def state_timed_out_healthcheck(self):
         return MenuState(
             self,
-            question="\n".join(
-                [
-                    "Welcome back to The National Department of Health's COVID-19 "
-                    "Service",
-                    "",
-                    "Reply",
-                ]
+            question=self._(
+                "Welcome back to The National Department of Health's COVID-19 Service\n"
+                "\n"
+                "Reply"
             ),
-            error="\n".join(
-                [
-                    "Welcome back to The National Department of Health's COVID-19 "
-                    "Service",
-                    "",
-                    "Reply",
-                ]
+            error=self._(
+                "Welcome back to The National Department of Health's COVID-19 Service\n"
+                "\n"
+                "Reply"
             ),
             choices=[
-                Choice(self.user.answers["resume_state"], "Continue where I left off"),
-                Choice(HealthCheckApp.START_STATE, "Start over"),
+                Choice(
+                    self.user.answers["resume_state"],
+                    self._("Continue where I left off"),
+                ),
+                Choice(HealthCheckApp.START_STATE, self._("Start over")),
             ],
         )
