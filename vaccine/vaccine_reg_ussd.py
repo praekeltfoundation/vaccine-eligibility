@@ -163,8 +163,8 @@ class Application(BaseApplication):
             self,
             question=self._(
                 "All security measures are taken to make sure your information is "
-                "safe. No personal data will be transferred from EVDS authorisation "
-                "through POPIA.\n"
+                "safe. No personal data will be transferred from EVDS without POPIA "
+                "compliance\n"
             ),
             choices=[Choice("state_identification_type", self._("ACCEPT"))],
             error=self._("TYPE 1 to ACCEPT our Privacy Policy"),
