@@ -8,7 +8,13 @@ from sanic import Sanic, response
 from vaccine.data.medscheme import config as m_config
 from vaccine.data.suburbs import config as s_config
 from vaccine.models import Message, StateData, User
+from vaccine.testing import AppTester
 from vaccine.vaccine_reg_whatsapp import Application, config
+
+
+@pytest.fixture
+def tester():
+    return AppTester(Application)
 
 
 @pytest.fixture
@@ -72,226 +78,122 @@ async def eventstore_mock(sanic_client):
 
 
 @pytest.mark.asyncio
-async def test_age_gate():
+async def test_age_gate(tester: AppTester):
     """
     Should ask the user if they're over 60
     """
-    u = User(addr="27820001001", state=StateData())
-    app = Application(u)
-    msg = Message(
-        content=None,
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-        session_event=Message.SESSION_EVENT.NEW,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_age_gate"
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+    tester.assert_state("state_age_gate")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_age_gate_error():
+async def test_age_gate_error(tester: AppTester):
     """
     Should show the error message on incorrect input
     """
-    u = User(addr="27820001001", state=StateData(name="state_age_gate"))
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_age_gate"
+    tester.setup_state("state_age_gate")
+    await tester.user_input("invalid")
+    tester.assert_state("state_age_gate")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_under_age_notification():
+async def test_under_age_notification(tester: AppTester):
     """
     Should ask the user if they want a notification when it opens up
     """
-    u = User(addr="27820001001", state=StateData(name="state_age_gate"), session_id=1)
-    app = Application(u)
-    msg = Message(
-        content="no",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_under_age_notification"
+    tester.setup_state("state_age_gate")
+    await tester.user_input("no")
+    tester.assert_state("state_under_age_notification")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_under_age_notification_error():
+async def test_under_age_notification_error(tester: AppTester):
     """
     Should show the error message on incorrect input
     """
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_under_age_notification"),
-        session_id=1,
-    )
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_under_age_notification"
+    tester.setup_state("state_under_age_notification")
+    await tester.user_input("invalid")
+    tester.assert_state("state_under_age_notification")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_under_age_notification_confirm():
+async def test_under_age_notification_confirm(tester: AppTester):
     """
     Should confirm the selection and end the session
     """
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_under_age_notification"),
-        session_id=1,
+    tester.setup_state("state_under_age_notification")
+    await tester.user_input("yes")
+    tester.assert_message(
+        "Thank you for confirming", session=Message.SESSION_EVENT.CLOSE
     )
-    app = Application(u)
-    msg = Message(
-        content="yes",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "Thank you for confirming"
-    assert reply.session_event == Message.SESSION_EVENT.CLOSE
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_identification_type():
-    u = User(addr="27820001001", state=StateData(name="state_age_gate"), session_id=1)
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [pdf, reply] = await app.process_message(msg)
-    assert u.state.name == "state_terms_and_conditions"
+async def test_identification_type(tester: AppTester):
+    tester.setup_state("state_age_gate")
+    await tester.user_input("1")
+    tester.assert_state("state_terms_and_conditions")
+    tester.assert_num_messages(2)
 
 
 @pytest.mark.asyncio
-async def test_identification_type_invalid():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_identification_type"),
-        session_id=1,
-    )
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_identification_type"
+async def test_identification_type_invalid(tester: AppTester):
+    tester.setup_state("state_identification_type")
+    await tester.user_input("invalid")
+    tester.assert_state("state_identification_type")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_identification_number():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_identification_type"),
-        session_id=1,
-    )
-    app = Application(u)
-    msg = Message(
-        content="rsa id number",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_identification_number"
+async def test_identification_number(tester: AppTester):
+    tester.setup_state("state_identification_type")
+    await tester.user_input("rsa id number")
+    tester.assert_state("state_identification_number")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_identification_number_invalid():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_identification_number"),
-        session_id=1,
-    )
-    app = Application(u)
-    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.name
-    msg = Message(
-        content="9001010001089",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_identification_number"
+async def test_identification_number_invalid(tester: AppTester):
+    tester.setup_state("state_identification_number")
+    tester.setup_answer("state_identification_type", "rsa_id")
+    await tester.user_input("9001010001089")
+    tester.assert_state("state_identification_number")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_passport_country():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_identification_number"),
-        session_id=1,
-    )
-    app = Application(u)
-    u.answers["state_identification_type"] = app.ID_TYPES.passport.name
-    msg = Message(
-        content="A1234567890",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_passport_country"
+async def test_passport_country(tester: AppTester):
+    tester.setup_state("state_identification_number")
+    tester.setup_answer("state_identification_type", "passport")
+    await tester.user_input("A1234567890")
+    tester.assert_state("state_passport_country")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_passport_country_search():
-    u = User(
-        addr="27820001001", state=StateData(name="state_passport_country"), session_id=1
-    )
-    app = Application(u)
-    msg = Message(
-        content="cote d'ivory",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_passport_country_list"
-    assert u.answers["state_passport_country"] == "cote d'ivory"
-
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Please confirm your passport's COUNTRY of origin. REPLY with a "
-            "NUMBER from the list below:",
-            "1. Republic of Côte d'Ivoire",
-            "2. Plurinational State of Bolivia",
-            "3. Swiss Confederation",
-            "4. Other",
-        ]
+async def test_passport_country_search(tester: AppTester):
+    tester.setup_state("state_passport_country")
+    await tester.user_input("cote d'ivory")
+    tester.assert_state("state_passport_country_list")
+    tester.assert_answer("state_passport_country", "cote d'ivory")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Please confirm your passport's COUNTRY of origin. REPLY with a "
+                "NUMBER from the list below:",
+                "1. Republic of Côte d'Ivoire",
+                "2. Plurinational State of Bolivia",
+                "3. Swiss Confederation",
+                "4. Other",
+            ]
+        )
     )
 
 
