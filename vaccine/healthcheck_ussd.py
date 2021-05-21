@@ -155,6 +155,9 @@ class Application(BaseApplication):
         self.save_answer(
             "state_preexisting_conditions", data["data"].get("preexisting_condition")
         )
+        self.save_answer(
+            "state_privacy_policy_accepted", data.get("privacy_policy_accepted", False)
+        )
         return await self.go_to_state("state_save_healthcheck_start")
 
     async def state_save_healthcheck_start(self):
@@ -244,13 +247,8 @@ class Application(BaseApplication):
         )
 
     async def state_terms(self):
-        if self.user.answers.get("confirmed_contact") == "yes":
-            next_state = "state_fever"
-        else:
-            next_state = "state_province"
         if self.user.answers.get("returning_user") == "yes":
-            return await self.go_to_state(next_state)
-
+            return await self.go_to_state("state_privacy_policy")
         return MenuState(
             self,
             question="\n".join(
@@ -270,10 +268,37 @@ class Application(BaseApplication):
                 ]
             ),
             choices=[
-                Choice(next_state, "YES"),
+                Choice("state_privacy_policy", "YES"),
                 Choice("state_end", "NO"),
                 Choice("state_more_info_pg1", "MORE INFO"),
             ],
+        )
+
+    async def state_privacy_policy(self):
+        if self.user.answers.get("confirmed_contact") == "yes":
+            next_state = "state_fever"
+        else:
+            next_state = "state_province"
+        if self.user.answers.get("state_privacy_policy_accepted"):
+            return await self.go_to_state(next_state)
+
+        return MenuState(
+            self,
+            question="\n".join(
+                [
+                    "Your personal information is protected under POPIA and in "
+                    "accordance with the provisions of the HealthCheck Privacy "
+                    "Notice sent to you by SMS."
+                ]
+            ),
+            error="\n".join(
+                [
+                    "Your personal information is protected under POPIA and in "
+                    "accordance with the provisions of the HealthCheck Privacy "
+                    "Notice sent to you by SMS."
+                ]
+            ),
+            choices=[Choice(next_state, "Accept")],
         )
 
     async def state_end(self):
