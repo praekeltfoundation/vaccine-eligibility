@@ -19,7 +19,6 @@ sentry-sdk = "^1.1.0"
 phonenumberslite = "^8.12.21"
 fuzzywuzzy =  {extras = ["speedup"], version = "^0.18.0"}
 pycountry = "^20.7.3"
-rapidpro-python = "^2.8.2"
 aiohttp-client-cache = "0.3.0"
 
 [tool.poetry.dev-dependencies]
