@@ -33,7 +33,9 @@ class Worker:
             "vumi", type=ExchangeType.DIRECT, durable=True, auto_delete=False
         )
 
-        self.redis = await aioredis.create_redis_pool(config.REDIS_URL)
+        self.redis = aioredis.from_url(
+            config.REDIS_URL, encoding="utf-8", decode_responses=True
+        )
 
         self.inbound_queue = await self.setup_consume(
             f"{config.TRANSPORT_NAME}.inbound", self.process_message
@@ -62,8 +64,7 @@ class Worker:
 
     async def teardown(self):
         await self.connection.close()
-        self.redis.close()
-        await self.redis.wait_closed()
+        await self.redis.close()
         if self.answer_worker:
             await self.answer_worker.teardown()
 
@@ -76,16 +77,21 @@ class Worker:
             return
 
         async with amqp_msg.process(requeue=True):
-            logger.debug(f"Processing inbound message {msg}")
-            user_data = await self.redis.get(f"user.{msg.from_addr}", encoding="utf-8")
-            user = User.get_or_create(msg.from_addr, user_data)
-            app = self.ApplicationClass(user)
-            for outbound in await app.process_message(msg):
-                await self.publish_message(outbound)
-            if self.answer_worker:
-                for answer in app.answer_events:
-                    await self.publish_answer(answer)
-            await self.redis.setex(f"user.{msg.from_addr}", config.TTL, user.to_json())
+            async with self.redis.lock(
+                f"userlock.{msg.from_addr}", timeout=config.USER_LOCK_TIMEOUT
+            ):
+                logger.debug(f"Processing inbound message {msg}")
+                user_data = await self.redis.get(f"user.{msg.from_addr}")
+                user = User.get_or_create(msg.from_addr, user_data)
+                app = self.ApplicationClass(user)
+                for outbound in await app.process_message(msg):
+                    await self.publish_message(outbound)
+                if self.answer_worker:
+                    for answer in app.answer_events:
+                        await self.publish_answer(answer)
+                await self.redis.setex(
+                    f"user.{msg.from_addr}", config.TTL, user.to_json()
+                )
 
     async def publish_message(self, msg: Message):
         await self.exchange.publish(

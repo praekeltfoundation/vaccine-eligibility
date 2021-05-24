@@ -77,6 +77,7 @@ async def google_api_mock(sanic_client):
     app.requests = []
     app.api_errormax = 0
     app.api_errors = 0
+    app.status = "OK"
 
     @app.route("/maps/api/place/autocomplete/json", methods=["GET"])
     def valid_city(request):
@@ -85,8 +86,8 @@ async def google_api_mock(sanic_client):
             if app.api_errors < app.api_errormax:
                 app.api_errors += 1
                 return response.json({}, status=500)
-        return response.json(
-            {
+        if app.status == "OK":
+            data = {
                 "status": "OK",
                 "predictions": [
                     {
@@ -94,9 +95,10 @@ async def google_api_mock(sanic_client):
                         "place_id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
                     }
                 ],
-            },
-            status=200,
-        )
+            }
+        else:
+            data = {"status": app.status}
+        return response.json(data, status=200)
 
     @app.route("/maps/api/place/details/json", methods=["GET"])
     def details_lookup(request):
@@ -105,17 +107,16 @@ async def google_api_mock(sanic_client):
             if app.api_errors < app.api_errormax:
                 app.api_errors += 1
                 return response.json({}, status=500)
-        return response.json(
-            {
+        if app.status == "OK":
+            data = {
                 "status": "OK",
                 "result": {
-                    "geometry": {
-                        "location": {"lat": -3.866651, "lng": 51.195827},
-                    }
+                    "geometry": {"location": {"lat": -3.866_651, "lng": 51.195_827}}
                 },
-            },
-            status=200,
-        )
+            }
+        else:
+            data = {"status": app.status}
+        return response.json(data, status=200)
 
     client = await sanic_client(app)
     config.GOOGLE_PLACES_KEY = "TEST-KEY"
@@ -843,6 +844,32 @@ async def test_state_city_skip():
 
 
 @pytest.mark.asyncio
+async def test_state_city_skip_confirmed_contact():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_age_years"),
+        session_id=1,
+        answers={
+            "state_province": "ZA-WC",
+            "state_city": "Cape Town",
+            "city_location": "+1+1/",
+            "confirmed_contact": "yes",
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="19",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_tracing"
+
+
+@pytest.mark.asyncio
 async def test_state_confirm_city(google_api_mock):
     u = User(
         addr="27820001003",
@@ -874,7 +901,7 @@ async def test_state_confirm_city(google_api_mock):
     )
 
     assert [r.path for r in google_api_mock.app.requests] == [
-        "/maps/api/place/autocomplete/json",
+        "/maps/api/place/autocomplete/json"
     ]
 
     assert u.answers["place_id"] == "ChIJD7fiBh9u5kcRYJSMaMOCCwQ"
@@ -891,6 +918,76 @@ async def test_state_confirm_city(google_api_mock):
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_city"
+
+
+@pytest.mark.asyncio
+async def test_state_city_no_results(google_api_mock):
+    google_api_mock.app.status = "NO_RESULT"
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_city"),
+        session_id=1,
+        answers={"google_session_token": "123"},
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="cape town",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_city"
+
+
+@pytest.mark.asyncio
+async def test_state_city_error(google_api_mock):
+    google_api_mock.app.api_errormax = 3
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_city"),
+        session_id=1,
+        answers={"google_session_token": "123"},
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="cape town",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert (
+        reply.content
+        == "Sorry, something went wrong. We have been notified. Please try again later"
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_city_temporary_error(google_api_mock):
+    google_api_mock.app.api_errormax = 1
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_city"),
+        session_id=1,
+        answers={"google_session_token": "123"},
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="cape town",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    await app.process_message(msg)
+    assert u.state.name == "state_confirm_city"
 
 
 @pytest.mark.asyncio
@@ -920,10 +1017,94 @@ async def test_state_place_details_lookup(google_api_mock):
     assert u.state.name == "state_age"
 
     assert [r.path for r in google_api_mock.app.requests] == [
-        "/maps/api/place/details/json",
+        "/maps/api/place/details/json"
     ]
 
     assert u.answers["city_location"] == "-03.866651+051.195827/"
+
+
+@pytest.mark.asyncio
+async def test_state_place_details_lookup_invalid_response(google_api_mock):
+    google_api_mock.app.status = "ERROR"
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_confirm_city"),
+        session_id=1,
+        answers={
+            "state_city": "Cape Town",
+            "google_session_token": "123",
+            "place_id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
+            "confirmed_contact": "no",
+        },
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    await app.process_message(msg)
+    assert u.state.name == "state_city"
+
+
+@pytest.mark.asyncio
+async def test_state_place_details_lookup_error(google_api_mock):
+    google_api_mock.app.api_errormax = 3
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_confirm_city"),
+        session_id=1,
+        answers={
+            "state_city": "Cape Town",
+            "google_session_token": "123",
+            "place_id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
+            "confirmed_contact": "no",
+        },
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert (
+        reply.content
+        == "Sorry, something went wrong. We have been notified. Please try again later"
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_place_details_lookup_temporary_error(google_api_mock):
+    google_api_mock.app.api_errormax = 1
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_confirm_city"),
+        session_id=1,
+        answers={
+            "state_city": "Cape Town",
+            "google_session_token": "123",
+            "place_id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
+            "confirmed_contact": "no",
+        },
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="yes",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    await app.process_message(msg)
+    assert u.state.name == "state_age"
 
 
 @pytest.mark.asyncio
@@ -953,7 +1134,7 @@ async def test_state_place_details_lookup_confirmed_contact(google_api_mock):
     assert u.state.name == "state_tracing"
 
     assert [r.path for r in google_api_mock.app.requests] == [
-        "/maps/api/place/details/json",
+        "/maps/api/place/details/json"
     ]
 
     assert u.answers["city_location"] == "-03.866651+051.195827/"
@@ -961,11 +1142,7 @@ async def test_state_place_details_lookup_confirmed_contact(google_api_mock):
 
 @pytest.mark.asyncio
 async def test_state_age():
-    u = User(
-        addr="27820001003",
-        state=StateData(name="state_age"),
-        session_id=1,
-    )
+    u = User(addr="27820001003", state=StateData(name="state_age"), session_id=1)
     app = Application(u)
 
     msg = Message(
@@ -1017,11 +1194,7 @@ async def test_state_age():
 
 @pytest.mark.asyncio
 async def test_state_fever():
-    u = User(
-        addr="27820001003",
-        state=StateData(name="state_fever"),
-        session_id=1,
-    )
+    u = User(addr="27820001003", state=StateData(name="state_fever"), session_id=1)
     app = Application(u)
 
     msg = Message(
@@ -1064,11 +1237,7 @@ async def test_state_fever():
 
 @pytest.mark.asyncio
 async def test_state_cough():
-    u = User(
-        addr="27820001003",
-        state=StateData(name="state_cough"),
-        session_id=1,
-    )
+    u = User(addr="27820001003", state=StateData(name="state_cough"), session_id=1)
     app = Application(u)
 
     msg = Message(
@@ -1174,9 +1343,7 @@ async def test_state_cough_confirmed_contact():
 @pytest.mark.asyncio
 async def test_state_sore_throat():
     u = User(
-        addr="27820001003",
-        state=StateData(name="state_sore_throat"),
-        session_id=1,
+        addr="27820001003", state=StateData(name="state_sore_throat"), session_id=1
     )
     app = Application(u)
 
@@ -1226,11 +1393,7 @@ async def test_state_sore_throat():
 
 @pytest.mark.asyncio
 async def test_state_breathing():
-    u = User(
-        addr="27820001003",
-        state=StateData(name="state_breathing"),
-        session_id=1,
-    )
+    u = User(addr="27820001003", state=StateData(name="state_breathing"), session_id=1)
     app = Application(u)
 
     msg = Message(
@@ -1338,9 +1501,7 @@ async def test_state_breathing_confirmed_contact():
 @pytest.mark.asyncio
 async def test_state_taste_and_smell():
     u = User(
-        addr="27820001003",
-        state=StateData(name="state_taste_and_smell"),
-        session_id=1,
+        addr="27820001003", state=StateData(name="state_taste_and_smell"), session_id=1
     )
     app = Application(u)
 
@@ -1383,9 +1544,7 @@ async def test_state_taste_and_smell():
 @pytest.mark.asyncio
 async def test_state_preexisting_conditions():
     u = User(
-        addr="27820001003",
-        state=StateData(name="state_taste_and_smell"),
-        session_id=1,
+        addr="27820001003", state=StateData(name="state_taste_and_smell"), session_id=1
     )
     app = Application(u)
 
@@ -1463,11 +1622,7 @@ async def test_state_preexisting_conditions_skip():
 
 @pytest.mark.asyncio
 async def test_state_exposure():
-    u = User(
-        addr="27820001003",
-        state=StateData(name="state_exposure"),
-        session_id=1,
-    )
+    u = User(addr="27820001003", state=StateData(name="state_exposure"), session_id=1)
     app = Application(u)
 
     msg = Message(
@@ -1546,11 +1701,7 @@ async def test_state_age_skip(google_api_mock):
 
 @pytest.mark.asyncio
 async def test_state_age_years():
-    u = User(
-        addr="27820001003",
-        state=StateData(name="state_age_years"),
-        session_id=1,
-    )
+    u = User(addr="27820001003", state=StateData(name="state_age_years"), session_id=1)
     app = Application(u)
 
     msg = Message(
@@ -1577,6 +1728,91 @@ async def test_state_age_years():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_province"
+    assert u.answers["state_age"] == "18-40"
+
+
+@pytest.mark.asyncio
+async def test_state_age_years_error():
+    u = User(addr="27820001003", state=StateData(name="state_age_years"), session_id=1)
+    app = Application(u)
+
+    msg = Message(
+        content="-1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_age_years"
+    assert reply.content == "Please TYPE your age in years (eg. 35)"
+
+
+@pytest.mark.asyncio
+async def test_state_age_years_le18():
+    u = User(addr="27820001003", state=StateData(name="state_age_years"), session_id=1)
+    app = Application(u)
+
+    msg = Message(
+        content="7",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    await app.process_message(msg)
+    assert u.answers["state_age"] == "<18"
+
+
+@pytest.mark.asyncio
+async def test_state_age_years_40t65():
+    u = User(addr="27820001003", state=StateData(name="state_age_years"), session_id=1)
+    app = Application(u)
+
+    msg = Message(
+        content="53",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    await app.process_message(msg)
+    assert u.answers["state_age"] == "40-65"
+
+
+@pytest.mark.asyncio
+async def test_state_age_years_gt65():
+    u = User(addr="27820001003", state=StateData(name="state_age_years"), session_id=1)
+    app = Application(u)
+
+    msg = Message(
+        content="68",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    await app.process_message(msg)
+    assert u.answers["state_age"] == ">65"
+
+
+@pytest.mark.asyncio
+async def test_state_age_years_gt150():
+    u = User(addr="27820001003", state=StateData(name="state_age_years"), session_id=1)
+    app = Application(u)
+
+    msg = Message(
+        content="188",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_age_years"
+    assert reply.content == "Please TYPE your age in years (eg. 35)"
 
 
 @pytest.mark.asyncio
@@ -1708,6 +1944,14 @@ async def test_state_tracing(eventstore_mock):
         "You will not be contacted. You may be ELIGIBLE FOR COVID-19 "
         "TESTING. Go to a testing center or Call 0800029999 or your "
         "healthcare practitioner for info."
+    )
+
+    eventstore_mock.app.triage_errormax = 3
+    app = Application(get_user())
+    [reply] = await app.process_message(get_message("yes"))
+    assert (
+        reply.content
+        == "Sorry, something went wrong. We have been notified. Please try again later"
     )
 
 
@@ -1901,5 +2145,7 @@ def test_format_location():
         answers={},
     )
     app = Application(u)
-    location = app.format_location(-3.86665100000, 51.19582700000)
+    location = app.format_location(-3.866_651_000_00, 51.195_827_000_00)
     assert location == "-03.866651+051.195827/"
+    location = app.format_location(-3.0, 51.195_827_000_00)
+    assert location == "-03+051.195827/"

@@ -1,30 +1,38 @@
 from dataclasses import dataclass
 from inspect import iscoroutinefunction
-from typing import Awaitable, Callable, List, Optional, Union
+from typing import TYPE_CHECKING, Awaitable, Callable, List, Optional, Union
 
-from vaccine.base_application import BaseApplication
 from vaccine.models import Message
+from vaccine.utils import get_display_choices
+
+if TYPE_CHECKING:  # pragma: no cover
+    from vaccine.base_application import BaseApplication
 
 
 class EndState:
     def __init__(
         self,
-        app: BaseApplication,
+        app: "BaseApplication",
         text: str,
         next: Optional[str] = None,
         clear_state: bool = True,
+        helper_metadata: Optional[dict] = None,
     ):
         self.app = app
         self.text = text
         self.next = next
         self.clear_state = clear_state
+        self.helper_metadata = helper_metadata
 
     async def process_message(self, message: Message) -> List[Message]:
         self.app.user.session_id = None
         self.app.state_name = self.next
         if self.clear_state:
             self.app.user.answers = {}
-        return self.app.send_message(self.text, continue_session=False)
+        kwargs = {"content": self.text, "continue_session": False}
+        if self.helper_metadata is not None:
+            kwargs["helper_metadata"] = self.helper_metadata
+        return self.app.send_message(**kwargs)
 
     async def display(self, message: Message) -> List[Message]:
         return await self.process_message(message)
@@ -39,7 +47,7 @@ class Choice:
 class ChoiceState:
     def __init__(
         self,
-        app: BaseApplication,
+        app: "BaseApplication",
         question: str,
         choices: List[Choice],
         error: str,
@@ -70,7 +78,7 @@ class ChoiceState:
 
     @property
     def _display_choices(self) -> str:
-        return "\n".join(f"{i + 1}. {c.label}" for i, c in enumerate(self.choices))
+        return get_display_choices(self.choices)
 
     async def _get_next(self, choice):
         if iscoroutinefunction(self.next):
@@ -94,7 +102,7 @@ class ChoiceState:
 class MenuState(ChoiceState):
     def __init__(
         self,
-        app: BaseApplication,
+        app: "BaseApplication",
         question: str,
         choices: List[Choice],
         error: str,
@@ -120,7 +128,7 @@ class ErrorMessage(Exception):
 class FreeText:
     def __init__(
         self,
-        app: BaseApplication,
+        app: "BaseApplication",
         question: str,
         next: str,
         check: Optional[Callable[[Optional[str]], Awaitable]] = None,

@@ -15,6 +15,7 @@ from vaccine.worker import Worker
 sentry_sdk.init(
     integrations=[SanicIntegration()],
     traces_sample_rate=config.SENTRY_TRACES_SAMPLE_RATE,
+    send_default_pii=True,
 )
 
 app = Sanic("vaccine")
