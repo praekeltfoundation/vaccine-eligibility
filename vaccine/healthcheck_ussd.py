@@ -168,7 +168,7 @@ class Application(BaseApplication):
         )
         self.save_answer(
             "state_privacy_policy_accepted",
-            data["data"].get("privacy_policy_accepted", False),
+            data["data"].get("privacy_policy_accepted"),
         )
         return await self.go_to_state("state_save_healthcheck_start")
 
@@ -277,7 +277,7 @@ class Application(BaseApplication):
         )
 
     async def state_send_privacy_policy_sms(self):
-        if self.user.answers.get("state_privacy_policy_accepted"):
+        if self.user.answers.get("state_privacy_policy_accepted") == "yes":
             return await self.go_to_state("state_privacy_policy")
 
         if (
@@ -312,7 +312,7 @@ class Application(BaseApplication):
             next_state = "state_fever"
         else:
             next_state = "state_province"
-        if self.user.answers.get("state_privacy_policy_accepted"):
+        if self.user.answers.get("state_privacy_policy_accepted") == "yes":
             return await self.go_to_state(next_state)
 
         return MenuState(
@@ -815,7 +815,7 @@ class Application(BaseApplication):
                         "risk": self.calculate_risk(),
                         "data": {
                             "age_years": self.user.answers.get("state_age_years"),
-                            "privacy_policy_accepted": True,
+                            "privacy_policy_accepted": "yes",
                         },
                     }
                     logger.info(">>>> state_submit_data /api/v3/covid19triage/")

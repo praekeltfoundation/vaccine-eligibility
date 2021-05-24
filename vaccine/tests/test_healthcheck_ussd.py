@@ -634,7 +634,7 @@ async def test_state_privacy_policy_confirmed_contact():
         addr="27820001003",
         state=StateData(name="state_privacy_policy"),
         session_id=1,
-        answers={"state_privacy_policy_accepted": True, "confirmed_contact": "yes"},
+        answers={"state_privacy_policy_accepted": "yes", "confirmed_contact": "yes"},
     )
     app = Application(u)
     msg = Message(
@@ -655,7 +655,7 @@ async def test_state_privacy_policy_non_confirmed_contact():
         addr="27820001003",
         state=StateData(name="state_privacy_policy"),
         session_id=1,
-        answers={"state_privacy_policy_accepted": True, "confirmed_contact": "no"},
+        answers={"state_privacy_policy_accepted": "yes", "confirmed_contact": "no"},
     )
     app = Application(u)
     msg = Message(
