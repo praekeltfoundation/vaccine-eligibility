@@ -53,6 +53,17 @@ def get_turn():
     )
 
 
+def get_rapidpro():
+    return aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=5),
+        headers={
+            "Authorization": f"Token {config.RAPIDPRO_TOKEN}",
+            "Content-Type": "application/json",
+            "User-Agent": "healthcheck-ussd",
+        },
+    )
+
+
 class Application(BaseApplication):
     START_STATE = "state_start"
 
@@ -156,7 +167,8 @@ class Application(BaseApplication):
             "state_preexisting_conditions", data["data"].get("preexisting_condition")
         )
         self.save_answer(
-            "state_privacy_policy_accepted", data.get("privacy_policy_accepted", False)
+            "state_privacy_policy_accepted",
+            data["data"].get("privacy_policy_accepted", False),
         )
         return await self.go_to_state("state_save_healthcheck_start")
 
@@ -281,6 +293,31 @@ class Application(BaseApplication):
             next_state = "state_province"
         if self.user.answers.get("state_privacy_policy_accepted"):
             return await self.go_to_state(next_state)
+
+        if (
+            config.RAPIDPRO_URL
+            and config.RAPIDPRO_TOKEN
+            and config.RAPIDPRO_PRIVACY_POLICY_SMS_FLOW
+        ):
+            async with get_rapidpro() as session:
+                for i in range(3):
+                    try:
+                        data = {
+                            "flow": config.RAPIDPRO_PRIVACY_POLICY_SMS_FLOW,
+                            "urns": [f"tel:{self.inbound.from_addr}"],
+                        }
+                        response = await session.post(
+                            urljoin(config.RAPIDPRO_URL, "/api/v2/flow_starts.json"),
+                            json=data,
+                        )
+                        response.raise_for_status()
+                        break
+                    except HTTP_EXCEPTIONS as e:
+                        if i == 2:
+                            logger.exception(e)
+                            return await self.go_to_state("state_error")
+                        else:
+                            continue
 
         return MenuState(
             self,
@@ -822,7 +859,10 @@ class Application(BaseApplication):
                         "tracing": self.user.answers.get("state_tracing"),
                         "confirmed_contact": self.user.answers.get("confirmed_contact"),
                         "risk": self.calculate_risk(),
-                        "data": {"age_years": self.user.answers.get("state_age_years")},
+                        "data": {
+                            "age_years": self.user.answers.get("state_age_years"),
+                            "privacy_policy_accepted": True,
+                        },
                     }
                     logger.info(">>>> state_submit_data /api/v3/covid19triage/")
                     logger.info(config.EVENTSTORE_API_URL)

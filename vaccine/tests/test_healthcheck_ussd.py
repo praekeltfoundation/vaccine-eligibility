@@ -159,6 +159,32 @@ async def turn_mock(sanic_client):
     config.TURN_API_URL = url
 
 
+@pytest.fixture
+async def rapidpro_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("mock_rapidpro")
+    app.requests = []
+    app.errors = 0
+    app.errormax = 0
+
+    @app.route("/api/v2/flow_starts.json", methods=["POST"])
+    def start_flow(request):
+        app.requests.append(request)
+        if app.errormax:
+            if app.errors < app.errormax:
+                app.errors += 1
+                return response.json({}, status=500)
+        return response.json({}, status=200)
+
+    client = await sanic_client(app)
+    url = config.RAPIDPRO_URL
+    config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
+    config.RAPIDPRO_TOKEN = "testtoken"
+    config.RAPIDPRO_PRIVACY_POLICY_SMS_FLOW = "flow-uuid"
+    yield client
+    config.RAPIDPRO_URL = url
+
+
 @pytest.mark.asyncio
 async def test_state_welcome_confirmed_contact(eventstore_mock, turn_mock):
     u = User(addr="27820001001", state=StateData())
@@ -568,7 +594,7 @@ async def test_state_terms_returning_user():
 
 
 @pytest.mark.asyncio
-async def test_state_privacy_policy():
+async def test_state_privacy_policy(rapidpro_mock):
     u = User(
         addr="27820001003",
         state=StateData(name="state_welcome"),
@@ -594,6 +620,11 @@ async def test_state_privacy_policy():
             "1. Accept",
         ]
     )
+
+    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/flow_starts.json"]
+    assert [r.json for r in rapidpro_mock.app.requests] == [
+        {"flow": "flow-uuid", "urns": ["tel:27820001003"]}
+    ]
 
 
 @pytest.mark.asyncio
@@ -687,7 +718,9 @@ async def test_state_end_confirmed_contact():
 
 @pytest.mark.asyncio
 async def test_state_province():
-    u = User(addr="27820001003", state=StateData(name="state_privacy_policy"), session_id=1)
+    u = User(
+        addr="27820001003", state=StateData(name="state_privacy_policy"), session_id=1
+    )
     app = Application(u)
     msg = Message(
         content="accept",
