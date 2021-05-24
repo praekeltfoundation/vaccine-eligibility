@@ -311,19 +311,15 @@ class Application(BaseApplication):
 
         return MenuState(
             self,
-            question="\n".join(
-                [
-                    "Your personal information is protected under POPIA and in "
-                    "accordance with the provisions of the HealthCheck Privacy "
-                    "Notice sent to you by SMS."
-                ]
+            question=self._(
+                "Your personal information is protected under POPIA and in "
+                "accordance with the provisions of the HealthCheck Privacy "
+                "Notice sent to you by SMS."
             ),
-            error="\n".join(
-                [
-                    "Your personal information is protected under POPIA and in "
-                    "accordance with the provisions of the HealthCheck Privacy "
-                    "Notice sent to you by SMS."
-                ]
+            error=self._(
+                "Your personal information is protected under POPIA and in "
+                "accordance with the provisions of the HealthCheck Privacy "
+                "Notice sent to you by SMS."
             ),
             choices=[Choice(next_state, "Accept")],
         )
