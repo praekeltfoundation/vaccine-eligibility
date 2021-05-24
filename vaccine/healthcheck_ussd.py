@@ -254,7 +254,7 @@ class Application(BaseApplication):
 
     async def state_terms(self):
         if self.user.answers.get("returning_user") == "yes":
-            return await self.go_to_state("state_privacy_policy")
+            return await self.go_to_state("state_send_privacy_policy_sms")
         return MenuState(
             self,
             question=self._(
@@ -270,19 +270,15 @@ class Application(BaseApplication):
                 "Reply"
             ),
             choices=[
-                Choice("state_privacy_policy", self._("YES")),
+                Choice("state_send_privacy_policy_sms", self._("YES")),
                 Choice("state_end", self._("NO")),
                 Choice("state_more_info_pg1", self._("MORE INFO")),
             ],
         )
 
-    async def state_privacy_policy(self):
-        if self.user.answers.get("confirmed_contact") == "yes":
-            next_state = "state_fever"
-        else:
-            next_state = "state_province"
+    async def state_send_privacy_policy_sms(self):
         if self.user.answers.get("state_privacy_policy_accepted"):
-            return await self.go_to_state(next_state)
+            return await self.go_to_state("state_privacy_policy")
 
         if (
             config.RAPIDPRO_URL
@@ -308,6 +304,16 @@ class Application(BaseApplication):
                             return await self.go_to_state("state_error")
                         else:
                             continue
+
+        return await self.go_to_state("state_privacy_policy")
+
+    async def state_privacy_policy(self):
+        if self.user.answers.get("confirmed_contact") == "yes":
+            next_state = "state_fever"
+        else:
+            next_state = "state_province"
+        if self.user.answers.get("state_privacy_policy_accepted"):
+            return await self.go_to_state(next_state)
 
         return MenuState(
             self,
