@@ -577,9 +577,7 @@ async def test_dob_year_not_match_id():
         addr="27820001001",
         state=StateData(name="state_dob_year"),
         session_id=1,
-        answers={
-            "state_identification_number": "9001010001088",
-        },
+        answers={"state_identification_number": "9001010001088"},
     )
     app = Application(u)
     u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.name
@@ -602,11 +600,7 @@ async def test_dob_year_not_match_id():
 
 @pytest.mark.asyncio
 async def test_dob_month():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_dob_year"),
-        session_id=1,
-    )
+    u = User(addr="27820001001", state=StateData(name="state_dob_year"), session_id=1)
     app = Application(u)
     u.answers["state_identification_type"] = app.ID_TYPES.asylum_seeker.name
     msg = Message(
@@ -985,6 +979,62 @@ async def test_suburb(evds_mock):
         ]
     )
     assert u.state.name == "state_suburb"
+
+
+@pytest.mark.asyncio
+async def test_province_no_results(evds_mock):
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_suburb_search"),
+        session_id=1,
+        answers={"state_province_id": "western cape"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="invalid",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert reply.content == "\n".join(
+        [
+            "Suburb not found. Try again",
+            "1. Eastern Cape",
+            "2. Free State",
+            "3. Gauteng",
+            "4. Kwazulu-natal",
+            "5. Limpopo",
+            "6. Mpumalanga",
+            "7. North West",
+            "8. Northern Cape",
+            "9. Western Cape",
+        ]
+    )
+    assert u.state.name == "state_province_no_results"
+
+
+@pytest.mark.asyncio
+async def test_suburb_no_results(evds_mock):
+    u = User(
+        addr="27820001001",
+        state=StateData(name="state_province_no_results"),
+        session_id=1,
+    )
+    app = Application(u)
+    msg = Message(
+        content="western cape",
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_suburb_search"
+    assert u.answers["state_province_id"] == "western cape"
 
 
 @pytest.mark.asyncio
