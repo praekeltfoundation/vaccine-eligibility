@@ -491,6 +491,10 @@ class Application(BaseApplication):
         search = self.user.answers["state_suburb_search"] or ""
         municipality = self.user.answers.get("state_municipality")
         _, results = await suburbs.search(province, search, municipality)
+
+        if len(results) == 0:
+            return await self.go_to_state("state_province_no_results")
+
         choices = [Choice(suburb[0], suburb[1][:30]) for suburb in results]
         question = self._("Please choose the best match for your location:")
         choices = enforce_character_limit_in_choices(
@@ -503,6 +507,19 @@ class Application(BaseApplication):
             choices=choices,
             error=self._("Do any of these match your location:"),
             next=next_state,
+        )
+
+    async def state_province_no_results(self):
+        async def next_(choice: Choice):
+            self.save_answer("state_province_id", choice.value)
+            return "state_suburb_search"
+
+        return ChoiceState(
+            self,
+            question=self._("Suburb not found. Try again"),
+            choices=[Choice(*province) for province in await suburbs.provinces()],
+            error=self._("Reply with a NUMBER:"),
+            next=next_,
         )
 
     async def state_self_registration(self):
