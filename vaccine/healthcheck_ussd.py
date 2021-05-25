@@ -14,7 +14,11 @@ from vaccine.states import (
     FreeText,
     MenuState,
 )
-from vaccine.utils import DECODE_MESSAGE_EXCEPTIONS, HTTP_EXCEPTIONS
+from vaccine.utils import (
+    DECODE_MESSAGE_EXCEPTIONS,
+    HTTP_EXCEPTIONS,
+    normalise_phonenumber,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +52,17 @@ def get_turn():
         headers={
             "Authorization": f"Bearer {config.TURN_API_TOKEN}",
             "Accept": "application/vnd.v1+json",
+            "User-Agent": "healthcheck-ussd",
+        },
+    )
+
+
+def get_rapidpro():
+    return aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=5),
+        headers={
+            "Authorization": f"Token {config.RAPIDPRO_TOKEN}",
+            "Content-Type": "application/json",
             "User-Agent": "healthcheck-ussd",
         },
     )
@@ -122,8 +137,7 @@ class Application(BaseApplication):
         )
 
     async def state_start(self):
-        # TODO: normalise msisdn
-        msisdn = self.inbound.from_addr
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
         async with get_eventstore() as session:
             for i in range(3):
                 try:
@@ -151,10 +165,16 @@ class Application(BaseApplication):
         self.save_answer("state_city", data["city"])
         self.save_answer("city_location", data["city_location"])
         self.save_answer("state_age", data["age"])
-        self.save_answer("state_age_years", data["data"].get("age_years"))
-        self.save_answer(
-            "state_preexisting_conditions", data["data"].get("preexisting_condition")
-        )
+        for data_field in [
+            "age_years",
+            "preexisting_condition",
+            "privacy_policy_accepted",
+        ]:
+            if data["data"].get(data_field):
+                self.save_answer(
+                    f"state_{data_field}",
+                    data["data"].get(data_field),
+                )
         return await self.go_to_state("state_save_healthcheck_start")
 
     async def state_save_healthcheck_start(self):
@@ -238,13 +258,8 @@ class Application(BaseApplication):
         )
 
     async def state_terms(self):
-        if self.user.answers.get("confirmed_contact") == "yes":
-            next_state = "state_fever"
-        else:
-            next_state = "state_province"
         if self.user.answers.get("returning_user") == "yes":
-            return await self.go_to_state(next_state)
-
+            return await self.go_to_state("state_send_privacy_policy_sms")
         return MenuState(
             self,
             question=self._(
@@ -260,10 +275,64 @@ class Application(BaseApplication):
                 "Reply"
             ),
             choices=[
-                Choice(next_state, self._("YES")),
+                Choice("state_send_privacy_policy_sms", self._("YES")),
                 Choice("state_end", self._("NO")),
                 Choice("state_more_info_pg1", self._("MORE INFO")),
             ],
+        )
+
+    async def state_send_privacy_policy_sms(self):
+        if self.user.answers.get("state_privacy_policy_accepted") == "yes":
+            return await self.go_to_state("state_privacy_policy")
+
+        if (
+            config.RAPIDPRO_URL
+            and config.RAPIDPRO_TOKEN
+            and config.RAPIDPRO_PRIVACY_POLICY_SMS_FLOW
+        ):
+            async with get_rapidpro() as session:
+                for i in range(3):
+                    try:
+                        data = {
+                            "flow": config.RAPIDPRO_PRIVACY_POLICY_SMS_FLOW,
+                            "urns": [f"tel:{self.inbound.from_addr}"],
+                        }
+                        response = await session.post(
+                            urljoin(config.RAPIDPRO_URL, "/api/v2/flow_starts.json"),
+                            json=data,
+                        )
+                        response.raise_for_status()
+                        break
+                    except HTTP_EXCEPTIONS as e:
+                        if i == 2:
+                            logger.exception(e)
+                            return await self.go_to_state("state_error")
+                        else:
+                            continue
+
+        return await self.go_to_state("state_privacy_policy")
+
+    async def state_privacy_policy(self):
+        if self.user.answers.get("confirmed_contact") == "yes":
+            next_state = "state_fever"
+        else:
+            next_state = "state_province"
+        if self.user.answers.get("state_privacy_policy_accepted") == "yes":
+            return await self.go_to_state(next_state)
+
+        return MenuState(
+            self,
+            question=self._(
+                "Your personal information is protected under POPIA and in "
+                "accordance with the provisions of the HealthCheck Privacy "
+                "Notice sent to you by SMS."
+            ),
+            error=self._(
+                "Your personal information is protected under POPIA and in "
+                "accordance with the provisions of the HealthCheck Privacy "
+                "Notice sent to you by SMS."
+            ),
+            choices=[Choice(next_state, "Accept")],
         )
 
     async def state_end(self):
@@ -749,7 +818,10 @@ class Application(BaseApplication):
                         "tracing": self.user.answers.get("state_tracing"),
                         "confirmed_contact": self.user.answers.get("confirmed_contact"),
                         "risk": self.calculate_risk(),
-                        "data": {"age_years": self.user.answers.get("state_age_years")},
+                        "data": {
+                            "age_years": self.user.answers.get("state_age_years"),
+                            "privacy_policy_accepted": "yes",
+                        },
                     }
                     logger.info(">>>> state_submit_data /api/v3/covid19triage/")
                     logger.info(config.EVENTSTORE_API_URL)

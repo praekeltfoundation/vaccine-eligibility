@@ -17,32 +17,25 @@ async def eventstore_mock(sanic_client):
     app.triage_errormax = 0
     app.triage_errors = 0
 
-    @app.route("/api/v2/healthcheckuserprofile/27820001001/", methods=["GET"])
-    @app.route("/api/v2/healthcheckuserprofile/27820001004/", methods=["GET"])
-    def valid_userprofile(request):
+    @app.route("/api/v2/healthcheckuserprofile/<msisdn>/", methods=["GET"])
+    def get_userprofile(request, msisdn):
         app.requests.append(request)
         if app.userprofile_errormax:
             if app.userprofile_errors < app.userprofile_errormax:
                 app.userprofile_errors += 1
                 return response.json({}, status=500)
-        return response.json(
-            {
-                "province": "ZA-WC",
-                "city": "Cape Town",
-                "city_location": "+12.34-56.78/",
-                "age": "18-40",
-                "data": {"age_years": "35", "preexisting_condition": "no"},
-            },
-            status=200,
-        )
 
-    @app.route("/api/v2/healthcheckuserprofile/27820001003/", methods=["GET"])
-    def userprofile_doesnotexist(request):
-        app.requests.append(request)
-        if app.userprofile_errormax:
-            if app.userprofile_errors < app.userprofile_errormax:
-                app.userprofile_errors += 1
-                return response.json({}, status=500)
+        if msisdn in ["+27820001001", "+27820001004"]:
+            return response.json(
+                {
+                    "province": "ZA-WC",
+                    "city": "Cape Town",
+                    "city_location": "+12.34-56.78/",
+                    "age": "18-40",
+                    "data": {"age_years": "35", "preexisting_condition": "no"},
+                },
+                status=200,
+            )
         return response.json({}, status=404)
 
     @app.route("/api/v2/covid19triagestart/", methods=["POST"])
@@ -160,6 +153,32 @@ async def turn_mock(sanic_client):
     config.TURN_API_URL = url
 
 
+@pytest.fixture
+async def rapidpro_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("mock_rapidpro")
+    app.requests = []
+    app.errors = 0
+    app.errormax = 0
+
+    @app.route("/api/v2/flow_starts.json", methods=["POST"])
+    def start_flow(request):
+        app.requests.append(request)
+        if app.errormax:
+            if app.errors < app.errormax:
+                app.errors += 1
+                return response.json({}, status=500)
+        return response.json({}, status=200)
+
+    client = await sanic_client(app)
+    url = config.RAPIDPRO_URL
+    config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
+    config.RAPIDPRO_TOKEN = "testtoken"
+    config.RAPIDPRO_PRIVACY_POLICY_SMS_FLOW = "flow-uuid"
+    yield client
+    config.RAPIDPRO_URL = url
+
+
 @pytest.mark.asyncio
 async def test_state_welcome_confirmed_contact(eventstore_mock, turn_mock):
     u = User(addr="27820001001", state=StateData())
@@ -186,7 +205,7 @@ async def test_state_welcome_confirmed_contact(eventstore_mock, turn_mock):
     assert u.state.name == "state_welcome"
 
     assert [r.path for r in eventstore_mock.app.requests] == [
-        "/api/v2/healthcheckuserprofile/27820001001/",
+        "/api/v2/healthcheckuserprofile/+27820001001/",
         "/api/v2/covid19triagestart/",
     ]
     assert [r.path for r in turn_mock.app.requests] == [
@@ -241,7 +260,7 @@ async def test_state_welcome_new_contact(eventstore_mock, turn_mock):
     assert u.state.name == "state_welcome"
 
     assert [r.path for r in eventstore_mock.app.requests] == [
-        "/api/v2/healthcheckuserprofile/27820001003/",
+        "/api/v2/healthcheckuserprofile/+27820001003/",
         "/api/v2/covid19triagestart/",
     ]
     assert [r.path for r in turn_mock.app.requests] == [
@@ -291,7 +310,7 @@ async def test_state_welcome_returning_contact(eventstore_mock, turn_mock):
     assert u.state.name == "state_welcome"
 
     assert [r.path for r in eventstore_mock.app.requests] == [
-        "/api/v2/healthcheckuserprofile/27820001004/",
+        "/api/v2/healthcheckuserprofile/+27820001004/",
         "/api/v2/covid19triagestart/",
     ]
     assert [r.path for r in turn_mock.app.requests] == [
@@ -565,16 +584,50 @@ async def test_state_terms_returning_user():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_province"
+    assert u.state.name == "state_privacy_policy"
 
 
 @pytest.mark.asyncio
-async def test_state_terms_confirmed_contact():
+async def test_state_privacy_policy(rapidpro_mock):
     u = User(
         addr="27820001003",
         state=StateData(name="state_welcome"),
         session_id=1,
-        answers={"returning_user": "yes", "confirmed_contact": "yes"},
+        answers={"returning_user": "yes"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="start",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_privacy_policy"
+    assert reply.content == "\n".join(
+        [
+            "Your personal information is protected under POPIA and in "
+            "accordance with the provisions of the HealthCheck Privacy "
+            "Notice sent to you by SMS.",
+            "1. Accept",
+        ]
+    )
+
+    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/flow_starts.json"]
+    assert [r.json for r in rapidpro_mock.app.requests] == [
+        {"flow": "flow-uuid", "urns": ["tel:27820001003"]}
+    ]
+
+
+@pytest.mark.asyncio
+async def test_state_privacy_policy_confirmed_contact():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_privacy_policy"),
+        session_id=1,
+        answers={"state_privacy_policy_accepted": "yes", "confirmed_contact": "yes"},
     )
     app = Application(u)
     msg = Message(
@@ -587,6 +640,27 @@ async def test_state_terms_confirmed_contact():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_fever"
+
+
+@pytest.mark.asyncio
+async def test_state_privacy_policy_non_confirmed_contact():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_privacy_policy"),
+        session_id=1,
+        answers={"state_privacy_policy_accepted": "yes", "confirmed_contact": "no"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="start",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_province"
 
 
 @pytest.mark.asyncio
@@ -638,10 +712,12 @@ async def test_state_end_confirmed_contact():
 
 @pytest.mark.asyncio
 async def test_state_province():
-    u = User(addr="27820001003", state=StateData(name="state_terms"), session_id=1)
+    u = User(
+        addr="27820001003", state=StateData(name="state_privacy_policy"), session_id=1
+    )
     app = Application(u)
     msg = Message(
-        content="yes",
+        content="accept",
         to_addr="27820001002",
         from_addr="27820001003",
         transport_name="whatsapp",
@@ -700,13 +776,13 @@ async def test_state_province():
 async def test_state_city():
     u = User(
         addr="27820001003",
-        state=StateData(name="state_terms"),
+        state=StateData(name="state_privacy_policy"),
         session_id=1,
         answers={"state_province": "ZA-WC"},
     )
     app = Application(u)
     msg = Message(
-        content="yes",
+        content="accept",
         to_addr="27820001002",
         from_addr="27820001003",
         transport_name="whatsapp",
@@ -739,7 +815,7 @@ async def test_state_city():
 async def test_state_city_skip():
     u = User(
         addr="27820001003",
-        state=StateData(name="state_terms"),
+        state=StateData(name="state_privacy_policy"),
         session_id=1,
         answers={
             "state_province": "ZA-WC",
@@ -749,7 +825,7 @@ async def test_state_city_skip():
     )
     app = Application(u)
     msg = Message(
-        content="yes",
+        content="accept",
         to_addr="27820001002",
         from_addr="27820001003",
         transport_name="whatsapp",

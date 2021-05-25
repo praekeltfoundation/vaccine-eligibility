@@ -288,6 +288,26 @@ class Application(BaseApplication):
             next="state_suburb_search",
         )
 
+    async def state_province_no_results(self):
+        async def next_(choice: Choice):
+            self.save_answer("state_province_id", choice.value)
+            return "state_suburb_search"
+
+        return ChoiceState(
+            self,
+            question=self._(
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+                "\n"
+                "⚠️ Your suburb could not be found. Please try again by selecting your "
+                "province\n"
+                "\n"
+                "Select your province"
+            ),
+            choices=[Choice(*province) for province in await suburbs.provinces()],
+            error=self._("Reply with a NUMBER:"),
+            next=next_,
+        )
+
     async def state_suburb_search(self):
         return FreeText(
             self,
@@ -344,6 +364,10 @@ class Application(BaseApplication):
         search = self.user.answers["state_suburb_search"] or ""
         municipality = self.user.answers.get("state_municipality")
         _, results = await suburbs.search(province, search, municipality, m_limit=10)
+
+        if len(results) == 0:
+            return await self.go_to_state("state_province_no_results")
+
         choices = [Choice(suburb[0], suburb[1][:200]) for suburb in results]
         choices = enforce_character_limit_in_choices(choices, 1000)
         choices.append(Choice("other", "Other"))
