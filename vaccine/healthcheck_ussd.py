@@ -14,7 +14,11 @@ from vaccine.states import (
     FreeText,
     MenuState,
 )
-from vaccine.utils import DECODE_MESSAGE_EXCEPTIONS, HTTP_EXCEPTIONS
+from vaccine.utils import (
+    DECODE_MESSAGE_EXCEPTIONS,
+    HTTP_EXCEPTIONS,
+    normalise_phonenumber,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -133,8 +137,7 @@ class Application(BaseApplication):
         )
 
     async def state_start(self):
-        # TODO: normalise msisdn
-        msisdn = self.inbound.from_addr
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
         async with get_eventstore() as session:
             for i in range(3):
                 try:

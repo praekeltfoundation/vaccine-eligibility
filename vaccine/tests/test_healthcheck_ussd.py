@@ -17,32 +17,25 @@ async def eventstore_mock(sanic_client):
     app.triage_errormax = 0
     app.triage_errors = 0
 
-    @app.route("/api/v2/healthcheckuserprofile/27820001001/", methods=["GET"])
-    @app.route("/api/v2/healthcheckuserprofile/27820001004/", methods=["GET"])
-    def valid_userprofile(request):
+    @app.route("/api/v2/healthcheckuserprofile/<msisdn>/", methods=["GET"])
+    def get_userprofile(request, msisdn):
         app.requests.append(request)
         if app.userprofile_errormax:
             if app.userprofile_errors < app.userprofile_errormax:
                 app.userprofile_errors += 1
                 return response.json({}, status=500)
-        return response.json(
-            {
-                "province": "ZA-WC",
-                "city": "Cape Town",
-                "city_location": "+12.34-56.78/",
-                "age": "18-40",
-                "data": {"age_years": "35", "preexisting_condition": "no"},
-            },
-            status=200,
-        )
 
-    @app.route("/api/v2/healthcheckuserprofile/27820001003/", methods=["GET"])
-    def userprofile_doesnotexist(request):
-        app.requests.append(request)
-        if app.userprofile_errormax:
-            if app.userprofile_errors < app.userprofile_errormax:
-                app.userprofile_errors += 1
-                return response.json({}, status=500)
+        if msisdn in ["+27820001001", "+27820001004"]:
+            return response.json(
+                {
+                    "province": "ZA-WC",
+                    "city": "Cape Town",
+                    "city_location": "+12.34-56.78/",
+                    "age": "18-40",
+                    "data": {"age_years": "35", "preexisting_condition": "no"},
+                },
+                status=200,
+            )
         return response.json({}, status=404)
 
     @app.route("/api/v2/covid19triagestart/", methods=["POST"])
@@ -212,7 +205,7 @@ async def test_state_welcome_confirmed_contact(eventstore_mock, turn_mock):
     assert u.state.name == "state_welcome"
 
     assert [r.path for r in eventstore_mock.app.requests] == [
-        "/api/v2/healthcheckuserprofile/27820001001/",
+        "/api/v2/healthcheckuserprofile/+27820001001/",
         "/api/v2/covid19triagestart/",
     ]
     assert [r.path for r in turn_mock.app.requests] == [
@@ -267,7 +260,7 @@ async def test_state_welcome_new_contact(eventstore_mock, turn_mock):
     assert u.state.name == "state_welcome"
 
     assert [r.path for r in eventstore_mock.app.requests] == [
-        "/api/v2/healthcheckuserprofile/27820001003/",
+        "/api/v2/healthcheckuserprofile/+27820001003/",
         "/api/v2/covid19triagestart/",
     ]
     assert [r.path for r in turn_mock.app.requests] == [
@@ -317,7 +310,7 @@ async def test_state_welcome_returning_contact(eventstore_mock, turn_mock):
     assert u.state.name == "state_welcome"
 
     assert [r.path for r in eventstore_mock.app.requests] == [
-        "/api/v2/healthcheckuserprofile/27820001004/",
+        "/api/v2/healthcheckuserprofile/+27820001004/",
         "/api/v2/covid19triagestart/",
     ]
     assert [r.path for r in turn_mock.app.requests] == [
