@@ -205,7 +205,7 @@ class AnswerWorker:
                                     a.response,
                                     a.response_metadata,
                                 ]
-                                for a in answers if a.response
+                                for a in answers
                             ]
                         },
                     }

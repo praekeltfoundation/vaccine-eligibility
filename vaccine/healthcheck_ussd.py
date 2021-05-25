@@ -165,14 +165,16 @@ class Application(BaseApplication):
         self.save_answer("state_city", data["city"])
         self.save_answer("city_location", data["city_location"])
         self.save_answer("state_age", data["age"])
-        self.save_answer("state_age_years", data["data"].get("age_years"))
-        self.save_answer(
-            "state_preexisting_conditions", data["data"].get("preexisting_condition")
-        )
-        self.save_answer(
-            "state_privacy_policy_accepted",
-            data["data"].get("privacy_policy_accepted"),
-        )
+        for data_field in [
+            "age_years",
+            "preexisting_condition",
+            "privacy_policy_accepted",
+        ]:
+            if data["data"].get(data_field):
+                self.save_answer(
+                    f"state_{data_field}",
+                    data["data"].get(data_field),
+                )
         return await self.go_to_state("state_save_healthcheck_start")
 
     async def state_save_healthcheck_start(self):

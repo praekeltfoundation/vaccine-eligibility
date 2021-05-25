@@ -276,30 +276,6 @@ async def test_answer_worker_push_results(answer_worker, flow_results_mock_serve
 
 
 @pytest.mark.asyncio
-async def test_answer_worker_push_empty_results(answer_worker, flow_results_mock_server):
-    """
-    Empty results should not be pushed
-    """
-    await send_inbound_amqp_message(
-        answer_worker.exchange,
-        "whatsapp.answer",
-        Answer(
-            question="question",
-            response=None,
-            address="27820001001",
-            session_id="session_id",
-            row_id="1",
-            timestamp=datetime(2021, 2, 3, 4, 5, 6, tzinfo=timezone.utc),
-        )
-        .to_json()
-        .encode(),
-    )
-
-    request = await flow_results_mock_server.app.future
-    assert request.json["data"]["attributes"]["responses"] == []
-
-
-@pytest.mark.asyncio
 async def test_answer_worker_push_results_server_down(
     answer_worker, flow_results_mock_server
 ):
