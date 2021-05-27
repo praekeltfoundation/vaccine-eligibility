@@ -27,6 +27,12 @@ class AppTester:
         """
         self.user.answers[answer_name] = answer_value
 
+    def setup_user_address(self, address: str):
+        """
+        Sets an address for the user
+        """
+        self.user.addr = address
+
     async def user_input(
         self, content: Optional[str] = None, session=Message.SESSION_EVENT.RESUME
     ):
@@ -46,7 +52,7 @@ class AppTester:
             self.user.session_id = self.DEFAULT_SESSION_ID
         await self.application.process_message(message)
 
-    def assert_state(self, name: str):
+    def assert_state(self, name: Optional[str]):
         """
         Asserts that the current user state matches `name`
         """
@@ -62,6 +68,14 @@ class AppTester:
         assert (
             self.user.answers[answer_name] == answer_value
         ), f"{answer_name} is {self.user.answers[answer_name]}, not {answer_value}"
+
+    def assert_no_answer(self, answer_name: str):
+        """
+        Assert that the user does not have a value stored for the answer
+        """
+        assert (
+            self.user.answers.get(answer_name) is None
+        ), f"{answer_name} has a value {self.user.answers[answer_name]}"
 
     def assert_num_messages(self, num: int):
         """

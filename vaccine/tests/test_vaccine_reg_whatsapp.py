@@ -7,7 +7,7 @@ from sanic import Sanic, response
 
 from vaccine.data.medscheme import config as m_config
 from vaccine.data.suburbs import config as s_config
-from vaccine.models import Message, StateData, User
+from vaccine.models import Message
 from vaccine.testing import AppTester
 from vaccine.vaccine_reg_whatsapp import Application, config
 
@@ -198,1210 +198,643 @@ async def test_passport_country_search(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_passport_country_search_other():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_passport_country_list"),
-        session_id=1,
-        answers={"state_passport_country": "CI"},
-    )
-    app = Application(u)
-    msg = Message(
-        content="other",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_passport_country"
+async def test_passport_country_search_other(tester: AppTester):
+    tester.setup_state("state_passport_country_list")
+    tester.setup_answer("state_passport_country", "CI")
+    await tester.user_input("other")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_passport_country")
 
 
 @pytest.mark.asyncio
-async def test_passport_country_search_list_invalid():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_passport_country_list"),
-        session_id=1,
-        answers={"state_passport_country": "Côte d'Ivoire"},
-    )
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_passport_country_list"
+async def test_passport_country_search_list_invalid(tester: AppTester):
+    tester.setup_state("state_passport_country_list")
+    tester.setup_answer("state_passport_country", "Côte d'Ivoire")
+    await tester.user_input("invalid")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_passport_country_list")
 
 
 @pytest.mark.asyncio
-async def test_said_date_and_sex_extraction():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_identification_number"),
-        session_id=1,
-    )
-    app = Application(u)
-    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.name
-    msg = Message(
-        content="9001010001088",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    await app.process_message(msg)
-    assert u.answers["state_dob_year"] == "1990"
-    assert u.answers["state_dob_month"] == "1"
-    assert u.answers["state_dob_day"] == "1"
-    assert u.answers["state_gender"] == "Female"
+async def test_said_date_and_sex_extraction(tester: AppTester):
+    tester.setup_state("state_identification_number")
+    tester.setup_answer("state_identification_type", "rsa_id")
+    await tester.user_input("9001010001088")
+    tester.assert_answer("state_dob_year", "1990")
+    tester.assert_answer("state_dob_month", "1")
+    tester.assert_answer("state_dob_day", "1")
+    tester.assert_answer("state_gender", "Female")
 
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.utils.get_today")
-async def test_said_date_extraction_ambiguous(get_today):
+async def test_said_date_extraction_ambiguous(get_today, tester: AppTester):
     get_today.return_value = date(2020, 1, 1)
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_identification_number"),
-        session_id=1,
-    )
-    app = Application(u)
-    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.name
-    msg = Message(
-        content="0001010001087",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    await app.process_message(msg)
-    assert "state_dob_year" not in u.answers
-    assert u.answers["state_dob_month"] == "1"
-    assert u.answers["state_dob_day"] == "1"
+    tester.setup_state("state_identification_number")
+    tester.setup_answer("state_identification_type", "rsa_id")
+    await tester.user_input("0001010001087")
+    tester.assert_no_answer("state_dob_year")
+    tester.assert_answer("state_dob_month", "1")
+    tester.assert_answer("state_dob_day", "1")
 
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.utils.get_today")
-async def test_gender(get_today):
+async def test_gender(get_today, tester: AppTester):
     get_today.return_value = date(2120, 1, 1)
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_dob_day"),
-        answers={"state_dob_year": "1990", "state_dob_month": "1"},
-        session_id=1,
-    )
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_gender"
+    tester.setup_state("state_dob_day")
+    tester.setup_answer("state_dob_year", "1990")
+    tester.setup_answer("state_dob_month", "1")
+    await tester.user_input("1")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_gender")
 
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.utils.get_today")
-async def test_gender_invalid(get_today):
+async def test_gender_invalid(get_today, tester: AppTester):
     get_today.return_value = date(2120, 1, 1)
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_gender"),
-        session_id=1,
-        answers={
-            "state_dob_year": "1990",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-        },
-    )
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_gender"
+    tester.setup_state("state_gender")
+    tester.setup_answer("state_dob_year", "1990")
+    tester.setup_answer("state_dob_month", "1")
+    tester.setup_answer("state_dob_day", "1")
+    await tester.user_input("invalid")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_gender")
 
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.utils.get_today")
-async def test_too_young(get_today):
+async def test_too_young(get_today, tester: AppTester):
     get_today.return_value = date(2020, 1, 1)
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_dob_year"),
-        session_id=1,
-        answers={
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-            "state_identification_type": "passport",
-        },
-    )
-    app = Application(u)
-    msg = Message(
-        content="1990",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_under_age_notification"
+    tester.setup_state("state_dob_year")
+    tester.setup_answer("state_dob_month", "1")
+    tester.setup_answer("state_dob_day", "1")
+    tester.setup_answer("state_identification_type", "passport")
+    await tester.user_input("1990")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_under_age_notification")
 
 
 @pytest.mark.asyncio
-async def test_dob_year():
-    u = User(addr="27820001001", state=StateData(name="state_surname"), session_id=1)
-    app = Application(u)
-    msg = Message(
-        content="test surname",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_dob_year"
+async def test_dob_year(tester: AppTester):
+    tester.setup_state("state_surname")
+    await tester.user_input("test surname")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_dob_year")
 
 
 @pytest.mark.asyncio
-async def test_dob_year_invalid():
-    u = User(addr="27820001001", state=StateData(name="state_dob_year"), session_id=1)
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_dob_year"
-    assert reply.content == "\n".join(
-        ["⚠️  Please TYPE in only the YEAR you were born.", "Example _1980_"]
+async def test_dob_year_invalid(tester: AppTester):
+    tester.setup_state("state_dob_year")
+    await tester.user_input("invalid")
+    tester.assert_state("state_dob_year")
+    tester.assert_message(
+        "\n".join(["⚠️  Please TYPE in only the YEAR you were born.", "Example _1980_"])
     )
 
 
 @pytest.mark.asyncio
-async def test_dob_year_not_match_id():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_dob_year"),
-        session_id=1,
-        answers={"state_identification_number": "9001010001088"},
-    )
-    app = Application(u)
-    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.name
-    msg = Message(
-        content="1991",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_dob_year"
-    assert (
-        reply.content
-        == "The YEAR you have given does not match the YEAR of your ID number. Please "
+async def test_dob_year_not_match_id(tester: AppTester):
+    tester.setup_state("state_dob_year")
+    tester.setup_answer("state_identification_number", "9001010001088")
+    tester.setup_answer("state_identification_type", "rsa_id")
+    await tester.user_input("1991")
+    tester.assert_state("state_dob_year")
+    tester.assert_message(
+        "The YEAR you have given does not match the YEAR of your ID number. Please "
         "try again"
     )
 
 
 @pytest.mark.asyncio
-async def test_dob_month():
-    u = User(addr="27820001001", state=StateData(name="state_dob_year"), session_id=1)
-    app = Application(u)
-    u.answers["state_identification_type"] = app.ID_TYPES.asylum_seeker.name
-    msg = Message(
-        content="1990",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_dob_month"
+async def test_dob_month(tester: AppTester):
+    tester.setup_state("state_dob_year")
+    tester.setup_answer("state_identification_type", "passport")
+    await tester.user_input("1990")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_dob_month")
 
 
 @pytest.mark.asyncio
-async def test_dob_month_error():
-    u = User(addr="27820001001", state=StateData(name="state_dob_month"), session_id=1)
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_dob_month"
+async def test_dob_month_error(tester: AppTester):
+    tester.setup_state("state_dob_month")
+    await tester.user_input("invalid")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_dob_month")
 
 
 @pytest.mark.asyncio
-async def test_dob_day():
-    u = User(addr="27820001001", state=StateData(name="state_dob_month"), session_id=1)
-    app = Application(u)
-    msg = Message(
-        content="january",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_dob_day"
+async def test_dob_day(tester: AppTester):
+    tester.setup_state("state_dob_month")
+    await tester.user_input("january")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_dob_day")
 
 
 @pytest.mark.asyncio
-async def test_dob_day_invalid():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_dob_day"),
-        session_id=1,
-        answers={"state_dob_year": "1990", "state_dob_month": "2"},
-    )
-    app = Application(u)
-    msg = Message(
-        content="29",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_dob_day"
+async def test_dob_day_invalid(tester: AppTester):
+    tester.setup_state("state_dob_day")
+    tester.setup_answer("state_dob_year", "1990")
+    tester.setup_answer("state_dob_month", "2")
+    await tester.user_input("29")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_dob_day")
 
 
 @pytest.mark.asyncio
-async def test_first_name():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_passport_country_list"),
-        session_id=1,
-        answers={"state_passport_country": "south africa"},
-    )
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_first_name"
+async def test_first_name(tester: AppTester):
+    tester.setup_state("state_passport_country_list")
+    tester.setup_answer("state_passport_country", "south africa")
+    await tester.user_input("1")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_first_name")
 
 
 @pytest.mark.asyncio
-async def test_surname():
-    u = User(addr="27820001001", state=StateData(name="state_first_name"), session_id=1)
-    app = Application(u)
-    msg = Message(
-        content="firstname",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_surname"
-    assert u.answers["state_first_name"] == "firstname"
+async def test_surname(tester: AppTester):
+    tester.setup_state("state_first_name")
+    await tester.user_input("firstname")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_surname")
+    tester.assert_answer("state_first_name", "firstname")
 
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.utils.get_today")
-async def test_skip_dob_and_gender(get_today, evds_mock):
+async def test_skip_dob_and_gender(get_today, evds_mock, tester: AppTester):
     get_today.return_value = date(2120, 1, 1)
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_surname"),
-        session_id=1,
-        answers={
-            "state_dob_day": "1",
-            "state_dob_month": "1",
-            "state_dob_year": "1990",
-            "state_gender": "male",
-        },
-    )
-    app = Application(u)
-    msg = Message(
-        content="test surname",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_province_id"
+    tester.setup_state("state_surname")
+    tester.setup_answer("state_dob_day", "1")
+    tester.setup_answer("state_dob_month", "1")
+    tester.setup_answer("state_dob_year", "1990")
+    tester.setup_answer("state_gender", "male")
+    await tester.user_input("test surname")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_province_id")
 
 
 @pytest.mark.asyncio
-async def test_state_after_terms_and_conditions(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_terms_and_conditions"),
-        session_id=1,
-    )
-    app = Application(u)
-    msg = Message(
-        content="accept",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_identification_type"
+async def test_state_after_terms_and_conditions(tester: AppTester):
+    tester.setup_state("state_terms_and_conditions")
+    await tester.user_input("accept")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_identification_type")
 
 
 @pytest.mark.asyncio
-async def test_province_invalid(evds_mock):
-    u = User(
-        addr="27820001001", state=StateData(name="state_province_id"), session_id=1
-    )
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_province_id"
+async def test_province_invalid(evds_mock, tester: AppTester):
+    tester.setup_state("state_province_id")
+    await tester.user_input("invalid")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_province_id")
 
 
 @pytest.mark.asyncio
-async def test_suburb_search(evds_mock):
-    u = User(
-        addr="27820001001", state=StateData(name="state_province_id"), session_id=1
-    )
-    app = Application(u)
-    msg = Message(
-        content="9",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_suburb_search"
-    assert u.answers["state_province_id"] == "western cape"
+async def test_suburb_search(evds_mock, tester: AppTester):
+    tester.setup_state("state_province_id")
+    await tester.user_input("9")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_suburb_search")
+    tester.assert_answer("state_province_id", "western cape")
 
 
 @pytest.mark.asyncio
-async def test_suburb(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_suburb_search"),
-        session_id=1,
-        answers={"state_province_id": "western cape"},
+async def test_suburb(evds_mock, tester: AppTester):
+    tester.setup_state("state_suburb_search")
+    tester.setup_answer("state_province_id", "western cape")
+    await tester.user_input("tableview")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Please REPLY with a NUMBER to confirm your location:",
+                "1. Table View, Blouberg",
+                "2. Other",
+            ]
+        )
     )
-    app = Application(u)
-    msg = Message(
-        content="tableview",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Please REPLY with a NUMBER to confirm your location:",
-            "1. Table View, Blouberg",
-            "2. Other",
-        ]
-    )
-    assert u.state.name == "state_suburb"
+    tester.assert_state("state_suburb")
 
 
 @pytest.mark.asyncio
-async def test_province_no_results(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_suburb_search"),
-        session_id=1,
-        answers={"state_province_id": "western cape"},
+async def test_province_no_results(evds_mock, tester: AppTester):
+    tester.setup_state("state_suburb_search")
+    tester.setup_answer("state_province_id", "western cape")
+    await tester.user_input("invalid")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "⚠️ Your suburb could not be found. Please try again by selecting your "
+                "province",
+                "",
+                "Select your province",
+                "1. Eastern Cape",
+                "2. Free State",
+                "3. Gauteng",
+                "4. Kwazulu-natal",
+                "5. Limpopo",
+                "6. Mpumalanga",
+                "7. North West",
+                "8. Northern Cape",
+                "9. Western Cape",
+            ]
+        )
     )
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "⚠️ Your suburb could not be found. Please try again by selecting your "
-            "province",
-            "",
-            "Select your province",
-            "1. Eastern Cape",
-            "2. Free State",
-            "3. Gauteng",
-            "4. Kwazulu-natal",
-            "5. Limpopo",
-            "6. Mpumalanga",
-            "7. North West",
-            "8. Northern Cape",
-            "9. Western Cape",
-        ]
-    )
-    assert u.state.name == "state_province_no_results"
+    tester.assert_state("state_province_no_results")
 
 
 @pytest.mark.asyncio
-async def test_suburb_search_no_results(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_province_no_results"),
-        session_id=1,
-    )
-    app = Application(u)
-    msg = Message(
-        content="western cape",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_suburb_search"
-    assert u.answers["state_province_id"] == "western cape"
+async def test_suburb_search_no_results(evds_mock, tester: AppTester):
+    tester.setup_state("state_province_no_results")
+    await tester.user_input("western cape")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_suburb_search")
+    tester.assert_answer("state_province_id", "western cape")
 
 
 @pytest.mark.asyncio
-async def test_municipality(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_suburb_search"),
-        session_id=1,
-        answers={"state_province_id": "eastern cape"},
+async def test_municipality(evds_mock, tester: AppTester):
+    tester.setup_state("state_suburb_search")
+    tester.setup_answer("state_province_id", "eastern cape")
+    await tester.user_input("mandela")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Please REPLY with a NUMBER to confirm your MUNICIPALITY:",
+                "1. Buffalo City",
+                "2. Enoch Mgijima",
+                "3. Great Kei",
+                "4. King Sabata Dalindyebo",
+                "5. Nelson Mandela Bay",
+                "6. Raymond Mhlaba",
+                "7. Umzimvubu",
+                "8. Mbizana",
+                "9. Mnquma",
+                "10. Other",
+            ]
+        )
     )
-    app = Application(u)
-    msg = Message(
-        content="mandela",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Please REPLY with a NUMBER to confirm your MUNICIPALITY:",
-            "1. Buffalo City",
-            "2. Enoch Mgijima",
-            "3. Great Kei",
-            "4. King Sabata Dalindyebo",
-            "5. Nelson Mandela Bay",
-            "6. Raymond Mhlaba",
-            "7. Umzimvubu",
-            "8. Mbizana",
-            "9. Mnquma",
-            "10. Other",
-        ]
-    )
-    assert u.state.name == "state_municipality"
+    tester.assert_state("state_municipality")
 
 
 @pytest.mark.asyncio
-async def test_municipality_other(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_municipality"),
-        session_id=1,
-        answers={"state_province_id": "eastern cape", "state_suburb_search": "mandela"},
-    )
-    app = Application(u)
-    msg = Message(
-        content="other",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    await app.process_message(msg)
-    assert u.state.name == "state_suburb_search"
+async def test_municipality_other(evds_mock, tester: AppTester):
+    tester.setup_state("state_municipality")
+    tester.setup_answer("state_province_id", "eastern cape")
+    tester.setup_answer("state_suburb_search", "mandela")
+    await tester.user_input("other")
+    tester.assert_state("state_suburb_search")
 
 
 @pytest.mark.asyncio
-async def test_municipality_plumstead(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_suburb_search"),
-        session_id=1,
-        answers={"state_province_id": "western cape"},
+async def test_municipality_plumstead(evds_mock, tester: AppTester):
+    tester.setup_state("state_suburb_search")
+    tester.setup_answer("state_province_id", "western cape")
+    await tester.user_input("plumstead")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Please REPLY with a NUMBER to confirm your location:",
+                "1. Plumstead, Cape Town",
+                "2. Other",
+            ]
+        )
     )
-    app = Application(u)
-    msg = Message(
-        content="plumstead",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Please REPLY with a NUMBER to confirm your location:",
-            "1. Plumstead, Cape Town",
-            "2. Other",
-        ]
-    )
-    assert u.state.name == "state_suburb"
+    tester.assert_state("state_suburb")
 
 
 @pytest.mark.asyncio
-async def test_suburb_with_municipality(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_municipality"),
-        session_id=1,
-        answers={"state_province_id": "eastern cape", "state_suburb_search": "mandela"},
+async def test_suburb_with_municipality(evds_mock, tester: AppTester):
+    tester.setup_state("state_municipality")
+    tester.setup_answer("state_province_id", "eastern cape")
+    tester.setup_answer("state_suburb_search", "mandela")
+    await tester.user_input("Buffalo City")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Please REPLY with a NUMBER to confirm your location:",
+                "1. Mandela Park, Mandela Park",
+                "2. Other",
+            ]
+        )
     )
-    app = Application(u)
-    msg = Message(
-        content="Buffalo City",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Please REPLY with a NUMBER to confirm your location:",
-            "1. Mandela Park, Mandela Park",
-            "2. Other",
-        ]
-    )
-    assert u.state.name == "state_suburb"
+    tester.assert_state("state_suburb")
 
 
 @pytest.mark.asyncio
-async def test_suburb_error(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_suburb"),
-        session_id=1,
-        answers={
-            "state_province_id": "western cape",
-            "state_suburb_search": "tableview",
-        },
-    )
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_suburb"
+async def test_suburb_error(evds_mock, tester: AppTester):
+    tester.setup_state("state_suburb")
+    tester.setup_answer("state_province_id", "western cape")
+    tester.setup_answer("state_suburb_search", "tableview")
+    await tester.user_input("invalid")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_suburb")
 
 
 @pytest.mark.asyncio
-async def test_suburb_other(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_suburb"),
-        session_id=1,
-        answers={
-            "state_province_id": "western cape",
-            "state_suburb_search": "tableview",
-        },
-    )
-    app = Application(u)
-    msg = Message(
-        content="other",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_province_id"
+async def test_suburb_other(evds_mock, tester: AppTester):
+    tester.setup_state("state_suburb")
+    tester.setup_answer("state_province_id", "western cape")
+    tester.setup_answer("state_suburb_search", "tableview")
+    await tester.user_input("other")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_province_id")
 
 
 @pytest.mark.asyncio
-async def test_suburb_value(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_suburb"),
-        session_id=1,
-        answers={
-            "state_province_id": "western cape",
-            "state_suburb_search": "tableview",
-        },
-    )
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_self_registration"
+async def test_suburb_value(evds_mock, tester: AppTester):
+    tester.setup_state("state_suburb")
+    tester.setup_answer("state_province_id", "western cape")
+    tester.setup_answer("state_suburb_search", "tableview")
+    await tester.user_input("1")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_self_registration")
 
 
 @pytest.mark.asyncio
-async def test_self_registration(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_suburb"),
-        session_id=1,
-        answers={
-            "state_province_id": "western cape",
-            "state_suburb_search": "tableview",
-        },
+async def test_self_registration(evds_mock, tester: AppTester):
+    tester.setup_state("state_suburb")
+    tester.setup_answer("state_province_id", "western cape")
+    tester.setup_answer("state_suburb_search", "tableview")
+    await tester.user_input("1")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "We will use your cell phone number to send you notifications and "
+                "updates via WhatsApp and/or SMS about getting vaccinated.",
+                "",
+                "Can we use 082 000 1001?",
+                "1. Yes",
+                "2. No",
+            ]
+        )
     )
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "We will use your cell phone number to send you notifications and updates "
-            "via WhatsApp and/or SMS about getting vaccinated.",
-            "",
-            "Can we use 082 000 1001?",
-            "1. Yes",
-            "2. No",
-        ]
-    )
-    assert u.state.name == "state_self_registration"
+    tester.assert_state("state_self_registration")
 
 
 @pytest.mark.asyncio
-@mock.patch("vaccine.utils.get_today")
-async def test_self_registration_invalid(get_today):
-    get_today.return_value = date(2100, 1, 1)
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_self_registration"),
-        session_id=1,
-        answers={
-            "state_dob_year": "1990",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-        },
-    )
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_self_registration"
+async def test_self_registration_invalid(tester: AppTester):
+    tester.setup_state("state_self_registration")
+    await tester.user_input("invalid")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_self_registration")
 
 
 @pytest.mark.asyncio
-@mock.patch("vaccine.utils.get_today")
-async def test_phone_number(get_today):
-    get_today.return_value = date(2100, 1, 1)
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_self_registration"),
-        session_id=1,
-        answers={
-            "state_dob_year": "1990",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-        },
-    )
-    app = Application(u)
-    msg = Message(
-        content="no",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_phone_number"
+async def test_phone_number(tester: AppTester):
+    tester.setup_state("state_self_registration")
+    await tester.user_input("no")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_phone_number")
 
 
 @pytest.mark.asyncio
-@mock.patch("vaccine.utils.get_today")
-async def test_phone_number_invalid(get_today):
-    get_today.return_value = date(2100, 1, 1)
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_phone_number"),
-        session_id=1,
-        answers={
-            "state_dob_year": "1990",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-        },
-    )
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_phone_number"
+async def test_phone_number_invalid(tester: AppTester):
+    tester.setup_state("state_phone_number")
+    await tester.user_input("invalid")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_phone_number")
 
 
 @pytest.mark.asyncio
-async def test_vaccination_time():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_medical_aid_number"),
-        session_id=1,
-    )
-    app = Application(u)
-    msg = Message(
-        content="A1234567890",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_vaccination_time"
+async def test_vaccination_time(tester: AppTester):
+    tester.setup_state("state_medical_aid_number")
+    await tester.user_input("A1234567890")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_vaccination_time")
 
 
 @pytest.mark.asyncio
-async def test_vaccination_time_invalid():
-    u = User(
-        addr="27820001001", state=StateData(name="state_vaccination_time"), session_id=1
-    )
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_vaccination_time"
+async def test_vaccination_time_invalid(tester: AppTester):
+    tester.setup_state("state_vaccination_time")
+    await tester.user_input("invalid")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_vaccination_time")
 
 
 @pytest.mark.asyncio
-async def test_medical_aid_search():
-    u = User(
-        addr="27820001001", state=StateData(name="state_medical_aid"), session_id=1
-    )
-    app = Application(u)
-    msg = Message(
-        content="yes",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_medical_aid_search"
+async def test_medical_aid_search(tester: AppTester):
+    tester.setup_state("state_medical_aid")
+    await tester.user_input("yes")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_medical_aid_search")
 
 
 @pytest.mark.asyncio
-async def test_medical_aid_list_1(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_medical_aid_search"),
-        session_id=1,
-    )
-    app = Application(u)
-    msg = Message(
-        content="discovery",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_medical_aid_list"
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Please confirm your Medical Aid Provider. REPLY with a NUMBER from the "
-            "list below:",
-            "1. Discovery Health Medical Scheme",
-            "2. Aeci Medical Aid Society",
-            "3. BMW Employees Medical Aid Society",
-            "4. None of these",
-        ]
+async def test_medical_aid_list_1(evds_mock, tester: AppTester):
+    tester.setup_state("state_medical_aid_search")
+    await tester.user_input("discovery")
+    tester.assert_state("state_medical_aid_list")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Please confirm your Medical Aid Provider. REPLY with a NUMBER from "
+                "the list below:",
+                "1. Discovery Health Medical Scheme",
+                "2. Aeci Medical Aid Society",
+                "3. BMW Employees Medical Aid Society",
+                "4. None of these",
+            ]
+        )
     )
 
 
 @pytest.mark.asyncio
-async def test_medical_aid_list_2(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_medical_aid_search"),
-        session_id=1,
-    )
-    app = Application(u)
-    msg = Message(
-        content="tsogo sun",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_medical_aid_list"
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Please confirm your Medical Aid Provider. REPLY with a NUMBER from the "
-            "list below:",
-            "1. Tsogo Sun Group Medical Scheme",
-            "2. Golden Arrows Employees Medical Benefit Fund",
-            "3. Government Employees Medical Scheme (GEMS)",
-            "4. None of these",
-        ]
+async def test_medical_aid_list_2(evds_mock, tester: AppTester):
+    tester.setup_state("state_medical_aid_search")
+    await tester.user_input("tsogo sun")
+    tester.assert_state("state_medical_aid_list")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Please confirm your Medical Aid Provider. REPLY with a NUMBER from "
+                "the list below:",
+                "1. Tsogo Sun Group Medical Scheme",
+                "2. Golden Arrows Employees Medical Benefit Fund",
+                "3. Government Employees Medical Scheme (GEMS)",
+                "4. None of these",
+            ]
+        )
     )
 
 
 @pytest.mark.asyncio
-async def test_medical_aid_list_3(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_medical_aid_search"),
-        session_id=1,
-    )
-    app = Application(u)
-    msg = Message(
-        content="de beers",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_medical_aid_list"
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Please confirm your Medical Aid Provider. REPLY with a NUMBER from the "
-            "list below:",
-            "1. De Beers Benefit Society",
-            "2. South African Breweries Medical Aid Scheme (SABMAS)",
-            "3. BMW Employees Medical Aid Society",
-            "4. None of these",
-        ]
+async def test_medical_aid_list_3(evds_mock, tester: AppTester):
+    tester.setup_state("state_medical_aid_search")
+    await tester.user_input("de beers")
+    tester.assert_state("state_medical_aid_list")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Please confirm your Medical Aid Provider. REPLY with a NUMBER from "
+                "the list below:",
+                "1. De Beers Benefit Society",
+                "2. South African Breweries Medical Aid Scheme (SABMAS)",
+                "3. BMW Employees Medical Aid Society",
+                "4. None of these",
+            ]
+        )
     )
 
 
 @pytest.mark.asyncio
-async def test_medical_aid_list_other(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_medical_aid_list"),
-        session_id=1,
-        answers={"state_medical_aid_search": "discovery"},
-    )
-    app = Application(u)
-    msg = Message(
-        content="4",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_medical_aid"
+async def test_medical_aid_list_other(evds_mock, tester: AppTester):
+    tester.setup_state("state_medical_aid_list")
+    tester.setup_answer("state_medical_aid_search", "discovery")
+    await tester.user_input("4")
+    tester.assert_state("state_medical_aid")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_medical_aid_number(evds_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_medical_aid_list"),
-        session_id=1,
-        answers={"state_medical_aid_search": "discovery"},
-    )
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_medical_aid_number"
+async def test_medical_aid_number(evds_mock, tester: AppTester):
+    tester.setup_state("state_medical_aid_list")
+    tester.setup_answer("state_medical_aid_search", "discovery")
+    await tester.user_input("1")
+    tester.assert_state("state_medical_aid_number")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_medical_aid():
-    u = User(
-        addr="27820001001", state=StateData(name="state_email_address"), session_id=1
-    )
-    app = Application(u)
-    msg = Message(
-        content="test@example.org",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_medical_aid"
+async def test_medical_aid(tester: AppTester):
+    tester.setup_state("state_email_address")
+    await tester.user_input("test@example.org")
+    tester.assert_state("state_medical_aid")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_medical_aid_invalid():
-    u = User(
-        addr="27820001001", state=StateData(name="state_medical_aid"), session_id=1
-    )
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_medical_aid"
+async def test_medical_aid_invalid(tester: AppTester):
+    tester.setup_state("state_medical_aid")
+    await tester.user_input("invalid")
+    tester.assert_state("state_medical_aid")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_email_address():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_self_registration"),
-        session_id=1,
-    )
-    app = Application(u)
-    msg = Message(
-        content="yes",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_email_address"
+async def test_email_address(tester: AppTester):
+    tester.setup_state("state_self_registration")
+    await tester.user_input("yes")
+    tester.assert_state("state_email_address")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_email_skip():
-    u = User(
-        addr="27820001001", state=StateData(name="state_email_address"), session_id=1
-    )
-    app = Application(u)
-    msg = Message(
-        content="skip",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_medical_aid"
+async def test_email_skip(tester: AppTester):
+    tester.setup_state("state_email_address")
+    await tester.user_input("skip")
+    tester.assert_state("state_medical_aid")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_email_invalid():
-    u = User(
-        addr="27820001001", state=StateData(name="state_email_address"), session_id=1
-    )
-    app = Application(u)
-    msg = Message(
-        content="invalid@",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_email_address"
+async def test_email_invalid(tester: AppTester):
+    tester.setup_state("state_email_address")
+    await tester.user_input("invalid@")
+    tester.assert_state("state_email_address")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_email_invalid_2():
-    u = User(
-        addr="27820001001", state=StateData(name="state_email_address"), session_id=1
-    )
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_email_address"
+async def test_email_invalid_2(tester: AppTester):
+    tester.setup_state("state_email_address")
+    await tester.user_input("invalid")
+    tester.assert_state("state_email_address")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_terms_and_conditions():
-    u = User(addr="27820001001", state=StateData(name="state_age_gate"), session_id=1)
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [pdf, reply] = await app.process_message(msg)
-    assert "document" in pdf.helper_metadata
-    assert u.state.name == "state_terms_and_conditions"
+async def test_terms_and_conditions(tester: AppTester):
+    tester.setup_state("state_age_gate")
+    await tester.user_input("1")
+    tester.assert_state("state_terms_and_conditions")
+    tester.assert_num_messages(2)
+    assert "document" in tester.application.messages[0].helper_metadata
 
 
 @pytest.mark.asyncio
-async def test_terms_and_conditions_invalid():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_terms_and_conditions"),
-        session_id=1,
-    )
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_terms_and_conditions"
+async def test_terms_and_conditions_invalid(tester: AppTester):
+    tester.setup_state("state_terms_and_conditions")
+    await tester.user_input("invalid")
+    tester.assert_state("state_terms_and_conditions")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_terms_and_conditions_summary():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_terms_and_conditions"),
-        session_id=1,
-    )
-    app = Application(u)
-    msg = Message(
-        content="read summary",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert u.state.name == "state_terms_and_conditions_summary"
+async def test_terms_and_conditions_summary(tester: AppTester):
+    tester.setup_state("state_terms_and_conditions")
+    await tester.user_input("read summary")
+    tester.assert_state("state_terms_and_conditions_summary")
+    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_no_terms():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_terms_and_conditions_summary"),
-        session_id=1,
+async def test_no_terms(tester: AppTester):
+    tester.setup_state("state_terms_and_conditions_summary")
+    await tester.user_input("no")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Thank you. If you change your mind, type *REGISTER* to restart your "
+                "registration session",
+            ]
+        ),
+        session=Message.SESSION_EVENT.CLOSE,
     )
-    app = Application(u)
-    msg = Message(
-        content="no",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Thank you. If you change your mind, type *REGISTER* to restart your "
-            "registration session",
-        ]
-    )
-    assert reply.session_event == Message.SESSION_EVENT.CLOSE
 
 
 @pytest.mark.asyncio
-async def test_state_success(evds_mock, eventstore_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_vaccination_time"),
-        session_id=1,
-        answers={
-            "state_dob_year": "1960",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-            "state_vaccination_time": "weekday_morning",
-            "state_suburb": "d114778e-c590-4a08-894e-0ddaefc5759e",
-            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
-            "state_gender": "Other",
-            "state_surname": "test surname",
-            "state_first_name": "test first name",
-            "state_identification_type": "rsa_id",
-            "state_identification_number": " 6001010001081 ",
-            "state_medical_aid": "state_vaccination_time",
-            "state_email_address": "SKIP",
-        },
+async def test_state_success(evds_mock, eventstore_mock, tester: AppTester):
+    tester.setup_state("state_vaccination_time")
+    tester.setup_answer("state_dob_year", "1960")
+    tester.setup_answer("state_dob_month", "1")
+    tester.setup_answer("state_dob_day", "1")
+    tester.setup_answer("state_vaccination_time", "weekday_morning")
+    tester.setup_answer("state_suburb", "d114778e-c590-4a08-894e-0ddaefc5759e")
+    tester.setup_answer("state_province_id", "e32298eb-17b4-471e-8d9b-ba093c6afc7c")
+    tester.setup_answer("state_gender", "Other")
+    tester.setup_answer("state_surname", "test surname")
+    tester.setup_answer("state_first_name", "test first name")
+    tester.setup_answer("state_identification_type", "rsa_id")
+    tester.setup_answer("state_identification_number", " 6001010001081 ")
+    tester.setup_answer("state_medical_aid", "state_vaccination_time")
+    tester.setup_answer("state_email_address", "SKIP")
+    await tester.user_input("1")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Congratulations! You successfully registered with the National "
+                "Department of Health to get a COVID-19 vaccine.",
+                "",
+                "Look out for messages from this number (060 012 3456) on WhatsApp OR "
+                "on SMS/email. We will update you with important information about "
+                "your appointment and what to expect.",
+            ]
+        ),
+        session=Message.SESSION_EVENT.CLOSE,
     )
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Congratulations! You successfully registered with the National Department "
-            "of Health to get a COVID-19 vaccine.",
-            "",
-            "Look out for messages from this number (060 012 3456) on WhatsApp OR on "
-            "SMS/email. We will update you with important information about your "
-            "appointment and what to expect.",
-        ]
-    )
-    assert reply.session_event == Message.SESSION_EVENT.CLOSE
 
     [requests] = evds_mock.app.requests
     assert requests.json == {
@@ -1440,49 +873,40 @@ async def test_state_success(evds_mock, eventstore_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_success_international_phonenumber(evds_mock, eventstore_mock):
-    u = User(
-        addr="32470001001",
-        state=StateData(name="state_vaccination_time"),
-        session_id=1,
-        answers={
-            "state_dob_year": "1960",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-            "state_vaccination_time": "weekday_morning",
-            "state_suburb": "d114778e-c590-4a08-894e-0ddaefc5759e",
-            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
-            "state_gender": "Other",
-            "state_surname": "test surname",
-            "state_first_name": "test first name",
-            "state_identification_type": "rsa_id",
-            "state_identification_number": "6001010001081",
-            "state_medical_aid": "state_vaccination_time",
-            "state_email_address": "SKIP",
-        },
+async def test_state_success_international_phonenumber(
+    evds_mock, eventstore_mock, tester: AppTester
+):
+    tester.setup_state("state_vaccination_time")
+    tester.setup_user_address("32470001001")
+    tester.setup_answer("state_dob_year", "1960")
+    tester.setup_answer("state_dob_month", "1")
+    tester.setup_answer("state_dob_day", "1")
+    tester.setup_answer("state_vaccination_time", "weekday_morning")
+    tester.setup_answer("state_suburb", "d114778e-c590-4a08-894e-0ddaefc5759e")
+    tester.setup_answer("state_province_id", "e32298eb-17b4-471e-8d9b-ba093c6afc7c")
+    tester.setup_answer("state_gender", "Other")
+    tester.setup_answer("state_surname", "test surname")
+    tester.setup_answer("state_first_name", "test first name")
+    tester.setup_answer("state_identification_type", "rsa_id")
+    tester.setup_answer("state_identification_number", "6001010001081")
+    tester.setup_answer("state_medical_aid", "state_vaccination_time")
+    tester.setup_answer("state_email_address", "SKIP")
+    await tester.user_input("1")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Congratulations! You successfully registered with the National "
+                "Department of Health to get a COVID-19 vaccine.",
+                "",
+                "Look out for messages from this number (060 012 3456) on WhatsApp OR "
+                "on SMS/email. We will update you with important information about "
+                "your appointment and what to expect.",
+            ]
+        ),
+        session=Message.SESSION_EVENT.CLOSE,
     )
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="32470001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Congratulations! You successfully registered with the National Department "
-            "of Health to get a COVID-19 vaccine.",
-            "",
-            "Look out for messages from this number (060 012 3456) on WhatsApp OR on "
-            "SMS/email. We will update you with important information about your "
-            "appointment and what to expect.",
-        ]
-    )
-    assert reply.session_event == Message.SESSION_EVENT.CLOSE
 
     [requests] = evds_mock.app.requests
     assert requests.json == {
@@ -1521,51 +945,39 @@ async def test_state_success_international_phonenumber(evds_mock, eventstore_moc
 
 
 @pytest.mark.asyncio
-async def test_state_success_passport(evds_mock, eventstore_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_vaccination_time"),
-        session_id=1,
-        answers={
-            "state_dob_year": "1960",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-            "state_vaccination_time": "weekday_morning",
-            "state_suburb": "d114778e-c590-4a08-894e-0ddaefc5759e",
-            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
-            "state_gender": "Other",
-            "state_surname": "test surname",
-            "state_first_name": "test first name",
-            "state_identification_type": "passport",
-            "state_identification_number": "A1234567890",
-            "state_passport_country": "south africa",
-            "state_passport_country_list": "ZA",
-            "state_medical_aid": "state_vaccination_time",
-            "state_email_address": "SKIP",
-        },
+async def test_state_success_passport(evds_mock, eventstore_mock, tester: AppTester):
+    tester.setup_state("state_vaccination_time")
+    tester.setup_answer("state_dob_year", "1960")
+    tester.setup_answer("state_dob_month", "1")
+    tester.setup_answer("state_dob_day", "1")
+    tester.setup_answer("state_vaccination_time", "weekday_morning")
+    tester.setup_answer("state_suburb", "d114778e-c590-4a08-894e-0ddaefc5759e")
+    tester.setup_answer("state_province_id", "e32298eb-17b4-471e-8d9b-ba093c6afc7c")
+    tester.setup_answer("state_gender", "Other")
+    tester.setup_answer("state_surname", "test surname")
+    tester.setup_answer("state_first_name", "test first name")
+    tester.setup_answer("state_identification_type", "passport")
+    tester.setup_answer("state_identification_number", "A1234567890")
+    tester.setup_answer("state_passport_country", "south africa")
+    tester.setup_answer("state_passport_country_list", "ZA")
+    tester.setup_answer("state_medical_aid", "state_vaccination_time")
+    tester.setup_answer("state_email_address", "SKIP")
+    await tester.user_input("1")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Congratulations! You successfully registered with the National "
+                "Department of Health to get a COVID-19 vaccine.",
+                "",
+                "Look out for messages from this number (060 012 3456) on WhatsApp OR "
+                "on SMS/email. We will update you with important information about "
+                "your appointment and what to expect.",
+            ]
+        ),
+        session=Message.SESSION_EVENT.CLOSE,
     )
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Congratulations! You successfully registered with the National Department "
-            "of Health to get a COVID-19 vaccine.",
-            "",
-            "Look out for messages from this number (060 012 3456) on WhatsApp OR on "
-            "SMS/email. We will update you with important information about your "
-            "appointment and what to expect.",
-        ]
-    )
-    assert reply.session_event == Message.SESSION_EVENT.CLOSE
 
     [requests] = evds_mock.app.requests
     assert requests.json == {
@@ -1605,49 +1017,39 @@ async def test_state_success_passport(evds_mock, eventstore_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_success_asylum_seeker(evds_mock, eventstore_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_vaccination_time"),
-        session_id=1,
-        answers={
-            "state_dob_year": "1960",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-            "state_vaccination_time": "weekday_morning",
-            "state_suburb": "d114778e-c590-4a08-894e-0ddaefc5759e",
-            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
-            "state_gender": "Other",
-            "state_surname": "test surname",
-            "state_first_name": "test first name",
-            "state_identification_type": "asylum_seeker",
-            "state_identification_number": "A1234567890",
-            "state_medical_aid": "state_vaccination_time",
-            "state_email_address": "SKIP",
-        },
+async def test_state_success_asylum_seeker(
+    evds_mock, eventstore_mock, tester: AppTester
+):
+    tester.setup_state("state_vaccination_time")
+    tester.setup_answer("state_dob_year", "1960")
+    tester.setup_answer("state_dob_month", "1")
+    tester.setup_answer("state_dob_day", "1")
+    tester.setup_answer("state_vaccination_time", "weekday_morning")
+    tester.setup_answer("state_suburb", "d114778e-c590-4a08-894e-0ddaefc5759e")
+    tester.setup_answer("state_province_id", "e32298eb-17b4-471e-8d9b-ba093c6afc7c")
+    tester.setup_answer("state_gender", "Other")
+    tester.setup_answer("state_surname", "test surname")
+    tester.setup_answer("state_first_name", "test first name")
+    tester.setup_answer("state_identification_type", "asylum_seeker")
+    tester.setup_answer("state_identification_number", "A1234567890")
+    tester.setup_answer("state_medical_aid", "state_vaccination_time")
+    tester.setup_answer("state_email_address", "SKIP")
+    await tester.user_input("1")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Congratulations! You successfully registered with the National "
+                "Department of Health to get a COVID-19 vaccine.",
+                "",
+                "Look out for messages from this number (060 012 3456) on WhatsApp OR "
+                "on SMS/email. We will update you with important information about "
+                "your appointment and what to expect.",
+            ]
+        ),
+        session=Message.SESSION_EVENT.CLOSE,
     )
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Congratulations! You successfully registered with the National Department "
-            "of Health to get a COVID-19 vaccine.",
-            "",
-            "Look out for messages from this number (060 012 3456) on WhatsApp OR on "
-            "SMS/email. We will update you with important information about your "
-            "appointment and what to expect.",
-        ]
-    )
-    assert reply.session_event == Message.SESSION_EVENT.CLOSE
 
     [requests] = evds_mock.app.requests
     assert requests.json == {
@@ -1685,49 +1087,37 @@ async def test_state_success_asylum_seeker(evds_mock, eventstore_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_success_refugee(evds_mock, eventstore_mock):
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_vaccination_time"),
-        session_id=1,
-        answers={
-            "state_dob_year": "1960",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-            "state_vaccination_time": "weekday_morning",
-            "state_suburb": "d114778e-c590-4a08-894e-0ddaefc5759e",
-            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
-            "state_gender": "Other",
-            "state_surname": "test surname",
-            "state_first_name": "test first name",
-            "state_identification_type": "refugee",
-            "state_identification_number": "A1234567890",
-            "state_medical_aid": "state_vaccination_time",
-            "state_email_address": "SKIP",
-        },
+async def test_state_success_refugee(evds_mock, eventstore_mock, tester: AppTester):
+    tester.setup_state("state_vaccination_time")
+    tester.setup_answer("state_dob_year", "1960")
+    tester.setup_answer("state_dob_month", "1")
+    tester.setup_answer("state_dob_day", "1")
+    tester.setup_answer("state_vaccination_time", "weekday_morning")
+    tester.setup_answer("state_suburb", "d114778e-c590-4a08-894e-0ddaefc5759e")
+    tester.setup_answer("state_province_id", "e32298eb-17b4-471e-8d9b-ba093c6afc7c")
+    tester.setup_answer("state_gender", "Other")
+    tester.setup_answer("state_surname", "test surname")
+    tester.setup_answer("state_first_name", "test first name")
+    tester.setup_answer("state_identification_type", "refugee")
+    tester.setup_answer("state_identification_number", "A1234567890")
+    tester.setup_answer("state_medical_aid", "state_vaccination_time")
+    tester.setup_answer("state_email_address", "SKIP")
+    await tester.user_input("1")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Congratulations! You successfully registered with the National "
+                "Department of Health to get a COVID-19 vaccine.",
+                "",
+                "Look out for messages from this number (060 012 3456) on WhatsApp OR "
+                "on SMS/email. We will update you with important information about "
+                "your appointment and what to expect.",
+            ]
+        ),
+        session=Message.SESSION_EVENT.CLOSE,
     )
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Congratulations! You successfully registered with the National Department "
-            "of Health to get a COVID-19 vaccine.",
-            "",
-            "Look out for messages from this number (060 012 3456) on WhatsApp OR on "
-            "SMS/email. We will update you with important information about your "
-            "appointment and what to expect.",
-        ]
-    )
-    assert reply.session_event == Message.SESSION_EVENT.CLOSE
 
     [requests] = evds_mock.app.requests
     assert requests.json == {
@@ -1765,52 +1155,40 @@ async def test_state_success_refugee(evds_mock, eventstore_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_success_temporary_failure(evds_mock):
+async def test_state_success_temporary_failure(evds_mock, tester: AppTester):
     evds_mock.app.errormax = 1
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_vaccination_time"),
-        session_id=1,
-        answers={
-            "state_dob_year": "1960",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-            "state_vaccination_time": "weekday_morning",
-            "state_suburb": "d114778e-c590-4a08-894e-0ddaefc5759e",
-            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
-            "state_gender": "Other",
-            "state_surname": "test surname",
-            "state_first_name": "test first name",
-            "state_identification_type": "passport",
-            "state_identification_number": "A1234567890",
-            "state_passport_country": "south africa",
-            "state_passport_country_list": "ZA",
-            "state_medical_aid": "state_vaccination_time",
-            "state_email_address": "test@example.org",
-        },
+    tester.setup_state("state_vaccination_time")
+    tester.setup_answer("state_dob_year", "1960")
+    tester.setup_answer("state_dob_month", "1")
+    tester.setup_answer("state_dob_day", "1")
+    tester.setup_answer("state_vaccination_time", "weekday_morning")
+    tester.setup_answer("state_suburb", "d114778e-c590-4a08-894e-0ddaefc5759e")
+    tester.setup_answer("state_province_id", "e32298eb-17b4-471e-8d9b-ba093c6afc7c")
+    tester.setup_answer("state_gender", "Other")
+    tester.setup_answer("state_surname", "test surname")
+    tester.setup_answer("state_first_name", "test first name")
+    tester.setup_answer("state_identification_type", "passport")
+    tester.setup_answer("state_identification_number", "A1234567890")
+    tester.setup_answer("state_passport_country", "south africa")
+    tester.setup_answer("state_passport_country_list", "ZA")
+    tester.setup_answer("state_medical_aid", "state_vaccination_time")
+    tester.setup_answer("state_email_address", "test@example.org")
+    await tester.user_input("1")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Congratulations! You successfully registered with the National "
+                "Department of Health to get a COVID-19 vaccine.",
+                "",
+                "Look out for messages from this number (060 012 3456) on WhatsApp OR "
+                "on SMS/email. We will update you with important information about "
+                "your appointment and what to expect.",
+            ]
+        ),
+        session=Message.SESSION_EVENT.CLOSE,
     )
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "Congratulations! You successfully registered with the National Department "
-            "of Health to get a COVID-19 vaccine.",
-            "",
-            "Look out for messages from this number (060 012 3456) on WhatsApp OR on "
-            "SMS/email. We will update you with important information about your "
-            "appointment and what to expect.",
-        ]
-    )
-    assert reply.session_event == Message.SESSION_EVENT.CLOSE
 
     requests = evds_mock.app.requests
     assert len(requests) == 2
@@ -1836,47 +1214,34 @@ async def test_state_success_temporary_failure(evds_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_error(evds_mock):
+async def test_state_error(evds_mock, tester: AppTester):
     evds_mock.app.errormax = 3
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_vaccination_time"),
-        session_id=1,
-        answers={
-            "state_dob_year": "1960",
-            "state_dob_month": "1",
-            "state_dob_day": "1",
-            "state_gender": "Other",
-            "state_suburb": "d114778e-c590-4a08-894e-0ddaefc5759e",
-            "state_province_id": "e32298eb-17b4-471e-8d9b-ba093c6afc7c",
-            "state_gender": "Other",
-            "state_surname": "test surname",
-            "state_first_name": "test first name",
-            "state_identification_type": "refugee",
-            "state_identification_number": "6001010001081",
-            "state_medical_aid": "state_medical_aid_search",
-            "state_medical_aid_search": "discovery",
-            "state_medical_aid_list": "971672ba-bb31-4fca-945a-7c530b8b5558",
-            "state_medical_aid_number": "M1234567890",
-            "state_vaccination_time": "weekday_morning",
-            "state_email_address": "SKIP",
-        },
+    tester.setup_state("state_vaccination_time")
+    tester.setup_answer("state_dob_year", "1960")
+    tester.setup_answer("state_dob_month", "1")
+    tester.setup_answer("state_dob_day", "1")
+    tester.setup_answer("state_gender", "Other")
+    tester.setup_answer("state_suburb", "d114778e-c590-4a08-894e-0ddaefc5759e")
+    tester.setup_answer("state_province_id", "e32298eb-17b4-471e-8d9b-ba093c6afc7c")
+    tester.setup_answer("state_gender", "Other")
+    tester.setup_answer("state_surname", "test surname")
+    tester.setup_answer("state_first_name", "test first name")
+    tester.setup_answer("state_identification_type", "refugee")
+    tester.setup_answer("state_identification_number", "6001010001081")
+    tester.setup_answer("state_medical_aid", "state_medical_aid_search")
+    tester.setup_answer("state_medical_aid_search", "discovery")
+    tester.setup_answer(
+        "state_medical_aid_list", "971672ba-bb31-4fca-945a-7c530b8b5558"
     )
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    tester.setup_answer("state_medical_aid_number", "M1234567890")
+    tester.setup_answer("state_vaccination_time", "weekday_morning")
+    tester.setup_answer("state_email_address", "SKIP")
+    await tester.user_input("1")
+    tester.assert_message(
+        "Something went wrong with your registration session. Your registration was "
+        "not able to be processed. Please try again later",
+        session=Message.SESSION_EVENT.CLOSE,
     )
-    [reply] = await app.process_message(msg)
-    assert (
-        reply.content
-        == "Something went wrong with your registration session. Your registration was "
-        "not able to be processed. Please try again later"
-    )
-    assert reply.session_event == Message.SESSION_EVENT.CLOSE
 
     requests = evds_mock.app.requests
     assert len(requests) == 3
@@ -1905,103 +1270,69 @@ async def test_state_error(evds_mock):
 
 
 @pytest.mark.asyncio
-async def test_timeout():
-    u = User(
-        addr="27820001001", state=StateData(name="state_passport_country"), session_id=1
+async def test_timeout(tester: AppTester):
+    tester.setup_state("state_passport_country")
+    await tester.user_input(session=Message.SESSION_EVENT.CLOSE)
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "We haven’t heard from you in a while!",
+                "",
+                "The registration session has timed out due to inactivity. You will "
+                "need to start again. Just TYPE the word REGISTER.",
+                "",
+                "-----",
+                "📌 Reply *0* to return to the main *MENU*",
+            ]
+        ),
+        session=Message.SESSION_EVENT.CLOSE,
     )
-    app = Application(u)
-    msg = Message(
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-        session_event=Message.SESSION_EVENT.CLOSE,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "We haven’t heard from you in a while!",
-            "",
-            "The registration session has timed out due to inactivity. You will need "
-            "to start again. Just TYPE the word REGISTER.",
-            "",
-            "-----",
-            "📌 Reply *0* to return to the main *MENU*",
-        ]
-    )
-    assert reply.session_event == Message.SESSION_EVENT.CLOSE
 
 
 @pytest.mark.asyncio
-async def test_throttle():
+async def test_throttle(tester: AppTester):
     throttle = config.THROTTLE_PERCENTAGE
     config.THROTTLE_PERCENTAGE = 100.0
 
-    u = User(addr="27820001001")
-    app = Application(u)
-    msg = Message(
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "\n".join(
-        [
-            "*VACCINE REGISTRATION SECURE CHAT* 🔐",
-            "",
-            "⚠️ We are currently experiencing high volumes of registrations.",
-            "",
-            "Your registration is important! Please try again in 15 minutes.",
-            "",
-            "-----",
-            "📌 Reply *0* to return to the main *MENU*",
-        ]
+    await tester.user_input()
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "⚠️ We are currently experiencing high volumes of registrations.",
+                "",
+                "Your registration is important! Please try again in 15 minutes.",
+                "",
+                "-----",
+                "📌 Reply *0* to return to the main *MENU*",
+            ]
+        ),
+        session=Message.SESSION_EVENT.CLOSE,
     )
 
     config.THROTTLE_PERCENTAGE = throttle
 
 
 @pytest.mark.asyncio
-async def test_exit_keywords():
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_terms_and_conditions_summary"),
-        session_id=1,
-    )
-    app = Application(u)
-    msg = Message(
-        content="menu",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == ""
-    assert reply.session_event == Message.SESSION_EVENT.CLOSE
-    assert reply.helper_metadata["automation_handle"] is True
-    assert u.answers == {}
-    assert u.state.name is None
+async def test_exit_keywords(tester: AppTester):
+    tester.setup_state("state_terms_and_conditions_summary")
+    await tester.user_input("menu")
+    tester.assert_message("", session=Message.SESSION_EVENT.CLOSE)
+    assert tester.application.messages[0].helper_metadata["automation_handle"] is True
+    tester.assert_state(None)
+    assert tester.user.answers == {}
 
 
 @pytest.mark.asyncio
-async def test_uncaught_exception():
-    u = User(
-        addr="27820001001", state=StateData(name="state_vaccination_time"), session_id=1
+async def test_uncaught_exception(tester: AppTester):
+    tester.setup_state("state_vaccination_time")
+    await tester.user_input("1")
+    tester.assert_message(
+        "Something went wrong. Please try again later.",
+        session=Message.SESSION_EVENT.CLOSE,
     )
-    app = Application(u)
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert reply.content == "Something went wrong. Please try again later."
-    assert reply.session_event == Message.SESSION_EVENT.CLOSE
-    assert u.answers == {}
-    assert u.state.name is None
+    assert tester.user.answers == {}
+    tester.assert_state(None)
