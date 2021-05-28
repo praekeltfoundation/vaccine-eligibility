@@ -288,8 +288,8 @@ async def test_passport_country_search():
             "Please confirm your passport's COUNTRY of origin. REPLY with a "
             "NUMBER from the list below:",
             "1. Republic of Côte d'Ivoire",
-            "2. Plurinational State of Bolivia",
-            "3. Swiss Confederation",
+            "2. British Indian Ocean Territory",
+            "3. Plurinational State of Bolivia",
             "4. Other",
         ]
     )
@@ -1194,7 +1194,7 @@ async def test_medical_aid_list_2(evds_mock):
             "list below:",
             "1. Tsogo Sun Group Medical Scheme",
             "2. Golden Arrows Employees Medical Benefit Fund",
-            "3. Government Employees Medical Scheme (GEMS)",
+            "3. Engen Medical Benefit Fund",
             "4. None of these",
         ]
     )
@@ -1224,8 +1224,8 @@ async def test_medical_aid_list_3(evds_mock):
             "Please confirm your Medical Aid Provider. REPLY with a NUMBER from the "
             "list below:",
             "1. De Beers Benefit Society",
-            "2. South African Breweries Medical Aid Scheme (SABMAS)",
-            "3. BMW Employees Medical Aid Society",
+            "2. BMW Employees Medical Aid Society",
+            "3. Government Employees Medical Scheme (GEMS)",
             "4. None of these",
         ]
     )

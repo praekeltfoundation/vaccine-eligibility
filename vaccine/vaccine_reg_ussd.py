@@ -256,7 +256,7 @@ class Application(BaseApplication):
 
         search = self.user.answers["state_passport_country_search"] or ""
         choices = [
-            Choice(country[0], country[1][:30])
+            Choice(country[0], country[1][:27])
             for country in countries.search_for_country(search)
         ]
         choices.append(Choice("other", self._("Other")))

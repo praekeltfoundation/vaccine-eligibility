@@ -111,7 +111,9 @@ class Suburbs:
             }
         else:
             suburbs_search = {k: f"{v.name}, {v.city}" for k, v in suburbs.items()}
-        possibilities = process.extract(search_text, suburbs_search, score_cutoff=80)
+        possibilities = process.extract(
+            search_text, suburbs_search, score_cutoff=80, limit=100
+        )
 
         if municipality_id is None and len(possibilities) > m_limit:
             municipalities = [
