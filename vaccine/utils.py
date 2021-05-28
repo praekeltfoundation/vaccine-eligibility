@@ -8,7 +8,7 @@ from uuid import uuid4
 import aiohttp
 import phonenumbers
 import pycountry
-from fuzzywuzzy import process
+from rapidfuzz import process
 
 DECODE_MESSAGE_EXCEPTIONS = (
     UnicodeDecodeError,

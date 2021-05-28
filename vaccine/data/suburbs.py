@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 
 import aiohttp
 from aiohttp_client_cache import CacheBackend, CachedSession
-from fuzzywuzzy import process
+from rapidfuzz import process
 
 from vaccine import vacreg_config as config
 
@@ -111,9 +111,7 @@ class Suburbs:
             }
         else:
             suburbs_search = {k: f"{v.name}, {v.city}" for k, v in suburbs.items()}
-        possibilities = process.extractBests(
-            search_text, suburbs_search, score_cutoff=80, limit=None
-        )
+        possibilities = process.extract(search_text, suburbs_search, score_cutoff=80)
 
         if municipality_id is None and len(possibilities) > m_limit:
             municipalities = [
