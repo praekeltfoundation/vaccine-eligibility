@@ -2,7 +2,7 @@ from urllib.parse import urljoin
 
 import aiohttp
 from aiohttp_client_cache import CacheBackend, CachedSession
-from fuzzywuzzy import process
+from rapidfuzz import process
 
 from vaccine import vacreg_config as config
 

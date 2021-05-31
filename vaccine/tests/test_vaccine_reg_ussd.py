@@ -340,8 +340,8 @@ async def test_passport_country_search():
         [
             "Please choose the best match for your COUNTRY of origin:",
             "1. Republic of Côte d'Ivoire",
-            "2. Plurinational State of Bolivia",
-            "3. Swiss Confederation",
+            "2. British Indian Ocean Territ",
+            "3. Plurinational State of Boli",
             "4. Other",
         ]
     )

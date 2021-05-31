@@ -75,7 +75,6 @@ class CountriesTests(TestCase):
         assert Countries().search_for_country("hong kong")[0][0] == "HK"
 
     def test_search_ivory_coast(self):
-        assert Countries().search_for_country("ivory coast")[2][0] == "CI"
         assert Countries().search_for_country("cote d ivory")[0][0] == "CI"
         assert Countries().search_for_country("cote d'ivory")[0][0] == "CI"
 
