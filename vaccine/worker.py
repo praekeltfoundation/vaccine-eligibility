@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 
 import aiohttp
 import aioredis
+import sentry_sdk
 from aio_pika import Connection, ExchangeType, IncomingMessage
 from aio_pika import Message as AMQPMessage
 from aio_pika import connect_robust
@@ -185,31 +186,36 @@ class AnswerWorker:
         if not answers:
             return
         try:
-            await self.session.post(
+            data = {
+                "data": {
+                    "type": "responses",
+                    "id": config.ANSWER_RESOURCE_ID,
+                    "attributes": {
+                        "responses": [
+                            [
+                                a.timestamp.isoformat(),
+                                a.row_id,
+                                a.address,
+                                a.session_id,
+                                a.question,
+                                a.response,
+                                a.response_metadata,
+                            ]
+                            for a in answers
+                        ]
+                    },
+                }
+            }
+            response = await self.session.post(
                 url=urljoin(
                     config.ANSWER_API_URL,
                     f"flow-results/packages/{config.ANSWER_RESOURCE_ID}/responses/",
                 ),
-                json={
-                    "data": {
-                        "type": "responses",
-                        "id": config.ANSWER_RESOURCE_ID,
-                        "attributes": {
-                            "responses": [
-                                [
-                                    a.timestamp.isoformat(),
-                                    a.row_id,
-                                    a.address,
-                                    a.session_id,
-                                    a.question,
-                                    a.response,
-                                    a.response_metadata,
-                                ]
-                                for a in answers
-                            ]
-                        },
-                    }
-                },
+                json=data,
+            )
+            response_data = await response.json()
+            sentry_sdk.set_context(
+                "answer_api", {"request_data": data, "response_data": response_data}
             )
         except HTTP_EXCEPTIONS:
             logger.exception("Error sending results to flow results server")
