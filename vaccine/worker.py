@@ -133,7 +133,7 @@ class AnswerWorker:
         self.connection = connection
         self.answers: List[IncomingMessage] = []
         self.session = aiohttp.ClientSession(
-            raise_for_status=True,
+            raise_for_status=False,
             timeout=aiohttp.ClientTimeout(total=10),
             connector=aiohttp.TCPConnector(limit=1),
             headers={
@@ -217,6 +217,7 @@ class AnswerWorker:
             sentry_sdk.set_context(
                 "answer_api", {"request_data": data, "response_data": response_data}
             )
+            response.raise_for_status()
         except HTTP_EXCEPTIONS:
             logger.exception("Error sending results to flow results server")
             self.answers.extend(msgs)
