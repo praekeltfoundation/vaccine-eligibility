@@ -151,3 +151,11 @@ class FreeText:
 
     async def display(self, message: Message):
         return self.app.send_message(self.question)
+
+
+class WhatsAppButtonState(ChoiceState):
+    async def display(self, message: Message):
+        return self.app.send_message(
+            self.question,
+            helper_metadata={"buttons": [choice.label for choice in self.choices]},
+        )
