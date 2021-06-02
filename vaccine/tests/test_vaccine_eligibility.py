@@ -32,13 +32,21 @@ async def test_new_user():
             "",
             "Which of these positions or job titles describes your current "
             "employment:",
-            "",
-            "1. Health Care Worker",
-            "2. Essential Worker",
-            "3. Other",
-            "4. Not Sure",
         ]
     )
+    assert reply.helper_metadata == {
+        "button": "Select Employment",
+        "sections": [
+            {
+                "rows": [
+                    {"id": "Health Care Worker", "title": "Health Care Worker"},
+                    {"id": "Essential Worker", "title": "Essential Worker"},
+                    {"id": "Other", "title": "Other"},
+                    {"id": "Not Sure", "title": "Not Sure"},
+                ]
+            }
+        ],
+    }
     assert u.state.name == "state_occupation"
     assert u.session_id is not None
 
@@ -154,13 +162,21 @@ async def test_occupation_not_sure():
             "",
             "Which of these positions or job titles describes your current "
             "employment:",
-            "",
-            "1. Health Care Worker",
-            "2. Essential Worker",
-            "3. Other",
-            "4. Not Sure",
         ]
     )
+    assert reply.helper_metadata == {
+        "button": "Select Employment",
+        "sections": [
+            {
+                "rows": [
+                    {"id": "Health Care Worker", "title": "Health Care Worker"},
+                    {"id": "Essential Worker", "title": "Essential Worker"},
+                    {"id": "Other", "title": "Other"},
+                    {"id": "Not Sure", "title": "Not Sure"},
+                ]
+            }
+        ],
+    }
     assert u.state.name == "state_occupation"
     assert u.session_id == "1"
 

@@ -159,3 +159,20 @@ class WhatsAppButtonState(ChoiceState):
             self.question,
             helper_metadata={"buttons": [choice.label for choice in self.choices]},
         )
+
+
+class WhatsAppListState(ChoiceState):
+    def __init__(self, *args, button: str, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.button = button
+
+    async def display(self, message: Message):
+        return self.app.send_message(
+            self.question,
+            helper_metadata={
+                "button": self.button,
+                "sections": [
+                    {"rows": [{"id": c.label, "title": c.label} for c in self.choices]}
+                ],
+            },
+        )

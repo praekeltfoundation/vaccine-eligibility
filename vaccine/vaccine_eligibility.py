@@ -4,11 +4,11 @@ from vaccine.base_application import BaseApplication
 from vaccine.models import Message
 from vaccine.states import (
     Choice,
-    ChoiceState,
     EndState,
     ErrorMessage,
     FreeText,
     WhatsAppButtonState,
+    WhatsAppListState,
 )
 
 
@@ -63,7 +63,7 @@ class Application(BaseApplication):
                 return "state_occupation"
             return "state_congregate"
 
-        return ChoiceState(
+        return WhatsAppListState(
             self,
             question="\n".join(
                 [
@@ -71,9 +71,9 @@ class Application(BaseApplication):
                     "",
                     "Which of these positions or job titles describes your current "
                     "employment:",
-                    "",
                 ]
             ),
+            button="Select Employment",
             choices=[
                 Choice("hcw", "Health Care Worker"),
                 Choice("essential", "Essential Worker"),
