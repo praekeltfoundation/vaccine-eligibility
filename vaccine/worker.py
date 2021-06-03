@@ -166,6 +166,10 @@ class AnswerWorker:
         await self.channel.close()
 
     async def process_answer(self, amqp_msg: IncomingMessage):
+        answer = Answer.from_json(amqp_msg.body.decode())
+        if answer.response is None:
+            amqp_msg.ack()
+            return
         self.answers.append(amqp_msg)
 
     async def _periodic_loop(self):
