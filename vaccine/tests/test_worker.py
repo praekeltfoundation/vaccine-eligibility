@@ -15,6 +15,35 @@ from vaccine.models import Answer, Event, Message, StateData, User
 from vaccine.worker import AnswerWorker, Worker, config, logger
 
 
+@pytest.fixture(autouse=True)
+async def cleanup():
+    """
+    Ensure that we always cleanup redis and amqp
+    """
+    redis = aioredis.from_url(config.REDIS_URL, encoding="utf-8", decode_responses=True)
+    for key in await redis.keys("user*"):
+        await redis.delete(key)
+    await redis.close()
+
+    connection = await connect_robust(config.AMQP_URL)
+    async with connection:
+        channel = await connection.channel()
+        for routing_key in [
+            f"{config.TRANSPORT_NAME}.inbound",
+            f"{config.TRANSPORT_NAME}.outbound",
+            f"{config.TRANSPORT_NAME}.event",
+            f"{config.TRANSPORT_NAME}.answer",
+        ]:
+            queue = await channel.declare_queue(
+                routing_key, durable=True, auto_delete=False
+            )
+            while True:
+                message = await queue.get(fail=False)
+                if message is None:
+                    break
+                message.ack()
+
+
 @pytest.fixture
 async def worker():
     worker = Worker()
