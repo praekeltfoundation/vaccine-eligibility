@@ -203,7 +203,7 @@ async def flow_results_mock_server(sanic_client):
     @app.route("flow-results/packages/invalid/responses", methods=["POST"])
     async def invalid(request):
         app.future.set_result(request)
-        return response.json({"test": "test"}, status=500)
+        return response.json({}, status=500)
 
     @app.route("flow-results/packages/<flow_id:uuid>/responses", methods=["POST"])
     async def messages(request, flow_id):
