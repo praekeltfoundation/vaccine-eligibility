@@ -50,7 +50,12 @@ class Worker:
             and config.ANSWER_API_TOKEN
             and config.ANSWER_RESOURCE_ID
         ):
-            self.answer_worker = AnswerWorker(self.connection)
+            self.answer_worker = AnswerWorker(
+                connection=self.connection,
+                url=config.ANSWER_API_URL,
+                token=config.ANSWER_API_TOKEN,
+                resource_id=config.ANSWER_RESOURCE_ID,
+            )
             await self.answer_worker.setup()
         else:
             self.answer_worker = None
@@ -129,7 +134,7 @@ class Worker:
 
 
 class AnswerWorker:
-    def __init__(self, connection: Connection):
+    def __init__(self, connection: Connection, url: str, token: str, resource_id: str):
         self.connection = connection
         self.answers: List[IncomingMessage] = []
         self.session = aiohttp.ClientSession(
@@ -137,10 +142,13 @@ class AnswerWorker:
             timeout=aiohttp.ClientTimeout(total=10),
             connector=aiohttp.TCPConnector(limit=1),
             headers={
-                "Authorization": f"Token {config.ANSWER_API_TOKEN}",
+                "Authorization": f"Token {token}",
                 "Content-Type": "application/vnd.api+json",
             },
         )
+        self.url = url
+        self.token = token
+        self.resource_id = resource_id
 
     async def setup(self):
         self.channel = await self.connection.channel()
@@ -167,13 +175,10 @@ class AnswerWorker:
 
     async def process_answer(self, amqp_msg: IncomingMessage):
         try:
-            answer = Answer.from_json(amqp_msg.body.decode("utf-8"))
+            Answer.from_json(amqp_msg.body.decode("utf-8"))
         except DECODE_MESSAGE_EXCEPTIONS:
             logger.exception(f"Invalid answer body {amqp_msg.body!r}")
             amqp_msg.reject(requeue=False)
-            return
-        if answer.response is None:
-            amqp_msg.ack()
             return
         self.answers.append(amqp_msg)
 
@@ -182,55 +187,71 @@ class AnswerWorker:
             await asyncio.sleep(config.ANSWER_BATCH_TIME)
             await self._push_results()
 
+    async def _submit_answers(
+        self, answers: List[Answer]
+    ) -> aiohttp.client.ClientResponse:
+        data = {
+            "data": {
+                "type": "responses",
+                "id": self.resource_id,
+                "attributes": {
+                    "responses": [
+                        [
+                            a.timestamp.isoformat(),
+                            a.row_id,
+                            a.address,
+                            a.session_id,
+                            a.question,
+                            a.response,
+                            a.response_metadata,
+                        ]
+                        for a in answers
+                    ]
+                },
+            }
+        }
+        response = await self.session.post(
+            url=urljoin(
+                self.url, f"flow-results/packages/{self.resource_id}/responses/"
+            ),
+            json=data,
+        )
+        response_data = await response.text()
+        sentry_sdk.set_context(
+            "answer_api", {"request_data": data, "response_data": response_data}
+        )
+        return response
+
     async def _push_results(self):
         msgs, self.answers = self.answers, []
-        answers = (Answer.from_json(a.body.decode()) for a in msgs)
         answers: List[Answer] = []
+        processed = []
         for msg in msgs:
             answers.append(Answer.from_json(msg.body.decode("utf-8")))
         if not answers:
             return
         try:
-            data = {
-                "data": {
-                    "type": "responses",
-                    "id": config.ANSWER_RESOURCE_ID,
-                    "attributes": {
-                        "responses": [
-                            [
-                                a.timestamp.isoformat(),
-                                a.row_id,
-                                a.address,
-                                a.session_id,
-                                a.question,
-                                a.response,
-                                a.response_metadata,
-                            ]
-                            for a in answers
-                        ]
-                    },
-                }
-            }
-            response = await self.session.post(
-                url=urljoin(
-                    config.ANSWER_API_URL,
-                    f"flow-results/packages/{config.ANSWER_RESOURCE_ID}/responses/",
-                ),
-                json=data,
-            )
-            response_data = await response.text()
-            logger.debug(f">>> response_data: {response_data}")
-            sentry_sdk.set_context(
-                "answer_api", {"request_data": data, "response_data": response_data}
-            )
-            response.raise_for_status()
+            response = await self._submit_answers(answers)
+            # If there is a 400 response, then we send one by one to figure out which
+            # answer has an issue, and nack it
+            if response.status == 400:
+                for msg in msgs:
+                    answer = Answer.from_json(msg.body.decode("utf-8"))
+                    response = await self._submit_answers([answer])
+                    if response.status == 400:
+                        msg.nack(requeue=False)
+                        processed.append(msg)
+                    response.raise_for_status()
+                    msg.ack()
+                    processed.append(msg)
+            else:
+                response.raise_for_status()
+                for m in msgs:
+                    m.ack()
         except HTTP_EXCEPTIONS:
             logger.exception("Error sending results to flow results server")
-            self.answers.extend(msgs)
+            self.answers.extend(m for m in msgs if m not in processed)
             return
-
-        for m in msgs:
-            m.ack()
 
 
 if __name__ == "__main__":  # pragma: no cover
