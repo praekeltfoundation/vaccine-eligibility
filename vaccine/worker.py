@@ -214,6 +214,8 @@ class AnswerWorker:
                 json=data,
             )
             response_data = await response.text()
+            print(">>> response_data")
+            print(response_data)
             sentry_sdk.set_context(
                 "answer_api", {"request_data": data, "response_data": response_data}
             )
