@@ -329,6 +329,7 @@ async def test_answer_worker_invalid_message_body(answer_worker):
 
     assert len(answer_worker.answers) == 0
 
+
 @pytest.mark.asyncio
 async def test_answer_worker_empty_response(answer_worker):
     """
