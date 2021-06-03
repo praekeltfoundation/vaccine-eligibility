@@ -228,11 +228,20 @@ async def flow_results_mock_server(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_whatsapp")
     app.future = Future()
+    app.requests = []
 
     @app.route("flow-results/packages/invalid/responses", methods=["POST"])
     async def invalid(request):
         app.future.set_result(request)
         return response.json({}, status=500)
+
+    @app.route("flow-results/packages/usererror/responses", methods=["POST"])
+    async def user_error(request):
+        app.requests.append(request)
+        for a in request.json["data"]["attributes"]["responses"]:
+            if a[5] is None:
+                return response.json({}, status=400)
+        return response.json({})
 
     @app.route("flow-results/packages/<flow_id:uuid>/responses", methods=["POST"])
     async def messages(request, flow_id):
@@ -251,20 +260,18 @@ async def connection():
 
 @pytest.fixture
 async def answer_worker(connection, flow_results_mock_server):
-    config.ANSWER_API_URL = (
-        f"http://{flow_results_mock_server.host}:{flow_results_mock_server.port}"
-    )
-    config.ANSWER_API_TOKEN = "testtoken"
-    config.ANSWER_RESOURCE_ID = "96ac814d-b9b4-48ae-bcef-997a724cdacf"
+    url = f"http://{flow_results_mock_server.host}:{flow_results_mock_server.port}"
     config.ANSWER_BATCH_TIME = 0.1
-    worker = AnswerWorker(connection)
+    worker = AnswerWorker(
+        connection=connection,
+        url=url,
+        token="testtoken",
+        resource_id="96ac814d-b9b4-48ae-bcef-997a724cdacf",
+    )
     await worker.setup()
     yield worker
     await worker.teardown()
-    config.ANSWER_API_URL = None
-    config.ANSWER_API_TOKEN = None
     config.ANSWER_BATCH_TIME = 5
-    config.ANSWER_RESOURCE_ID = None
 
 
 @pytest.mark.asyncio
@@ -314,7 +321,7 @@ async def test_answer_worker_push_results_server_down(
     log_stream = StringIO()
     logger.addHandler(logging.StreamHandler(log_stream))
     logger.setLevel(logging.DEBUG)
-    config.ANSWER_RESOURCE_ID = "invalid"
+    answer_worker.resource_id = "invalid"
     await send_inbound_amqp_message(
         answer_worker.exchange,
         "whatsapp.answer",
@@ -339,6 +346,57 @@ async def test_answer_worker_push_results_server_down(
 
     for msg in answer_worker.answers:
         msg.ack()
+
+
+@pytest.mark.asyncio
+async def test_answer_worker_push_results_user_error(
+    answer_worker, flow_results_mock_server
+):
+    """
+    If there is a 400 response, then submit each answer separately, and log and nack the
+    one that is an issue
+    """
+    log_stream = StringIO()
+    logger.addHandler(logging.StreamHandler(log_stream))
+    logger.setLevel(logging.DEBUG)
+    answer_worker.resource_id = "usererror"
+    await send_inbound_amqp_message(
+        answer_worker.exchange,
+        "whatsapp.answer",
+        Answer(
+            question="question",
+            response="answer",
+            address="27820001001",
+            session_id="session_id",
+            row_id="1",
+            timestamp=datetime(2021, 2, 3, 4, 5, 6, tzinfo=timezone.utc),
+        )
+        .to_json()
+        .encode(),
+    )
+    await send_inbound_amqp_message(
+        answer_worker.exchange,
+        "whatsapp.answer",
+        Answer(
+            question="question",
+            response=None,
+            address="27820001001",
+            session_id="session_id",
+            row_id="1",
+            timestamp=datetime(2021, 2, 3, 4, 5, 6, tzinfo=timezone.utc),
+        )
+        .to_json()
+        .encode(),
+    )
+
+    # wait for worker to log error
+    for _ in range(10):
+        if len(flow_results_mock_server.app.requests) == 3:
+            break
+        await sleep(0.1)
+    assert "Error sending results to flow results server" in log_stream.getvalue()
+
+    assert len(answer_worker.answers) == 0
 
 
 @pytest.mark.asyncio
