@@ -328,3 +328,28 @@ async def test_answer_worker_invalid_message_body(answer_worker):
     assert "Invalid answer body" in log_stream.getvalue()
 
     assert len(answer_worker.answers) == 0
+
+
+@pytest.mark.asyncio
+async def test_answer_worker_empty_response(answer_worker):
+    """
+    If the response is none the answer should be ignored
+    """
+    await send_inbound_amqp_message(
+        answer_worker.exchange,
+        "whatsapp.answer",
+        Answer(
+            question="question",
+            response=None,
+            address="27820001001",
+            session_id="session_id",
+            row_id="1",
+            timestamp=datetime(2021, 2, 3, 4, 5, 6, tzinfo=timezone.utc),
+        )
+        .to_json()
+        .encode(),
+    )
+
+    # wait for worker to log error
+    await sleep(0.1)
+    assert len(answer_worker.answers) == 0

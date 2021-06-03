@@ -166,6 +166,15 @@ class AnswerWorker:
         await self.channel.close()
 
     async def process_answer(self, amqp_msg: IncomingMessage):
+        try:
+            answer = Answer.from_json(amqp_msg.body.decode("utf-8"))
+        except DECODE_MESSAGE_EXCEPTIONS:
+            logger.exception(f"Invalid answer body {amqp_msg.body!r}")
+            amqp_msg.reject(requeue=False)
+            return
+        if answer.response is None:
+            amqp_msg.ack()
+            return
         self.answers.append(amqp_msg)
 
     async def _periodic_loop(self):
@@ -178,11 +187,7 @@ class AnswerWorker:
         answers = (Answer.from_json(a.body.decode()) for a in msgs)
         answers: List[Answer] = []
         for msg in msgs:
-            try:
-                answers.append(Answer.from_json(msg.body.decode("utf-8")))
-            except DECODE_MESSAGE_EXCEPTIONS:
-                logger.exception(f"Invalid answer body {msg.body!r}")
-                msg.reject(requeue=False)
+            answers.append(Answer.from_json(msg.body.decode("utf-8")))
         if not answers:
             return
         try:
