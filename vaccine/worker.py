@@ -171,6 +171,7 @@ class AnswerWorker:
         except DECODE_MESSAGE_EXCEPTIONS:
             logger.exception(f"Invalid answer body {amqp_msg.body!r}")
             amqp_msg.reject(requeue=False)
+            return
         if answer.response is None:
             amqp_msg.ack()
             return
