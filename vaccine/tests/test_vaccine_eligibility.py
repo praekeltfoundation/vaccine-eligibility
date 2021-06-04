@@ -32,13 +32,21 @@ async def test_new_user():
             "",
             "Which of these positions or job titles describes your current "
             "employment:",
-            "",
-            "1. Health Care Worker",
-            "2. Essential Worker",
-            "3. Other",
-            "4. Not Sure",
         ]
     )
+    assert reply.helper_metadata == {
+        "button": "Select Employment",
+        "sections": [
+            {
+                "rows": [
+                    {"id": "Health Care Worker", "title": "Health Care Worker"},
+                    {"id": "Essential Worker", "title": "Essential Worker"},
+                    {"id": "Other", "title": "Other"},
+                    {"id": "Not Sure", "title": "Not Sure"},
+                ]
+            }
+        ],
+    }
     assert u.state.name == "state_occupation"
     assert u.session_id is not None
 
@@ -154,13 +162,21 @@ async def test_occupation_not_sure():
             "",
             "Which of these positions or job titles describes your current "
             "employment:",
-            "",
-            "1. Health Care Worker",
-            "2. Essential Worker",
-            "3. Other",
-            "4. Not Sure",
         ]
     )
+    assert reply.helper_metadata == {
+        "button": "Select Employment",
+        "sections": [
+            {
+                "rows": [
+                    {"id": "Health Care Worker", "title": "Health Care Worker"},
+                    {"id": "Essential Worker", "title": "Essential Worker"},
+                    {"id": "Other", "title": "Other"},
+                    {"id": "Not Sure", "title": "Not Sure"},
+                ]
+            }
+        ],
+    }
     assert u.state.name == "state_occupation"
     assert u.session_id == "1"
 
@@ -245,12 +261,9 @@ async def test_congregate_not_sure():
             "",
             "Are you often in contact with lots of people or are you often in a closed "
             "space with lots of people?",
-            "",
-            "1. Yes",
-            "2. No",
-            "3. Not Sure",
         ]
     )
+    assert reply.helper_metadata == {"buttons": ["Yes", "No", "Not Sure"]}
     assert u.state.name == "state_congregate"
 
 
@@ -430,12 +443,9 @@ async def test_comorbidities_not_sure():
             "",
             "Has a doctor ever diagnosed you with diabetes, chronic lung disease, "
             "cardiovascular(heart) disease, renal disease, HIV, TB, or Obesity?",
-            "",
-            "1. Yes",
-            "2. No",
-            "3. Not Sure",
         ]
     )
+    assert reply.helper_metadata == {"buttons": ["Yes", "No", "Not Sure"]}
     assert u.state.name == "state_comorbidities"
 
 
@@ -562,11 +572,9 @@ async def test_result_2():
             "",
             "Would you like to be notified when registration for *PHASE 2* is "
             "available?",
-            "",
-            "1. Yes",
-            "2. No",
         ]
     )
+    assert reply.helper_metadata == {"buttons": ["Yes", "No"]}
     assert u.state.name == "state_result_2"
 
 
@@ -605,11 +613,9 @@ async def test_result_3():
             "",
             "Would you like to be notified when registration for *PHASE 3* is "
             "available?",
-            "",
-            "1. Yes",
-            "2. No",
         ]
     )
+    assert reply.helper_metadata == {"buttons": ["Yes", "No"]}
     assert u.state.name == "state_result_3"
 
 

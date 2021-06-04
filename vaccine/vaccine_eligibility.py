@@ -2,7 +2,14 @@ from typing import List, Optional
 
 from vaccine.base_application import BaseApplication
 from vaccine.models import Message
-from vaccine.states import Choice, ChoiceState, EndState, ErrorMessage, FreeText
+from vaccine.states import (
+    Choice,
+    EndState,
+    ErrorMessage,
+    FreeText,
+    WhatsAppButtonState,
+    WhatsAppListState,
+)
 
 
 class Application(BaseApplication):
@@ -56,7 +63,7 @@ class Application(BaseApplication):
                 return "state_occupation"
             return "state_congregate"
 
-        return ChoiceState(
+        return WhatsAppListState(
             self,
             question="\n".join(
                 [
@@ -64,9 +71,9 @@ class Application(BaseApplication):
                     "",
                     "Which of these positions or job titles describes your current "
                     "employment:",
-                    "",
                 ]
             ),
+            button="Select Employment",
             choices=[
                 Choice("hcw", "Health Care Worker"),
                 Choice("essential", "Essential Worker"),
@@ -91,7 +98,7 @@ class Application(BaseApplication):
                 return "state_congregate"
             return "state_age"
 
-        return ChoiceState(
+        return WhatsAppButtonState(
             self,
             question="\n".join(
                 [
@@ -99,7 +106,6 @@ class Application(BaseApplication):
                     "",
                     "Are you often in contact with lots of people or are you often in "
                     "a closed space with lots of people?",
-                    "",
                 ]
             ),
             choices=[
@@ -184,7 +190,7 @@ class Application(BaseApplication):
                 return "state_comorbidities"
             return "state_result"
 
-        return ChoiceState(
+        return WhatsAppButtonState(
             self,
             question="\n".join(
                 [
@@ -193,7 +199,6 @@ class Application(BaseApplication):
                     "Has a doctor ever diagnosed you with diabetes, chronic lung "
                     "disease, cardiovascular(heart) disease, renal disease, HIV, TB, "
                     "or Obesity?",
-                    "",
                 ]
             ),
             choices=[
@@ -284,7 +289,7 @@ class Application(BaseApplication):
         )
 
     async def state_result_2(self):
-        return ChoiceState(
+        return WhatsAppButtonState(
             self,
             question="\n".join(
                 [
@@ -296,7 +301,6 @@ class Application(BaseApplication):
                     "",
                     "Would you like to be notified when registration for *PHASE 2* is "
                     "available?",
-                    "",
                 ]
             ),
             choices=[Choice("yes", "Yes"), Choice("no", "No")],
@@ -306,7 +310,7 @@ class Application(BaseApplication):
         )
 
     async def state_result_3(self):
-        return ChoiceState(
+        return WhatsAppButtonState(
             self,
             question="\n".join(
                 [
@@ -318,7 +322,6 @@ class Application(BaseApplication):
                     "",
                     "Would you like to be notified when registration for *PHASE 3* is "
                     "available?",
-                    "",
                 ]
             ),
             choices=[Choice("yes", "Yes"), Choice("no", "No")],
