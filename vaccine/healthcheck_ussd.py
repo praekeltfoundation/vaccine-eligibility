@@ -914,7 +914,7 @@ class Application(BaseApplication):
                     "A cough may also be a sign of TB – a dangerous but treatable "
                     "disease."
                 )
-            elif risk == "moderate" and answers.get("state_fever") == "yes":
+            elif answers.get("state_fever") == "yes":
                 text = self._("A fever or night sweats may also be signs of TB.")
         else:
             text = self._(
