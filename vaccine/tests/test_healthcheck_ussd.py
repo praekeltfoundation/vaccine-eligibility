@@ -2035,6 +2035,179 @@ async def test_state_tracing_restart(eventstore_mock):
     assert u.state.name == "state_start"
 
 
+@pytest.mark.asyncio
+async def test_state_tb_prompt_1():
+    config.TB_USSD_CODE = "*123#"
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_display_risk"),
+        session_id=1,
+        answers={"state_tracing": "yes"},
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) <= 160
+    assert u.state.name == "state_tb_prompt_1"
+    assert reply.content == "\n".join(
+        [
+            "One of the less obvious signs of TB is losing weight without realising "
+            "it.",
+            "1. Next",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_tb_prompt_1_moderate_cough():
+    config.TB_USSD_CODE = "*123#"
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_display_risk"),
+        session_id=1,
+        answers={"state_tracing": "yes", "state_cough": "yes"},
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) <= 160
+    assert u.state.name == "state_tb_prompt_1"
+    assert reply.content == "\n".join(
+        [
+            "A cough may also be a sign of TB – a dangerous but treatable disease.",
+            "1. Next",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_tb_prompt_1_moderate_fever():
+    config.TB_USSD_CODE = "*123#"
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_display_risk"),
+        session_id=1,
+        answers={"state_tracing": "yes", "state_fever": "yes"},
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) <= 160
+    assert u.state.name == "state_tb_prompt_1"
+    assert reply.content == "\n".join(
+        [
+            "A fever or night sweats may also be signs of TB.",
+            "1. Next",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_tb_prompt_no_tracing():
+    config.TB_USSD_CODE = "*123#"
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_display_risk"),
+        session_id=1,
+        answers={},
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) <= 160
+    assert u.state.name == "state_tb_prompt_1"
+    assert reply.content == "\n".join(
+        [
+            "One of the less obvious signs of TB is losing weight without realising "
+            "it.",
+            "1. Next",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_tb_prompt_2_moderate():
+    config.TB_USSD_CODE = "*123#"
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_tb_prompt_1"),
+        session_id=1,
+        answers={"state_tracing": "yes", "state_cough": "yes"},
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) <= 160
+    assert u.state.name == "state_start"
+    assert reply.content == (
+        "Some COVID symptoms are like TB symptoms. To protect your health, we "
+        "recommend that you complete a TB HealthCheck. To start, please dial "
+        f"{config.TB_USSD_CODE}"
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_tb_prompt_2_low():
+    config.TB_USSD_CODE = "*123#"
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_tb_prompt_1"),
+        session_id=1,
+        answers={"state_tracing": "yes"},
+    )
+    app = Application(u)
+
+    msg = Message(
+        content="1",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) <= 160
+    assert u.state.name == "state_start"
+    assert reply.content == (
+        "If you or a family member has cough, fever, weight loss or night "
+        f"sweats, please also check if you have TB by dialling {config.TB_USSD_CODE}"
+    )
+
+
 def test_calculate_risk():
     def get_user(answers={}):
         return User(

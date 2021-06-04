@@ -892,6 +892,61 @@ class Application(BaseApplication):
                     "TESTING. Go to a testing center or Call 0800029999 or your "
                     "healthcare practitioner for info."
                 )
+
+        if config.TB_USSD_CODE and risk != "high":
+            return MenuState(
+                self,
+                question=self._(text),
+                error=self._(text),
+                choices=[Choice("state_tb_prompt_1", self._("Next"))],
+            )
+        else:
+            return EndState(self, text, next=self.START_STATE)
+
+    async def state_tb_prompt_1(self):
+        answers = self.user.answers
+        risk = self.calculate_risk()
+
+        text = ""
+        if risk == "moderate":
+            if answers.get("state_cough") == "yes":
+                text = self._(
+                    "A cough may also be a sign of TB – a dangerous but treatable "
+                    "disease."
+                )
+            elif answers.get("state_fever") == "yes":
+                text = self._("A fever or night sweats may also be signs of TB.")
+        else:
+            text = self._(
+                "One of the less obvious signs of TB is losing weight without "
+                "realising it."
+            )
+
+        if text:
+            return MenuState(
+                self,
+                question=self._(text),
+                error=self._(text),
+                choices=[Choice("state_tb_prompt_2", self._("Next"))],
+            )
+        else:
+            return await self.go_to_state("state_tb_prompt_2")
+
+    async def state_tb_prompt_2(self):
+        risk = self.calculate_risk()
+        text = ""
+        if risk == "moderate":
+            text = self._(
+                "Some COVID symptoms are like TB symptoms. To protect your health, we "
+                "recommend that you complete a TB HealthCheck. To start, please dial "
+                f"{config.TB_USSD_CODE}"
+            )
+        else:
+            text = self._(
+                "If you or a family member has cough, fever, weight loss or night "
+                "sweats, please also check if you have TB by dialling "
+                f"{config.TB_USSD_CODE}"
+            )
         return EndState(self, text, next=self.START_STATE)
 
     async def state_no_tracing_low_risk(self):
@@ -900,10 +955,15 @@ class Application(BaseApplication):
             " STAY HOME, avoid contact with other people in your community and "
             "self-quarantine."
         )
+        next_text = "START OVER"
+        next_state = "state_start"
+        if config.TB_USSD_CODE:
+            next_text = "Next"
+            next_state = "state_tb_prompt_1"
         return MenuState(
             self,
             question=question,
-            choices=[Choice("state_start", "START OVER")],
+            choices=[Choice(next_state, next_text)],
             error=question,
         )
 
@@ -912,10 +972,15 @@ class Application(BaseApplication):
             "You won't be contacted. SELF-QUARANTINE for 10 days, do this HealthCheck "
             "daily to monitor symptoms. Stay/sleep alone in a room with good air flow."
         )
+        next_text = "START OVER"
+        next_state = "state_start"
+        if config.TB_USSD_CODE:
+            next_text = "Next"
+            next_state = "state_tb_prompt_1"
         return MenuState(
             self,
             question=question,
-            choices=[Choice("state_start", "START OVER")],
+            choices=[Choice(next_state, next_text)],
             error=question,
         )
 
