@@ -2088,7 +2088,7 @@ async def test_state_tb_prompt_1_moderate_cough():
     assert u.state.name == "state_tb_prompt_1"
     assert reply.content == "\n".join(
         [
-            "A cough may also be a sign of TB – a dangerous but treatable disease.",
+            "A cough may also be a sign of TB - a dangerous but treatable disease.",
             "1. Next",
         ]
     )
