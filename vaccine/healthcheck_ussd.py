@@ -911,7 +911,7 @@ class Application(BaseApplication):
         if risk == "moderate":
             if answers.get("state_cough") == "yes":
                 text = self._(
-                    "A cough may also be a sign of TB – a dangerous but treatable "
+                    "A cough may also be a sign of TB - a dangerous but treatable "
                     "disease."
                 )
             elif answers.get("state_fever") == "yes":
