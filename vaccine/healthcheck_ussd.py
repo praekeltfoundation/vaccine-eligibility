@@ -910,11 +910,17 @@ class Application(BaseApplication):
         text = ""
         if risk == "moderate":
             if answers.get("state_cough") == "yes":
-                text = "A cough may also be a sign of TB – a dangerous but treatable disease."
+                text = self._(
+                    "A cough may also be a sign of TB – a dangerous but treatable "
+                    "disease."
+                )
             elif risk == "moderate" and answers.get("state_fever") == "yes":
-                text = "A fever or night sweats may also be signs of TB."
+                text = self._("A fever or night sweats may also be signs of TB.")
         else:
-            text = "One of the less obvious signs of TB is losing weight without realising it."
+            text = self._(
+                "One of the less obvious signs of TB is losing weight without "
+                "realising it."
+            )
 
         if text:
             return MenuState(
@@ -930,9 +936,17 @@ class Application(BaseApplication):
         risk = self.calculate_risk()
         text = ""
         if risk == "moderate":
-            text = f"Some COVID symptoms are like TB symptoms. To protect your health, we recommend that you complete a TB HealthCheck. To start, please dial {config.TB_USSD_CODE}"
+            text = self._(
+                "Some COVID symptoms are like TB symptoms. To protect your health, we "
+                "recommend that you complete a TB HealthCheck. To start, please dial "
+                f"{config.TB_USSD_CODE}"
+            )
         else:
-            text = f"If you or a family member has cough, fever, weight loss or night sweats, please also check if you have TB by dialling {config.TB_USSD_CODE}"
+            text = self._(
+                "If you or a family member has cough, fever, weight loss or night "
+                "sweats, please also check if you have TB by dialling "
+                f"{config.TB_USSD_CODE}"
+            )
         return EndState(self, text, next=self.START_STATE)
 
     async def state_no_tracing_low_risk(self):

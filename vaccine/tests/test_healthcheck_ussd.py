@@ -2058,7 +2058,8 @@ async def test_state_tb_prompt_1():
     assert u.state.name == "state_tb_prompt_1"
     assert reply.content == "\n".join(
         [
-            "One of the less obvious signs of TB is losing weight without realising it.",
+            "One of the less obvious signs of TB is losing weight without realising "
+            "it.",
             "1. Next",
         ]
     )
@@ -2121,6 +2122,7 @@ async def test_state_tb_prompt_1_moderate_fever():
         ]
     )
 
+
 @pytest.mark.asyncio
 async def test_state_tb_prompt_no_tracing():
     config.TB_USSD_CODE = "*123#"
@@ -2144,10 +2146,12 @@ async def test_state_tb_prompt_no_tracing():
     assert u.state.name == "state_tb_prompt_1"
     assert reply.content == "\n".join(
         [
-            "One of the less obvious signs of TB is losing weight without realising it.",
+            "One of the less obvious signs of TB is losing weight without realising "
+            "it.",
             "1. Next",
         ]
     )
+
 
 @pytest.mark.asyncio
 async def test_state_tb_prompt_2_moderate():
@@ -2170,7 +2174,11 @@ async def test_state_tb_prompt_2_moderate():
     [reply] = await app.process_message(msg)
     assert len(reply.content) <= 160
     assert u.state.name == "state_start"
-    assert reply.content == f"Some COVID symptoms are like TB symptoms. To protect your health, we recommend that you complete a TB HealthCheck. To start, please dial {config.TB_USSD_CODE}"
+    assert reply.content == (
+        "Some COVID symptoms are like TB symptoms. To protect your health, we "
+        "recommend that you complete a TB HealthCheck. To start, please dial "
+        f"{config.TB_USSD_CODE}"
+    )
 
 
 @pytest.mark.asyncio
@@ -2194,7 +2202,10 @@ async def test_state_tb_prompt_2_low():
     [reply] = await app.process_message(msg)
     assert len(reply.content) <= 160
     assert u.state.name == "state_start"
-    assert reply.content == f"If you or a family member has cough, fever, weight loss or night sweats, please also check if you have TB by dialling {config.TB_USSD_CODE}"
+    assert reply.content == (
+        "If you or a family member has cough, fever, weight loss or night "
+        f"sweats, please also check if you have TB by dialling {config.TB_USSD_CODE}"
+    )
 
 
 def test_calculate_risk():
