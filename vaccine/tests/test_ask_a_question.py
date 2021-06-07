@@ -116,6 +116,9 @@ async def test_display_response_choices(tester: AppTester, model_mock):
                 "1. Are COVID-19 vaccines safe?",
                 "2. Do vaccines work against COVID-19 variants?",
                 "3. Do we know what's in the vaccines?",
+                "",
+                "[💡Tip: If you don't see what you're looking for, try typing your "
+                "question again using different words or reply *FAQ* to browse topics]",
             ]
         )
     )

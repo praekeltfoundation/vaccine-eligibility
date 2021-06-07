@@ -53,6 +53,7 @@ class ChoiceState:
         error: str,
         next: Union[str, Callable],
         accept_labels: bool = True,
+        footer: Optional[str] = None,
     ):
         self.app = app
         self.question = question
@@ -60,6 +61,7 @@ class ChoiceState:
         self.error = error
         self.accept_labels = accept_labels
         self.next = next
+        self.footer = footer
 
     def _get_choice(self, content: Optional[str]) -> Optional[Choice]:
         content = (content or "").strip()
@@ -96,7 +98,10 @@ class ChoiceState:
             return await state.display(message)
 
     async def display(self, message: Message):
-        return self.app.send_message(f"{self.question}\n{self._display_choices}")
+        text = f"{self.question}\n{self._display_choices}"
+        if self.footer is not None:
+            text = f"{text}\n{self.footer}"
+        return self.app.send_message(text)
 
 
 class MenuState(ChoiceState):
@@ -107,12 +112,14 @@ class MenuState(ChoiceState):
         choices: List[Choice],
         error: str,
         accept_labels: bool = True,
+        footer: Optional[str] = None,
     ):
         self.app = app
         self.question = question
         self.choices = choices
         self.error = error
         self.accept_labels = accept_labels
+        self.footer = footer
 
     async def _next(self, choice: Choice):
         return choice.value

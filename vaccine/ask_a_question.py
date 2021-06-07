@@ -149,6 +149,10 @@ class Application(BaseApplication):
             choices=[Choice(title, title) for title, _ in responses],
             error="",  # Errors now redirect to `state_question`
             next="state_display_selected_choice",
+            footer=self._(
+                "\n[💡Tip: If you don't see what you're looking for, try typing your "
+                "question again using different words or reply *FAQ* to browse topics]"
+            ),
         )
 
     async def state_display_selected_choice(self):
