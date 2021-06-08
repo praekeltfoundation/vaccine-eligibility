@@ -202,7 +202,7 @@ class Application(BaseApplication):
                         url=urljoin(config.MODEL_API_URL, "/inbound/feedback"),
                         json=data,
                     )
-                    response_data = await response.json()
+                    response_data = await response.text()
                     sentry_sdk.set_context(
                         "model", {"request_data": data, "response_data": response_data}
                     )
