@@ -229,7 +229,7 @@ async def test_display_selected_choice(tester: AppTester, model_mock):
     tester.assert_state("state_end")
     [request] = model_mock.app.requests
     assert request.json == {
-        "feedback": "yes",
+        "feedback": {"choice": "Are COVID-19 vaccines safe?", "feedback": "yes"},
         "feedback_secret_key": "testsecretkey",
         "inbound_id": 66,
     }
