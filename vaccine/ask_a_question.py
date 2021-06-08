@@ -10,7 +10,7 @@ import sentry_sdk
 from vaccine import ask_a_question_config as config
 from vaccine.base_application import BaseApplication
 from vaccine.models import Message
-from vaccine.states import Choice, ChoiceState, EndState, ErrorMessage, FreeText
+from vaccine.states import Choice, ChoiceState, EndState, FreeText, KeywordState
 from vaccine.utils import HTTP_EXCEPTIONS
 from vaccine.validators import nonempty_validator
 
@@ -225,14 +225,15 @@ class Application(BaseApplication):
             "⤴️ *BACK* to return to search results\n"
             "📌 *0* for the main *MENU*"
         )
-
-        async def check(text):
-            text = re.sub(r"[^\w⤴️]+", "", text).lower()
-            if text not in ["⤴️", "back"]:
-                raise ErrorMessage(question)
-
-        return FreeText(
-            self, question=question, next="state_display_selected_choice", check=check
+        return KeywordState(
+            self,
+            question=question,
+            keywords={
+                "⤴️": "state_display_selected_choice",
+                "back": "state_display_selected_choice",
+                "*back": "state_display_selected_choice",
+            },
+            default="state_exit",
         )
 
     async def state_error(self):
