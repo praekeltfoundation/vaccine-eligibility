@@ -119,13 +119,10 @@ class KeywordState:
 
     async def process_message(self, message: Message):
         content = (message.content or "").strip().lower()
-        for keyword, target in self.keywords.items():
-            if keyword == content:
-                self.app.save_answer(self.app.state_name, keyword)
-                self.app.state_name = target
-                break
-        else:
-            self.app.state_name = self.default
+        state_name = self.keywords.get(content)
+        if state_name:
+            self.app.save_answer(self.app.state_name, content)
+        self.app.state_name = state_name or self.default
         state = await self.app.get_current_state()
         return await state.display(message)
 
