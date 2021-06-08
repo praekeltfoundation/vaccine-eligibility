@@ -185,7 +185,10 @@ class Application(BaseApplication):
         data = {
             "inbound_id": model_response["inbound_id"],
             "feedback_secret_key": model_response["feedback_secret_key"],
-            "feedback": self.user.answers["state_display_selected_choice"],
+            "feedback": {
+                "choice": self.user.answers["state_display_response_choices"],
+                "feedback": self.user.answers["state_display_selected_choice"],
+            },
         }
         async with model as session:
             for i in range(3):
