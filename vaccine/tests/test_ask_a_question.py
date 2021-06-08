@@ -287,8 +287,13 @@ async def test_state_end(tester: AppTester, model_mock):
     )
     tester.assert_state("state_end")
 
-    await tester.user_input("invalid")
-    tester.assert_state("state_end")
-
     await tester.user_input("⤴️")
     tester.assert_state("state_display_selected_choice")
+
+
+@pytest.mark.asyncio
+async def test_state_end_invalid(tester: AppTester, model_mock):
+    tester.setup_state("state_end")
+    await tester.user_input("invalid")
+    tester.assert_message("", session=Message.SESSION_EVENT.CLOSE)
+    assert tester.application.messages[0].helper_metadata["automation_handle"] is True
