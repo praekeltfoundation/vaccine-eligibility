@@ -44,6 +44,11 @@ class Application(BaseApplication):
             "menu",
             "0",
             "faq",
+            "cases",
+            "news",
+            "vaccine",
+            "check",
+            "register",
         ):
             self.state_name = "state_exit"
 
