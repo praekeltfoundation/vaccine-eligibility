@@ -10,7 +10,7 @@ import sentry_sdk
 from vaccine import ask_a_question_config as config
 from vaccine.base_application import BaseApplication
 from vaccine.models import Message
-from vaccine.states import Choice, ChoiceState, EndState, FreeText, KeywordState
+from vaccine.states import Choice, ChoiceState, EndState, FreeText
 from vaccine.utils import HTTP_EXCEPTIONS
 from vaccine.validators import nonempty_validator
 
@@ -217,24 +217,15 @@ class Application(BaseApplication):
         return await self.go_to_state("state_end")
 
     async def state_end(self):
-        question = self._(
+        text = self._(
             "Thank you for confirming.\n"
             "\n"
             "-----\n"
             "Reply:\n"
-            "⤴️ *BACK* to return to search results\n"
+            "❓ *ASK* to ask more vaccine questions\n"
             "📌 *0* for the main *MENU*"
         )
-        return KeywordState(
-            self,
-            question=question,
-            keywords={
-                "⤴️": "state_display_selected_choice",
-                "back": "state_display_selected_choice",
-                "*back": "state_display_selected_choice",
-            },
-            default="state_exit",
-        )
+        return EndState(self, text=text)
 
     async def state_error(self):
         return EndState(

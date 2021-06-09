@@ -226,7 +226,6 @@ async def test_display_selected_choice(tester: AppTester, model_mock):
     )
 
     await tester.user_input("1")
-    tester.assert_state("state_end")
     [request] = model_mock.app.requests
     assert request.json == {
         "feedback": {"choice": "Are COVID-19 vaccines safe?", "feedback": "yes"},
@@ -244,7 +243,6 @@ async def test_display_selected_choice_temporary_error(tester: AppTester, model_
     model_mock.app.errormax = 1
     tester.setup_state("state_display_selected_choice")
     await tester.user_input("1")
-    tester.assert_state("state_end")
     assert len(model_mock.app.requests) == 2
 
 
@@ -280,20 +278,9 @@ async def test_state_end(tester: AppTester, model_mock):
                 "",
                 "-----",
                 "Reply:",
-                "⤴️ *BACK* to return to search results",
+                "❓ *ASK* to ask more vaccine questions",
                 "📌 *0* for the main *MENU*",
             ]
-        )
+        ),
+        session=Message.SESSION_EVENT.CLOSE,
     )
-    tester.assert_state("state_end")
-
-    await tester.user_input("⤴️")
-    tester.assert_state("state_display_selected_choice")
-
-
-@pytest.mark.asyncio
-async def test_state_end_invalid(tester: AppTester, model_mock):
-    tester.setup_state("state_end")
-    await tester.user_input("invalid")
-    tester.assert_message("", session=Message.SESSION_EVENT.CLOSE)
-    assert tester.application.messages[0].helper_metadata["automation_handle"] is True
