@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from inspect import iscoroutinefunction
-from typing import TYPE_CHECKING, Awaitable, Callable, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Awaitable, Callable, List, Optional, Union
 
 from vaccine.models import Message
 from vaccine.utils import get_display_choices
@@ -102,32 +102,6 @@ class ChoiceState:
         if self.footer is not None:
             text = f"{text}\n{self.footer}"
         return self.app.send_message(text)
-
-
-class KeywordState:
-    def __init__(
-        self,
-        app: "BaseApplication",
-        question: str,
-        keywords: Dict[str, str],
-        default: str,
-    ):
-        self.app = app
-        self.question = question
-        self.keywords = keywords
-        self.default = default
-
-    async def process_message(self, message: Message):
-        content = (message.content or "").strip().lower()
-        state_name = self.keywords.get(content)
-        if state_name:
-            self.app.save_answer(self.app.state_name, content)
-        self.app.state_name = state_name or self.default
-        state = await self.app.get_current_state()
-        return await state.display(message)
-
-    async def display(self, message: Message):
-        return self.app.send_message(self.question)
 
 
 class MenuState(ChoiceState):
