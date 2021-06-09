@@ -75,10 +75,10 @@ class Application(BaseApplication):
 
     async def state_question(self):
         question = self._(
-            "❓ *YOUR VACCINE QUESTIONS*\n"
+            "❓ *ASK*  your questions about vaccines\n"
             "\n"
-            "Search our knowledge hub by *typing your own question* or sharing a "
-            "'*rumour*' that's going around to get the facts!\n"
+            "Try *typing your own question* or sharing/forwarding a '*rumour*' that's "
+            "going around to get the facts!\n"
             "\n"
             '[💡Tip: Reply with a question like: "_Are vaccines safe?"_]'
         )

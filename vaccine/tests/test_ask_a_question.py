@@ -89,10 +89,10 @@ async def test_question(tester: AppTester, model_mock):
     tester.assert_message(
         "\n".join(
             [
-                "❓ *YOUR VACCINE QUESTIONS*",
+                "❓ *ASK*  your questions about vaccines",
                 "",
-                "Search our knowledge hub by *typing your own question* or sharing a "
-                "'*rumour*' that's going around to get the facts!",
+                "Try *typing your own question* or sharing/forwarding a '*rumour*' "
+                "that's going around to get the facts!",
                 "",
                 '[💡Tip: Reply with a question like: "_Are vaccines safe?"_]',
             ]
