@@ -179,7 +179,10 @@ class Application(BaseApplication):
         return ChoiceState(
             self,
             question=question,
-            choices=[Choice("yes", self._("*YES*")), Choice("no", self._("*NO*"))],
+            choices=[
+                Choice("yes", self._("*YES*"), ["yes"]),
+                Choice("no", self._("*NO*"), ["no"]),
+            ],
             error=question,
             next="state_submit_user_feedback",
         )

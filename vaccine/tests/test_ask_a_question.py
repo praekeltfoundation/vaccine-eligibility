@@ -225,7 +225,7 @@ async def test_display_selected_choice(tester: AppTester, model_mock):
         )
     )
 
-    await tester.user_input("1")
+    await tester.user_input("yes")
     [request] = model_mock.app.requests
     assert request.json == {
         "feedback": {"choice": "Are COVID-19 vaccines safe?", "feedback": "yes"},
