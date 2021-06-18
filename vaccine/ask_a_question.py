@@ -49,6 +49,7 @@ class Application(BaseApplication):
             "vaccine",
             "check",
             "register",
+            "ask",
         ):
             self.state_name = "state_exit"
 
@@ -220,6 +221,8 @@ class Application(BaseApplication):
         return await self.go_to_state("state_end")
 
     async def state_end(self):
+        if self.user.answers["state_display_selected_choice"] == "no":
+            return await self.go_to_state("state_another_result")
         text = self._(
             "Thank you for confirming.\n"
             "\n"
@@ -229,6 +232,29 @@ class Application(BaseApplication):
             "📌 *0* for the main *MENU*"
         )
         return EndState(self, text=text)
+
+    async def state_another_result(self):
+        responses = json.loads(self.user.answers["model_response"])["top_responses"]
+        question = self._("Thank you for confirming.\n" "\n" "Try a different result?")
+
+        async def next_state(choice: Choice):
+            self.save_answer("state_display_response_choices", choice.label)
+            return "state_display_selected_choice"
+
+        return ChoiceState(
+            self,
+            question=question,
+            choices=[Choice(title, title) for title, _ in responses],
+            error=question,
+            next=next_state,
+            footer=self._(
+                "\n"
+                "-----\n"
+                "Reply:\n"
+                "❓ *ASK* to ask more vaccine questions\n"
+                "📌 *0* for the main *MENU*"
+            ),
+        )
 
     async def state_error(self):
         return EndState(
