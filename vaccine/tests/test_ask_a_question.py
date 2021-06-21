@@ -225,13 +225,53 @@ async def test_display_selected_choice(tester: AppTester, model_mock):
         )
     )
 
-    await tester.user_input("1")
+    await tester.user_input("yes")
     [request] = model_mock.app.requests
     assert request.json == {
         "feedback": {"choice": "Are COVID-19 vaccines safe?", "feedback": "yes"},
         "feedback_secret_key": "testsecretkey",
         "inbound_id": 66,
     }
+
+
+@pytest.mark.asyncio
+async def test_display_selected_choice_no_feedback(tester: AppTester, model_mock):
+    with open("vaccine/tests/aaq_model_response.json") as f:
+        tester.setup_answer("model_response", f.read())
+
+    tester.setup_state("state_display_response_choices")
+    await tester.user_input("1")
+    tester.assert_state("state_display_selected_choice")
+    await tester.user_input("no")
+    [request] = model_mock.app.requests
+    assert request.json == {
+        "feedback": {"choice": "Are COVID-19 vaccines safe?", "feedback": "no"},
+        "feedback_secret_key": "testsecretkey",
+        "inbound_id": 66,
+    }
+    tester.assert_state("state_another_result")
+    tester.assert_message(
+        "\n".join(
+            [
+                "Thank you for confirming.",
+                "",
+                "Try a different result?",
+                "1. Are COVID-19 vaccines safe?",
+                "2. Do vaccines work against COVID-19 variants?",
+                "3. Do we know what's in the vaccines?",
+                "",
+                "-----",
+                "Reply:",
+                "❓ *ASK* to ask more vaccine questions",
+                "📌 *0* for the main *MENU*",
+            ]
+        )
+    )
+    await tester.user_input("2")
+    tester.assert_state("state_display_selected_choice")
+    tester.assert_answer(
+        "state_display_response_choices", "Do vaccines work against COVID-19 variants?"
+    )
 
 
 @pytest.mark.asyncio

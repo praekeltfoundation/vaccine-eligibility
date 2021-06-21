@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from inspect import iscoroutinefunction
 from typing import TYPE_CHECKING, Awaitable, Callable, List, Optional, Union
 
@@ -42,6 +42,7 @@ class EndState:
 class Choice:
     value: str
     label: str
+    additional_keywords: List[str] = field(default_factory=list)
 
 
 class ChoiceState:
@@ -63,18 +64,18 @@ class ChoiceState:
         self.next = next
         self.footer = footer
 
-    def _get_choice(self, content: Optional[str]) -> Optional[Choice]:
-        content = (content or "").strip()
-        try:
-            choice_num = int(content)
-            if choice_num > 0 and choice_num <= len(self.choices):
-                return self.choices[choice_num - 1]
-        except ValueError:
-            pass
+    def _normalise_text(self, text: Optional[str]) -> str:
+        return (text or "").strip().lower()
 
-        if self.accept_labels:
-            for choice in self.choices:
-                if content.lower() == choice.label.strip().lower():
+    def _get_choice(self, content: Optional[str]) -> Optional[Choice]:
+        content = self._normalise_text(content)
+        for i, choice in enumerate(self.choices):
+            if content == str(i + 1):
+                return choice
+            if self.accept_labels and content == self._normalise_text(choice.label):
+                return choice
+            for keyword in choice.additional_keywords:
+                if content == self._normalise_text(keyword):
                     return choice
         return None
 
