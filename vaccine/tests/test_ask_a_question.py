@@ -85,7 +85,7 @@ async def test_timeout(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_question(tester: AppTester, model_mock):
-    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+    await tester.user_input("ask", session=Message.SESSION_EVENT.NEW)
     tester.assert_message(
         "\n".join(
             [

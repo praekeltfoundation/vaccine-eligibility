@@ -40,7 +40,10 @@ class Application(BaseApplication):
     async def process_message(self, message: Message) -> List[Message]:
         if message.session_event == Message.SESSION_EVENT.CLOSE:
             self.state_name = "state_timeout"
-        if re.sub(r"\W+", " ", message.content or "").strip().lower() in (
+        keyword = re.sub(r"\W+", " ", message.content or "").strip().lower()
+        if keyword in ("ask",) and self.state_name not in (None, self.START_STATE):
+            self.state_name = "state_exit"
+        if keyword in (
             "menu",
             "0",
             "faq",
@@ -49,7 +52,6 @@ class Application(BaseApplication):
             "vaccine",
             "check",
             "register",
-            "ask",
         ):
             self.state_name = "state_exit"
 
