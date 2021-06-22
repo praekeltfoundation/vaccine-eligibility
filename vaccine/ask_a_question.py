@@ -34,6 +34,16 @@ def get_model():
     )
 
 
+class RedirectChoiceState(ChoiceState):
+    async def process_message(self, message: Message):
+        choice = self._get_choice(message.content)
+        if choice is None:
+            state = await self.app.go_to_state("state_question")
+            return await state.process_message(message)
+        else:
+            return await super().process_message(message)
+
+
 class Application(BaseApplication):
     START_STATE = "state_question"
 
@@ -144,14 +154,6 @@ class Application(BaseApplication):
         return FreeText(self, question=question, check=check, next="state_call_model")
 
     async def state_display_response_choices(self):
-        class RedirectChoiceState(ChoiceState):
-            async def process_message(self, message: Message):
-                choice = self._get_choice(message.content)
-                if choice is None:
-                    state = await self.app.go_to_state("state_question")
-                    return await state.process_message(message)
-                else:
-                    return await super().process_message(message)
 
         responses = json.loads(self.user.answers["model_response"])["top_responses"]
         return RedirectChoiceState(
@@ -182,14 +184,14 @@ class Application(BaseApplication):
             "Did the information above ☝🏽 answer your question?\n"
             "Reply:"
         ).format(title=title, content=content)
-        return ChoiceState(
+        return RedirectChoiceState(
             self,
             question=question,
             choices=[
                 Choice("yes", self._("*YES*"), ["yes"]),
                 Choice("no", self._("*NO*"), ["no"]),
             ],
-            error=question,
+            error="",  # Errors redirect to `state_question`
             next="state_submit_user_feedback",
         )
 
@@ -246,11 +248,11 @@ class Application(BaseApplication):
             self.save_answer("state_display_response_choices", choice.label)
             return "state_display_selected_choice"
 
-        return ChoiceState(
+        return RedirectChoiceState(
             self,
             question=question,
             choices=[Choice(title, title) for title, _ in responses],
-            error=question,
+            error="",  # Errors redirect to `state_question`
             next=next_state,
             footer=self._(
                 "\n"
