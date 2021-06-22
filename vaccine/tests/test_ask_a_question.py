@@ -105,6 +105,13 @@ async def test_question(tester: AppTester, model_mock):
 
 
 @pytest.mark.asyncio
+async def test_reset_keyword(tester: AppTester):
+    tester.setup_state("state_no_responses")
+    await tester.user_input("ask")
+    tester.assert_state("state_question")
+
+
+@pytest.mark.asyncio
 async def test_display_response_choices(tester: AppTester, model_mock):
     tester.setup_state("state_question")
     await tester.user_input("Is the vaccine safe?")
