@@ -42,6 +42,7 @@ class Application(BaseApplication):
             self.state_name = "state_timeout"
         keyword = re.sub(r"\W+", " ", message.content or "").strip().lower()
         if keyword in ("ask",) and self.state_name not in (None, self.START_STATE):
+            message.session_event = Message.SESSION_EVENT.NEW
             self.state_name = self.START_STATE
         if keyword in (
             "menu",
