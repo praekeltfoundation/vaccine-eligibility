@@ -96,7 +96,7 @@ class Application(BaseApplication):
             "Try *typing your own question* or sharing/forwarding a '*rumour*' that's "
             "going around to get the facts!\n"
             "\n"
-            '[💡Tip: Reply with a question like: "_Are vaccines safe?"_]'
+            '[💡Tip: Reply with a question like: _"Are vaccines safe?"_ ]'
         )
         return FreeText(
             self,
