@@ -1,5 +1,6 @@
 import logging
 import random
+import re
 from datetime import date
 from enum import Enum
 from urllib.parse import urljoin
@@ -635,15 +636,16 @@ class Application(BaseApplication):
             "medicalAidMember": self.user.answers["state_medical_aid"] == "yes",
         }
         id_type = self.user.answers["state_identification_type"]
+        id_number = re.sub(r"\W", "", self.user.answers["state_identification_number"])
         if id_type == self.ID_TYPES.rsa_id.name:
-            data["iDNumber"] = self.user.answers["state_identification_number"].strip()
+            data["iDNumber"] = id_number
         if (
             id_type == self.ID_TYPES.refugee.name
             or id_type == self.ID_TYPES.asylum_seeker.name
         ):
-            data["refugeeNumber"] = self.user.answers["state_identification_number"]
+            data["refugeeNumber"] = id_number
         if id_type == self.ID_TYPES.passport.name:
-            data["passportNumber"] = self.user.answers["state_identification_number"]
+            data["passportNumber"] = id_number
             if self.user.answers["state_passport_country"] != "other":
                 data["passportCountry"] = self.user.answers["state_passport_country"]
             else:
@@ -708,16 +710,15 @@ class Application(BaseApplication):
             "data": self.evds_response,
         }
         id_type = self.user.answers["state_identification_type"]
+        id_number = re.sub(r"\W", "", self.user.answers["state_identification_number"])
         if id_type == self.ID_TYPES.rsa_id.name:
-            data["id_number"] = self.user.answers["state_identification_number"].strip()
+            data["id_number"] = id_number
         if id_type == self.ID_TYPES.asylum_seeker.name:
-            data["asylum_seeker_number"] = self.user.answers[
-                "state_identification_number"
-            ]
+            data["asylum_seeker_number"] = id_number
         if id_type == self.ID_TYPES.refugee.name:
-            data["refugee_number"] = self.user.answers["state_identification_number"]
+            data["refugee_number"] = id_number
         if id_type == self.ID_TYPES.passport.name:
-            data["passport_number"] = self.user.answers["state_identification_number"]
+            data["passport_number"] = id_number
             if self.user.answers["state_passport_country"] != "other":
                 data["passport_country"] = self.user.answers["state_passport_country"]
             else:

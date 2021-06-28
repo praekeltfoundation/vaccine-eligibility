@@ -816,7 +816,7 @@ async def test_state_success(evds_mock, eventstore_mock, tester: AppTester):
     tester.setup_answer("state_surname", "test surname")
     tester.setup_answer("state_first_name", "test first name")
     tester.setup_answer("state_identification_type", "rsa_id")
-    tester.setup_answer("state_identification_number", " 6001010001081 ")
+    tester.setup_answer("state_identification_number", " 6001 010001081 ")
     tester.setup_answer("state_medical_aid", "state_vaccination_time")
     tester.setup_answer("state_email_address", "SKIP")
     await tester.user_input("1")
