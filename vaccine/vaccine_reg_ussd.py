@@ -122,12 +122,10 @@ class Application(BaseApplication):
             self,
             question=self._(
                 "Self-registration is only available to people {minimum_age} years or "
-                "older. Can we SMS you on this number when this changes?"
+                "older. Can we contact you on this number when this changes?"
             ).format(minimum_age=config.ELIGIBILITY_AGE_GATE_MIN),
             choices=[Choice("yes", self._("Yes")), Choice("no", self._("No"))],
-            error=self._(
-                "Can we notify you via SMS to let you know when you can register?"
-            ),
+            error=self._("Can we notify you to let you know when you can register?"),
             next="state_confirm_notification",
         )
 
@@ -456,7 +454,10 @@ class Application(BaseApplication):
     async def state_suburb_search(self):
         return FreeText(
             self,
-            question=self._("Please TYPE the name of the SUBURB where you live."),
+            question=self._(
+                "Please TYPE the name of the SUBURB to help us allocate your "
+                "appointment"
+            ),
             next="state_municipality",
         )
 
@@ -555,8 +556,8 @@ class Application(BaseApplication):
         return FreeText(
             self,
             question=self._(
-                "Please TYPE a CELL NUMBER we can send an SMS to with your appointment "
-                "information"
+                "Please TYPE a MOBILE NUMBER we can send an SMS to with your "
+                "appointment information"
             ),
             next="state_confirm_phone_number",
             check=phone_number_validation,
