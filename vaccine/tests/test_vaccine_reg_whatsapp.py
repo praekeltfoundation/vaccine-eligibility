@@ -185,9 +185,9 @@ async def test_passport_country_search(tester: AppTester):
         "\n".join(
             [
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "Please confirm your passport's COUNTRY of origin.",
                 "",
-                "Please confirm your passport's COUNTRY of origin. REPLY with a "
-                "NUMBER from the list below:",
+                "REPLY with a NUMBER from the list below:",
                 "1. Republic of Côte d'Ivoire",
                 "2. British Indian Ocean Territory",
                 "3. Plurinational State of Bolivia",
@@ -410,6 +410,7 @@ async def test_suburb(evds_mock, tester: AppTester):
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐",
                 "",
                 "Please REPLY with a NUMBER to confirm your location:",
+                "",
                 "1. Table View, Blouberg",
                 "2. Other",
             ]
@@ -466,7 +467,8 @@ async def test_municipality(evds_mock, tester: AppTester):
             [
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐",
                 "",
-                "Please REPLY with a NUMBER to confirm your MUNICIPALITY:",
+                "Please confirm the MUNICIPALITY for the suburb you have given:",
+                "",
                 "1. Buffalo City",
                 "2. Enoch Mgijima",
                 "3. Great Kei",
@@ -503,6 +505,7 @@ async def test_municipality_plumstead(evds_mock, tester: AppTester):
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐",
                 "",
                 "Please REPLY with a NUMBER to confirm your location:",
+                "",
                 "1. Plumstead, Cape Town",
                 "2. Other",
             ]
@@ -523,6 +526,7 @@ async def test_suburb_with_municipality(evds_mock, tester: AppTester):
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐",
                 "",
                 "Please REPLY with a NUMBER to confirm your location:",
+                "",
                 "1. Mandela Park, Mandela Park",
                 "2. Other",
             ]
@@ -572,7 +576,7 @@ async def test_self_registration(evds_mock, tester: AppTester):
             [
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐",
                 "",
-                "We will use your cell phone number to send you notifications and "
+                "We will use your mobile phone number to send you notifications and "
                 "updates via WhatsApp and/or SMS about getting vaccinated.",
                 "",
                 "Can we use 082 000 1001?",
@@ -644,6 +648,7 @@ async def test_medical_aid_list_1(evds_mock, tester: AppTester):
                 "",
                 "Please confirm your Medical Aid Provider. REPLY with a NUMBER from "
                 "the list below:",
+                "",
                 "1. Discovery Health Medical Scheme",
                 "2. Aeci Medical Aid Society",
                 "3. BMW Employees Medical Aid Society",
@@ -665,6 +670,7 @@ async def test_medical_aid_list_2(evds_mock, tester: AppTester):
                 "",
                 "Please confirm your Medical Aid Provider. REPLY with a NUMBER from "
                 "the list below:",
+                "",
                 "1. Tsogo Sun Group Medical Scheme",
                 "2. Golden Arrows Employees Medical Benefit Fund",
                 "3. Engen Medical Benefit Fund",
@@ -686,6 +692,7 @@ async def test_medical_aid_list_3(evds_mock, tester: AppTester):
                 "",
                 "Please confirm your Medical Aid Provider. REPLY with a NUMBER from "
                 "the list below:",
+                "",
                 "1. De Beers Benefit Society",
                 "2. BMW Employees Medical Aid Society",
                 "3. Government Employees Medical Scheme (GEMS)",
@@ -831,6 +838,9 @@ async def test_state_success(evds_mock, eventstore_mock, tester: AppTester):
                 "Look out for messages from this number (060 012 3456) on WhatsApp OR "
                 "on SMS/email. We will update you with important information about "
                 "your appointment and what to expect.",
+                "",
+                "-----",
+                "📌 Reply *0* to return to the main *MENU*",
             ]
         ),
         session=Message.SESSION_EVENT.CLOSE,
@@ -903,6 +913,9 @@ async def test_state_success_international_phonenumber(
                 "Look out for messages from this number (060 012 3456) on WhatsApp OR "
                 "on SMS/email. We will update you with important information about "
                 "your appointment and what to expect.",
+                "",
+                "-----",
+                "📌 Reply *0* to return to the main *MENU*",
             ]
         ),
         session=Message.SESSION_EVENT.CLOSE,
@@ -974,6 +987,9 @@ async def test_state_success_passport(evds_mock, eventstore_mock, tester: AppTes
                 "Look out for messages from this number (060 012 3456) on WhatsApp OR "
                 "on SMS/email. We will update you with important information about "
                 "your appointment and what to expect.",
+                "",
+                "-----",
+                "📌 Reply *0* to return to the main *MENU*",
             ]
         ),
         session=Message.SESSION_EVENT.CLOSE,
@@ -1046,6 +1062,9 @@ async def test_state_success_asylum_seeker(
                 "Look out for messages from this number (060 012 3456) on WhatsApp OR "
                 "on SMS/email. We will update you with important information about "
                 "your appointment and what to expect.",
+                "",
+                "-----",
+                "📌 Reply *0* to return to the main *MENU*",
             ]
         ),
         session=Message.SESSION_EVENT.CLOSE,
@@ -1114,6 +1133,9 @@ async def test_state_success_refugee(evds_mock, eventstore_mock, tester: AppTest
                 "Look out for messages from this number (060 012 3456) on WhatsApp OR "
                 "on SMS/email. We will update you with important information about "
                 "your appointment and what to expect.",
+                "",
+                "-----",
+                "📌 Reply *0* to return to the main *MENU*",
             ]
         ),
         session=Message.SESSION_EVENT.CLOSE,
@@ -1185,6 +1207,9 @@ async def test_state_success_temporary_failure(evds_mock, tester: AppTester):
                 "Look out for messages from this number (060 012 3456) on WhatsApp OR "
                 "on SMS/email. We will update you with important information about "
                 "your appointment and what to expect.",
+                "",
+                "-----",
+                "📌 Reply *0* to return to the main *MENU*",
             ]
         ),
         session=Message.SESSION_EVENT.CLOSE,
