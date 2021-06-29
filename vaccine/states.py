@@ -55,6 +55,7 @@ class ChoiceState:
         next: Union[str, Callable],
         accept_labels: bool = True,
         footer: Optional[str] = None,
+        error_footer: Optional[str] = None,
     ):
         self.app = app
         self.question = question
@@ -63,6 +64,7 @@ class ChoiceState:
         self.accept_labels = accept_labels
         self.next = next
         self.footer = footer
+        self.error_footer = error_footer
 
     def _normalise_text(self, text: Optional[str]) -> str:
         return (text or "").strip().lower()
@@ -91,7 +93,10 @@ class ChoiceState:
     async def process_message(self, message: Message):
         choice = self._get_choice(message.content)
         if choice is None:
-            return self.app.send_message(f"{self.error}\n{self._display_choices}")
+            text = f"{self.error}\n{self._display_choices}"
+            if self.error_footer:
+                text = f"{text}\n{self.footer}"
+            return self.app.send_message(text)
         else:
             self.app.save_answer(self.app.state_name, choice.value)
             self.app.state_name = await self._get_next(choice)
@@ -114,6 +119,7 @@ class MenuState(ChoiceState):
         error: str,
         accept_labels: bool = True,
         footer: Optional[str] = None,
+        error_footer: Optional[str] = None,
     ):
         self.app = app
         self.question = question
@@ -121,6 +127,7 @@ class MenuState(ChoiceState):
         self.error = error
         self.accept_labels = accept_labels
         self.footer = footer
+        self.error_footer = error_footer
 
     async def _next(self, choice: Choice):
         return choice.value

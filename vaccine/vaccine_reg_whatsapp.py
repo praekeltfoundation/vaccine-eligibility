@@ -122,15 +122,18 @@ class Application(BaseApplication):
             question=self._(
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
-                "Welcome to the official Phase 2&3 COVID-19 Vaccination "
+                "Welcome to the official COVID-19 Vaccination "
                 "Self-registration Portal from the National Department of Health. "
                 "Registration will take about 5 minutes. Please have your ID, "
                 "Passport, Refugee Permit or Asylum Seeker Permit *Number* on "
                 "hand. If you have Medical Aid, we will also ask for your Medical "
                 "Aid Number.\n"
                 "\n"
-                "Note: If you are a health professional, register for Phase 1 at "
-                "https://vaccine.enroll.health.gov.za/\n"
+                "*Note:*\n"
+                "- Vaccination is voluntary and no payment is required\n"
+                "- No co-payment/levy will be required if you belong to a Medical Aid\n"
+                "- Everyone who registers will be offered vaccination\n"
+                "- We will move down the age groups as quickly as we can\n"
                 "\n"
                 "Registration is currently only open to those {minimum_age} years "
                 "and older. Are you {minimum_age} or older?\n"
@@ -142,6 +145,11 @@ class Application(BaseApplication):
                 "Please confirm that you are {minimum_age} years or older by typing 1 "
                 "(or 2 if you are NOT {minimum_age} years or older)\n"
             ).format(minimum_age=config.ELIGIBILITY_AGE_GATE_MIN),
+            error_footer=self._(
+                "\n"
+                "-----\n"
+                "Or reply 📌 *0* to end this session and return to the main *MENU*"
+            ),
             choices=[
                 Choice(
                     "state_terms_pdf",
@@ -177,12 +185,18 @@ class Application(BaseApplication):
                 "getting vaccinated become available?\n"
             ),
             choices=[Choice("yes", self._("Yes")), Choice("no", self._("No"))],
+            footer=self._("\n" "REPLY with the NUMBER of the option you have chosen."),
             error=self._(
                 "⚠️ This service works best when you use the numbered options "
                 "available.\n"
                 "\n"
                 "Please let us know if we can notify you via Whatsapp on this "
-                "number when updates about getting vaccinated become available?"
+                "number when updates about getting vaccinated become available?\n"
+            ),
+            error_footer=self._(
+                "\n"
+                "-----\n"
+                "Reply 📌 *0* to end this session and return to the main *MENU*"
             ),
             next="state_confirm_notification",
         )
@@ -210,7 +224,7 @@ class Application(BaseApplication):
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
                 "Do you agree to the attached Electronic Vaccine Data System "
-                "PRIVACY POLICY that explains how your data is used and protected?"
+                "PRIVACY POLICY that explains how your data is used and protected?\n"
             ),
             choices=[
                 Choice("state_terms_and_conditions_summary", self._("Read summary")),
@@ -218,7 +232,12 @@ class Application(BaseApplication):
             ],
             error=self._(
                 "⚠️ This service works best when you reply with one of the numbers "
-                "next to the options provided."
+                "next to the options provided.\n"
+            ),
+            error_footer=self._(
+                "\n"
+                "Reply 1 to read a summary of the DATA PROTECTION & PRIVACY POLICY. "
+                "Reply 2 to accept"
             ),
         )
 
@@ -257,7 +276,12 @@ class Application(BaseApplication):
                 "⚠️ This service works best when you reply with one of the numbers "
                 "next to the options provided.\n"
                 "\n"
-                "Do you accept the EVDS Privacy Notice?"
+                "Do you accept the EVDS Privacy Notice?\n"
+            ),
+            error_footer=self._(
+                "\n"
+                "------\n"
+                "📌 Or reply *0* to end this session and return to the main *MENU*"
             ),
         )
 
@@ -278,8 +302,8 @@ class Application(BaseApplication):
             question=self._(
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
-                "We need your location to help us match you with a nearby "
-                "vaccination site\n"
+                "We need your location to help us allocate you to an available "
+                "vaccination site as close and as soon as possible\n"
                 "\n"
                 "Select your province"
             ),
@@ -341,15 +365,20 @@ class Application(BaseApplication):
             question=self._(
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
-                "Please REPLY with a NUMBER to confirm your MUNICIPALITY:"
+                "Please confirm the MUNICIPALITY for the suburb you have given:\n"
             ),
             choices=choices,
             error=self._(
                 "⚠️ This service works best when you reply with one of the numbers "
                 "next to the options provided.\n"
                 "\n"
-                "Please REPLY with a NUMBER from the list below to confirm the "
-                "MUNICIPALITY:"
+                "Please REPLY with a NUMBER from the list below to confirm "
+                "municipality of the suburb you have shared:\n"
+            ),
+            error_footer=self._(
+                "\n"
+                "------\n"
+                "📌 Or reply *0* to end this session and return to the main *MENU*"
             ),
             next=next_state,
         )
@@ -376,7 +405,7 @@ class Application(BaseApplication):
             question=self._(
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
-                "Please REPLY with a NUMBER to confirm your location:"
+                "Please REPLY with a NUMBER to confirm your location:\n"
             ),
             choices=choices,
             error=self._(
@@ -384,7 +413,12 @@ class Application(BaseApplication):
                 "next to the options provided.\n"
                 "\n"
                 "Please REPLY with a NUMBER from the list below to confirm the "
-                "location you have shared:"
+                "location you have shared:\n"
+            ),
+            error_footer=self._(
+                "\n"
+                "------\n"
+                "📌 Or reply *0* to end this session and return to the main *MENU*"
             ),
             next=next_state,
         )
@@ -395,7 +429,7 @@ class Application(BaseApplication):
             question=self._(
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
-                "Which method would you like to use for identification?"
+                "Which method would you like to use for identification?\n"
             ),
             choices=[Choice(i.name, i.value) for i in self.ID_TYPES],
             error=self._(
@@ -403,7 +437,7 @@ class Application(BaseApplication):
                 "next to the options provided.\n"
                 "\n"
                 "Please choose the type of identification document you have from "
-                "the list below?"
+                "the list below?\n"
             ),
             next="state_identification_number",
         )
@@ -418,9 +452,11 @@ class Application(BaseApplication):
             next_state = "state_first_name"
 
         async def validate_identification_number(value):
-            error_msg = self._("⚠️ Please enter a valid {id_type}").format(
-                id_type=idtype_label
-            )
+            error_msg = self._(
+                "⚠️ Please enter a valid {id_type}\n"
+                "\n"
+                "📌 Or reply *0* to end this session and return to the main *MENU*"
+            ).format(id_type=idtype_label)
             if idtype == self.ID_TYPES.rsa_id:
                 try:
                     id_number = SAIDNumber(value)
@@ -474,9 +510,9 @@ class Application(BaseApplication):
             self,
             question=self._(
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+                "Please confirm your passport's COUNTRY of origin.\n"
                 "\n"
-                "Please confirm your passport's COUNTRY of origin. REPLY with a "
-                "NUMBER from the list below:"
+                "REPLY with a NUMBER from the list below:"
             ),
             choices=choices,
             error=self._("Do any of these match your COUNTRY:"),
@@ -575,7 +611,7 @@ class Application(BaseApplication):
             question=self._(
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
-                "In which MONTH were you born?"
+                "In which MONTH were you born?\n"
             ),
             choices=[
                 Choice("1", self._("January")),
@@ -596,8 +632,9 @@ class Application(BaseApplication):
                 "⚠️ This service works best when you reply with one of the numbers "
                 "next to the options provided.\n"
                 "\n"
-                "In which MONTH were you born? "
+                "In which MONTH were you born?\n"
             ),
+            error_footer=self._("\n" "Reply with the number next to the month."),
         )
 
     async def state_dob_day(self):
@@ -648,7 +685,7 @@ class Application(BaseApplication):
         return ChoiceState(
             self,
             question=self._(
-                "*VACCINE REGISTRATION SECURE CHAT* 🔐\n" "\n" "What is your GENDER?"
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐\n" "\n" "What is your GENDER?\n"
             ),
             choices=[
                 Choice("Male", self._("Male")),
@@ -659,7 +696,7 @@ class Application(BaseApplication):
                 "⚠️ This service works best when you reply with one of the numbers "
                 "next to the options provided.\n"
                 "\n"
-                "REPLY with the NUMBER next to your gender in the list below."
+                "REPLY with the NUMBER next to your gender in the list below.\n"
             ),
             next="state_province_id",
         )
@@ -671,7 +708,7 @@ class Application(BaseApplication):
             question=self._(
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
-                "We will use your cell phone number to send you notifications and "
+                "We will use your mobile phone number to send you notifications and "
                 "updates via WhatsApp and/or SMS about getting vaccinated.\n"
                 "\n"
                 "Can we use {number}?"
@@ -684,7 +721,7 @@ class Application(BaseApplication):
                 "⚠️ This service works best when you reply with one of the numbers "
                 "next to the options provided.\n"
                 "\n"
-                "Please confirm that we can use {number} to contact you."
+                "Please confirm that we can use {number} to contact you.\n"
             ).format(number=number),
         )
 
@@ -705,7 +742,7 @@ class Application(BaseApplication):
             question=self._(
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
-                "Please TYPE the CELL PHONE NUMBER we can contact you on."
+                "Please TYPE the MOBILE PHONE NUMBER we can contact you on."
             ),
             next="state_email_address",
             check=phone_number_validation,
@@ -743,7 +780,10 @@ class Application(BaseApplication):
             question=self._(
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
-                "Do you belong to a South African Medical Aid?"
+                "Note: If you belong to a Medical Aid, your day-to-day savings and/or "
+                "benefits won't be affected.\n"
+                "\n"
+                "Do you belong to a South African Medical Aid?\n"
             ),
             choices=[
                 Choice("state_medical_aid_search", self._("Yes")),
@@ -753,7 +793,7 @@ class Application(BaseApplication):
                 "⚠️ This service works best when you reply with one of the numbers "
                 "next to the options provided.\n"
                 "\n"
-                "Please confirm if you belong to a Medical Aid."
+                "Please confirm if you belong to a Medical Aid.\n"
             ),
         )
 
@@ -786,7 +826,7 @@ class Application(BaseApplication):
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
                 "Please confirm your Medical Aid Provider. REPLY with a NUMBER "
-                "from the list below:"
+                "from the list below:\n"
             ),
             choices=choices,
             error=self._(
@@ -794,7 +834,7 @@ class Application(BaseApplication):
                 "next to the options provided.\n"
                 "\n"
                 "REPLY with the NUMBER next to the name of your "
-                "Medical Aid Provider:"
+                "Medical Aid Provider:\n"
             ),
             next=next_state,
         )
@@ -826,7 +866,9 @@ class Application(BaseApplication):
             question=self._(
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
-                "Which option do you prefer for your vaccination appointment?"
+                "Note: We will try to allocate you an appointment based on your "
+                "preference.\n"
+                "Which option do you prefer for your vaccination appointment?\n"
             ),
             choices=[
                 Choice("weekday_morning", self._("Weekday Morning")),
@@ -837,7 +879,7 @@ class Application(BaseApplication):
                 "⚠️ This service works best when you reply with one of the numbers "
                 "next to the options provided.\n"
                 "\n"
-                "When would you be available for a vaccination appointment?"
+                "When would you be available for a vaccination appointment?\n"
             ),
             next="state_submit_to_evds",
         )
@@ -996,7 +1038,10 @@ class Application(BaseApplication):
                 "\n"
                 "Look out for messages from this number (060 012 3456) on WhatsApp "
                 "OR on SMS/email. We will update you with important information "
-                "about your appointment and what to expect."
+                "about your appointment and what to expect.\n"
+                "\n"
+                "-----\n"
+                "📌 Reply *0* to return to the main *MENU*"
             ),
         )
 
