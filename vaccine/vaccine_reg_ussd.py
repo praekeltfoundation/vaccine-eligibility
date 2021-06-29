@@ -23,12 +23,13 @@ from vaccine.utils import (
     HTTP_EXCEPTIONS,
     SAIDNumber,
     calculate_age,
+    clean_name,
     countries,
     display_phonenumber,
     enforce_character_limit_in_choices,
     normalise_phonenumber,
 )
-from vaccine.validators import nonempty_validator
+from vaccine.validators import name_validator, nonempty_validator
 
 logger = logging.getLogger(__name__)
 
@@ -393,7 +394,7 @@ class Application(BaseApplication):
                 "Please TYPE your FIRST NAME as it appears in your identification "
                 "document"
             ),
-            check=nonempty_validator(
+            check=name_validator(
                 self._(
                     "ERROR: Reply with your FIRST NAME as it appears in your "
                     "identification document"
@@ -409,7 +410,7 @@ class Application(BaseApplication):
                 "Please TYPE your SURNAME as it appears in your identification "
                 "document."
             ),
-            check=nonempty_validator(
+            check=name_validator(
                 self._(
                     "ERROR: Reply with your SURNAME as it appears in your "
                     "identification document"
@@ -419,8 +420,8 @@ class Application(BaseApplication):
         )
 
     async def state_confirm_profile(self):
-        first_name = self.user.answers["state_first_name"][:36]
-        surname = self.user.answers["state_surname"][:36]
+        first_name = clean_name(self.user.answers["state_first_name"])[:36]
+        surname = clean_name(self.user.answers["state_surname"])[:36]
         id_number = self.user.answers["state_identification_number"][:25]
         return MenuState(
             self,
@@ -625,8 +626,8 @@ class Application(BaseApplication):
         )
         data = {
             "gender": self.user.answers["state_gender"],
-            "surname": self.user.answers["state_surname"],
-            "firstName": self.user.answers["state_first_name"],
+            "surname": clean_name(self.user.answers["state_surname"]),
+            "firstName": clean_name(self.user.answers["state_first_name"]),
             "dateOfBirth": date_of_birth.isoformat(),
             "mobileNumber": normalise_phonenumber(phonenumber).lstrip("+"),
             "preferredVaccineScheduleTimeOfDay": vac_time,
@@ -699,8 +700,8 @@ class Application(BaseApplication):
             "msisdn": normalise_phonenumber(phonenumber),
             "source": f"USSD {self.inbound.to_addr}",
             "gender": self.user.answers["state_gender"],
-            "first_name": self.user.answers["state_first_name"],
-            "last_name": self.user.answers["state_surname"],
+            "first_name": clean_name(self.user.answers["state_first_name"]),
+            "last_name": clean_name(self.user.answers["state_surname"]),
             "date_of_birth": date_of_birth.isoformat(),
             "preferred_time": vac_time,
             "preferred_date": vac_day,

@@ -27,12 +27,13 @@ from vaccine.utils import (
     HTTP_EXCEPTIONS,
     SAIDNumber,
     calculate_age,
+    clean_name,
     countries,
     display_phonenumber,
     enforce_character_limit_in_choices,
     normalise_phonenumber,
 )
-from vaccine.validators import nonempty_validator
+from vaccine.validators import name_validator, nonempty_validator
 
 logger = logging.getLogger(__name__)
 
@@ -534,10 +535,7 @@ class Application(BaseApplication):
             "📌 Or reply *0* to end this session and return to the main *MENU*"
         )
         return FreeText(
-            self,
-            question=question,
-            check=nonempty_validator(error),
-            next="state_surname",
+            self, question=question, check=name_validator(error), next="state_surname"
         )
 
     async def state_surname(self):
@@ -556,10 +554,7 @@ class Application(BaseApplication):
         )
 
         return FreeText(
-            self,
-            question=question,
-            check=nonempty_validator(error),
-            next="state_dob_year",
+            self, question=question, check=name_validator(error), next="state_dob_year"
         )
 
     async def state_dob_year(self):
@@ -903,8 +898,8 @@ class Application(BaseApplication):
         )
         data = {
             "gender": self.user.answers["state_gender"],
-            "surname": self.user.answers["state_surname"],
-            "firstName": self.user.answers["state_first_name"],
+            "surname": clean_name(self.user.answers["state_surname"]),
+            "firstName": clean_name(self.user.answers["state_first_name"]),
             "dateOfBirth": date_of_birth.isoformat(),
             "mobileNumber": normalise_phonenumber(phonenumber).lstrip("+"),
             "preferredVaccineScheduleTimeOfDay": vac_time,
@@ -985,8 +980,8 @@ class Application(BaseApplication):
             "msisdn": normalise_phonenumber(phonenumber),
             "source": f"WhatsApp {self.inbound.to_addr}",
             "gender": self.user.answers["state_gender"],
-            "first_name": self.user.answers["state_first_name"],
-            "last_name": self.user.answers["state_surname"],
+            "first_name": clean_name(self.user.answers["state_first_name"]),
+            "last_name": clean_name(self.user.answers["state_surname"]),
             "date_of_birth": date_of_birth.isoformat(),
             "preferred_time": vac_time,
             "preferred_date": vac_day,

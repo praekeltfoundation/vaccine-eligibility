@@ -352,6 +352,14 @@ async def test_first_name(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_first_name_invalid(tester: AppTester):
+    tester.setup_state("state_first_name")
+    await tester.user_input("")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_first_name")
+
+
+@pytest.mark.asyncio
 async def test_surname(tester: AppTester):
     tester.setup_state("state_first_name")
     await tester.user_input("firstname")
@@ -820,8 +828,8 @@ async def test_state_success(evds_mock, eventstore_mock, tester: AppTester):
     tester.setup_answer("state_suburb", "d114778e-c590-4a08-894e-0ddaefc5759e")
     tester.setup_answer("state_province_id", "e32298eb-17b4-471e-8d9b-ba093c6afc7c")
     tester.setup_answer("state_gender", "Other")
-    tester.setup_answer("state_surname", "test surname")
-    tester.setup_answer("state_first_name", "test first name")
+    tester.setup_answer("state_surname", " test \nsurname$")
+    tester.setup_answer("state_first_name", " test first %name")
     tester.setup_answer("state_identification_type", "rsa_id")
     tester.setup_answer("state_identification_number", " 6001 010001081 ")
     tester.setup_answer("state_medical_aid", "state_vaccination_time")
