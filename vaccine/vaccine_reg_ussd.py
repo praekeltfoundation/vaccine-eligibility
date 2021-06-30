@@ -229,7 +229,6 @@ class Application(BaseApplication):
             question=self._("Which country issued your passport?"),
             error=self._("Which country issued your passport?"),
             choices=[
-                Choice("ZA", self._("South Africa")),
                 Choice("ZW", self._("Zimbabwe")),
                 Choice("MZ", self._("Mozambique")),
                 Choice("MW", self._("Malawi")),
