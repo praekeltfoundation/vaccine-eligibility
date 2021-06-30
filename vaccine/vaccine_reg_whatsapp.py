@@ -182,9 +182,11 @@ class Application(BaseApplication):
         return ChoiceState(
             self,
             question=self._(
-                "Can we notify you via Whatsapp on this number when updates about "
-                "getting vaccinated become available?\n"
-            ),
+                "Self-registration is only available to people {minimum_age} years or "
+                "older.\n"
+                "\n"
+                "Can we contact you on this number when this changes?\n"
+            ).format(minimum_age=config.ELIGIBILITY_AGE_GATE_MIN),
             choices=[Choice("yes", self._("Yes")), Choice("no", self._("No"))],
             footer=self._("\n" "REPLY with the NUMBER of the option you have chosen."),
             error=self._(
