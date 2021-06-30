@@ -135,6 +135,7 @@ class Countries:
         return {
             country.alpha_2: getattr(country, "official_name", "") or country.name
             for country in pycountry.countries
+            if country.alpha_2 != "ZA"
         }
 
     def search_for_country(self, search_text):

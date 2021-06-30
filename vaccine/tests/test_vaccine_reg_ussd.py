@@ -285,7 +285,7 @@ async def test_passport_country_by_choosing():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
     assert u.state.name == "state_gender"
-    assert u.answers["state_passport_country"] == "ZW"
+    assert u.answers["state_passport_country"] == "MZ"
 
 
 @pytest.mark.asyncio
