@@ -12,7 +12,7 @@ def nonempty_validator(error_text):
 
 def name_validator(error_text):
     async def validator(value):
-        if not clean_name(value):
+        if len(clean_name(value)) < 2:
             raise ErrorMessage(error_text)
 
     return validator
