@@ -163,7 +163,8 @@ class Application(BaseApplication):
         self.save_answer("returning_user", "yes")
         self.save_answer("state_province", data["province"])
         self.save_answer("state_city", data["city"])
-        self.save_answer("city_location", data["city_location"])
+        if data["city_location"]:
+            self.save_answer("city_location", data["city_location"])
         self.save_answer("state_age", data["age"])
         for data_field in [
             "age_years",
