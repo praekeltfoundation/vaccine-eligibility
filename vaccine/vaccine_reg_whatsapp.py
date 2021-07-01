@@ -556,7 +556,36 @@ class Application(BaseApplication):
         )
 
         return FreeText(
-            self, question=question, check=name_validator(error), next="state_dob_year"
+            self,
+            question=question,
+            check=name_validator(error),
+            next="state_confirm_profile",
+        )
+
+    async def state_confirm_profile(self):
+        first_name = clean_name(self.user.answers["state_first_name"])[:200]
+        surname = clean_name(self.user.answers["state_surname"])[:200]
+        id_number = self.user.answers["state_identification_number"][:200]
+        return MenuState(
+            self,
+            question=self._(
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+                "\n"
+                "Please confirm the following:\n"
+                "\n"
+                "{first_name} {surname}\n"
+                "{id_number}\n"
+            ).format(first_name=first_name, surname=surname, id_number=id_number),
+            choices=[
+                Choice("state_dob_year", self._("Correct")),
+                Choice("state_identification_type", self._("Wrong")),
+            ],
+            error=self._(
+                "Is the information you shared correct?\n"
+                "\n"
+                "{first_name} {surname}\n"
+                "{id_number}"
+            ).format(first_name=first_name, surname=surname, id_number=id_number),
         )
 
     async def state_dob_year(self):

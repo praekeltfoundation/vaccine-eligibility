@@ -277,10 +277,36 @@ async def test_too_young(get_today, tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_dob_year(tester: AppTester):
+async def test_confirm_profile(tester: AppTester):
+    tester.setup_answer("state_identification_number", "123456")
+    tester.setup_answer("state_first_name", "test$ first ")
     tester.setup_state("state_surname")
-    await tester.user_input("test surname")
-    tester.assert_num_messages(1)
+    await tester.user_input("test$ surname")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "Please confirm the following:",
+                "",
+                "test first test surname",
+                "123456",
+                "",
+                "1. Correct",
+                "2. Wrong",
+            ]
+        )
+    )
+    tester.assert_state("state_confirm_profile")
+
+
+@pytest.mark.asyncio
+async def test_dob_year(tester: AppTester):
+    tester.setup_answer("state_identification_number", "123456")
+    tester.setup_answer("state_first_name", "test$ first ")
+    tester.setup_answer("state_surname", "test$ surname ")
+    tester.setup_state("state_confirm_profile")
+    await tester.user_input("correct")
     tester.assert_state("state_dob_year")
 
 
@@ -372,12 +398,15 @@ async def test_surname(tester: AppTester):
 @mock.patch("vaccine.utils.get_today")
 async def test_skip_dob_and_gender(get_today, evds_mock, tester: AppTester):
     get_today.return_value = date(2120, 1, 1)
-    tester.setup_state("state_surname")
+    tester.setup_state("state_confirm_profile")
     tester.setup_answer("state_dob_day", "1")
     tester.setup_answer("state_dob_month", "1")
     tester.setup_answer("state_dob_year", "1990")
     tester.setup_answer("state_gender", "male")
-    await tester.user_input("test surname")
+    tester.setup_answer("state_first_name", "first")
+    tester.setup_answer("state_surname", "surname")
+    tester.setup_answer("state_identification_number", "123456")
+    await tester.user_input("correct")
     tester.assert_num_messages(1)
     tester.assert_state("state_province_id")
 
