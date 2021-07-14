@@ -95,7 +95,7 @@ class ChoiceState:
         if choice is None:
             text = f"{self.error}\n{self._display_choices}"
             if self.error_footer:
-                text = f"{text}\n{self.footer}"
+                text = f"{text}\n{self.error_footer}"
             return self.app.send_message(text)
         else:
             self.app.save_answer(self.app.state_name, choice.value)
