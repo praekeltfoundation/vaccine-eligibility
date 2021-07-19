@@ -110,6 +110,12 @@ class ChoiceState:
         return self.app.send_message(text)
 
 
+class LanguageState(ChoiceState):
+    async def _get_next(self, choice: Choice):
+        self.app.set_language(choice.value)
+        return await super()._get_next(choice)
+
+
 class MenuState(ChoiceState):
     def __init__(
         self,

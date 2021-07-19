@@ -78,11 +78,53 @@ async def eventstore_mock(sanic_client):
 
 
 @pytest.mark.asyncio
+async def test_language(tester: AppTester):
+    """
+    Should set the user language on selection
+    """
+    assert tester.user.lang is None
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+    tester.assert_state("state_language")
+    tester.assert_num_messages(1)
+    await tester.user_input("2")
+    assert tester.user.lang == "zul"
+    tester.assert_state("state_age_gate")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*INGXOXO EPHEPHILE YOKUBHALISELA UKUGOMA*🔐 ",
+                " ",
+                "Uyemukelwa kwi-Portal esemthethweni ye-COVID-19 Vaccination "
+                "Self-registration evela eMnyangweni Wezempilo Kazwelonke. Ukubhalisa "
+                "kuzothatha cishe imizuzu engu-5. Sicela ube *nenombolo* yakho ye-ID , "
+                "yePhasipothi, yemvume yababaleki noma yemvume yokufuna ukukhoseliswa "
+                "esandleni. Uma uneMedical Aid, sizocela nenombolo yakho "
+                "ye-Medical Aid.",
+                " ",
+                "*Qaphela:* ",
+                "- Ukugoma kwenziwa ngokuzithandela futhi akudingeki ukuthi ukhokhe ",
+                "- Akukho okuzokhokhwa ngokuhlanganyela / intela ezodingeka uma "
+                "ungaphansi kweMedical Aid ",
+                "- Wonke umuntu obhalisile uzonikezwa umuthi wokugoma ",
+                "- Sizohamba ngamaqembu eminyeka ngokushesha okukhulu ",
+                " ",
+                "Ukubhalisa okwamanje kuvulelwe abaneminyaka engu-60 nangaphezulu "
+                "kuphela. Uneminyaka engu-60 noma ngaphezulu? ",
+                "",
+                "1. Yebo, ngineminyaka engu-60 noma ngaphezulu",
+                "2. Cha",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
 async def test_age_gate(tester: AppTester):
     """
     Should ask the user if they're over 60
     """
-    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+    tester.setup_state("state_language")
+    await tester.user_input("1")
     tester.assert_state("state_age_gate")
     tester.assert_num_messages(1)
 
