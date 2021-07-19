@@ -21,6 +21,7 @@ from vaccine.states import (
     EndState,
     ErrorMessage,
     FreeText,
+    LanguageState,
     MenuState,
 )
 from vaccine.utils import (
@@ -72,7 +73,7 @@ def get_eventstore():
 
 
 class Application(BaseApplication):
-    START_STATE = "state_age_gate"
+    START_STATE = "state_language"
 
     def __init__(self, user):
         super().__init__(user)
@@ -112,12 +113,39 @@ class Application(BaseApplication):
     async def state_exit(self):
         return EndState(self, "", helper_metadata={"automation_handle": True})
 
-    async def state_age_gate(self):
+    async def state_language(self):
         self.user.answers = {}
 
         if random.random() < config.THROTTLE_PERCENTAGE / 100.0:
             return await self.go_to_state("state_throttle")
 
+        return LanguageState(
+            self,
+            question="*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+            "\n"
+            "Welcome to the official COVID-19 Vaccination Self-registration service "
+            "from the National Department of Health.\n"
+            "\n"
+            "If your language is not available, register by calling 0800 029 999, "
+            "toll-free (Monday - Friday: 7am to 8pm OR Saturday, Sunday and public "
+            "holidays: 8am to 6pm)\n"
+            "\n"
+            "To continue, select your language from the list:\n",
+            error="*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+            "\n"
+            "Please choose your language from this list:\n"
+            "\n",
+            choices=[
+                Choice("eng", "English"),
+                Choice("zul", "isiZulu"),
+                Choice("xho", "isiXhosa"),
+                Choice("afr", "Afrikaans"),
+                Choice("sot", "Sesotho"),
+            ],
+            next="state_age_gate",
+        )
+
+    async def state_age_gate(self):
         return MenuState(
             self,
             question=self._(

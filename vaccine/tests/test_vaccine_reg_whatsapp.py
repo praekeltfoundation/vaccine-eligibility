@@ -78,11 +78,27 @@ async def eventstore_mock(sanic_client):
 
 
 @pytest.mark.asyncio
+async def test_language(tester: AppTester):
+    """
+    Should set the user language on selection
+    """
+    assert tester.user.lang is None
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+    tester.assert_state("state_language")
+    tester.assert_num_messages(1)
+    await tester.user_input("3")
+    assert tester.user.lang == "xho"
+    tester.assert_state("state_age_gate")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
 async def test_age_gate(tester: AppTester):
     """
     Should ask the user if they're over 60
     """
-    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+    tester.setup_state("state_language")
+    await tester.user_input("1")
     tester.assert_state("state_age_gate")
     tester.assert_num_messages(1)
 
