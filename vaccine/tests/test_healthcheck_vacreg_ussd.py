@@ -6,6 +6,7 @@ import pytest
 from vaccine.healthcheck_ussd import Application as HealthCheckApp
 from vaccine.healthcheck_vacreg_ussd import Application
 from vaccine.models import Message, StateData, User
+from vaccine.testing import AppTester
 from vaccine.vaccine_reg_ussd import Application as VacRegApp
 
 
@@ -338,3 +339,14 @@ async def test_state_timed_out_vaccinereg():
     assert len(reply.content) < 140
     assert u.answers["resume_state"] == "state_vaccination_time"
     assert u.session_id != 1
+
+
+async def test_state_language():
+    tester = AppTester(Application)
+    tester.setup_state("state_menu")
+    await tester.user_input("3")
+    tester.assert_state("state_language")
+
+    await tester.user_input("2")
+    tester.assert_state("state_menu")
+    assert tester.user.lang == "zul"
