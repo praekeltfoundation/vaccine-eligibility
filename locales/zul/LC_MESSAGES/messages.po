@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2021-07-20 15:37+0200\n"
-"PO-Revision-Date: 2021-07-20 16:20+0200\n"
+"PO-Revision-Date: 2021-07-20 16:21+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zu\n"
@@ -1047,39 +1047,39 @@ msgstr ""
 
 #: vaccine/vaccine_reg_whatsapp.py:671
 msgid "January"
-msgstr "u-January"
+msgstr "January"
 
 #: vaccine/vaccine_reg_whatsapp.py:672
 msgid "February"
-msgstr "u-February"
+msgstr "February"
 
 #: vaccine/vaccine_reg_whatsapp.py:673
 msgid "March"
-msgstr "u-March"
+msgstr "March"
 
 #: vaccine/vaccine_reg_whatsapp.py:674
 msgid "April"
-msgstr "u-April"
+msgstr "April"
 
 #: vaccine/vaccine_reg_whatsapp.py:678
 msgid "August"
-msgstr "u-August"
+msgstr "August"
 
 #: vaccine/vaccine_reg_whatsapp.py:679
 msgid "September"
-msgstr "u-September"
+msgstr "September"
 
 #: vaccine/vaccine_reg_whatsapp.py:680
 msgid "October"
-msgstr "u-October"
+msgstr "October"
 
 #: vaccine/vaccine_reg_whatsapp.py:681
 msgid "November"
-msgstr "u-November"
+msgstr "November"
 
 #: vaccine/vaccine_reg_whatsapp.py:682
 msgid "December"
-msgstr "u-December"
+msgstr "December"
 
 #: vaccine/vaccine_reg_whatsapp.py:685
 msgid ""
