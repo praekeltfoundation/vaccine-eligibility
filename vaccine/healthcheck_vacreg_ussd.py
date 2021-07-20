@@ -49,25 +49,23 @@ class Application(VacRegApp, HealthCheckApp):
                     HealthCheckApp.START_STATE,
                     self._("HealthCheck Symptom checker [ENG]"),
                 ),
-                Choice("state_language", "Change language"),
+                Choice("state_language", self._("Change language")),
             ],
         )
 
     async def state_language(self):
         return LanguageState(
             self,
-            question=self._(
-                "NATIONAL DEPT OF HEALTH's COVID-19 Response services\n"
-                "\n"
-                "Language:"
-            ),
-            error=self._("ERROR: Please try again\n" "\n" "Language:"),
+            question="NATIONAL DEPT OF HEALTH's COVID-19 Response services\n"
+            "\n"
+            "Language:",
+            error="ERROR: Please try again\n" "\n" "Language:",
             choices=[
-                Choice("eng", self._("English")),
-                Choice("zul", self._("isiZulu")),
-                Choice("zul", self._("isiXhosa")),
-                Choice("zul", self._("Afrikaans")),
-                Choice("zul", self._("Sesotho")),
+                Choice("eng", "English"),
+                Choice("zul", "isiZulu"),
+                Choice("xho", "isiXhosa"),
+                Choice("afr", "Afrikaans"),
+                Choice("sot", "Sesotho"),
             ],
             next="state_menu",
         )
