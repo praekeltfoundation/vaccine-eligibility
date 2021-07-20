@@ -1,0 +1,972 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2021-07-19 16:02+0200\n"
+"PO-Revision-Date: 2021-07-20 15:06+0200\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"X-Generator: Poedit 3.0\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: af\n"
+
+#: vaccine/vaccine_reg_whatsapp.py:82
+msgid "RSA ID Number"
+msgstr "RSA ID-nommer"
+
+#: vaccine/vaccine_reg_whatsapp.py:83
+msgid "Passport Number"
+msgstr "Paspoortnommer"
+
+#: vaccine/vaccine_reg_whatsapp.py:84
+msgid "Asylum Seeker Permit number"
+msgstr "Asielsoeker-permitnommer"
+
+#: vaccine/vaccine_reg_whatsapp.py:85
+msgid "Refugee Permit number"
+msgstr "Vlugteling-permitnommer"
+
+#: vaccine/vaccine_reg_whatsapp.py:100
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"We haven’t heard from you in a while!\n"
+"\n"
+"The registration session has timed out due to inactivity. You will need to "
+"start again. Just TYPE the word REGISTER.\n"
+"\n"
+"-----\n"
+"📌 Reply *0* to return to the main *MENU*"
+msgstr ""
+"\"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"Ons het lanklaas van jou gehoor! \n"
+" \n"
+"Die registrasiesessie het verstryk weens geen aktiwiteit. Jy sal van voor af "
+"moet begin. TIK slegs die woord REGISTREER in. \n"
+" \n"
+"----- \n"
+"📌 Antwoord *0* om terug te keer na die hoof- *MENU*\""
+
+#: vaccine/vaccine_reg_whatsapp.py:151
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Welcome to the official COVID-19 Vaccination Self-registration Portal from "
+"the National Department of Health. Registration will take about 5 minutes. "
+"Please have your ID, Passport, Refugee Permit or Asylum Seeker Permit "
+"*Number* on hand. If you have Medical Aid, we will also ask for your Medical "
+"Aid Number.\n"
+"\n"
+"*Note:*\n"
+"- Vaccination is voluntary and no payment is required\n"
+"- No co-payment/levy will be required if you belong to a Medical Aid\n"
+"- Everyone who registers will be offered vaccination\n"
+"- We will move down the age groups as quickly as we can\n"
+"\n"
+"Registration is currently only open to those {minimum_age} years and older. "
+"Are you {minimum_age} or older?\n"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"Welkom by die Nasionale Departement van Gesondheid se amptelike "
+"Selfregistrasieportaal vir COVID-19-inenting. Dit neem sowat 5 minute om te "
+"registreer. Hou asseblief die *Nommer* van jou ID, Paspoort, Vlugtelingpermit "
+"of Asielsoekerpermit gereed. As jy 'n Mediese Fonds het, sal ons ook jou "
+"Mediesefondsnommer vra. \n"
+" \n"
+"*Let wel:* \n"
+"- Inenting is vrywillig en geen betaling word vereis nie \n"
+"- Geen bybetaling/heffing word vereis as jy aan 'n Mediese Fonds behoort "
+"nie \n"
+"- Inenting sal aangebied word aan elkeen wat registreer \n"
+"- Ons sal so vinnig moontlik afbeweeg met die ouderdomsgroepe \n"
+" \n"
+"Slegs mense wat {minimum_age} jaar en ouer is, kan tans registreer. Is jy "
+"{minimum_age} of ouer? \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:170
+msgid ""
+"⚠️ This service works best when you use the numbered options available\n"
+"\n"
+"Please confirm that you are {minimum_age} years or older by typing 1 (or 2 if "
+"you are NOT {minimum_age} years or older)\n"
+msgstr ""
+"⚠️ Hierdie diens werk die beste indien jy uit die beskikbare nommeropsies "
+"kies \n"
+" \n"
+"Bevestig asseblief dat jy 50 jaar of ouer is deur 1 in te tik (of 2 as jy NIE "
+"50 jaar of ouer is nie) \n"
+"\n"
+
+#: vaccine/vaccine_reg_whatsapp.py:177
+msgid ""
+"\n"
+"-----\n"
+"Or reply 📌 *0* to end this session and return to the main *MENU*"
+msgstr ""
+"\n"
+"----- \n"
+"Of antwoord 📌 *0* om hierdie sessie te beëindig en terug te keer na die hoof'-"
+"*MENU*"
+
+#: vaccine/vaccine_reg_whatsapp.py:185
+msgid "Yes, I am {minimum_age} or older"
+msgstr "Ja, ek is {minimum_age} of ouer"
+
+#: vaccine/vaccine_reg_whatsapp.py:189 vaccine/vaccine_reg_whatsapp.py:218
+#: vaccine/vaccine_reg_whatsapp.py:304 vaccine/vaccine_reg_whatsapp.py:772
+#: vaccine/vaccine_reg_whatsapp.py:844
+msgid "No"
+msgstr "Nee"
+
+#: vaccine/vaccine_reg_whatsapp.py:196
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"⚠️ We are currently experiencing high volumes of registrations.\n"
+"\n"
+"Your registration is important! Please try again in 15 minutes.\n"
+"\n"
+"-----\n"
+"📌 Reply *0* to return to the main *MENU*"
+msgstr ""
+"\"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"⚠️ Ons ervaar tans ’n hoë volume registrasies. \n"
+" \n"
+"Jou registrasie is belangrik! Probeer asseblief weer oor 1 uur. \n"
+" \n"
+"----- \n"
+"📌 Antwoord *0* om terug te keer na die hoof- *MENU*\""
+
+#: vaccine/vaccine_reg_whatsapp.py:212
+msgid ""
+"Self-registration is only available to people {minimum_age} years or older.\n"
+"\n"
+"Can we contact you on this number when this changes?\n"
+msgstr ""
+"Selfregistrasie is slegs beskikbaar vir mense wat {minimum_age} jaar of ouer "
+"is\n"
+"\n"
+"Kan ons jou via WhatsApp by hierdie nommer kontak om jou in kennis te stel "
+"wanneer nuwe inligting oor inenting beskikbaar word? \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:218 vaccine/vaccine_reg_whatsapp.py:771
+#: vaccine/vaccine_reg_whatsapp.py:843
+msgid "Yes"
+msgstr "Ja"
+
+#: vaccine/vaccine_reg_whatsapp.py:219
+msgid ""
+"\n"
+"REPLY with the NUMBER of the option you have chosen."
+msgstr ""
+"\n"
+"ANTWOORD met die NOMMER van die opsie wat jy gekies het."
+
+#: vaccine/vaccine_reg_whatsapp.py:220
+msgid ""
+"⚠️ This service works best when you use the numbered options available.\n"
+"\n"
+"Please let us know if we can notify you via Whatsapp on this number when "
+"updates about getting vaccinated become available?\n"
+msgstr ""
+"⚠️ Hierdie diens werk die beste indien jy uit die beskikbare nommeropsies "
+"kies. \n"
+" \n"
+"Laat weet asseblief of ons jou via WhatsApp by hierdie nommer in kennis kan "
+"stel wanneer nuwe inligting oor inenting beskikbaar word? \n"
+"\n"
+
+#: vaccine/vaccine_reg_whatsapp.py:227
+msgid ""
+"\n"
+"-----\n"
+"Reply 📌 *0* to end this session and return to the main *MENU*"
+msgstr ""
+"\n"
+"----- \n"
+"Antwoord 📌 *0* om hierdie sessie te beëindig en terug te keer na die hoof- "
+"*MENU*\""
+
+#: vaccine/vaccine_reg_whatsapp.py:236
+msgid "Thank you for confirming"
+msgstr "Dankie vir jou bevestiging"
+
+#: vaccine/vaccine_reg_whatsapp.py:254
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Do you agree to the attached Electronic Vaccine Data System PRIVACY POLICY "
+"that explains how your data is used and protected?\n"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+"\n"
+"Aanvaar jy die aangehegte PRIVAATHEIDSBELEID vir die Elektroniese "
+"Inentingsdatastelsel, wat verduidelik hoe jou data gebruik en beskerm word? \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:261
+msgid "Read summary"
+msgstr "Lees opsomming"
+
+#: vaccine/vaccine_reg_whatsapp.py:262
+msgid "Accept"
+msgstr "Aanvaar"
+
+#: vaccine/vaccine_reg_whatsapp.py:264
+msgid ""
+"⚠️ This service works best when you reply with one of the numbers next to the "
+"options provided.\n"
+msgstr ""
+"⚠️ Hierdie diens werk die beste indien jy antwoord met een van die nommers "
+"langs die opsies wat verskaf word. \n"
+"\n"
+
+#: vaccine/vaccine_reg_whatsapp.py:268
+msgid ""
+"\n"
+"Reply 1 to read a summary of the DATA PROTECTION & PRIVACY POLICY. Reply 2 to "
+"accept"
+msgstr ""
+"\n"
+"Antwoord 1 om ’n opsomming van die DATABESKERMINGS- & PRIVAATHEIDSBELEID te "
+"lees. Antwoord 2 om te aanvaar"
+
+#: vaccine/vaccine_reg_whatsapp.py:278
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"*Electronic Vaccine Data System DATA PROTECTION & PRIVACY POLICY (“EVDS "
+"Privacy Policy) SUMMARY*\n"
+"\n"
+"The EVDS Privacy Policy complies with the POPI Act.\n"
+"\n"
+"Your personal data including: contact, medical aid & vaccine protocol details "
+"are processed with your consent for the agreed purpose (to support the "
+"COVID-19 Vaccination roll out in South Africa) and remain confidential.\n"
+"\n"
+"EVDS uses your data to check your eligibility & inform you of the date & "
+"venue of your vaccination.\n"
+"\n"
+"Registration is voluntary & does not guarantee vaccination.\n"
+"\n"
+"All security measures have been taken to keep your information safe. No "
+"personal data will be transferred from EVDS without legislative authorisation "
+"in compliance with the Popi Act.\n"
+"\n"
+"Do you accept the EVDS Privacy Notice?\n"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"*OPSOMMING VAN DATABESKERMINGS- & PRIVAATHEIDSBELEID vir Elektroniese "
+"Inentingsdatastelsel (\"\"EVDS-privaatheidsbeleid)* \n"
+" \n"
+"Die EVDS-privaatheidsbeleid voldoen aan die POPI-wet. \n"
+" \n"
+"Jou persoonlike data, ingesluit jou kontak-, mediesefonds- en "
+"inentingsprotokol-besonderhede, word met jou toestemming verwerk vir die "
+"ooreengekome doel (om die uitrol van COVID-19-inenting in Suid-Afrika te "
+"ondersteun) en bly vertroulik. \n"
+" \n"
+"EVDS gebruik jou inligting om na te gaan of jy kwalifiseer & jou te laat weet "
+"waar en wanneer jy ingeënt word. \n"
+" \n"
+"Registrasie is vrywillig & waarborg nie inenting nie. \n"
+" \n"
+"Alle veiligheidsmaatreëls is getref om jou inligting te beveilig. In "
+"ooreenstemming met die Popi-wet sal geen persoonlike inligting sonder wettige "
+"magtiging vanaf EVDS oorgedra word nie. \n"
+" \n"
+"Aanvaar jy die EVDS-privaatheidskennisgewing? \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:303
+msgid "Yes, I accept"
+msgstr "Ja, ek aanvaar dit"
+
+#: vaccine/vaccine_reg_whatsapp.py:306
+msgid ""
+"⚠️ This service works best when you reply with one of the numbers next to the "
+"options provided.\n"
+"\n"
+"Do you accept the EVDS Privacy Notice?\n"
+msgstr ""
+"⚠️ Hierdie diens werk die beste indien jy antwoord met een van die nommers wat "
+"langs die opsies verskaf word. \n"
+" \n"
+"Aanvaar jy die EVDS-privaatheidskennisgewing? \n"
+"\n"
+
+#: vaccine/vaccine_reg_whatsapp.py:312 vaccine/vaccine_reg_whatsapp.py:409
+#: vaccine/vaccine_reg_whatsapp.py:449
+msgid ""
+"\n"
+"------\n"
+"📌 Or reply *0* to end this session and return to the main *MENU*"
+msgstr ""
+"\n"
+"------ \n"
+"📌 Of antwoord *0* om hierdie sessie te beëindig en terug te keer na die hoof'-"
+"*MENU*\""
+
+#: vaccine/vaccine_reg_whatsapp.py:322
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Thank you. If you change your mind, type *REGISTER* to restart your "
+"registration session"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"Dankie. As jy van plan verander, tik *REGISTER* om van voor af met "
+"registrasie te begin"
+
+#: vaccine/vaccine_reg_whatsapp.py:333
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"We need your location to help us allocate you to an available vaccination "
+"site as close and as soon as possible\n"
+"\n"
+"Select your province"
+msgstr ""
+"BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE 🔐 \n"
+" \n"
+"Ons benodig jou ligging om jou so gou moontlik aan 'n beskikbare "
+"inentingsplek so naby moontlik aan jou te kan toewys."
+
+#: vaccine/vaccine_reg_whatsapp.py:342 vaccine/vaccine_reg_whatsapp.py:362
+msgid "Reply with a NUMBER:"
+msgstr "⚠️ Antwoord met ’n NOMMER:"
+
+#: vaccine/vaccine_reg_whatsapp.py:353
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"⚠️ Your suburb could not be found. Please try again by selecting your "
+"province\n"
+"\n"
+"Select your province"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"⚠️ Jou voorstad kon nie gevind word nie. Please try again by selecting your "
+"province"
+
+#: vaccine/vaccine_reg_whatsapp.py:369
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please TYPE the name of the SUBURB where you want to get vaccinated"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"TIK asseblief die naam in van die VOORSTAD waar jy ingeënt wil word"
+
+#: vaccine/vaccine_reg_whatsapp.py:396
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please confirm the MUNICIPALITY for the suburb you have given:\n"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"Bevestig asseblief die MUNISIPALITEIT vir die voorstad wat jy verskaf het: \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:402
+msgid ""
+"⚠️ This service works best when you reply with one of the numbers next to the "
+"options provided.\n"
+"\n"
+"Please REPLY with a NUMBER from the list below to confirm municipality of the "
+"suburb you have shared:\n"
+msgstr ""
+"⚠️ Hierdie diens werk die beste indien jy antwoord met een van die nommers wat "
+"langs die opsies verskaf word. \n"
+" \n"
+"ANTWOORD asseblief met ’n NOMMER uit die onderstaande lys om die "
+"munisipaliteit te bevestig van die voorstad wat jy verskaf het: \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:436
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please REPLY with a NUMBER to confirm your location:\n"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"ANTWOORD asseblief met ’n NOMMER om jou ligging te bevestig: \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:442
+msgid ""
+"⚠️ This service works best when you reply with one of the numbers next to the "
+"options provided.\n"
+"\n"
+"Please REPLY with a NUMBER from the list below to confirm the location you "
+"have shared:\n"
+msgstr ""
+"⚠️ Hierdie diens werk die beste indien jy antwoord met een van die nommers wat "
+"langs die opsies verskaf word. \n"
+" \n"
+"ANTWOORD asseblief met ’n NOMMER uit onderstaande lys om die ligging wat jy "
+"verskaf het, te bevestig: \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:460
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Which method would you like to use for identification?\n"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"Watter metode wil jy gebruik vir identifikasie? \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:466
+msgid ""
+"⚠️ This service works best when you reply with one of the numbers next to the "
+"options provided.\n"
+"\n"
+"Please choose the type of identification document you have from the list "
+"below?\n"
+msgstr ""
+"⚠️ Hierdie diens werk die beste indien jy antwoord met een van die nommers "
+"langs die opsies wat verskaf word. \n"
+" \n"
+"Kies asseblief die soort identifikasiedokument wat jy het uit die "
+"onderstaande lys? \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:486
+msgid ""
+"⚠️ Please enter a valid {id_type}\n"
+"\n"
+"📌 Or reply *0* to end this session and return to the main *MENU*"
+msgstr ""
+"⚠️ Tik asseblief ’n geldige {id_type} in \n"
+" \n"
+"📌 Of antwoord *0* om hierdie sessie te beëindig en terug te keer na die hoof'-"
+"*MENU*"
+
+#: vaccine/vaccine_reg_whatsapp.py:507
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please TYPE in your {id_type}"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"TIK asseblief jou {id_type} in."
+
+#: vaccine/vaccine_reg_whatsapp.py:519
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please TYPE in your passport's COUNTRY of origin.\n"
+"Example _Zimbabwe_"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"TIK asseblief jou paspoort se LAND van herkoms in. \n"
+"Voorbeeld _Zimbabwe_"
+
+#: vaccine/vaccine_reg_whatsapp.py:539 vaccine/vaccine_reg_whatsapp.py:747
+msgid "Other"
+msgstr "Ander"
+
+#: vaccine/vaccine_reg_whatsapp.py:542
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"Please confirm your passport's COUNTRY of origin.\n"
+"\n"
+"REPLY with a NUMBER from the list below:"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+"Bevestig asseblief jou paspoort se LAND van herkoms. \n"
+" \n"
+"ANTWOORD met ’n NOMMER uit onderstaande lys:"
+
+#: vaccine/vaccine_reg_whatsapp.py:549
+msgid "Do any of these match your COUNTRY:"
+msgstr "⚠️  Is jou LAND een van die volgende:"
+
+#: vaccine/vaccine_reg_whatsapp.py:554
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please TYPE your FIRST NAME as it appears in your identification document."
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"TIK asseblief jou VOORNAAM in soos wat dit in jou identifikasie-dokument "
+"verskyn."
+
+#: vaccine/vaccine_reg_whatsapp.py:560
+msgid ""
+"⚠️ Please try again\n"
+"\n"
+"TYPE your FIRST NAME as it appears in your identification document.\n"
+"\n"
+"📌 Or reply *0* to end this session and return to the main *MENU*"
+msgstr ""
+"⚠️ Probeer asseblief weer \n"
+" \n"
+"TIK jou VOORNAAM in soos wat dit in jou identifikasie-dokument verskyn. \n"
+" \n"
+"📌 Of antwoord *0* om hierdie sessie te beëindig en terug te keer na die hoof'-"
+"*MENU*"
+
+#: vaccine/vaccine_reg_whatsapp.py:572
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please TYPE your SURNAME as it appears in your identification document."
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"TIK asseblief jou VAN in soos wat dit in jou identifikasie-dokument verskyn."
+
+#: vaccine/vaccine_reg_whatsapp.py:578
+msgid ""
+"⚠️ Please try again\n"
+"\n"
+"TYPE your SURNAME as it appears in your identification document.\n"
+"\n"
+"📌 Or reply *0* to end this session and return to the main *MENU*"
+msgstr ""
+"⚠️ Probeer asseblief weer \n"
+" \n"
+"TIK jou VAN in soos wat dit in jou identifikasiedokument verskyn. \n"
+" \n"
+"📌 Of antwoord *0* om hierdie sessie te beëindig en terug te keer na die hoof'-"
+"*MENU*"
+
+#: vaccine/vaccine_reg_whatsapp.py:599
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please confirm the following:\n"
+"\n"
+"{first_name} {surname}\n"
+"{id_number}\n"
+msgstr ""
+"BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE 🔐 \n"
+"\n"
+"Bevestig asseblief die volgende: \n"
+" \n"
+"{first_name} {surname}\n"
+"{id_number}\n"
+
+#: vaccine/vaccine_reg_whatsapp.py:608
+msgid "Correct"
+msgstr "Korrek"
+
+#: vaccine/vaccine_reg_whatsapp.py:609
+msgid "Wrong"
+msgstr "Verkeerd"
+
+#: vaccine/vaccine_reg_whatsapp.py:611
+msgid ""
+"Is the information you shared correct?\n"
+"\n"
+"{first_name} {surname}\n"
+"{id_number}"
+msgstr ""
+"Het jy jou inligting korrek verskaf? \n"
+"{first_name} {surname}\n"
+"{id_number}"
+
+#: vaccine/vaccine_reg_whatsapp.py:631
+msgid ""
+"⚠️  Please TYPE in only the YEAR you were born.\n"
+"Example _1980_"
+msgstr ""
+"⚠️ TIK asseblief slegs die JAAR in waarin jy gebore is. \n"
+"Voorbeeld _1980_"
+
+#: vaccine/vaccine_reg_whatsapp.py:642
+msgid ""
+"The YEAR you have given does not match the YEAR of your ID number. Please try "
+"again"
+msgstr ""
+"Die JAAR wat deur jou verskaf is, verskil van die JAAR in jou ID-nommer. "
+"Probeer asseblief weer"
+
+#: vaccine/vaccine_reg_whatsapp.py:650
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please TYPE in the YEAR you were born?"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"TIK asseblief die JAAR in waarin jy gebore is?"
+
+#: vaccine/vaccine_reg_whatsapp.py:665
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"In which MONTH were you born?\n"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"In watter MAAND is jy gebore? \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:671
+msgid "January"
+msgstr "Januarie"
+
+#: vaccine/vaccine_reg_whatsapp.py:672
+msgid "February"
+msgstr "Februarie"
+
+#: vaccine/vaccine_reg_whatsapp.py:673
+msgid "March"
+msgstr "Maart"
+
+#: vaccine/vaccine_reg_whatsapp.py:674
+msgid "April"
+msgstr "April"
+
+#: vaccine/vaccine_reg_whatsapp.py:675
+msgid "May"
+msgstr "Mei"
+
+#: vaccine/vaccine_reg_whatsapp.py:676
+msgid "June"
+msgstr "Junie"
+
+#: vaccine/vaccine_reg_whatsapp.py:677
+msgid "July"
+msgstr "Julie"
+
+#: vaccine/vaccine_reg_whatsapp.py:678
+msgid "August"
+msgstr "Augustus"
+
+#: vaccine/vaccine_reg_whatsapp.py:679
+msgid "September"
+msgstr "September"
+
+#: vaccine/vaccine_reg_whatsapp.py:680
+msgid "October"
+msgstr "Oktober"
+
+#: vaccine/vaccine_reg_whatsapp.py:681
+msgid "November"
+msgstr "November"
+
+#: vaccine/vaccine_reg_whatsapp.py:682
+msgid "December"
+msgstr "Desember"
+
+#: vaccine/vaccine_reg_whatsapp.py:685
+msgid ""
+"⚠️ This service works best when you reply with one of the numbers next to the "
+"options provided.\n"
+"\n"
+"In which MONTH were you born?\n"
+msgstr ""
+"⚠️ Hierdie diens werk die beste indien jy antwoord met een van die nommers wat "
+"langs die opsies verskaf word. \n"
+" \n"
+"In watter MAAND is jy gebore? \n"
+"\n"
+
+#: vaccine/vaccine_reg_whatsapp.py:691
+msgid ""
+"\n"
+"Reply with the number next to the month."
+msgstr ""
+"\n"
+"Antwoord met die nommer langs die maand."
+
+#: vaccine/vaccine_reg_whatsapp.py:707
+msgid ""
+"⚠️ Please enter a valid calendar DAY for your birth date. Type in only the "
+"day.\n"
+"\n"
+"Example: If you were born on 20 May, type _20_"
+msgstr ""
+"⚠️ Tik asseblief 'n geldige kalenderDAG vir jou geboortedatum in. Tik slegs "
+"die dag in. \n"
+" \n"
+"Voorbeeld: As jy op 20 Mei gebore is, tik _20_"
+
+#: vaccine/vaccine_reg_whatsapp.py:717
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please TYPE the DAY of your birth date.\n"
+"\n"
+"Example: If you were born on 31 May, type _31_"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"TIK asseblief die DAG van jou geboortedatum in. \n"
+" \n"
+"Voorbeeld: As jy op 31 Mei gebore is, tik in _31_"
+
+#: vaccine/vaccine_reg_whatsapp.py:741
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"What is your GENDER?\n"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"Wat is jou GESLAG? \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:745
+msgid "Male"
+msgstr "Manlik"
+
+#: vaccine/vaccine_reg_whatsapp.py:746
+msgid "Female"
+msgstr "Vroulik"
+
+#: vaccine/vaccine_reg_whatsapp.py:749
+msgid ""
+"⚠️ This service works best when you reply with one of the numbers next to the "
+"options provided.\n"
+"\n"
+"REPLY with the NUMBER next to your gender in the list below.\n"
+msgstr ""
+"⚠️ Hierdie diens werk die beste indien jy antwoord met een van die nommers "
+"langs die opsies wat verskaf word. \n"
+" \n"
+"ANTWOORD met die NOMMER langs jou geslag in die onderstaande lys. \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:762
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"We will use your mobile phone number to send you notifications and updates "
+"via WhatsApp and/or SMS about getting vaccinated.\n"
+"\n"
+"Can we use {number}?"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"Ons sal jou selfoonnommer gebruik om kennisgewings en die jongste nuus oor "
+"inenting via WhatsApp en/of SMS aan jou te stuur. \n"
+" \n"
+"Kan ons {number} gebruik?"
+
+#: vaccine/vaccine_reg_whatsapp.py:774
+msgid ""
+"⚠️ This service works best when you reply with one of the numbers next to the "
+"options provided.\n"
+"\n"
+"Please confirm that we can use {number} to contact you.\n"
+msgstr ""
+"⚠️ Hierdie diens werk die beste indien jy antwoord met een van die nommers wat "
+"langs die opsies verskaf word. \n"
+" \n"
+"Bevestig asseblief dat ons jou by {number} mag kontak.\n"
+
+#: vaccine/vaccine_reg_whatsapp.py:788
+msgid ""
+"⚠️ Please type a valid cell phone number.\n"
+"Example _081234567_"
+msgstr ""
+"⚠️ Verskaf asseblief ’n geldige selfoonnommer. \n"
+"Voorbeeld _081234567_"
+
+#: vaccine/vaccine_reg_whatsapp.py:796
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please TYPE the MOBILE PHONE NUMBER we can contact you on."
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"TIK asseblief die SELFOONNOMMER in waar ons jou kan kontak."
+
+#: vaccine/vaccine_reg_whatsapp.py:813
+msgid ""
+"⚠️ Please TYPE a valid EMAIL address. (Or type SKIP if you are unable to share "
+"an email address.)"
+msgstr ""
+"⚠️ TIK asseblief ’n geldige E-POS-adres in. (Of tik SLAAN OOR in as jy nie ’n "
+"e-posadres kan verskaf nie.)"
+
+#: vaccine/vaccine_reg_whatsapp.py:821
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please TYPE your EMAIL address. (Or type SKIP if you are unable to share an "
+"email address.)"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"TIK asseblief jou E-POS-adres in. (Of tik SLAAN OOR in as jy nie ’n e-"
+"posadres kan verskaf nie.)"
+
+#: vaccine/vaccine_reg_whatsapp.py:834
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Note: If you belong to a Medical Aid, your day-to-day savings and/or benefits "
+"won't be affected.\n"
+"\n"
+"Do you belong to a South African Medical Aid?\n"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"NB: As jy aan 'n Mediese Fonds behoort, word jou dag-tot-dag-spaarrekening en/"
+"of -voordele nie geraak nie. \n"
+" \n"
+"Is jy lid van 'n Suid-Afrikaanse Mediese Fonds? \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:846
+msgid ""
+"⚠️ This service works best when you reply with one of the numbers next to the "
+"options provided.\n"
+"\n"
+"Please confirm if you belong to a Medical Aid.\n"
+msgstr ""
+"⚠️ Hierdie diens werk die beste indien jy antwoord met een van die nommers wat "
+"langs die opsies verskaf word. \n"
+" \n"
+"Bevestig asseblief of jy lid is van 'n Suid-Afrikaanse Mediese Fonds. \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:857
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please TYPE the name of your Medical Aid PROVIDER."
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"TIK asseblief die naam in van jou MEDIESE FONDS."
+
+#: vaccine/vaccine_reg_whatsapp.py:876
+msgid "None of these"
+msgstr "Nie een hiervan nie\""
+
+#: vaccine/vaccine_reg_whatsapp.py:879
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please confirm your Medical Aid Provider. REPLY with a NUMBER from the list "
+"below:\n"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"Bevestig asseblief die naam van jou Mediese Fonds Verskaffer. ANTWOORD met ’n "
+"NOMMER uit onderstaande lys: \n"
+"\n"
+
+#: vaccine/vaccine_reg_whatsapp.py:886
+msgid ""
+"⚠️ This service works best when you reply with one of the numbers next to the "
+"options provided.\n"
+"\n"
+"REPLY with the NUMBER next to the name of your Medical Aid Provider:\n"
+msgstr ""
+"⚠️ Hierdie diens werk die beste indien jy antwoord met een van die nommers "
+"langs die opsies wat verskaf word. \n"
+" \n"
+"ANTWOORD met die NOMMER langs die naam van jou Mediese Fonds: \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:897
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Please TYPE your Medical Aid NUMBER."
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"TIK asseblief jou mediesefonds-NOMMER in."
+
+#: vaccine/vaccine_reg_whatsapp.py:902
+msgid ""
+"⚠️ Please try again\n"
+"\n"
+"Reply with your Medical Aid NUMBER\n"
+"\n"
+"📌 Or reply *0* to end this session and return to the main *MENU*"
+msgstr ""
+"⚠️ Probeer asseblief weer \n"
+" \n"
+"Antwoord met jou mediesefonds-NOMMER \n"
+" \n"
+"📌 Of antwoord *0* om hierdie sessie te beëindig en terug te keer na die hoof'-"
+"*MENU*"
+
+#: vaccine/vaccine_reg_whatsapp.py:920
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Note: We will try to allocate you an appointment based on your preference.\n"
+"Which option do you prefer for your vaccination appointment?\n"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"Let wel: Ons sal jou voorkeure in ag probeer neem vir jou afspraak. \n"
+"Watter opsie verkies jy vir jou inentingsafspraak? \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:928
+msgid "Weekday Morning"
+msgstr "Weeksoggend"
+
+#: vaccine/vaccine_reg_whatsapp.py:929
+msgid "Weekday Afternoon"
+msgstr "Weeksmiddag"
+
+#: vaccine/vaccine_reg_whatsapp.py:930
+msgid "Weekend Morning"
+msgstr "Naweekoggend"
+
+#: vaccine/vaccine_reg_whatsapp.py:932
+msgid ""
+"⚠️ This service works best when you reply with one of the numbers next to the "
+"options provided.\n"
+"\n"
+"When would you be available for a vaccination appointment?\n"
+msgstr ""
+"⚠️ Hierdie diens werk die beste indien jy antwoord met een van die nommers "
+"langs die opsies wat verskaf word. \n"
+" \n"
+"Wanneer sal jy beskikbaar wees vir ’n inentings-afspraak? \n"
+
+#: vaccine/vaccine_reg_whatsapp.py:1087
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"Congratulations! You successfully registered with the National Department of "
+"Health to get a COVID-19 vaccine.\n"
+"\n"
+"Look out for messages from this number (060 012 3456) on WhatsApp OR on SMS/"
+"email. We will update you with important information about your appointment "
+"and what to expect.\n"
+"\n"
+"-----\n"
+"📌 Reply *0* to return to the main *MENU*"
+msgstr ""
+"*BEVEILIGDE PORTAAL VIR INENTINGSREGISTRASIE* 🔐 \n"
+" \n"
+"Geluk! Jy het suksesvol by die Nasionale Departement van Gesondheid "
+"geregistreer om teen COVID-19 ingeënt te word. \n"
+" \n"
+"Wees op die uitkyk vir boodskappe vanaf hierdie nommer (060 012 3456) per "
+"WhatsApp OF per SMS/e-pos. Ons sal jou op hoogte hou van belangrike inligting "
+"oor jou afspraak en wat jy kan verwag. \n"
+" \n"
+" \n"
+"----- \n"
+"📌 Antwoord *0* om terug te keer na die hoof- *MENU*\""
+
+#: vaccine/vaccine_reg_whatsapp.py:1105
+msgid ""
+"Something went wrong with your registration session. Your registration was "
+"not able to be processed. Please try again later"
+msgstr ""
+"Iets het verkeerd geloop met jou registrasiesessie. Jou registrasie kon nie "
+"verwerk word nie. Probeer asseblief later weer"
