@@ -3,7 +3,7 @@ from typing import List
 from vaccine import vacreg_config as config
 from vaccine.healthcheck_ussd import Application as HealthCheckApp
 from vaccine.models import Message
-from vaccine.states import Choice, MenuState
+from vaccine.states import Choice, LanguageState, MenuState
 from vaccine.utils import SAIDNumber
 from vaccine.vaccine_reg_ussd import Application as VacRegApp
 
@@ -46,9 +46,28 @@ class Application(VacRegApp, HealthCheckApp):
             choices=[
                 Choice(VacRegApp.START_STATE, self._("Vaccine Registration")),
                 Choice(
-                    HealthCheckApp.START_STATE, self._("HealthCheck Symptom checker")
+                    HealthCheckApp.START_STATE,
+                    self._("HealthCheck Symptom checker [ENG]"),
                 ),
+                Choice("state_language", self._("Change language")),
             ],
+        )
+
+    async def state_language(self):
+        return LanguageState(
+            self,
+            question="NATIONAL DEPT OF HEALTH's COVID-19 Response services\n"
+            "\n"
+            "Language:",
+            error="ERROR: Please try again\n" "\n" "Language:",
+            choices=[
+                Choice("eng", "English"),
+                Choice("zul", "isiZulu"),
+                Choice("xho", "isiXhosa"),
+                Choice("afr", "Afrikaans"),
+                Choice("sot", "Sesotho"),
+            ],
+            next="state_menu",
         )
 
     async def process_message(self, message: Message) -> List[Message]:
