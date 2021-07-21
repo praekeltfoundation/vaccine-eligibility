@@ -30,7 +30,7 @@ async def test_menu():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_menu"
+    assert u.state.name == "state_language"
 
 
 @pytest.mark.asyncio
@@ -38,6 +38,7 @@ async def test_menu():
 async def test_menu_with_id_number(get_today):
     get_today.return_value = date(2021, 1, 1)
 
+    # English language choice
     u = User(addr="27820001001")
     app = Application(u)
     msg = Message(
@@ -46,6 +47,17 @@ async def test_menu_with_id_number(get_today):
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="*123*456*6001210001089#",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
@@ -100,14 +112,26 @@ async def test_menu_with_id_number(get_today):
 async def test_menu_with_id_number_not_eligible(get_today):
     get_today.return_value = date(2021, 1, 1)
 
+    # English language choice
     u = User(addr="27820001001")
     app = Application(u)
     msg = Message(
-        to_addr="*123*456*9001010001088#",
+        to_addr="*123*456*6001210001089#",
         from_addr="27820001001",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="*123*456*9001010001088#",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
@@ -119,14 +143,26 @@ async def test_menu_with_id_number_not_eligible(get_today):
 async def test_menu_with_id_number_invalid(get_today):
     get_today.return_value = date(2021, 1, 1)
 
+    # English language choice
     u = User(addr="27820001001")
     app = Application(u)
     msg = Message(
-        to_addr="*123*456*9001010001000#",
+        to_addr="*123*456*6001210001089#",
         from_addr="27820001001",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="*123*456*9001010001000#",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
@@ -138,14 +174,26 @@ async def test_menu_with_id_number_invalid(get_today):
 async def test_menu_with_no_id_number(get_today):
     get_today.return_value = date(2021, 1, 1)
 
+    # English language choice
     u = User(addr="27820001001")
     app = Application(u)
     msg = Message(
-        to_addr="*123*456*7#",
+        to_addr="*123*456*6001210001089#",
         from_addr="27820001001",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="*123*456*7#",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
@@ -157,14 +205,26 @@ async def test_menu_with_no_id_number(get_today):
 async def test_menu_with_id_number_ambigious_age_older(get_today):
     get_today.return_value = date(2021, 1, 1)
 
+    # English language choice
     u = User(addr="27820001001")
     app = Application(u)
     msg = Message(
-        to_addr="*123*456*0001010001087#",
+        to_addr="*123*456*6001210001089#",
         from_addr="27820001001",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="*123*456*0001010001087#",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
@@ -231,14 +291,26 @@ async def test_menu_with_id_number_ambigious_age_older(get_today):
 async def test_menu_with_id_number_ambigious_age_younger(get_today):
     get_today.return_value = date(2021, 1, 1)
 
+    # English language choice
     u = User(addr="27820001001")
     app = Application(u)
     msg = Message(
-        to_addr="*123*456*0001010001087#",
+        to_addr="*123*456*6001210001089#",
         from_addr="27820001001",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+
+    app = Application(u)
+    msg = Message(
+        content="1",
+        to_addr="*123*456*0001010001087#",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160

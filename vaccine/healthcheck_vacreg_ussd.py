@@ -9,7 +9,7 @@ from vaccine.vaccine_reg_ussd import Application as VacRegApp
 
 
 class Application(VacRegApp, HealthCheckApp):
-    START_STATE = "state_menu"
+    START_STATE = "state_language"
 
     async def state_menu(self):
         ussd_parts = self.inbound.to_addr.split("*")
