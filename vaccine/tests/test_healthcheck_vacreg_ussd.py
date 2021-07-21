@@ -116,7 +116,7 @@ async def test_menu_with_id_number_not_eligible(get_today):
     u = User(addr="27820001001")
     app = Application(u)
     msg = Message(
-        to_addr="*123*456*6001210001089#",
+        to_addr="*123*456*9001010001088#",
         from_addr="27820001001",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
@@ -147,7 +147,7 @@ async def test_menu_with_id_number_invalid(get_today):
     u = User(addr="27820001001")
     app = Application(u)
     msg = Message(
-        to_addr="*123*456*6001210001089#",
+        to_addr="*123*456*9001010001000#",
         from_addr="27820001001",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
@@ -178,7 +178,7 @@ async def test_menu_with_no_id_number(get_today):
     u = User(addr="27820001001")
     app = Application(u)
     msg = Message(
-        to_addr="*123*456*6001210001089#",
+        to_addr="*123*456*7#",
         from_addr="27820001001",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
@@ -209,7 +209,7 @@ async def test_menu_with_id_number_ambigious_age_older(get_today):
     u = User(addr="27820001001")
     app = Application(u)
     msg = Message(
-        to_addr="*123*456*6001210001089#",
+        to_addr="*123*456*0001010001087#",
         from_addr="27820001001",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
@@ -295,7 +295,7 @@ async def test_menu_with_id_number_ambigious_age_younger(get_today):
     u = User(addr="27820001001")
     app = Application(u)
     msg = Message(
-        to_addr="*123*456*6001210001089#",
+        to_addr="*123*456*0001010001087#",
         from_addr="27820001001",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
