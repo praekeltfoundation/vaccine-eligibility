@@ -337,7 +337,7 @@ msgid ""
 msgstr ""
 "IMPAZAMO: Nceda uphendule nje NGOMHLA wokuzalwa kwakho. \n"
 " \n"
-"Umzekelo: Ukuba uzelwe nge-31 Meyi, chwetheza_ 31_"
+"Umzekelo: Ukuba uzelwe nge-31 Meyi, chwetheza _31_"
 
 #: vaccine/vaccine_reg_ussd.py:374
 msgid ""
@@ -1125,7 +1125,7 @@ msgstr ""
 " \n"
 "Nceda CHWETHEZA USUKU lokuzalwa kwakho. \n"
 " \n"
-"Umzekelo: Ukuba uzelwe nge-31 Meyi, chwetheza_ 31_"
+"Umzekelo: Ukuba uzelwe nge-31 Meyi, chwetheza _31_"
 
 #: vaccine/vaccine_reg_whatsapp.py:741
 msgid ""
@@ -1355,4 +1355,4 @@ msgstr ""
 " \n"
 " \n"
 "----- \n"
-"📌 Phendula *0* ukubuyela kwi- *MENU* yakuqala\""
+"📌 Phendula *0* ukubuyela kwi- *MENU* yakuqala"
