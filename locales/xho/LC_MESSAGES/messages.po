@@ -382,7 +382,7 @@ msgid ""
 msgstr ""
 "Qinisekisa oku kulandelayo: \n"
 " \n"
-"{first_name} {last_name}\n"
+"{first_name} {surname}\n"
 "{id_number}\n"
 
 #: vaccine/vaccine_reg_ussd.py:434 vaccine/vaccine_reg_ussd.py:574
