@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2021-07-20 15:37+0200\n"
-"PO-Revision-Date: 2021-07-22 10:39+0200\n"
+"PO-Revision-Date: 2021-07-23 14:23+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zu\n"
@@ -27,7 +27,7 @@ msgstr "IMPAZAMO: Sicela uzame futhi"
 
 #: vaccine/healthcheck_vacreg_ussd.py:47
 msgid "Vaccine Registration"
-msgstr "Ukubhalisela Umgomo Kwe-EVDS"
+msgstr "Ukubhalisela umgomo"
 
 #: vaccine/healthcheck_vacreg_ussd.py:50
 msgid "HealthCheck Symptom checker [ENG]"
@@ -132,7 +132,7 @@ msgstr "Cha"
 
 #: vaccine/vaccine_reg_ussd.py:129
 msgid "Can we notify you to let you know when you can register?"
-msgstr "Singakukwazisa ukuthi ungabhalisa nini?"
+msgstr "Singakwazisa ukuthi ungabhalisa nini?"
 
 #: vaccine/vaccine_reg_ussd.py:139
 msgid ""
@@ -159,7 +159,7 @@ msgid ""
 "date & venue. Registration is voluntary & does not guarantee vaccination.\n"
 msgstr ""
 "iEVDS isebenzisa idatha yakho ukuhlola ukufaneleka nokukwazisa ngosuku "
-"nanendawo yokugoma. Ukubhalisa kungokuzithandela & akusho ukuthi uzogoma.\n"
+"nanendawo yokugoma. Ukubhalisa kungokuzithandela futhi akusho ukuthi uzogoma.\n"
 
 #: vaccine/vaccine_reg_ussd.py:164
 msgid ""
@@ -415,7 +415,8 @@ msgstr "Phendula nge-NOMBOLO:"
 #: vaccine/vaccine_reg_ussd.py:457
 msgid "Please TYPE the name of the SUBURB to help us allocate your appointment"
 msgstr ""
-"Sicela ubhale igama LEPHETHELO LEDOLOBHA ukusisiza ukuhlela i-appointment yakho"
+"Sicela ubhale igama LEPHETHELO LEDOLOBHA ukusisiza ukuhlela i-aphoyintimenti "
+"yakho"
 
 #: vaccine/vaccine_reg_ussd.py:476
 msgid "Please select your municipality"
@@ -445,7 +446,7 @@ msgid ""
 "{number} to send you SMS appointment information?"
 msgstr ""
 "Sicela uphendule ngo-1 noma 2 ukuqinisekisa ukuthi singayisebenzisa le nombolo "
-"na: {number} ukukuthumela imininingwane ye-appointment nge-SMS?"
+"na: {number} ukukuthumela imininingwane ye-aphoyintimenti nge-SMS?"
 
 #: vaccine/vaccine_reg_ussd.py:551
 msgid "ERROR: Please enter a valid mobile number (do not use spaces)"
@@ -457,7 +458,7 @@ msgid ""
 "Please TYPE a MOBILE NUMBER we can send an SMS to with your appointment "
 "information"
 msgstr ""
-"Sicela uthayiphe INOMBOLO YE-MOBILE esingathumela kuyo iSMS enemininingwane "
+"Sicela uthayiphe INOMBOLO YE-selula esingathumela kuyo iSMS enemininingwane "
 "yakho ye-appointment"
 
 #: vaccine/vaccine_reg_ussd.py:570
@@ -470,7 +471,7 @@ msgstr "IMPAZAMO: Sicela uzame futhi. Ingabe inombolo u-{number} ilungile?"
 
 #: vaccine/vaccine_reg_ussd.py:585
 msgid "In which time slot would you prefer to get your vaccination?\n"
-msgstr "Ungathanda ukuthola ukugoma ngasiphi isikhathi?\n"
+msgstr "Ungathanda ukuthola umgomo ngasiphi isikhathi? \n"
 
 #: vaccine/vaccine_reg_ussd.py:589 vaccine/vaccine_reg_whatsapp.py:928
 msgid "Weekday Morning"
@@ -488,8 +489,8 @@ msgstr "Impelasonto Ekuseni"
 msgid ""
 "When would you prefer your vaccine appointment based on the options below?"
 msgstr ""
-"Ungathanda ibe nini i-appointment yakho yokugoma ngokuya ngezinketho "
-"ezingezansi?"
+"Ungathanda ibe nini i-aphoyintimenti yakho yokugoma ngokuya ngezinketho "
+"ezingezansi? "
 
 #: vaccine/vaccine_reg_ussd.py:603
 msgid "Do you belong to a Medical Aid?"
@@ -505,14 +506,14 @@ msgid ""
 "and appointment details will be sent via SMS."
 msgstr ""
 ":) Usubhalisele ukugonywa NGEMPUMELELO. Imininingwane eyengeziwe "
-"nemininingwane ye-appointment izothunyelwa nge-SMS."
+"nemininingwane ye-aphoyintimenti izothunyelwa nge-SMS."
 
 #: vaccine/vaccine_reg_ussd.py:761 vaccine/vaccine_reg_whatsapp.py:1105
 msgid ""
 "Something went wrong with your registration session. Your registration was not "
 "able to be processed. Please try again later"
 msgstr ""
-"Kukhona okungahambanga kahle ngeseshini yakho sokubhalisa. Ukubhalisa kwakho "
+"Kukhona okungahambanga kahle ngeseshini yakho yokubhalisa. Ukubhalisa kwakho "
 "akukwazanga ukucutshungulwa. Sicela uzame futhi emuva kwesikhathi"
 
 #: vaccine/vaccine_reg_whatsapp.py:100
@@ -1186,7 +1187,7 @@ msgid ""
 msgstr ""
 "*INGXOXO EPHEPHILE YOKUBHALISELA UKUGOMA*🔐 \n"
 " \n"
-"Sicela UBHALE INOMBOLO YOGCINGO ethintekayo esingaxhumana nawe kuyo."
+"Sicela UBHALE INOMBOLO YOCINGO ethintekayo esingaxhumana nawe kuyo."
 
 #: vaccine/vaccine_reg_whatsapp.py:813
 msgid ""
@@ -1338,13 +1339,14 @@ msgid ""
 "📌 Reply *0* to return to the main *MENU*"
 msgstr ""
 "*INGXOXO EPHEPHILE YOKUBHALISELA UKUGOMA*🔐 \n"
-"\n"
+" \n"
 "Halala! Ubhalise ngempumelelo noMnyango Wezempilo Kazwelonke ukuthola umuthi "
-"wokugoma i-COVID-19. \n"
-"\n"
+"wokugomela i-COVID-19. \n"
+" \n"
 "Qaphela imilayezo evela kule nombolo (060 012 3456) kuWhatsApp NOMA kwi-SMS/i-"
-"imeyili. Sizokuvuselela ngolwazi olubalulekile mayelana nokuqokwa kwakho "
+"imeyili. Sizokuthumelela ulwazi olubalulekile mayelana ne-aphoyintimenti yakho "
 "nokuthi yini ongayilindela. \n"
-"\n"
-"-----\n"
-"📌Phendula *0* ukuze ubuyele *MENU* olukhulu"
+" \n"
+" \n"
+"----- \n"
+"📌Phendula *0* ukuze ubuyele ku *MENU* olukhulu"
