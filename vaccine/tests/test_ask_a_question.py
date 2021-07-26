@@ -233,8 +233,13 @@ async def test_display_selected_choice(tester: AppTester, model_mock):
     )
 
     await tester.user_input("yes")
-    [request] = model_mock.app.requests
-    assert request.json == {
+    [r1, r2] = model_mock.app.requests
+    assert r1.json == {
+        "feedback": {"choice": "Are COVID-19 vaccines safe?"},
+        "feedback_secret_key": "testsecretkey",
+        "inbound_id": 66,
+    }
+    assert r2.json == {
         "feedback": {"choice": "Are COVID-19 vaccines safe?", "feedback": "yes"},
         "feedback_secret_key": "testsecretkey",
         "inbound_id": 66,
@@ -250,8 +255,13 @@ async def test_display_selected_choice_no_feedback(tester: AppTester, model_mock
     await tester.user_input("1")
     tester.assert_state("state_display_selected_choice")
     await tester.user_input("no")
-    [request] = model_mock.app.requests
-    assert request.json == {
+    [r1, r2] = model_mock.app.requests
+    assert r1.json == {
+        "feedback": {"choice": "Are COVID-19 vaccines safe?"},
+        "feedback_secret_key": "testsecretkey",
+        "inbound_id": 66,
+    }
+    assert r2.json == {
         "feedback": {"choice": "Are COVID-19 vaccines safe?", "feedback": "no"},
         "feedback_secret_key": "testsecretkey",
         "inbound_id": 66,

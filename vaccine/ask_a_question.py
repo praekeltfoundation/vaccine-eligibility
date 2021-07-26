@@ -161,12 +161,43 @@ class Application(BaseApplication):
             question=self._("🔎 *Top Search Results*\n"),
             choices=[Choice(title, title) for title, _ in responses],
             error="",  # Errors now redirect to `state_question`
-            next="state_display_selected_choice",
+            next="state_submit_user_choice",
             footer=self._(
                 "\n[💡Tip: If you don't see what you're looking for, try typing your "
                 "question again using different words or reply *FAQ* to browse topics]"
             ),
         )
+
+    async def state_submit_user_choice(self):
+        model = get_model()
+        model_response = json.loads(self.user.answers["model_response"])
+        data = {
+            "inbound_id": model_response["inbound_id"],
+            "feedback_secret_key": model_response["feedback_secret_key"],
+            "feedback": {
+                "choice": self.user.answers["state_display_response_choices"],
+            },
+        }
+        async with model as session:
+            for i in range(3):
+                try:
+                    response = await session.post(
+                        url=urljoin(config.MODEL_API_URL, "/inbound/feedback"),
+                        json=data,
+                    )
+                    response_data = await response.text()
+                    sentry_sdk.set_context(
+                        "model", {"request_data": data, "response_data": response_data}
+                    )
+                    response.raise_for_status()
+                    break
+                except HTTP_EXCEPTIONS as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
+        return await self.go_to_state("state_display_selected_choice")
 
     async def state_display_selected_choice(self):
         responses = json.loads(self.user.answers["model_response"])["top_responses"]
