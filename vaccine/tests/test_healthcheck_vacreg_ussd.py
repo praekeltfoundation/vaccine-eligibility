@@ -413,6 +413,15 @@ async def test_state_timed_out_vaccinereg():
     assert u.session_id != 1
 
 
+async def test_state_timed_out_timed_out():
+    tester = AppTester(Application)
+    tester.setup_state("state_timed_out_vacreg")
+    tester.setup_answer("resume_state", "state_vaccination_time")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+    tester.assert_state("state_timed_out_vacreg")
+    tester.assert_answer("resume_state", "state_vaccination_time")
+
+
 async def test_state_language():
     tester = AppTester(Application)
     tester.setup_state("state_menu")
