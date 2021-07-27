@@ -74,7 +74,10 @@ class Application(VacRegApp, HealthCheckApp):
         if (
             message.session_event == Message.SESSION_EVENT.NEW
             and self.state_name is not None
-            and self.state_name != self.START_STATE
+            and (
+                hasattr(VacRegApp, self.state_name)
+                or hasattr(HealthCheckApp, self.state_name)
+            )
         ):
             self.save_answer("resume_state", self.state_name)
             if hasattr(VacRegApp, self.state_name):
