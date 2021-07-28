@@ -243,6 +243,20 @@ async def flow_results_mock_server(sanic_client):
                 return response.json({}, status=400)
         return response.json({})
 
+    @app.route("flow-results/packages/duplicate/responses", methods=["POST"])
+    async def duplicate(request):
+        app.requests.append(request)
+        return response.json(
+            {
+                "data": {
+                    "attributes": {
+                        "responses": ["row_id is not unique for flow question"]
+                    }
+                }
+            },
+            status=400,
+        )
+
     @app.route("flow-results/packages/<flow_id:uuid>/responses", methods=["POST"])
     async def messages(request, flow_id):
         app.future.set_result(request)
@@ -396,6 +410,42 @@ async def test_answer_worker_push_results_user_error(
         await sleep(0.1)
     assert "Error sending results to flow results server" in log_stream.getvalue()
 
+    assert len(answer_worker.answers) == 0
+
+
+@pytest.mark.asyncio
+async def test_answer_worker_push_results_duplicate(
+    answer_worker, flow_results_mock_server
+):
+    """
+    If there is a 400 response, then submit each answer separately, and if it's a
+    duplicate submission error, ignore it.
+    """
+    log_stream = StringIO()
+    logger.addHandler(logging.StreamHandler(log_stream))
+    logger.setLevel(logging.DEBUG)
+    answer_worker.resource_id = "duplicate"
+    await send_inbound_amqp_message(
+        answer_worker.exchange,
+        "whatsapp.answer",
+        Answer(
+            question="question",
+            response="answer",
+            address="27820001001",
+            session_id="session_id",
+            row_id="1",
+            timestamp=datetime(2021, 2, 3, 4, 5, 6, tzinfo=timezone.utc),
+        )
+        .to_json()
+        .encode(),
+    )
+
+    # wait for worker to log error
+    for _ in range(10):
+        if len(flow_results_mock_server.app.requests) == 2:
+            break
+        await sleep(0.1)
+    assert log_stream.getvalue() == ""
     assert len(answer_worker.answers) == 0
 
 
