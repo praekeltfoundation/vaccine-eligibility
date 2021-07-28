@@ -1,6 +1,7 @@
 import asyncio
 import importlib
 import logging
+from json import JSONDecodeError
 from typing import Callable, List
 from urllib.parse import urljoin
 
@@ -239,6 +240,18 @@ class AnswerWorker:
                     answer = Answer.from_json(msg.body.decode("utf-8"))
                     response = await self._submit_answers([answer])
                     if response.status == 400:
+                        # If this is a duplicate submission, then ignore error
+                        try:
+                            response_body = await response.json()
+                            if (
+                                response_body["data"]["attributes"]["responses"][0]
+                                == "row_id is not unique for flow question"
+                            ):
+                                msg.ack()
+                                processed.append(msg)
+                                continue
+                        except (TypeError, KeyError, IndexError, JSONDecodeError):
+                            pass
                         msg.nack(requeue=False)
                         processed.append(msg)
                     response.raise_for_status()
