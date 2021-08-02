@@ -52,7 +52,7 @@ def get_today():
 def calculate_age(date_of_birth: date):
     today = get_today()
     years = today.year - date_of_birth.year
-    if (today.month, today.day) < (date_of_birth.month, date_of_birth.year):
+    if (today.month, today.day) < (date_of_birth.month, date_of_birth.day):
         years -= 1
     return years
 
