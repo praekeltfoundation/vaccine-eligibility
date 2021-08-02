@@ -5,6 +5,7 @@ from vaccine.states import Choice
 from vaccine.utils import (
     Countries,
     SAIDNumber,
+    calculate_age,
     display_phonenumber,
     enforce_character_limit_in_choices,
     get_display_choices,
@@ -44,7 +45,7 @@ class SAIDNumberTests(TestCase):
         assert SAIDNumber("1912310001081").date_of_birth == date(2019, 12, 31)
         assert SAIDNumber("2001010001085").date_of_birth == date(1920, 1, 1)
         assert SAIDNumber("1912310001081").age == 0
-        assert SAIDNumber("2001010001085").age == 99
+        assert SAIDNumber("2001010001085").age == 100
 
     def test_sex(self):
         assert SAIDNumber("9001010001088").sex == SAIDNumber.SEX.female
@@ -94,3 +95,13 @@ class MiscellaneousTests(TestCase):
         reduced_choices = enforce_character_limit_in_choices(choices)
         assert len(reduced_choices) == 3
         assert len(get_display_choices(reduced_choices)) < 160
+
+
+class CalculateAgeTests(TestCase):
+    @mock.patch("vaccine.utils.get_today")
+    def test_calculate_age(self, get_today):
+        get_today.return_value = date(2021, 8, 1)
+        # Birthday yesterday, today, and tomorrow
+        assert calculate_age(date(1986, 7, 31)) == 35
+        assert calculate_age(date(1986, 8, 1)) == 35
+        assert calculate_age(date(1986, 8, 2)) == 34
