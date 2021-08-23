@@ -837,6 +837,30 @@ async def test_state_city_skip():
 
 
 @pytest.mark.asyncio
+async def test_state_city_skip_minor():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_privacy_policy"),
+        session_id=1,
+        answers={
+            "state_province": "ZA-WC",
+            "state_age": "<18"
+        },
+    )
+    app = Application(u)
+    msg = Message(
+        content="accept",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_fever"
+
+
+@pytest.mark.asyncio
 async def test_state_city_skip_confirmed_contact():
     u = User(
         addr="27820001003",

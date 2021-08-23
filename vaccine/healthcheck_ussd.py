@@ -425,9 +425,18 @@ class Application(BaseApplication):
         )
 
     async def state_city(self):
+        skip = False
+
         if self.user.answers.get("state_city") and self.user.answers.get(
             "city_location"
         ):
+            skip = True
+
+        if self.user.answers.get("state_age") == "<18":
+            self.save_answer("state_city", "<not collected>")
+            skip = True
+
+        if skip:
             if self.user.answers.get("confirmed_contact") == "yes":
                 return await self.go_to_state("state_tracing")
             return await self.go_to_state("state_fever")
