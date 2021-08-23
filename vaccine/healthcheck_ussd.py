@@ -401,9 +401,6 @@ class Application(BaseApplication):
         )
 
     async def state_province(self):
-        # if self.users.answers.get("state_age") == "<18":
-        #     self.save_answer("place_id", first_result["place_id"])
-
         if self.user.answers.get("state_province"):
             return await self.go_to_state("state_city")
         return ChoiceState(
@@ -554,23 +551,6 @@ class Application(BaseApplication):
                         return await self.go_to_state("state_error")
                     else:
                         continue
-
-    # async def state_age(self):
-    #     if self.user.answers.get("state_age"):
-    #         return await self.go_to_state("state_fever")
-
-    #     return ChoiceState(
-    #         self,
-    #         question=self._("How old are you?"),
-    #         error=self._("Please use numbers from list.\n" "\n" "How old are you?"),
-    #         choices=[
-    #             Choice("<18", "<18"),
-    #             Choice("18-40", "18-39"),
-    #             Choice("40-65", "40-65"),
-    #             Choice(">65", ">65"),
-    #         ],
-    #         next="state_fever",
-    #     )
 
     async def state_age_years(self):
         if self.user.answers.get("state_age") and self.user.answers.get(
