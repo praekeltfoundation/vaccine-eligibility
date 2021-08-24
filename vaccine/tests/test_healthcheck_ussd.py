@@ -660,7 +660,7 @@ async def test_state_privacy_policy_non_confirmed_contact():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_province"
+    assert u.state.name == "state_age"
 
 
 @pytest.mark.asyncio
@@ -712,12 +712,10 @@ async def test_state_end_confirmed_contact():
 
 @pytest.mark.asyncio
 async def test_state_province():
-    u = User(
-        addr="27820001003", state=StateData(name="state_privacy_policy"), session_id=1
-    )
+    u = User(addr="27820001003", state=StateData(name="state_age"), session_id=1)
     app = Application(u)
     msg = Message(
-        content="accept",
+        content="1",
         to_addr="27820001002",
         from_addr="27820001003",
         transport_name="whatsapp",
@@ -776,13 +774,13 @@ async def test_state_province():
 async def test_state_city():
     u = User(
         addr="27820001003",
-        state=StateData(name="state_privacy_policy"),
+        state=StateData(name="state_age"),
         session_id=1,
         answers={"state_province": "ZA-WC"},
     )
     app = Application(u)
     msg = Message(
-        content="accept",
+        content="2",
         to_addr="27820001002",
         from_addr="27820001003",
         transport_name="whatsapp",
@@ -821,6 +819,7 @@ async def test_state_city_skip():
             "state_province": "ZA-WC",
             "state_city": "Cape Town",
             "city_location": "+1+1/",
+            "state_age": "18-35",
         },
     )
     app = Application(u)
