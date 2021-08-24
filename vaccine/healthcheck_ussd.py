@@ -317,7 +317,7 @@ class Application(BaseApplication):
         if self.user.answers.get("confirmed_contact") == "yes":
             next_state = "state_fever"
         else:
-            next_state = "state_province"
+            next_state = "state_age"
         if self.user.answers.get("state_privacy_policy_accepted") == "yes":
             return await self.go_to_state(next_state)
 
