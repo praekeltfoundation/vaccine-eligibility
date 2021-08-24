@@ -842,10 +842,7 @@ async def test_state_city_skip_minor():
         addr="27820001003",
         state=StateData(name="state_privacy_policy"),
         session_id=1,
-        answers={
-            "state_province": "ZA-WC",
-            "state_age": "<18"
-        },
+        answers={"state_province": "ZA-WC", "state_age": "<18"},
     )
     app = Application(u)
     msg = Message(
