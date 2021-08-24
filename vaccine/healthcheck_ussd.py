@@ -383,6 +383,23 @@ class Application(BaseApplication):
             choices=[Choice("state_terms", self._("Next"))],
         )
 
+    async def state_age(self):
+        if self.user.answers.get("state_age"):
+            return await self.go_to_state("state_province")
+
+        return ChoiceState(
+            self,
+            question=self._("How old are you?"),
+            error=self._("Please use numbers from list.\n" "\n" "How old are you?"),
+            choices=[
+                Choice("<18", "<18"),
+                Choice("18-40", "18-39"),
+                Choice("40-65", "40-65"),
+                Choice(">65", ">65"),
+            ],
+            next="state_province",
+        )
+
     async def state_province(self):
         if self.user.answers.get("state_province"):
             return await self.go_to_state("state_city")
@@ -405,12 +422,21 @@ class Application(BaseApplication):
         )
 
     async def state_city(self):
+        skip = False
+
         if self.user.answers.get("state_city") and self.user.answers.get(
             "city_location"
         ):
+            skip = True
+
+        if self.user.answers.get("state_age") == "<18":
+            self.save_answer("state_city", "<not collected>")
+            skip = True
+
+        if skip:
             if self.user.answers.get("confirmed_contact") == "yes":
                 return await self.go_to_state("state_tracing")
-            return await self.go_to_state("state_age")
+            return await self.go_to_state("state_fever")
 
         text = self._(
             "Please TYPE the name of your Suburb, Township, Town or Village (or "
@@ -518,30 +544,13 @@ class Application(BaseApplication):
 
                     if self.user.answers.get("confirmed_contact") == "yes":
                         return await self.go_to_state("state_tracing")
-                    return await self.go_to_state("state_age")
+                    return await self.go_to_state("state_fever")
                 except HTTP_EXCEPTIONS as e:
                     if i == 2:
                         logger.exception(e)
                         return await self.go_to_state("state_error")
                     else:
                         continue
-
-    async def state_age(self):
-        if self.user.answers.get("state_age"):
-            return await self.go_to_state("state_fever")
-
-        return ChoiceState(
-            self,
-            question=self._("How old are you?"),
-            error=self._("Please use numbers from list.\n" "\n" "How old are you?"),
-            choices=[
-                Choice("<18", "<18"),
-                Choice("18-40", "18-39"),
-                Choice("40-65", "40-65"),
-                Choice(">65", ">65"),
-            ],
-            next="state_fever",
-        )
 
     async def state_age_years(self):
         if self.user.answers.get("state_age") and self.user.answers.get(

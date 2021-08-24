@@ -833,7 +833,28 @@ async def test_state_city_skip():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_age"
+    assert u.state.name == "state_fever"
+
+
+@pytest.mark.asyncio
+async def test_state_city_skip_minor():
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_privacy_policy"),
+        session_id=1,
+        answers={"state_province": "ZA-WC", "state_age": "<18"},
+    )
+    app = Application(u)
+    msg = Message(
+        content="accept",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 160
+    assert u.state.name == "state_fever"
 
 
 @pytest.mark.asyncio
@@ -1007,7 +1028,7 @@ async def test_state_place_details_lookup(google_api_mock):
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_age"
+    assert u.state.name == "state_fever"
 
     assert [r.path for r in google_api_mock.app.requests] == [
         "/maps/api/place/details/json"
@@ -1097,7 +1118,7 @@ async def test_state_place_details_lookup_temporary_error(google_api_mock):
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
     )
     await app.process_message(msg)
-    assert u.state.name == "state_age"
+    assert u.state.name == "state_fever"
 
 
 @pytest.mark.asyncio
@@ -1171,16 +1192,22 @@ async def test_state_age():
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert u.state.name == "state_fever"
+    assert u.state.name == "state_province"
 
     assert reply.content == "\n".join(
         [
-            "Do you feel very hot or cold? Are you sweating or shivering? "
-            "When you touch your forehead, does it feel hot?",
+            "Select your province",
             "",
-            "Reply",
-            "1. Yes",
-            "2. No",
+            "Reply:",
+            "1. EASTERN CAPE",
+            "2. FREE STATE",
+            "3. GAUTENG",
+            "4. KWAZULU NATAL",
+            "5. LIMPOPO",
+            "6. MPUMALANGA",
+            "7. NORTH WEST",
+            "8. NORTHERN CAPE",
+            "9. WESTERN CAPE",
         ]
     )
 
