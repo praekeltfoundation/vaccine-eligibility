@@ -712,9 +712,7 @@ async def test_state_end_confirmed_contact():
 
 @pytest.mark.asyncio
 async def test_state_province():
-    u = User(
-        addr="27820001003", state=StateData(name="state_age"), session_id=1
-    )
+    u = User(addr="27820001003", state=StateData(name="state_age"), session_id=1)
     app = Application(u)
     msg = Message(
         content="1",
@@ -821,7 +819,7 @@ async def test_state_city_skip():
             "state_province": "ZA-WC",
             "state_city": "Cape Town",
             "city_location": "+1+1/",
-            "state_age": "18-35"
+            "state_age": "18-35",
         },
     )
     app = Application(u)
