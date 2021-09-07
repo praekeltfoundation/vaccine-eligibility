@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from inspect import iscoroutinefunction
-from typing import TYPE_CHECKING, Awaitable, Callable, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Optional, Union
 
 from vaccine.models import Message
 from vaccine.utils import get_display_choices
@@ -56,6 +56,8 @@ class ChoiceState:
         accept_labels: bool = True,
         footer: Optional[str] = None,
         error_footer: Optional[str] = None,
+        header: Optional[str] = None,
+        error_header: Optional[str] = None,
     ):
         self.app = app
         self.question = question
@@ -65,6 +67,8 @@ class ChoiceState:
         self.next = next
         self.footer = footer
         self.error_footer = error_footer
+        self.header = header
+        self.error_header = error_header
 
     def _normalise_text(self, text: Optional[str]) -> str:
         return (text or "").strip().lower()
@@ -96,6 +100,8 @@ class ChoiceState:
             text = f"{self.error}\n{self._display_choices}"
             if self.error_footer:
                 text = f"{text}\n{self.error_footer}"
+            if self.error_header:
+                text = f"{self.error_header}\n{text}"
             return self.app.send_message(text)
         else:
             self.app.save_answer(self.app.state_name, choice.value)
@@ -107,6 +113,8 @@ class ChoiceState:
         text = f"{self.question}\n{self._display_choices}"
         if self.footer is not None:
             text = f"{text}\n{self.footer}"
+        if self.header is not None:
+            text = f"{self.header}\n{text}"
         return self.app.send_message(text)
 
 
@@ -126,6 +134,8 @@ class MenuState(ChoiceState):
         accept_labels: bool = True,
         footer: Optional[str] = None,
         error_footer: Optional[str] = None,
+        header: Optional[str] = None,
+        error_header: Optional[str] = None,
     ):
         self.app = app
         self.question = question
@@ -134,6 +144,8 @@ class MenuState(ChoiceState):
         self.accept_labels = accept_labels
         self.footer = footer
         self.error_footer = error_footer
+        self.header = header
+        self.error_header = error_header
 
     async def _next(self, choice: Choice):
         return choice.value
@@ -176,9 +188,16 @@ class FreeText:
 
 class WhatsAppButtonState(ChoiceState):
     async def display(self, message: Message):
+        helper_metadata: Dict[str, Any] = {
+            "buttons": [choice.label for choice in self.choices]
+        }
+        if self.header:
+            helper_metadata["header"] = self.header
+        if self.footer:
+            helper_metadata["footer"] = self.footer
         return self.app.send_message(
             self.question,
-            helper_metadata={"buttons": [choice.label for choice in self.choices]},
+            helper_metadata=helper_metadata,
         )
 
 
