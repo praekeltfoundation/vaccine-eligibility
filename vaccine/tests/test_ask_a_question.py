@@ -209,8 +209,6 @@ async def test_display_selected_choice(tester: AppTester, model_mock):
     tester.assert_message(
         "\n".join(
             [
-                "*Are COVID-19 vaccines safe?*",
-                "",
                 "Yes, COVID-19 vaccines are safe. No step in the development, testing "
                 "or regulation process has been skipped for these vaccines.\r",
                 "\r",
@@ -221,13 +219,6 @@ async def test_display_selected_choice(tester: AppTester, model_mock):
                 "each country to make sure that they are safe.\r",
                 "\r",
                 "Watch: youtu.be/AeSSyjhz8Hk",
-                "",
-                "------------",
-                "_Help us get better and finding answers for you._",
-                "Did the information above ☝🏽 answer your question?",
-                "Reply:",
-                "1. *YES*",
-                "2. *NO*",
             ]
         )
     )
