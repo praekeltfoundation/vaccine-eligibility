@@ -10,7 +10,7 @@ import sentry_sdk
 from vaccine import ask_a_question_config as config
 from vaccine.base_application import BaseApplication
 from vaccine.models import Message
-from vaccine.states import Choice, ChoiceState, EndState, FreeText
+from vaccine.states import Choice, ChoiceState, EndState, FreeText, WhatsAppButtonState
 from vaccine.utils import HTTP_EXCEPTIONS
 from vaccine.validators import nonempty_validator
 
@@ -35,6 +35,16 @@ def get_model():
 
 
 class RedirectChoiceState(ChoiceState):
+    async def process_message(self, message: Message):
+        choice = self._get_choice(message.content)
+        if choice is None:
+            state = await self.app.go_to_state("state_question")
+            return await state.process_message(message)
+        else:
+            return await super().process_message(message)
+
+
+class WhatsAppRedirectButtonState(WhatsAppButtonState):
     async def process_message(self, message: Message):
         choice = self._get_choice(message.content)
         if choice is None:
@@ -205,24 +215,16 @@ class Application(BaseApplication):
         for title, content in responses:
             if choice == title:
                 break
-        question = self._(
-            "*{title}*\n"
-            "\n"
-            "{content}\n"
-            "\n"
-            "------------\n"
-            "_Help us get better and finding answers for you._\n"
-            "Did the information above ☝🏽 answer your question?\n"
-            "Reply:"
-        ).format(title=title, content=content)
-        return RedirectChoiceState(
+        return WhatsAppRedirectButtonState(
             self,
-            question=question,
+            question=content,
             choices=[
-                Choice("yes", self._("*YES*"), ["yes"]),
-                Choice("no", self._("*NO*"), ["no"]),
+                Choice("yes", self._("👍"), ["yes"]),
+                Choice("no", self._("👎︎"), ["no"]),
             ],
             error="",  # Errors redirect to `state_question`
+            header=title,
+            footer=self._("Was this helpful?"),
             next="state_submit_user_feedback",
         )
 
