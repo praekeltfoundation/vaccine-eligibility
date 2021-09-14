@@ -79,4 +79,25 @@ async def test_full_name(tester: AppTester):
     tester.assert_state("state_full_name")
 
     await tester.user_input("test name")
-    # tester.assert_state("state_select_number")
+    tester.assert_state("state_select_number")
+
+
+@pytest.mark.asyncio
+async def test_select_number(tester: AppTester):
+    tester.setup_state("state_full_name")
+    await tester.user_input("test name")
+    tester.assert_message(
+        "Can the hotline team call you back on 082 000 1001?",
+        buttons=["Use this number", "Use a different number"],
+    )
+    tester.assert_state("state_select_number")
+
+    await tester.user_input("invalid")
+    tester.assert_message(
+        "Can the hotline team call you back on 082 000 1001?",
+        buttons=["Use this number", "Use a different number"],
+    )
+    tester.assert_state("state_select_number")
+
+    await tester.user_input("use this number")
+    # tester.assert_state("state_enter_number")

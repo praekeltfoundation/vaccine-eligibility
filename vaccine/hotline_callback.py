@@ -4,6 +4,7 @@ from typing import List
 from vaccine.base_application import BaseApplication
 from vaccine.models import Message
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
+from vaccine.utils import display_phonenumber
 from vaccine.validators import nonempty_validator
 
 
@@ -46,7 +47,7 @@ class Application(BaseApplication):
                 Choice("main_menu", self._("Main Menu")),
             ],
             # TODO: Get proper error message
-            error="Please select a valid choice",
+            error=question,
             next="state_full_name",
         )
 
@@ -61,4 +62,20 @@ class Application(BaseApplication):
             next="state_select_number",
             # TODO: Get proper error message
             check=nonempty_validator(question),
+        )
+
+    async def state_select_number(self):
+        question = self._("Can the hotline team call you back on {number}?").format(
+            number=display_phonenumber(self.user.addr)
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("this_number", self._("Use this number")),
+                Choice("different_number", self._("Use a different number")),
+            ],
+            # TODO: Get a proper error messsage
+            error=question,
+            next="state_enter_number",
         )
