@@ -20,7 +20,7 @@ async def test_exit_keywords(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_question(tester: AppTester):
+async def test_menu(tester: AppTester):
     await tester.user_input("support", session=Message.SESSION_EVENT.NEW)
     tester.assert_message(
         "\n".join(
@@ -46,3 +46,37 @@ async def test_question(tester: AppTester):
         header="💉 *VACCINE SUPPORT*",
     )
     tester.assert_state("state_menu")
+
+    await tester.user_input("call me back")
+    tester.assert_state("state_full_name")
+
+
+@pytest.mark.asyncio
+async def test_full_name(tester: AppTester):
+    tester.setup_state("state_menu")
+    await tester.user_input("call me back")
+    tester.assert_message(
+        "\n".join(
+            [
+                "Please type your NAME",
+                "(This will be given to the hotline team to use when they call you "
+                "back)",
+            ]
+        )
+    )
+    tester.assert_state("state_full_name")
+
+    await tester.user_input("")
+    tester.assert_message(
+        "\n".join(
+            [
+                "Please type your NAME",
+                "(This will be given to the hotline team to use when they call you "
+                "back)",
+            ]
+        )
+    )
+    tester.assert_state("state_full_name")
+
+    await tester.user_input("test name")
+    # tester.assert_state("state_select_number")

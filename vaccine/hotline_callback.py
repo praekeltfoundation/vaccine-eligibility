@@ -3,7 +3,8 @@ from typing import List
 
 from vaccine.base_application import BaseApplication
 from vaccine.models import Message
-from vaccine.states import Choice, EndState, WhatsAppButtonState
+from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
+from vaccine.validators import nonempty_validator
 
 
 class Application(BaseApplication):
@@ -46,5 +47,18 @@ class Application(BaseApplication):
             ],
             # TODO: Get proper error message
             error="Please select a valid choice",
-            next="state_name",
+            next="state_full_name",
+        )
+
+    async def state_full_name(self):
+        question = self._(
+            "Please type your NAME\n"
+            "(This will be given to the hotline team to use when they call you back)"
+        )
+        return FreeText(
+            self,
+            question=question,
+            next="state_select_number",
+            # TODO: Get proper error message
+            check=nonempty_validator(question),
         )
