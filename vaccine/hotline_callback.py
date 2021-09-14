@@ -5,7 +5,7 @@ from vaccine.base_application import BaseApplication
 from vaccine.models import Message
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
 from vaccine.utils import display_phonenumber
-from vaccine.validators import nonempty_validator
+from vaccine.validators import nonempty_validator, phone_number_validator
 
 
 class Application(BaseApplication):
@@ -78,4 +78,20 @@ class Application(BaseApplication):
             # TODO: Get a proper error messsage
             error=question,
             next="state_enter_number",
+        )
+
+    async def state_enter_number(self):
+        if self.user.answers["state_select_number"] == "this_number":
+            self.save_answer("state_enter_number", self.user.addr)
+            return await self.go_to_state("state_submit_request")
+
+        return FreeText(
+            self,
+            question=self._("Please TYPE the CELL PHONE NUMBER we can contact you on."),
+            next="state_submit_request",
+            check=phone_number_validator(
+                self._(
+                    "⚠️ Please type a valid cell phone number.\n" "Example _081234567_"
+                )
+            ),
         )

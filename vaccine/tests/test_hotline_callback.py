@@ -101,3 +101,20 @@ async def test_select_number(tester: AppTester):
 
     await tester.user_input("use this number")
     # tester.assert_state("state_enter_number")
+
+
+@pytest.mark.asyncio
+async def test_enter_number(tester: AppTester):
+    tester.setup_state("state_select_number")
+    await tester.user_input("use a different number")
+    tester.assert_message("Please TYPE the CELL PHONE NUMBER we can contact you on.")
+    tester.assert_state("state_enter_number")
+
+    await tester.user_input("invalid")
+    tester.assert_message(
+        "\n".join(["⚠️ Please type a valid cell phone number.", "Example _081234567_"])
+    )
+    tester.assert_state("state_enter_number")
+
+    await tester.user_input("0820001003")
+    # tester.assert_state("state_submit_request")
