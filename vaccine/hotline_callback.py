@@ -1,6 +1,6 @@
 import logging
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import List
 from urllib.parse import urljoin
 
