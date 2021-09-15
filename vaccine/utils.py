@@ -22,6 +22,8 @@ DECODE_MESSAGE_EXCEPTIONS = (
 
 HTTP_EXCEPTIONS = (aiohttp.ClientError, asyncio.TimeoutError)
 
+TZ_SAST = timezone(timedelta(hours=2), "SAST")
+
 
 def random_id():
     return uuid4().hex
@@ -46,7 +48,7 @@ def luhn_checksum(input):
 
 
 def get_today():
-    return datetime.now(tz=timezone(timedelta(hours=2))).date()
+    return datetime.now(tz=TZ_SAST).date()
 
 
 def calculate_age(date_of_birth: date):

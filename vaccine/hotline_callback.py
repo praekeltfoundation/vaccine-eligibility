@@ -62,7 +62,7 @@ def get_current_datetime() -> datetime:
     """
     Returns the current datetime in SAST
     """
-    return datetime.now(tz=timezone(timedelta(hours=2)))
+    return datetime.now(tz=TZ_SAST)
 
 
 def in_office_hours() -> bool:
