@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from unittest import mock
 
 import pytest
@@ -39,6 +39,52 @@ async def callback_api_mock(sanic_client):
     config.CALLBACK_API_URL = f"http://{client.host}:{client.port}"
     yield client
     config.CALLBACK_API_URL = url
+
+
+@pytest.fixture
+async def turn_api_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("mock_turn_api")
+    app.requests = []
+    app.errors = 0
+    app.errormax = 0
+
+    @app.route("/v1/contacts/<msisdn:int>/messages", methods=["GET"])
+    def callback(request, msisdn):
+        app.requests.append(request)
+        if app.errormax:
+            if app.errors < app.errormax:
+                app.errors += 1
+                return response.json({}, status=500)
+        return response.json(
+            {
+                "messages": [
+                    {
+                        "type": "text",
+                        "text": {"body": "test message1"},
+                        "timestamp": "1631711883",
+                        "_vnd": {"v1": {"direction": "outbound"}},
+                    },
+                    {
+                        "type": "text",
+                        "text": {"body": "test message2"},
+                        "timestamp": "1631712883",
+                        "_vnd": {"v1": {"direction": "inbound"}},
+                    },
+                    {
+                        "type": "image",
+                        "timestamp": "1631713883",
+                        "_vnd": {"v1": {"direction": "inbound"}},
+                    },
+                ]
+            }
+        )
+
+    client = await sanic_client(app)
+    url = config.TURN_URL
+    config.TURN_URL = f"http://{client.host}:{client.port}"
+    yield client
+    config.TURN_URL = url
 
 
 @pytest.mark.asyncio
@@ -115,7 +161,9 @@ async def test_full_name(tester: AppTester):
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.hotline_callback.in_office_hours")
-async def test_select_number(in_office_hours, tester: AppTester, callback_api_mock):
+async def test_select_number(
+    in_office_hours, tester: AppTester, callback_api_mock, turn_api_mock
+):
     in_office_hours.return_value = False
     tester.setup_state("state_full_name")
     await tester.user_input("test name")
@@ -138,7 +186,9 @@ async def test_select_number(in_office_hours, tester: AppTester, callback_api_mo
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.hotline_callback.in_office_hours")
-async def test_enter_number(in_office_hours, tester: AppTester, callback_api_mock):
+async def test_enter_number(
+    in_office_hours, tester: AppTester, callback_api_mock, turn_api_mock
+):
     in_office_hours.return_value = True
     tester.setup_state("state_select_number")
     tester.setup_answer("state_full_name", "test name")
@@ -205,7 +255,9 @@ def test_in_office_hours(get_current_datetime):
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.hotline_callback.in_office_hours")
-async def test_success_inoffice(in_office_hours, tester: AppTester, callback_api_mock):
+async def test_success_inoffice(
+    in_office_hours, tester: AppTester, callback_api_mock, turn_api_mock
+):
     in_office_hours.return_value = True
     tester.setup_state("state_select_number")
     tester.setup_answer("state_full_name", "test name")
@@ -227,9 +279,13 @@ async def test_success_inoffice(in_office_hours, tester: AppTester, callback_api
 
 
 @pytest.mark.asyncio
+@mock.patch("vaccine.utils.get_today")
 @mock.patch("vaccine.hotline_callback.in_office_hours")
-async def test_success_ooo(in_office_hours, tester: AppTester, callback_api_mock):
+async def test_success_ooo(
+    in_office_hours, get_today, tester: AppTester, callback_api_mock, turn_api_mock
+):
     in_office_hours.return_value = False
+    get_today.return_value = date(2021, 9, 15)
     tester.setup_state("state_enter_number")
     tester.setup_answer("state_full_name", "test name")
     tester.setup_answer("state_select_number", "different_number")
@@ -247,12 +303,22 @@ async def test_success_ooo(in_office_hours, tester: AppTester, callback_api_mock
             ]
         )
     )
+    [request] = callback_api_mock.app.requests
+    assert request.json == {
+        "Name": "test name",
+        "CLI": "+27820001003",
+        "DateTimeOfRequest": "2021-09-15",
+        "Language": "English",
+        "ChatHistory": "2021-09-15 15:18 < test message1\n"
+        "2021-09-15 15:34 > test message2\n"
+        "2021-09-15 15:51 > <image>",
+    }
 
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.hotline_callback.in_office_hours")
 async def test_success_temporary_error(
-    in_office_hours, tester: AppTester, callback_api_mock
+    in_office_hours, tester: AppTester, callback_api_mock, turn_api_mock
 ):
     in_office_hours.return_value = False
     callback_api_mock.app.errormax = 1
@@ -279,7 +345,7 @@ async def test_success_temporary_error(
 @pytest.mark.asyncio
 @mock.patch("vaccine.hotline_callback.in_office_hours")
 async def test_success_permanent_error(
-    in_office_hours, tester: AppTester, callback_api_mock
+    in_office_hours, tester: AppTester, callback_api_mock, turn_api_mock
 ):
     in_office_hours.return_value = False
     callback_api_mock.app.errormax = 3

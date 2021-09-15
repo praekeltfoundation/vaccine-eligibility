@@ -14,6 +14,7 @@ from vaccine.models import Message
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
 from vaccine.utils import (
     HTTP_EXCEPTIONS,
+    TZ_SAST,
     display_phonenumber,
     get_today,
     normalise_phonenumber,
@@ -36,6 +37,23 @@ def get_callback_api():
             "Content-Type": "application/json",
             "Accept": "application/json",
             "User-Agent": "contactndoh-hotline-callback",
+        },
+    )
+
+
+def get_turn_api():
+    # TODO: Cache the session globally. Things that don't work:
+    # - Declaring the session at the top of the file
+    #   You get a `Timeout context manager should be used inside a task` error
+    # - Declaring it here but caching it in a global variable for reuse
+    #   You get a `Event loop is closed` error
+    return aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=5),
+        headers={
+            "Content-Type": "application/json",
+            "Accept": "application/vnd.v1+json",
+            "User-Agent": "contactndoh-hotline-callback",
+            "Authorization": f"Bearer {config.TURN_TOKEN}",
         },
     )
 
@@ -135,18 +153,65 @@ class Application(BaseApplication):
     async def state_enter_number(self):
         if self.user.answers["state_select_number"] == "this_number":
             self.save_answer("state_enter_number", f"+{self.user.addr.lstrip('+')}")
-            return await self.go_to_state("state_submit_request")
+            return await self.go_to_state("state_get_message_history")
 
         return FreeText(
             self,
             question=self._("Please TYPE the CELL PHONE NUMBER we can contact you on."),
-            next="state_submit_request",
+            next="state_get_message_history",
             check=phone_number_validator(
                 self._(
                     "⚠️ Please type a valid cell phone number.\n" "Example _081234567_"
                 )
             ),
         )
+
+    async def state_get_message_history(self):
+        turn_api = get_turn_api()
+        url = urljoin(
+            config.TURN_URL, f"v1/contacts/{self.user.addr.lstrip('+')}/messages"
+        )
+
+        async with turn_api as session:
+            for i in range(3):
+                try:
+                    response = await session.get(url=url)
+                    response_data = await response.json()
+                    sentry_sdk.set_context("turn_api", {"response_data": response_data})
+                    response.raise_for_status()
+                    break
+                except HTTP_EXCEPTIONS as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
+
+        def format_message(message: dict) -> str:
+            timestamp = datetime.fromtimestamp(
+                float(message["timestamp"]), tz=timezone.utc
+            )
+            timestamp = timestamp.astimezone(TZ_SAST)
+            formatted_ts = timestamp.strftime("%Y-%m-%d %H:%M")
+            if message["type"] == "text":
+                body = message["text"]["body"][:200]
+            else:
+                body = f"<{message['type']}>"
+            direction = message["_vnd"]["v1"]["direction"]
+            direction = ">" if direction == "inbound" else "<"
+            return " ".join([formatted_ts, direction, body])
+
+        length = 0
+        formatted_messages = []
+        for message in response_data["messages"]:
+            formatted_message = format_message(message)
+            if length + len(formatted_message) + 1 < 1000:
+                formatted_messages.append(formatted_message)
+                length += len(formatted_message) + 1
+            else:
+                break
+        self.message_history = "\n".join(formatted_messages)
+        return await self.go_to_state("state_submit_request")
 
     async def state_submit_request(self):
         callback_api = get_callback_api()
@@ -163,8 +228,7 @@ class Application(BaseApplication):
             "CLI": phonenumber,
             "Name": self.user.answers["state_full_name"],
             "Language": "English",
-            # TODO: fill in chat history
-            "ChatHistory": "",
+            "ChatHistory": self.message_history,
         }
 
         async with callback_api as session:
