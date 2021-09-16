@@ -169,14 +169,14 @@ async def test_select_number(
     await tester.user_input("test name")
     tester.assert_message(
         "Can the hotline team call you back on 082 000 1001?",
-        buttons=["Use this number", "Use a different number"],
+        buttons=["Use this number", "Use another number"],
     )
     tester.assert_state("state_select_number")
 
     await tester.user_input("invalid")
     tester.assert_message(
         "Can the hotline team call you back on 082 000 1001?",
-        buttons=["Use this number", "Use a different number"],
+        buttons=["Use this number", "Use another number"],
     )
     tester.assert_state("state_select_number")
 
@@ -192,7 +192,7 @@ async def test_enter_number(
     in_office_hours.return_value = True
     tester.setup_state("state_select_number")
     tester.setup_answer("state_full_name", "test name")
-    await tester.user_input("use a different number")
+    await tester.user_input("use another number")
     tester.assert_message("Please TYPE the CELL PHONE NUMBER we can contact you on.")
     tester.assert_state("state_enter_number")
 

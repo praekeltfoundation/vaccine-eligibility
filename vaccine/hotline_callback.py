@@ -143,7 +143,7 @@ class Application(BaseApplication):
             question=question,
             choices=[
                 Choice("this_number", self._("Use this number")),
-                Choice("different_number", self._("Use a different number")),
+                Choice("different_number", self._("Use another number")),
             ],
             # TODO: Get a proper error messsage
             error=question,
