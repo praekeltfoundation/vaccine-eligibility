@@ -220,13 +220,7 @@ async def test_congregate_invalid():
     )
     [reply] = await app.process_message(msg)
     assert reply.content == "\n".join(
-        [
-            "⚠️ This service works best when you use the numbered options available",
-            "",
-            "1. Yes",
-            "2. No",
-            "3. Not Sure",
-        ]
+        ["⚠️ This service works best when you use the numbered options available", ""]
     )
     assert u.state.name == "state_congregate"
     assert "state_congregate" not in u.answers
@@ -396,13 +390,7 @@ async def test_comorbidities_invalid():
     )
     [reply] = await app.process_message(msg)
     assert reply.content == "\n".join(
-        [
-            "⚠️ This service works best when you use the numbered options available",
-            "",
-            "1. Yes",
-            "2. No",
-            "3. Not Sure",
-        ]
+        ["⚠️ This service works best when you use the numbered options available", ""]
     )
     assert u.state.name == "state_comorbidities"
     assert "state_comorbidities" not in u.answers

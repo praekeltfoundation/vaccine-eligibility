@@ -1,4 +1,4 @@
-from typing import Optional, Type
+from typing import List, Optional, Type
 
 from vaccine.base_application import BaseApplication
 from vaccine.models import Message, User
@@ -90,6 +90,8 @@ class AppTester:
         self,
         content: Optional[str] = None,
         session: Optional[Message.SESSION_EVENT] = None,
+        buttons: Optional[List[str]] = None,
+        header: Optional[str] = None,
     ):
         """
         Asserts that the application sent a single message, with the provided parameters
@@ -104,3 +106,9 @@ class AppTester:
             assert (
                 message.session_event == session
             ), f"Message session is {message.session_event}, not {session}"
+        if buttons is not None:
+            btns = message.helper_metadata.get("buttons")
+            assert btns == buttons, f"Buttons are {btns}, not {buttons}"
+        if header is not None:
+            hdr = message.helper_metadata.get("header")
+            assert hdr == header, f"Header is {hdr}, not {header}"

@@ -97,17 +97,20 @@ class ChoiceState:
     async def process_message(self, message: Message):
         choice = self._get_choice(message.content)
         if choice is None:
-            text = f"{self.error}\n{self._display_choices}"
-            if self.error_footer:
-                text = f"{text}\n{self.error_footer}"
-            if self.error_header:
-                text = f"{self.error_header}\n{text}"
-            return self.app.send_message(text)
+            return await self.display_error(message)
         else:
             self.app.save_answer(self.app.state_name, choice.value)
             self.app.state_name = await self._get_next(choice)
             state = await self.app.get_current_state()
             return await state.display(message)
+
+    async def display_error(self, message: Message):
+        text = f"{self.error}\n{self._display_choices}"
+        if self.error_footer:
+            text = f"{text}\n{self.error_footer}"
+        if self.error_header:
+            text = f"{self.error_header}\n{text}"
+        return self.app.send_message(text)
 
     async def display(self, message: Message):
         text = f"{self.question}\n{self._display_choices}"
@@ -197,6 +200,19 @@ class WhatsAppButtonState(ChoiceState):
             helper_metadata["footer"] = self.footer
         return self.app.send_message(
             self.question,
+            helper_metadata=helper_metadata,
+        )
+
+    async def display_error(self, message: Message):
+        helper_metadata: Dict[str, Any] = {
+            "buttons": [choice.label for choice in self.choices]
+        }
+        if self.error_header:
+            helper_metadata["header"] = self.error_header
+        if self.error_footer:
+            helper_metadata["footer"] = self.error_footer
+        return self.app.send_message(
+            self.error,
             helper_metadata=helper_metadata,
         )
 
