@@ -279,7 +279,7 @@ async def test_success_inoffice(
 
 
 @pytest.mark.asyncio
-@mock.patch("vaccine.utils.get_today")
+@mock.patch("vaccine.hotline_callback.get_today")
 @mock.patch("vaccine.hotline_callback.in_office_hours")
 async def test_success_ooo(
     in_office_hours, get_today, tester: AppTester, callback_api_mock, turn_api_mock
