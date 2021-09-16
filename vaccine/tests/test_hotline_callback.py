@@ -120,7 +120,7 @@ async def test_menu(tester: AppTester):
             ]
         ),
         buttons=["Call me back", "Main Menu"],
-        header="💉 *VACCINE SUPPORT*",
+        header="💉 VACCINE SUPPORT",
     )
     tester.assert_state("state_menu")
 

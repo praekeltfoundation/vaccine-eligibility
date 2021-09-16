@@ -111,7 +111,7 @@ class Application(BaseApplication):
         return WhatsAppButtonState(
             self,
             question=question,
-            header=self._("💉 *VACCINE SUPPORT*"),
+            header=self._("💉 VACCINE SUPPORT"),
             choices=[
                 Choice("call_me_back", self._("Call me back")),
                 Choice("main_menu", self._("Main Menu")),
