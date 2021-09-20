@@ -129,6 +129,19 @@ async def test_menu(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_menu_invalid(tester: AppTester):
+    await tester.user_input("support", session=Message.SESSION_EVENT.NEW)
+    tester.assert_state("state_menu")
+
+    await tester.user_input("invalid")
+    tester.assert_state(None)
+    assert tester.application.messages[-1].helper_metadata == {
+        "automation_handle": True
+    }
+    tester.assert_message(content="", session=Message.SESSION_EVENT.CLOSE)
+
+
+@pytest.mark.asyncio
 async def test_full_name(tester: AppTester):
     tester.setup_state("state_menu")
     await tester.user_input("call me back")
@@ -167,13 +180,6 @@ async def test_select_number(
     in_office_hours.return_value = False
     tester.setup_state("state_full_name")
     await tester.user_input("test name")
-    tester.assert_message(
-        "Can the hotline team call you back on 082 000 1001?",
-        buttons=["Use this number", "Use another number"],
-    )
-    tester.assert_state("state_select_number")
-
-    await tester.user_input("invalid")
     tester.assert_message(
         "Can the hotline team call you back on 082 000 1001?",
         buttons=["Use this number", "Use another number"],
