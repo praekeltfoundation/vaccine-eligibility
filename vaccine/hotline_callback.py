@@ -25,6 +25,16 @@ logger = logging.getLogger(__name__)
 za_holidays = holidays.SouthAfrica()
 
 
+class WhatsAppExitButtonState(WhatsAppButtonState):
+    async def process_message(self, message: Message):
+        choice = self._get_choice(message.content)
+        if choice is None:
+            state = await self.app.go_to_state("state_exit")
+            return await state.process_message(message)
+        else:
+            return await super().process_message(message)
+
+
 def get_callback_api():
     # TODO: Cache the session globally. Things that don't work:
     # - Declaring the session at the top of the file
@@ -108,7 +118,7 @@ class Application(BaseApplication):
             "The toll-free hotline is also available for you to call *24 hours a day*, "
             "every day for *Emergencies, health advice and post vaccination queries*"
         )
-        return WhatsAppButtonState(
+        return WhatsAppExitButtonState(
             self,
             question=question,
             header=self._("💉 VACCINE SUPPORT"),
@@ -116,8 +126,8 @@ class Application(BaseApplication):
                 Choice("call_me_back", self._("Call me back")),
                 Choice("main_menu", self._("Main Menu")),
             ],
-            # TODO: Get proper error message
-            error=question,
+            # Goes to state_exit for error handling
+            error="",
             next="state_full_name",
         )
 
@@ -138,15 +148,15 @@ class Application(BaseApplication):
         question = self._("Can the hotline team call you back on {number}?").format(
             number=display_phonenumber(self.user.addr)
         )
-        return WhatsAppButtonState(
+        return WhatsAppExitButtonState(
             self,
             question=question,
             choices=[
                 Choice("this_number", self._("Use this number")),
                 Choice("different_number", self._("Use another number")),
             ],
-            # TODO: Get a proper error messsage
-            error=question,
+            # Goes back state_exit for error handling
+            error="",
             next="state_enter_number",
         )
 
