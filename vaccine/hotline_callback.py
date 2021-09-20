@@ -94,7 +94,15 @@ class Application(BaseApplication):
     async def process_message(self, message: Message) -> List[Message]:
         keyword = re.sub(r"\W+", " ", message.content or "").strip().lower()
         # Exit keywords
-        if keyword in ("menu", "0", "main menu"):
+        if keyword in (
+            "menu",
+            "0",
+            "main menu",
+            "cases",
+            "vaccine",
+            "vaccines",
+            "latest",
+        ):
             self.state_name = "state_exit"
 
         return await super().process_message(message)
