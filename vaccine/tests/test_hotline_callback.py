@@ -164,8 +164,9 @@ async def test_full_name(tester: AppTester):
         "\n".join(
             [
                 "Please type your NAME",
-                "(This will be given to the hotline team to use when they call you "
-                "back)",
+                "",
+                "------",
+                "OR 📌 Reply  *0* to return to the main *MENU*",
             ]
         )
     )

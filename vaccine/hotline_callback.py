@@ -144,12 +144,17 @@ class Application(BaseApplication):
             "Please type your NAME\n"
             "(This will be given to the hotline team to use when they call you back)"
         )
+        error = self._(
+            "Please type your NAME\n"
+            "\n"
+            "------\n"
+            "OR 📌 Reply  *0* to return to the main *MENU*"
+        )
         return FreeText(
             self,
             question=question,
             next="state_select_number",
-            # TODO: Get proper error message
-            check=nonempty_validator(question),
+            check=nonempty_validator(error),
         )
 
     async def state_select_number(self):
