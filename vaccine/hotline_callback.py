@@ -92,6 +92,14 @@ class Application(BaseApplication):
     START_STATE = "state_menu"
 
     async def process_message(self, message: Message) -> List[Message]:
+        if message.session_event == Message.SESSION_EVENT.CLOSE:
+            if self.state_name == "state_menu":
+                # Reset and don't send a reply
+                self.state_name = None
+                self.user.session_id = None
+                return self.messages
+            self.state_name = "state_timeout"
+
         keyword = re.sub(r"\W+", " ", message.content or "").strip().lower()
         # Exit keywords
         if keyword in (
@@ -106,6 +114,15 @@ class Application(BaseApplication):
             self.state_name = "state_exit"
 
         return await super().process_message(message)
+
+    async def state_timeout(self):
+        return EndState(
+            self,
+            self._(
+                "We haven't heard from you in while. If you would like the hotline "
+                "team to call you back, reply SUPPORT now and follow the prompts"
+            ),
+        )
 
     async def state_exit(self):
         return EndState(self, "", helper_metadata={"automation_handle": True})
@@ -124,16 +141,16 @@ class Application(BaseApplication):
             "---------------------\n"
             "\n"
             "The toll-free hotline is also available for you to call *24 hours a day*, "
-            "every day for *Emergencies, health advice and post vaccination queries*"
+            "every day for *Emergencies, health advice and post vaccination queries*\n"
+            "\n"
+            "---------------------\n"
+            "📌 Reply  *0* to return to the main *MENU*"
         )
         return WhatsAppExitButtonState(
             self,
             question=question,
             header=self._("💉 VACCINE SUPPORT"),
-            choices=[
-                Choice("call_me_back", self._("Call me back")),
-                Choice("main_menu", self._("Main Menu")),
-            ],
+            choices=[Choice("call_me_back", self._("Call me back"))],
             # Goes to state_exit for error handling
             error="",
             next="state_full_name",
@@ -144,12 +161,17 @@ class Application(BaseApplication):
             "Please type your NAME\n"
             "(This will be given to the hotline team to use when they call you back)"
         )
+        error = self._(
+            "Please type your NAME\n"
+            "\n"
+            "------\n"
+            "OR 📌 Reply  *0* to return to the main *MENU*"
+        )
         return FreeText(
             self,
             question=question,
             next="state_select_number",
-            # TODO: Get proper error message
-            check=nonempty_validator(question),
+            check=nonempty_validator(error),
         )
 
     async def state_select_number(self):
@@ -216,8 +238,8 @@ class Application(BaseApplication):
             else:
                 body = f"<{message['type']}>"
             direction = message["_vnd"]["v1"]["direction"]
-            direction = ">" if direction == "inbound" else "<"
-            return " ".join([formatted_ts, direction, body])
+            direction = ">>" if direction == "inbound" else "<<"
+            return f"{formatted_ts} {direction}\n {body}"
 
         length = 0
         formatted_messages = []

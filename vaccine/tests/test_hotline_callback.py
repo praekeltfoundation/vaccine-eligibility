@@ -117,9 +117,12 @@ async def test_menu(tester: AppTester):
                 "The toll-free hotline is also available for you to call *24 hours a "
                 "day*, every day for *Emergencies, health advice and post vaccination "
                 "queries*",
+                "",
+                "---------------------",
+                "📌 Reply  *0* to return to the main *MENU*",
             ]
         ),
-        buttons=["Call me back", "Main Menu"],
+        buttons=["Call me back"],
         header="💉 VACCINE SUPPORT",
     )
     tester.assert_state("state_menu")
@@ -161,8 +164,9 @@ async def test_full_name(tester: AppTester):
         "\n".join(
             [
                 "Please type your NAME",
-                "(This will be given to the hotline team to use when they call you "
-                "back)",
+                "",
+                "------",
+                "OR 📌 Reply  *0* to return to the main *MENU*",
             ]
         )
     )
@@ -315,9 +319,14 @@ async def test_success_ooo(
         "CLI": "+27820001003",
         "DateTimeOfRequest": "2021-09-15",
         "Language": "English",
-        "ChatHistory": "2021-09-15 15:18 < test message1\n"
-        "2021-09-15 15:34 > test message2\n"
-        "2021-09-15 15:51 > <image>",
+        "ChatHistory": (
+            "2021-09-15 15:18 <<\n"
+            " test message1\n"
+            "2021-09-15 15:34 >>\n"
+            " test message2\n"
+            "2021-09-15 15:51 >>\n"
+            " <image>"
+        ),
     }
 
 
@@ -362,3 +371,19 @@ async def test_success_permanent_error(
     tester.assert_state(None)
     tester.assert_message("Something went wrong. Please try again later.")
     assert len(callback_api_mock.app.requests) == 3
+
+
+@pytest.mark.asyncio
+async def test_timeout(tester: AppTester):
+    """
+    Show timeout message on all states except menu
+    """
+    await tester.user_input(session=Message.SESSION_EVENT.CLOSE)
+    tester.assert_message(
+        "We haven't heard from you in while. If you would like the hotline team to "
+        "call you back, reply SUPPORT now and follow the prompts"
+    )
+
+    tester.setup_state("state_menu")
+    await tester.user_input(session=Message.SESSION_EVENT.CLOSE)
+    tester.assert_num_messages(0)
