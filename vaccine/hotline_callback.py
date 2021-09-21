@@ -92,6 +92,14 @@ class Application(BaseApplication):
     START_STATE = "state_menu"
 
     async def process_message(self, message: Message) -> List[Message]:
+        if message.session_event == Message.SESSION_EVENT.CLOSE:
+            if self.state_name == "state_menu":
+                # Reset and don't send a reply
+                self.state_name = None
+                self.user.session_id = None
+                return self.messages
+            self.state_name = "state_timeout"
+
         keyword = re.sub(r"\W+", " ", message.content or "").strip().lower()
         # Exit keywords
         if keyword in (
@@ -106,6 +114,15 @@ class Application(BaseApplication):
             self.state_name = "state_exit"
 
         return await super().process_message(message)
+
+    async def state_timeout(self):
+        return EndState(
+            self,
+            self._(
+                "We haven't heard from you in while. If you would like the hotline "
+                "team to call you back, reply SUPPORT now and follow the prompts"
+            ),
+        )
 
     async def state_exit(self):
         return EndState(self, "", helper_metadata={"automation_handle": True})

@@ -371,3 +371,19 @@ async def test_success_permanent_error(
     tester.assert_state(None)
     tester.assert_message("Something went wrong. Please try again later.")
     assert len(callback_api_mock.app.requests) == 3
+
+
+@pytest.mark.asyncio
+async def test_timeout(tester: AppTester):
+    """
+    Show timeout message on all states except menu
+    """
+    await tester.user_input(session=Message.SESSION_EVENT.CLOSE)
+    tester.assert_message(
+        "We haven't heard from you in while. If you would like the hotline team to "
+        "call you back, reply SUPPORT now and follow the prompts"
+    )
+
+    tester.setup_state("state_menu")
+    await tester.user_input(session=Message.SESSION_EVENT.CLOSE)
+    tester.assert_num_messages(0)
