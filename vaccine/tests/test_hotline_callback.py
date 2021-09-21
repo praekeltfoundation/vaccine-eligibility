@@ -117,9 +117,12 @@ async def test_menu(tester: AppTester):
                 "The toll-free hotline is also available for you to call *24 hours a "
                 "day*, every day for *Emergencies, health advice and post vaccination "
                 "queries*",
+                "",
+                "---------------------",
+                "📌 Reply  *0* to return to the main *MENU*",
             ]
         ),
-        buttons=["Call me back", "Main Menu"],
+        buttons=["Call me back"],
         header="💉 VACCINE SUPPORT",
     )
     tester.assert_state("state_menu")

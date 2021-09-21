@@ -124,16 +124,16 @@ class Application(BaseApplication):
             "---------------------\n"
             "\n"
             "The toll-free hotline is also available for you to call *24 hours a day*, "
-            "every day for *Emergencies, health advice and post vaccination queries*"
+            "every day for *Emergencies, health advice and post vaccination queries*\n"
+            "\n"
+            "---------------------\n"
+            "📌 Reply  *0* to return to the main *MENU*"
         )
         return WhatsAppExitButtonState(
             self,
             question=question,
             header=self._("💉 VACCINE SUPPORT"),
-            choices=[
-                Choice("call_me_back", self._("Call me back")),
-                Choice("main_menu", self._("Main Menu")),
-            ],
+            choices=[Choice("call_me_back", self._("Call me back"))],
             # Goes to state_exit for error handling
             error="",
             next="state_full_name",
