@@ -52,7 +52,7 @@ class ChoiceState:
         question: str,
         choices: List[Choice],
         error: str,
-        next: Union[str, Callable],
+        next: Union[str, Callable, Dict[str, str]],
         accept_labels: bool = True,
         footer: Optional[str] = None,
         error_footer: Optional[str] = None,
@@ -94,6 +94,8 @@ class ChoiceState:
             return await self.next(choice)
         if isfunction(self.next):
             return self.next(choice)
+        if isinstance(self.next, dict):
+            return self.next[choice.value]
         return self.next
 
     async def process_message(self, message: Message):

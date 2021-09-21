@@ -41,3 +41,25 @@ async def test_start(tester: AppTester):
         ),
         buttons=["Tell me more", "View and Accept T&Cs"],
     )
+
+    await tester.user_input("View and Accept T&Cs")
+    tester.assert_state("state_terms")
+
+
+@pytest.mark.asyncio
+async def test_terms(tester: AppTester):
+    await tester.user_input("View and Accept T&Cs")
+    tester.assert_state("state_terms")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*REPORT* 📵 Powered by ```Real411```",
+                "",
+                "Your information is kept private and confidential and only used with "
+                "your consent for the purpose of reporting disinformation.",
+                "",
+                "Do you agree to the attached PRIVACY POLICY?",
+            ]
+        ),
+        buttons=["I agree", "No thanks"],
+    )

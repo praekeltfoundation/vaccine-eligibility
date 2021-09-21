@@ -67,7 +67,31 @@ class Application(BaseApplication):
             # Goes to state_exit for error handling
             error="",
             next={
-                "tell_me_more": "state_province",
+                # TODO: add tell me more state
+                "tell_me_more": "state_terms",
                 "terms_and_conditions": "state_terms",
-            }.get,
+            },
+        )
+
+    async def state_terms(self):
+        question = self._(
+            "*REPORT* 📵 Powered by ```Real411```\n"
+            "\n"
+            "Your information is kept private and confidential and only used with your "
+            "consent for the purpose of reporting disinformation.\n"
+            "\n"
+            # TODO: add privacy policy
+            "Do you agree to the attached PRIVACY POLICY?"
+        )
+        return WhatsAppExitButtonState(
+            self,
+            question=question,
+            choices=[Choice("yes", "I agree"), Choice("no", "No thanks")],
+            # Goes to state_exit for error handling
+            error="",
+            next={
+                "yes": "state_province",
+                # TODO: Add state for if they select no
+                "no": "state_province",
+            },
         )
