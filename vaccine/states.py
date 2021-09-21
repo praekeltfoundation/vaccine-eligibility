@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from inspect import iscoroutinefunction
+from inspect import iscoroutinefunction, isfunction
 from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Optional, Union
 
 from vaccine.models import Message
@@ -92,6 +92,8 @@ class ChoiceState:
     async def _get_next(self, choice):
         if iscoroutinefunction(self.next):
             return await self.next(choice)
+        if isfunction(self.next):
+            return self.next(choice)
         return self.next
 
     async def process_message(self, message: Message):
@@ -198,10 +200,7 @@ class WhatsAppButtonState(ChoiceState):
             helper_metadata["header"] = self.header
         if self.footer:
             helper_metadata["footer"] = self.footer
-        return self.app.send_message(
-            self.question,
-            helper_metadata=helper_metadata,
-        )
+        return self.app.send_message(self.question, helper_metadata=helper_metadata)
 
     async def display_error(self, message: Message):
         helper_metadata: Dict[str, Any] = {
@@ -211,10 +210,7 @@ class WhatsAppButtonState(ChoiceState):
             helper_metadata["header"] = self.error_header
         if self.error_footer:
             helper_metadata["footer"] = self.error_footer
-        return self.app.send_message(
-            self.error,
-            helper_metadata=helper_metadata,
-        )
+        return self.app.send_message(self.error, helper_metadata=helper_metadata)
 
 
 class WhatsAppListState(ChoiceState):
