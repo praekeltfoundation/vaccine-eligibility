@@ -221,8 +221,8 @@ class Application(BaseApplication):
             else:
                 body = f"<{message['type']}>"
             direction = message["_vnd"]["v1"]["direction"]
-            direction = ">" if direction == "inbound" else "<"
-            return " ".join([formatted_ts, direction, body])
+            direction = ">>" if direction == "inbound" else "<<"
+            return f"{formatted_ts} {direction}\n {body}"
 
         length = 0
         formatted_messages = []

@@ -319,9 +319,14 @@ async def test_success_ooo(
         "CLI": "+27820001003",
         "DateTimeOfRequest": "2021-09-15",
         "Language": "English",
-        "ChatHistory": "2021-09-15 15:18 < test message1\n"
-        "2021-09-15 15:34 > test message2\n"
-        "2021-09-15 15:51 > <image>",
+        "ChatHistory": (
+            "2021-09-15 15:18 <<\n"
+            " test message1\n"
+            "2021-09-15 15:34 >>\n"
+            " test message2\n"
+            "2021-09-15 15:51 >>\n"
+            " <image>"
+        ),
     }
 
 
