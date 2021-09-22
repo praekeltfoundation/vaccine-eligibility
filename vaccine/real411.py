@@ -3,10 +3,20 @@ from typing import List
 
 from vaccine.base_application import BaseApplication
 from vaccine.models import Message
-from vaccine.states import Choice, EndState, WhatsAppButtonState
+from vaccine.states import Choice, EndState, WhatsAppButtonState, WhatsAppListState
 
 
 class WhatsAppExitButtonState(WhatsAppButtonState):
+    async def process_message(self, message: Message):
+        choice = self._get_choice(message.content)
+        if choice is None:
+            state = await self.app.go_to_state("state_exit")
+            return await state.process_message(message)
+        else:
+            return await super().process_message(message)
+
+
+class WhatsAppExitListState(WhatsAppListState):
     async def process_message(self, message: Message):
         choice = self._get_choice(message.content)
         if choice is None:
@@ -94,4 +104,30 @@ class Application(BaseApplication):
                 # TODO: Add state for if they select no
                 "no": "state_province",
             },
+        )
+
+    async def state_province(self):
+        question = self._(
+            "*REPORT* 📵 Powered by ```Real411```\n"
+            "\n"
+            "Which province are you reporting this from?"
+        )
+        return WhatsAppExitListState(
+            self,
+            question=question,
+            # Goes to state_exit for error handling
+            error="",
+            button="Select province",
+            choices=[
+                Choice("ZA-GT", "Gauteng"),
+                Choice("ZA-WC", "Western Cape"),
+                Choice("ZA-NL", "KwaZulu-Natal"),
+                Choice("ZA-FS", "Freestate"),
+                Choice("ZA-EC", "Eastern Cape"),
+                Choice("ZA-LP", "Limpopo"),
+                Choice("ZA-MP", "Mpumalanga"),
+                Choice("ZA-NC", "Northern Cape"),
+                Choice("ZA-NW", "North West"),
+            ],
+            next="state_first_name",
         )
