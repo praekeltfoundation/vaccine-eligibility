@@ -3,7 +3,14 @@ from typing import List
 
 from vaccine.base_application import BaseApplication
 from vaccine.models import Message
-from vaccine.states import Choice, EndState, WhatsAppButtonState, WhatsAppListState
+from vaccine.states import (
+    Choice,
+    EndState,
+    FreeText,
+    WhatsAppButtonState,
+    WhatsAppListState,
+)
+from vaccine.validators import nonempty_validator
 
 
 class WhatsAppExitButtonState(WhatsAppButtonState):
@@ -130,4 +137,28 @@ class Application(BaseApplication):
                 Choice("ZA-NW", "North West"),
             ],
             next="state_first_name",
+        )
+
+    async def state_first_name(self):
+        question = self._(
+            "*REPORT* 📵 Powered by ```Real411```\n" "\n" "Reply with your FIRST NAME:"
+        )
+        return FreeText(
+            self,
+            question=question,
+            next="state_surname",
+            # TODO: Add error message for empty text
+            check=nonempty_validator(question),
+        )
+
+    async def state_surname(self):
+        question = self._(
+            "*REPORT* 📵 Powered by ```Real411```\n" "\n" "Reply with your SURNAME:"
+        )
+        return FreeText(
+            self,
+            question=question,
+            next="state_email",
+            # TODO: Add error message for empty text
+            check=nonempty_validator(question),
         )

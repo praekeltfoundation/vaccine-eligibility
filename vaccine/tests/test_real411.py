@@ -97,3 +97,35 @@ async def test_province(tester: AppTester):
         "Northern Cape",
         "North West",
     ]
+    await tester.user_input("western cape")
+    tester.assert_state("state_first_name")
+
+
+@pytest.mark.asyncio
+async def test_first_name(tester: AppTester):
+    tester.setup_state("state_province")
+    await tester.user_input("western cape")
+    tester.assert_state("state_first_name")
+    tester.assert_message(
+        "\n".join(
+            ["*REPORT* 📵 Powered by ```Real411```", "", "Reply with your FIRST NAME:"]
+        )
+    )
+
+    await tester.user_input("test name")
+    tester.assert_state("state_surname")
+
+
+@pytest.mark.asyncio
+async def test_surname(tester: AppTester):
+    tester.setup_state("state_first_name")
+    await tester.user_input("test name")
+    tester.assert_state("state_surname")
+    tester.assert_message(
+        "\n".join(
+            ["*REPORT* 📵 Powered by ```Real411```", "", "Reply with your SURNAME:"]
+        )
+    )
+
+    # await tester.user_input("test surname")
+    # tester.assert_state("state_email")
