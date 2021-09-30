@@ -10,7 +10,7 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
-from vaccine.validators import nonempty_validator
+from vaccine.validators import email_validator, nonempty_validator
 
 
 class WhatsAppExitButtonState(WhatsAppButtonState):
@@ -161,4 +161,19 @@ class Application(BaseApplication):
             next="state_email",
             # TODO: Add error message for empty text
             check=nonempty_validator(question),
+        )
+
+    async def state_email(self):
+        question = self._(
+            "*REPORT* 📵 Powered by ```Real411```\n"
+            "\n"
+            "Please TYPE your EMAIL address. (Or type SKIP if you are unable to share "
+            "an email address.)"
+        )
+        # TODO: Add error message, maybe including error description from library
+        return FreeText(
+            self,
+            question=question,
+            next="state_source",
+            check=email_validator(error_text=question, skip_keywords=["skip"]),
         )

@@ -127,5 +127,29 @@ async def test_surname(tester: AppTester):
         )
     )
 
-    # await tester.user_input("test surname")
-    # tester.assert_state("state_email")
+    await tester.user_input("test surname")
+    tester.assert_state("state_email")
+
+
+@pytest.mark.asyncio
+async def test_email(tester: AppTester):
+    tester.setup_state("state_email")
+    await tester.user_input("invalid email")
+    tester.assert_state("state_email")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*REPORT* 📵 Powered by ```Real411```",
+                "",
+                "Please TYPE your EMAIL address. (Or type SKIP if you are unable to "
+                "share an email address.)",
+            ]
+        )
+    )
+
+    # await tester.user_input("skip")
+    # tester.assert_state("state_source_type")
+
+    # tester.setup_state("state_email")
+    # await tester.user_input("valid@example.org")
+    # tester.assert_state("state_source_type")
