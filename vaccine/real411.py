@@ -204,3 +204,33 @@ class Application(BaseApplication):
             ],
             next="state_description",
         )
+
+    async def state_description(self):
+        question = self._(
+            "*REPORT* 📵 Powered by ```Real411```\n"
+            "\n"
+            "Please describe the information being reported in your own words:"
+        )
+        # TODO: Add error message
+        return FreeText(
+            self,
+            question=question,
+            next="state_media",
+            check=nonempty_validator(question),
+        )
+
+    async def state_media(self):
+        question = self._(
+            "*REPORT* 📵 Powered by ```Real411```\n"
+            "\n"
+            "Please share any additional information such as screenshots, photos, "
+            "voicenotes or links (or type SKIP)"
+        )
+        # TODO: Add error message
+        # TODO: What if they want to send multiple media items?
+        return FreeText(
+            self,
+            question=question,
+            next="state_opt_in",
+            check=nonempty_validator(question),
+        )

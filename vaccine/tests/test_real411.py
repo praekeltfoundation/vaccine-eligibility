@@ -187,3 +187,42 @@ async def test_source_type(tester: AppTester):
         "Political Ad",
         "Other",
     ]
+
+    await tester.user_input("whatsapp")
+    tester.assert_state("state_description")
+
+
+@pytest.mark.asyncio
+async def test_description(tester: AppTester):
+    tester.setup_state("state_source_type")
+    await tester.user_input("whatsapp")
+    tester.assert_state("state_description")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*REPORT* 📵 Powered by ```Real411```",
+                "",
+                "Please describe the information being reported in your own words:",
+            ]
+        )
+    )
+
+    await tester.user_input("test description")
+    tester.assert_state("state_media")
+
+
+@pytest.mark.asyncio
+async def test_media(tester: AppTester):
+    tester.setup_state("state_description")
+    await tester.user_input("test description")
+    tester.assert_state("state_media")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*REPORT* 📵 Powered by ```Real411```",
+                "",
+                "Please share any additional information such as screenshots, photos, "
+                "voicenotes or links (or type SKIP)",
+            ]
+        )
+    )
