@@ -226,3 +226,46 @@ async def test_media(tester: AppTester):
             ]
         )
     )
+
+    await tester.user_input("SKIP")
+    tester.assert_state("state_opt_in")
+
+
+@pytest.mark.asyncio
+async def test_opt_in(tester: AppTester):
+    tester.setup_state("state_media")
+    await tester.user_input("SKIP")
+    tester.assert_state("state_opt_in")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*REPORT* 📵 Powered by ```Real411```",
+                "",
+                "To complete your report please confirm that all the information is "
+                "accurate to the best of your knowledge and that you give ContactNDOH "
+                "permission to send you message about the outcome of your report",
+            ]
+        ),
+        buttons=["I agree", "No"],
+    )
+
+
+@pytest.mark.asyncio
+async def test_success(tester: AppTester):
+    tester.setup_state("state_opt_in")
+    await tester.user_input("I agree")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*REPORT* 📵 Powered by ```Real411```",
+                "",
+                "Thank you for helping to stop the spread of inaccurate or misleading "
+                "information!",
+                "",
+                "Look out for messages from us in the next few days",
+                "",
+                "Reply 0 to return to the main MENU",
+            ]
+        ),
+        session=Message.SESSION_EVENT.CLOSE,
+    )

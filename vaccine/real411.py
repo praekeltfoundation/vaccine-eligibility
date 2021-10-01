@@ -234,3 +234,33 @@ class Application(BaseApplication):
             next="state_opt_in",
             check=nonempty_validator(question),
         )
+
+    async def state_opt_in(self):
+        question = self._(
+            "*REPORT* 📵 Powered by ```Real411```\n"
+            "\n"
+            "To complete your report please confirm that all the information is "
+            "accurate to the best of your knowledge and that you give ContactNDOH "
+            "permission to send you message about the outcome of your report"
+        )
+        return WhatsAppExitButtonState(
+            self,
+            question=question,
+            choices=[Choice("yes", "I agree"), Choice("no", "No")],
+            # Goes to state_exit for error handling
+            error="",
+            next="state_success",
+        )
+
+    async def state_success(self):
+        text = self._(
+            "*REPORT* 📵 Powered by ```Real411```\n"
+            "\n"
+            "Thank you for helping to stop the spread of inaccurate or misleading "
+            "information!\n"
+            "\n"
+            "Look out for messages from us in the next few days\n"
+            "\n"
+            "Reply 0 to return to the main MENU"
+        )
+        return EndState(self, text=text)
