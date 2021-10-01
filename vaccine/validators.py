@@ -21,7 +21,10 @@ def nonempty_validator(error_text):
 
 def name_validator(error_text):
     async def validator(value):
-        if len(clean_name(value)) < 2:
+        value = clean_name(value)
+        if len(value) < 2:
+            raise ErrorMessage(error_text)
+        if value.isdigit():
             raise ErrorMessage(error_text)
 
     return validator
