@@ -147,9 +147,43 @@ async def test_email(tester: AppTester):
         )
     )
 
-    # await tester.user_input("skip")
-    # tester.assert_state("state_source_type")
+    await tester.user_input("skip")
+    tester.assert_state("state_source_type")
 
-    # tester.setup_state("state_email")
-    # await tester.user_input("valid@example.org")
-    # tester.assert_state("state_source_type")
+    tester.setup_state("state_email")
+    await tester.user_input("valid@example.org")
+    tester.assert_state("state_source_type")
+
+
+@pytest.mark.asyncio
+async def test_source_type(tester: AppTester):
+    tester.setup_state("state_email")
+    await tester.user_input("skip")
+    tester.assert_state("state_source_type")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*REPORT* 📵 Powered by ```Real411```",
+                "",
+                "Please tell us where you saw/heard the information being reported",
+            ]
+        )
+    )
+
+    assert tester.application.messages[0].helper_metadata["button"] == "Source type"
+
+    assert [
+        r["title"]
+        for r in tester.application.messages[0].helper_metadata["sections"][0]["rows"]
+    ] == [
+        "WhatsApp",
+        "Facebook",
+        "Twitter",
+        "Instagram",
+        "Youtube",
+        "Website",
+        "Radio",
+        "TV",
+        "Political Ad",
+        "Other",
+    ]

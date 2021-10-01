@@ -174,6 +174,33 @@ class Application(BaseApplication):
         return FreeText(
             self,
             question=question,
-            next="state_source",
+            next="state_source_type",
             check=email_validator(error_text=question, skip_keywords=["skip"]),
+        )
+
+    async def state_source_type(self):
+        question = self._(
+            "*REPORT* 📵 Powered by ```Real411```\n"
+            "\n"
+            "Please tell us where you saw/heard the information being reported"
+        )
+        return WhatsAppExitListState(
+            self,
+            question=question,
+            # Goes to state_exit for error handling
+            error="",
+            button="Source type",
+            choices=[
+                Choice("WhatsApp", "WhatsApp"),
+                Choice("Facebook", "Facebook"),
+                Choice("Twitter", "Twitter"),
+                Choice("Instagram", "Instagram"),
+                Choice("Youtube", "Youtube"),
+                Choice("Website", "Website"),
+                Choice("Radio", "Radio"),
+                Choice("TV", "TV"),
+                Choice("Political Ad", "Political Ad"),
+                Choice("Other", "Other"),
+            ],
+            next="state_description",
         )
