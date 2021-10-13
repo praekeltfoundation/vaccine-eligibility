@@ -209,6 +209,39 @@ async def test_identification_number_invalid(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_identification_number_said_on_passport(tester: AppTester):
+    tester.setup_state("state_identification_number")
+    tester.setup_answer("state_identification_type", "passport")
+    await tester.user_input("9001010001088")
+    tester.assert_state("state_check_id_number")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+async def test_check_id_number(tester: AppTester):
+    tester.setup_state("state_identification_number")
+    tester.setup_answer("state_identification_type", "passport")
+    await tester.user_input("9001010001088")
+    tester.assert_state("state_check_id_number")
+    tester.assert_num_messages(1)
+    await tester.user_input("yes")
+    tester.assert_answer("state_identification_type", "rsa_id")
+    tester.assert_state("state_first_name")
+
+
+@pytest.mark.asyncio
+async def test_check_id_number_restart(tester: AppTester):
+    tester.setup_state("state_identification_number")
+    tester.setup_answer("state_identification_type", "passport")
+    await tester.user_input("9001010001088")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_check_id_number")
+    await tester.user_input("no")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_identification_type")
+
+
+@pytest.mark.asyncio
 async def test_passport_country(tester: AppTester):
     tester.setup_state("state_identification_number")
     tester.setup_answer("state_identification_type", "passport")

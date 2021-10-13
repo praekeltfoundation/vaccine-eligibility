@@ -477,11 +477,6 @@ class Application(BaseApplication):
         idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
         idtype_label = idtype.value
 
-        if idtype == self.ID_TYPES.passport:
-            next_state = "state_passport_country"
-        else:
-            next_state = "state_first_name"
-
         async def validate_identification_number(value):
             error_msg = self._(
                 "⚠️ Please enter a valid {id_type}\n"
@@ -509,9 +504,46 @@ class Application(BaseApplication):
                 "\n"
                 "Please TYPE in your {id_type}"
             ).format(id_type=idtype_label),
-            next=next_state,
+            next="state_check_id_number",
             check=validate_identification_number,
         )
+
+    async def state_check_id_number(self):
+        """
+        Checks to see if there's an SA ID number for a non-SA ID ID type
+        """
+        idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
+        idnumber = self.user.answers["state_identification_number"]
+
+        try:
+            SAIDNumber(idnumber)
+            if idtype != self.ID_TYPES.rsa_id:
+                return MenuState(
+                    self,
+                    question=self._(
+                        "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+                        "\n"
+                        "The number you have entered appears to be a RSA ID Number. Is "
+                        "this correct?\n"
+                    ),
+                    choices=[
+                        Choice("state_change_to_rsa_id", self._("Yes")),
+                        Choice("state_identification_type", self._("No")),
+                    ],
+                    error=self._("This looks like an SA ID number"),
+                )
+        except ValueError:
+            pass
+
+        if idtype == self.ID_TYPES.passport:
+            next_state = "state_passport_country"
+        else:
+            next_state = "state_first_name"
+        return await self.go_to_state(next_state)
+
+    async def state_change_to_rsa_id(self):
+        self.save_answer("state_identification_type", self.ID_TYPES.rsa_id.name)
+        return await self.go_to_state("state_first_name")
 
     async def state_passport_country(self):
         return FreeText(
