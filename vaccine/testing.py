@@ -34,7 +34,10 @@ class AppTester:
         self.user.addr = address
 
     async def user_input(
-        self, content: Optional[str] = None, session=Message.SESSION_EVENT.RESUME
+        self,
+        content: Optional[str] = None,
+        session=Message.SESSION_EVENT.RESUME,
+        transport_metadata: Optional[dict] = None,
     ):
         """
         User input into the application
@@ -47,6 +50,7 @@ class AppTester:
             transport_type=self.DEFAULT_TRANSPORT_TYPE,
             content=content,
             session_event=session,
+            transport_metadata=transport_metadata or {},
         )
         if session in (Message.SESSION_EVENT.RESUME, Message.SESSION_EVENT.CLOSE):
             self.user.session_id = self.DEFAULT_SESSION_ID
