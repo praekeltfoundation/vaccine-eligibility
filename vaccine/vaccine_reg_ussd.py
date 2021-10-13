@@ -75,7 +75,7 @@ class Application(BaseApplication):
 
         class ID_TYPES(Enum):
             rsa_id = self._("RSA ID Number")
-            passport = self._("Passport Number")
+            passport = self._("NON-RSA Passport Number")
             asylum_seeker = self._("Asylum Seeker Permit number")
             refugee = self._("Refugee Permit number")
 
