@@ -485,13 +485,7 @@ class Application(BaseApplication):
             ).format(id_type=idtype_label)
             if idtype == self.ID_TYPES.rsa_id:
                 try:
-                    id_number = SAIDNumber(value)
-                    dob = id_number.date_of_birth
-                    if id_number.age > config.AMBIGUOUS_MAX_AGE - 100:
-                        self.save_answer("state_dob_year", str(dob.year))
-                    self.save_answer("state_dob_month", str(dob.month))
-                    self.save_answer("state_dob_day", str(dob.day))
-                    self.save_answer("state_gender", id_number.sex.value)
+                    SAIDNumber(value)
                 except ValueError:
                     raise ErrorMessage(error_msg)
             else:
@@ -649,6 +643,12 @@ class Application(BaseApplication):
         )
 
     async def state_dob_year(self):
+        idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
+        if idtype == self.ID_TYPES.rsa_id:
+            id_number = SAIDNumber(self.user.answers["state_identification_number"])
+            if id_number.age > config.AMBIGUOUS_MAX_AGE - 100:
+                self.save_answer("state_dob_year", str(id_number.date_of_birth.year))
+
         if self.user.answers.get("state_dob_year"):
             return await self.go_to_state("state_dob_month")
 
@@ -689,6 +689,11 @@ class Application(BaseApplication):
         )
 
     async def state_dob_month(self):
+        idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
+        if idtype == self.ID_TYPES.rsa_id:
+            id_number = SAIDNumber(self.user.answers["state_identification_number"])
+            self.save_answer("state_dob_month", str(id_number.date_of_birth.month))
+
         if self.user.answers.get("state_dob_month"):
             return await self.go_to_state("state_dob_day")
 
@@ -724,6 +729,11 @@ class Application(BaseApplication):
         )
 
     async def state_dob_day(self):
+        idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
+        if idtype == self.ID_TYPES.rsa_id:
+            id_number = SAIDNumber(self.user.answers["state_identification_number"])
+            self.save_answer("state_dob_day", str(id_number.date_of_birth.day))
+
         if self.user.answers.get("state_dob_day"):
             return await self.go_to_state("state_gender")
 
@@ -758,6 +768,11 @@ class Application(BaseApplication):
         )
 
     async def state_gender(self):
+        idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
+        if idtype == self.ID_TYPES.rsa_id:
+            id_number = SAIDNumber(self.user.answers["state_identification_number"])
+            self.save_answer("state_gender", id_number.sex.value)
+
         year = int(self.user.answers["state_dob_year"])
         month = int(self.user.answers["state_dob_month"])
         day = int(self.user.answers["state_dob_day"])

@@ -291,10 +291,16 @@ async def test_passport_country_search_list_invalid(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_said_date_and_sex_extraction(tester: AppTester):
-    tester.setup_state("state_identification_number")
+@mock.patch("vaccine.utils.get_today")
+async def test_said_date_and_sex_extraction(get_today, tester: AppTester, evds_mock):
+    get_today.return_value = date(2100, 1, 1)
+    tester.setup_state("state_confirm_profile")
+    tester.setup_answer("state_first_name", "test")
+    tester.setup_answer("state_surname", "name")
     tester.setup_answer("state_identification_type", "rsa_id")
-    await tester.user_input("9001010001088")
+    tester.setup_answer("state_identification_number", "9001010001088")
+    await tester.user_input("correct")
+    tester.assert_state("state_province_id")
     tester.assert_answer("state_dob_year", "1990")
     tester.assert_answer("state_dob_month", "1")
     tester.assert_answer("state_dob_day", "1")
@@ -303,12 +309,18 @@ async def test_said_date_and_sex_extraction(tester: AppTester):
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.utils.get_today")
-async def test_said_date_extraction_ambiguous(get_today, tester: AppTester):
-    get_today.return_value = date(2020, 1, 1)
-    tester.setup_state("state_identification_number")
+async def test_said_date_extraction_ambiguous(get_today, tester: AppTester, evds_mock):
+    get_today.return_value = date(2010, 1, 1)
+    tester.setup_state("state_confirm_profile")
+    tester.setup_answer("state_first_name", "test")
+    tester.setup_answer("state_surname", "name")
     tester.setup_answer("state_identification_type", "rsa_id")
-    await tester.user_input("0001010001087")
+    tester.setup_answer("state_identification_number", "0001010001087")
+    await tester.user_input("correct")
+    tester.assert_state("state_dob_year")
     tester.assert_no_answer("state_dob_year")
+    await tester.user_input("1900")
+    tester.assert_state("state_province_id")
     tester.assert_answer("state_dob_month", "1")
     tester.assert_answer("state_dob_day", "1")
 
@@ -320,6 +332,7 @@ async def test_gender(get_today, tester: AppTester):
     tester.setup_state("state_dob_day")
     tester.setup_answer("state_dob_year", "1990")
     tester.setup_answer("state_dob_month", "1")
+    tester.setup_answer("state_identification_type", "passport")
     await tester.user_input("1")
     tester.assert_num_messages(1)
     tester.assert_state("state_gender")
@@ -333,6 +346,7 @@ async def test_gender_invalid(get_today, tester: AppTester):
     tester.setup_answer("state_dob_year", "1990")
     tester.setup_answer("state_dob_month", "1")
     tester.setup_answer("state_dob_day", "1")
+    tester.setup_answer("state_identification_type", "passport")
     await tester.user_input("invalid")
     tester.assert_num_messages(1)
     tester.assert_state("state_gender")
@@ -380,6 +394,7 @@ async def test_dob_year(tester: AppTester):
     tester.setup_answer("state_identification_number", "123456")
     tester.setup_answer("state_first_name", "test$ first ")
     tester.setup_answer("state_surname", "test$ surname ")
+    tester.setup_answer("state_identification_type", "passport")
     tester.setup_state("state_confirm_profile")
     await tester.user_input("correct")
     tester.assert_state("state_dob_year")
@@ -388,6 +403,7 @@ async def test_dob_year(tester: AppTester):
 @pytest.mark.asyncio
 async def test_dob_year_invalid(tester: AppTester):
     tester.setup_state("state_dob_year")
+    tester.setup_answer("state_identification_type", "passport")
     await tester.user_input("invalid")
     tester.assert_state("state_dob_year")
     tester.assert_message(
@@ -396,7 +412,9 @@ async def test_dob_year_invalid(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_dob_year_not_match_id(tester: AppTester):
+@mock.patch("vaccine.utils.get_today")
+async def test_dob_year_not_match_id(get_today, tester: AppTester):
+    get_today.return_value = date(2010, 1, 1)
     tester.setup_state("state_dob_year")
     tester.setup_answer("state_identification_number", "9001010001088")
     tester.setup_answer("state_identification_type", "rsa_id")
@@ -420,6 +438,7 @@ async def test_dob_month(tester: AppTester):
 @pytest.mark.asyncio
 async def test_dob_month_error(tester: AppTester):
     tester.setup_state("state_dob_month")
+    tester.setup_answer("state_identification_type", "passport")
     await tester.user_input("invalid")
     tester.assert_num_messages(1)
     tester.assert_state("state_dob_month")
@@ -428,6 +447,7 @@ async def test_dob_month_error(tester: AppTester):
 @pytest.mark.asyncio
 async def test_dob_day(tester: AppTester):
     tester.setup_state("state_dob_month")
+    tester.setup_answer("state_identification_type", "passport")
     await tester.user_input("january")
     tester.assert_num_messages(1)
     tester.assert_state("state_dob_day")
@@ -438,6 +458,7 @@ async def test_dob_day_invalid(tester: AppTester):
     tester.setup_state("state_dob_day")
     tester.setup_answer("state_dob_year", "1990")
     tester.setup_answer("state_dob_month", "2")
+    tester.setup_answer("state_identification_type", "passport")
     await tester.user_input("29")
     tester.assert_num_messages(1)
     tester.assert_state("state_dob_day")
@@ -474,6 +495,7 @@ async def test_surname(tester: AppTester):
 async def test_skip_dob_and_gender(get_today, evds_mock, tester: AppTester):
     get_today.return_value = date(2120, 1, 1)
     tester.setup_state("state_confirm_profile")
+    tester.setup_answer("state_identification_type", "passport")
     tester.setup_answer("state_dob_day", "1")
     tester.setup_answer("state_dob_month", "1")
     tester.setup_answer("state_dob_year", "1990")

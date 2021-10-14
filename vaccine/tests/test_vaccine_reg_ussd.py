@@ -264,7 +264,9 @@ async def test_identification_number_said_on_passport(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_check_id_number(tester: AppTester):
+@mock.patch("vaccine.utils.get_today")
+async def test_check_id_number(get_today, tester: AppTester):
+    get_today.return_value = date(2100, 1, 1)
     tester.setup_state("state_identification_number")
     tester.setup_answer("state_identification_type", "passport")
     await tester.user_input("9001010001088")
@@ -272,7 +274,11 @@ async def test_check_id_number(tester: AppTester):
     tester.assert_num_messages(1)
     await tester.user_input("yes")
     tester.assert_answer("state_identification_type", "rsa_id")
-    tester.assert_state("state_gender")
+    tester.assert_answer("state_dob_year", "1990")
+    tester.assert_answer("state_dob_month", "1")
+    tester.assert_answer("state_dob_day", "1")
+    tester.assert_answer("state_gender", "Female")
+    tester.assert_state("state_first_name")
 
 
 @pytest.mark.asyncio
@@ -314,6 +320,7 @@ async def test_passport_country_by_choosing():
         addr="27820001001", state=StateData(name="state_passport_country"), session_id=1
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.passport.name
     msg = Message(
         content="2",
         to_addr="27820001002",
@@ -351,6 +358,7 @@ async def test_passport_country_search():
         addr="27820001001", state=StateData(name="state_passport_country"), session_id=1
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.passport.name
     msg = Message(
         content="other",
         to_addr="27820001002",
@@ -468,26 +476,17 @@ async def test_said_date_and_sex_extraction():
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.utils.get_today")
-async def test_said_date_extraction_ambiguous(get_today):
+async def test_said_date_extraction_ambiguous(get_today, tester: AppTester):
     get_today.return_value = date(2020, 1, 1)
-    u = User(
-        addr="27820001001",
-        state=StateData(name="state_identification_number"),
-        session_id=1,
-    )
-    app = Application(u)
-    u.answers["state_identification_type"] = app.ID_TYPES.rsa_id.name
-    msg = Message(
-        content="0001010001087",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    await app.process_message(msg)
-    assert "state_dob_year" not in u.answers
-    assert u.answers["state_dob_month"] == "1"
-    assert u.answers["state_dob_day"] == "1"
+    tester.setup_state("state_identification_number")
+    tester.setup_answer("state_identification_type", "rsa_id")
+    await tester.user_input("0001010001087")
+    tester.assert_state("state_dob_year")
+    tester.assert_no_answer("state_dob_year")
+
+    await tester.user_input("1900")
+    tester.assert_answer("state_dob_month", "1")
+    tester.assert_answer("state_dob_day", "1")
 
 
 @pytest.mark.asyncio
@@ -515,6 +514,7 @@ async def test_gender():
 async def test_gender_invalid():
     u = User(addr="27820001001", state=StateData(name="state_gender"), session_id=1)
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.passport.name
     msg = Message(
         content="invalid",
         to_addr="27820001002",
@@ -577,6 +577,7 @@ async def test_too_young(get_today):
 async def test_dob_year():
     u = User(addr="27820001001", state=StateData(name="state_gender"), session_id=1)
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.passport.name
     msg = Message(
         content="male",
         to_addr="27820001002",
@@ -593,6 +594,7 @@ async def test_dob_year():
 async def test_dob_year_invalid():
     u = User(addr="27820001001", state=StateData(name="state_dob_year"), session_id=1)
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.passport.name
     msg = Message(
         content="invalid",
         to_addr="27820001002",
@@ -611,7 +613,9 @@ async def test_dob_year_invalid():
 
 
 @pytest.mark.asyncio
-async def test_dob_year_not_match_id():
+@mock.patch("vaccine.utils.get_today")
+async def test_dob_year_not_match_id(get_today):
+    get_today.return_value = date(2010, 1, 1)
     u = User(
         addr="27820001001",
         state=StateData(name="state_dob_year"),
@@ -658,6 +662,7 @@ async def test_dob_month():
 async def test_dob_month_error():
     u = User(addr="27820001001", state=StateData(name="state_dob_month"), session_id=1)
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.passport.name
     msg = Message(
         content="invalid",
         to_addr="27820001002",
@@ -674,6 +679,7 @@ async def test_dob_month_error():
 async def test_dob_day():
     u = User(addr="27820001001", state=StateData(name="state_dob_month"), session_id=1)
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.passport.name
     msg = Message(
         content="jan",
         to_addr="27820001002",
@@ -695,6 +701,7 @@ async def test_dob_day_invalid():
         answers={"state_dob_year": "1990", "state_dob_month": "2"},
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.passport.name
     msg = Message(
         content="29",
         to_addr="27820001002",
@@ -718,6 +725,7 @@ async def test_first_name(get_today):
         answers={"state_dob_year": "1990", "state_dob_month": "2"},
     )
     app = Application(u)
+    u.answers["state_identification_type"] = app.ID_TYPES.passport.name
     msg = Message(
         content="2",
         to_addr="27820001002",
