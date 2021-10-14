@@ -6,7 +6,13 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message, StateData, User
+from vaccine.testing import AppTester
 from vaccine.vaccine_reg_ussd import Application, config
+
+
+@pytest.fixture
+def tester():
+    return AppTester(Application)
 
 
 @pytest.fixture
@@ -249,6 +255,39 @@ async def test_identification_number_invalid():
 
 
 @pytest.mark.asyncio
+async def test_identification_number_said_on_passport(tester: AppTester):
+    tester.setup_state("state_identification_number")
+    tester.setup_answer("state_identification_type", "passport")
+    await tester.user_input("9001010001088")
+    tester.assert_state("state_check_id_number")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+async def test_check_id_number(tester: AppTester):
+    tester.setup_state("state_identification_number")
+    tester.setup_answer("state_identification_type", "passport")
+    await tester.user_input("9001010001088")
+    tester.assert_state("state_check_id_number")
+    tester.assert_num_messages(1)
+    await tester.user_input("yes")
+    tester.assert_answer("state_identification_type", "rsa_id")
+    tester.assert_state("state_gender")
+
+
+@pytest.mark.asyncio
+async def test_check_id_number_restart(tester: AppTester):
+    tester.setup_state("state_identification_number")
+    tester.setup_answer("state_identification_type", "passport")
+    await tester.user_input("9001010001088")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_check_id_number")
+    await tester.user_input("no")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_identification_type")
+
+
+@pytest.mark.asyncio
 async def test_passport_country():
     u = User(
         addr="27820001001",
@@ -461,7 +500,7 @@ async def test_gender():
     app = Application(u)
     u.answers["state_identification_type"] = app.ID_TYPES.asylum_seeker.name
     msg = Message(
-        content="9001010001088",
+        content="ABC123",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
