@@ -524,7 +524,12 @@ class Application(BaseApplication):
                         Choice("state_change_to_rsa_id", self._("Yes")),
                         Choice("state_identification_type", self._("No")),
                     ],
-                    error=self._("This looks like an SA ID number"),
+                    error=self._(
+                        "Please try again\n"
+                        "\n"
+                        "Please confirm that the number you have entered is a RSA ID "
+                        "Number"
+                    ),
                 )
         except ValueError:
             pass

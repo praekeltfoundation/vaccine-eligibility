@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-07-20 15:37+0200\n"
-"PO-Revision-Date: 2021-07-23 17:06+0200\n"
+"POT-Creation-Date: 2021-10-19 14:23+0200\n"
+"PO-Revision-Date: 2021-10-19 15:17+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sesotho\n"
@@ -36,7 +36,7 @@ msgstr "HealthCheck Symptom checker [ENG]"
 msgid "Change language"
 msgstr "Fetola Puo"
 
-#: vaccine/healthcheck_vacreg_ussd.py:89 vaccine/healthcheck_vacreg_ussd.py:93
+#: vaccine/healthcheck_vacreg_ussd.py:92 vaccine/healthcheck_vacreg_ussd.py:96
 msgid ""
 "Welcome back to the NATIONAL DEPARTMENT OF HEALTH's COVID-19 Vaccine "
 "Registration service"
@@ -44,15 +44,15 @@ msgstr ""
 "Re ya o amohela hape ho tshebeletso ya Ngodisetso ya Ente ya COVID-19 ya "
 "LEFAPHA LA BOPHELO LA NAHA"
 
-#: vaccine/healthcheck_vacreg_ussd.py:100 vaccine/healthcheck_vacreg_ussd.py:122
+#: vaccine/healthcheck_vacreg_ussd.py:103 vaccine/healthcheck_vacreg_ussd.py:125
 msgid "Continue where I left off"
 msgstr "Tswela pele moo ke felletseng teng"
 
-#: vaccine/healthcheck_vacreg_ussd.py:102 vaccine/healthcheck_vacreg_ussd.py:124
+#: vaccine/healthcheck_vacreg_ussd.py:105 vaccine/healthcheck_vacreg_ussd.py:127
 msgid "Start over"
 msgstr "Qala qalong"
 
-#: vaccine/healthcheck_vacreg_ussd.py:109 vaccine/healthcheck_vacreg_ussd.py:114
+#: vaccine/healthcheck_vacreg_ussd.py:112 vaccine/healthcheck_vacreg_ussd.py:117
 msgid ""
 "Welcome back to The National Department of Health's COVID-19 Service\n"
 "\n"
@@ -67,7 +67,7 @@ msgid "RSA ID Number"
 msgstr "Nomoro ya ID ya RSA"
 
 #: vaccine/vaccine_reg_ussd.py:78 vaccine/vaccine_reg_whatsapp.py:83
-msgid "Passport Number"
+msgid "NON-RSA Passport Number"
 msgstr "Nomoro ya Phasepoto"
 
 #: vaccine/vaccine_reg_ussd.py:79 vaccine/vaccine_reg_whatsapp.py:84
@@ -95,8 +95,8 @@ msgid ""
 "Self-registration is currently only available to those {minimum_age} years of "
 "age or older. Please tell us if you are {minimum_age} or older?"
 msgstr ""
-"Boingodiso ha jwale bo fumaneha ho feela batho ba dilemo di {minimum_age} kapa "
-"ho feta. O dilemo di {minimum_age} kapa ho feta?"
+"Boingodiso ha jwale bo fumaneha ho feela batho ba dilemo di {minimum_age} "
+"kapa ho feta. O dilemo di {minimum_age} kapa ho feta?"
 
 #: vaccine/vaccine_reg_ussd.py:113
 msgid ""
@@ -113,19 +113,21 @@ msgid ""
 "Self-registration is only available to people {minimum_age} years or older. "
 "Can we contact you on this number when this changes?"
 msgstr ""
-"Boingodiso bo fumaneha ho feela batho ba dilemo di {minimum_age} kapa ho feta. "
-"Na re ka ikopanya le wena nomorong ee ha hoo ho fetoha?"
+"Boingodiso bo fumaneha ho feela batho ba dilemo di {minimum_age} kapa ho "
+"feta. Na re ka ikopanya le wena nomorong ee ha hoo ho fetoha?"
 
-#: vaccine/vaccine_reg_ussd.py:128 vaccine/vaccine_reg_ussd.py:536
-#: vaccine/vaccine_reg_ussd.py:604 vaccine/vaccine_reg_whatsapp.py:218
-#: vaccine/vaccine_reg_whatsapp.py:771 vaccine/vaccine_reg_whatsapp.py:843
+#: vaccine/vaccine_reg_ussd.py:128 vaccine/vaccine_reg_ussd.py:227
+#: vaccine/vaccine_reg_ussd.py:591 vaccine/vaccine_reg_ussd.py:659
+#: vaccine/vaccine_reg_whatsapp.py:218 vaccine/vaccine_reg_whatsapp.py:524
+#: vaccine/vaccine_reg_whatsapp.py:823 vaccine/vaccine_reg_whatsapp.py:895
 msgid "Yes"
 msgstr "Ee"
 
-#: vaccine/vaccine_reg_ussd.py:128 vaccine/vaccine_reg_ussd.py:537
-#: vaccine/vaccine_reg_ussd.py:604 vaccine/vaccine_reg_whatsapp.py:189
-#: vaccine/vaccine_reg_whatsapp.py:218 vaccine/vaccine_reg_whatsapp.py:304
-#: vaccine/vaccine_reg_whatsapp.py:772 vaccine/vaccine_reg_whatsapp.py:844
+#: vaccine/vaccine_reg_ussd.py:128 vaccine/vaccine_reg_ussd.py:228
+#: vaccine/vaccine_reg_ussd.py:592 vaccine/vaccine_reg_ussd.py:659
+#: vaccine/vaccine_reg_whatsapp.py:189 vaccine/vaccine_reg_whatsapp.py:218
+#: vaccine/vaccine_reg_whatsapp.py:304 vaccine/vaccine_reg_whatsapp.py:525
+#: vaccine/vaccine_reg_whatsapp.py:824 vaccine/vaccine_reg_whatsapp.py:896
 msgid "No"
 msgstr "Tjhee"
 
@@ -183,85 +185,102 @@ msgstr "O ka rata ho ngodisa jwang?"
 msgid "Please choose 1 of the following ways to register:"
 msgstr "Kgetha 1 ya mekgwa e latelang ho ngodisa:"
 
-#: vaccine/vaccine_reg_ussd.py:197
+#: vaccine/vaccine_reg_ussd.py:192
 msgid "Invalid {id_type}. Please try again"
 msgstr "Leka hape. Ka kopo kenya {id_type} ya hao"
 
-#: vaccine/vaccine_reg_ussd.py:216
+#: vaccine/vaccine_reg_ussd.py:205
 msgid "Please enter your {id_type}"
 msgstr "Ka kopo kenya {id_type} ya hao"
 
-#: vaccine/vaccine_reg_ussd.py:229 vaccine/vaccine_reg_ussd.py:230
+#: vaccine/vaccine_reg_ussd.py:222
+msgid ""
+"The number you have entered appears to be a RSA ID Number. Is this correct?\n"
+msgstr ""
+"Nomoro eo u e kentseng e bonahala e le Nomoro ea ID ea RSA. Na hoo ho "
+"nepahetse?\n"
+
+#: vaccine/vaccine_reg_ussd.py:230 vaccine/vaccine_reg_whatsapp.py:527
+msgid ""
+"Please try again\n"
+"\n"
+"Please confirm that the number you have entered is a RSA ID Number"
+msgstr ""
+"Ka kopo leka hape \n"
+"\n"
+"Ka kopo netefatsa hore nomoro eo u e kentseng ke Nomoro ea ID ea RSA"
+
+#: vaccine/vaccine_reg_ussd.py:263 vaccine/vaccine_reg_ussd.py:264
 msgid "Which country issued your passport?"
 msgstr "Ke naha efeng e o fileng phasepoto ya hao?"
 
-#: vaccine/vaccine_reg_ussd.py:232
+#: vaccine/vaccine_reg_ussd.py:266
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
 
-#: vaccine/vaccine_reg_ussd.py:233
+#: vaccine/vaccine_reg_ussd.py:267
 msgid "Mozambique"
 msgstr "Mozambique"
 
-#: vaccine/vaccine_reg_ussd.py:234
+#: vaccine/vaccine_reg_ussd.py:268
 msgid "Malawi"
 msgstr "Malawi"
 
-#: vaccine/vaccine_reg_ussd.py:235
+#: vaccine/vaccine_reg_ussd.py:269
 msgid "Nigeria"
 msgstr "Nigeria"
 
-#: vaccine/vaccine_reg_ussd.py:236
+#: vaccine/vaccine_reg_ussd.py:270
 msgid "DRC"
 msgstr "DRC"
 
-#: vaccine/vaccine_reg_ussd.py:237
+#: vaccine/vaccine_reg_ussd.py:271
 msgid "Somalia"
 msgstr "Somalia"
 
-#: vaccine/vaccine_reg_ussd.py:238 vaccine/vaccine_reg_ussd.py:261
-#: vaccine/vaccine_reg_ussd.py:280 vaccine/vaccine_reg_ussd.py:481
-#: vaccine/vaccine_reg_ussd.py:505 vaccine/vaccine_reg_whatsapp.py:539
-#: vaccine/vaccine_reg_whatsapp.py:747
+#: vaccine/vaccine_reg_ussd.py:272 vaccine/vaccine_reg_ussd.py:295
+#: vaccine/vaccine_reg_ussd.py:319 vaccine/vaccine_reg_ussd.py:536
+#: vaccine/vaccine_reg_ussd.py:560 vaccine/vaccine_reg_whatsapp.py:570
+#: vaccine/vaccine_reg_whatsapp.py:799
 msgid "Other"
 msgstr "Tse ding"
 
-#: vaccine/vaccine_reg_ussd.py:246
+#: vaccine/vaccine_reg_ussd.py:280
 msgid "Please TYPE in your passport's COUNTRY of origin."
 msgstr "Ka kopo THAEPA NAHA ya tlhaho e phasepotong ya hao."
 
-#: vaccine/vaccine_reg_ussd.py:264
+#: vaccine/vaccine_reg_ussd.py:298
 msgid "Please choose the best match for your COUNTRY of origin:"
 msgstr "Ka kopo kgetha kgetho e tshwanang le NAHA ya hao ya tlhaho:"
 
-#: vaccine/vaccine_reg_ussd.py:266 vaccine/vaccine_reg_whatsapp.py:549
+#: vaccine/vaccine_reg_ussd.py:300 vaccine/vaccine_reg_whatsapp.py:580
 msgid "Do any of these match your COUNTRY:"
 msgstr "Na e nngwe ya tsee e tshwana le NAHA ya hao:"
 
-#: vaccine/vaccine_reg_ussd.py:276
+#: vaccine/vaccine_reg_ussd.py:315
 msgid "What is your gender?"
 msgstr "BONG ba hao ke bofe?"
 
-#: vaccine/vaccine_reg_ussd.py:278 vaccine/vaccine_reg_whatsapp.py:745
+#: vaccine/vaccine_reg_ussd.py:317 vaccine/vaccine_reg_whatsapp.py:797
 msgid "Male"
 msgstr "E motona"
 
-#: vaccine/vaccine_reg_ussd.py:279 vaccine/vaccine_reg_whatsapp.py:746
+#: vaccine/vaccine_reg_ussd.py:318 vaccine/vaccine_reg_whatsapp.py:798
 msgid "Female"
 msgstr "Ya Motshehadi"
 
-#: vaccine/vaccine_reg_ussd.py:282
+#: vaccine/vaccine_reg_ussd.py:321
 msgid "Please select your gender using one of the numbers below"
 msgstr "Ka kopo kgetha bong ba hao o sebedisa e nngwe ya dinomoro tse ka tlase"
 
-#: vaccine/vaccine_reg_ussd.py:298
+#: vaccine/vaccine_reg_ussd.py:343
 msgid ""
 "REQUIRED: Please TYPE the 4 digits of the YEAR you were born (Example: 1980)"
 msgstr ""
 "E YA HLOKAHALA: Ka kopo THAEPA dinomoro tse 4 tsa selemo seo o hlahileng ka "
 "sona (Mohlala: 1980)"
 
-#: vaccine/vaccine_reg_ussd.py:309 vaccine/vaccine_reg_whatsapp.py:642
+#: vaccine/vaccine_reg_ussd.py:354 vaccine/vaccine_reg_whatsapp.py:679
 msgid ""
 "The YEAR you have given does not match the YEAR of your ID number. Please try "
 "again"
@@ -269,67 +288,68 @@ msgstr ""
 "SELEMO seo o faneng ka sona ha se tshwane le SELEMO se nomorong ya hao ya ID. "
 "Ka kopo leka hape"
 
-#: vaccine/vaccine_reg_ussd.py:317
+#: vaccine/vaccine_reg_ussd.py:362
 msgid "Date of birth: In which YEAR were you born? (Please TYPE just the YEAR)"
-msgstr "Letsatsi la Tswalo: O hlahile SELEMONG sefe? (Ka kopo ngola selemo fela)"
+msgstr ""
+"Letsatsi la Tswalo: O hlahile SELEMONG sefe? (Ka kopo ngola selemo fela)"
 
-#: vaccine/vaccine_reg_ussd.py:331
+#: vaccine/vaccine_reg_ussd.py:381
 msgid "Date of birth: In which MONTH were you born?"
 msgstr "Letsatsi la Tswalo: O hlahile KGWEDING efe?"
 
-#: vaccine/vaccine_reg_ussd.py:333
+#: vaccine/vaccine_reg_ussd.py:383
 msgid "Jan"
 msgstr "Jan"
 
-#: vaccine/vaccine_reg_ussd.py:334
+#: vaccine/vaccine_reg_ussd.py:384
 msgid "Feb"
 msgstr "Feb"
 
-#: vaccine/vaccine_reg_ussd.py:335
+#: vaccine/vaccine_reg_ussd.py:385
 msgid "Mar"
 msgstr "Mar"
 
-#: vaccine/vaccine_reg_ussd.py:336
+#: vaccine/vaccine_reg_ussd.py:386
 msgid "Apr"
 msgstr "Apr"
 
-#: vaccine/vaccine_reg_ussd.py:337 vaccine/vaccine_reg_whatsapp.py:675
+#: vaccine/vaccine_reg_ussd.py:387 vaccine/vaccine_reg_whatsapp.py:717
 msgid "May"
 msgstr "May"
 
-#: vaccine/vaccine_reg_ussd.py:338 vaccine/vaccine_reg_whatsapp.py:676
+#: vaccine/vaccine_reg_ussd.py:388 vaccine/vaccine_reg_whatsapp.py:718
 msgid "June"
 msgstr "Jun"
 
-#: vaccine/vaccine_reg_ussd.py:339 vaccine/vaccine_reg_whatsapp.py:677
+#: vaccine/vaccine_reg_ussd.py:389 vaccine/vaccine_reg_whatsapp.py:719
 msgid "July"
 msgstr "Jul"
 
-#: vaccine/vaccine_reg_ussd.py:340
+#: vaccine/vaccine_reg_ussd.py:390
 msgid "Aug"
 msgstr "Aug"
 
-#: vaccine/vaccine_reg_ussd.py:341
+#: vaccine/vaccine_reg_ussd.py:391
 msgid "Sep"
 msgstr "Sept"
 
-#: vaccine/vaccine_reg_ussd.py:342
+#: vaccine/vaccine_reg_ussd.py:392
 msgid "Oct"
 msgstr "Oct"
 
-#: vaccine/vaccine_reg_ussd.py:343
+#: vaccine/vaccine_reg_ussd.py:393
 msgid "Nov"
 msgstr "Nov"
 
-#: vaccine/vaccine_reg_ussd.py:344
+#: vaccine/vaccine_reg_ussd.py:394
 msgid "Dec"
 msgstr "Dec"
 
-#: vaccine/vaccine_reg_ussd.py:347
+#: vaccine/vaccine_reg_ussd.py:397
 msgid "REQUIRED: Choose your birthday MONTH using the numbers below:"
 msgstr "YA HLOKAHALA: Kgetha kgwedi ya hao ya tswalo ka dinomoro tse ka tlase:"
 
-#: vaccine/vaccine_reg_ussd.py:365
+#: vaccine/vaccine_reg_ussd.py:420
 msgid ""
 "ERROR: Please reply with just the DAY of your birthday.\n"
 "\n"
@@ -339,7 +359,7 @@ msgstr ""
 " \n"
 "Mohlala: Haeba o o hlahile ka la 31 Motsheanong, thaepa _31_"
 
-#: vaccine/vaccine_reg_ussd.py:374
+#: vaccine/vaccine_reg_ussd.py:429
 msgid ""
 "Date of birth: On which DAY of the month were you born? (Please type just the "
 "DAY)"
@@ -347,30 +367,34 @@ msgstr ""
 "Letsatsi la Tswalo: O hlahile LETSATSING lefe la kgwedi eo o hlahileng ka "
 "yona? (Ka kopo ngola letsatsi feela)"
 
-#: vaccine/vaccine_reg_ussd.py:392
-msgid "Please TYPE your FIRST NAME as it appears in your identification document"
+#: vaccine/vaccine_reg_ussd.py:447
+msgid ""
+"Please TYPE your FIRST NAME as it appears in your identification document"
 msgstr ""
 "Ka kopo THAEPA LEBITSO LA PELE la hao jwalo ka ha le hlaha tokomaneng ya hao "
 "ya boitsebiso"
 
-#: vaccine/vaccine_reg_ussd.py:397
+#: vaccine/vaccine_reg_ussd.py:452
 msgid ""
-"ERROR: Reply with your FIRST NAME as it appears in your identification document"
+"ERROR: Reply with your FIRST NAME as it appears in your identification "
+"document"
 msgstr ""
 "PHOSO: Araba ka LEBITSO LA PELE jwalo ka ha le hlaha tokomaneng ya hao ya "
 "boitsebiso"
 
-#: vaccine/vaccine_reg_ussd.py:408
+#: vaccine/vaccine_reg_ussd.py:463
 msgid "Please TYPE your SURNAME as it appears in your identification document."
 msgstr ""
-"Ka kopo THAEPA FANE ya hao jwalo ka ha e hlaha tokomaneng ya hao ya boitsebiso."
+"Ka kopo THAEPA FANE ya hao jwalo ka ha e hlaha tokomaneng ya hao ya "
+"boitsebiso."
 
-#: vaccine/vaccine_reg_ussd.py:413
+#: vaccine/vaccine_reg_ussd.py:468
 msgid ""
 "ERROR: Reply with your SURNAME as it appears in your identification document"
-msgstr "PHOSO: Araba ka FANE jwalo ka ha e hlaha tokomaneng ya hao ya boitsebiso"
+msgstr ""
+"PHOSO: Araba ka FANE jwalo ka ha e hlaha tokomaneng ya hao ya boitsebiso"
 
-#: vaccine/vaccine_reg_ussd.py:427
+#: vaccine/vaccine_reg_ussd.py:482
 msgid ""
 "Confirm the following:\n"
 "\n"
@@ -382,17 +406,17 @@ msgstr ""
 "{first_name} {surname}\n"
 "{id_number}\n"
 
-#: vaccine/vaccine_reg_ussd.py:434 vaccine/vaccine_reg_ussd.py:574
-#: vaccine/vaccine_reg_whatsapp.py:608
+#: vaccine/vaccine_reg_ussd.py:489 vaccine/vaccine_reg_ussd.py:629
+#: vaccine/vaccine_reg_whatsapp.py:639
 msgid "Correct"
 msgstr "Di nepahetse"
 
-#: vaccine/vaccine_reg_ussd.py:435 vaccine/vaccine_reg_ussd.py:575
-#: vaccine/vaccine_reg_whatsapp.py:609
+#: vaccine/vaccine_reg_ussd.py:490 vaccine/vaccine_reg_ussd.py:630
+#: vaccine/vaccine_reg_whatsapp.py:640
 msgid "Wrong"
 msgstr "Di fosahetse"
 
-#: vaccine/vaccine_reg_ussd.py:437 vaccine/vaccine_reg_whatsapp.py:611
+#: vaccine/vaccine_reg_ussd.py:492 vaccine/vaccine_reg_whatsapp.py:642
 msgid ""
 "Is the information you shared correct?\n"
 "\n"
@@ -403,56 +427,57 @@ msgstr ""
 "{first_name} {surname}\n"
 "{id_number}"
 
-#: vaccine/vaccine_reg_ussd.py:448
+#: vaccine/vaccine_reg_ussd.py:503
 msgid "Select Your Province"
 msgstr "Kgetha profense ya hao"
 
-#: vaccine/vaccine_reg_ussd.py:450 vaccine/vaccine_reg_ussd.py:523
+#: vaccine/vaccine_reg_ussd.py:505 vaccine/vaccine_reg_ussd.py:578
 #: vaccine/vaccine_reg_whatsapp.py:342 vaccine/vaccine_reg_whatsapp.py:362
 msgid "Reply with a NUMBER:"
 msgstr "Araba ka NOMORO:"
 
-#: vaccine/vaccine_reg_ussd.py:457
+#: vaccine/vaccine_reg_ussd.py:512
 msgid "Please TYPE the name of the SUBURB to help us allocate your appointment"
 msgstr ""
 "Ka kopo thaepa lebitso la MOTSANA-TOROPO ho re thusa ho aba tumellano ya "
 "kopano ya hao"
 
-#: vaccine/vaccine_reg_ussd.py:476
+#: vaccine/vaccine_reg_ussd.py:531
 msgid "Please select your municipality"
 msgstr "Araba ka NOMORO"
 
-#: vaccine/vaccine_reg_ussd.py:501
+#: vaccine/vaccine_reg_ussd.py:556
 msgid "Please choose the best match for your location:"
 msgstr "Ka kopo kgetha sebaka se tshwanang le moo o leng teng:"
 
-#: vaccine/vaccine_reg_ussd.py:510
+#: vaccine/vaccine_reg_ussd.py:565
 msgid "Do any of these match your location:"
 msgstr "Na e nngwe ya tsee e tshwana le moo o le teng:"
 
-#: vaccine/vaccine_reg_ussd.py:521
+#: vaccine/vaccine_reg_ussd.py:576
 msgid "Suburb not found. Try again"
 msgstr "Motsana-toropo ha wa fumanwa. Leka hape"
 
-#: vaccine/vaccine_reg_ussd.py:531
-msgid "Can we use this number: {number} to send you SMS appointment information?"
+#: vaccine/vaccine_reg_ussd.py:586
+msgid ""
+"Can we use this number: {number} to send you SMS appointment information?"
 msgstr ""
 "Na re ka sebedisa nomoro ee: {number} ho o romella SMS ya dintlha tsa "
 "tumellano ya ketelo?"
 
-#: vaccine/vaccine_reg_ussd.py:539
+#: vaccine/vaccine_reg_ussd.py:594
 msgid ""
 "Please reply with a number 1 or 2 to confirm if we can use this number: "
 "{number} to send you SMS appointment information?"
 msgstr ""
-"Ka kopo araba ka 1 kapa 2 ho netefatsa hore re ka sebedisa nomoro ee: {number} "
-"ho o romella SMS ya dintlha tsa tumellano ya ketelo?"
+"Ka kopo araba ka 1 kapa 2 ho netefatsa hore re ka sebedisa nomoro ee: "
+"{number} ho o romella SMS ya dintlha tsa tumellano ya ketelo?"
 
-#: vaccine/vaccine_reg_ussd.py:551
+#: vaccine/vaccine_reg_ussd.py:606
 msgid "ERROR: Please enter a valid mobile number (do not use spaces)"
 msgstr "PHOSO: Ka kopo kenya nomoro e nepahetse (se ke wa siya dikgeo)"
 
-#: vaccine/vaccine_reg_ussd.py:558
+#: vaccine/vaccine_reg_ussd.py:613
 msgid ""
 "Please TYPE a MOBILE NUMBER we can send an SMS to with your appointment "
 "information"
@@ -460,46 +485,46 @@ msgstr ""
 "Ka kopo thaepa NOMORO YA MOHALA eo re ka romellang SMS e nang le dintlha tsa "
 "tumellano ya ketelo ho yona"
 
-#: vaccine/vaccine_reg_ussd.py:570
+#: vaccine/vaccine_reg_ussd.py:625
 msgid "Please confirm that your number is {number}."
 msgstr "\"Ka kopo netefatsa hore nomoro ya hao ke {number}."
 
-#: vaccine/vaccine_reg_ussd.py:577
+#: vaccine/vaccine_reg_ussd.py:632
 msgid "ERROR: Please try again. Is the number {number} correct?"
 msgstr "PHOSO: Ka kopo leka hape. Na nomoro {number} e nepahetse?"
 
-#: vaccine/vaccine_reg_ussd.py:585
+#: vaccine/vaccine_reg_ussd.py:640
 msgid "In which time slot would you prefer to get your vaccination?\n"
 msgstr "Ke nakong efeng eo o ratang hore o fumane kentelo ya hao ka yona?\n"
 
-#: vaccine/vaccine_reg_ussd.py:589 vaccine/vaccine_reg_whatsapp.py:928
+#: vaccine/vaccine_reg_ussd.py:644 vaccine/vaccine_reg_whatsapp.py:980
 msgid "Weekday Morning"
 msgstr "Hare ha beke Hoseng"
 
-#: vaccine/vaccine_reg_ussd.py:590 vaccine/vaccine_reg_whatsapp.py:929
+#: vaccine/vaccine_reg_ussd.py:645 vaccine/vaccine_reg_whatsapp.py:981
 msgid "Weekday Afternoon"
 msgstr "Hare ha beke Thapama"
 
-#: vaccine/vaccine_reg_ussd.py:591 vaccine/vaccine_reg_whatsapp.py:930
+#: vaccine/vaccine_reg_ussd.py:646 vaccine/vaccine_reg_whatsapp.py:982
 msgid "Weekend Morning"
 msgstr "Mafelo a beke Hoseng"
 
-#: vaccine/vaccine_reg_ussd.py:593
+#: vaccine/vaccine_reg_ussd.py:648
 msgid ""
 "When would you prefer your vaccine appointment based on the options below?"
 msgstr ""
 "O ka rata hore tumellano ya ketelo ya hao ya kentelo e be neng ho latela "
 "dikgetho tse ka tlase?"
 
-#: vaccine/vaccine_reg_ussd.py:603
+#: vaccine/vaccine_reg_ussd.py:658
 msgid "Do you belong to a Medical Aid?"
 msgstr "Na o na le Medical Aid?"
 
-#: vaccine/vaccine_reg_ussd.py:605
+#: vaccine/vaccine_reg_ussd.py:660
 msgid "ERROR: Please try again. Do you belong to a Medical Aid?"
 msgstr "PHOSO: Ka kopo leka hape. Na o na botho ba mekgatlo ya Medica Aid?"
 
-#: vaccine/vaccine_reg_ussd.py:752
+#: vaccine/vaccine_reg_ussd.py:807
 msgid ""
 ":) You have SUCCESSFULLY registered to get vaccinated. Additional information "
 "and appointment details will be sent via SMS."
@@ -507,10 +532,10 @@ msgstr ""
 ":) O ngodiseditse ho fumana ente KA KATLEHO. Lesedi le leng le dintlha tsa "
 "tumellano ya kopano di tla romelwa ka SMS."
 
-#: vaccine/vaccine_reg_ussd.py:761 vaccine/vaccine_reg_whatsapp.py:1105
+#: vaccine/vaccine_reg_ussd.py:816 vaccine/vaccine_reg_whatsapp.py:1157
 msgid ""
-"Something went wrong with your registration session. Your registration was not "
-"able to be processed. Please try again later"
+"Something went wrong with your registration session. Your registration was "
+"not able to be processed. Please try again later"
 msgstr ""
 "Ho na le ho phoso e etsahetseng ka tshebeletso ya ngodiso ya hao. Ngodiso ya "
 "hao ha ya kgona ho tswela pele. Ka kopo leka hape hamorao"
@@ -541,10 +566,11 @@ msgstr ""
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
-"Welcome to the official COVID-19 Vaccination Self-registration Portal from the "
-"National Department of Health. Registration will take about 5 minutes. Please "
-"have your ID, Passport, Refugee Permit or Asylum Seeker Permit *Number* on "
-"hand. If you have Medical Aid, we will also ask for your Medical Aid Number.\n"
+"Welcome to the official COVID-19 Vaccination Self-registration Portal from "
+"the National Department of Health. Registration will take about 5 minutes. "
+"Please have your ID, Passport, Refugee Permit or Asylum Seeker Permit "
+"*Number* on hand. If you have Medical Aid, we will also ask for your Medical "
+"Aid Number.\n"
 "\n"
 "*Note:*\n"
 "- Vaccination is voluntary and no payment is required\n"
@@ -558,14 +584,15 @@ msgstr ""
 "*PUISANO E SIRELETSEHILENG YA NGODISETSO YA KENTELO* 🔐 \n"
 " \n"
 "Re ya o amohela ho Lebota la Boingodisetso ba Kentelo ya COVID-19 la semmuso "
-"ho tswa ho Lefapha la Bophelo la Naha. Ngodiso e tla nka metsotso e ka bang 5. "
-"Ka kopo eba le ID ya hao, Phasepoto, Phemiti ya Mophaphathehi kapa *Nomoro* ya "
-"Phemiti ya Mokopi wa Botshabelo letsohong. Haeba o na le Medical Aid, re tla o "
-"kopa hape Noromo ya Medical Aid. \n"
+"ho tswa ho Lefapha la Bophelo la Naha. Ngodiso e tla nka metsotso e ka bang "
+"5. Ka kopo eba le ID ya hao, Phasepoto, Phemiti ya Mophaphathehi kapa "
+"*Nomoro* ya Phemiti ya Mokopi wa Botshabelo letsohong. Haeba o na le Medical "
+"Aid, re tla o kopa hape Noromo ya Medical Aid. \n"
 " \n"
 "*Hlokomela:* \n"
 "- Ho enta ke boikgethelo mme ha hona patala e hlokwang \n"
-"- Ha hona tefello-mmoho/tefiso e tla hlokwa haeba o le karolo ya Medical Aid \n"
+"- Ha hona tefello-mmoho/tefiso e tla hlokwa haeba o le karolo ya Medical "
+"Aid \n"
 "- E mong le e mong ya ngodisang o tla fuwa kentelo \n"
 "- Re tla theoha le dihlopha tsa dilemo kapele ka moo re ka kgonang \n"
 " \n"
@@ -701,8 +728,8 @@ msgid ""
 "accept"
 msgstr ""
 "\n"
-"Araba ka 1 ho bala kakaretso ya TSHIRELETSO ya DATA & LEANO la LEKUNUTU. Araba "
-"2 ho amohela"
+"Araba ka 1 ho bala kakaretso ya TSHIRELETSO ya DATA & LEANO la LEKUNUTU. "
+"Araba 2 ho amohela"
 
 #: vaccine/vaccine_reg_whatsapp.py:278
 msgid ""
@@ -717,8 +744,8 @@ msgid ""
 "are processed with your consent for the agreed purpose (to support the "
 "COVID-19 Vaccination roll out in South Africa) and remain confidential.\n"
 "\n"
-"EVDS uses your data to check your eligibility & inform you of the date & venue "
-"of your vaccination.\n"
+"EVDS uses your data to check your eligibility & inform you of the date & "
+"venue of your vaccination.\n"
 "\n"
 "Registration is voluntary & does not guarantee vaccination.\n"
 "\n"
@@ -730,8 +757,8 @@ msgid ""
 msgstr ""
 "*PUISANO E SIRELETSEHILENG YA NGODISETSO YA KENTELO* 🔐 \n"
 " \n"
-"*KAKARETSO ya TSHIRELETSO YA DINTLHA & LEANO LA LEKUNUTU la Electronic Vaccine "
-"Data System (“Leano la Lekunutu la EVDS)* \n"
+"*KAKARETSO ya TSHIRELETSO YA DINTLHA & LEANO LA LEKUNUTU la Electronic "
+"Vaccine Data System (“Leano la Lekunutu la EVDS)* \n"
 " \n"
 "Leano la Lekunutu la EVDS le latela Molao wa POPI. \n"
 " \n"
@@ -795,8 +822,8 @@ msgstr ""
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
-"We need your location to help us allocate you to an available vaccination site "
-"as close and as soon as possible\n"
+"We need your location to help us allocate you to an available vaccination "
+"site as close and as soon as possible\n"
 "\n"
 "Select your province"
 msgstr ""
@@ -811,7 +838,8 @@ msgstr ""
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
-"⚠️ Your suburb could not be found. Please try again by selecting your province\n"
+"⚠️ Your suburb could not be found. Please try again by selecting your "
+"province\n"
 "\n"
 "Select your province"
 msgstr ""
@@ -904,7 +932,7 @@ msgstr ""
 "Ka kopo kgetha tokomane ya boitsebiso eo o nang le yona ho tswa lethathamong "
 "le ka tlase? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:486
+#: vaccine/vaccine_reg_whatsapp.py:481
 msgid ""
 "⚠️ Please enter a valid {id_type}\n"
 "\n"
@@ -914,7 +942,7 @@ msgstr ""
 " \n"
 "📌 Kapa araba *0* ho emisa tshebeletso ena le ho kgutlela ho *MENU* wa mantlha"
 
-#: vaccine/vaccine_reg_whatsapp.py:507
+#: vaccine/vaccine_reg_whatsapp.py:496
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -924,7 +952,18 @@ msgstr ""
 " \n"
 "Ka kopo THAEPA {id_type} ya hao."
 
-#: vaccine/vaccine_reg_whatsapp.py:519
+#: vaccine/vaccine_reg_whatsapp.py:517
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"The number you have entered appears to be a RSA ID Number. Is this correct?\n"
+msgstr ""
+"*PUISANO E SIRELETSEHILENG YA NGODISETSO YA KENTELO* 🔐 \n"
+"\n"
+"Nomoro eo u e kentseng e bonahala e le Nomoro ea ID ea RSA. Na hoo ho "
+"nepahetse?\n"
+
+#: vaccine/vaccine_reg_whatsapp.py:550
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -936,7 +975,7 @@ msgstr ""
 "Ka kopo THAEPA NAHA ya tlhaho e phasepotong ya hao. \n"
 "Mohlala _Zimbabwe_"
 
-#: vaccine/vaccine_reg_whatsapp.py:542
+#: vaccine/vaccine_reg_whatsapp.py:573
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "Please confirm your passport's COUNTRY of origin.\n"
@@ -949,7 +988,7 @@ msgstr ""
 " \n"
 "ARABA ka NOMORO ho tswa lethathamong le ka tlase:"
 
-#: vaccine/vaccine_reg_whatsapp.py:554
+#: vaccine/vaccine_reg_whatsapp.py:585
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -960,7 +999,7 @@ msgstr ""
 "Ka kopo THAEPA LEBITSO LA PELE la hao jwalo ka ha le hlaha tokomaneng ya hao "
 "ya boitsebiso."
 
-#: vaccine/vaccine_reg_whatsapp.py:560
+#: vaccine/vaccine_reg_whatsapp.py:591
 msgid ""
 "⚠️ Please try again\n"
 "\n"
@@ -975,7 +1014,7 @@ msgstr ""
 " \n"
 "📌 Kapa araba *0* ho emisa tshebeletso ena le ho kgutlela ho *MENU* wa mantlha"
 
-#: vaccine/vaccine_reg_whatsapp.py:572
+#: vaccine/vaccine_reg_whatsapp.py:603
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -983,9 +1022,10 @@ msgid ""
 msgstr ""
 "*PUISANO E SIRELETSEHILENG YA NGODISETSO YA KENTELO* 🔐 \n"
 " \n"
-"Ka kopo THAEPA FANE ya hao jwalo ka ha e hlaha tokomaneng ya hao ya boitsebiso."
+"Ka kopo THAEPA FANE ya hao jwalo ka ha e hlaha tokomaneng ya hao ya "
+"boitsebiso."
 
-#: vaccine/vaccine_reg_whatsapp.py:578
+#: vaccine/vaccine_reg_whatsapp.py:609
 msgid ""
 "⚠️ Please try again\n"
 "\n"
@@ -999,7 +1039,7 @@ msgstr ""
 " \n"
 "📌 Kapa araba *0* ho emisa tshebeletso ena le ho kgutlela ho *MENU* wa mantlha"
 
-#: vaccine/vaccine_reg_whatsapp.py:599
+#: vaccine/vaccine_reg_whatsapp.py:630
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1015,7 +1055,7 @@ msgstr ""
 "{first_name} {surname}\n"
 "{id_number}\n"
 
-#: vaccine/vaccine_reg_whatsapp.py:631
+#: vaccine/vaccine_reg_whatsapp.py:668
 msgid ""
 "⚠️  Please TYPE in only the YEAR you were born.\n"
 "Example _1980_"
@@ -1023,7 +1063,7 @@ msgstr ""
 "⚠️ Ka kopo THAEPA fela SELEMO seo o hlahileng ka sona. \n"
 "Mohlala_1980_"
 
-#: vaccine/vaccine_reg_whatsapp.py:650
+#: vaccine/vaccine_reg_whatsapp.py:687
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1033,7 +1073,7 @@ msgstr ""
 " \n"
 "Ka kopo THAEPA SELEMO seo o hlahileng ka sona?"
 
-#: vaccine/vaccine_reg_whatsapp.py:665
+#: vaccine/vaccine_reg_whatsapp.py:707
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1043,43 +1083,43 @@ msgstr ""
 " \n"
 "O hlahile KGWEDING efe? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:671
+#: vaccine/vaccine_reg_whatsapp.py:713
 msgid "January"
 msgstr "Pherekgong"
 
-#: vaccine/vaccine_reg_whatsapp.py:672
+#: vaccine/vaccine_reg_whatsapp.py:714
 msgid "February"
 msgstr "Hlakola"
 
-#: vaccine/vaccine_reg_whatsapp.py:673
+#: vaccine/vaccine_reg_whatsapp.py:715
 msgid "March"
 msgstr "Hlakubele"
 
-#: vaccine/vaccine_reg_whatsapp.py:674
+#: vaccine/vaccine_reg_whatsapp.py:716
 msgid "April"
 msgstr "Mmesa"
 
-#: vaccine/vaccine_reg_whatsapp.py:678
+#: vaccine/vaccine_reg_whatsapp.py:720
 msgid "August"
 msgstr "Phato"
 
-#: vaccine/vaccine_reg_whatsapp.py:679
+#: vaccine/vaccine_reg_whatsapp.py:721
 msgid "September"
 msgstr "Lwetse"
 
-#: vaccine/vaccine_reg_whatsapp.py:680
+#: vaccine/vaccine_reg_whatsapp.py:722
 msgid "October"
 msgstr "Mphalane"
 
-#: vaccine/vaccine_reg_whatsapp.py:681
+#: vaccine/vaccine_reg_whatsapp.py:723
 msgid "November"
 msgstr "Pudungwane"
 
-#: vaccine/vaccine_reg_whatsapp.py:682
+#: vaccine/vaccine_reg_whatsapp.py:724
 msgid "December"
 msgstr "Tshitwe"
 
-#: vaccine/vaccine_reg_whatsapp.py:685
+#: vaccine/vaccine_reg_whatsapp.py:727
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided.\n"
@@ -1091,7 +1131,7 @@ msgstr ""
 " \n"
 "O hlahile KGWEDING efe? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:691
+#: vaccine/vaccine_reg_whatsapp.py:733
 msgid ""
 "\n"
 "Reply with the number next to the month."
@@ -1099,7 +1139,7 @@ msgstr ""
 "\n"
 "Araba ka nomoro e pele ha kgwedi."
 
-#: vaccine/vaccine_reg_whatsapp.py:707
+#: vaccine/vaccine_reg_whatsapp.py:754
 msgid ""
 "⚠️ Please enter a valid calendar DAY for your birth date. Type in only the "
 "day.\n"
@@ -1111,7 +1151,7 @@ msgstr ""
 " \n"
 "Mohlala: Haeba o o hlahile ka la 20 Motsheanong, thaepa _20_"
 
-#: vaccine/vaccine_reg_whatsapp.py:717
+#: vaccine/vaccine_reg_whatsapp.py:764
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1125,7 +1165,7 @@ msgstr ""
 " \n"
 "Mohlala: Haeba o o hlahile ka la 31 Motsheanong, thaepa _31_"
 
-#: vaccine/vaccine_reg_whatsapp.py:741
+#: vaccine/vaccine_reg_whatsapp.py:793
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1135,7 +1175,7 @@ msgstr ""
 " \n"
 "BONG ba hao ke mang? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:749
+#: vaccine/vaccine_reg_whatsapp.py:801
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided.\n"
@@ -1147,12 +1187,12 @@ msgstr ""
 " \n"
 "ARABA ka NOMORO e pele ha lethathamo la bong le ka tlase. \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:762
+#: vaccine/vaccine_reg_whatsapp.py:814
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
-"We will use your mobile phone number to send you notifications and updates via "
-"WhatsApp and/or SMS about getting vaccinated.\n"
+"We will use your mobile phone number to send you notifications and updates "
+"via WhatsApp and/or SMS about getting vaccinated.\n"
 "\n"
 "Can we use {number}?"
 msgstr ""
@@ -1163,7 +1203,7 @@ msgstr ""
 " \n"
 "Re ka sebedisa {number}?"
 
-#: vaccine/vaccine_reg_whatsapp.py:774
+#: vaccine/vaccine_reg_whatsapp.py:826
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided.\n"
@@ -1175,7 +1215,7 @@ msgstr ""
 " \n"
 "Ka kopo netefatsa hore re ka sebedisa {number} ho ikopanya le wena. \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:788
+#: vaccine/vaccine_reg_whatsapp.py:840
 msgid ""
 "⚠️ Please type a valid cell phone number.\n"
 "Example _081234567_"
@@ -1183,7 +1223,7 @@ msgstr ""
 "⚠️ Ka kopo thaepa nomoro ya mohala e nepahetseng. \n"
 "Mohlala _081234567_"
 
-#: vaccine/vaccine_reg_whatsapp.py:796
+#: vaccine/vaccine_reg_whatsapp.py:848
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1193,7 +1233,7 @@ msgstr ""
 " \n"
 "Ka kopo THAEPA NOMORO YA MOHALA eo re ka ikopanynang le wena ho yona."
 
-#: vaccine/vaccine_reg_whatsapp.py:813
+#: vaccine/vaccine_reg_whatsapp.py:865
 msgid ""
 "⚠️ Please TYPE a valid EMAIL address. (Or type SKIP if you are unable to share "
 "an email address.)"
@@ -1201,7 +1241,7 @@ msgstr ""
 "⚠️ Ka kopo THAEPA aterese ya EMAIL e nepahetseng. (Kapa thaepa SKIP haeba o sa "
 "kgone ho arolelana ka aterese ya hao ya email.)"
 
-#: vaccine/vaccine_reg_whatsapp.py:821
+#: vaccine/vaccine_reg_whatsapp.py:873
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1213,7 +1253,7 @@ msgstr ""
 "Ka kopo THAEPA aterese ya hao ya EMAIL. (Kapa thaepa SKIP haeba o sa kgone ho "
 "arolelana ka aterese ya hao ya email.)"
 
-#: vaccine/vaccine_reg_whatsapp.py:834
+#: vaccine/vaccine_reg_whatsapp.py:886
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1229,7 +1269,7 @@ msgstr ""
 " \n"
 "O na le Medical Aid wa Afrika Borwa? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:846
+#: vaccine/vaccine_reg_whatsapp.py:898
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided.\n"
@@ -1241,7 +1281,7 @@ msgstr ""
 " \n"
 "Ka kopo netefatsa hore o na le Medical Aid wa Afrika Borwa. \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:857
+#: vaccine/vaccine_reg_whatsapp.py:909
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1251,11 +1291,11 @@ msgstr ""
 " \n"
 "Ka kopo THAEPA lebitso la MOFANI wa Medical Aid wa hao."
 
-#: vaccine/vaccine_reg_whatsapp.py:876
+#: vaccine/vaccine_reg_whatsapp.py:928
 msgid "None of these"
 msgstr "Ha hona eo e leng yona"
 
-#: vaccine/vaccine_reg_whatsapp.py:879
+#: vaccine/vaccine_reg_whatsapp.py:931
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1267,7 +1307,7 @@ msgstr ""
 "Ka kopo netefatsa Mofani wa Medical Aid wa hao. ARABA ka NOMORO ho tswa "
 "lethathamong le ka tlase: \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:886
+#: vaccine/vaccine_reg_whatsapp.py:938
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided.\n"
@@ -1279,7 +1319,7 @@ msgstr ""
 " \n"
 "Araba ka NOMORO e pele ha lebitso la Mofani wa Medical Aid wa hao: \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:897
+#: vaccine/vaccine_reg_whatsapp.py:949
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1289,7 +1329,7 @@ msgstr ""
 " \n"
 "Ka kopo THAEPA NOMORO ya Medical Aid wa hao."
 
-#: vaccine/vaccine_reg_whatsapp.py:902
+#: vaccine/vaccine_reg_whatsapp.py:954
 msgid ""
 "⚠️ Please try again\n"
 "\n"
@@ -1303,7 +1343,7 @@ msgstr ""
 " \n"
 "📌 Kapa araba *0* ho emisa tshebeletso ena le ho kgutlela ho *MENU* wa mantlha"
 
-#: vaccine/vaccine_reg_whatsapp.py:920
+#: vaccine/vaccine_reg_whatsapp.py:972
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1317,7 +1357,7 @@ msgstr ""
 "Ke kgetho efeng eo o e batlang bakeng sa tumellano ya kopano ya hao ya "
 "kentelo? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:932
+#: vaccine/vaccine_reg_whatsapp.py:984
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided.\n"
@@ -1329,7 +1369,7 @@ msgstr ""
 " \n"
 "O ka fumaneha neng bakeng sa tumellano ya kopano ya kentelo? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:1087
+#: vaccine/vaccine_reg_whatsapp.py:1139
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1355,3 +1395,6 @@ msgstr ""
 " \n"
 "----- \n"
 "📌 Araba *0* ho kgutlela ho *MENU* wa mantlha"
+
+#~ msgid "Passport Number"
+#~ msgstr "Nomoro ya Phasepoto"
