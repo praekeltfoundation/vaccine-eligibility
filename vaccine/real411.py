@@ -1,16 +1,39 @@
 import re
 from typing import List
+from urllib.parse import urljoin
 
+import aiohttp
+from aiohttp_client_cache import CacheBackend, CachedSession
+
+from vaccine import real411_config as config
 from vaccine.base_application import BaseApplication
 from vaccine.models import Message
 from vaccine.states import (
     Choice,
+    ChoiceState,
     EndState,
     FreeText,
     WhatsAppButtonState,
     WhatsAppListState,
 )
 from vaccine.validators import email_validator, nonempty_validator
+
+cache_backend = CacheBackend(expire_after=60)
+
+
+async def get_real411_form_data():
+    async with CachedSession(cache=cache_backend) as session:
+        response = await session.get(
+            url=urljoin(config.REAL411_URL, "form-data"),
+            timeout=aiohttp.ClientTimeout(total=5),
+            headers={
+                "Accept": "application/json",
+                "User-Agent": "real411-whatsapp",
+                "x-api-key": config.REAL411_TOKEN,
+            },
+        )
+        response.raise_for_status()
+        return await response.json()
 
 
 class WhatsAppExitButtonState(WhatsAppButtonState):
@@ -153,29 +176,17 @@ class Application(BaseApplication):
         )
 
     async def state_source_type(self):
+        source_types = (await get_real411_form_data())["Source"]
         question = self._(
             "*REPORT* 📵 Powered by ```Real411```\n"
             "\n"
             "Please tell us where you saw/heard the information being reported"
         )
-        return WhatsAppExitListState(
+        return ChoiceState(
             self,
             question=question,
-            # Goes to state_exit for error handling
-            error="",
-            button="Source type",
-            choices=[
-                Choice("WhatsApp", "WhatsApp"),
-                Choice("Facebook", "Facebook"),
-                Choice("Twitter", "Twitter"),
-                Choice("Instagram", "Instagram"),
-                Choice("Youtube", "Youtube"),
-                Choice("Website", "Website"),
-                Choice("Radio", "Radio"),
-                Choice("TV", "TV"),
-                Choice("Political Ad", "Political Ad"),
-                Choice("Other", "Other"),
-            ],
+            choices=[Choice(s["id"], s["name"]) for s in source_types],
+            error=question,
             next="state_description",
         )
 

@@ -1,5 +1,7 @@
 import pytest
+from sanic import Sanic, response
 
+from vaccine import real411_config as config
 from vaccine.models import Message
 from vaccine.real411 import Application
 from vaccine.testing import AppTester
@@ -8,6 +10,29 @@ from vaccine.testing import AppTester
 @pytest.fixture
 def tester():
     return AppTester(Application)
+
+
+@pytest.fixture
+async def real411_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("real411_mock")
+    app.requests = []
+
+    @app.route("/form-data", methods=["GET"])
+    def check(request):
+        app.requests.append(request)
+        return response.file_stream(
+            "vaccine/tests/real411.json", mime_type="application/json"
+        )
+
+    client = await sanic_client(app)
+    url = config.REAL411_URL
+    token = config.REAL411_TOKEN
+    config.REAL411_URL = f"http://{client.host}:{client.port}"
+    config.REAL411_TOKEN = "testtoken"
+    yield client
+    config.REAL411_URL = url
+    config.REAL411_TOKEN = token
 
 
 @pytest.mark.asyncio
@@ -98,7 +123,7 @@ async def test_surname(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_email(tester: AppTester):
+async def test_email(tester: AppTester, real411_mock):
     tester.setup_state("state_email")
     await tester.user_input("invalid email")
     tester.assert_state("state_email")
@@ -122,7 +147,7 @@ async def test_email(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_source_type(tester: AppTester):
+async def test_source_type(tester: AppTester, real411_mock):
     tester.setup_state("state_email")
     await tester.user_input("skip")
     tester.assert_state("state_source_type")
@@ -132,34 +157,25 @@ async def test_source_type(tester: AppTester):
                 "*REPORT* 📵 Powered by ```Real411```",
                 "",
                 "Please tell us where you saw/heard the information being reported",
+                "1. WhatsApp",
+                "2. Facebook",
+                "3. Twitter",
+                "4. Instagram",
+                "5. Youtube",
+                "6. Other Website",
+                "7. Radio / TV",
+                "8. Political Ad",
+                "9. Other",
             ]
         )
     )
-
-    assert tester.application.messages[0].helper_metadata["button"] == "Source type"
-
-    assert [
-        r["title"]
-        for r in tester.application.messages[0].helper_metadata["sections"][0]["rows"]
-    ] == [
-        "WhatsApp",
-        "Facebook",
-        "Twitter",
-        "Instagram",
-        "Youtube",
-        "Website",
-        "Radio",
-        "TV",
-        "Political Ad",
-        "Other",
-    ]
 
     await tester.user_input("whatsapp")
     tester.assert_state("state_description")
 
 
 @pytest.mark.asyncio
-async def test_description(tester: AppTester):
+async def test_description(tester: AppTester, real411_mock):
     tester.setup_state("state_source_type")
     await tester.user_input("whatsapp")
     tester.assert_state("state_description")
