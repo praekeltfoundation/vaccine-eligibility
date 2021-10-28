@@ -64,47 +64,13 @@ async def test_terms(tester: AppTester):
         buttons=["I agree", "No thanks"],
     )
     await tester.user_input("I agree")
-    tester.assert_state("state_province")
-
-
-@pytest.mark.asyncio
-async def test_province(tester: AppTester):
-    tester.setup_state("state_terms")
-    await tester.user_input("I agree")
-    tester.assert_state("state_province")
-    tester.assert_message(
-        "\n".join(
-            [
-                "*REPORT* 📵 Powered by ```Real411```",
-                "",
-                "Which province are you reporting this from?",
-            ]
-        )
-    )
-    assert tester.application.messages[0].helper_metadata["button"] == "Select province"
-
-    assert [
-        r["title"]
-        for r in tester.application.messages[0].helper_metadata["sections"][0]["rows"]
-    ] == [
-        "Gauteng",
-        "Western Cape",
-        "KwaZulu-Natal",
-        "Freestate",
-        "Eastern Cape",
-        "Limpopo",
-        "Mpumalanga",
-        "Northern Cape",
-        "North West",
-    ]
-    await tester.user_input("western cape")
     tester.assert_state("state_first_name")
 
 
 @pytest.mark.asyncio
 async def test_first_name(tester: AppTester):
-    tester.setup_state("state_province")
-    await tester.user_input("western cape")
+    tester.setup_state("state_terms")
+    await tester.user_input("I agree")
     tester.assert_state("state_first_name")
     tester.assert_message(
         "\n".join(

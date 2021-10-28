@@ -107,36 +107,10 @@ class Application(BaseApplication):
             # Goes to state_exit for error handling
             error="",
             next={
-                "yes": "state_province",
+                "yes": "state_first_name",
                 # TODO: Add state for if they select no
-                "no": "state_province",
+                "no": "state_first_name",
             },
-        )
-
-    async def state_province(self):
-        question = self._(
-            "*REPORT* 📵 Powered by ```Real411```\n"
-            "\n"
-            "Which province are you reporting this from?"
-        )
-        return WhatsAppExitListState(
-            self,
-            question=question,
-            # Goes to state_exit for error handling
-            error="",
-            button="Select province",
-            choices=[
-                Choice("ZA-GT", "Gauteng"),
-                Choice("ZA-WC", "Western Cape"),
-                Choice("ZA-NL", "KwaZulu-Natal"),
-                Choice("ZA-FS", "Freestate"),
-                Choice("ZA-EC", "Eastern Cape"),
-                Choice("ZA-LP", "Limpopo"),
-                Choice("ZA-MP", "Mpumalanga"),
-                Choice("ZA-NC", "Northern Cape"),
-                Choice("ZA-NW", "North West"),
-            ],
-            next="state_first_name",
         )
 
     async def state_first_name(self):
