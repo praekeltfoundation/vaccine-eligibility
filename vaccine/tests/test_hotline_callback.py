@@ -112,13 +112,17 @@ async def test_menu(tester: AppTester):
                 "Saturdays, Sundays and Public Holidays",
                 "8am-6pm",
                 "",
-                "---------------------",
-                "",
-                "The toll-free hotline is also available for you to call *24 hours a "
+                "_The toll-free hotline is also available for you to call *24 hours a "
                 "day*, every day for *Emergencies, health advice and post vaccination "
-                "queries*",
+                "queries*_",
                 "",
                 "---------------------",
+                "",
+                "📧 Questions and queries can also be emailed directly to "
+                "info@vaccinesupport.org.za",
+                "",
+                "---------------------",
+                "",
                 "📌 Reply  *0* to return to the main *MENU*",
             ]
         ),
