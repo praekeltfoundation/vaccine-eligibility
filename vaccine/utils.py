@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta, timezone
 from enum import Enum
 from functools import cached_property
 from json import JSONDecodeError
-from typing import Optional, AnyStr
+from typing import AnyStr, Optional
 from uuid import uuid4
 
 import aiohttp
