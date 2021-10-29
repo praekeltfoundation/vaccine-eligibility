@@ -1,5 +1,7 @@
 import pytest
+from sanic import Sanic, response
 
+from vaccine import real411_config as config
 from vaccine.models import Message
 from vaccine.real411 import Application
 from vaccine.testing import AppTester
@@ -8,6 +10,39 @@ from vaccine.testing import AppTester
 @pytest.fixture
 def tester():
     return AppTester(Application)
+
+
+@pytest.fixture
+async def real411_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("real411_mock")
+    app.requests = []
+
+    @app.route("/form-data", methods=["GET"])
+    def check(request):
+        app.requests.append(request)
+        return response.file_stream(
+            "vaccine/tests/real411.json", mime_type="application/json"
+        )
+
+    @app.route("/submit/v2", methods=["POST"])
+    def submit(request):
+        app.requests.append(request)
+        return response.json({"complaint_ref": 1, "file_urls": []})
+
+    @app.route("/complaints/finalize", methods=["POST"])
+    def finalise(request):
+        app.requests.append(request)
+        return response.json({})
+
+    client = await sanic_client(app)
+    url = config.REAL411_URL
+    token = config.REAL411_TOKEN
+    config.REAL411_URL = f"http://{client.host}:{client.port}"
+    config.REAL411_TOKEN = "testtoken"
+    yield client
+    config.REAL411_URL = url
+    config.REAL411_TOKEN = token
 
 
 @pytest.mark.asyncio
@@ -64,47 +99,13 @@ async def test_terms(tester: AppTester):
         buttons=["I agree", "No thanks"],
     )
     await tester.user_input("I agree")
-    tester.assert_state("state_province")
-
-
-@pytest.mark.asyncio
-async def test_province(tester: AppTester):
-    tester.setup_state("state_terms")
-    await tester.user_input("I agree")
-    tester.assert_state("state_province")
-    tester.assert_message(
-        "\n".join(
-            [
-                "*REPORT* 📵 Powered by ```Real411```",
-                "",
-                "Which province are you reporting this from?",
-            ]
-        )
-    )
-    assert tester.application.messages[0].helper_metadata["button"] == "Select province"
-
-    assert [
-        r["title"]
-        for r in tester.application.messages[0].helper_metadata["sections"][0]["rows"]
-    ] == [
-        "Gauteng",
-        "Western Cape",
-        "KwaZulu-Natal",
-        "Freestate",
-        "Eastern Cape",
-        "Limpopo",
-        "Mpumalanga",
-        "Northern Cape",
-        "North West",
-    ]
-    await tester.user_input("western cape")
     tester.assert_state("state_first_name")
 
 
 @pytest.mark.asyncio
 async def test_first_name(tester: AppTester):
-    tester.setup_state("state_province")
-    await tester.user_input("western cape")
+    tester.setup_state("state_terms")
+    await tester.user_input("I agree")
     tester.assert_state("state_first_name")
     tester.assert_message(
         "\n".join(
@@ -132,7 +133,7 @@ async def test_surname(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_email(tester: AppTester):
+async def test_email(tester: AppTester, real411_mock):
     tester.setup_state("state_email")
     await tester.user_input("invalid email")
     tester.assert_state("state_email")
@@ -156,7 +157,7 @@ async def test_email(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_source_type(tester: AppTester):
+async def test_source_type(tester: AppTester, real411_mock):
     tester.setup_state("state_email")
     await tester.user_input("skip")
     tester.assert_state("state_source_type")
@@ -166,34 +167,25 @@ async def test_source_type(tester: AppTester):
                 "*REPORT* 📵 Powered by ```Real411```",
                 "",
                 "Please tell us where you saw/heard the information being reported",
+                "1. WhatsApp",
+                "2. Facebook",
+                "3. Twitter",
+                "4. Instagram",
+                "5. Youtube",
+                "6. Other Website",
+                "7. Radio / TV",
+                "8. Political Ad",
+                "9. Other",
             ]
         )
     )
-
-    assert tester.application.messages[0].helper_metadata["button"] == "Source type"
-
-    assert [
-        r["title"]
-        for r in tester.application.messages[0].helper_metadata["sections"][0]["rows"]
-    ] == [
-        "WhatsApp",
-        "Facebook",
-        "Twitter",
-        "Instagram",
-        "Youtube",
-        "Website",
-        "Radio",
-        "TV",
-        "Political Ad",
-        "Other",
-    ]
 
     await tester.user_input("whatsapp")
     tester.assert_state("state_description")
 
 
 @pytest.mark.asyncio
-async def test_description(tester: AppTester):
+async def test_description(tester: AppTester, real411_mock):
     tester.setup_state("state_source_type")
     await tester.user_input("whatsapp")
     tester.assert_state("state_description")
@@ -251,9 +243,16 @@ async def test_opt_in(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_success(tester: AppTester):
-    tester.setup_state("state_opt_in")
-    await tester.user_input("I agree")
+async def test_success(tester: AppTester, real411_mock):
+    await tester.user_input("View and Accept T&Cs")  # start
+    await tester.user_input("I agree")  # terms
+    await tester.user_input("first name")  # first_name
+    await tester.user_input("surname")  # surname
+    await tester.user_input("test@example.org")  # email
+    await tester.user_input("whatsapp")  # source_type
+    await tester.user_input("test description")  # description
+    await tester.user_input("skip")  # media
+    await tester.user_input("I agree")  # opt_in
     tester.assert_message(
         "\n".join(
             [
@@ -269,3 +268,15 @@ async def test_success(tester: AppTester):
         ),
         session=Message.SESSION_EVENT.CLOSE,
     )
+    [_, submit, finalise] = real411_mock.app.requests
+    assert submit.json == {
+        "complaint_source": "PRAEKELT_API",
+        "agree": True,
+        "name": "first name surname",
+        "phone": "+27820001001",
+        "complaint_types": '[{"id": 5, "reason": "test description"}]',
+        "language": 13,
+        "source": 1,
+        "email": "test@example.org",
+    }
+    assert finalise.json == {"ref": 1}
