@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta, timezone
 from enum import Enum
 from functools import cached_property
 from json import JSONDecodeError
-from typing import Optional
+from typing import Optional, AnyStr
 from uuid import uuid4
 
 import aiohttp
@@ -151,3 +151,9 @@ countries = Countries()
 def clean_name(name: Optional[str]) -> str:
     name = re.sub(r"[^a-zA-Z0-9\s\u00C0-\u017F]|\n", "", name or "")
     return name.strip()
+
+
+def enforce_string(anystring: AnyStr) -> str:
+    if isinstance(anystring, bytes):
+        return anystring.decode()
+    return anystring

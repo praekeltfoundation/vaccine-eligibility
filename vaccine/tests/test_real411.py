@@ -25,6 +25,16 @@ async def real411_mock(sanic_client):
             "vaccine/tests/real411.json", mime_type="application/json"
         )
 
+    @app.route("/submit/v2", methods=["POST"])
+    def submit(request):
+        app.requests.append(request)
+        return response.json({"complaint_ref": 1, "file_urls": []})
+
+    @app.route("/complaints/finalize", methods=["POST"])
+    def finalise(request):
+        app.requests.append(request)
+        return response.json({})
+
     client = await sanic_client(app)
     url = config.REAL411_URL
     token = config.REAL411_TOKEN
@@ -233,9 +243,16 @@ async def test_opt_in(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_success(tester: AppTester):
-    tester.setup_state("state_opt_in")
-    await tester.user_input("I agree")
+async def test_success(tester: AppTester, real411_mock):
+    await tester.user_input("View and Accept T&Cs")  # start
+    await tester.user_input("I agree")  # terms
+    await tester.user_input("first name")  # first_name
+    await tester.user_input("surname")  # surname
+    await tester.user_input("test@example.org")  # email
+    await tester.user_input("whatsapp")  # source_type
+    await tester.user_input("test description")  # description
+    await tester.user_input("skip")  # media
+    await tester.user_input("I agree")  # opt_in
     tester.assert_message(
         "\n".join(
             [
@@ -251,3 +268,15 @@ async def test_success(tester: AppTester):
         ),
         session=Message.SESSION_EVENT.CLOSE,
     )
+    [_, submit, finalise] = real411_mock.app.requests
+    assert submit.json == {
+        "complaint_source": "PRAEKELT_API",
+        "agree": True,
+        "name": "first name surname",
+        "phone": "+27820001001",
+        "complaint_types": '[{"id": 5, "reason": "test description"}]',
+        "language": 13,
+        "source": 1,
+        "email": "test@example.org",
+    }
+    assert finalise.json == {"ref": 1}

@@ -1,5 +1,6 @@
+import json
 import re
-from typing import List
+from typing import List, Optional, Tuple
 from urllib.parse import urljoin
 
 import aiohttp
@@ -16,24 +17,81 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
+from vaccine.utils import enforce_string, normalise_phonenumber
 from vaccine.validators import email_validator, nonempty_validator
 
 cache_backend = CacheBackend(expire_after=60)
 
 
+def get_real411_api_client():
+    return CachedSession(
+        cache=cache_backend,
+        timeout=aiohttp.ClientTimeout(total=5),
+        headers={
+            "Accept": "application/json",
+            "User-Agent": "real411-whatsapp",
+            "x-api-key": config.REAL411_TOKEN,
+        },
+    )
+
+
 async def get_real411_form_data():
-    async with CachedSession(cache=cache_backend) as session:
+    async with get_real411_api_client() as session:
         response = await session.get(
-            url=urljoin(config.REAL411_URL, "form-data"),
-            timeout=aiohttp.ClientTimeout(total=5),
-            headers={
-                "Accept": "application/json",
-                "User-Agent": "real411-whatsapp",
-                "x-api-key": config.REAL411_TOKEN,
-            },
+            url=enforce_string(urljoin(config.REAL411_URL, "form-data"))
         )
         response.raise_for_status()
         return await response.json()
+
+
+async def submit_real411_form(
+    terms: bool,
+    name: str,
+    phone: str,
+    source: int,
+    reason: str,
+    email: Optional[str] = None,
+    source_url: Optional[str] = None,
+) -> Tuple[int, List[str]]:
+    # TODO: files
+    for complaint_type in (await get_real411_form_data())["ComplaintType"]:
+        if (
+            "dis" in complaint_type["code"].lower()
+            or "disinformation" in complaint_type["type"].lower()
+        ):
+            break
+    for language in (await get_real411_form_data())["Language"]:
+        if "end" in language["code"].lower() or "english" in language["name"].lower():
+            break
+    data = {
+        "complaint_source": config.REAL411_IDENTIFIER,
+        "agree": terms,
+        "name": name,
+        "phone": phone,
+        "complaint_types": json.dumps([{"id": complaint_type["id"], "reason": reason}]),
+        "language": language["id"],
+        "source": source,
+    }
+    if email:
+        data["email"] = email
+    if source_url:
+        data["source_url"] = source_url
+    async with get_real411_api_client() as session:
+        response = await session.post(
+            url=enforce_string(urljoin(config.REAL411_URL, "submit/v2")), json=data
+        )
+        response.raise_for_status()
+        response_data = await response.json()
+        return (response_data["complaint_ref"], response_data["file_urls"])
+
+
+async def finalise_real411_form(form_reference: str):
+    async with get_real411_api_client() as session:
+        response = await session.post(
+            url=enforce_string(urljoin(config.REAL411_URL, "complaints/finalize")),
+            json={"ref": form_reference},
+        )
+        response.raise_for_status()
 
 
 class WhatsAppExitButtonState(WhatsAppButtonState):
@@ -205,6 +263,9 @@ class Application(BaseApplication):
         )
 
     async def state_media(self):
+        # TODO: split out into separate URL and media steps
+        # TODO: make URL or media or both required, depending on API result
+        # TODO: for whatsapp type, allow text only, if forwarded message
         question = self._(
             "*REPORT* 📵 Powered by ```Real411```\n"
             "\n"
@@ -234,8 +295,24 @@ class Application(BaseApplication):
             choices=[Choice("yes", "I agree"), Choice("no", "No")],
             # Goes to state_exit for error handling
             error="",
-            next="state_success",
+            next="state_submit_report",
         )
+
+    async def state_submit_report(self):
+        answers = self.user.answers
+        email = answers["state_email"]
+        if email.strip().lower() == "skip":
+            email = None
+        form_reference, _ = await submit_real411_form(
+            terms=answers["state_terms"] == "yes",
+            name=f"{answers['state_first_name']} {answers['state_surname']}",
+            phone=normalise_phonenumber(self.user.addr),
+            source=answers["state_source_type"],
+            reason=answers["state_description"],
+            email=email,
+        )
+        await finalise_real411_form(form_reference)
+        return await self.go_to_state("state_success")
 
     async def state_success(self):
         text = self._(
