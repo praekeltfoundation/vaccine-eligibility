@@ -61,7 +61,7 @@ async def submit_real411_form(
         ):
             break
     for language in (await get_real411_form_data())["Language"]:
-        if "end" in language["code"].lower() or "english" in language["name"].lower():
+        if "eng" in language["code"].lower() or "english" in language["name"].lower():
             break
     data = {
         "complaint_source": config.REAL411_IDENTIFIER,
