@@ -68,16 +68,60 @@ async def test_start(tester: AppTester):
             [
                 "*REPORT* 📵 Powered by ```Real411```",
                 "",
-                "There is a lot of information going around related to the COVID-19 "
-                "pandemic. Some of this information may be false and potentially "
-                "harmful. Help to stop the spread of inaccurate or misleading "
-                "information by reporting it here.",
+                "There is a lot of information going around on WhatsApp related to the "
+                "COVID-19 pandemic. Some of this information may be false and "
+                "potentially harmful. Help to stop the spread of inaccurate or "
+                "misleading information on WhatsApp by reporting it here",
             ]
         ),
         buttons=["Tell me more", "View and Accept T&Cs"],
     )
 
+    await tester.user_input("invalid")
+    tester.assert_state("state_start")
+    tester.assert_message(
+        "This service works best when you use the options given. Please try using "
+        "the buttons below or reply *0* to return the main *MENU*."
+    )
+
     await tester.user_input("View and Accept T&Cs")
+    tester.assert_state("state_terms")
+
+
+@pytest.mark.asyncio
+async def test_tell_me_more(tester: AppTester):
+    await tester.user_input("tell me more")
+    tester.assert_state("state_tell_me_more")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*REPORT* 📵 Powered by ```Real411``` allows you to report digital "
+                "offences encountered on WhatsApp.",
+                "",
+                "You can report 4 types of digital offences here namely, "
+                "Disinformation, hate speech, incitement to violence and journalist "
+                "harassment. Disinformation is false, inaccurate or misleading "
+                "information designed, "
+                "presented and promoted online to intentionally cause public harm. "
+                "Hate speech suggests messages with malicious intent to harm or "
+                "dehumanise and may lead to incitement of violence. Incitement is the "
+                "encouragement of others to commit a crime, in this case violent "
+                "actions, which may cause harm, damage or even death. Journalists can "
+                "report unwanted conduct that is persistent or serious and demeans, "
+                "humiliates or creates a hostile or intimidating environment to induce "
+                "submission by actual or threatened adverse consequences.",
+            ]
+        )
+    )
+
+    await tester.user_input("invalid")
+    tester.assert_state("state_tell_me_more")
+    tester.assert_message(
+        "This service works best when you use the options given. Please try using the "
+        "buttons below."
+    )
+
+    await tester.user_input("continue")
     tester.assert_state("state_terms")
 
 

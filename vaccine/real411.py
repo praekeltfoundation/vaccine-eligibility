@@ -150,24 +150,61 @@ class Application(BaseApplication):
         question = self._(
             "*REPORT* 📵 Powered by ```Real411```\n"
             "\n"
-            "There is a lot of information going around related to the COVID-19 "
-            "pandemic. Some of this information may be false and potentially harmful. "
-            "Help to stop the spread of inaccurate or misleading information by "
-            "reporting it here."
+            "There is a lot of information going around on WhatsApp related to the "
+            "COVID-19 pandemic. Some of this information may be false and potentially "
+            "harmful. Help to stop the spread of inaccurate or misleading information "
+            "on WhatsApp by reporting it here"
         )
-        return WhatsAppExitButtonState(
+        error = self._(
+            "This service works best when you use the options given. Please try using "
+            "the buttons below or reply *0* to return the main *MENU*."
+        )
+        return WhatsAppButtonState(
             self,
             question=question,
             choices=[
                 Choice("tell_me_more", self._("Tell me more")),
                 Choice("terms_and_conditions", self._("View and Accept T&Cs")),
             ],
-            # Goes to state_exit for error handling
-            error="",
+            error=error,
             next={
-                # TODO: add tell me more state
-                "tell_me_more": "state_terms",
+                "tell_me_more": "state_tell_me_more",
                 "terms_and_conditions": "state_terms",
+            },
+        )
+
+    async def state_tell_me_more(self):
+        question = self._(
+            "*REPORT* 📵 Powered by ```Real411``` allows you to report digital "
+            "offences encountered on WhatsApp.\n"
+            "\n"
+            "You can report 4 types of digital offences here namely, Disinformation, "
+            "hate speech, incitement to violence and journalist harassment. "
+            "Disinformation is false, inaccurate or misleading information designed, "
+            "presented and promoted online to intentionally cause public harm. Hate "
+            "speech suggests messages with malicious intent to harm or dehumanise and "
+            "may lead to incitement of violence. Incitement is the encouragement of "
+            "others to commit a crime, in this case violent actions, which may cause "
+            "harm, damage or even death. Journalists can report unwanted conduct that "
+            "is persistent or serious and demeans, humiliates or creates a hostile or "
+            "intimidating environment to induce submission by actual or threatened "
+            "adverse consequences."
+        )
+        error = self._(
+            "This service works best when you use the options given. Please try using "
+            "the buttons below."
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("continue", self._("Continue")),
+                Choice("exit", self._("Exit")),
+            ],
+            error=error,
+            next={
+                "continue": "state_terms",
+                "exit": "state_exit",
             },
         )
 
