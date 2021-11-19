@@ -127,8 +127,17 @@ async def test_tell_me_more(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_terms(tester: AppTester):
+    """
+    PDF document with terms and conditions, and ask whether they accept
+    """
     await tester.user_input("View and Accept T&Cs")
     tester.assert_state("state_terms")
+    document = tester.application.messages.pop(0)
+    assert (
+        document.helper_metadata["document"]
+        == "https://healthcheck-rasa-images.s3.af-south-1.amazonaws.com/"
+        "Real411_Privacy+Policy_WhatsApp_02112021.docx.pdf"
+    )
     tester.assert_message(
         "\n".join(
             [
@@ -142,8 +151,38 @@ async def test_terms(tester: AppTester):
         ),
         buttons=["I agree", "No thanks"],
     )
+
+    await tester.user_input("invalid")
+    tester.assert_message(
+        "\n".join(
+            [
+                "This service works best when you use the options given. Try using the "
+                "buttons below or reply *0* to return the main *MENU*.",
+                "",
+                "Do you agree to our PRIVACY POLICY?",
+            ]
+        )
+    )
+
     await tester.user_input("I agree")
     tester.assert_state("state_first_name")
+
+
+@pytest.mark.asyncio
+async def test_refuse_terms(tester: AppTester):
+    tester.setup_state("state_terms")
+    await tester.user_input("no thanks")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*REPORT* 📵 Powered by ```Real411```",
+                "",
+                "If you change your mind, type *REPORT* anytime.",
+                "Reply *0 *to return to the main *MENU*",
+            ]
+        ),
+        session=Message.SESSION_EVENT.CLOSE,
+    )
 
 
 @pytest.mark.asyncio

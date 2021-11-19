@@ -169,7 +169,7 @@ class Application(BaseApplication):
             error=error,
             next={
                 "tell_me_more": "state_tell_me_more",
-                "terms_and_conditions": "state_terms",
+                "terms_and_conditions": "state_terms_pdf",
             },
         )
 
@@ -203,10 +203,22 @@ class Application(BaseApplication):
             ],
             error=error,
             next={
-                "continue": "state_terms",
+                "continue": "state_terms_pdf",
                 "exit": "state_exit",
             },
         )
+
+    async def state_terms_pdf(self):
+        self.messages.append(
+            self.inbound.reply(
+                None,
+                helper_metadata={
+                    "document": "https://healthcheck-rasa-images.s3.af-south-1."
+                    "amazonaws.com/Real411_Privacy+Policy_WhatsApp_02112021.docx.pdf"
+                },
+            )
+        )
+        return await self.go_to_state("state_terms")
 
     async def state_terms(self):
         question = self._(
@@ -215,20 +227,34 @@ class Application(BaseApplication):
             "Your information is kept private and confidential and only used with your "
             "consent for the purpose of reporting disinformation.\n"
             "\n"
-            # TODO: add privacy policy
             "Do you agree to the attached PRIVACY POLICY?"
         )
-        return WhatsAppExitButtonState(
+        error = self._(
+            "This service works best when you use the options given. Try using the "
+            "buttons below or reply *0* to return the main *MENU*.\n"
+            "\n"
+            "Do you agree to our PRIVACY POLICY?"
+        )
+        return WhatsAppButtonState(
             self,
             question=question,
             choices=[Choice("yes", "I agree"), Choice("no", "No thanks")],
-            # Goes to state_exit for error handling
-            error="",
+            error=error,
             next={
                 "yes": "state_first_name",
-                # TODO: Add state for if they select no
-                "no": "state_first_name",
+                "no": "state_refuse_terms",
             },
+        )
+
+    async def state_refuse_terms(self):
+        return EndState(
+            self,
+            self._(
+                "*REPORT* 📵 Powered by ```Real411```\n"
+                "\n"
+                "If you change your mind, type *REPORT* anytime.\n"
+                "Reply *0 *to return to the main *MENU*"
+            ),
         )
 
     async def state_first_name(self):
