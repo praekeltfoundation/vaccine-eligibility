@@ -251,8 +251,10 @@ async def test_confirm_name(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_email(tester: AppTester, real411_mock):
-    tester.setup_state("state_email")
-    await tester.user_input("invalid email")
+    tester.setup_answer("state_first_name", "firstname")
+    tester.setup_answer("state_surname", "surname")
+    tester.setup_state("state_confirm_name")
+    await tester.user_input("confirm")
     tester.assert_state("state_email")
     tester.assert_message(
         "\n".join(
@@ -261,6 +263,18 @@ async def test_email(tester: AppTester, real411_mock):
                 "",
                 "Please TYPE your EMAIL address. (Or type SKIP if you are unable to "
                 "share an email address.)",
+            ]
+        )
+    )
+
+    await tester.user_input("invalid")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*REPORT* 📵 Powered by ```Real411```",
+                "",
+                "Please TYPE a valid EMAIL address or type *SKIP* if you are unable to "
+                "share an email address",
             ]
         )
     )

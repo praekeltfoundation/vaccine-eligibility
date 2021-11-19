@@ -315,12 +315,17 @@ class Application(BaseApplication):
             "Please TYPE your EMAIL address. (Or type SKIP if you are unable to share "
             "an email address.)"
         )
-        # TODO: Add error message, maybe including error description from library
+        error = self._(
+            "*REPORT* 📵 Powered by ```Real411```\n"
+            "\n"
+            "Please TYPE a valid EMAIL address or type *SKIP* if you are unable to "
+            "share an email address"
+        )
         return FreeText(
             self,
             question=question,
             next="state_source_type",
-            check=email_validator(error_text=question, skip_keywords=["skip"]),
+            check=email_validator(error_text=error, skip_keywords=["skip"]),
         )
 
     async def state_source_type(self):
