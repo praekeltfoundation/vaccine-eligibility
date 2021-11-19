@@ -48,7 +48,6 @@ async def submit_real411_form(
     terms: bool,
     name: str,
     phone: str,
-    source: int,
     reason: str,
     email: Optional[str] = None,
     source_url: Optional[str] = None,
@@ -63,6 +62,9 @@ async def submit_real411_form(
     for language in (await get_real411_form_data())["Language"]:
         if "eng" in language["code"].lower() or "english" in language["name"].lower():
             break
+    for source in (await get_real411_form_data())["Source"]:
+        if "whatsapp" in source["name"].lower() or "wht" in source["code"].lower():
+            break
     data = {
         "complaint_source": config.REAL411_IDENTIFIER,
         "agree": terms,
@@ -70,7 +72,7 @@ async def submit_real411_form(
         "phone": phone,
         "complaint_types": json.dumps([{"id": complaint_type["id"], "reason": reason}]),
         "language": language["id"],
-        "source": source,
+        "source": source["id"],
     }
     if email:
         data["email"] = email
@@ -324,23 +326,8 @@ class Application(BaseApplication):
         return FreeText(
             self,
             question=question,
-            next="state_source_type",
-            check=email_validator(error_text=error, skip_keywords=["skip"]),
-        )
-
-    async def state_source_type(self):
-        source_types = (await get_real411_form_data())["Source"]
-        question = self._(
-            "*REPORT* 📵 Powered by ```Real411```\n"
-            "\n"
-            "Please tell us where you saw/heard the information being reported"
-        )
-        return ChoiceState(
-            self,
-            question=question,
-            choices=[Choice(s["id"], s["name"]) for s in source_types],
-            error=question,
             next="state_description",
+            check=email_validator(error_text=error, skip_keywords=["skip"]),
         )
 
     async def state_description(self):
@@ -402,7 +389,6 @@ class Application(BaseApplication):
             terms=answers["state_terms"] == "yes",
             name=f"{answers['state_first_name']} {answers['state_surname']}",
             phone=normalise_phonenumber(self.user.addr),
-            source=answers["state_source_type"],
             reason=answers["state_description"],
             email=email,
         )

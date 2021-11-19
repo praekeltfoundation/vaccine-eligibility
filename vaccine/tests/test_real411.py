@@ -250,7 +250,7 @@ async def test_confirm_name(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_email(tester: AppTester, real411_mock):
+async def test_email(tester: AppTester):
     tester.setup_answer("state_first_name", "firstname")
     tester.setup_answer("state_surname", "surname")
     tester.setup_state("state_confirm_name")
@@ -280,45 +280,17 @@ async def test_email(tester: AppTester, real411_mock):
     )
 
     await tester.user_input("skip")
-    tester.assert_state("state_source_type")
+    tester.assert_state("state_description")
 
     tester.setup_state("state_email")
     await tester.user_input("valid@example.org")
-    tester.assert_state("state_source_type")
-
-
-@pytest.mark.asyncio
-async def test_source_type(tester: AppTester, real411_mock):
-    tester.setup_state("state_email")
-    await tester.user_input("skip")
-    tester.assert_state("state_source_type")
-    tester.assert_message(
-        "\n".join(
-            [
-                "*REPORT* 📵 Powered by ```Real411```",
-                "",
-                "Please tell us where you saw/heard the information being reported",
-                "1. WhatsApp",
-                "2. Facebook",
-                "3. Twitter",
-                "4. Instagram",
-                "5. Youtube",
-                "6. Other Website",
-                "7. Radio / TV",
-                "8. Political Ad",
-                "9. Other",
-            ]
-        )
-    )
-
-    await tester.user_input("whatsapp")
     tester.assert_state("state_description")
 
 
 @pytest.mark.asyncio
 async def test_description(tester: AppTester, real411_mock):
-    tester.setup_state("state_source_type")
-    await tester.user_input("whatsapp")
+    tester.setup_state("state_email")
+    await tester.user_input("test@example.org")
     tester.assert_state("state_description")
     tester.assert_message(
         "\n".join(
@@ -381,7 +353,6 @@ async def test_success(tester: AppTester, real411_mock):
     await tester.user_input("surname")  # surname
     await tester.user_input("confirm")  # confirm name
     await tester.user_input("test@example.org")  # email
-    await tester.user_input("whatsapp")  # source_type
     await tester.user_input("test description")  # description
     await tester.user_input("skip")  # media
     await tester.user_input("I agree")  # opt_in
