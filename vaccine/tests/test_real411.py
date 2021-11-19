@@ -344,6 +344,17 @@ async def test_opt_in(tester: AppTester):
         buttons=["I agree", "No"],
     )
 
+    await tester.user_input("invalid")
+    tester.assert_message(
+        "\n".join(
+            [
+                "This service works best when you use the options given. Please try using the buttons below or reply *0* to return the main *MENU*.",
+                "",
+                "Do you agree to share your report with Real411?",
+            ]
+        )
+    )
+
 
 @pytest.mark.asyncio
 async def test_success(tester: AppTester, real411_mock):

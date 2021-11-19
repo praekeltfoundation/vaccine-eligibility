@@ -96,26 +96,6 @@ async def finalise_real411_form(form_reference: str):
         response.raise_for_status()
 
 
-class WhatsAppExitButtonState(WhatsAppButtonState):
-    async def process_message(self, message: Message):
-        choice = self._get_choice(message.content)
-        if choice is None:
-            state = await self.app.go_to_state("state_exit")
-            return await state.process_message(message)
-        else:
-            return await super().process_message(message)
-
-
-class WhatsAppExitListState(WhatsAppListState):
-    async def process_message(self, message: Message):
-        choice = self._get_choice(message.content)
-        if choice is None:
-            state = await self.app.go_to_state("state_exit")
-            return await state.process_message(message)
-        else:
-            return await super().process_message(message)
-
-
 class Application(BaseApplication):
     START_STATE = "state_start"
 
@@ -371,12 +351,17 @@ class Application(BaseApplication):
             "accurate to the best of your knowledge and that you give ContactNDOH "
             "permission to send you message about the outcome of your report"
         )
-        return WhatsAppExitButtonState(
+        error = self._(
+            "This service works best when you use the options given. Please try using "
+            "the buttons below or reply *0* to return the main *MENU*.\n"
+            "\n"
+            "Do you agree to share your report with Real411?"
+        )
+        return WhatsAppButtonState(
             self,
             question=question,
             choices=[Choice("yes", "I agree"), Choice("no", "No")],
-            # Goes to state_exit for error handling
-            error="",
+            error=error,
             next="state_submit_report",
         )
 
@@ -389,7 +374,7 @@ class Application(BaseApplication):
             terms=answers["state_terms"] == "yes",
             name=f"{answers['state_first_name']} {answers['state_surname']}",
             phone=normalise_phonenumber(self.user.addr),
-            reason=answers["state_description"],
+            reason=f"{answers['state_description']}\n\n{answers['state_media']}",
             email=email,
         )
         await finalise_real411_form(form_reference)
