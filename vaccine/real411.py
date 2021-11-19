@@ -276,9 +276,36 @@ class Application(BaseApplication):
         return FreeText(
             self,
             question=question,
-            next="state_email",
+            next="state_confirm_name",
             # TODO: Add error message for empty text
             check=nonempty_validator(question),
+        )
+
+    async def state_confirm_name(self):
+        return WhatsAppButtonState(
+            self,
+            question=self._(
+                "*REPORT* 📵 Powered by ```Real411```\n"
+                "\n"
+                "Please confirm your full name as {first_name} {surname}"
+            ).format(
+                first_name=self.user.answers["state_first_name"],
+                surname=self.user.answers["state_surname"],
+            ),
+            choices=[
+                Choice("yes", self._("Confirm")),
+                Choice("no", self._("Edit name")),
+            ],
+            error=self._(
+                "This service works best when you use the options given. Try using the "
+                "buttons below or reply *0* to return the main *MENU*.\n"
+                "\n"
+                "Please confirm your full name as {first_name} {surname}"
+            ).format(
+                first_name=self.user.answers["state_first_name"],
+                surname=self.user.answers["state_surname"],
+            ),
+            next={"yes": "state_email", "no": "state_first_name"},
         )
 
     async def state_email(self):

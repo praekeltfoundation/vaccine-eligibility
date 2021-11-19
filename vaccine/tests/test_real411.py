@@ -202,6 +202,7 @@ async def test_first_name(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_surname(tester: AppTester):
+    tester.setup_answer("state_first_name", "firstname")
     tester.setup_state("state_first_name")
     await tester.user_input("test name")
     tester.assert_state("state_surname")
@@ -212,6 +213,39 @@ async def test_surname(tester: AppTester):
     )
 
     await tester.user_input("test surname")
+    tester.assert_state("state_confirm_name")
+
+
+@pytest.mark.asyncio
+async def test_confirm_name(tester: AppTester):
+    tester.setup_answer("state_first_name", "firstname")
+    tester.setup_state("state_surname")
+    await tester.user_input("surname")
+    tester.assert_state("state_confirm_name")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*REPORT* 📵 Powered by ```Real411```",
+                "",
+                "Please confirm your full name as firstname surname",
+            ]
+        ),
+        buttons=["Confirm", "Edit name"],
+    )
+
+    await tester.user_input("invalid")
+    tester.assert_message(
+        "\n".join(
+            [
+                "This service works best when you use the options given. Try using the "
+                "buttons below or reply *0* to return the main *MENU*.",
+                "",
+                "Please confirm your full name as firstname surname",
+            ]
+        )
+    )
+
+    await tester.user_input("confirm")
     tester.assert_state("state_email")
 
 
@@ -331,6 +365,7 @@ async def test_success(tester: AppTester, real411_mock):
     await tester.user_input("I agree")  # terms
     await tester.user_input("first name")  # first_name
     await tester.user_input("surname")  # surname
+    await tester.user_input("confirm")  # confirm name
     await tester.user_input("test@example.org")  # email
     await tester.user_input("whatsapp")  # source_type
     await tester.user_input("test description")  # description
