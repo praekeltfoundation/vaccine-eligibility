@@ -3,7 +3,7 @@ from sanic import Sanic, response
 
 from vaccine import real411_config as config
 from vaccine.models import Message
-from vaccine.real411 import Application
+from vaccine.real411 import BLANK_PNG, Application
 from vaccine.testing import AppTester
 
 
@@ -25,10 +25,24 @@ async def real411_mock(sanic_client):
             "vaccine/tests/real411.json", mime_type="application/json"
         )
 
+    @app.route("/file_upload", methods=["POST"])
+    def file_upload(request):
+        app.requests.append(request)
+        return response.text("")
+
     @app.route("/submit/v2", methods=["POST"])
     def submit(request):
         app.requests.append(request)
-        return response.json({"complaint_ref": 1, "file_urls": []})
+        file_count = len(request.json["file_names"])
+        return response.json(
+            {
+                "complaint_ref": 1,
+                "file_urls": [
+                    app.url_for("file_upload", _external=True)
+                    for _ in range(file_count)
+                ],
+            }
+        )
 
     @app.route("/complaints/finalize", methods=["POST"])
     def finalise(request):
@@ -36,13 +50,35 @@ async def real411_mock(sanic_client):
         return response.json({})
 
     client = await sanic_client(app)
+    app.config.SERVER_NAME = f"http://{client.host}:{client.port}"
     url = config.REAL411_URL
     token = config.REAL411_TOKEN
-    config.REAL411_URL = f"http://{client.host}:{client.port}"
+    config.REAL411_URL = app.config.SERVER_NAME
     config.REAL411_TOKEN = "testtoken"
     yield client
     config.REAL411_URL = url
     config.REAL411_TOKEN = token
+
+
+@pytest.fixture
+async def whatsapp_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("whatsapp_mock")
+    app.requests = []
+
+    @app.route("/v1/media/<media_id>", methods=["GET"])
+    def get_media(request, media_id):
+        app.requests.append(request)
+        return response.raw(b"testfile")
+
+    client = await sanic_client(app)
+    url = config.WHATSAPP_URL
+    token = config.WHATSAPP_TOKEN
+    config.WHATSAPP_URL = f"http://{client.host}:{client.port}"
+    config.WHATSAPP_TOKEN = "testtoken"
+    yield client
+    config.WHATSAPP_URL = url
+    config.WHATSAPP_TOKEN = token
 
 
 @pytest.mark.asyncio
@@ -297,7 +333,8 @@ async def test_description(tester: AppTester, real411_mock):
             [
                 "*REPORT* 📵 Powered by ```Real411```",
                 "",
-                "Please describe the information being reported in your own words:",
+                "Please describe the information being reported in your own words or "
+                "simply forward a message that you would like to report:",
             ]
         )
     )
@@ -348,7 +385,8 @@ async def test_opt_in(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "This service works best when you use the options given. Please try using the buttons below or reply *0* to return the main *MENU*.",
+                "This service works best when you use the options given. Please try "
+                "using the buttons below or reply *0* to return the main *MENU*.",
                 "",
                 "Do you agree to share your report with Real411?",
             ]
@@ -357,15 +395,31 @@ async def test_opt_in(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_success(tester: AppTester, real411_mock):
+async def test_success(tester: AppTester, real411_mock, whatsapp_mock):
     await tester.user_input("View and Accept T&Cs")  # start
     await tester.user_input("I agree")  # terms
     await tester.user_input("first name")  # first_name
     await tester.user_input("surname")  # surname
     await tester.user_input("confirm")  # confirm name
     await tester.user_input("test@example.org")  # email
-    await tester.user_input("test description")  # description
-    await tester.user_input("skip")  # media
+    await tester.user_input(
+        "test video description",
+        transport_metadata={
+            "message": {
+                "type": "video",
+                "video": {"id": "vid1", "mime_type": "video/mp4"},
+            }
+        },
+    )  # description
+    await tester.user_input(
+        "test image description",
+        transport_metadata={
+            "message": {
+                "type": "image",
+                "image": {"id": "img1", "mime_type": "image/jpeg"},
+            }
+        },
+    )  # media
     await tester.user_input("I agree")  # opt_in
     tester.assert_message(
         "\n".join(
@@ -382,15 +436,57 @@ async def test_success(tester: AppTester, real411_mock):
         ),
         session=Message.SESSION_EVENT.CLOSE,
     )
-    [_, submit, finalise] = real411_mock.app.requests
+    [_, submit, uploadvid, uploadimg, finalise] = real411_mock.app.requests
     assert submit.json == {
         "complaint_source": "PRAEKELT_API",
         "agree": True,
         "name": "first name surname",
         "phone": "+27820001001",
-        "complaint_types": '[{"id": 5, "reason": "test description"}]',
+        "complaint_types": '[{"id": 5, "reason": "test video description\\n\\ntest '
+        'image description"}]',
         "language": 13,
         "source": 1,
         "email": "test@example.org",
+        "file_names": [
+            {"name": "vid1", "type": "video/mp4"},
+            {"name": "img1", "type": "image/jpeg"},
+        ],
     }
+    assert uploadvid.files["file"][0].body == b"testfile"
+    assert uploadvid.files["file"][0].name == "vid1"
+    assert uploadvid.files["file"][0].type == "video/mp4"
+    assert uploadimg.files["file"][0].body == b"testfile"
+    assert uploadimg.files["file"][0].name == "img1"
+    assert uploadimg.files["file"][0].type == "image/jpeg"
+    assert finalise.json == {"ref": 1}
+
+
+@pytest.mark.asyncio
+async def test_success_no_media(tester: AppTester, real411_mock, whatsapp_mock):
+    """
+    Uploads a blank 1x1 PNG if there is no media
+    """
+    await tester.user_input("View and Accept T&Cs")  # start
+    await tester.user_input("I agree")  # terms
+    await tester.user_input("first name")  # first_name
+    await tester.user_input("surname")  # surname
+    await tester.user_input("confirm")  # confirm name
+    await tester.user_input("SKIP")  # email
+    await tester.user_input("test description")  # description
+    await tester.user_input("SKIP")  # media
+    await tester.user_input("I agree")  # opt_in
+    [_, submit, upload, finalise] = real411_mock.app.requests
+    assert submit.json == {
+        "complaint_source": "PRAEKELT_API",
+        "agree": True,
+        "name": "first name surname",
+        "phone": "+27820001001",
+        "complaint_types": '[{"id": 5, "reason": "test description\\n\\nSKIP"}]',
+        "language": 13,
+        "source": 1,
+        "file_names": [{"name": "placeholder", "type": "image/png"}],
+    }
+    assert upload.files["file"][0].body == BLANK_PNG
+    assert upload.files["file"][0].name == "placeholder"
+    assert upload.files["file"][0].type == "image/png"
     assert finalise.json == {"ref": 1}

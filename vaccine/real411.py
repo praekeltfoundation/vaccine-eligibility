@@ -1,5 +1,6 @@
 import json
 import re
+from base64 import b64decode
 from typing import List, Optional, Tuple
 from urllib.parse import urljoin
 
@@ -9,18 +10,16 @@ from aiohttp_client_cache import CacheBackend, CachedSession
 from vaccine import real411_config as config
 from vaccine.base_application import BaseApplication
 from vaccine.models import Message
-from vaccine.states import (
-    Choice,
-    ChoiceState,
-    EndState,
-    FreeText,
-    WhatsAppButtonState,
-    WhatsAppListState,
-)
-from vaccine.utils import enforce_string, normalise_phonenumber
+from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
+from vaccine.utils import enforce_string, normalise_phonenumber, save_media
 from vaccine.validators import email_validator, nonempty_validator
 
 cache_backend = CacheBackend(expire_after=60)
+
+BLANK_PNG = b64decode(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAA"
+    "AFAAGq1chRAAAAAElFTkSuQmCC"
+)
 
 
 def get_real411_api_client():
@@ -50,9 +49,8 @@ async def submit_real411_form(
     phone: str,
     reason: str,
     email: Optional[str] = None,
-    source_url: Optional[str] = None,
+    file_names: Optional[List[dict]] = None,
 ) -> Tuple[int, List[str]]:
-    # TODO: files
     for complaint_type in (await get_real411_form_data())["ComplaintType"]:
         if (
             "dis" in complaint_type["code"].lower()
@@ -73,11 +71,10 @@ async def submit_real411_form(
         "complaint_types": json.dumps([{"id": complaint_type["id"], "reason": reason}]),
         "language": language["id"],
         "source": source["id"],
+        "file_names": file_names or [],
     }
     if email:
         data["email"] = email
-    if source_url:
-        data["source_url"] = source_url
     async with get_real411_api_client() as session:
         response = await session.post(
             url=enforce_string(urljoin(config.REAL411_URL, "submit/v2")), json=data
@@ -94,6 +91,25 @@ async def finalise_real411_form(form_reference: str):
             json={"ref": form_reference},
         )
         response.raise_for_status()
+
+
+def get_whatsapp_api():
+    return aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=5),
+        headers={
+            "User-Agent": "contactndoh-real411",
+            "Authorization": f"Bearer {config.WHATSAPP_TOKEN}",
+        },
+    )
+
+
+async def get_whatsapp_media(media_id):
+    async with get_whatsapp_api() as session:
+        response = await session.get(
+            url=urljoin(config.WHATSAPP_URL, f"v1/media/{media_id}")
+        )
+        response.raise_for_status()
+        return response.content
 
 
 class Application(BaseApplication):
@@ -314,33 +330,28 @@ class Application(BaseApplication):
         question = self._(
             "*REPORT* 📵 Powered by ```Real411```\n"
             "\n"
-            "Please describe the information being reported in your own words:"
+            "Please describe the information being reported in your own words or "
+            "simply forward a message that you would like to report:"
         )
-        # TODO: Add error message
         return FreeText(
             self,
             question=question,
             next="state_media",
-            check=nonempty_validator(question),
+            check=save_media(self, "state_description_file"),
         )
 
     async def state_media(self):
-        # TODO: split out into separate URL and media steps
-        # TODO: make URL or media or both required, depending on API result
-        # TODO: for whatsapp type, allow text only, if forwarded message
         question = self._(
             "*REPORT* 📵 Powered by ```Real411```\n"
             "\n"
             "Please share any additional information such as screenshots, photos, "
             "voicenotes or links (or type SKIP)"
         )
-        # TODO: Add error message
-        # TODO: What if they want to send multiple media items?
         return FreeText(
             self,
             question=question,
             next="state_opt_in",
-            check=nonempty_validator(question),
+            check=save_media(self, "state_media_file"),
         )
 
     async def state_opt_in(self):
@@ -370,13 +381,38 @@ class Application(BaseApplication):
         email = answers["state_email"]
         if email.strip().lower() == "skip":
             email = None
-        form_reference, _ = await submit_real411_form(
+        files = []
+        if answers.get("state_description_file"):
+            file = json.loads(answers["state_description_file"])
+            files.append({"name": file["id"], "type": file["mime_type"]})
+        if answers.get("state_media_file"):
+            file = json.loads(answers["state_media_file"])
+            files.append({"name": file["id"], "type": file["mime_type"]})
+        if not files:
+            files.append({"name": "placeholder", "type": "image/png"})
+
+        form_reference, file_urls = await submit_real411_form(
             terms=answers["state_terms"] == "yes",
             name=f"{answers['state_first_name']} {answers['state_surname']}",
             phone=normalise_phonenumber(self.user.addr),
             reason=f"{answers['state_description']}\n\n{answers['state_media']}",
             email=email,
+            file_names=files,
         )
+
+        async with aiohttp.ClientSession() as session:
+            for file, file_url in zip(files, file_urls):
+                if file["name"] == "placeholder":
+                    file_data = BLANK_PNG
+                else:
+                    file_data = await get_whatsapp_media(file["name"])
+                data = aiohttp.FormData()
+                data.add_field(
+                    "file", file_data, filename=file["name"], content_type=file["type"]
+                )
+                result = await session.post(file_url, data=data)
+                result.raise_for_status()
+
         await finalise_real411_form(form_reference)
         return await self.go_to_state("state_success")
 

@@ -1,9 +1,9 @@
 import asyncio
+import json
 import re
 from datetime import date, datetime, timedelta, timezone
 from enum import Enum
 from functools import cached_property
-from json import JSONDecodeError
 from typing import AnyStr, Optional
 from uuid import uuid4
 
@@ -14,7 +14,7 @@ from rapidfuzz import process
 
 DECODE_MESSAGE_EXCEPTIONS = (
     UnicodeDecodeError,
-    JSONDecodeError,
+    json.JSONDecodeError,
     TypeError,
     KeyError,
     ValueError,
@@ -157,3 +157,17 @@ def enforce_string(anystring: AnyStr) -> str:
     if isinstance(anystring, bytes):
         return anystring.decode()
     return anystring
+
+
+def save_media(app, field):
+    """
+    If this is a media message, store the media metadata on the contact
+    """
+
+    async def validator(content):
+        msg_type = app.inbound.transport_metadata.get("message", {}).get("type")
+        if msg_type in ["audio", "document", "image", "video", "voice"]:
+            media = app.inbound.transport_metadata.get("message", {}).get(msg_type, {})
+            app.save_answer(field, json.dumps(media))
+
+    return validator
