@@ -93,7 +93,10 @@ async def test_exit_keywords(tester: AppTester):
 @pytest.mark.asyncio
 async def test_timeout(tester: AppTester):
     await tester.user_input(session=Message.SESSION_EVENT.CLOSE)
-    tester.assert_message("We haven't heard from you in while.")
+    tester.assert_message(
+        "We haven't heard from you in while. Reply *0* to return to the main *MENU*, "
+        "or *REPORT* to try again."
+    )
 
 
 @pytest.mark.asyncio
@@ -490,3 +493,21 @@ async def test_success_no_media(tester: AppTester, real411_mock, whatsapp_mock):
     assert upload.files["file"][0].name == "placeholder"
     assert upload.files["file"][0].type == "image/png"
     assert finalise.json == {"ref": 1}
+
+
+@pytest.mark.asyncio
+async def test_no_opt_in(tester: AppTester):
+    tester.setup_state("state_opt_in")
+    await tester.user_input("no")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*REPORT* 📵 Powered by ```Real411```",
+                "",
+                "Your report will not be shared",
+                "",
+                "Reply *REPORT* to start over",
+                "Reply *0* to return to the main *MENU*",
+            ]
+        )
+    )

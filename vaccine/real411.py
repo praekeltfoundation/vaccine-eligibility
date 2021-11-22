@@ -12,7 +12,7 @@ from vaccine.base_application import BaseApplication
 from vaccine.models import Message
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
 from vaccine.utils import enforce_string, normalise_phonenumber, save_media
-from vaccine.validators import email_validator, nonempty_validator
+from vaccine.validators import email_validator
 
 cache_backend = CacheBackend(expire_after=60)
 
@@ -22,7 +22,7 @@ BLANK_PNG = b64decode(
 )
 
 
-def get_real411_api_client():
+def get_real411_api_client() -> aiohttp.ClientSession:
     return CachedSession(
         cache=cache_backend,
         timeout=aiohttp.ClientTimeout(total=5),
@@ -34,7 +34,7 @@ def get_real411_api_client():
     )
 
 
-async def get_real411_form_data():
+async def get_real411_form_data() -> dict:
     async with get_real411_api_client() as session:
         response = await session.get(
             url=enforce_string(urljoin(config.REAL411_URL, "form-data"))
@@ -84,7 +84,7 @@ async def submit_real411_form(
         return (response_data["complaint_ref"], response_data["file_urls"])
 
 
-async def finalise_real411_form(form_reference: str):
+async def finalise_real411_form(form_reference: str) -> None:
     async with get_real411_api_client() as session:
         response = await session.post(
             url=enforce_string(urljoin(config.REAL411_URL, "complaints/finalize")),
@@ -93,7 +93,7 @@ async def finalise_real411_form(form_reference: str):
         response.raise_for_status()
 
 
-def get_whatsapp_api():
+def get_whatsapp_api() -> aiohttp.ClientSession:
     return aiohttp.ClientSession(
         timeout=aiohttp.ClientTimeout(total=5),
         headers={
@@ -103,7 +103,7 @@ def get_whatsapp_api():
     )
 
 
-async def get_whatsapp_media(media_id):
+async def get_whatsapp_media(media_id: str) -> aiohttp.StreamReader:
     async with get_whatsapp_api() as session:
         response = await session.get(
             url=urljoin(config.WHATSAPP_URL, f"v1/media/{media_id}")
@@ -137,8 +137,10 @@ class Application(BaseApplication):
     async def state_timeout(self):
         return EndState(
             self,
-            # TODO: Proper copy
-            self._("We haven't heard from you in while."),
+            self._(
+                "We haven't heard from you in while. Reply *0* to return to the main "
+                "*MENU*, or *REPORT* to try again."
+            ),
         )
 
     async def state_exit(self):
@@ -263,8 +265,6 @@ class Application(BaseApplication):
             self,
             question=question,
             next="state_surname",
-            # TODO: Add error message for empty text
-            check=nonempty_validator(question),
         )
 
     async def state_surname(self):
@@ -275,8 +275,6 @@ class Application(BaseApplication):
             self,
             question=question,
             next="state_confirm_name",
-            # TODO: Add error message for empty text
-            check=nonempty_validator(question),
         )
 
     async def state_confirm_name(self):
@@ -323,7 +321,7 @@ class Application(BaseApplication):
             self,
             question=question,
             next="state_description",
-            check=email_validator(error_text=error, skip_keywords=["skip"]),
+            check=email_validator(error_text=error, skip_keywords=["skip", "*skip*"]),
         )
 
     async def state_description(self):
@@ -373,7 +371,10 @@ class Application(BaseApplication):
             question=question,
             choices=[Choice("yes", "I agree"), Choice("no", "No")],
             error=error,
-            next="state_submit_report",
+            next={
+                "yes": "state_submit_report",
+                "no": "state_do_not_share",
+            },
         )
 
     async def state_submit_report(self):
@@ -428,3 +429,25 @@ class Application(BaseApplication):
             "Reply 0 to return to the main MENU"
         )
         return EndState(self, text=text)
+
+    async def state_do_not_share(self):
+        return EndState(
+            self,
+            text=self._(
+                "*REPORT* 📵 Powered by ```Real411```\n"
+                "\n"
+                "Your report will not be shared\n"
+                "\n"
+                "Reply *REPORT* to start over\n"
+                "Reply *0* to return to the main *MENU*"
+            ),
+        )
+
+    async def state_error(self):
+        return EndState(
+            self,
+            text=self._(
+                "Something went wrong. Please try again later. Reply *0* to go back to "
+                "the main *MENU*, or *REPORT* to try again."
+            ),
+        )
