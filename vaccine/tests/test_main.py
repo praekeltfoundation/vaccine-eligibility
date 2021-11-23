@@ -1,4 +1,8 @@
+from sanic_testing import TestManager
+
 from vaccine.main import app
+
+TestManager(app)
 
 
 def test_metrics():
