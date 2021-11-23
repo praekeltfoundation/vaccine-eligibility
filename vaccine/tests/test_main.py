@@ -1,5 +1,6 @@
-from vaccine.main import app
 from sanic_testing import TestManager
+
+from vaccine.main import app
 
 TestManager(app)
 
