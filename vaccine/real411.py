@@ -25,7 +25,7 @@ BLANK_PNG = b64decode(
 def get_real411_api_client() -> aiohttp.ClientSession:
     return CachedSession(
         cache=cache_backend,
-        timeout=aiohttp.ClientTimeout(total=5),
+        timeout=aiohttp.ClientTimeout(total=10),
         headers={
             "Accept": "application/json",
             "User-Agent": "real411-whatsapp",
