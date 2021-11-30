@@ -102,13 +102,13 @@ def get_whatsapp_api() -> aiohttp.ClientSession:
     )
 
 
-async def get_whatsapp_media(media_id: str) -> aiohttp.StreamReader:
+async def get_whatsapp_media(media_id: str) -> aiohttp.ClientResponse:
     async with get_whatsapp_api() as session:
         response = await session.get(
             url=urljoin(config.WHATSAPP_URL, f"v1/media/{media_id}")
         )
         response.raise_for_status()
-        return response.content
+        return response
 
 
 class Application(BaseApplication):
@@ -406,13 +406,18 @@ class Application(BaseApplication):
             for file, file_url in zip(files, file_urls):
                 if file["name"] == "placeholder":
                     file_data = BLANK_PNG
+                    file_size = len(file_data)
                 else:
-                    file_data = await get_whatsapp_media(file["name"])
+                    response = await get_whatsapp_media(file["name"])
+                    file_data = response.content
+                    file_size = response.headers["content-length"]
                 result = await session.put(
                     file_url,
                     data=file_data,
-                    expect100=True,
-                    headers={"Content-Type": file["type"]},
+                    headers={
+                        "Content-Type": file["type"],
+                        "Content-Length": str(file_size),
+                    },
                 )
                 result.raise_for_status()
 
