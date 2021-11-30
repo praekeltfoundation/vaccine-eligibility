@@ -25,7 +25,7 @@ async def real411_mock(sanic_client):
             "vaccine/tests/real411.json", mime_type="application/json"
         )
 
-    @app.route("/file_upload", methods=["POST"])
+    @app.route("/file_upload", methods=["PUT"])
     def file_upload(request):
         app.requests.append(request)
         return response.text("")
@@ -455,12 +455,8 @@ async def test_success(tester: AppTester, real411_mock, whatsapp_mock):
             {"name": "img1", "type": "image/jpeg"},
         ],
     }
-    assert uploadvid.files["file"][0].body == b"testfile"
-    assert uploadvid.files["file"][0].name == "vid1"
-    assert uploadvid.files["file"][0].type == "video/mp4"
-    assert uploadimg.files["file"][0].body == b"testfile"
-    assert uploadimg.files["file"][0].name == "img1"
-    assert uploadimg.files["file"][0].type == "image/jpeg"
+    assert uploadvid.body == b"testfile"
+    assert uploadimg.body == b"testfile"
     assert finalise.json == {"ref": 1}
 
 
@@ -489,9 +485,7 @@ async def test_success_no_media(tester: AppTester, real411_mock, whatsapp_mock):
         "source": 1,
         "file_names": [{"name": "placeholder", "type": "image/png"}],
     }
-    assert upload.files["file"][0].body == BLANK_PNG
-    assert upload.files["file"][0].name == "placeholder"
-    assert upload.files["file"][0].type == "image/png"
+    assert upload.body == BLANK_PNG
     assert finalise.json == {"ref": 1}
 
 
