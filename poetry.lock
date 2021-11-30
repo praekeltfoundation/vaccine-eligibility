@@ -57,25 +57,27 @@ speedups = ["aiodns", "brotli", "cchardet"]
 
 [[package]]
 name = "aiohttp-client-cache"
-version = "0.3.0"
+version = "0.5.2"
 description = "Persistent cache for aiohttp requests"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
-aiohttp = "*"
-attrs = "*"
+aiohttp = {version = ">=3.0", extras = ["speedups"]}
+attrs = ">=21.2,<22.0"
 itsdangerous = "*"
-python-forge = "*"
-url-normalize = "*"
+python-forge = ">=18.6,<19.0"
+url-normalize = ">=1.4,<2.0"
 
 [package.extras]
-backends = ["aiosqlite", "aioboto3", "motor", "aioredis"]
-build = ["coveralls", "twine", "wheel"]
-dev = ["coveralls", "twine", "wheel", "aiosqlite", "aioboto3", "motor", "aioredis", "m2r2 (>=0.2.5,<0.3.0)", "docutils (==0.16)", "Sphinx (>=3.5.3,<3.6.0)", "sphinx-autodoc-typehints", "sphinx-automodapi", "sphinx-copybutton", "sphinx-material", "sphinxcontrib-apidoc", "black (==20.8b1)", "flake8", "isort", "mypy", "pre-commit", "pytest (>=5.0)", "pytest-aiohttp", "pytest-asyncio", "pytest-cov"]
-docs = ["m2r2 (>=0.2.5,<0.3.0)", "docutils (==0.16)", "Sphinx (>=3.5.3,<3.6.0)", "sphinx-autodoc-typehints", "sphinx-automodapi", "sphinx-copybutton", "sphinx-material", "sphinxcontrib-apidoc"]
-test = ["black (==20.8b1)", "flake8", "isort", "mypy", "pre-commit", "pytest (>=5.0)", "pytest-aiohttp", "pytest-asyncio", "pytest-cov"]
+all = ["aioboto3 (>=8.3.0,<9.0.0)", "aiobotocore (==1.2.2)", "aiofiles (>=0.6.0)", "aioredis (>=1.3,<2.0)", "aiosqlite (>=0.16,<0.17)", "motor (>=2.0)"]
+dynamodb = ["aioboto3 (>=8.3.0,<9.0.0)", "aiobotocore (==1.2.2)"]
+filesystem = ["aiofiles (>=0.6.0)"]
+redis = ["aioredis (>=1.3,<2.0)"]
+sqlite = ["aiosqlite (>=0.16,<0.17)"]
+mongodb = ["motor (>=2.0)"]
+docs = ["furo (>=2021.6.24-beta.37)", "linkify-it-py (>=1.0.1,<2.0.0)", "myst-parser (>=0.15.1,<0.16.0)", "sphinx (>=4.0.2,<5.0.0)", "sphinx-automodapi (>=0.13)", "sphinx-autodoc-typehints (>=1.11,<2.0)", "sphinx-copybutton (>=0.3,<0.4)", "sphinx-inline-tabs (>=2021.4.11-beta.9,<2022.0.0)", "sphinxcontrib-apidoc (>=0.3,<0.4)"]
 
 [[package]]
 name = "aioredis"
@@ -147,17 +149,17 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "attrs"
-version = "20.3.0"
+version = "21.2.0"
 description = "Classes Without Boilerplate"
 category = "main"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [package.extras]
-dev = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface", "furo", "sphinx", "pre-commit"]
-docs = ["furo", "sphinx", "zope.interface"]
-tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface"]
-tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six"]
+dev = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "mypy", "pytest-mypy-plugins", "zope.interface", "furo", "sphinx", "sphinx-notfound-page", "pre-commit"]
+docs = ["furo", "sphinx", "zope.interface", "sphinx-notfound-page"]
+tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "mypy", "pytest-mypy-plugins", "zope.interface"]
+tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "mypy", "pytest-mypy-plugins"]
 
 [[package]]
 name = "black"
@@ -1207,7 +1209,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "f4e6e1cad28de5aca61662d37698e5a36c802e2cf78e6c862618dc4d4464ec0c"
+content-hash = "5a75b8b54d5a66e6f3c41596c55462edc221c05ec1fbfffe2761c959f068c8af"
 
 [metadata.files]
 aio-pika = [
@@ -1297,8 +1299,8 @@ aiohttp = [
     {file = "aiohttp-3.8.1.tar.gz", hash = "sha256:fc5471e1a54de15ef71c1bc6ebe80d4dc681ea600e68bfd1cbce40427f0b7578"},
 ]
 aiohttp-client-cache = [
-    {file = "aiohttp-client-cache-0.3.0.tar.gz", hash = "sha256:d6feafb9924cfd40159f80fd4cd5f39794ff6b90f209bca190a5432d64892cab"},
-    {file = "aiohttp_client_cache-0.3.0-py3-none-any.whl", hash = "sha256:b6d1c09aeb5eaa753e488c2e5f98069c8d4f466b325b327af29f37ad181f67de"},
+    {file = "aiohttp-client-cache-0.5.2.tar.gz", hash = "sha256:78fbd5b84d0f2ec5014710827e81f1cdc25dc1e1a6ded9daaef19edaaf020039"},
+    {file = "aiohttp_client_cache-0.5.2-py3-none-any.whl", hash = "sha256:d742aef9d77900288358888cb5fd2ec6702355bc8d00bb532d2899b7a0a0b932"},
 ]
 aioredis = [
     {file = "aioredis-2.0.0a1-py3-none-any.whl", hash = "sha256:32d7910724282a475c91b8b34403867069a4f07bf0c5ad5fe66cd797322f9a0d"},
@@ -1325,8 +1327,8 @@ atomicwrites = [
     {file = "atomicwrites-1.4.0.tar.gz", hash = "sha256:ae70396ad1a434f9c7046fd2dd196fc04b12f9e91ffb859164193be8b6168a7a"},
 ]
 attrs = [
-    {file = "attrs-20.3.0-py2.py3-none-any.whl", hash = "sha256:31b2eced602aa8423c2aea9c76a724617ed67cf9513173fd3a4f03e3a929c7e6"},
-    {file = "attrs-20.3.0.tar.gz", hash = "sha256:832aa3cde19744e49938b91fea06d69ecb9e649c93ba974535d08ad92164f700"},
+    {file = "attrs-21.2.0-py2.py3-none-any.whl", hash = "sha256:149e90d6d8ac20db7a955ad60cf0e6881a3f20d37096140088356da6c716b0b1"},
+    {file = "attrs-21.2.0.tar.gz", hash = "sha256:ef6aaac3ca6cd92904cdd0d83f629a15f18053ec84e6432106f7a4d04ae4f5fb"},
 ]
 black = [
     {file = "black-21.10b0-py3-none-any.whl", hash = "sha256:6eb7448da9143ee65b856a5f3676b7dda98ad9abe0f87fce8c59291f15e82a5b"},
