@@ -456,7 +456,9 @@ async def test_success(tester: AppTester, real411_mock, whatsapp_mock):
         ],
     }
     assert uploadvid.body == b"testfile"
+    assert uploadvid.headers["content-type"] == "video/mp4"
     assert uploadimg.body == b"testfile"
+    assert uploadimg.headers["content-type"] == "image/jpeg"
     assert finalise.json == {"ref": 1}
 
 
@@ -485,8 +487,8 @@ async def test_success_no_media(tester: AppTester, real411_mock, whatsapp_mock):
         "source": 1,
         "file_names": [{"name": "placeholder", "type": "image/png"}],
     }
-    print(upload.headers)
     assert upload.body == BLANK_PNG
+    assert upload.headers["content-type"] == "image/png"
     assert finalise.json == {"ref": 1}
 
 

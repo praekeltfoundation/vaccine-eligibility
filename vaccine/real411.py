@@ -409,7 +409,12 @@ class Application(BaseApplication):
                     file_data = BLANK_PNG
                 else:
                     file_data = await get_whatsapp_media(file["name"])
-                result = await session.put(file_url, data=file_data, expect100=True)
+                result = await session.put(
+                    file_url,
+                    data=file_data,
+                    expect100=True,
+                    headers={"Content-Type": file["type"]},
+                )
                 result.raise_for_status()
 
         await finalise_real411_form(form_reference)
