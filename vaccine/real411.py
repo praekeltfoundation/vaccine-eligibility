@@ -25,7 +25,6 @@ BLANK_PNG = b64decode(
 def get_real411_api_client() -> aiohttp.ClientSession:
     return CachedSession(
         cache=cache_backend,
-        timeout=aiohttp.ClientTimeout(total=30),
         headers={
             "Accept": "application/json",
             "User-Agent": "contactndoh-real411",
@@ -94,7 +93,6 @@ async def finalise_real411_form(form_reference: str) -> None:
 
 def get_whatsapp_api() -> aiohttp.ClientSession:
     return aiohttp.ClientSession(
-        timeout=aiohttp.ClientTimeout(total=30),
         headers={
             "User-Agent": "contactndoh-real411",
             "Authorization": f"Bearer {config.WHATSAPP_TOKEN}",
@@ -400,7 +398,6 @@ class Application(BaseApplication):
             file_names=files,
         )
         async with aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=30),
             headers={"User-Agent": "contactndoh-real411"},
         ) as session:
             for file, file_url in zip(files, file_urls):
