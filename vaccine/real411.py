@@ -72,9 +72,8 @@ async def submit_real411_form(
         "language": language["id"],
         "source": source["id"],
         "file_names": file_names or [],
+        "email": email or "placeholder@example.org",
     }
-    if email:
-        data["email"] = email
     async with get_real411_api_client() as session:
         response = await session.post(
             url=enforce_string(urljoin(config.REAL411_URL, "submit/v2")), json=data
@@ -204,7 +203,7 @@ class Application(BaseApplication):
             error=error,
             next={
                 "continue": "state_terms_pdf",
-                "exit": "state_exit",
+                "exit": "state_refuse_terms",
             },
         )
 
@@ -253,7 +252,7 @@ class Application(BaseApplication):
                 "*REPORT* 📵 Powered by ```Real411```\n"
                 "\n"
                 "If you change your mind, type *REPORT* anytime.\n"
-                "Reply *0 *to return to the main *MENU*"
+                "Reply *0* to return to the main *MENU*"
             ),
         )
 

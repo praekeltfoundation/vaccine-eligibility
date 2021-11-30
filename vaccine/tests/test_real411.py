@@ -217,7 +217,7 @@ async def test_refuse_terms(tester: AppTester):
                 "*REPORT* 📵 Powered by ```Real411```",
                 "",
                 "If you change your mind, type *REPORT* anytime.",
-                "Reply *0 *to return to the main *MENU*",
+                "Reply *0* to return to the main *MENU*",
             ]
         ),
         session=Message.SESSION_EVENT.CLOSE,
@@ -486,6 +486,7 @@ async def test_success_no_media(tester: AppTester, real411_mock, whatsapp_mock):
         "language": 13,
         "source": 1,
         "file_names": [{"name": "placeholder", "type": "image/png"}],
+        "email": "placeholder@example.org",
     }
     assert upload.body == BLANK_PNG
     assert upload.headers["content-type"] == "image/png"
