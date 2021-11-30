@@ -485,6 +485,7 @@ async def test_success_no_media(tester: AppTester, real411_mock, whatsapp_mock):
         "source": 1,
         "file_names": [{"name": "placeholder", "type": "image/png"}],
     }
+    print(upload.headers)
     assert upload.body == BLANK_PNG
     assert finalise.json == {"ref": 1}
 

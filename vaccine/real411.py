@@ -28,7 +28,7 @@ def get_real411_api_client() -> aiohttp.ClientSession:
         timeout=aiohttp.ClientTimeout(total=10),
         headers={
             "Accept": "application/json",
-            "User-Agent": "real411-whatsapp",
+            "User-Agent": "contactndoh-real411",
             "x-api-key": config.REAL411_TOKEN,
         },
     )
@@ -400,14 +400,16 @@ class Application(BaseApplication):
             email=email,
             file_names=files,
         )
-
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=10),
+            headers={"User-Agent": "contactndoh-real411"},
+        ) as session:
             for file, file_url in zip(files, file_urls):
                 if file["name"] == "placeholder":
                     file_data = BLANK_PNG
                 else:
                     file_data = await get_whatsapp_media(file["name"])
-                result = await session.put(file_url, data=file_data)
+                result = await session.put(file_url, data=file_data, expect100=True)
                 result.raise_for_status()
 
         await finalise_real411_form(form_reference)
