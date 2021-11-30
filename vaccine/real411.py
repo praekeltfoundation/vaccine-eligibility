@@ -407,11 +407,7 @@ class Application(BaseApplication):
                     file_data = BLANK_PNG
                 else:
                     file_data = await get_whatsapp_media(file["name"])
-                data = aiohttp.FormData()
-                data.add_field(
-                    "file", file_data, filename=file["name"], content_type=file["type"]
-                )
-                result = await session.post(file_url, data=data)
+                result = await session.put(file_url, data=file_data)
                 result.raise_for_status()
 
         await finalise_real411_form(form_reference)
