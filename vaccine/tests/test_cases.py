@@ -31,8 +31,28 @@ async def nicd_gis_mock(sanic_client):
     cases.NICD_GIS_WARD_URL = url
 
 
+@pytest.fixture
+async def sacoronavirus_powerbi_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("sacoronavirus_powerbi_mock")
+    app.ctx.requests = []
+
+    @app.route("/", methods=["POST"])
+    def check(request):
+        app.ctx.requests.append(request)
+        return response.file_stream(
+            "vaccine/tests/sacoronavirus_powerbi_vaccinations.json",
+        )
+
+    client = await sanic_client(app)
+    url = cases.SACORONAVIRUS_POWERBI_URL
+    cases.SACORONAVIRUS_POWERBI_URL = f"http://{client.host}:{client.port}/"
+    yield client
+    cases.SACORONAVIRUS_POWERBI_URL = url
+
+
 @pytest.mark.asyncio
-async def test_cases(tester: AppTester, nicd_gis_mock):
+async def test_cases(tester: AppTester, nicd_gis_mock, sacoronavirus_powerbi_mock):
     await tester.user_input("cases", session=Message.SESSION_EVENT.NEW)
     tester.assert_message(
         "\n".join(

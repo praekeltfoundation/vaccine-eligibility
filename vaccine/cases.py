@@ -2,10 +2,12 @@ from collections import defaultdict
 from vaccine.base_application import BaseApplication
 from vaccine.states import EndState
 import aiohttp
+import json
 
 NICD_GIS_WARD_URL = (
     "https://gis.nicd.ac.za/hosting/rest/services/WARDS_MN/MapServer/0/query"
 )
+SACORONAVIRUS_POWERBI_URL = "https://wabi-west-europe-api.analysis.windows.net/public/reports/querydata?synchronous=true"
 
 
 def format_int(n: int) -> str:
@@ -32,6 +34,28 @@ async def get_nicd_gis_ward_data() -> dict:
         return await response.json()
 
 
+async def get_sacoronavirus_powerbi_vaccination_data() -> int:
+    # This is an undocumented API, and will return a 401 if changed slightly
+    async with aiohttp.ClientSession() as session:
+        with open("vaccine/sacoronavirus_powerbi_request_body", "rb") as f:
+            body = f.read()
+        response = await session.post(
+            SACORONAVIRUS_POWERBI_URL,
+            data=body,
+            raise_for_status=True,
+            headers={
+                "User-Agent": "curl/7.64.1",
+                "Accept": "*/*",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            expect100=True,
+        )
+        response_data = json.loads(await response.read())
+        return response_data["results"][0]["result"]["data"]["dsr"]["DS"][0]["PH"][0][
+            "DM0"
+        ][0]["M0"]
+
+
 class Application(BaseApplication):
     STATE_START = "start_start"
 
@@ -48,13 +72,15 @@ class Application(BaseApplication):
                 province_cases[ward["Province"].title()] += ward["Tot_No_of_Cases"]
 
         province_cases.pop("Pending")
-        vaccinations = format_int(25_619_891)
         province_text = "\n".join(
             [
                 f"{name} - {format_int(count)}"
                 for name, count in sorted(province_cases.items())
             ]
         )
+
+        vaccinations = format_int(await get_sacoronavirus_powerbi_vaccination_data())
+
         text = (
             "*Current Status of Cases of COVID-19 in South Africa*\n"
             "\n"
