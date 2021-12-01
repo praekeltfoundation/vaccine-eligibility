@@ -1,9 +1,9 @@
 import pytest
+from sanic import Sanic, response
 
 from vaccine import cases
 from vaccine.models import Message
 from vaccine.testing import AppTester
-from sanic import Sanic, response
 
 
 @pytest.fixture

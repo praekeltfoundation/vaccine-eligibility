@@ -1,13 +1,15 @@
+import json
 from collections import defaultdict
+
+import aiohttp
+
 from vaccine.base_application import BaseApplication
 from vaccine.states import EndState
-import aiohttp
-import json
 
 NICD_GIS_WARD_URL = (
     "https://gis.nicd.ac.za/hosting/rest/services/WARDS_MN/MapServer/0/query"
 )
-SACORONAVIRUS_POWERBI_URL = "https://wabi-west-europe-api.analysis.windows.net/public/reports/querydata?synchronous=true"
+SACORONAVIRUS_POWERBI_URL = "https://wabi-west-europe-api.analysis.windows.net/public/reports/querydata?synchronous=true"  # noqa: E501
 
 
 def format_int(n: int) -> str:
