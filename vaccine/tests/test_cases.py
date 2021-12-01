@@ -1,17 +1,38 @@
 import pytest
 
-from vaccine.cases import Application
+from vaccine import cases
 from vaccine.models import Message
 from vaccine.testing import AppTester
+from sanic import Sanic, response
 
 
 @pytest.fixture
 def tester():
-    return AppTester(Application)
+    return AppTester(cases.Application)
+
+
+@pytest.fixture
+async def nicd_gis_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("nicd_gis_mock")
+    app.ctx.requests = []
+
+    @app.route("/", methods=["GET"])
+    def check(request):
+        app.ctx.requests.append(request)
+        return response.file_stream(
+            "vaccine/tests/nicd_gis_wards.json", mime_type="application/json"
+        )
+
+    client = await sanic_client(app)
+    url = cases.NICD_GIS_WARD_URL
+    cases.NICD_GIS_WARD_URL = f"http://{client.host}:{client.port}/"
+    yield client
+    cases.NICD_GIS_WARD_URL = url
 
 
 @pytest.mark.asyncio
-async def test_cases(tester: AppTester):
+async def test_cases(tester: AppTester, nicd_gis_mock):
     await tester.user_input("cases", session=Message.SESSION_EVENT.NEW)
     tester.assert_message(
         "\n".join(
@@ -20,19 +41,19 @@ async def test_cases(tester: AppTester):
                 "",
                 "*Vaccinations:* 25 619 891",
                 "",
-                "*Total cases:* 2 968 052",
-                "4 373 New cases",
+                "*Total cases:* 2 963 663",
+                "2 273 New cases",
                 "",
                 "*The breakdown per province of total infections is as follows:*",
-                "Eastern Cape - 293 239",
-                "Free State - 165 597",
-                "Gauteng - 946 863",
-                "KwaZulu-Natal - 518 591",
-                "Limpopo - 123 710",
-                "Mpumalanga - 153 975",
-                "North West - 154 290",
-                "Northern Cape - 93 343",
-                "Western Cape - 518 444",
+                "Eastern Cape - 294 283",
+                "Free State - 170 227",
+                "Gauteng - 943 079",
+                "Kwazulu-Natal - 542 083",
+                "Limpopo - 120 685",
+                "Mpumalanga - 124 710",
+                "North West - 156 366",
+                "Northern Cape - 94 111",
+                "Western Cape - 517 992",
                 "",
                 "For the latest news go to twitter.com/HealthZA or "
                 "sacoronavirus.co.za/category/press-releases-and-notices/",

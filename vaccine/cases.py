@@ -1,5 +1,11 @@
+from collections import defaultdict
 from vaccine.base_application import BaseApplication
 from vaccine.states import EndState
+import aiohttp
+
+NICD_GIS_WARD_URL = (
+    "https://gis.nicd.ac.za/hosting/rest/services/WARDS_MN/MapServer/0/query"
+)
 
 
 def format_int(n: int) -> str:
@@ -9,34 +15,53 @@ def format_int(n: int) -> str:
     return f"{n:,d}".replace(",", " ")
 
 
+async def get_nicd_gis_ward_data() -> dict:
+    async with aiohttp.ClientSession(
+        headers={"User-Agent": "contactndoh-cases"}
+    ) as session:
+        response = await session.get(
+            NICD_GIS_WARD_URL,
+            params={
+                "where": "1=1",
+                "outFields": "Province,Latest,Tot_No_of_Cases",
+                "returnGeometry": "false",
+                "f": "json",
+            },
+            raise_for_status=True,
+        )
+        return await response.json()
+
+
 class Application(BaseApplication):
     STATE_START = "start_start"
 
     async def state_start(self):
+        case_data = await get_nicd_gis_ward_data()
+        total_cases = 0
+        new_cases = 0
+        province_cases = defaultdict(int)
+        for ward in case_data["features"]:
+            ward = ward["attributes"]
+            total_cases += ward["Tot_No_of_Cases"]
+            new_cases += ward["Latest"]
+            if ward["Province"]:
+                province_cases[ward["Province"].title()] += ward["Tot_No_of_Cases"]
+
+        province_cases.pop("Pending")
         vaccinations = format_int(25_619_891)
-        total_cases = format_int(2_968_052)
-        new_cases = format_int(4_373)
-        province_cases = (
-            ("Eastern Cape", format_int(293_239)),
-            ("Free State", format_int(165_597)),
-            ("Gauteng", format_int(946_863)),
-            ("KwaZulu-Natal", format_int(518_591)),
-            ("Limpopo", format_int(123_710)),
-            ("Mpumalanga", format_int(153_975)),
-            ("North West", format_int(154_290)),
-            ("Northern Cape", format_int(93_343)),
-            ("Western Cape", format_int(518_444)),
-        )
         province_text = "\n".join(
-            [f"{name} - {count}" for name, count in province_cases]
+            [
+                f"{name} - {format_int(count)}"
+                for name, count in sorted(province_cases.items())
+            ]
         )
         text = (
             "*Current Status of Cases of COVID-19 in South Africa*\n"
             "\n"
             f"*Vaccinations:* {vaccinations}\n"
             "\n"
-            f"*Total cases:* {total_cases}\n"
-            f"{new_cases} New cases\n"
+            f"*Total cases:* {format_int(total_cases)}\n"
+            f"{format_int(new_cases)} New cases\n"
             "\n"
             "*The breakdown per province of total infections is as follows:*\n"
             f"{province_text}\n"
