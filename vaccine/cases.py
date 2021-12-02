@@ -65,18 +65,19 @@ class Application(BaseApplication):
         case_data = await get_nicd_gis_ward_data()
         total_cases = 0
         new_cases = 0
-        province_cases = defaultdict(int)
+        province_cases = defaultdict(lambda: defaultdict(int))
         for ward in case_data["features"]:
             ward = ward["attributes"]
             total_cases += ward["Tot_No_of_Cases"]
             new_cases += ward["Latest"]
             if ward["Province"]:
-                province_cases[ward["Province"].title()] += ward["Tot_No_of_Cases"]
+                province_cases[ward["Province"].title()]["t"] += ward["Tot_No_of_Cases"]
+                province_cases[ward["Province"].title()]["l"] += ward["Latest"]
 
         province_cases.pop("Pending")
         province_text = "\n".join(
             [
-                f"{name} - {format_int(count)}"
+                f"{name} - {format_int(count['t'])} (+{format_int(count['l'])})"
                 for name, count in sorted(province_cases.items())
             ]
         )
