@@ -51,8 +51,28 @@ async def sacoronavirus_powerbi_mock(sanic_client):
     cases.SACORONAVIRUS_POWERBI_URL = url
 
 
+@pytest.fixture
+async def sacoronavirus_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("sacoronavirus_mock")
+    app.ctx.requests = []
+
+    @app.route("/category/daily-cases/", methods=["GET"])
+    def check(request):
+        app.ctx.requests.append(request)
+        return response.file_stream("vaccine/tests/sacoronavirus_cases.html")
+
+    client = await sanic_client(app)
+    url = cases.SACORONAVIRUS_POWERBI_URL
+    cases.CASES_IMAGE_URL = f"http://{client.host}:{client.port}/category/daily-cases/"
+    yield client
+    cases.SACORONAVIRUS_POWERBI_URL = url
+
+
 @pytest.mark.asyncio
-async def test_cases(tester: AppTester, nicd_gis_mock, sacoronavirus_powerbi_mock):
+async def test_cases(
+    tester: AppTester, nicd_gis_mock, sacoronavirus_powerbi_mock, sacoronavirus_mock
+):
     await tester.user_input("cases", session=Message.SESSION_EVENT.NEW)
     tester.assert_message(
         "\n".join(
@@ -82,4 +102,8 @@ async def test_cases(tester: AppTester, nicd_gis_mock, sacoronavirus_powerbi_moc
                 "📌 Reply *0* for the main *MENU*",
             ]
         )
+    )
+    assert (
+        tester.application.messages[0].helper_metadata["image"]
+        == "https://sacoronavirus.b-cdn.net/wp-content/uploads/2021/12/01-dec-map.jpg"
     )
