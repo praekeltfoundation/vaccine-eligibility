@@ -57,16 +57,24 @@ async def sacoronavirus_mock(sanic_client):
     app = Sanic("sacoronavirus_mock")
     app.ctx.requests = []
 
+    @app.route("/", methods=["GET"])
+    def homepage(request):
+        app.ctx.requests.append(request)
+        return response.file_stream("vaccine/tests/sacoronavirus.html")
+
     @app.route("/category/daily-cases/", methods=["GET"])
     def check(request):
         app.ctx.requests.append(request)
         return response.file_stream("vaccine/tests/sacoronavirus_cases.html")
 
     client = await sanic_client(app)
-    url = cases.SACORONAVIRUS_POWERBI_URL
+    img_url = cases.CASES_IMAGE_URL
+    homepage_url = cases.SACORONAVIRUS_URL
     cases.CASES_IMAGE_URL = f"http://{client.host}:{client.port}/category/daily-cases/"
+    cases.SACORONAVIRUS_URL = f"http://{client.host}:{client.port}/"
     yield client
-    cases.SACORONAVIRUS_POWERBI_URL = url
+    cases.CASES_IMAGE_URL = img_url
+    cases.SACORONAVIRUS_URL = homepage_url
 
 
 @pytest.mark.asyncio
@@ -79,20 +87,27 @@ async def test_cases(
             [
                 "*Current Status of Cases of COVID-19 in South Africa*",
                 "",
-                "*Vaccinations:* 25 619 891",
+                "💉 *Vaccinations administered*",
+                "25 619 891",
                 "",
-                "*Total cases:* 2 963 663 (+2 273)",
+                "🦠 *Cases*",
+                "Total: 2 963 663",
+                "New cases: 2 273",
+                "2 850 905 Full recoveries (Confirmed Negative)",
                 "",
-                "*The breakdown per province of total infections is as follows:*",
-                "Eastern Cape - 294 283 (+10)",
-                "Free State - 170 227 (+27)",
-                "Gauteng - 943 079 (+1 895)",
-                "Kwazulu-Natal - 542 083 (+74)",
-                "Limpopo - 120 685 (+33)",
-                "Mpumalanga - 124 710 (+49)",
-                "North West - 156 366 (+56)",
-                "Northern Cape - 94 111 (+10)",
-                "Western Cape - 517 992 (+119)",
+                "💔 *Deaths*",
+                "89 915",
+                "",
+                "📊 *New cases by province*",
+                "Gauteng: 1 895",
+                "Western Cape: 119",
+                "Kwazulu-Natal: 74",
+                "North West: 56",
+                "Mpumalanga: 49",
+                "Limpopo: 33",
+                "Free State: 27",
+                "Eastern Cape: 10",
+                "Northern Cape: 10",
                 "",
                 "For the latest news go to twitter.com/HealthZA or "
                 "sacoronavirus.co.za/category/press-releases-and-notices/",

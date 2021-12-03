@@ -1,5 +1,7 @@
 import json
 from collections import defaultdict
+from operator import itemgetter
+from typing import Tuple
 
 import aiohttp
 from bs4 import BeautifulSoup
@@ -12,6 +14,7 @@ NICD_GIS_WARD_URL = (
 )
 SACORONAVIRUS_POWERBI_URL = "https://wabi-west-europe-api.analysis.windows.net/public/reports/querydata?synchronous=true"  # noqa: E501
 CASES_IMAGE_URL = "https://sacoronavirus.co.za/category/daily-cases/"
+SACORONAVIRUS_URL = "https://sacoronavirus.co.za/"
 
 
 def format_int(n: int) -> str:
@@ -65,6 +68,23 @@ async def get_daily_cases_image_url() -> str:
         return soup.main.img["src"]
 
 
+async def get_deaths_recoveries() -> Tuple[int, int]:
+    async with aiohttp.ClientSession(
+        headers={"User-Agent": "contactndoh-cases"}
+    ) as session:
+        response = await session.get(SACORONAVIRUS_URL, raise_for_status=True)
+        soup = BeautifulSoup(await response.text(), "html.parser")
+        counters = soup.find("div", class_="counters-box")
+        deaths, recoveries = 0, 0
+        for counter in counters.find_all("div", "counter-box-container"):
+            name = counter.find("div", "counter-box-content").string
+            if "death" in name.lower():
+                deaths = int(counter.span["data-value"])
+            elif "recover" in name.lower():
+                recoveries = int(counter.span["data-value"])
+        return deaths, recoveries
+
+
 class Application(BaseApplication):
     STATE_START = "start_start"
 
@@ -72,35 +92,45 @@ class Application(BaseApplication):
         case_data = await get_nicd_gis_ward_data()
         total_cases = 0
         new_cases = 0
-        province_cases = defaultdict(lambda: defaultdict(int))
+        province_cases = defaultdict(int)
         for ward in case_data["features"]:
             ward = ward["attributes"]
             total_cases += ward["Tot_No_of_Cases"]
             new_cases += ward["Latest"]
             if ward["Province"]:
-                province_cases[ward["Province"].title()]["t"] += ward["Tot_No_of_Cases"]
-                province_cases[ward["Province"].title()]["l"] += ward["Latest"]
+                province_cases[ward["Province"].title()] += ward["Latest"]
 
         province_cases.pop("Pending")
         province_text = "\n".join(
             [
-                f"{name} - {format_int(count['t'])} (+{format_int(count['l'])})"
-                for name, count in sorted(province_cases.items())
+                f"{name}: {format_int(count)}"
+                for name, count in sorted(
+                    province_cases.items(), key=itemgetter(1), reverse=True
+                )
             ]
         )
 
-        vaccinations = format_int(await get_sacoronavirus_powerbi_vaccination_data())
+        vaccinations = await get_sacoronavirus_powerbi_vaccination_data()
 
         image_url = await get_daily_cases_image_url()
+
+        deaths, recoveries = await get_deaths_recoveries()
 
         text = (
             "*Current Status of Cases of COVID-19 in South Africa*\n"
             "\n"
-            f"*Vaccinations:* {vaccinations}\n"
+            "💉 *Vaccinations administered*\n"
+            f"{format_int(vaccinations)}\n"
             "\n"
-            f"*Total cases:* {format_int(total_cases)} (+{format_int(new_cases)})\n"
+            "🦠 *Cases*\n"
+            f"Total: {format_int(total_cases)}\n"
+            f"New cases: {format_int(new_cases)}\n"
+            f"{format_int(recoveries)} Full recoveries (Confirmed Negative)\n"
             "\n"
-            "*The breakdown per province of total infections is as follows:*\n"
+            "💔 *Deaths*\n"
+            f"{format_int(deaths)}\n"
+            "\n"
+            "📊 *New cases by province*\n"
             f"{province_text}\n"
             "\n"
             "For the latest news go to twitter.com/HealthZA or "
