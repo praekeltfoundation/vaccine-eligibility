@@ -1,6 +1,7 @@
 import json
 from collections import defaultdict
 from typing import Tuple
+from operator import itemgetter
 
 import aiohttp
 from bs4 import BeautifulSoup
@@ -91,24 +92,25 @@ class Application(BaseApplication):
         case_data = await get_nicd_gis_ward_data()
         total_cases = 0
         new_cases = 0
-        province_cases = defaultdict(lambda: defaultdict(int))
+        province_cases = defaultdict(int)
         for ward in case_data["features"]:
             ward = ward["attributes"]
             total_cases += ward["Tot_No_of_Cases"]
             new_cases += ward["Latest"]
             if ward["Province"]:
-                province_cases[ward["Province"].title()]["t"] += ward["Tot_No_of_Cases"]
-                province_cases[ward["Province"].title()]["l"] += ward["Latest"]
+                province_cases[ward["Province"].title()] += ward["Latest"]
 
         province_cases.pop("Pending")
         province_text = "\n".join(
             [
-                f"{name} - {format_int(count['t'])} (+{format_int(count['l'])})"
-                for name, count in sorted(province_cases.items())
+                f"{name}: {format_int(count)}"
+                for name, count in sorted(
+                    province_cases.items(), key=itemgetter(1), reverse=True
+                )
             ]
         )
 
-        vaccinations = format_int(await get_sacoronavirus_powerbi_vaccination_data())
+        vaccinations = await get_sacoronavirus_powerbi_vaccination_data()
 
         image_url = await get_daily_cases_image_url()
 
@@ -117,13 +119,18 @@ class Application(BaseApplication):
         text = (
             "*Current Status of Cases of COVID-19 in South Africa*\n"
             "\n"
-            f"*Vaccinations:* {vaccinations}\n"
+            "💉 *Vaccinations administered*\n"
+            f"{format_int(vaccinations)}\n"
             "\n"
-            f"*Total cases:* {format_int(total_cases)} (+{format_int(new_cases)})\n"
+            "🦠 *Cases*\n"
+            f"Total: {format_int(total_cases)}\n"
+            f"New cases: {format_int(new_cases)}\n"
             f"{format_int(recoveries)} Full recoveries (Confirmed Negative)\n"
-            f"{format_int(deaths)} Deaths\n"
             "\n"
-            "*The breakdown per province of total infections is as follows:*\n"
+            "💔 *Deaths*\n"
+            f"{format_int(deaths)}\n"
+            "\n"
+            "📊 *New cases by province*\n"
             f"{province_text}\n"
             "\n"
             "For the latest news go to twitter.com/HealthZA or "
