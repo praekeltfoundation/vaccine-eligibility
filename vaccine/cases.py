@@ -2,6 +2,7 @@ import json
 from collections import defaultdict
 
 import aiohttp
+from bs4 import BeautifulSoup
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import EndState
@@ -10,6 +11,7 @@ NICD_GIS_WARD_URL = (
     "https://gis.nicd.ac.za/hosting/rest/services/WARDS_MN/MapServer/0/query"
 )
 SACORONAVIRUS_POWERBI_URL = "https://wabi-west-europe-api.analysis.windows.net/public/reports/querydata?synchronous=true"  # noqa: E501
+CASES_IMAGE_URL = "https://sacoronavirus.co.za/category/daily-cases/"
 
 
 def format_int(n: int) -> str:
@@ -45,17 +47,22 @@ async def get_sacoronavirus_powerbi_vaccination_data() -> int:
             SACORONAVIRUS_POWERBI_URL,
             data=body,
             raise_for_status=True,
-            headers={
-                "User-Agent": "curl/7.64.1",
-                "Accept": "*/*",
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
+            headers={"User-Agent": "contactndoh-cases"},
             expect100=True,
         )
         response_data = json.loads(await response.read())
         return response_data["results"][0]["result"]["data"]["dsr"]["DS"][0]["PH"][0][
             "DM0"
         ][0]["M0"]
+
+
+async def get_daily_cases_image_url() -> str:
+    async with aiohttp.ClientSession(
+        headers={"User-Agent": "contactndoh-cases"}
+    ) as session:
+        response = await session.get(CASES_IMAGE_URL, raise_for_status=True)
+        soup = BeautifulSoup(await response.text(), "html.parser")
+        return soup.main.img["src"]
 
 
 class Application(BaseApplication):
@@ -84,6 +91,8 @@ class Application(BaseApplication):
 
         vaccinations = format_int(await get_sacoronavirus_powerbi_vaccination_data())
 
+        image_url = await get_daily_cases_image_url()
+
         text = (
             "*Current Status of Cases of COVID-19 in South Africa*\n"
             "\n"
@@ -101,4 +110,4 @@ class Application(BaseApplication):
             "🆕 Reply *NEWS* for the latest news\n"
             "📌 Reply *0* for the main *MENU*"
         )
-        return EndState(self, text)
+        return EndState(self, text, helper_metadata={"image": image_url})
