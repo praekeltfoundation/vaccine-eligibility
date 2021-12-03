@@ -1,5 +1,6 @@
 import json
 from collections import defaultdict
+from datetime import datetime
 from operator import itemgetter
 from typing import Tuple
 
@@ -8,6 +9,7 @@ from bs4 import BeautifulSoup
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import EndState
+from vaccine.utils import TZ_SAST
 
 NICD_GIS_WARD_URL = (
     "https://gis.nicd.ac.za/hosting/rest/services/WARDS_MN/MapServer/0/query"
@@ -116,6 +118,8 @@ class Application(BaseApplication):
 
         deaths, recoveries = await get_deaths_recoveries()
 
+        timestamp = datetime.now(tz=TZ_SAST)
+
         text = (
             "*Current Status of Cases of COVID-19 in South Africa*\n"
             "\n"
@@ -138,6 +142,9 @@ class Application(BaseApplication):
             "\n"
             "------\n"
             "🆕 Reply *NEWS* for the latest news\n"
-            "📌 Reply *0* for the main *MENU*"
+            "📌 Reply *0* for the main *MENU*\n"
+            "_Source: https://sacoronavirus.co.za "
+            f"Updated: {timestamp.strftime('%d/%m/%Y %Hh%M')} "
+            "(Errors and omissions excepted)_"
         )
         return EndState(self, text, helper_metadata={"image": image_url})

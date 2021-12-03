@@ -1,9 +1,13 @@
+from datetime import datetime
+from unittest.mock import patch
+
 import pytest
 from sanic import Sanic, response
 
 from vaccine import cases
 from vaccine.models import Message
 from vaccine.testing import AppTester
+from vaccine.utils import TZ_SAST
 
 
 @pytest.fixture
@@ -78,9 +82,15 @@ async def sacoronavirus_mock(sanic_client):
 
 
 @pytest.mark.asyncio
+@patch("vaccine.cases.datetime")
 async def test_cases(
-    tester: AppTester, nicd_gis_mock, sacoronavirus_powerbi_mock, sacoronavirus_mock
+    dt,
+    tester: AppTester,
+    nicd_gis_mock,
+    sacoronavirus_powerbi_mock,
+    sacoronavirus_mock,
 ):
+    dt.now.return_value = datetime(2020, 1, 2, 3, 4, tzinfo=TZ_SAST)
     await tester.user_input("cases", session=Message.SESSION_EVENT.NEW)
     tester.assert_message(
         "\n".join(
@@ -115,6 +125,8 @@ async def test_cases(
                 "------",
                 "🆕 Reply *NEWS* for the latest news",
                 "📌 Reply *0* for the main *MENU*",
+                "_Source: https://sacoronavirus.co.za Updated: 02/01/2020 03h04 "
+                "(Errors and omissions excepted)_",
             ]
         )
     )
