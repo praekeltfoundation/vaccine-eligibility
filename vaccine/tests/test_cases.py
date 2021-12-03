@@ -57,16 +57,24 @@ async def sacoronavirus_mock(sanic_client):
     app = Sanic("sacoronavirus_mock")
     app.ctx.requests = []
 
+    @app.route("/", methods=["GET"])
+    def homepage(request):
+        app.ctx.requests.append(request)
+        return response.file_stream("vaccine/tests/sacoronavirus.html")
+
     @app.route("/category/daily-cases/", methods=["GET"])
     def check(request):
         app.ctx.requests.append(request)
         return response.file_stream("vaccine/tests/sacoronavirus_cases.html")
 
     client = await sanic_client(app)
-    url = cases.SACORONAVIRUS_POWERBI_URL
+    img_url = cases.CASES_IMAGE_URL
+    homepage_url = cases.SACORONAVIRUS_URL
     cases.CASES_IMAGE_URL = f"http://{client.host}:{client.port}/category/daily-cases/"
+    cases.SACORONAVIRUS_URL = f"http://{client.host}:{client.port}/"
     yield client
-    cases.SACORONAVIRUS_POWERBI_URL = url
+    cases.CASES_IMAGE_URL = img_url
+    cases.SACORONAVIRUS_URL = homepage_url
 
 
 @pytest.mark.asyncio
@@ -82,6 +90,8 @@ async def test_cases(
                 "*Vaccinations:* 25 619 891",
                 "",
                 "*Total cases:* 2 963 663 (+2 273)",
+                "2 850 905 Full recoveries (Confirmed Negative)",
+                "89 915 Deaths",
                 "",
                 "*The breakdown per province of total infections is as follows:*",
                 "Eastern Cape - 294 283 (+10)",
