@@ -1,7 +1,7 @@
 import json
 from collections import defaultdict
-from typing import Tuple
 from operator import itemgetter
+from typing import Tuple
 
 import aiohttp
 from bs4 import BeautifulSoup
