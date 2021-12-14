@@ -1,13 +1,9 @@
-from datetime import datetime
-from unittest.mock import patch
-
 import pytest
 from sanic import Sanic, response
 
 from vaccine import cases
 from vaccine.models import Message
 from vaccine.testing import AppTester
-from vaccine.utils import TZ_SAST
 
 
 @pytest.fixture
@@ -16,81 +12,63 @@ def tester():
 
 
 @pytest.fixture
-async def nicd_gis_mock(sanic_client):
+async def healthcheck_mock(sanic_client):
     Sanic.test_mode = True
-    app = Sanic("nicd_gis_mock")
+    app = Sanic("healthcheck_mock")
     app.ctx.requests = []
 
-    @app.route("/", methods=["GET"])
-    def check(request):
+    @app.route("/v2/covidcases/contactndoh", methods=["GET"])
+    def contactndoh(request):
         app.ctx.requests.append(request)
-        return response.file_stream(
-            "vaccine/tests/nicd_gis_wards.json", mime_type="application/json"
+        return response.json(
+            {
+                "image": {
+                    "id": 1,
+                    "url": "https://sacoronavirus.b-cdn.net/wp-content/uploads/2021/12/13-dec-map.jpg",  # noqa: E501
+                    "image": "https://s3.af-south-1.amazonaws.com/evds-healthcheck-qa-django/13-dec-map.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAUPEZAKIUSYC4ZVEQ%2F20211214%2Faf-south-1%2Fs3%2Faws4_request&X-Amz-Date=20211214T135744Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=a7a7687c3cfb59501502c185be38a14f10c1435772e1ddf83267f09639baefdb",  # noqa: E501
+                    "image_size": 107854,
+                    "image_width": 960,
+                    "image_height": 720,
+                    "date": "2021-12-13",
+                    "created_at": "2021-12-14T15:24:52.909491+02:00",
+                    "updated_at": "2021-12-14T15:24:52.909539+02:00",
+                },
+                "counter": {
+                    "id": 1,
+                    "tests": 20283906,
+                    "positive": 3180785,
+                    "recoveries": 2913297,
+                    "deaths": 90148,
+                    "vaccines": 27188606,
+                    "date": "2021-12-14",
+                    "created_at": "2021-12-14T15:00:48.861565+02:00",
+                    "updated_at": "2021-12-14T15:00:48.861582+02:00",
+                },
+                "timestamp": "2021-12-14T13:00:48.565583Z",
+                "latest": 0,
+                "latest_provinces": {
+                    "Western Cape": 0,
+                    "Eastern Cape": 0,
+                    "Northern Cape": 0,
+                    "Free State": 0,
+                    "Kwazulu-Natal": 0,
+                    "North West": 0,
+                    "Gauteng": 0,
+                    "Mpumalanga": 0,
+                    "Limpopo": 0,
+                },
+            }
         )
 
     client = await sanic_client(app)
-    url = cases.NICD_GIS_WARD_URL
-    cases.NICD_GIS_WARD_URL = f"http://{client.host}:{client.port}/"
+    url = cases.HEALTHCHECK_API_URL
+    cases.HEALTHCHECK_API_URL = f"http://{client.host}:{client.port}/"
     yield client
-    cases.NICD_GIS_WARD_URL = url
-
-
-@pytest.fixture
-async def sacoronavirus_powerbi_mock(sanic_client):
-    Sanic.test_mode = True
-    app = Sanic("sacoronavirus_powerbi_mock")
-    app.ctx.requests = []
-
-    @app.route("/", methods=["POST"])
-    def check(request):
-        app.ctx.requests.append(request)
-        return response.file_stream(
-            "vaccine/tests/sacoronavirus_powerbi_vaccinations.json",
-        )
-
-    client = await sanic_client(app)
-    url = cases.SACORONAVIRUS_POWERBI_URL
-    cases.SACORONAVIRUS_POWERBI_URL = f"http://{client.host}:{client.port}/"
-    yield client
-    cases.SACORONAVIRUS_POWERBI_URL = url
-
-
-@pytest.fixture
-async def sacoronavirus_mock(sanic_client):
-    Sanic.test_mode = True
-    app = Sanic("sacoronavirus_mock")
-    app.ctx.requests = []
-
-    @app.route("/", methods=["GET"])
-    def homepage(request):
-        app.ctx.requests.append(request)
-        return response.file_stream("vaccine/tests/sacoronavirus.html")
-
-    @app.route("/category/daily-cases/", methods=["GET"])
-    def check(request):
-        app.ctx.requests.append(request)
-        return response.file_stream("vaccine/tests/sacoronavirus_cases.html")
-
-    client = await sanic_client(app)
-    img_url = cases.CASES_IMAGE_URL
-    homepage_url = cases.SACORONAVIRUS_URL
-    cases.CASES_IMAGE_URL = f"http://{client.host}:{client.port}/category/daily-cases/"
-    cases.SACORONAVIRUS_URL = f"http://{client.host}:{client.port}/"
-    yield client
-    cases.CASES_IMAGE_URL = img_url
-    cases.SACORONAVIRUS_URL = homepage_url
+    cases.HEALTHCHECK_API_URL = url
 
 
 @pytest.mark.asyncio
-@patch("vaccine.cases.datetime")
-async def test_cases(
-    dt,
-    tester: AppTester,
-    nicd_gis_mock,
-    sacoronavirus_powerbi_mock,
-    sacoronavirus_mock,
-):
-    dt.now.return_value = datetime(2020, 1, 2, 3, 4, tzinfo=TZ_SAST)
+async def test_cases(tester: AppTester, healthcheck_mock):
     await tester.user_input("cases", session=Message.SESSION_EVENT.NEW)
     tester.assert_message(
         "\n".join(
@@ -98,26 +76,26 @@ async def test_cases(
                 "*Current Status of Cases of COVID-19 in South Africa*",
                 "",
                 "💉 *Vaccinations administered*",
-                "25 619 891",
+                "27 188 606",
                 "",
                 "🦠 *Cases*",
-                "Total: 2 963 663",
-                "New cases: 2 273",
-                "2 850 905 Full recoveries (Confirmed Negative)",
+                "Total: 3 180 785",
+                "New cases: 0",
+                "2 913 297 Full recoveries (Confirmed Negative)",
                 "",
                 "💔 *Deaths*",
-                "89 915",
+                "90 148",
                 "",
                 "📊 *New cases by province*",
-                "Gauteng: 1 895",
-                "Western Cape: 119",
-                "Kwazulu-Natal: 74",
-                "North West: 56",
-                "Mpumalanga: 49",
-                "Limpopo: 33",
-                "Free State: 27",
-                "Eastern Cape: 10",
-                "Northern Cape: 10",
+                "Western Cape: 0",
+                "Eastern Cape: 0",
+                "Northern Cape: 0",
+                "Free State: 0",
+                "Kwazulu-Natal: 0",
+                "North West: 0",
+                "Gauteng: 0",
+                "Mpumalanga: 0",
+                "Limpopo: 0",
                 "",
                 "For the latest news go to twitter.com/HealthZA or "
                 "sacoronavirus.co.za/category/press-releases-and-notices/",
@@ -125,12 +103,12 @@ async def test_cases(
                 "------",
                 "🆕 Reply *NEWS* for the latest news",
                 "📌 Reply *0* for the main *MENU*",
-                "_Source: https://sacoronavirus.co.za Updated: 02/01/2020 03h04 "
+                "_Source: https://sacoronavirus.co.za Updated: 14/12/2021 15h00 "
                 "(Errors and omissions excepted)_",
             ]
         )
     )
     assert (
         tester.application.messages[0].helper_metadata["image"]
-        == "https://sacoronavirus.b-cdn.net/wp-content/uploads/2021/12/01-dec-map.jpg"
+        == "https://s3.af-south-1.amazonaws.com/evds-healthcheck-qa-django/13-dec-map.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAUPEZAKIUSYC4ZVEQ%2F20211214%2Faf-south-1%2Fs3%2Faws4_request&X-Amz-Date=20211214T135744Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=a7a7687c3cfb59501502c185be38a14f10c1435772e1ddf83267f09639baefdb"  # noqa: E501
     )
