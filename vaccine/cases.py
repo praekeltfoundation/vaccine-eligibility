@@ -72,7 +72,7 @@ class Application(BaseApplication):
             "💉 *Vaccinations administered*\n"
             f"{format_int(data['counter']['vaccines'])}\n"
             "\n"
-            "🔬 *Tests Conducted*\n"
+            "🔬 *Tests conducted*\n"
             f"Total: {format_int(data['counter']['tests'])}\n"
             f"{daily_tests}"
             "\n"

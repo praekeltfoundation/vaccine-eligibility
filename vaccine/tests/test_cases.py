@@ -79,7 +79,7 @@ async def test_cases(tester: AppTester, healthcheck_mock):
                 "💉 *Vaccinations administered*",
                 "27 188 606",
                 "",
-                "🔬 *Tests Conducted*",
+                "🔬 *Tests conducted*",
                 "Total: 20 283 906",
                 "Daily: 50 377",
                 "",
