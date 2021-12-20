@@ -47,20 +47,20 @@ class Application(BaseApplication):
         )
 
         daily_cases = (
-            f"Daily: {format_int(data['daily']['positive'])}\n"
+            f"New cases: {format_int(data['daily']['positive'])}\n"
             if "daily" in data
             else ""
         )
         daily_deaths = (
             f"Daily: {format_int(data['daily']['deaths'])}\n" if "daily" in data else ""
         )
+        daily_tests = (
+            f"Daily: {format_int(data['daily']['tests'])}\n" if "daily" in data else ""
+        )
 
         text = (
             "*Current Status of Cases of COVID-19 in South Africa*\n"
             f"_Reported at {timestamp}_\n"
-            "\n"
-            "💉 *Vaccinations administered*\n"
-            f"{format_int(data['counter']['vaccines'])}\n"
             "\n"
             "🦠 *Cases*\n"
             f"Total: {format_int(data['counter']['positive'])}\n"
@@ -68,6 +68,13 @@ class Application(BaseApplication):
             f"Active cases: {format_int(active)}\n"
             f"{format_int(data['counter']['recoveries'])} "
             "Full recoveries (Confirmed Negative)\n"
+            "\n"
+            "💉 *Vaccinations administered*\n"
+            f"{format_int(data['counter']['vaccines'])}\n"
+            "\n"
+            "🔬 *Tests Conducted*\n"
+            f"Total: {format_int(data['counter']['tests'])}\n"
+            f"{daily_tests}"
             "\n"
             "💔 *Deaths*\n"
             f"Total: {format_int(data['counter']['deaths'])}\n"
