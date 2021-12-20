@@ -1,5 +1,4 @@
 from datetime import datetime
-from operator import itemgetter
 from os import environ
 from urllib.parse import urljoin
 
@@ -7,7 +6,6 @@ import aiohttp
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import EndState
-from vaccine.utils import TZ_SAST
 
 HEALTHCHECK_API_URL = environ.get(
     "HEALTHCHECK_API_URL",
@@ -38,44 +36,46 @@ class Application(BaseApplication):
 
     async def state_start(self):
         data = await get_cases_api_data()
-        province_text = "\n".join(
-            [
-                f"{name}: {format_int(count)}"
-                for name, count in sorted(
-                    data["latest_provinces"].items(), key=itemgetter(1), reverse=True
-                )
-            ]
+
+        timestamp = datetime.fromisoformat(data["counter"]["date"]).date()
+        timestamp = timestamp.strftime("%d/%m/%Y")
+
+        active = (
+            data["counter"]["positive"]
+            - data["counter"]["recoveries"]
+            - data["counter"]["deaths"]
         )
 
-        timestamp = datetime.fromisoformat(data["timestamp"].replace("Z", "+00:00"))
-        timestamp = timestamp.astimezone(TZ_SAST)
+        daily_cases = (
+            f"Daily: {format_int(data['daily']['positive'])}\n"
+            if "daily" in data
+            else ""
+        )
+        daily_deaths = (
+            f"Daily: {format_int(data['daily']['deaths'])}\n" if "daily" in data else ""
+        )
 
         text = (
             "*Current Status of Cases of COVID-19 in South Africa*\n"
+            f"_Reported at {timestamp}_\n"
             "\n"
             "💉 *Vaccinations administered*\n"
             f"{format_int(data['counter']['vaccines'])}\n"
             "\n"
             "🦠 *Cases*\n"
             f"Total: {format_int(data['counter']['positive'])}\n"
-            f"New cases: {format_int(data['latest'])}\n"
+            f"{daily_cases}"
+            f"Active cases: {format_int(active)}\n"
             f"{format_int(data['counter']['recoveries'])} "
             "Full recoveries (Confirmed Negative)\n"
             "\n"
             "💔 *Deaths*\n"
-            f"{format_int(data['counter']['deaths'])}\n"
-            "\n"
-            "📊 *New cases by province*\n"
-            f"{province_text}\n"
-            "\n"
-            "For the latest news go to twitter.com/HealthZA or "
-            "sacoronavirus.co.za/category/press-releases-and-notices/\n"
+            f"Total: {format_int(data['counter']['deaths'])}\n"
+            f"{daily_deaths}"
             "\n"
             "------\n"
             "🆕 Reply *NEWS* for the latest news\n"
             "📌 Reply *0* for the main *MENU*\n"
-            "_Source: https://sacoronavirus.co.za "
-            f"Updated: {timestamp.strftime('%d/%m/%Y %Hh%M')} "
-            "(Errors and omissions excepted)_"
+            "_Source: https://sacoronavirus.co.za_"
         )
         return EndState(self, text, helper_metadata={"image": data["image"]["image"]})
