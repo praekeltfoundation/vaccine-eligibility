@@ -44,18 +44,12 @@ async def healthcheck_mock(sanic_client):
                     "created_at": "2021-12-14T15:00:48.861565+02:00",
                     "updated_at": "2021-12-14T15:00:48.861582+02:00",
                 },
-                "timestamp": "2021-12-14T13:00:48.565583Z",
-                "latest": 0,
-                "latest_provinces": {
-                    "Western Cape": 0,
-                    "Eastern Cape": 0,
-                    "Northern Cape": 0,
-                    "Free State": 0,
-                    "Kwazulu-Natal": 0,
-                    "North West": 0,
-                    "Gauteng": 0,
-                    "Mpumalanga": 0,
-                    "Limpopo": 0,
+                "daily": {
+                    "tests": 50377,
+                    "positive": 15465,
+                    "recoveries": 18224,
+                    "deaths": 3,
+                    "vaccines": 6296,
                 },
             }
         )
@@ -74,37 +68,25 @@ async def test_cases(tester: AppTester, healthcheck_mock):
         "\n".join(
             [
                 "*Current Status of Cases of COVID-19 in South Africa*",
+                "_Reported at 14/12/2021_",
                 "",
                 "💉 *Vaccinations administered*",
                 "27 188 606",
                 "",
                 "🦠 *Cases*",
                 "Total: 3 180 785",
-                "New cases: 0",
+                "Daily: 15 465",
+                "Active cases: 177 340",
                 "2 913 297 Full recoveries (Confirmed Negative)",
                 "",
                 "💔 *Deaths*",
-                "90 148",
-                "",
-                "📊 *New cases by province*",
-                "Western Cape: 0",
-                "Eastern Cape: 0",
-                "Northern Cape: 0",
-                "Free State: 0",
-                "Kwazulu-Natal: 0",
-                "North West: 0",
-                "Gauteng: 0",
-                "Mpumalanga: 0",
-                "Limpopo: 0",
-                "",
-                "For the latest news go to twitter.com/HealthZA or "
-                "sacoronavirus.co.za/category/press-releases-and-notices/",
+                "Total: 90 148",
+                "Daily: 3",
                 "",
                 "------",
                 "🆕 Reply *NEWS* for the latest news",
                 "📌 Reply *0* for the main *MENU*",
-                "_Source: https://sacoronavirus.co.za Updated: 14/12/2021 15h00 "
-                "(Errors and omissions excepted)_",
+                "_Source: https://sacoronavirus.co.za_",
             ]
         )
     )
