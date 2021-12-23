@@ -1,9 +1,12 @@
 import asyncio
 import json
 import re
+import time
+from contextlib import asynccontextmanager
 from datetime import date, datetime, timedelta, timezone
 from enum import Enum
 from functools import cached_property
+from logging import Logger
 from typing import AnyStr, Optional
 from uuid import uuid4
 
@@ -171,3 +174,12 @@ def save_media(app, field):
             app.save_answer(field, json.dumps(media))
 
     return validator
+
+
+@asynccontextmanager
+async def log_timing(message: str, logger: Logger):
+    start_time = time.monotonic()
+    try:
+        yield
+    finally:
+        logger.debug(f"{message} in {time.monotonic() - start_time}s")
