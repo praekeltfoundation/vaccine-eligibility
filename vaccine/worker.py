@@ -95,7 +95,7 @@ class Worker:
                     async with log_timing(f"{msg_id} Got user", logger):
                         user_data = await self.redis.get(f"user.{msg.from_addr}")
                         user = User.get_or_create(msg.from_addr, user_data)
-                    async with log_timing("{msg_id} Processed message", logger):
+                    async with log_timing(f"{msg_id} Processed message", logger):
                         app = self.ApplicationClass(user)
                         messages = await app.process_message(msg)
                     async with log_timing(f"{msg_id} Published responses", logger):
