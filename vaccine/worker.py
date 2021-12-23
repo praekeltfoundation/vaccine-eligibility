@@ -84,6 +84,7 @@ class Worker:
             amqp_msg.reject(requeue=False)
             return
 
+        msg_id = msg.message_id
         async with amqp_msg.process(requeue=True):
             try:
                 async with self.redis.lock(
@@ -91,20 +92,20 @@ class Worker:
                 ):
                     logger.debug(f"Processing inbound message {msg}")
 
-                    async with log_timing("Got user", logger):
+                    async with log_timing(f"{msg_id} Got user", logger):
                         user_data = await self.redis.get(f"user.{msg.from_addr}")
                         user = User.get_or_create(msg.from_addr, user_data)
-                    async with log_timing("Processed message", logger):
+                    async with log_timing("{msg_id} Processed message", logger):
                         app = self.ApplicationClass(user)
                         messages = await app.process_message(msg)
-                    async with log_timing("Published responses", logger):
+                    async with log_timing(f"{msg_id} Published responses", logger):
                         for outbound in messages:
                             await self.publish_message(outbound)
-                    async with log_timing("Published answers", logger):
+                    async with log_timing(f"{msg_id} Published answers", logger):
                         if self.answer_worker:
                             for answer in app.answer_events:
                                 await self.publish_answer(answer)
-                    async with log_timing("Saved user", logger):
+                    async with log_timing(f"{msg_id} Saved user", logger):
                         await self.redis.setex(
                             f"user.{msg.from_addr}", config.TTL, user.to_json()
                         )
