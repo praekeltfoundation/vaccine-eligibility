@@ -12,6 +12,7 @@ from aio_pika import Connection, ExchangeType, IncomingMessage
 from aio_pika import Message as AMQPMessage
 from aio_pika import connect_robust
 from aio_pika.message import DeliveryMode
+from aioredis.exceptions import LockNotOwnedError
 
 from vaccine import config
 from vaccine.models import Answer, Event, Message, User
@@ -84,21 +85,26 @@ class Worker:
             return
 
         async with amqp_msg.process(requeue=True):
-            async with self.redis.lock(
-                f"userlock.{msg.from_addr}", timeout=config.USER_LOCK_TIMEOUT
-            ):
-                logger.debug(f"Processing inbound message {msg}")
-                user_data = await self.redis.get(f"user.{msg.from_addr}")
-                user = User.get_or_create(msg.from_addr, user_data)
-                app = self.ApplicationClass(user)
-                for outbound in await app.process_message(msg):
-                    await self.publish_message(outbound)
-                if self.answer_worker:
-                    for answer in app.answer_events:
-                        await self.publish_answer(answer)
-                await self.redis.setex(
-                    f"user.{msg.from_addr}", config.TTL, user.to_json()
-                )
+            try:
+                async with self.redis.lock(
+                    f"userlock.{msg.from_addr}", timeout=config.USER_LOCK_TIMEOUT
+                ):
+                    logger.debug(f"Processing inbound message {msg}")
+                    user_data = await self.redis.get(f"user.{msg.from_addr}")
+                    user = User.get_or_create(msg.from_addr, user_data)
+                    app = self.ApplicationClass(user)
+                    for outbound in await app.process_message(msg):
+                        await self.publish_message(outbound)
+                    if self.answer_worker:
+                        for answer in app.answer_events:
+                            await self.publish_answer(answer)
+                    await self.redis.setex(
+                        f"user.{msg.from_addr}", config.TTL, user.to_json()
+                    )
+            except LockNotOwnedError:
+                # There's nothing we can do if a lock is no longer owned when we're
+                # done processing, so log it and carry on
+                logger.exception("")
 
     async def publish_message(self, msg: Message):
         await self.exchange.publish(
