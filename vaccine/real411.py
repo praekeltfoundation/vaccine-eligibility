@@ -109,6 +109,26 @@ async def get_whatsapp_media(media_id: str) -> bytes:
         return await response.read()
 
 
+def get_healthcheck_api() -> aiohttp.ClientSession:
+    return aiohttp.ClientSession(
+        headers={
+            "User-Agent": "contactndoh-real411",
+            "Authorization": f"Token {config.HEALTHCHECK_TOKEN}",
+        }
+    )
+
+
+async def store_complaint_id(complaint_ref: str, msisdn: str) -> None:
+    async with get_healthcheck_api() as session:
+        response = await session.post(
+            url=enforce_string(
+                urljoin(config.HEALTHCHECK_URL, "v2/real411/complaint/")
+            ),
+            json={"complaint_ref": complaint_ref, "msisdn": msisdn},
+        )
+        response.raise_for_status()
+
+
 class Application(BaseApplication):
     START_STATE = "state_start"
 
@@ -397,6 +417,7 @@ class Application(BaseApplication):
             email=email,
             file_names=files,
         )
+        await store_complaint_id(form_reference, self.user.addr)
         async with aiohttp.ClientSession(
             headers={"User-Agent": "contactndoh-real411"},
         ) as session:
