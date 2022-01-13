@@ -81,6 +81,24 @@ async def whatsapp_mock(sanic_client):
     config.WHATSAPP_TOKEN = token
 
 
+@pytest.fixture
+async def healthcheck_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("healthcheck_mock")
+    app.requests = []
+
+    @app.route("/v2/real411/complaint/", methods=["POST"])
+    def store_complaint_ref(request):
+        app.requests.append(request)
+        return response.json({})
+
+    client = await sanic_client(app)
+    url = config.HEALTHCHECK_URL
+    config.HEALTHCHECK_URL = f"http://{client.host}:{client.port}"
+    yield client
+    config.HEALTHCHECK_URL = url
+
+
 @pytest.mark.asyncio
 async def test_exit_keywords(tester: AppTester):
     await tester.user_input("Main Menu")
@@ -327,7 +345,7 @@ async def test_email(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_description(tester: AppTester, real411_mock):
+async def test_description(tester: AppTester):
     tester.setup_state("state_email")
     await tester.user_input("test@example.org")
     tester.assert_state("state_description")
@@ -398,7 +416,9 @@ async def test_opt_in(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_success(tester: AppTester, real411_mock, whatsapp_mock):
+async def test_success(
+    tester: AppTester, real411_mock, whatsapp_mock, healthcheck_mock
+):
     await tester.user_input("View and Accept T&Cs")  # start
     await tester.user_input("I agree")  # terms
     await tester.user_input("first name")  # first_name
@@ -461,9 +481,14 @@ async def test_success(tester: AppTester, real411_mock, whatsapp_mock):
     assert uploadimg.headers["content-type"] == "image/jpeg"
     assert finalise.json == {"ref": 1}
 
+    [complaint] = healthcheck_mock.app.requests
+    assert complaint.json == {"complaint_ref": 1, "msisdn": "27820001001"}
+
 
 @pytest.mark.asyncio
-async def test_success_no_media(tester: AppTester, real411_mock, whatsapp_mock):
+async def test_success_no_media(
+    tester: AppTester, real411_mock, whatsapp_mock, healthcheck_mock
+):
     """
     Uploads a blank 1x1 PNG if there is no media
     """
@@ -491,6 +516,9 @@ async def test_success_no_media(tester: AppTester, real411_mock, whatsapp_mock):
     assert upload.body == BLANK_PNG
     assert upload.headers["content-type"] == "image/png"
     assert finalise.json == {"ref": 1}
+
+    [complaint] = healthcheck_mock.app.requests
+    assert complaint.json == {"complaint_ref": 1, "msisdn": "27820001001"}
 
 
 @pytest.mark.asyncio
