@@ -202,8 +202,10 @@ async def test_menu_with_no_id_number(get_today):
 
 @pytest.mark.asyncio
 @mock.patch("vaccine.utils.get_today")
-async def test_menu_with_id_number_ambigious_age_older(get_today):
-    get_today.return_value = date(2021, 1, 1)
+@mock.patch("vaccine.vaccine_reg_ussd.get_today")
+async def test_menu_with_id_number_ambigious_age_older(get_today1, get_today2):
+    get_today1.return_value = date(2021, 1, 1)
+    get_today2.return_value = date(2021, 1, 1)
 
     # English language choice
     u = User(addr="27820001001")

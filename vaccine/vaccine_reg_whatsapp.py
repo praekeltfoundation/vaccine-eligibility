@@ -32,6 +32,7 @@ from vaccine.utils import (
     countries,
     display_phonenumber,
     enforce_character_limit_in_choices,
+    get_today,
     normalise_phonenumber,
 )
 from vaccine.validators import name_validator, nonempty_validator
@@ -661,8 +662,8 @@ class Application(BaseApplication):
             try:
                 assert isinstance(value, str)
                 assert value.isdigit()
-                assert int(value) > date.today().year - config.AMBIGUOUS_MAX_AGE
-                assert int(value) <= date.today().year
+                assert int(value) > get_today().year - config.AMBIGUOUS_MAX_AGE
+                assert int(value) <= get_today().year
             except AssertionError:
                 raise ErrorMessage(
                     self._(

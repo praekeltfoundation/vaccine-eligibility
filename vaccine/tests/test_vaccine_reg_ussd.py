@@ -475,9 +475,13 @@ async def test_said_date_and_sex_extraction():
 
 
 @pytest.mark.asyncio
+@mock.patch("vaccine.vaccine_reg_ussd.get_today")
 @mock.patch("vaccine.utils.get_today")
-async def test_said_date_extraction_ambiguous(get_today, tester: AppTester):
-    get_today.return_value = date(2020, 1, 1)
+async def test_said_date_extraction_ambiguous(
+    get_today1, get_today2, tester: AppTester
+):
+    get_today1.return_value = date(2020, 1, 1)
+    get_today2.return_value = date(2020, 1, 1)
     tester.setup_state("state_identification_number")
     tester.setup_answer("state_identification_type", "rsa_id")
     await tester.user_input("0001010001087")
