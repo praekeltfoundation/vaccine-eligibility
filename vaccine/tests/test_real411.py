@@ -78,12 +78,15 @@ async def real411_mock(sanic_client):
         return response.json(
             {
                 "success": True,
-                "complaint_ref": "WDM88J4P",
-                "file_urls": [
-                    app.url_for("file_upload", _external=True)
-                    for _ in range(file_count)
-                ],
-                "real411_backlink": "https://example.org",
+                "data": {
+                    "complaint_ref": "WDM88J4P",
+                    "file_urls": [
+                        app.url_for("file_upload", _external=True)
+                        for _ in range(file_count)
+                    ],
+                    "real411_backlink": "https://example.org",
+                },
+                "errors": None,
             }
         )
 
