@@ -1,5 +1,6 @@
 import json
 import re
+from asyncio import gather
 from base64 import b64decode
 from typing import List, Optional, Tuple
 from urllib.parse import urljoin
@@ -22,6 +23,12 @@ BLANK_PNG = b64decode(
 )
 
 
+class Real411APIException(Exception):
+    """
+    Error when interacting with the Real411 API
+    """
+
+
 def get_real411_api_client() -> aiohttp.ClientSession:
     return CachedSession(
         cache=cache_backend,
@@ -33,13 +40,25 @@ def get_real411_api_client() -> aiohttp.ClientSession:
     )
 
 
-async def get_real411_form_data() -> dict:
+def check_real411_api_response(data: dict) -> None:
+    if not data.get("success") or data.get("errors"):
+        raise Real411APIException(f"Error in API response: {data.get('errors')}")
+
+
+async def get_real411_single_resource(resource_type: str, resource_code: str) -> dict:
     async with get_real411_api_client() as session:
         response = await session.get(
-            url=enforce_string(urljoin(config.REAL411_URL, "form-data"))
+            url=enforce_string(urljoin(config.REAL411_URL, resource_type)),
+            params={"limit": -1, "code": resource_code},
         )
         response.raise_for_status()
-        return await response.json()
+        data = await response.json()
+        check_real411_api_response(data)
+        if data["data"]["total"] != 1:
+            raise Real411APIException(
+                f"{data['data']['total']} {resource_type} returned for {resource_code}"
+            )
+        return data["data"]["rows"][0]
 
 
 async def submit_real411_form(
@@ -49,46 +68,44 @@ async def submit_real411_form(
     reason: str,
     email: Optional[str] = None,
     file_names: Optional[List[dict]] = None,
-) -> Tuple[int, List[str]]:
-    for complaint_type in (await get_real411_form_data())["ComplaintType"]:
-        if (
-            "dis" in complaint_type["code"].lower()
-            or "disinformation" in complaint_type["type"].lower()
-        ):
-            break
-    for language in (await get_real411_form_data())["Language"]:
-        if "eng" in language["code"].lower() or "english" in language["name"].lower():
-            break
-    for source in (await get_real411_form_data())["Source"]:
-        if "whatsapp" in source["name"].lower() or "wht" in source["code"].lower():
-            break
+) -> Tuple[str, List[str], str]:
+    complaint_type, language, source = await gather(
+        get_real411_single_resource("complaint-type", "DIS"),
+        get_real411_single_resource("language", "ENG"),
+        get_real411_single_resource("source", "WHT"),
+    )
     data = {
-        "complaint_source": config.REAL411_IDENTIFIER,
         "agree": terms,
         "name": name,
+        "email": email or "placeholder@example.org",
         "phone": phone,
         "complaint_types": json.dumps([{"id": complaint_type["id"], "reason": reason}]),
         "language": language["id"],
         "source": source["id"],
         "file_names": file_names or [],
-        "email": email or "placeholder@example.org",
     }
     async with get_real411_api_client() as session:
         response = await session.post(
-            url=enforce_string(urljoin(config.REAL411_URL, "submit/v2")), json=data
+            url=enforce_string(urljoin(config.REAL411_URL, "complaint")), json=data
         )
         response.raise_for_status()
         response_data = await response.json()
-        return (response_data["complaint_ref"], response_data["file_urls"])
+        check_real411_api_response(response_data)
+        return (
+            response_data["complaint_ref"],
+            response_data["file_urls"],
+            response_data["real411_backlink"],
+        )
 
 
 async def finalise_real411_form(form_reference: str) -> None:
     async with get_real411_api_client() as session:
         response = await session.post(
-            url=enforce_string(urljoin(config.REAL411_URL, "complaints/finalize")),
+            url=enforce_string(urljoin(config.REAL411_URL, "complaint/finalize")),
             json={"ref": form_reference},
         )
         response.raise_for_status()
+        check_real411_api_response(await response.json())
 
 
 def get_whatsapp_api() -> aiohttp.ClientSession:
@@ -409,7 +426,7 @@ class Application(BaseApplication):
         if not files:
             files.append({"name": "placeholder", "type": "image/png"})
 
-        form_reference, file_urls = await submit_real411_form(
+        form_reference, file_urls, self.backlink = await submit_real411_form(
             terms=answers["state_terms"] == "yes",
             name=f"{answers['state_first_name']} {answers['state_surname']}",
             phone=normalise_phonenumber(self.user.addr),
