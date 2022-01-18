@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from sanic import Sanic, response
 
@@ -18,11 +20,50 @@ async def real411_mock(sanic_client):
     app = Sanic("real411_mock")
     app.requests = []
 
-    @app.route("/form-data", methods=["GET"])
-    def check(request):
-        app.requests.append(request)
-        return response.file_stream(
-            "vaccine/tests/real411.json", mime_type="application/json"
+    @app.route("/complaint-type", methods=["GET"])
+    def complaint_type(request):
+        with open("vaccine/tests/real411.json") as f:
+            data = json.load(f)
+        complaints = [
+            c for c in data["ComplaintType"] if c["code"] == request.args.get("code")
+        ]
+        return response.json(
+            {
+                "success": True,
+                "message": "",
+                "data": {"rows": complaints, "total": len(complaints)},
+                "errors": None,
+            }
+        )
+
+    @app.route("/language", methods=["GET"])
+    def language(request):
+        with open("vaccine/tests/real411.json") as f:
+            data = json.load(f)
+        languages = [
+            c for c in data["Language"] if c["code"] == request.args.get("code")
+        ]
+        return response.json(
+            {
+                "success": True,
+                "message": "",
+                "data": {"rows": languages, "total": len(languages)},
+                "errors": None,
+            }
+        )
+
+    @app.route("/source", methods=["GET"])
+    def source(request):
+        with open("vaccine/tests/real411.json") as f:
+            data = json.load(f)
+        sources = [c for c in data["Source"] if c["code"] == request.args.get("code")]
+        return response.json(
+            {
+                "success": True,
+                "message": "",
+                "data": {"rows": sources, "total": len(sources)},
+                "errors": None,
+            }
         )
 
     @app.route("/file_upload", methods=["PUT"])
@@ -30,24 +71,28 @@ async def real411_mock(sanic_client):
         app.requests.append(request)
         return response.text("")
 
-    @app.route("/submit/v2", methods=["POST"])
+    @app.route("/complaint", methods=["POST"])
     def submit(request):
         app.requests.append(request)
         file_count = len(request.json["file_names"])
         return response.json(
             {
-                "complaint_ref": 1,
+                "success": True,
+                "complaint_ref": "WDM88J4P",
                 "file_urls": [
                     app.url_for("file_upload", _external=True)
                     for _ in range(file_count)
                 ],
+                "real411_backlink": "https://example.org",
             }
         )
 
-    @app.route("/complaints/finalize", methods=["POST"])
+    @app.route("/complaint/finalize", methods=["POST"])
     def finalise(request):
         app.requests.append(request)
-        return response.json({})
+        return response.json(
+            {"success": True, "message": "Complaint finalised", "errors": None}
+        )
 
     client = await sanic_client(app)
     app.config.SERVER_NAME = f"http://{client.host}:{client.port}"
@@ -459,9 +504,8 @@ async def test_success(
         ),
         session=Message.SESSION_EVENT.CLOSE,
     )
-    [_, submit, uploadvid, uploadimg, finalise] = real411_mock.app.requests
+    [submit, uploadvid, uploadimg, finalise] = real411_mock.app.requests
     assert submit.json == {
-        "complaint_source": "PRAEKELT_API",
         "agree": True,
         "name": "first name surname",
         "phone": "+27820001001",
@@ -479,10 +523,10 @@ async def test_success(
     assert uploadvid.headers["content-type"] == "video/mp4"
     assert uploadimg.body == b"testfile"
     assert uploadimg.headers["content-type"] == "image/jpeg"
-    assert finalise.json == {"ref": 1}
+    assert finalise.json == {"ref": "WDM88J4P"}
 
     [complaint] = healthcheck_mock.app.requests
-    assert complaint.json == {"complaint_ref": 1, "msisdn": "27820001001"}
+    assert complaint.json == {"complaint_ref": "WDM88J4P", "msisdn": "27820001001"}
 
 
 @pytest.mark.asyncio
@@ -501,9 +545,8 @@ async def test_success_no_media(
     await tester.user_input("test description")  # description
     await tester.user_input("SKIP")  # media
     await tester.user_input("I agree")  # opt_in
-    [_, submit, upload, finalise] = real411_mock.app.requests
+    [submit, upload, finalise] = real411_mock.app.requests
     assert submit.json == {
-        "complaint_source": "PRAEKELT_API",
         "agree": True,
         "name": "first name surname",
         "phone": "+27820001001",
@@ -515,10 +558,10 @@ async def test_success_no_media(
     }
     assert upload.body == BLANK_PNG
     assert upload.headers["content-type"] == "image/png"
-    assert finalise.json == {"ref": 1}
+    assert finalise.json == {"ref": "WDM88J4P"}
 
     [complaint] = healthcheck_mock.app.requests
-    assert complaint.json == {"complaint_ref": 1, "msisdn": "27820001001"}
+    assert complaint.json == {"complaint_ref": "WDM88J4P", "msisdn": "27820001001"}
 
 
 @pytest.mark.asyncio
