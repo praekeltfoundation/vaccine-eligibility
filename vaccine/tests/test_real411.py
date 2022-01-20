@@ -573,7 +573,7 @@ async def test_success_no_media(
         "language": 13,
         "source": 1,
         "file_names": [{"name": "placeholder", "type": "image/png"}],
-        "email": "placeholder@example.org",
+        "email": "reporting@praekelt.org",
     }
     assert upload.body == BLANK_PNG
     assert upload.headers["content-type"] == "image/png"

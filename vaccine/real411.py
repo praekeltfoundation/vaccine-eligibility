@@ -77,7 +77,7 @@ async def submit_real411_form(
     data = {
         "agree": terms,
         "name": name,
-        "email": email or "placeholder@example.org",
+        "email": email or "reporting@praekelt.org",
         "phone": phone,
         "complaint_types": json.dumps([{"id": complaint_type["id"], "reason": reason}]),
         "language": language["id"],
