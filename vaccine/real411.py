@@ -182,12 +182,11 @@ class Application(BaseApplication):
 
     async def state_start(self):
         question = self._(
-            "*REPORT* 📵 Powered by ```Real411```\n"
+            "*REPORT* 📵 powered by ```Real411.org```\n"
             "\n"
-            "There is a lot of information going around on WhatsApp related to the "
-            "COVID-19 pandemic. Some of this information may be false and potentially "
-            "harmful. Help to stop the spread of inaccurate or misleading information "
-            "on WhatsApp by reporting it here"
+            "There is a lot of information about COVID-19 being shared on WhatsApp. "
+            "Some of this information is false and could be harmful. Report misleading "
+            "or inaccurate information here to help stop its spread on WhatsApp."
         )
         error = self._(
             "This service works best when you use the options given. Please try using "
@@ -197,8 +196,8 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("tell_me_more", self._("Tell me more")),
-                Choice("terms_and_conditions", self._("View and Accept T&Cs")),
+                Choice("tell_me_more", self._("Learn more")),
+                Choice("terms_and_conditions", self._("Continue")),
             ],
             error=error,
             next={
@@ -209,20 +208,29 @@ class Application(BaseApplication):
 
     async def state_tell_me_more(self):
         question = self._(
-            "*REPORT* 📵 Powered by ```Real411``` allows you to report digital "
-            "offences encountered on WhatsApp.\n"
+            "*REPORT* 📵 powered by ```Real411.org``` allows you to report WhatsApp "
+            "messages that include:\n"
+            "- disinformation\n"
+            "- hate speech\n"
+            "- incitement to violence\n"
+            "- harassment of a journalist\n"
             "\n"
-            "You can report 4 types of digital offences here namely, Disinformation, "
-            "hate speech, incitement to violence and journalist harassment. "
-            "Disinformation is false, inaccurate or misleading information designed, "
-            "presented and promoted online to intentionally cause public harm. Hate "
-            "speech suggests messages with malicious intent to harm or dehumanise and "
-            "may lead to incitement of violence. Incitement is the encouragement of "
-            "others to commit a crime, in this case violent actions, which may cause "
-            "harm, damage or even death. Journalists can report unwanted conduct that "
-            "is persistent or serious and demeans, humiliates or creates a hostile or "
-            "intimidating environment to induce submission by actual or threatened "
-            "adverse consequences."
+            "*Disinformation* is false, inaccurate or misleading information that aims "
+            "to cause public harm on purpose.\n"
+            "\n"
+            "*Hate speech* includes messages that intend to harm a person or group, or "
+            "make them feel less than other people.\n"
+            "\n"
+            "*Incitement to violence* includes messages that encourage violence that "
+            "could cause harm, damage or even death.\n"
+            "\n"
+            "*Harrassment of a journalist* includes messages to members of the media "
+            "that aim to humiliate, shame, threaten or intimidate them.\n"
+            "\n"
+            "Use this service to report WhatsApp messages that were forwarded to you "
+            "personally or to a WhatsApp group that your are a member of. You can "
+            "report what you've seen on social media, websites, TV or radio at "
+            "www.real411.org/complaints-create."
         )
         error = self._(
             "This service works best when you use the options given. Please try using "
@@ -256,10 +264,10 @@ class Application(BaseApplication):
 
     async def state_terms(self):
         question = self._(
-            "*REPORT* 📵 Powered by ```Real411```\n"
+            "*REPORT* 📵 powered by ```Real411.org```\n"
             "\n"
-            "Your information is kept private and confidential and only used with your "
-            "consent for the purpose of reporting disinformation.\n"
+            "Your information is kept private and confidential. It is only used with "
+            "your permission to report disinformation.\n"
             "\n"
             "Do you agree to the attached PRIVACY POLICY?"
         )
@@ -284,7 +292,7 @@ class Application(BaseApplication):
         return EndState(
             self,
             self._(
-                "*REPORT* 📵 Powered by ```Real411```\n"
+                "*REPORT* 📵 Powered by ```Real411.org```\n"
                 "\n"
                 "If you change your mind, type *REPORT* anytime.\n"
                 "Reply *0* to return to the main *MENU*"
@@ -293,7 +301,9 @@ class Application(BaseApplication):
 
     async def state_first_name(self):
         question = self._(
-            "*REPORT* 📵 Powered by ```Real411```\n" "\n" "Reply with your FIRST NAME:"
+            "*REPORT* 📵 Powered by ```Real411.org```\n"
+            "\n"
+            "Reply with your FIRST NAME:"
         )
         return FreeText(
             self,
@@ -303,7 +313,7 @@ class Application(BaseApplication):
 
     async def state_surname(self):
         question = self._(
-            "*REPORT* 📵 Powered by ```Real411```\n" "\n" "Reply with your SURNAME:"
+            "*REPORT* 📵 Powered by ```Real411.org```\n" "\n" "Reply with your SURNAME:"
         )
         return FreeText(
             self,
@@ -315,9 +325,9 @@ class Application(BaseApplication):
         return WhatsAppButtonState(
             self,
             question=self._(
-                "*REPORT* 📵 Powered by ```Real411```\n"
+                "*REPORT* 📵 Powered by ```Real411.org```\n"
                 "\n"
-                "Please confirm your full name as {first_name} {surname}"
+                "Please confirm that your full name is {first_name} {surname}"
             ).format(
                 first_name=self.user.answers["state_first_name"],
                 surname=self.user.answers["state_surname"],
@@ -340,16 +350,16 @@ class Application(BaseApplication):
 
     async def state_email(self):
         question = self._(
-            "*REPORT* 📵 Powered by ```Real411```\n"
+            "*REPORT* 📵 powered by ```Real411.org```\n"
             "\n"
-            "Please TYPE your EMAIL address. (Or type SKIP if you are unable to share "
-            "an email address.)"
+            "Please TYPE your EMAIL address. (Or type SKIP if you can't share an email "
+            "address.)"
         )
         error = self._(
-            "*REPORT* 📵 Powered by ```Real411```\n"
+            "*REPORT* 📵 powered by ```Real411.org```\n"
             "\n"
-            "Please TYPE a valid EMAIL address or type *SKIP* if you are unable to "
-            "share an email address"
+            "Please TYPE a valid EMAIL address or type *SKIP* if you can't share an "
+            "email address"
         )
         return FreeText(
             self,
@@ -360,10 +370,10 @@ class Application(BaseApplication):
 
     async def state_description(self):
         question = self._(
-            "*REPORT* 📵 Powered by ```Real411```\n"
+            "*REPORT* 📵 powered by ```Real411.org```\n"
             "\n"
-            "Please describe the information being reported in your own words or "
-            "simply forward a message that you would like to report:"
+            "Please type in your own words the issue that you want to report or simply "
+            "forward a message that you would like to report:"
         )
         return FreeText(
             self,
@@ -374,9 +384,9 @@ class Application(BaseApplication):
 
     async def state_media(self):
         question = self._(
-            "*REPORT* 📵 Powered by ```Real411```\n"
+            "*REPORT* 📵 powered by ```Real411.org```\n"
             "\n"
-            "Please share any additional information such as screenshots, photos, "
+            "Please share any extra information, such as screenshots, photos, "
             "voicenotes or links (or type SKIP)"
         )
         return FreeText(
@@ -388,17 +398,18 @@ class Application(BaseApplication):
 
     async def state_opt_in(self):
         question = self._(
-            "*REPORT* 📵 Powered by ```Real411```\n"
+            "*REPORT* 📵 powered by ```Real411.org```\n"
             "\n"
-            "To complete your report please confirm that all the information is "
-            "accurate to the best of your knowledge and that you give ContactNDOH "
-            "permission to send you message about the outcome of your report"
+            "To complete your report, please confirm that all the information you've "
+            "given is accurate to the best of your knowledge and that you give "
+            "ContactNDOH permission to send you a message about the outcome of your "
+            "report"
         )
         error = self._(
             "This service works best when you use the options given. Please try using "
             "the buttons below or reply *0* to return the main *MENU*.\n"
             "\n"
-            "Do you agree to share your report with Real411?"
+            "Do you agree to share your report with Real411.org?"
         )
         return WhatsAppButtonState(
             self,
@@ -426,7 +437,7 @@ class Application(BaseApplication):
         if not files:
             files.append({"name": "placeholder", "type": "image/png"})
 
-        form_reference, file_urls, self.backlink = await submit_real411_form(
+        self.form_reference, file_urls, self.backlink = await submit_real411_form(
             terms=answers["state_terms"] == "yes",
             name=f"{answers['state_first_name']} {answers['state_surname']}",
             phone=normalise_phonenumber(self.user.addr),
@@ -434,7 +445,7 @@ class Application(BaseApplication):
             email=email,
             file_names=files,
         )
-        await store_complaint_id(form_reference, self.user.addr)
+        await store_complaint_id(self.form_reference, self.user.addr)
         async with aiohttp.ClientSession(
             headers={"User-Agent": "contactndoh-real411"},
         ) as session:
@@ -450,17 +461,20 @@ class Application(BaseApplication):
                 )
                 result.raise_for_status()
 
-        await finalise_real411_form(form_reference)
+        await finalise_real411_form(self.form_reference)
         return await self.go_to_state("state_success")
 
     async def state_success(self):
         text = self._(
-            "*REPORT* 📵 Powered by ```Real411```\n"
+            "*REPORT* 📵 Powered by ```Real411.org```\n"
+            f"_Complaint ID: {self.form_reference}_\n"
             "\n"
             "Thank you for helping to stop the spread of inaccurate or misleading "
             "information!\n"
             "\n"
             "Look out for messages from us in the next few days\n"
+            "\n"
+            f"To track the status of your report, visit {self.backlink}\n"
             "\n"
             "Reply 0 to return to the main MENU"
         )
@@ -470,12 +484,16 @@ class Application(BaseApplication):
         return EndState(
             self,
             text=self._(
-                "*REPORT* 📵 Powered by ```Real411```\n"
+                "*REPORT* 📵 powered by ```Real411.org```\n"
                 "\n"
-                "Your report will not be shared\n"
+                "Your report will not be shared.\n"
                 "\n"
-                "Reply *REPORT* to start over\n"
-                "Reply *0* to return to the main *MENU*"
+                "If you have seen or heard anything on other platforms, including "
+                "social media, websites or even TV or radio, you can also report them "
+                "at www.real411.org/complaints-create.\n"
+                "\n"
+                "Reply *REPORT *to start over\n"
+                "Reply *0 *to return to the main *MENU*"
             ),
         )
 

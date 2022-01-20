@@ -171,15 +171,15 @@ async def test_start(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "*REPORT* 📵 Powered by ```Real411```",
+                "*REPORT* 📵 powered by ```Real411.org```",
                 "",
-                "There is a lot of information going around on WhatsApp related to the "
-                "COVID-19 pandemic. Some of this information may be false and "
-                "potentially harmful. Help to stop the spread of inaccurate or "
-                "misleading information on WhatsApp by reporting it here",
+                "There is a lot of information about COVID-19 being shared on "
+                "WhatsApp. Some of this information is false and could be harmful. "
+                "Report misleading or inaccurate information here to help stop its "
+                "spread on WhatsApp.",
             ]
         ),
-        buttons=["Tell me more", "View and Accept T&Cs"],
+        buttons=["Learn more", "Continue"],
     )
 
     await tester.user_input("invalid")
@@ -189,32 +189,40 @@ async def test_start(tester: AppTester):
         "the buttons below or reply *0* to return the main *MENU*."
     )
 
-    await tester.user_input("View and Accept T&Cs")
+    await tester.user_input("Continue")
     tester.assert_state("state_terms")
 
 
 @pytest.mark.asyncio
 async def test_tell_me_more(tester: AppTester):
-    await tester.user_input("tell me more")
+    await tester.user_input("learn more")
     tester.assert_state("state_tell_me_more")
     tester.assert_message(
         "\n".join(
             [
-                "*REPORT* 📵 Powered by ```Real411``` allows you to report digital "
-                "offences encountered on WhatsApp.",
+                "*REPORT* 📵 powered by ```Real411.org``` allows you to report "
+                "WhatsApp messages that include:",
+                "- disinformation",
+                "- hate speech",
+                "- incitement to violence",
+                "- harassment of a journalist",
                 "",
-                "You can report 4 types of digital offences here namely, "
-                "Disinformation, hate speech, incitement to violence and journalist "
-                "harassment. Disinformation is false, inaccurate or misleading "
-                "information designed, "
-                "presented and promoted online to intentionally cause public harm. "
-                "Hate speech suggests messages with malicious intent to harm or "
-                "dehumanise and may lead to incitement of violence. Incitement is the "
-                "encouragement of others to commit a crime, in this case violent "
-                "actions, which may cause harm, damage or even death. Journalists can "
-                "report unwanted conduct that is persistent or serious and demeans, "
-                "humiliates or creates a hostile or intimidating environment to induce "
-                "submission by actual or threatened adverse consequences.",
+                "*Disinformation* is false, inaccurate or misleading information that "
+                "aims to cause public harm on purpose.",
+                "",
+                "*Hate speech* includes messages that intend to harm a person or "
+                "group, or make them feel less than other people.",
+                "",
+                "*Incitement to violence* includes messages that encourage violence "
+                "that could cause harm, damage or even death.",
+                "",
+                "*Harrassment of a journalist* includes messages to members of the "
+                "media that aim to humiliate, shame, threaten or intimidate them.",
+                "",
+                "Use this service to report WhatsApp messages that were forwarded to "
+                "you personally or to a WhatsApp group that your are a member of. You "
+                "can report what you've seen on social media, websites, TV or radio at "
+                "www.real411.org/complaints-create.",
             ]
         )
     )
@@ -235,7 +243,7 @@ async def test_terms(tester: AppTester):
     """
     PDF document with terms and conditions, and ask whether they accept
     """
-    await tester.user_input("View and Accept T&Cs")
+    await tester.user_input("Continue")
     tester.assert_state("state_terms")
     document = tester.application.messages.pop(0)
     assert (
@@ -246,10 +254,10 @@ async def test_terms(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "*REPORT* 📵 Powered by ```Real411```",
+                "*REPORT* 📵 powered by ```Real411.org```",
                 "",
-                "Your information is kept private and confidential and only used with "
-                "your consent for the purpose of reporting disinformation.",
+                "Your information is kept private and confidential. It is only used "
+                "with your permission to report disinformation.",
                 "",
                 "Do you agree to the attached PRIVACY POLICY?",
             ]
@@ -280,7 +288,7 @@ async def test_refuse_terms(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "*REPORT* 📵 Powered by ```Real411```",
+                "*REPORT* 📵 Powered by ```Real411.org```",
                 "",
                 "If you change your mind, type *REPORT* anytime.",
                 "Reply *0* to return to the main *MENU*",
@@ -297,7 +305,11 @@ async def test_first_name(tester: AppTester):
     tester.assert_state("state_first_name")
     tester.assert_message(
         "\n".join(
-            ["*REPORT* 📵 Powered by ```Real411```", "", "Reply with your FIRST NAME:"]
+            [
+                "*REPORT* 📵 Powered by ```Real411.org```",
+                "",
+                "Reply with your FIRST NAME:",
+            ]
         )
     )
 
@@ -313,7 +325,7 @@ async def test_surname(tester: AppTester):
     tester.assert_state("state_surname")
     tester.assert_message(
         "\n".join(
-            ["*REPORT* 📵 Powered by ```Real411```", "", "Reply with your SURNAME:"]
+            ["*REPORT* 📵 Powered by ```Real411.org```", "", "Reply with your SURNAME:"]
         )
     )
 
@@ -330,9 +342,9 @@ async def test_confirm_name(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "*REPORT* 📵 Powered by ```Real411```",
+                "*REPORT* 📵 Powered by ```Real411.org```",
                 "",
-                "Please confirm your full name as firstname surname",
+                "Please confirm that your full name is firstname surname",
             ]
         ),
         buttons=["Confirm", "Edit name"],
@@ -364,10 +376,10 @@ async def test_email(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "*REPORT* 📵 Powered by ```Real411```",
+                "*REPORT* 📵 powered by ```Real411.org```",
                 "",
-                "Please TYPE your EMAIL address. (Or type SKIP if you are unable to "
-                "share an email address.)",
+                "Please TYPE your EMAIL address. (Or type SKIP if you can't share an "
+                "email address.)",
             ]
         )
     )
@@ -376,10 +388,10 @@ async def test_email(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "*REPORT* 📵 Powered by ```Real411```",
+                "*REPORT* 📵 powered by ```Real411.org```",
                 "",
-                "Please TYPE a valid EMAIL address or type *SKIP* if you are unable to "
-                "share an email address",
+                "Please TYPE a valid EMAIL address or type *SKIP* if you can't share "
+                "an email address",
             ]
         )
     )
@@ -400,9 +412,9 @@ async def test_description(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "*REPORT* 📵 Powered by ```Real411```",
+                "*REPORT* 📵 powered by ```Real411.org```",
                 "",
-                "Please describe the information being reported in your own words or "
+                "Please type in your own words the issue that you want to report or "
                 "simply forward a message that you would like to report:",
             ]
         )
@@ -420,9 +432,9 @@ async def test_media(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "*REPORT* 📵 Powered by ```Real411```",
+                "*REPORT* 📵 powered by ```Real411.org```",
                 "",
-                "Please share any additional information such as screenshots, photos, "
+                "Please share any extra information, such as screenshots, photos, "
                 "voicenotes or links (or type SKIP)",
             ]
         )
@@ -440,11 +452,12 @@ async def test_opt_in(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "*REPORT* 📵 Powered by ```Real411```",
+                "*REPORT* 📵 powered by ```Real411.org```",
                 "",
-                "To complete your report please confirm that all the information is "
-                "accurate to the best of your knowledge and that you give ContactNDOH "
-                "permission to send you message about the outcome of your report",
+                "To complete your report, please confirm that all the information "
+                "you've given is accurate to the best of your knowledge and that you "
+                "give ContactNDOH permission to send you a message about the outcome "
+                "of your report",
             ]
         ),
         buttons=["I agree", "No"],
@@ -457,7 +470,7 @@ async def test_opt_in(tester: AppTester):
                 "This service works best when you use the options given. Please try "
                 "using the buttons below or reply *0* to return the main *MENU*.",
                 "",
-                "Do you agree to share your report with Real411?",
+                "Do you agree to share your report with Real411.org?",
             ]
         )
     )
@@ -467,7 +480,7 @@ async def test_opt_in(tester: AppTester):
 async def test_success(
     tester: AppTester, real411_mock, whatsapp_mock, healthcheck_mock
 ):
-    await tester.user_input("View and Accept T&Cs")  # start
+    await tester.user_input("Continue")  # start
     await tester.user_input("I agree")  # terms
     await tester.user_input("first name")  # first_name
     await tester.user_input("surname")  # surname
@@ -495,12 +508,15 @@ async def test_success(
     tester.assert_message(
         "\n".join(
             [
-                "*REPORT* 📵 Powered by ```Real411```",
+                "*REPORT* 📵 Powered by ```Real411.org```",
+                "_Complaint ID: WDM88J4P_",
                 "",
                 "Thank you for helping to stop the spread of inaccurate or misleading "
                 "information!",
                 "",
                 "Look out for messages from us in the next few days",
+                "",
+                "To track the status of your report, visit https://example.org",
                 "",
                 "Reply 0 to return to the main MENU",
             ]
@@ -539,7 +555,7 @@ async def test_success_no_media(
     """
     Uploads a blank 1x1 PNG if there is no media
     """
-    await tester.user_input("View and Accept T&Cs")  # start
+    await tester.user_input("Continue")  # start
     await tester.user_input("I agree")  # terms
     await tester.user_input("first name")  # first_name
     await tester.user_input("surname")  # surname
@@ -574,12 +590,16 @@ async def test_no_opt_in(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "*REPORT* 📵 Powered by ```Real411```",
+                "*REPORT* 📵 powered by ```Real411.org```",
                 "",
-                "Your report will not be shared",
+                "Your report will not be shared.",
                 "",
-                "Reply *REPORT* to start over",
-                "Reply *0* to return to the main *MENU*",
+                "If you have seen or heard anything on other platforms, including "
+                "social media, websites or even TV or radio, you can also report them "
+                "at www.real411.org/complaints-create.",
+                "",
+                "Reply *REPORT *to start over",
+                "Reply *0 *to return to the main *MENU*",
             ]
         )
     )
