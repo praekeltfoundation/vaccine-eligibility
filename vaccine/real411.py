@@ -383,8 +383,9 @@ class Application(BaseApplication):
         question = self._(
             "*REPORT* 📵 powered by ```Real411.org```\n"
             "\n"
-            "Please type in your own words the issue that you want to report or simply "
-            "forward a message that you would like to report:"
+            "To report a WhatsApp message that contains misinformation about COVID-19, "
+            "please type a description of the complaint in your own words OR simply "
+            "forward the message that you would like to report."
         )
         error = self._(
             "I'm afraid we cannot read the file that you sent through.\n"

@@ -414,8 +414,9 @@ async def test_description(tester: AppTester):
             [
                 "*REPORT* 📵 powered by ```Real411.org```",
                 "",
-                "Please type in your own words the issue that you want to report or "
-                "simply forward a message that you would like to report:",
+                "To report a WhatsApp message that contains misinformation about "
+                "COVID-19, please type a description of the complaint in your own "
+                "words OR simply forward the message that you would like to report.",
             ]
         )
     )
