@@ -13,7 +13,7 @@ from vaccine.base_application import BaseApplication
 from vaccine.models import Message
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
 from vaccine.utils import enforce_string, normalise_phonenumber, save_media
-from vaccine.validators import email_validator
+from vaccine.validators import email_validator, enforce_mime_types
 
 cache_backend = CacheBackend(expire_after=60)
 
@@ -21,6 +21,17 @@ BLANK_PNG = b64decode(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAA"
     "AFAAGq1chRAAAAAElFTkSuQmCC"
 )
+
+ACCEPTED_MIME_TYPES = [
+    "video/mp4",
+    "image/jpeg",
+    "image/png",
+    "application/pdf",
+    "audio/ogg",
+    "video/ogg",
+    "audio/wav",
+    "audio/x-wav",
+]
 
 
 class Real411APIException(Exception):
@@ -375,11 +386,30 @@ class Application(BaseApplication):
             "Please type in your own words the issue that you want to report or simply "
             "forward a message that you would like to report:"
         )
+        error = self._(
+            "I'm afraid we cannot read the file that you sent through.\n"
+            "\n"
+            "We can only read video, image, document or audio files that have these "
+            "letters at the end of the file name:\n"
+            ".mp4\n"
+            ".jpeg\n"
+            ".png\n"
+            ".pdf\n"
+            ".ogg\n"
+            ".wave\n"
+            ".x-wav\n"
+            "\n"
+            "If you cannot send one of these files, don't worry. We will investigate "
+            "based on the description of the problem that you already typed in."
+        )
         return FreeText(
             self,
             question=question,
             next="state_media",
-            check=save_media(self, "state_description_file"),
+            check=[
+                enforce_mime_types(self, error, ACCEPTED_MIME_TYPES),
+                save_media(self, "state_description_file"),
+            ],
         )
 
     async def state_media(self):
@@ -389,11 +419,30 @@ class Application(BaseApplication):
             "Please share any extra information, such as screenshots, photos, "
             "voicenotes or links (or type SKIP)"
         )
+        error = self._(
+            "I'm afraid we cannot read the file that you sent through.\n"
+            "\n"
+            "We can only read video, image, document or audio files that have these "
+            "letters at the end of the file name:\n"
+            ".mp4\n"
+            ".jpeg\n"
+            ".png\n"
+            ".pdf\n"
+            ".ogg\n"
+            ".wave\n"
+            ".x-wav\n"
+            "\n"
+            "If you cannot send one of these files, don't worry. We will investigate "
+            "based on the description of the problem that you already typed in."
+        )
         return FreeText(
             self,
             question=question,
             next="state_opt_in",
-            check=save_media(self, "state_media_file"),
+            check=[
+                enforce_mime_types(self, error, ACCEPTED_MIME_TYPES),
+                save_media(self, "state_media_file"),
+            ],
         )
 
     async def state_opt_in(self):
