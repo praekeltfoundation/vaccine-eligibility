@@ -57,3 +57,18 @@ def email_validator(error_text: str, skip_keywords: Iterable[str] = []):
             raise ErrorMessage(error_text.format(email_error=e))
 
     return validator
+
+
+def enforce_mime_types(app, error, mime_types):
+    """
+    Ensure that if media is sent, it is one of a set of mime types
+    """
+
+    async def validator(content: Optional[str]):
+        msg_type = app.inbound.transport_metadata.get("message", {}).get("type")
+        if msg_type in ["audio", "document", "image", "video", "voice", "sticker"]:
+            media = app.inbound.transport_metadata.get("message", {}).get(msg_type, {})
+            if media.get("mime_type") not in mime_types:
+                raise ErrorMessage(error)
+
+    return validator

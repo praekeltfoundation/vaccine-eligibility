@@ -445,6 +445,39 @@ async def test_media(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_media_invalid_mimetype(tester: AppTester):
+    tester.setup_state("state_description")
+    await tester.user_input(
+        "test description",
+        transport_metadata={
+            "message": {"type": "document", "mime_type": "application/msword"}
+        },
+    )
+    tester.assert_state("state_description")
+    tester.assert_message(
+        "\n".join(
+            [
+                "I'm afraid we cannot read the file that you sent through.",
+                "",
+                "We can only read video, image, document or audio files that have "
+                "these letters at the end of the file name:",
+                ".mp4",
+                ".jpeg",
+                ".png",
+                ".pdf",
+                ".ogg",
+                ".wave",
+                ".x-wav",
+                "",
+                "If you cannot send one of these files, don't worry. We will "
+                "investigate based on the description of the problem that you already "
+                "typed in.",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
 async def test_opt_in(tester: AppTester):
     tester.setup_state("state_media")
     await tester.user_input("SKIP")

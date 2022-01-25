@@ -171,7 +171,11 @@ class FreeText:
         app: "BaseApplication",
         question: str,
         next: str,
-        check: Optional[Callable[[Optional[str]], Awaitable]] = None,
+        check: Union[
+            Callable[[Optional[str]], Awaitable],
+            List[Callable[[Optional[str]], Awaitable]],
+            None,
+        ] = None,
     ):
         self.app = app
         self.question = question
@@ -180,10 +184,13 @@ class FreeText:
 
     async def process_message(self, message: Message):
         if self.check is not None:
-            try:
-                await self.check(message.content)
-            except ErrorMessage as e:
-                return self.app.send_message(e.message)
+            if not isinstance(self.check, list):
+                self.check = [self.check]
+            for validator in self.check:
+                try:
+                    await validator(message.content)
+                except ErrorMessage as e:
+                    return self.app.send_message(e.message)
         self.app.save_answer(self.app.state_name, message.content or "")
         self.app.state_name = self.next
         state = await self.app.get_current_state()

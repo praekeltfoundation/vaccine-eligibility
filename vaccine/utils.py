@@ -7,7 +7,7 @@ from datetime import date, datetime, timedelta, timezone
 from enum import Enum
 from functools import cached_property
 from logging import Logger
-from typing import AnyStr, Optional
+from typing import TYPE_CHECKING, AnyStr, Awaitable, Callable, Optional
 from uuid import uuid4
 
 import aiohttp
@@ -26,6 +26,9 @@ DECODE_MESSAGE_EXCEPTIONS = (
 HTTP_EXCEPTIONS = (aiohttp.ClientError, asyncio.TimeoutError)
 
 TZ_SAST = timezone(timedelta(hours=2), "SAST")
+
+if TYPE_CHECKING:  # pragma: no cover
+    from vaccine.base_application import BaseApplication
 
 
 def random_id():
@@ -162,14 +165,18 @@ def enforce_string(anystring: AnyStr) -> str:
     return anystring
 
 
-def save_media(app, field):
+def save_media(
+    app: "BaseApplication", field: str
+) -> Callable[[Optional[str]], Awaitable]:
     """
     If this is a media message, store the media metadata on the contact
     """
 
-    async def validator(content):
+    async def validator(content: Optional[str]):
+        if not app.inbound:
+            return
         msg_type = app.inbound.transport_metadata.get("message", {}).get("type")
-        if msg_type in ["audio", "document", "image", "video", "voice"]:
+        if msg_type in ["audio", "document", "image", "video", "voice", "sticker"]:
             media = app.inbound.transport_metadata.get("message", {}).get(msg_type, {})
             app.save_answer(field, json.dumps(media))
 
