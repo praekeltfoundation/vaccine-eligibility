@@ -39,6 +39,8 @@ from vaccine.validators import name_validator, nonempty_validator
 
 logger = logging.getLogger(__name__)
 
+EXIT_KEYWORDS = {"menu", "0", "support"}
+
 
 def get_evds():
     # TODO: Cache the session globally. Things that don't work:
@@ -90,7 +92,7 @@ class Application(BaseApplication):
     async def process_message(self, message: Message) -> List[Message]:
         if message.session_event == Message.SESSION_EVENT.CLOSE:
             self.state_name = "state_timeout"
-        if re.sub(r"\W+", " ", message.content or "").strip().lower() in {"menu", "0"}:
+        if re.sub(r"\W+", " ", message.content or "").strip().lower() in EXIT_KEYWORDS:
             self.state_name = "state_exit"
 
         return await super().process_message(message)
@@ -107,6 +109,8 @@ class Application(BaseApplication):
                 "will need to start again. Just TYPE the word REGISTER.\n"
                 "\n"
                 "-----\n"
+                "Reply *SUPPORT* for details on how to get help with your "
+                "registration\n"
                 "📌 Reply *0* to return to the main *MENU*"
             ),
         )
@@ -202,6 +206,8 @@ class Application(BaseApplication):
                 "Your registration is important! Please try again in 15 minutes.\n"
                 "\n"
                 "-----\n"
+                "Reply *SUPPORT* for details on how to get help with your "
+                "registration\n"
                 "📌 Reply *0* to return to the main *MENU*"
             ),
             next=self.START_STATE,
@@ -228,6 +234,8 @@ class Application(BaseApplication):
             error_footer=self._(
                 "\n"
                 "-----\n"
+                "Reply *SUPPORT* for details on how to get help with your "
+                "registration\n"
                 "Reply 📌 *0* to end this session and return to the main *MENU*"
             ),
             next="state_confirm_notification",
@@ -355,7 +363,8 @@ class Application(BaseApplication):
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
                 "⚠️ Your suburb could not be found. Please try again by selecting your "
-                "province\n"
+                "province. Reply *SUPPORT* anytime if you need help from the "
+                "📞 Hotline Team\n"
                 "\n"
                 "Select your province"
             ),
@@ -410,7 +419,8 @@ class Application(BaseApplication):
             error_footer=self._(
                 "\n"
                 "------\n"
-                "📌 Or reply *0* to end this session and return to the main *MENU*"
+                "📌 Or reply *0* to end this session and return to the main *MENU*\n"
+                "Reply *SUPPORT* anytime if you need help from the 📞 Hotline Team"
             ),
             next=next_state,
         )
@@ -450,7 +460,8 @@ class Application(BaseApplication):
             error_footer=self._(
                 "\n"
                 "------\n"
-                "📌 Or reply *0* to end this session and return to the main *MENU*"
+                "📌 Or reply *0* to end this session and return to the main *MENU*\n"
+                "Reply *SUPPORT* anytime if you need help from the 📞 Hotline Team"
             ),
             next=next_state,
         )
@@ -471,6 +482,12 @@ class Application(BaseApplication):
                 "Please choose the type of identification document you have from "
                 "the list below?\n"
             ),
+            error_footer=self._(
+                "\n"
+                "-------\n"
+                "If you experiencing any problems with your registration, reply "
+                "*SUPPORT* now to get help from the 📞 Hotline Team"
+            ),
             next="state_identification_number",
         )
 
@@ -482,7 +499,8 @@ class Application(BaseApplication):
             error_msg = self._(
                 "⚠️ Please enter a valid {id_type}\n"
                 "\n"
-                "📌 Or reply *0* to end this session and return to the main *MENU*"
+                "📌 Or reply *0* to end this session and return to the main *MENU*\n"
+                "Reply *SUPPORT* anytime if you need help from the 📞 Hotline Team"
             ).format(id_type=idtype_label)
             if idtype == self.ID_TYPES.rsa_id:
                 try:
@@ -594,7 +612,10 @@ class Application(BaseApplication):
             "\n"
             "TYPE your FIRST NAME as it appears in your identification document.\n"
             "\n"
-            "📌 Or reply *0* to end this session and return to the main *MENU*"
+            "-------\n"
+            "📌 Or reply *0* to end this session and return to the main *MENU*\n"
+            "If you experiencing any problems with your registration, reply *SUPPORT* "
+            "now to get help from the 📞 Hotline Team"
         )
         return FreeText(
             self, question=question, check=name_validator(error), next="state_surname"
@@ -612,6 +633,9 @@ class Application(BaseApplication):
             "\n"
             "TYPE your SURNAME as it appears in your identification document.\n"
             "\n"
+            "-------\n"
+            "If you experiencing any problems with your registration, reply *SUPPORT* "
+            "now to get help from the 📞 Hotline Team\n"
             "📌 Or reply *0* to end this session and return to the main *MENU*"
         )
 
@@ -727,7 +751,8 @@ class Application(BaseApplication):
             next="state_dob_day",
             error=self._(
                 "⚠️ This service works best when you reply with one of the numbers "
-                "next to the options provided.\n"
+                "next to the options provided. Reply *SUPPORT* anytime if you need "
+                "help from the 📞 Hotline Team\n"
                 "\n"
                 "In which MONTH were you born?\n"
             ),
@@ -756,7 +781,13 @@ class Application(BaseApplication):
                         "⚠️ Please enter a valid calendar DAY for your birth date. "
                         "Type in only the day.\n"
                         "\n"
-                        "Example: If you were born on 20 May, type _20_"
+                        "Example: If you were born on 20 May, type _20_\n"
+                        "\n"
+                        "-------\n"
+                        "If you experiencing any problems with your registration, "
+                        "reply *SUPPORT* now to get help from the 📞 Hotline Team\n"
+                        "📌 Or reply *0* to end this session and return to the main "
+                        "*MENU*"
                     )
                 )
 
@@ -801,7 +832,9 @@ class Application(BaseApplication):
             ],
             error=self._(
                 "⚠️ This service works best when you reply with one of the numbers "
-                "next to the options provided.\n"
+                "next to the options provided. If you experiencing any problems with "
+                "your registration, reply *SUPPORT* now to get help from the "
+                "📞 Hotline Team\n"
                 "\n"
                 "REPLY with the NUMBER next to your gender in the list below.\n"
             ),
@@ -938,10 +971,13 @@ class Application(BaseApplication):
             choices=choices,
             error=self._(
                 "⚠️ This service works best when you reply with one of the numbers "
-                "next to the options provided.\n"
+                "next to the options provided. Reply *SUPPORT* anytime if you need "
+                "help from the 📞 Hotline Team"
                 "\n"
-                "REPLY with the NUMBER next to the name of your "
-                "Medical Aid Provider:\n"
+                "REPLY with the NUMBER next to the name of your Medical Aid Provider:\n"
+            ),
+            error_footer=self._(
+                "\n" "📌 Or reply *0* to end this session and return to the main *MENU*"
             ),
             next=next_state,
         )
@@ -1156,7 +1192,13 @@ class Application(BaseApplication):
         return EndState(
             self,
             text=self._(
-                "Something went wrong with your registration session. Your "
-                "registration was not able to be processed. Please try again later"
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+                "\n"
+                "⚠️ Our portal is currently down.\n"
+                "\n"
+                "Your registration is important! Please try again in 1 hour.\n"
+                "\n"
+                "-----\n"
+                "📌 Reply *0* to return to the main *MENU*"
             ),
         )
