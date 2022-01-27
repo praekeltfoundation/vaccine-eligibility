@@ -568,7 +568,8 @@ async def test_province_no_results(evds_mock, tester: AppTester):
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐",
                 "",
                 "⚠️ Your suburb could not be found. Please try again by selecting your "
-                "province",
+                "province. Reply *SUPPORT* anytime if you need help from the "
+                "📞 Hotline Team",
                 "",
                 "Select your province",
                 "1. Eastern Cape",
@@ -1401,8 +1402,18 @@ async def test_state_error(evds_mock, tester: AppTester):
     tester.setup_answer("state_email_address", "SKIP")
     await tester.user_input("1")
     tester.assert_message(
-        "Something went wrong with your registration session. Your registration was "
-        "not able to be processed. Please try again later",
+        "\n".join(
+            [
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐",
+                "",
+                "⚠️ Our portal is currently down.",
+                "",
+                "Your registration is important! Please try again in 1 hour.",
+                "",
+                "-----",
+                "📌 Reply *0* to return to the main *MENU*",
+            ]
+        ),
         session=Message.SESSION_EVENT.CLOSE,
     )
 
@@ -1447,6 +1458,7 @@ async def test_timeout(tester: AppTester):
                 "need to start again. Just TYPE the word REGISTER.",
                 "",
                 "-----",
+                "Reply *SUPPORT* for details on how to get help with your registration",
                 "📌 Reply *0* to return to the main *MENU*",
             ]
         ),
@@ -1470,6 +1482,7 @@ async def test_throttle(tester: AppTester):
                 "Your registration is important! Please try again in 15 minutes.",
                 "",
                 "-----",
+                "Reply *SUPPORT* for details on how to get help with your registration",
                 "📌 Reply *0* to return to the main *MENU*",
             ]
         ),
