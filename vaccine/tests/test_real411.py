@@ -557,6 +557,16 @@ async def test_success(
         ),
         session=Message.SESSION_EVENT.CLOSE,
     )
+    [msg] = tester.fake_worker.outbound_messages
+    assert msg.content == "\n".join(
+        [
+            "*REPORT* 📵 powered by ```Real411.org```",
+            "",
+            "Thank you for your submission",
+            "⏳ Please wait while we process your submission to give you a reference "
+            "number and a link to track your submission",
+        ]
+    )
     [submit, uploadvid, uploadimg, finalise] = real411_mock.app.requests
     assert submit.json == {
         "agree": True,

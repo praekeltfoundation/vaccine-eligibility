@@ -467,10 +467,24 @@ class Application(BaseApplication):
             choices=[Choice("yes", "I agree"), Choice("no", "No")],
             error=error,
             next={
-                "yes": "state_submit_report",
+                "yes": "state_send_interim_message",
                 "no": "state_do_not_share",
             },
         )
+
+    async def state_send_interim_message(self):
+        await self.worker.publish_message(
+            self.inbound.reply(
+                self._(
+                    "*REPORT* 📵 powered by ```Real411.org```\n"
+                    "\n"
+                    "Thank you for your submission\n"
+                    "⏳ Please wait while we process your submission to give you a "
+                    "reference number and a link to track your submission"
+                )
+            )
+        )
+        return await self.go_to_state("state_submit_report")
 
     async def state_submit_report(self):
         answers = self.user.answers
