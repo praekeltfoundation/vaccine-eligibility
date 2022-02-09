@@ -96,7 +96,7 @@ class Worker:
                         user_data = await self.redis.get(f"user.{msg.from_addr}")
                         user = User.get_or_create(msg.from_addr, user_data)
                     async with log_timing(f"{msg_id} Processed message", logger):
-                        app = self.ApplicationClass(user)
+                        app = self.ApplicationClass(user, self)
                         messages = await app.process_message(msg)
                     async with log_timing(f"{msg_id} Published responses", logger):
                         for outbound in messages:

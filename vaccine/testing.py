@@ -1,7 +1,10 @@
-from typing import List, Optional, Type
+from typing import Callable, List, Optional, Type
+
+from aio_pika import IncomingMessage
 
 from vaccine.base_application import BaseApplication
-from vaccine.models import Message, User
+from vaccine.models import Answer, Message, User
+from vaccine.worker import Worker
 
 
 class AppTester:
@@ -13,7 +16,8 @@ class AppTester:
 
     def __init__(self, app_class: Type[BaseApplication]):
         self.user = User(addr=self.DEFAULT_USER_ADDRESS)
-        self.application = app_class(self.user)
+        self.fake_worker = FakeWorker()
+        self.application = app_class(self.user, self.fake_worker)
 
     def setup_state(self, name: str):
         """
@@ -116,3 +120,32 @@ class AppTester:
         if header is not None:
             hdr = message.helper_metadata.get("header")
             assert hdr == header, f"Header is {hdr}, not {header}"
+
+
+class FakeWorker(Worker):
+    def __init__(self):
+        self.inbound_messages: List[IncomingMessage] = []
+        self.outbound_messages: List[Message] = []
+        self.events: List[IncomingMessage] = []
+        self.answers: List[Answer] = []
+
+    async def setup(self):
+        pass
+
+    async def setup_consume(self, routing_key: str, callback: Callable):
+        pass
+
+    async def teardown(self):
+        pass
+
+    async def process_message(self, amqp_msg: IncomingMessage):
+        self.inbound_messages.append(amqp_msg)
+
+    async def publish_message(self, msg: Message):
+        self.outbound_messages.append(msg)
+
+    async def publish_answer(self, answer: Answer):
+        self.answers.append(answer)
+
+    async def process_event(self, amqp_msg: IncomingMessage):
+        self.events.append(amqp_msg)
