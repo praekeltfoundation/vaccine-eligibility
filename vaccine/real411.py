@@ -418,7 +418,7 @@ class Application(BaseApplication):
             "*REPORT* 📵 powered by ```Real411.org```\n"
             "\n"
             "Please share any extra information, such as screenshots, photos, "
-            "voicenotes or links (or type SKIP)"
+            "or links (or type SKIP)"
         )
         error = self._(
             "I'm afraid we cannot read the file that you sent through.\n"

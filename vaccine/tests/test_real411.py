@@ -436,7 +436,7 @@ async def test_media(tester: AppTester):
                 "*REPORT* 📵 powered by ```Real411.org```",
                 "",
                 "Please share any extra information, such as screenshots, photos, "
-                "voicenotes or links (or type SKIP)",
+                "or links (or type SKIP)",
             ]
         )
     )
