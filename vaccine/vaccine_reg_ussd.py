@@ -71,8 +71,8 @@ def get_eventstore():
 class Application(BaseApplication):
     START_STATE = "state_age_gate"
 
-    def __init__(self, user):
-        super().__init__(user)
+    def __init__(self, user, worker=None):
+        super().__init__(user, worker)
 
         class ID_TYPES(Enum):
             rsa_id = self._("RSA ID Number")

@@ -7,6 +7,7 @@ from prometheus_client import Counter
 from vaccine.models import Answer, Message, User
 from vaccine.states import EndState
 from vaccine.utils import random_id
+from vaccine.worker import Worker
 
 STATE_CHANGE = Counter(
     "state_change", "Whenever a user's state gets changed", ("from_state", "to_state")
@@ -19,8 +20,10 @@ class BaseApplication:
     START_STATE = "state_start"
     ERROR_STATE = "state_error"
 
-    def __init__(self, user: User):
+    # TODO: transition all tests over to new test helper to make worker manditory
+    def __init__(self, user: User, worker: Optional[Worker] = None):
         self.user = user
+        self.worker = worker
         self.answer_events: List[Answer] = []
         self.messages: List[Message] = []
         self.inbound: Optional[Message] = None
