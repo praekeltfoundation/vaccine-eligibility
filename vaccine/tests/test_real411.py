@@ -436,7 +436,7 @@ async def test_media(tester: AppTester):
                 "*REPORT* 📵 powered by ```Real411.org```",
                 "",
                 "Please share any extra information, such as screenshots, photos, "
-                "or links (or type SKIP)",
+                "voicenotes or links (or type SKIP)",
             ]
         )
     )
@@ -462,6 +462,10 @@ async def test_media_invalid_mimetype(tester: AppTester):
                 "",
                 "We can only read video, image, document or audio files that have "
                 "these letters at the end of the file name:",
+                ".amr",
+                ".aac",
+                ".m4a",
+                ".mp3",
                 ".mp4",
                 ".jpeg",
                 ".png",

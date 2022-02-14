@@ -28,9 +28,14 @@ ACCEPTED_MIME_TYPES = [
     "image/png",
     "application/pdf",
     "audio/ogg",
+    "audio/ogg; codecs=opus",
     "video/ogg",
     "audio/wav",
     "audio/x-wav",
+    "audio/aac",
+    "audio/mp4",
+    "audio/amr",
+    "audio/mpeg",
 ]
 
 
@@ -392,6 +397,10 @@ class Application(BaseApplication):
             "\n"
             "We can only read video, image, document or audio files that have these "
             "letters at the end of the file name:\n"
+            ".amr\n"
+            ".aac\n"
+            ".m4a\n"
+            ".mp3\n"
             ".mp4\n"
             ".jpeg\n"
             ".png\n"
@@ -418,13 +427,17 @@ class Application(BaseApplication):
             "*REPORT* 📵 powered by ```Real411.org```\n"
             "\n"
             "Please share any extra information, such as screenshots, photos, "
-            "or links (or type SKIP)"
+            "voicenotes or links (or type SKIP)"
         )
         error = self._(
             "I'm afraid we cannot read the file that you sent through.\n"
             "\n"
             "We can only read video, image, document or audio files that have these "
             "letters at the end of the file name:\n"
+            ".amr\n"
+            ".aac\n"
+            ".m4a\n"
+            ".mp3\n"
             ".mp4\n"
             ".jpeg\n"
             ".png\n"
