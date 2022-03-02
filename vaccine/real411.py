@@ -1,7 +1,6 @@
 import json
 import re
 from asyncio import gather
-from base64 import b64decode
 from typing import List, Optional, Tuple
 from urllib.parse import urljoin
 
@@ -16,11 +15,6 @@ from vaccine.utils import enforce_string, normalise_phonenumber, save_media
 from vaccine.validators import email_validator, enforce_mime_types
 
 cache_backend = CacheBackend(expire_after=60)
-
-BLANK_PNG = b64decode(
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAA"
-    "AFAAGq1chRAAAAAElFTkSuQmCC"
-)
 
 ACCEPTED_MIME_TYPES = [
     "video/mp4",
@@ -528,7 +522,8 @@ class Application(BaseApplication):
         ) as session:
             for file, file_url in zip(files, file_urls):
                 if file["name"] == "placeholder":
-                    file_data = BLANK_PNG
+                    with open("vaccine/data/real411_placeholder.png", "rb") as f:
+                        file_data = f.read()
                 else:
                     file_data = await get_whatsapp_media(file["name"])
                 result = await session.put(

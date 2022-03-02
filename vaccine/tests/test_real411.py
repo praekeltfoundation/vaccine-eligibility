@@ -5,7 +5,7 @@ from sanic import Sanic, response
 
 from vaccine import real411_config as config
 from vaccine.models import Message
-from vaccine.real411 import BLANK_PNG, Application
+from vaccine.real411 import Application
 from vaccine.testing import AppTester
 
 
@@ -623,7 +623,8 @@ async def test_success_no_media(
         "file_names": [{"name": "placeholder", "type": "image/png"}],
         "email": "reporting@praekelt.org",
     }
-    assert upload.body == BLANK_PNG
+    with open("vaccine/data/real411_placeholder.png", "rb") as f:
+        assert upload.body == f.read()
     assert upload.headers["content-type"] == "image/png"
     assert finalise.json == {"ref": "WDM88J4P"}
 
