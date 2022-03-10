@@ -857,16 +857,16 @@ class Application(BaseApplication):
         if answers.get("confirmed_contact") == "yes":
             if risk == "moderate":
                 text = self._(
-                    "We recommend you SELF-QUARANTINE for the next 10 days and do this "
-                    "HealthCheck daily to monitor your symptoms. Stay/sleep alone in a "
-                    "room with good air flow."
+                    "We suggest you use HealthCheck to watch out for COVID symptoms. "
+                    "If you've had contact with somone with COVID & you have symptoms, "
+                    "please isolate for 7 days."
                 )
 
             if risk == "high":
                 text = self._(
-                    "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing center "
-                    "or Call 0800029999 or visit your healthcare practitioner for info"
-                    " on what to do & how to test."
+                    "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing centre, "
+                    "call 0800029999 or visit a healthcare practitioner. Self-isolate "
+                    "while you wait for results"
                 )
             return EndState(self, text, next=self.START_STATE)
 
@@ -878,16 +878,16 @@ class Application(BaseApplication):
                 )
             if risk == "moderate":
                 text = self._(
-                    "We recommend you SELF-QUARANTINE for the next 10 days and do "
-                    "this HealthCheck daily to monitor your symptoms. Stay/sleep "
-                    "alone in a room with good air flow."
+                    "We suggest you use HealthCheck to watch out for COVID symptoms. "
+                    "If you've had contact with somone with COVID & you have symptoms, "
+                    "please isolate for 7 days."
                 )
 
             if risk == "high":
                 text = self._(
-                    "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing center "
-                    "or Call 0800029999 or visit your healthcare practitioner for "
-                    "info on what to do & how to test."
+                    "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing centre, "
+                    "call 0800029999 or visit a healthcare practitioner. Self-isolate "
+                    "while you wait for results"
                 )
         else:
             if risk == "low":
@@ -979,8 +979,8 @@ class Application(BaseApplication):
 
     async def state_no_tracing_moderate_risk(self):
         question = self._(
-            "You won't be contacted. SELF-QUARANTINE for 10 days, do this HealthCheck "
-            "daily to monitor symptoms. Stay/sleep alone in a room with good air flow."
+            "You will not be contacted. Use HealthCheck to check for COVID symptoms. "
+            "You do not need to isolate. If symptoms develop please isolate for 7 days."
         )
         next_text = "START OVER"
         next_state = "state_start"
