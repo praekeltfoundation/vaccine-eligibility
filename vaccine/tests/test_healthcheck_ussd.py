@@ -1920,9 +1920,9 @@ async def test_state_tracing(eventstore_mock):
     [reply] = await app.process_message(get_message("yes"))
     assert len(reply.content) < 160
     assert (
-        reply.content == "We recommend you SELF-QUARANTINE for the next 10 days and do "
-        "this HealthCheck daily to monitor your symptoms. Stay/sleep "
-        "alone in a room with good air flow."
+        reply.content == "We suggest you use HealthCheck to watch out for COVID "
+        "symptoms. If you've had contact with somone with COVID & you have "
+        "symptoms, please isolate for 7 days."
     )
 
     app = Application(get_user({"state_fever": "yes", "state_exposure": "yes"}))
@@ -1930,9 +1930,9 @@ async def test_state_tracing(eventstore_mock):
     assert len(reply.content) < 160
     assert (
         reply.content
-        == "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing center "
-        "or Call 0800029999 or visit your healthcare practitioner for "
-        "info on what to do & how to test."
+        == "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing centre, call "
+        "0800029999 or visit a healthcare practitioner. Self-isolate while you wait "
+        "for results"
     )
 
     app = Application(get_user({}))
@@ -1950,8 +1950,8 @@ async def test_state_tracing(eventstore_mock):
     assert len(reply.content) <= 160
 
     assert reply.content == (
-        "You won't be contacted. SELF-QUARANTINE for 10 days, do this HealthCheck "
-        "daily to monitor symptoms. Stay/sleep alone in a room with good air flow."
+        "You will not be contacted. Use HealthCheck to check for COVID symptoms. You "
+        "do not need to isolate. If symptoms develop please isolate for 7 days."
         "\n1. START OVER"
     )
 
@@ -2025,18 +2025,18 @@ async def test_state_tracing_confirmed_contact(eventstore_mock):
     assert len(reply.content) < 160
     assert (
         reply.content
-        == "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing center "
-        "or Call 0800029999 or visit your healthcare practitioner for "
-        "info on what to do & how to test."
+        == "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing centre, "
+        "call 0800029999 or visit a healthcare practitioner. Self-isolate "
+        "while you wait for results"
     )
 
     app = Application(get_user({"state_exposure": "yes"}))
     [reply] = await app.process_message(get_message("yes"))
     assert len(reply.content) < 160
     assert (
-        reply.content == "We recommend you SELF-QUARANTINE for the next 10 days and do "
-        "this HealthCheck daily to monitor your symptoms. Stay/sleep "
-        "alone in a room with good air flow."
+        reply.content == "We suggest you use HealthCheck to watch out for COVID "
+        "symptoms. If you've had contact with somone with COVID & you have symptoms, "
+        "please isolate for 7 days."
     )
 
 
