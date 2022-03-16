@@ -1920,9 +1920,9 @@ async def test_state_tracing(eventstore_mock):
     [reply] = await app.process_message(get_message("yes"))
     assert len(reply.content) < 160
     assert (
-        reply.content == "We suggest you use HealthCheck to watch out for COVID "
-        "symptoms. If you've had contact with somone with COVID & you have "
-        "symptoms, please isolate for 7 days."
+        reply.content == "Use this HealthCheck to watch out for COVID "
+        "symptoms. You do not need to isolate at this stage. If symptoms "
+        "develop please see a healthcare professional."
     )
 
     app = Application(get_user({"state_fever": "yes", "state_exposure": "yes"}))
@@ -1930,9 +1930,9 @@ async def test_state_tracing(eventstore_mock):
     assert len(reply.content) < 160
     assert (
         reply.content
-        == "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing centre, call "
-        "0800029999 or visit a healthcare practitioner. Self-isolate while you wait "
-        "for results"
+        == "You may be ELIGIBLE FOR A COVID-19 TEST. Go to a testing centre, call "
+        "0800029999 or see a health worker. Self-isolate if you test positive AND "
+        "have symptoms"
     )
 
     app = Application(get_user({}))

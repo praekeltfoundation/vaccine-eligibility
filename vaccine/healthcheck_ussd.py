@@ -878,16 +878,16 @@ class Application(BaseApplication):
                 )
             if risk == "moderate":
                 text = self._(
-                    "We suggest you use HealthCheck to watch out for COVID symptoms. "
-                    "If you've had contact with somone with COVID & you have symptoms, "
-                    "please isolate for 7 days."
+                    "Use this HealthCheck to watch out for COVID symptoms. You do not "
+                    "need to isolate at this stage. If symptoms develop please see a "
+                    "healthcare professional."
                 )
 
             if risk == "high":
                 text = self._(
-                    "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing centre, "
-                    "call 0800029999 or visit a healthcare practitioner. Self-isolate "
-                    "while you wait for results"
+                    "You may be ELIGIBLE FOR A COVID-19 TEST. Go to a testing centre, "
+                    "call 0800029999 or see a health worker. Self-isolate if you test "
+                    "positive AND have symptoms"
                 )
         else:
             if risk == "low":
