@@ -499,7 +499,7 @@ async def test_state_privacy_policy(rapidpro_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_privacy_policy():
+async def test_skip_state_privacy_policy():
     u = User(
         addr="27820001003",
         state=StateData(name="state_privacy_policy"),
