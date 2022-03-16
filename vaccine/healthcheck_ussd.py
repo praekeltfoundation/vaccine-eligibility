@@ -46,17 +46,6 @@ def get_google_api():
     )
 
 
-def get_turn():
-    return aiohttp.ClientSession(
-        timeout=aiohttp.ClientTimeout(total=5),
-        headers={
-            "Authorization": f"Bearer {config.TURN_API_TOKEN}",
-            "Accept": "application/vnd.v1+json",
-            "User-Agent": "healthcheck-ussd",
-        },
-    )
-
-
 def get_rapidpro():
     return aiohttp.ClientSession(
         timeout=aiohttp.ClientTimeout(total=5),
@@ -84,18 +73,6 @@ class Application(BaseApplication):
         ]:
             if answer == "yes":
                 symptom_count += 1
-
-        if answers.get("confirmed_contact") == "yes":
-            if answers.get("state_province") == "ZA-WC":
-                if (
-                    int(answers.get("state_age_years")) > 55
-                    or answers.get("state_preexisting_conditions") == "yes"
-                ) and symptom_count >= 1:
-                    return "high"
-                return "moderate"
-            if symptom_count >= 1:
-                return "high"
-            return "moderate"
 
         if symptom_count == 0:
             if answers.get("state_exposure") == "yes":
@@ -138,6 +115,7 @@ class Application(BaseApplication):
 
     async def state_start(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
+        self.save_answer("google_session_token", secrets.token_bytes(20).hex())
         async with get_eventstore() as session:
             for i in range(3):
                 try:
@@ -199,32 +177,6 @@ class Application(BaseApplication):
                         return await self.go_to_state("state_error")
                     else:
                         continue
-        return await self.go_to_state("state_get_confirmed_contact")
-
-    async def state_get_confirmed_contact(self):
-        self.save_answer("google_session_token", secrets.token_bytes(20).hex())
-        # TODO: normalise msisdn
-        msisdn = self.inbound.from_addr
-        whatsapp_id = msisdn.lstrip("+")
-        async with get_turn() as session:
-            for i in range(3):
-                try:
-                    response = await session.get(
-                        urljoin(
-                            config.TURN_API_URL, f"/v1/contacts/{whatsapp_id}/profile"
-                        )
-                    )
-                    response.raise_for_status()
-                    data = await response.json()
-                    break
-                except HTTP_EXCEPTIONS as e:
-                    if i == 2:
-                        logger.exception(e)
-                        return await self.go_to_state("state_error")
-                    else:
-                        continue
-        confirmed_contact = data.get("fields", {}).get("confirmed_contact", False)
-        self.save_answer("confirmed_contact", "yes" if confirmed_contact else "no")
         return await self.go_to_state("state_welcome")
 
     async def state_welcome(self):
@@ -243,14 +195,6 @@ class Application(BaseApplication):
                 "\n"
                 "Reply"
             )
-        if self.user.answers.get("confirmed_contact") == "yes":
-            question = self._(
-                "The National Department of Health thanks you for contributing to "
-                "the health of all citizens. Stop the spread of COVID-19\n"
-                "\n"
-                "Reply"
-            )
-            error = question
         return MenuState(
             self,
             question=question,
@@ -314,10 +258,7 @@ class Application(BaseApplication):
         return await self.go_to_state("state_privacy_policy")
 
     async def state_privacy_policy(self):
-        if self.user.answers.get("confirmed_contact") == "yes":
-            next_state = "state_fever"
-        else:
-            next_state = "state_age"
+        next_state = "state_age"
         if self.user.answers.get("state_privacy_policy_accepted") == "yes":
             return await self.go_to_state(next_state)
 
@@ -337,18 +278,11 @@ class Application(BaseApplication):
         )
 
     async def state_end(self):
-        if self.user.answers.get("confirmed_contact") == "yes":
-            text = self._(
-                "You can return to this service at any time. Remember, if you think "
-                "you have COVID-19 STAY HOME, avoid contact with other people and "
-                "self-quarantine."
-            )
-        else:
-            text = self._(
-                "You can return to this service at any time. Remember, if you think "
-                "you have COVID-19 STAY HOME, avoid contact with other people and "
-                "self-isolate."
-            )
+        text = self._(
+            "You can return to this service at any time. Remember, if you think "
+            "you have COVID-19 STAY HOME, avoid contact with other people and "
+            "self-isolate."
+        )
         return EndState(self, text=text, next=self.START_STATE)
 
     async def state_more_info_pg1(self):
@@ -434,8 +368,6 @@ class Application(BaseApplication):
             skip = True
 
         if skip:
-            if self.user.answers.get("confirmed_contact") == "yes":
-                return await self.go_to_state("state_tracing")
             return await self.go_to_state("state_fever")
 
         text = self._(
@@ -542,8 +474,6 @@ class Application(BaseApplication):
                         self.format_location(location["lat"], location["lng"]),
                     )
 
-                    if self.user.answers.get("confirmed_contact") == "yes":
-                        return await self.go_to_state("state_tracing")
                     return await self.go_to_state("state_fever")
                 except HTTP_EXCEPTIONS as e:
                     if i == 2:
@@ -611,19 +541,6 @@ class Application(BaseApplication):
             "\n"
             "Reply"
         )
-        if self.user.answers.get("confirmed_contact") == "yes":
-            question = self._(
-                "Do you have a cough that recently started in the last week?\n"
-                "\n"
-                "Reply"
-            )
-            error = self._(
-                "This service works best when you select numbers from the list.\n"
-                "\n"
-                "Do you have a cough that recently started in the last week?\n"
-                "\n"
-                "Reply"
-            )
         return ChoiceState(
             self,
             question=question,
@@ -660,23 +577,6 @@ class Application(BaseApplication):
             "Reply"
         )
         next_state = "state_exposure"
-        if self.user.answers.get("confirmed_contact") == "yes":
-            question = self._(
-                "Do you have shortness of breath while resting or difficulty "
-                "breathing, that you've noticed recently?\n"
-                "\n"
-                "Reply"
-            )
-            error = self._(
-                "Please use numbers from list.\n"
-                "\n"
-                "Do you have shortness of breath while resting or difficulty "
-                "breathing, that you've noticed recently?\n"
-                "\n"
-                "Reply"
-            )
-            self.save_answer("state_exposure", "yes")
-            next_state = "state_taste_and_smell"
         return ChoiceState(
             self,
             question=question,
@@ -775,22 +675,6 @@ class Application(BaseApplication):
             Choice("no", self._("NO")),
             Choice("restart", self._("RESTART")),
         ]
-        if self.user.answers.get("confirmed_contact") == "yes":
-            question = self._(
-                "Finally, please confirm that the information you shared is "
-                "ACCURATE to the best of your knowledge?\n"
-                "\n"
-                "Reply"
-            )
-            error = self._(
-                "Please use numbers from the list.\n"
-                "\n"
-                "Finally, please confirm that the information you shared is "
-                "ACCURATE to the best of your knowledge?\n"
-                "\n"
-                "Reply"
-            )
-            choices = [Choice("yes", self._("YES")), Choice("no", self._("NO"))]
         return ChoiceState(
             self,
             question=question,
@@ -826,7 +710,6 @@ class Application(BaseApplication):
                         ),
                         "exposure": self.user.answers.get("state_exposure"),
                         "tracing": self.user.answers.get("state_tracing"),
-                        "confirmed_contact": self.user.answers.get("confirmed_contact"),
                         "risk": self.calculate_risk(),
                         "data": {
                             "age_years": self.user.answers.get("state_age_years"),
@@ -854,21 +737,6 @@ class Application(BaseApplication):
         answers = self.user.answers
         risk = self.calculate_risk()
         text = ""
-        if answers.get("confirmed_contact") == "yes":
-            if risk == "moderate":
-                text = self._(
-                    "We suggest you use HealthCheck to watch out for COVID symptoms. "
-                    "If you've had contact with somone with COVID & you have symptoms, "
-                    "please isolate for 7 days."
-                )
-
-            if risk == "high":
-                text = self._(
-                    "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing centre, "
-                    "call 0800029999 or visit a healthcare practitioner. Self-isolate "
-                    "while you wait for results"
-                )
-            return EndState(self, text, next=self.START_STATE)
 
         if answers.get("state_tracing") == "yes":
             if risk == "low":
@@ -878,16 +746,16 @@ class Application(BaseApplication):
                 )
             if risk == "moderate":
                 text = self._(
-                    "We suggest you use HealthCheck to watch out for COVID symptoms. "
-                    "If you've had contact with somone with COVID & you have symptoms, "
-                    "please isolate for 7 days."
+                    "Use this HealthCheck to watch out for COVID symptoms. You do not "
+                    "need to isolate at this stage. If symptoms develop please see a "
+                    "healthcare professional."
                 )
 
             if risk == "high":
                 text = self._(
-                    "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing centre, "
-                    "call 0800029999 or visit a healthcare practitioner. Self-isolate "
-                    "while you wait for results"
+                    "You may be ELIGIBLE FOR A COVID-19 TEST. Go to a testing centre, "
+                    "call 0800029999 or see a health worker. Self-isolate if you test "
+                    "positive AND have symptoms"
                 )
         else:
             if risk == "low":
