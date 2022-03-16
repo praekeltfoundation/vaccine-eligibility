@@ -120,40 +120,6 @@ async def google_api_mock(sanic_client):
 
 
 @pytest.fixture
-async def turn_mock(sanic_client):
-    Sanic.test_mode = True
-    app = Sanic("mock_turn")
-    app.requests = []
-    app.errors = 0
-    app.errormax = 0
-
-    @app.route("/v1/contacts/27820001001/profile", methods=["GET"])
-    def valid_userprofile(request):
-        app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
-                return response.json({}, status=500)
-        return response.json({"fields": {"confirmed_contact": True}}, status=200)
-
-    @app.route("/v1/contacts/27820001003/profile", methods=["GET"])
-    @app.route("/v1/contacts/27820001004/profile", methods=["GET"])
-    def not_confirmed_contact(request):
-        app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
-                return response.json({}, status=500)
-        return response.json({"fields": {"confirmed_contact": False}}, status=200)
-
-    client = await sanic_client(app)
-    url = config.TURN_API_URL
-    config.TURN_API_URL = f"http://{client.host}:{client.port}"
-    yield client
-    config.TURN_API_URL = url
-
-
-@pytest.fixture
 async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
@@ -180,62 +146,7 @@ async def rapidpro_mock(sanic_client):
 
 
 @pytest.mark.asyncio
-async def test_state_welcome_confirmed_contact(eventstore_mock, turn_mock):
-    u = User(addr="27820001001", state=StateData())
-    app = Application(u)
-    msg = Message(
-        content=None,
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-        session_event=Message.SESSION_EVENT.NEW,
-    )
-    [reply] = await app.process_message(msg)
-    assert len(reply.content) < 140
-    assert reply.content == "\n".join(
-        [
-            "The National Department of Health thanks you for contributing to the "
-            "health of all citizens. Stop the spread of COVID-19",
-            "",
-            "Reply",
-            "1. START",
-        ]
-    )
-    assert u.state.name == "state_welcome"
-
-    assert [r.path for r in eventstore_mock.app.requests] == [
-        "/api/v2/healthcheckuserprofile/+27820001001/",
-        "/api/v2/covid19triagestart/",
-    ]
-    assert [r.path for r in turn_mock.app.requests] == [
-        "/v1/contacts/27820001001/profile"
-    ]
-    assert u.answers["confirmed_contact"] == "yes"
-
-    app.messages = []
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert len(reply.content) < 160
-    assert reply.content == "\n".join(
-        [
-            "The National Department of Health thanks you for contributing to the "
-            "health of all citizens. Stop the spread of COVID-19",
-            "",
-            "Reply",
-            "1. START",
-        ]
-    )
-
-
-@pytest.mark.asyncio
-async def test_state_welcome_new_contact(eventstore_mock, turn_mock):
+async def test_state_welcome_new_contact(eventstore_mock):
     u = User(addr="27820001003", state=StateData())
     app = Application(u)
     msg = Message(
@@ -263,10 +174,6 @@ async def test_state_welcome_new_contact(eventstore_mock, turn_mock):
         "/api/v2/healthcheckuserprofile/+27820001003/",
         "/api/v2/covid19triagestart/",
     ]
-    assert [r.path for r in turn_mock.app.requests] == [
-        "/v1/contacts/27820001003/profile"
-    ]
-    assert u.answers["confirmed_contact"] == "no"
     assert u.answers["returning_user"] == "no"
 
     app.messages = []
@@ -285,7 +192,7 @@ async def test_state_welcome_new_contact(eventstore_mock, turn_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_welcome_returning_contact(eventstore_mock, turn_mock):
+async def test_state_welcome_returning_contact(eventstore_mock):
     u = User(addr="27820001004", state=StateData())
     app = Application(u)
     msg = Message(
@@ -313,11 +220,6 @@ async def test_state_welcome_returning_contact(eventstore_mock, turn_mock):
         "/api/v2/healthcheckuserprofile/+27820001004/",
         "/api/v2/covid19triagestart/",
     ]
-    assert [r.path for r in turn_mock.app.requests] == [
-        "/v1/contacts/27820001004/profile"
-    ]
-
-    assert u.answers["confirmed_contact"] == "no"
     assert u.answers["returning_user"] == "yes"
 
     app.messages = []
@@ -336,10 +238,9 @@ async def test_state_welcome_returning_contact(eventstore_mock, turn_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_welcome_temporary_errors(eventstore_mock, turn_mock):
+async def test_state_welcome_temporary_errors(eventstore_mock):
     eventstore_mock.app.userprofile_errormax = 1
     eventstore_mock.app.start_errormax = 1
-    turn_mock.app.errormax = 1
     u = User(addr="27820001001", state=StateData())
     app = Application(u)
     msg = Message(
@@ -353,7 +254,6 @@ async def test_state_welcome_temporary_errors(eventstore_mock, turn_mock):
     [reply] = await app.process_message(msg)
 
     assert len(eventstore_mock.app.requests) == 4
-    assert len(turn_mock.app.requests) == 2
 
 
 @pytest.mark.asyncio
@@ -395,29 +295,6 @@ async def test_state_welcome_start_error(eventstore_mock):
     [reply] = await app.process_message(msg)
 
     assert len(eventstore_mock.app.requests) == 4
-    assert u.state.name == "state_start"
-    assert (
-        reply.content == "Sorry, something went wrong. We have been notified. Please "
-        "try again later"
-    )
-
-
-@pytest.mark.asyncio
-async def test_state_welcome_turn_error(eventstore_mock, turn_mock):
-    turn_mock.app.errormax = 3
-    u = User(addr="27820001003", state=StateData())
-    app = Application(u)
-    msg = Message(
-        content=None,
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-        session_event=Message.SESSION_EVENT.NEW,
-    )
-    [reply] = await app.process_message(msg)
-
-    assert len(turn_mock.app.requests) == 3
     assert u.state.name == "state_start"
     assert (
         reply.content == "Sorry, something went wrong. We have been notified. Please "
@@ -622,33 +499,12 @@ async def test_state_privacy_policy(rapidpro_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_privacy_policy_confirmed_contact():
+async def test_state_privacy_policy():
     u = User(
         addr="27820001003",
         state=StateData(name="state_privacy_policy"),
         session_id=1,
-        answers={"state_privacy_policy_accepted": "yes", "confirmed_contact": "yes"},
-    )
-    app = Application(u)
-    msg = Message(
-        content="start",
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert len(reply.content) < 160
-    assert u.state.name == "state_fever"
-
-
-@pytest.mark.asyncio
-async def test_state_privacy_policy_non_confirmed_contact():
-    u = User(
-        addr="27820001003",
-        state=StateData(name="state_privacy_policy"),
-        session_id=1,
-        answers={"state_privacy_policy_accepted": "yes", "confirmed_contact": "no"},
+        answers={"state_privacy_policy_accepted": "yes"},
     )
     app = Application(u)
     msg = Message(
@@ -680,32 +536,6 @@ async def test_state_end():
         reply.content
         == "You can return to this service at any time. Remember, if you think you "
         "have COVID-19 STAY HOME, avoid contact with other people and self-isolate."
-    )
-    assert u.state.name == "state_start"
-
-
-@pytest.mark.asyncio
-async def test_state_end_confirmed_contact():
-    u = User(
-        addr="27820001003",
-        state=StateData(name="state_terms"),
-        session_id=1,
-        answers={"confirmed_contact": "yes"},
-    )
-    app = Application(u)
-    msg = Message(
-        content="no",
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert len(reply.content) < 160
-    assert (
-        reply.content
-        == "You can return to this service at any time. Remember, if you think you "
-        "have COVID-19 STAY HOME, avoid contact with other people and self-quarantine."
     )
     assert u.state.name == "state_start"
 
@@ -857,32 +687,6 @@ async def test_state_city_skip_minor():
 
 
 @pytest.mark.asyncio
-async def test_state_city_skip_confirmed_contact():
-    u = User(
-        addr="27820001003",
-        state=StateData(name="state_age_years"),
-        session_id=1,
-        answers={
-            "state_province": "ZA-WC",
-            "state_city": "Cape Town",
-            "city_location": "+1+1/",
-            "confirmed_contact": "yes",
-        },
-    )
-    app = Application(u)
-    msg = Message(
-        content="19",
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert len(reply.content) < 160
-    assert u.state.name == "state_tracing"
-
-
-@pytest.mark.asyncio
 async def test_state_confirm_city(google_api_mock):
     u = User(
         addr="27820001003",
@@ -1013,7 +817,6 @@ async def test_state_place_details_lookup(google_api_mock):
             "state_city": "Cape Town",
             "google_session_token": "123",
             "place_id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
-            "confirmed_contact": "no",
         },
     )
     app = Application(u)
@@ -1047,7 +850,6 @@ async def test_state_place_details_lookup_invalid_response(google_api_mock):
             "state_city": "Cape Town",
             "google_session_token": "123",
             "place_id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
-            "confirmed_contact": "no",
         },
     )
     app = Application(u)
@@ -1074,7 +876,6 @@ async def test_state_place_details_lookup_error(google_api_mock):
             "state_city": "Cape Town",
             "google_session_token": "123",
             "place_id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
-            "confirmed_contact": "no",
         },
     )
     app = Application(u)
@@ -1104,7 +905,6 @@ async def test_state_place_details_lookup_temporary_error(google_api_mock):
             "state_city": "Cape Town",
             "google_session_token": "123",
             "place_id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
-            "confirmed_contact": "no",
         },
     )
     app = Application(u)
@@ -1118,39 +918,6 @@ async def test_state_place_details_lookup_temporary_error(google_api_mock):
     )
     await app.process_message(msg)
     assert u.state.name == "state_fever"
-
-
-@pytest.mark.asyncio
-async def test_state_place_details_lookup_confirmed_contact(google_api_mock):
-    u = User(
-        addr="27820001003",
-        state=StateData(name="state_confirm_city"),
-        session_id=1,
-        answers={
-            "state_city": "Cape Town",
-            "google_session_token": "123",
-            "place_id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
-            "confirmed_contact": "yes",
-        },
-    )
-    app = Application(u)
-
-    msg = Message(
-        content="yes",
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert len(reply.content) < 160
-    assert u.state.name == "state_tracing"
-
-    assert [r.path for r in google_api_mock.app.requests] == [
-        "/maps/api/place/details/json"
-    ]
-
-    assert u.answers["city_location"] == "-03.866651+051.195827/"
 
 
 @pytest.mark.asyncio
@@ -1304,62 +1071,6 @@ async def test_state_cough():
 
 
 @pytest.mark.asyncio
-async def test_state_cough_confirmed_contact():
-    u = User(
-        addr="27820001003",
-        state=StateData(name="state_fever"),
-        session_id=1,
-        answers={"confirmed_contact": "yes"},
-    )
-    app = Application(u)
-
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert len(reply.content) < 160
-    assert u.state.name == "state_cough"
-
-    assert reply.content == "\n".join(
-        [
-            "Do you have a cough that recently started in the last week?",
-            "",
-            "Reply",
-            "1. Yes",
-            "2. No",
-        ]
-    )
-
-    app.messages = []
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert len(reply.content) < 160
-    assert u.state.name == "state_cough"
-
-    assert reply.content == "\n".join(
-        [
-            "This service works best when you select numbers from the list.",
-            "",
-            "Do you have a cough that recently started in the last week?",
-            "",
-            "Reply",
-            "1. Yes",
-            "2. No",
-        ]
-    )
-
-
-@pytest.mark.asyncio
 async def test_state_sore_throat():
     u = User(
         addr="27820001003", state=StateData(name="state_sore_throat"), session_id=1
@@ -1456,63 +1167,6 @@ async def test_state_breathing():
             "1. Yes",
             "2. No",
             "3. NOT SURE",
-        ]
-    )
-
-
-@pytest.mark.asyncio
-async def test_state_breathing_confirmed_contact():
-    u = User(
-        addr="27820001003",
-        state=StateData(name="state_sore_throat"),
-        session_id=1,
-        answers={"confirmed_contact": "yes"},
-    )
-    app = Application(u)
-
-    msg = Message(
-        content="1",
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert len(reply.content) < 160
-    assert u.state.name == "state_breathing"
-
-    assert reply.content == "\n".join(
-        [
-            "Do you have shortness of breath while resting or difficulty "
-            "breathing, that you've noticed recently?",
-            "",
-            "Reply",
-            "1. Yes",
-            "2. No",
-        ]
-    )
-    app.messages = []
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert len(reply.content) < 160
-    assert u.state.name == "state_breathing"
-
-    assert reply.content == "\n".join(
-        [
-            "Please use numbers from list.",
-            "",
-            "Do you have shortness of breath while resting or difficulty "
-            "breathing, that you've noticed recently?",
-            "",
-            "Reply",
-            "1. Yes",
-            "2. No",
         ]
     )
 
@@ -1975,72 +1629,6 @@ async def test_state_tracing(eventstore_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_tracing_confirmed_contact(eventstore_mock):
-    def get_user(answers={}):
-        answers["confirmed_contact"] = "yes"
-        return User(
-            addr="27820001003",
-            state=StateData(name="state_tracing"),
-            session_id=1,
-            answers=answers,
-        )
-
-    def get_message(content):
-        return Message(
-            content=content,
-            to_addr="27820001002",
-            from_addr="27820001003",
-            transport_name="whatsapp",
-            transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-        )
-
-    u = get_user()
-    app = Application(u)
-    msg = Message(
-        content="invalid",
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert len(reply.content) <= 160
-    assert u.state.name == "state_tracing"
-
-    assert reply.content == "\n".join(
-        [
-            "Please use numbers from the list.",
-            "",
-            "Finally, please confirm that the information you shared is "
-            "ACCURATE to the best of your knowledge?",
-            "",
-            "Reply",
-            "1. YES",
-            "2. NO",
-        ]
-    )
-
-    app = Application(get_user({"state_fever": "yes", "state_exposure": "yes"}))
-    [reply] = await app.process_message(get_message("yes"))
-    assert len(reply.content) < 160
-    assert (
-        reply.content
-        == "You may be ELIGIBLE FOR COVID-19 TESTING. Go to a testing centre, "
-        "call 0800029999 or visit a healthcare practitioner. Self-isolate "
-        "while you wait for results"
-    )
-
-    app = Application(get_user({"state_exposure": "yes"}))
-    [reply] = await app.process_message(get_message("yes"))
-    assert len(reply.content) < 160
-    assert (
-        reply.content == "We suggest you use HealthCheck to watch out for COVID "
-        "symptoms. If you've had contact with somone with COVID & you have symptoms, "
-        "please isolate for 7 days."
-    )
-
-
-@pytest.mark.asyncio
 async def test_state_tracing_restart(eventstore_mock):
     u = User(
         addr="27820001003",
@@ -2058,7 +1646,7 @@ async def test_state_tracing_restart(eventstore_mock):
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) <= 160
-    assert u.state.name == "state_start"
+    assert u.state.name == "state_welcome"
 
 
 @pytest.mark.asyncio
@@ -2277,53 +1865,6 @@ def test_calculate_risk():
 
     app = Application(
         get_user({"state_cough": "yes", "state_fever": "yes", "state_breathing": "yes"})
-    )
-    test = app.calculate_risk()
-    assert test == "high"
-
-    app = Application(get_user({"confirmed_contact": "yes"}))
-    test = app.calculate_risk()
-    assert test == "moderate"
-
-    app = Application(get_user({"confirmed_contact": "yes", "state_fever": "yes"}))
-    test = app.calculate_risk()
-    assert test == "high"
-
-    app = Application(
-        get_user(
-            {
-                "confirmed_contact": "yes",
-                "state_province": "ZA-WC",
-                "state_age_years": "34",
-            }
-        )
-    )
-    test = app.calculate_risk()
-    assert test == "moderate"
-
-    app = Application(
-        get_user(
-            {
-                "confirmed_contact": "yes",
-                "state_province": "ZA-WC",
-                "state_age_years": "56",
-                "state_fever": "yes",
-            }
-        )
-    )
-    test = app.calculate_risk()
-    assert test == "high"
-
-    app = Application(
-        get_user(
-            {
-                "confirmed_contact": "yes",
-                "state_province": "ZA-WC",
-                "state_age_years": "34",
-                "state_preexisting_conditions": "yes",
-                "state_fever": "yes",
-            }
-        )
     )
     test = app.calculate_risk()
     assert test == "high"
