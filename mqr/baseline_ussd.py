@@ -31,7 +31,7 @@ class Application(BaseApplication):
     async def survey_start(self):
         if config.RAPIDPRO_URL and config.RAPIDPRO_TOKEN:
             msisdn = normalise_phonenumber(self.inbound.from_addr)
-            urn = ' f"whatsapp:{msisdn.lstrip(' + ')}"'
+            urn = f"whatsapp:{msisdn.lstrip(' + ')}"
 
             for i in range(3):
                 try:
@@ -40,7 +40,7 @@ class Application(BaseApplication):
                     )
 
                     if not contact:
-                        return await self.go_to_state("survey_start")
+                        return await self.go_to_state("state_error")
 
                     data = await contact
                     if not data.mqr_consent and data.mqr_arm:
