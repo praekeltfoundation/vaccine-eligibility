@@ -31,10 +31,7 @@ class Application(BaseApplication):
     async def survey_start(self):
         if config.RAPIDPRO_URL and config.RAPIDPRO_TOKEN:
             msisdn = normalise_phonenumber(self.inbound.from_addr)
-            if msisdn.startswith("+"):
-                urn = ' f"whatsapp:{msisdn.lstrip(' + ')}"'
-            else:
-                urn = msisdn
+            urn = ' f"whatsapp:{msisdn.lstrip(' + ')}"'
 
             for i in range(3):
                 try:
@@ -43,10 +40,11 @@ class Application(BaseApplication):
                     )
 
                     if not contact:
-                        self.save_answer("returning_user", "no")
                         return await self.go_to_state("survey_start")
-                    # response.raise_for_status()
+
                     data = await contact
+                    if not data.mqr_consent and data.mqr_arm:
+                        return await self.go_to_state("state_error")
                     break
                 except HTTP_EXCEPTIONS as e:
                     if i == 2:
@@ -55,7 +53,6 @@ class Application(BaseApplication):
                     else:
                         continue
 
-        self.save_answer("returning_user", "yes")
         self.save_answer("state_age", data.age)
         return await self.go_to_state("breast_feeding")
 
@@ -69,9 +66,9 @@ class Application(BaseApplication):
             "Do you plan to breastfeed your baby after birth?"
         )
         choices = [
-            Choice("1", "Yes"),
-            Choice("2", "No"),
-            Choice("3", "Skip"),
+            Choice("yes", "Yes"),
+            Choice("no", "No"),
+            Choice("skip", "Skip"),
         ]
 
         return ChoiceState(
