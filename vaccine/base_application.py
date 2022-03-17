@@ -80,7 +80,8 @@ class BaseApplication:
                 await state.display(message)
             else:
                 await state.process_message(message)
-        except Exception:
+        except Exception as e:
+            print('*******', e)
             logger.exception("Application error")
             self.state_name = self.ERROR_STATE
             state = await self.get_current_state()
