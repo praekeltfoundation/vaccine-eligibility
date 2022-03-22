@@ -11,17 +11,6 @@ from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
 logger = logging.getLogger(__name__)
 
 
-def get_rapidpro():
-    return aiohttp.ClientSession(
-        timeout=aiohttp.ClientTimeout(total=5),
-        headers={
-            "Authorization": f"Token {config.RAPIDPRO_TOKEN}",
-            "Content-Type": "application/json",
-            "User-Agent": "baseline-ussd",
-        },
-    )
-
-
 class Application(BaseApplication):
     START_SURVEY = "survey_start"
 
@@ -30,28 +19,30 @@ class Application(BaseApplication):
             msisdn = normalise_phonenumber(self.inbound.from_addr)
             urn = f"whatsapp:{msisdn.lstrip(' + ')}"
 
-            for i in range(3):
-                try:
-                    contact = rapidpro.get_contacts(urn=urn).first(
-                        retry_on_rate_exceed=True
-                    )
+            if rapidpro:
+                for i in range(3):
+                    try:
+                        contact = rapidpro.get_contacts(urn=urn).first(
+                            retry_on_rate_exceed=True
+                        )
 
-                    if not contact:
-                        return await self.go_to_state("state_error")
+                        if not contact:
+                            return await self.go_to_state("state_error")
 
-                    data = await contact
-                    if not data.mqr_consent and data.mqr_arm:
-                        return await self.go_to_state("state_error")
-                    break
-                except HTTP_EXCEPTIONS as e:
-                    if i == 2:
-                        logger.exception(e)
-                        return await self.go_to_state("state_error")
-                    else:
-                        continue
+                        data = await contact
+                        if not data.mqr_consent and data.mqr_arm:
+                            return await self.go_to_state("state_error")
+                        break
+                    except HTTP_EXCEPTIONS as e:
+                        if i == 2:
+                            logger.exception(e)
+                            return await self.go_to_state("state_error")
+                        else:
+                            continue
 
-        self.save_answer("state_age", data.age)
-        return await self.go_to_state("breast_feeding")
+                self.save_answer("state_age", data.age)
+                return await self.go_to_state("breast_feeding")
+            return await self.go_to_state("state_error")
 
     async def breast_feeding(self):
         question = self._(
@@ -235,7 +226,7 @@ class Application(BaseApplication):
         question = self._(
             "5/13 \n"
             "\n"
-            "How often do you plan to go to the clinic for a a check-up during " 
+            "How often do you plan to go to the clinic for a a check-up during "
             "this pregnancy?"
         )
         error = self._(
