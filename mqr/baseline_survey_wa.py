@@ -1,6 +1,5 @@
 import logging
 
-import vaccine.healthcheck_config as config
 from mqr.utils import rapidpro
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, ChoiceState, EndState
@@ -53,7 +52,7 @@ class Application(BaseApplication):
         choices = [
             Choice("yes", "Yes"),
             Choice("no", "No"),
-            Choice("skip", "Skip"),
+            Choice("skip", "Skip this question"),
         ]
 
         return ChoiceState(
@@ -77,32 +76,14 @@ class Application(BaseApplication):
             "*How long do you plan to give your baby only"
             " breastmilk before giving other foods and water?*"
         )
-        choices = [Choice("1", "Next")]
-
-        return ChoiceState(
-            self,
-            question=question,
-            error=error,
-            choices=choices,
-            next="breast_feeding_term_answers",
-        )
-
-    async def breast_feeding_term_answers(self):
-        question = self._("Breast feeding period")
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "*How long do you plan to give your baby only"
-            " breastmilk before giving other foods and water?*"
-        )
         choices = [
-            Choice("0_3_months", "0-3 months"),
-            Choice("4_5_months", "4-5 months"),
+            Choice("0_3_months", "Between 0 and 3 months"),
+            Choice("4_5_months", "Between 4 and 5 months"),
             Choice("6_months", "For 6 months"),
             Choice("over_6_months", "Longer than 6 months"),
             Choice("not_only_breastfeed", "I don't want to only breastfeed"),
             Choice("dont_know", "I don't know"),
-            Choice("skip", "Skip"),
+            Choice("skip", "Skip this question"),
         ]
 
         return ChoiceState(
@@ -110,7 +91,7 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="vaccination_diseases_statement",
+            next="breast_feeding_term_answers",
         )
 
     async def vaccination_diseases_statement(self):
@@ -130,7 +111,14 @@ class Application(BaseApplication):
             "I think it is important to vaccinate my baby against severe"
             " diseases like measles, polio and tetanus"
         )
-        choices = [Choice("1", "Next")]
+        choices = [
+            Choice("strongly_agree", "I strongly agree"),
+            Choice("agree", "I agree"),
+            Choice("neutral", "I don't agree or disagree"),
+            Choice("disagree", "I disagree"),
+            Choice("strongly_disagree", "I strongly disagree"),
+            Choice("skip", "Skip this question"),
+        ]
 
         return ChoiceState(
             self,
@@ -140,15 +128,24 @@ class Application(BaseApplication):
             next="vaccination_severe_diseases_statement_answers",
         )
 
-    async def vaccination_diseases_statement_answers(self):
-        question = self._("")
+    async def vaccination_risks_statement(self):
+        question = self._(
+            "4/13 \n"
+            "\n"
+            "What do you think about this statement"
+            "\n"
+            "The benefits of vaccines protecting my child against diseases "
+            "like measles, tetanus, and polio outweigh the risks of my child " 
+            "developing a serious side effect from the vaccine."
+        )
         error = self._(
             "Please use numbers from list.\n"
             "\n"
             "What do you think about this statement"
             "\n"
-            "I think it is important to vaccinate my baby against severe"
-            " diseases like measles, polio and tetanus"
+            "The benefits of vaccines protecting my child against diseases "
+            "like measles, tetanus, and polio outweigh the risks of my child " 
+            "developing a serious side effect from the vaccine."
         )
         choices = [
             Choice("strongly_agree", "I strongly agree"),
@@ -156,35 +153,8 @@ class Application(BaseApplication):
             Choice("neutral", "I don't agree or disagree"),
             Choice("disagree", "I disagree"),
             Choice("strongly_disagree", "I strongly disagree"),
-            Choice("skip", "Skip"),
+            Choice("skip", "Skip this question"),
         ]
-
-        return ChoiceState(
-            self,
-            question=question,
-            error=error,
-            choices=choices,
-            next="vaccination_risks_statement",
-        )
-
-    async def vaccination_risks_statement(self):
-        question = self._(
-            "4/13 \n"
-            "\n"
-            "What do you think about this statement"
-            "\n"
-            "The benefits of vaccinating my child outweighs the risks my "
-            "child will develop side effects from them"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "What do you think about this statement"
-            "\n"
-            "The benefits of vaccinating my child outweighs the risks my "
-            "child will develop side effects from them"
-        )
-        choices = [Choice("1", "Next")]
 
         return ChoiceState(
             self,
@@ -192,31 +162,6 @@ class Application(BaseApplication):
             error=error,
             choices=choices,
             next="vaccination_risks_statement_answers",
-        )
-
-    async def vaccination_risks_statement_answers(self):
-        question = self._("")
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "The benefits of vaccinating my child outweighs the risks my "
-            "child will develop side effects from them"
-        )
-        choices = [
-            Choice("strongly_agree", "I strongly agree"),
-            Choice("agree", "I agree"),
-            Choice("neutral", "I don't agree or disagree"),
-            Choice("disagree", "I disagree"),
-            Choice("strongly_disagree", "I strongly disagree"),
-            Choice("skip", "Skip"),
-        ]
-
-        return ChoiceState(
-            self,
-            question=question,
-            error=error,
-            choices=choices,
-            next="pregnancy_checkup",
         )
 
     async def pregnancy_checkup(self):
@@ -232,24 +177,6 @@ class Application(BaseApplication):
             "How often do you plan to go to the clinic for a a check-up during "
             "this pregnancy?"
         )
-        choices = [Choice("1", "Next")]
-
-        return ChoiceState(
-            self,
-            question=question,
-            error=error,
-            choices=choices,
-            next="pregnancy_checkup_answers",
-        )
-
-    async def pregnancy_checkup_answers(self):
-        question = self._("")
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "How often do you plan to go to the clinic for a a check-up during "
-            "this pregnancy?"
-        )
         choices = [
             Choice("more_than_once_a_month", "More than once a month"),
             Choice("once_a_month", "Once a month"),
@@ -257,7 +184,7 @@ class Application(BaseApplication):
             Choice("once_4_5_months", "Once every  4 to 5 months"),
             Choice("once_6_9_months", "Once every 6 to 9 months"),
             Choice("never", "Never"),
-            Choice("skip", "Skip"),
+            Choice("skip", "Skip this question"),
         ]
 
         return ChoiceState(
@@ -265,7 +192,7 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="eating_vegetables",
+            next="pregnancy_checkup_answers",
         )
 
     async def eating_vegetables(self):
@@ -282,7 +209,7 @@ class Application(BaseApplication):
         choices = [
             Choice("yes", "Yes"),
             Choice("no", "No"),
-            Choice("skip", "Skip"),
+            Choice("skip", "Skip this question"),
         ]
 
         return ChoiceState(
@@ -307,7 +234,7 @@ class Application(BaseApplication):
         choices = [
             Choice("yes", "Yes"),
             Choice("no", "No"),
-            Choice("skip", "Skip"),
+            Choice("skip", "Skip this question"),
         ]
 
         return ChoiceState(
@@ -334,7 +261,7 @@ class Application(BaseApplication):
         choices = [
             Choice("yes", "Yes"),
             Choice("no", "No"),
-            Choice("skip", "Skip"),
+            Choice("skip", "Skip this question"),
         ]
 
         return ChoiceState(
@@ -356,7 +283,7 @@ class Application(BaseApplication):
             Choice("once_a_month", "Once a month"),
             Choice("less_once_a_month", "Less than once a month"),
             Choice("never", "Never"),
-            Choice("skip", "Skip"),
+            Choice("skip", "Skip this question"),
         ]
 
         return ChoiceState(
@@ -371,7 +298,7 @@ class Application(BaseApplication):
         question = self._(
             "10/13 \n"
             "\n"
-            "In your view, what is the biggest pregnancy danger sign on this list?"
+            "In your opinion, what is the biggest danger sign in pregnancy from this list?"
         )
         error = self._(
             "Please use numbers from list.\n"
@@ -382,7 +309,7 @@ class Application(BaseApplication):
             Choice("weight_gain", "Weight gain of 4-5 kilograms"),
             Choice("vaginal_bleeding", "Vaginal bleeding"),
             Choice("nose_bleeds", "Nose bleeds"),
-            Choice("skip", "Skip"),
+            Choice("skip", "Skip this question"),
         ]
 
         return ChoiceState(
@@ -408,7 +335,7 @@ class Application(BaseApplication):
             Choice("swollen_feet_legs", "Swollen feet and legs even after sleep"),
             Choice("bloating", "Bloating"),
             Choice("gas", "Gas"),
-            Choice("skip", "Skip"),
+            Choice("skip", "Skip this question"),
         ]
 
         return ChoiceState(
@@ -430,7 +357,7 @@ class Application(BaseApplication):
             Choice("separated_or_divorced", "Separated or divorced"),
             Choice("widowed", "Widowed"),
             Choice("partner_or_boyfriend", "Have a partner or boyfriend"),
-            Choice("skip", "Skip"),
+            Choice("skip", "Skip this question"),
         ]
 
         return ChoiceState(
@@ -452,30 +379,13 @@ class Application(BaseApplication):
             "\n"
             "Which answer best describes your highest level of education?"
         )
-        choices = [Choice("1", "Next")]
-
-        return ChoiceState(
-            self,
-            question=question,
-            error=error,
-            choices=choices,
-            next="vaccinate_baby_statement_answers",
-        )
-
-    async def education_highest_level_answers(self):
-        question = self._("")
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "Which answer best describes your highest level of education? "
-        )
         choices = [
-            Choice("less_grade_7", "Less than Grade 7"),
-            Choice("between_grade_7_12", "Between Grades 7-12"),
-            Choice("matric", "Matric"),
+            Choice("less_grade_7", "I didn't finish primary school"),
+            Choice("between_grade_7_12", "I finished Grade 7"),
+            Choice("matric", "I finished Grade 12"),
             Choice("diploma", "Diploma"),
             Choice("degree_or_higher", "University degree or higher"),
-            Choice("skip", "Skip"),
+            Choice("skip", "Skip this question"),
         ]
 
         return ChoiceState(
@@ -483,7 +393,7 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="state_end",
+            next="vaccinate_baby_statement_answers",
         )
 
     async def state_end(self):
