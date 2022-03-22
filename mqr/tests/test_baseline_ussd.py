@@ -380,8 +380,8 @@ async def test_pregnancy_danger_signs():
         reply.content == "10/13 \n"
         "\n"
         "In your view, what is the biggest pregnancy danger sign on this list?\n"
-        "1. Yes\n"
-        "2. Weight gain of 4-5 kilograms\n"
+        "1. Weight gain of 4-5 kilograms\n"
+        "2. Vaginal bleeding\n"
         "3. Nose bleeds\n"
         "4. Skip"
     )

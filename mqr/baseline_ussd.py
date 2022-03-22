@@ -398,8 +398,8 @@ class Application(BaseApplication):
             "In your view, what is the biggest pregnancy danger sign on this list?"
         )
         choices = [
-            Choice("weight_gain", "Yes"),
-            Choice("vaginal_bleeding", "Weight gain of 4-5 kilograms"),
+            Choice("weight_gain", "Weight gain of 4-5 kilograms"),
+            Choice("vaginal_bleeding", "Vaginal bleeding"),
             Choice("nose_bleeds", "Nose bleeds"),
             Choice("skip", "Skip"),
         ]
