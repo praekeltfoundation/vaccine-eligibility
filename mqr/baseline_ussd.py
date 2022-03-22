@@ -11,13 +11,29 @@ from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
 logger = logging.getLogger(__name__)
 
 
+def get_eventstore():
+    # TODO: Cache the session globally. Things that don't work:
+    # - Declaring the session at the top of the file
+    #   You get a `Timeout context manager should be used inside a task` error
+    # - Declaring it here but caching it in a global variable for reuse
+    #   You get a `Event loop is closed` error
+    return aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=5),
+        headers={
+            "Authorization": f"Token {config.EVENTSTORE_API_TOKEN}",
+            "Content-Type": "application/json",
+            "User-Agent": "mqr-baseline-study-ussd",
+        },
+    )
+
+
 def get_rapidpro():
     return aiohttp.ClientSession(
         timeout=aiohttp.ClientTimeout(total=5),
         headers={
             "Authorization": f"Token {config.RAPIDPRO_TOKEN}",
             "Content-Type": "application/json",
-            "User-Agent": "healthcheck-ussd",
+            "User-Agent": "mqr-baseline-study-ussd",
         },
     )
 
@@ -57,10 +73,10 @@ class Application(BaseApplication):
                     else:
                         continue
         if sms_mqr_contact:
-            return await self.go_to_state("breast_feeding")
+            return await self.go_to_state("state_breastfeed")
         return await self.go_to_state("state_contact_not_found")
 
-    async def breast_feeding(self):
+    async def state_breastfeed(self):
         question = self._(
             "1/13\n" "\n" "Do you plan to breastfeed your baby after birth?"
         )
@@ -80,21 +96,21 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="breast_feeding_term",
+            next="state_breastfeed_period_question",
         )
 
-    async def breast_feeding_term(self):
+    async def state_breastfeed_period_question(self):
         question = self._(
             "2/13 \n"
             "\n"
-            "*How long do you plan to give your baby only breastmilk "
-            "before giving other foods and water?*"
+            "How long do you plan to give your baby only breastmilk "
+            "before giving other foods and water?"
         )
         error = self._(
             "Please use numbers from list.\n"
             "\n"
-            "*How long do you plan to give your baby only"
-            " breastmilk before giving other foods and water?*"
+            "How long do you plan to give your baby only"
+            " breastmilk before giving other foods and water?"
         )
         choices = [Choice("1", "Next")]
 
@@ -103,17 +119,12 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="breast_feeding_term_answers",
+            next="state_breastfeed_period",
         )
 
-    async def breast_feeding_term_answers(self):
+    async def state_breastfeed_period(self):
         question = self._("Breast feeding period")
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "*How long do you plan to give your baby only"
-            " breastmilk before giving other foods and water?*"
-        )
+        error = self._("Please use numbers from list.")
         choices = [
             Choice("0_3_months", "0-3 months"),
             Choice("4_5_months", "4-5 months"),
@@ -129,10 +140,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="vaccination_diseases_statement",
+            next="state_vaccine_importance_question",
         )
 
-    async def vaccination_diseases_statement(self):
+    async def state_vaccine_importance_question(self):
         question = self._(
             "3/13 \n"
             "\n"
@@ -156,10 +167,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="vaccination_severe_diseases_statement_answers",
+            next="state_vaccine_importance",
         )
 
-    async def vaccination_diseases_statement_answers(self):
+    async def state_vaccine_importance(self):
         question = self._("")
         error = self._(
             "Please use numbers from list.\n"
@@ -183,10 +194,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="vaccination_risks_statement",
+            next="state_vaccine_benefits_question",
         )
 
-    async def vaccination_risks_statement(self):
+    async def state_vaccine_benefits_question(self):
         question = self._(
             "4/13 \n"
             "\n"
@@ -210,10 +221,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="vaccination_risks_statement_answers",
+            next="state_vaccine_benefits",
         )
 
-    async def vaccination_risks_statement_answers(self):
+    async def state_vaccine_benefits(self):
         question = self._("")
         error = self._(
             "Please use numbers from list.\n"
@@ -235,10 +246,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="pregnancy_checkup",
+            next="state_clinic_visit_frequency_question",
         )
 
-    async def pregnancy_checkup(self):
+    async def state_clinic_visit_frequency_question(self):
         question = self._(
             "5/13 \n"
             "\n"
@@ -258,10 +269,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="pregnancy_checkup_answers",
+            next="state_clinic_visit_frequency",
         )
 
-    async def pregnancy_checkup_answers(self):
+    async def state_clinic_visit_frequency(self):
         question = self._("")
         error = self._(
             "Please use numbers from list.\n"
@@ -284,10 +295,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="eating_vegetables",
+            next="state_vegetables",
         )
 
-    async def eating_vegetables(self):
+    async def state_vegetables(self):
         question = self._(
             "6/13 \n"
             "\n"
@@ -309,10 +320,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="eating_fruits",
+            next="state_fruit",
         )
 
-    async def eating_fruits(self):
+    async def state_fruit(self):
         question = self._(
             "7/13 \n"
             "\n"
@@ -334,10 +345,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="eating_dairy_products",
+            next="state_dairy",
         )
 
-    async def eating_dairy_products(self):
+    async def state_dairy(self):
         question = self._(
             "8/13 \n"
             "\n"
@@ -361,10 +372,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="eating_liver_frequency",
+            next="state_liver_frequency",
         )
 
-    async def eating_liver_frequency(self):
+    async def state_liver_frequency(self):
         question = self._("9/13 \n" "\n" "How often do you eat liver?")
         error = self._(
             "Please use numbers from list.\n" "\n" "How often do you eat liver?"
@@ -383,10 +394,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="pregnancy_danger_signs",
+            next="state_danger_sign1",
         )
 
-    async def pregnancy_danger_signs(self):
+    async def state_danger_sign1(self):
         question = self._(
             "10/13 \n"
             "\n"
@@ -409,10 +420,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="second_pregnancy_danger_signs",
+            next="state_danger_sign2",
         )
 
-    async def second_pregnancy_danger_signs(self):
+    async def state_danger_sign2(self):
         question = self._(
             "11/13 \n"
             "\n"
@@ -435,10 +446,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="marital_status",
+            next="state_marital_status",
         )
 
-    async def marital_status(self):
+    async def state_marital_status(self):
         question = self._("12/13 \n" "\n" "What is your marital status?")
         error = self._(
             "Please use numbers from list.\n" "\n" "What is your marital status?"
@@ -457,10 +468,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="education_highest_level",
+            next="state_education_level_question",
         )
 
-    async def education_highest_level(self):
+    async def state_education_level_question(self):
         question = self._(
             "13/13 \n"
             "\n"
@@ -481,7 +492,7 @@ class Application(BaseApplication):
             next="vaccinate_baby_statement_answers",
         )
 
-    async def education_highest_level_answers(self):
+    async def state_education_level(self):
         question = self._("")
         error = self._(
             "Please use numbers from list.\n"
@@ -502,8 +513,50 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="state_end",
+            next="state_submit_data",
         )
+
+    async def state_submit_data(self):
+        async with get_eventstore() as session:
+            for i in range(3):
+                try:
+                    answers = self.user.answers
+                    data = {
+                        "msisdn": self.inbound.from_addr,
+                        "breastfeed": answers.get("state_breastfeed"),
+                        "breastfeed_period": answers.get("state_breastfeed_period"),
+                        "vaccine_importance": answers.get("state_vaccine_importance"),
+                        "vaccine_benefits": answers.get("state_vaccine_benefits"),
+                        "clinic_visit_frequency": answers.get(
+                            "state_clinic_visit_frequency"
+                        ),
+                        "vegetables": answers.get("state_vegetables"),
+                        "fruit": answers.get("state_fruit"),
+                        "dairy": answers.get("state_dairy"),
+                        "liver_frequency": answers.get("state_liver_frequency"),
+                        "danger_sign1": answers.get("state_danger_sign1"),
+                        "danger_sign2": answers.get("state_danger_sign2"),
+                        "marital_status": answers.get("state_marital_status"),
+                        "education_level": answers.get("state_education_level"),
+                    }
+                    logger.info(">>>> state_submit_data /api/v1/mqrbaselinesurvey/")
+                    logger.info(config.EVENTSTORE_API_URL)
+                    logger.info(data)
+                    response = await session.post(
+                        urljoin(
+                            config.EVENTSTORE_API_URL, "/api/v1/mqrbaselinesurvey/"
+                        ),
+                        json=data,
+                    )
+                    response.raise_for_status()
+                    break
+                except HTTP_EXCEPTIONS as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
+        return await self.go_to_state("state_end")
 
     async def state_end(self):
         text = self._(
