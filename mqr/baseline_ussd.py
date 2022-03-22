@@ -1,7 +1,5 @@
 import logging
 
-import aiohttp
-
 import vaccine.healthcheck_config as config
 from mqr.utils import rapidpro
 from vaccine.base_application import BaseApplication
