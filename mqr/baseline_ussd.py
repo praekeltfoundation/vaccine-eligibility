@@ -35,7 +35,7 @@ class Application(BaseApplication):
             for i in range(3):
                 try:
                     response = await session.get(
-                        urljoin(config.RAPIDPRO_URL, f"/api/v2/contacts.json"),
+                        urljoin(config.RAPIDPRO_URL, "/api/v2/contacts.json"),
                         params={"urn": urn},
                     )
                     response.raise_for_status()
