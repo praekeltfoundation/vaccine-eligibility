@@ -1,7 +1,9 @@
 import logging
+from urllib.parse import urljoin
+
+import aiohttp
 
 import vaccine.healthcheck_config as config
-from mqr.utils import rapidpro
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, ChoiceState, EndState
 from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
@@ -9,42 +11,58 @@ from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
 logger = logging.getLogger(__name__)
 
 
+def get_rapidpro():
+    return aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=5),
+        headers={
+            "Authorization": f"Token {config.RAPIDPRO_TOKEN}",
+            "Content-Type": "application/json",
+            "User-Agent": "healthcheck-ussd",
+        },
+    )
+
+
 class Application(BaseApplication):
-    START_SURVEY = "survey_start"
+    START_SURVEY = "state_start"
 
-    async def survey_start(self):
-        if config.RAPIDPRO_URL and config.RAPIDPRO_TOKEN:
-            msisdn = normalise_phonenumber(self.inbound.from_addr)
-            urn = f"whatsapp:{msisdn.lstrip(' + ')}"
+    async def state_start(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        urn = f"whatsapp:{msisdn.lstrip(' + ')}"
 
-            if rapidpro:
-                for i in range(3):
-                    try:
-                        contact = rapidpro.get_contacts(urn=urn).first(
-                            retry_on_rate_exceed=True
-                        )
+        sms_mqr_contact = False
 
-                        if not contact:
-                            return await self.go_to_state("state_error")
+        async with get_rapidpro() as session:
+            for i in range(3):
+                try:
+                    response = await session.get(
+                        urljoin(config.RAPIDPRO_URL, "/api/v2/contacts.json"),
+                        params={"urn": urn},
+                    )
+                    response.raise_for_status()
+                    response_body = await response.json()
 
-                        data = await contact
-                        if not data.mqr_consent and data.mqr_arm:
-                            return await self.go_to_state("state_error")
-                        break
-                    except HTTP_EXCEPTIONS as e:
-                        if i == 2:
-                            logger.exception(e)
-                            return await self.go_to_state("state_error")
-                        else:
-                            continue
+                    if len(response_body["results"]) > 0:
+                        contact = response_body["results"][0]
 
-                self.save_answer("state_age", data.age)
-                return await self.go_to_state("breast_feeding")
-            return await self.go_to_state("state_error")
+                        if (
+                            contact["fields"]["mqr_consent"] == "Accepted"
+                            and contact["fields"]["mqr_arm"] == "RCM_SMS"
+                        ):
+                            sms_mqr_contact = True
+                    break
+                except HTTP_EXCEPTIONS as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
+        if sms_mqr_contact:
+            return await self.go_to_state("breast_feeding")
+        return await self.go_to_state("state_contact_not_found")
 
     async def breast_feeding(self):
         question = self._(
-            "1/13 \n" "\n" "Do you plan to breastfeed your baby after birth?"
+            "1/13\n" "\n" "Do you plan to breastfeed your baby after birth?"
         )
         error = self._(
             "Please use numbers from list.\n"
@@ -380,8 +398,8 @@ class Application(BaseApplication):
             "In your view, what is the biggest pregnancy danger sign on this list?"
         )
         choices = [
-            Choice("weight_gain", "Yes"),
-            Choice("vaginal_bleeding", "Weight gain of 4-5 kilograms"),
+            Choice("weight_gain", "Weight gain of 4-5 kilograms"),
+            Choice("vaginal_bleeding", "Vaginal bleeding"),
             Choice("nose_bleeds", "Nose bleeds"),
             Choice("skip", "Skip"),
         ]
@@ -495,12 +513,19 @@ class Application(BaseApplication):
         )
         return EndState(self, text=text, next=self.START_STATE)
 
-    async def survey_error(self):
+    async def state_error(self):
         return EndState(
             self,
             self._(
                 "Sorry, something went wrong. We have been notified. Please try again "
                 "later"
             ),
+            next=self.START_SURVEY,
+        )
+
+    async def state_contact_not_found(self):
+        return EndState(
+            self,
+            self._("TODO COPY"),
             next=self.START_SURVEY,
         )

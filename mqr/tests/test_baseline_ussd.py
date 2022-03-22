@@ -1,7 +1,148 @@
 import pytest
+from sanic import Sanic, response
 
+import vaccine.healthcheck_config as config
 from mqr.baseline_ussd import Application
 from vaccine.models import Message, StateData, User
+
+
+def get_rapidpro_contact(urn, mqr_consent="Accepted", mqr_arm="RCM_SMS"):
+    return {
+        "uuid": "b733e997-b0b4-4d4d-a3ad-0546e1644aa9",
+        "name": "",
+        "language": "zul",
+        "groups": [],
+        "fields": {"mqr_consent": mqr_consent, "mqr_arm": mqr_arm},
+        "blocked": False,
+        "stopped": False,
+        "created_on": "2015-11-11T08:30:24.922024+00:00",
+        "modified_on": "2015-11-11T08:30:25.525936+00:00",
+        "urns": [urn],
+    }
+
+
+@pytest.fixture
+async def rapidpro_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("mock_rapidpro")
+    app.requests = []
+    app.errors = 0
+    app.errormax = 0
+
+    @app.route("/api/v2/contacts.json", methods=["GET"])
+    def get_contact(request):
+        app.requests.append(request)
+        if app.errormax:
+            if app.errors < app.errormax:
+                app.errors += 1
+                return response.json({}, status=500)
+
+        contacts = []
+        urn = request.args.get("urn")
+        if urn == "whatsapp:27820001003":
+            contacts = [get_rapidpro_contact(urn)]
+
+        if urn == "whatsapp:27820001004":
+            contacts = [get_rapidpro_contact(urn, "Declined", "BCM")]
+
+        return response.json(
+            {
+                "results": contacts,
+                "next": None,
+            },
+            status=200,
+        )
+
+    client = await sanic_client(app)
+    url = config.RAPIDPRO_URL
+    config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
+    config.RAPIDPRO_TOKEN = "testtoken"
+    yield client
+    config.RAPIDPRO_URL = url
+
+
+@pytest.mark.asyncio
+async def test_state_survey_start(rapidpro_mock):
+    u = User(addr="27820001003", state=StateData())
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 140
+    assert reply.content == "\n".join(
+        [
+            "1/13",
+            "",
+            "Do you plan to breastfeed your baby after birth?",
+            "1. Yes",
+            "2. No",
+            "3. Skip",
+        ]
+    )
+
+    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
+
+
+@pytest.mark.asyncio
+async def test_state_survey_start_not_mqr_contact(rapidpro_mock):
+    u = User(addr="27820001004", state=StateData())
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001004",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 140
+    assert reply.content == "TODO COPY"
+
+    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
+
+
+@pytest.mark.asyncio
+async def test_state_survey_start_not_found(rapidpro_mock):
+    u = User(addr="27820001005", state=StateData())
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001005",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 140
+    assert reply.content == "TODO COPY"
+
+    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
+
+
+@pytest.mark.asyncio
+async def test_state_start_temporary_errors(rapidpro_mock):
+    rapidpro_mock.app.errormax = 3
+    u = User(addr="27820001001", state=StateData())
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001001",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert len(rapidpro_mock.app.requests) == 3
 
 
 @pytest.mark.asyncio
@@ -42,7 +183,7 @@ async def test_breast_feeding_valid():
 
     assert len(reply.content) < 160
     assert (
-        reply.content == "1/13 \n"
+        reply.content == "1/13\n"
         "\n"
         "Do you plan to breastfeed your baby after birth?\n"
         "1. Yes\n"
@@ -239,8 +380,8 @@ async def test_pregnancy_danger_signs():
         reply.content == "10/13 \n"
         "\n"
         "In your view, what is the biggest pregnancy danger sign on this list?\n"
-        "1. Yes\n"
-        "2. Weight gain of 4-5 kilograms\n"
+        "1. Weight gain of 4-5 kilograms\n"
+        "2. Vaginal bleeding\n"
         "3. Nose bleeds\n"
         "4. Skip"
     )
