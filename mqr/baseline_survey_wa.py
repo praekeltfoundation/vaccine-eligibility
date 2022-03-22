@@ -135,7 +135,7 @@ class Application(BaseApplication):
             "What do you think about this statement"
             "\n"
             "The benefits of vaccines protecting my child against diseases "
-            "like measles, tetanus, and polio outweigh the risks of my child " 
+            "like measles, tetanus, and polio outweigh the risks of my child "
             "developing a serious side effect from the vaccine."
         )
         error = self._(
@@ -144,7 +144,7 @@ class Application(BaseApplication):
             "What do you think about this statement"
             "\n"
             "The benefits of vaccines protecting my child against diseases "
-            "like measles, tetanus, and polio outweigh the risks of my child " 
+            "like measles, tetanus, and polio outweigh the risks of my child "
             "developing a serious side effect from the vaccine."
         )
         choices = [
@@ -298,7 +298,8 @@ class Application(BaseApplication):
         question = self._(
             "10/13 \n"
             "\n"
-            "In your opinion, what is the biggest danger sign in pregnancy from this list?"
+            "In your opinion, what is the biggest danger sign in pregnancy "
+            "from this list?"
         )
         error = self._(
             "Please use numbers from list.\n"
@@ -380,9 +381,9 @@ class Application(BaseApplication):
             "Which answer best describes your highest level of education?"
         )
         choices = [
-            Choice("less_grade_7", "I didn't finish primary school"),
-            Choice("between_grade_7_12", "I finished Grade 7"),
-            Choice("matric", "I finished Grade 12"),
+            Choice("less_grade_7", "Less than Grade 7"),
+            Choice("between_grade_7_12", "Between Grades 7-12"),
+            Choice("matric", "Matric"),
             Choice("diploma", "Diploma"),
             Choice("degree_or_higher", "University degree or higher"),
             Choice("skip", "Skip this question"),

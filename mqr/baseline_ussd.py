@@ -13,33 +13,34 @@ class Application(BaseApplication):
     START_SURVEY = "survey_start"
 
     async def survey_start(self):
-        msisdn = normalise_phonenumber(self.inbound.from_addr)
-        urn = f"whatsapp:{msisdn.lstrip(' + ')}"
+        if config.RAPIDPRO_URL and config.RAPIDPRO_TOKEN:
+            msisdn = normalise_phonenumber(self.inbound.from_addr)
+            urn = f"whatsapp:{msisdn.lstrip(' + ')}"
 
-        if rapidpro:
-            for i in range(3):
-                try:
-                    contact = rapidpro.get_contacts(urn=urn).first(
-                        retry_on_rate_exceed=True
-                    )
+            if rapidpro:
+                for i in range(3):
+                    try:
+                        contact = rapidpro.get_contacts(urn=urn).first(
+                            retry_on_rate_exceed=True
+                        )
 
-                    if not contact:
-                        return await self.go_to_state("state_error")
+                        if not contact:
+                            return await self.go_to_state("state_error")
 
-                    data = await contact
-                    if not data.mqr_consent and data.mqr_arm:
-                        return await self.go_to_state("state_error")
-                    break
-                except HTTP_EXCEPTIONS as e:
-                    if i == 2:
-                        logger.exception(e)
-                        return await self.go_to_state("state_error")
-                    else:
-                        continue
+                        data = await contact
+                        if not data.mqr_consent and data.mqr_arm:
+                            return await self.go_to_state("state_error")
+                        break
+                    except HTTP_EXCEPTIONS as e:
+                        if i == 2:
+                            logger.exception(e)
+                            return await self.go_to_state("state_error")
+                        else:
+                            continue
 
-            self.save_answer("state_age", data.age)
-            return await self.go_to_state("breast_feeding")
-        return await self.go_to_state("state_error")
+                self.save_answer("state_age", data.age)
+                return await self.go_to_state("breast_feeding")
+            return await self.go_to_state("state_error")
 
     async def breast_feeding(self):
         question = self._(

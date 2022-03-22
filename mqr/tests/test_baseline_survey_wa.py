@@ -76,12 +76,12 @@ async def test_breast_feeding_term_invalid():
             " breastmilk before giving other foods and water?*"
             "\n"
             "1. Between 0 and 3 months\n"
-             "2. Between 4 and 5 months\n"
-             "3. For 6 months\n"
-             "4. Longer than 6 months\n"
-             "5. I don't want to only breastfeed\n"
-             "6. I don't know\n"
-             "7. Skip this question"
+            "2. Between 4 and 5 months\n"
+            "3. For 6 months\n"
+            "4. Longer than 6 months\n"
+            "5. I don't want to only breastfeed\n"
+            "6. I don't know\n"
+            "7. Skip this question"
         ]
     )
 
@@ -241,7 +241,8 @@ async def test_pregnancy_danger_signs():
     assert (
         reply.content == "10/13 \n"
         "\n"
-        "In your opinion, what is the biggest danger sign in pregnancy from this list?\n"
+        "In your opinion, what is the biggest danger sign in pregnancy "
+        "from this list?\n"
         "1. Weight gain of 4-5 kilograms\n"
         "2. Vaginal bleeding\n"
         "3. Nose bleeds\n"
@@ -363,9 +364,9 @@ async def test_vaccination_risks_statement():
             "4/13 \n"
             "\n"
             "What do you think about this statement\n"
-            "The benefits of vaccines protecting my child against diseases like measles, "
-            "tetanus, and polio outweigh the risks of my child developing a serious side "
-            "effect from the vaccine.\n"
+            "The benefits of vaccines protecting my child against diseases like "
+            "measles, tetanus, and polio outweigh the risks of my child developing "
+            "a serious side effect from the vaccine.\n"
             "1. I strongly agree\n"
             "2. I agree\n"
             "3. I don't agree or disagree\n"
@@ -438,12 +439,11 @@ async def test_education_highest_level():
             "13/13 \n"
             "\n"
             "Which answer best describes your highest level of education?\n"
-            "1. I didn't finish primary school\n"
-            "2. I finished Grade 7\n"
-            "3. I finished Grade 12\n"
+            "1. Less than Grade 7\n"
+            "2. Between Grades 7-12\n"
+            "3. Matric\n"
             "4. Diploma\n"
             "5. University degree or higher\n"
             "6. Skip this question"
         ]
     )
-
