@@ -1,9 +1,9 @@
 import pytest
 from sanic import Sanic, response
 
+import vaccine.healthcheck_config as config
 from mqr.baseline_ussd import Application
 from vaccine.models import Message, StateData, User
-import vaccine.healthcheck_config as config
 
 
 def get_rapidpro_contact(urn, mqr_consent="Accepted", mqr_arm="RCM_SMS"):
