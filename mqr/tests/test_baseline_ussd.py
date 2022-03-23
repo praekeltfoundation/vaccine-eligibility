@@ -152,7 +152,8 @@ async def test_state_survey_start_not_mqr_contact(rapidpro_mock):
         [
             "You have dialed the wrong number.",
             "",
-            "Dial *134*550*2# when you're at a clinic to register on MomConnect or dial *134*550*7# to update details",
+            "Dial *134*550*2# when you're at a clinic to register on MomConnect or "
+            "dial *134*550*7# to update details",
         ]
     )
 
@@ -177,7 +178,8 @@ async def test_state_survey_start_not_found(rapidpro_mock):
         [
             "You have dialed the wrong number.",
             "",
-            "Dial *134*550*2# when you're at a clinic to register on MomConnect or dial *134*550*7# to update details",
+            "Dial *134*550*2# when you're at a clinic to register on MomConnect or "
+            "dial *134*550*7# to update details",
         ]
     )
 
