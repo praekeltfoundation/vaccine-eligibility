@@ -168,6 +168,10 @@ async def test_state_start_temporary_errors(rapidpro_mock):
     )
     [reply] = await app.process_message(msg)
 
+    assert reply.content == (
+        "Sorry, something went wrong. We have been notified. Please try again later"
+    )
+
     assert len(rapidpro_mock.app.requests) == 3
 
 
