@@ -73,8 +73,37 @@ class Application(BaseApplication):
                     else:
                         continue
         if sms_mqr_contact:
-            return await self.go_to_state("state_breastfeed")
+            return await self.go_to_state("state_check_existing_result")
         return await self.go_to_state("state_contact_not_found")
+
+    async def state_check_existing_result(self):
+        msisdn = self.inbound.from_addr
+        exists = False
+
+        async with get_eventstore() as session:
+            for i in range(3):
+                try:
+                    response = await session.get(
+                        urljoin(
+                            config.EVENTSTORE_API_URL,
+                            f"/api/v1/mqrbaselinesurvey/{msisdn}/",
+                        ),
+                    )
+                    response.raise_for_status()
+                    response_body = await response.json()
+
+                    if len(response_body["results"]) > 0:
+                        exists = True
+                    break
+                except HTTP_EXCEPTIONS as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
+        if exists:
+            return await self.go_to_state("state_already_completed")
+        return await self.go_to_state("state_breastfeed")
 
     async def state_breastfeed(self):
         question = self._(
@@ -579,6 +608,30 @@ class Application(BaseApplication):
     async def state_contact_not_found(self):
         return EndState(
             self,
-            self._("TODO COPY"),
+            self._(
+                "\n".join(
+                    [
+                        "You have dialed the wrong number.",
+                        "",
+                        "Dial *134*550*2# when you're at a clinic to register on "
+                        "MomConnect or dial *134*550*7# to update details",
+                    ]
+                )
+            ),
+            next=self.START_SURVEY,
+        )
+
+    async def state_already_completed(self):
+        return EndState(
+            self,
+            self._(
+                "\n".join(
+                    [
+                        "Thanks, you have already completed this survey.",
+                        "",
+                        "You will get your weekly message soon.",
+                    ]
+                )
+            ),
             next=self.START_SURVEY,
         )
