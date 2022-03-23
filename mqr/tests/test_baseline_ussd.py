@@ -70,6 +70,8 @@ async def eventstore_mock(sanic_client):
     app.requests = []
     app.errormax = 0
     app.errors = 0
+    app.not_found_errormax = 0
+    app.not_found_errors = 0
 
     @app.route("/api/v1/mqrbaselinesurvey/", methods=["POST"])
     def valid_baseline_survey(request):
@@ -80,6 +82,20 @@ async def eventstore_mock(sanic_client):
                 return response.json({}, status=500)
         return response.json({})
 
+    @app.route("/api/v1/mqrbaselinesurvey/27820001003/", methods=["GET"])
+    def get_baseline_survey_not_found(request):
+        app.requests.append(request)
+        if app.not_found_errormax:
+            if app.not_found_errors < app.not_found_errormax:
+                app.not_found_errors += 1
+                return response.json({}, status=500)
+        return response.json({"results": []})
+
+    @app.route("/api/v1/mqrbaselinesurvey/27820001004/", methods=["GET"])
+    def get_baseline_survey_found(request):
+        app.requests.append(request)
+        return response.json({"results": [{"dummy": "result"}]})
+
     client = await sanic_client(app)
     url = config.EVENTSTORE_API_URL
     config.EVENTSTORE_API_URL = f"http://{client.host}:{client.port}"
@@ -88,7 +104,7 @@ async def eventstore_mock(sanic_client):
 
 
 @pytest.mark.asyncio
-async def test_state_survey_start(rapidpro_mock):
+async def test_state_survey_start(rapidpro_mock, eventstore_mock):
     u = User(addr="27820001003", state=StateData())
     app = Application(u)
     msg = Message(
@@ -113,6 +129,9 @@ async def test_state_survey_start(rapidpro_mock):
     )
 
     assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in eventstore_mock.app.requests] == [
+        "/api/v1/mqrbaselinesurvey/27820001003/"
+    ]
 
 
 @pytest.mark.asyncio
@@ -129,7 +148,11 @@ async def test_state_survey_start_not_mqr_contact(rapidpro_mock):
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 140
-    assert reply.content == "TODO COPY"
+    assert reply.content == "\n".join([
+                "You have dialed the wrong number.",
+                "",
+                "Dial *134*550*2# when you're at a clinic to register on MomConnect or dial *134*550*7# to update details"
+            ])
 
     assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
 
@@ -147,8 +170,12 @@ async def test_state_survey_start_not_found(rapidpro_mock):
         session_event=Message.SESSION_EVENT.NEW,
     )
     [reply] = await app.process_message(msg)
-    assert len(reply.content) < 140
-    assert reply.content == "TODO COPY"
+    assert len(reply.content) < 160
+    assert reply.content == "\n".join([
+                "You have dialed the wrong number.",
+                "",
+                "Dial *134*550*2# when you're at a clinic to register on MomConnect or dial *134*550*7# to update details"
+            ])
 
     assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
 
@@ -173,6 +200,56 @@ async def test_state_start_temporary_errors(rapidpro_mock):
     )
 
     assert len(rapidpro_mock.app.requests) == 3
+
+
+@pytest.mark.asyncio
+async def test_state_check_existing_result_temporary_errors(eventstore_mock):
+    eventstore_mock.app.not_found_errormax = 3
+    u = User(addr="27820001003", state=StateData(name="state_check_existing_result"))
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == (
+        "Sorry, something went wrong. We have been notified. Please try again later"
+    )
+
+    assert len(eventstore_mock.app.requests) == 3
+
+
+@pytest.mark.asyncio
+async def test_state_check_existing_result_found(eventstore_mock):
+    u = User(addr="27820001004", state=StateData(name="state_check_existing_result"))
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001004",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 140
+    assert reply.content == "\n".join(
+        [
+            "Thanks, you have already completed this survey.",
+            "",
+            "You will get your weekly message soon.",
+        ]
+    )
+    assert u.state.name == "state_start"
+
+    assert [r.path for r in eventstore_mock.app.requests] == [
+        "/api/v1/mqrbaselinesurvey/27820001004/"
+    ]
 
 
 @pytest.mark.asyncio
@@ -242,7 +319,6 @@ async def test_state_breastfeed_period_invalid():
 
     assert len(reply.content) < 160
     assert user.state.name == "state_breastfeed_period"
-    print(reply.content)
     assert reply.content == "\n".join(
         [
             "Please use numbers from list.",
