@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from sanic import Sanic, response
 
@@ -59,6 +61,30 @@ async def rapidpro_mock(sanic_client):
     config.RAPIDPRO_TOKEN = "testtoken"
     yield client
     config.RAPIDPRO_URL = url
+
+
+@pytest.fixture
+async def eventstore_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("mock_eventstore")
+    app.requests = []
+    app.errormax = 0
+    app.errors = 0
+
+    @app.route("/api/v1/mqrbaselinesurvey/", methods=["POST"])
+    def valid_baseline_survey(request):
+        app.requests.append(request)
+        if app.errormax:
+            if app.errors < app.errormax:
+                app.errors += 1
+                return response.json({}, status=500)
+        return response.json({})
+
+    client = await sanic_client(app)
+    url = config.EVENTSTORE_API_URL
+    config.EVENTSTORE_API_URL = f"http://{client.host}:{client.port}"
+    yield client
+    config.EVENTSTORE_API_URL = url
 
 
 @pytest.mark.asyncio
@@ -146,10 +172,10 @@ async def test_state_start_temporary_errors(rapidpro_mock):
 
 
 @pytest.mark.asyncio
-async def test_breast_feeding():
+async def test_state_breastfeed():
     user = User(
         addr="278201234567",
-        state=StateData(name="breast_feeding"),
+        state=StateData(name="state_breastfeed"),
         session_id=1,
         answers={"returning_user": "yes"},
     )
@@ -164,12 +190,12 @@ async def test_breast_feeding():
     [reply] = await app.process_message(msg)
 
     assert len(reply.content) < 160
-    assert user.state.name == "breast_feeding"
+    assert user.state.name == "state_breastfeed"
 
 
 @pytest.mark.asyncio
-async def test_breast_feeding_valid():
-    user = User(addr="27820001003", state=StateData("breast_feeding"))
+async def test_state_breastfeed_valid():
+    user = User(addr="27820001003", state=StateData("state_breastfeed"))
     app = Application(user)
     msg = Message(
         content=None,
@@ -193,10 +219,10 @@ async def test_breast_feeding_valid():
 
 
 @pytest.mark.asyncio
-async def test_breast_feeding_term_invalid():
+async def test_state_breastfeed_period_invalid():
     user = User(
         addr="278201234567",
-        state=StateData(name="breast_feeding_term"),
+        state=StateData(name="state_breastfeed_period"),
         session_id=1,
         answers={},
     )
@@ -211,55 +237,47 @@ async def test_breast_feeding_term_invalid():
     [reply] = await app.process_message(msg)
 
     assert len(reply.content) < 160
-    assert user.state.name == "breast_feeding_term"
+    assert user.state.name == "state_breastfeed_period"
+    print(reply.content)
     assert reply.content == "\n".join(
         [
-            "Please use numbers from list.\n"
-            "\n"
-            "*How long do you plan to give your baby only"
-            " breastmilk before giving other foods and water?*"
-            "\n"
-            "1. Next"
+            "Please use numbers from list.",
+            "1. 0-3 months",
+            "2. 4-5 months",
+            "3. For 6 months",
+            "4. Longer than 6 months",
+            "5. I don't want to only breastfeed",
+            "6. I don't know",
+            "7. Skip",
         ]
     )
 
 
 @pytest.mark.asyncio
-async def test_breast_feeding_term_valid():
+async def test_state_breastfeed_period_valid():
     user = User(
         addr="278201234567",
-        state=StateData(name="breast_feeding_term"),
+        state=StateData(name="state_breastfeed_period"),
         session_id=1,
         answers={},
     )
     app = Application(user)
     msg = Message(
-        content="invalid",
+        content="1",
         to_addr="278201234567",
         from_addr="27820001003",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.USSD,
-        session_event=Message.SESSION_EVENT.NEW,
     )
     [reply] = await app.process_message(msg)
 
     assert len(reply.content) < 160
-    assert user.state.name == "breast_feeding_term"
-    assert reply.content == "\n".join(
-        [
-            "2/13 \n"
-            "\n"
-            "*How long do you plan to give your baby only"
-            " breastmilk before giving other foods and water?*"
-            "\n"
-            "1. Next"
-        ]
-    )
+    assert user.state.name == "state_vaccine_importance_question"
 
 
 @pytest.mark.asyncio
-async def test_eating_vegetables():
-    user = User(addr="27820001003", state=StateData("eating_vegetables"))
+async def test_state_vegetables():
+    user = User(addr="27820001003", state=StateData("state_vegetables"))
     app = Application(user)
     msg = Message(
         content=None,
@@ -283,8 +301,8 @@ async def test_eating_vegetables():
 
 
 @pytest.mark.asyncio
-async def test_eating_fruits():
-    user = User(addr="27820001003", state=StateData("eating_fruits"))
+async def test_state_fruit():
+    user = User(addr="27820001003", state=StateData("state_fruit"))
     app = Application(user)
     msg = Message(
         content=None,
@@ -308,8 +326,8 @@ async def test_eating_fruits():
 
 
 @pytest.mark.asyncio
-async def test_eating_dairy_products():
-    user = User(addr="27820001003", state=StateData("eating_dairy_products"))
+async def test_state_dairy():
+    user = User(addr="27820001003", state=StateData("state_dairy"))
     app = Application(user)
     msg = Message(
         content=None,
@@ -334,8 +352,8 @@ async def test_eating_dairy_products():
 
 
 @pytest.mark.asyncio
-async def test_eating_liver_frequency():
-    user = User(addr="27820001003", state=StateData("eating_liver_frequency"))
+async def test_state_liver_frequency():
+    user = User(addr="27820001003", state=StateData("state_liver_frequency"))
     app = Application(user)
     msg = Message(
         content=None,
@@ -362,8 +380,8 @@ async def test_eating_liver_frequency():
 
 
 @pytest.mark.asyncio
-async def test_pregnancy_danger_signs():
-    user = User(addr="27820001003", state=StateData("pregnancy_danger_signs"))
+async def test_state_danger_sign1():
+    user = User(addr="27820001003", state=StateData("state_danger_sign1"))
     app = Application(user)
     msg = Message(
         content=None,
@@ -388,8 +406,8 @@ async def test_pregnancy_danger_signs():
 
 
 @pytest.mark.asyncio
-async def test_second_pregnancy_danger_signs():
-    user = User(addr="27820001003", state=StateData("second_pregnancy_danger_signs"))
+async def test_state_danger_sign2():
+    user = User(addr="27820001003", state=StateData("state_danger_sign2"))
     app = Application(user)
     msg = Message(
         content=None,
@@ -397,7 +415,6 @@ async def test_second_pregnancy_danger_signs():
         from_addr="27820001003",
         transport_name="whatsapp",
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-        session_event=Message.SESSION_EVENT.NEW,
     )
     [reply] = await app.process_message(msg)
 
@@ -414,8 +431,8 @@ async def test_second_pregnancy_danger_signs():
 
 
 @pytest.mark.asyncio
-async def test_marital_status():
-    user = User(addr="27820001003", state=StateData("marital_status"))
+async def test_state_marital_status():
+    user = User(addr="27820001003", state=StateData("state_marital_status"))
     app = Application(user)
     msg = Message(
         content=None,
@@ -442,10 +459,10 @@ async def test_marital_status():
 
 
 @pytest.mark.asyncio
-async def test_vaccination_diseases_statement():
+async def test_state_vaccine_importance_question():
     user = User(
         addr="278201234567",
-        state=StateData(name="vaccination_diseases_statement"),
+        state=StateData(name="state_vaccine_importance_question"),
         session_id=1,
         answers={},
     )
@@ -461,7 +478,7 @@ async def test_vaccination_diseases_statement():
     [reply] = await app.process_message(msg)
 
     assert len(reply.content) < 160
-    assert user.state.name == "vaccination_diseases_statement"
+    assert user.state.name == "state_vaccine_importance_question"
     assert reply.content == "\n".join(
         [
             "3/13 \n"
@@ -475,10 +492,10 @@ async def test_vaccination_diseases_statement():
 
 
 @pytest.mark.asyncio
-async def test_vaccination_diseases_statement_answer():
+async def test_state_vaccine_importance():
     user = User(
         addr="278201234567",
-        state=StateData(name="vaccination_diseases_statement_answers"),
+        state=StateData(name="state_vaccine_importance"),
         session_id=1,
         answers={},
     )
@@ -494,7 +511,7 @@ async def test_vaccination_diseases_statement_answer():
     [reply] = await app.process_message(msg)
 
     assert len(reply.content) < 160
-    assert user.state.name == "vaccination_diseases_statement_answers"
+    assert user.state.name == "state_vaccine_importance"
     assert reply.content == "\n".join(
         [
             "\n"
@@ -509,10 +526,10 @@ async def test_vaccination_diseases_statement_answer():
 
 
 @pytest.mark.asyncio
-async def test_vaccination_risks_statement():
+async def test_state_vaccine_benefits_question():
     user = User(
         addr="278201234567",
-        state=StateData(name="vaccination_risks_statement"),
+        state=StateData(name="state_vaccine_benefits_question"),
         session_id=1,
         answers={},
     )
@@ -528,7 +545,7 @@ async def test_vaccination_risks_statement():
     [reply] = await app.process_message(msg)
 
     assert len(reply.content) < 160
-    assert user.state.name == "vaccination_risks_statement"
+    assert user.state.name == "state_vaccine_benefits_question"
     assert reply.content == "\n".join(
         [
             "4/13 \n"
@@ -542,10 +559,10 @@ async def test_vaccination_risks_statement():
 
 
 @pytest.mark.asyncio
-async def test_vaccination_risks_statement_answers():
+async def test_state_vaccine_benefits():
     user = User(
         addr="278201234567",
-        state=StateData(name="vaccination_risks_statement_answers"),
+        state=StateData(name="state_vaccine_benefits"),
         session_id=1,
         answers={},
     )
@@ -561,7 +578,7 @@ async def test_vaccination_risks_statement_answers():
     [reply] = await app.process_message(msg)
 
     assert len(reply.content) < 160
-    assert user.state.name == "vaccination_risks_statement_answers"
+    assert user.state.name == "state_vaccine_benefits"
     assert reply.content == "\n".join(
         [
             "\n"
@@ -576,10 +593,10 @@ async def test_vaccination_risks_statement_answers():
 
 
 @pytest.mark.asyncio
-async def test_pregnancy_checkup():
+async def test_state_clinic_visit_frequency_question():
     user = User(
         addr="278201234567",
-        state=StateData(name="pregnancy_checkup"),
+        state=StateData(name="state_clinic_visit_frequency_question"),
         session_id=1,
         answers={},
     )
@@ -595,7 +612,7 @@ async def test_pregnancy_checkup():
     [reply] = await app.process_message(msg)
 
     assert len(reply.content) < 160
-    assert user.state.name == "pregnancy_checkup"
+    assert user.state.name == "state_clinic_visit_frequency_question"
     assert reply.content == "\n".join(
         [
             "5/13 \n"
@@ -608,10 +625,10 @@ async def test_pregnancy_checkup():
 
 
 @pytest.mark.asyncio
-async def test_pregnancy_checkup_answers():
+async def test_state_clinic_visit_frequency():
     user = User(
         addr="278201234567",
-        state=StateData(name="pregnancy_checkup_answers"),
+        state=StateData(name="state_clinic_visit_frequency"),
         session_id=1,
         answers={},
     )
@@ -627,7 +644,7 @@ async def test_pregnancy_checkup_answers():
     [reply] = await app.process_message(msg)
 
     assert len(reply.content) < 160
-    assert user.state.name == "pregnancy_checkup_answers"
+    assert user.state.name == "state_clinic_visit_frequency"
     assert reply.content == "\n".join(
         [
             "\n"
@@ -643,10 +660,10 @@ async def test_pregnancy_checkup_answers():
 
 
 @pytest.mark.asyncio
-async def test_education_highest_level():
+async def test_state_education_level_question():
     user = User(
         addr="278201234567",
-        state=StateData(name="education_highest_level"),
+        state=StateData(name="state_education_level_question"),
         session_id=1,
         answers={},
     )
@@ -662,7 +679,7 @@ async def test_education_highest_level():
     [reply] = await app.process_message(msg)
 
     assert len(reply.content) < 160
-    assert user.state.name == "education_highest_level"
+    assert user.state.name == "state_education_level_question"
     assert reply.content == "\n".join(
         [
             "13/13 \n"
@@ -674,10 +691,10 @@ async def test_education_highest_level():
 
 
 @pytest.mark.asyncio
-async def test_education_highest_level_answers():
+async def test_state_education_level():
     user = User(
         addr="278201234567",
-        state=StateData(name="education_highest_level_answers"),
+        state=StateData(name="state_education_level"),
         session_id=1,
         answers={},
     )
@@ -693,7 +710,7 @@ async def test_education_highest_level_answers():
     [reply] = await app.process_message(msg)
 
     assert len(reply.content) < 160
-    assert user.state.name == "education_highest_level_answers"
+    assert user.state.name == "state_education_level"
     assert reply.content == "\n".join(
         [
             "\n"
@@ -705,3 +722,66 @@ async def test_education_highest_level_answers():
             "6. Skip"
         ]
     )
+
+
+@pytest.mark.asyncio
+async def test_state_education_level_submit(eventstore_mock):
+    user = User(
+        addr="278201234567",
+        state=StateData(name="state_education_level"),
+        session_id=1,
+        answers={
+            "state_breastfeed": "yes",
+            "state_breastfeed_period": "0_3_months",
+            "state_vaccine_importance": "strongly_agree",
+            "state_vaccine_benefits": "strongly_agree",
+            "state_clinic_visit_frequency": "more_than_once_a_month",
+            "state_vegetables": "yes",
+            "state_fruit": "yes",
+            "state_dairy": "yes",
+            "state_liver_frequency": "2_3_times_week",
+            "state_danger_sign1": "weight_gain",
+            "state_danger_sign2": "swollen_feet_legs",
+            "state_marital_status": "never_married",
+        },
+    )
+    app = Application(user)
+    msg = Message(
+        content="1",
+        to_addr="278201234567",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.USSD,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert len(reply.content) <= 160
+    assert user.state.name == "state_start"
+
+    assert reply.content == (
+        "Thank you for answering. You'll get your R5 airtime in the next 24 hours "
+        "& your first message will be sent soon   Dial *134*550*7# (free) "
+        "to update your details"
+    )
+
+    assert [r.path for r in eventstore_mock.app.requests] == [
+        "/api/v1/mqrbaselinesurvey/"
+    ]
+
+    request = eventstore_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "msisdn": "27820001003",
+        "breastfeed": "yes",
+        "breastfeed_period": "0_3_months",
+        "vaccine_importance": "strongly_agree",
+        "vaccine_benefits": "strongly_agree",
+        "clinic_visit_frequency": "more_than_once_a_month",
+        "vegetables": "yes",
+        "fruit": "yes",
+        "dairy": "yes",
+        "liver_frequency": "2_3_times_week",
+        "danger_sign1": "weight_gain",
+        "danger_sign2": "swollen_feet_legs",
+        "marital_status": "never_married",
+        "education_level": "less_grade_7",
+    }
