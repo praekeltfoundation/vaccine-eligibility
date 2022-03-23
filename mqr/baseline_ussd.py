@@ -608,11 +608,15 @@ class Application(BaseApplication):
     async def state_contact_not_found(self):
         return EndState(
             self,
-            self._("\n".join([
-                "You have dialed the wrong number.",
-                "",
-                "Dial *134*550*2# when you're at a clinic to register on MomConnect or dial *134*550*7# to update details"
-            ])),
+            self._(
+                "\n".join(
+                    [
+                        "You have dialed the wrong number.",
+                        "",
+                        "Dial *134*550*2# when you're at a clinic to register on MomConnect or dial *134*550*7# to update details",
+                    ]
+                )
+            ),
             next=self.START_SURVEY,
         )
 

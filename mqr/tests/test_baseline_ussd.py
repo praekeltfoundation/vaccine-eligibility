@@ -148,11 +148,13 @@ async def test_state_survey_start_not_mqr_contact(rapidpro_mock):
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 140
-    assert reply.content == "\n".join([
-                "You have dialed the wrong number.",
-                "",
-                "Dial *134*550*2# when you're at a clinic to register on MomConnect or dial *134*550*7# to update details"
-            ])
+    assert reply.content == "\n".join(
+        [
+            "You have dialed the wrong number.",
+            "",
+            "Dial *134*550*2# when you're at a clinic to register on MomConnect or dial *134*550*7# to update details",
+        ]
+    )
 
     assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
 
@@ -171,11 +173,13 @@ async def test_state_survey_start_not_found(rapidpro_mock):
     )
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 160
-    assert reply.content == "\n".join([
-                "You have dialed the wrong number.",
-                "",
-                "Dial *134*550*2# when you're at a clinic to register on MomConnect or dial *134*550*7# to update details"
-            ])
+    assert reply.content == "\n".join(
+        [
+            "You have dialed the wrong number.",
+            "",
+            "Dial *134*550*2# when you're at a clinic to register on MomConnect or dial *134*550*7# to update details",
+        ]
+    )
 
     assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
 
