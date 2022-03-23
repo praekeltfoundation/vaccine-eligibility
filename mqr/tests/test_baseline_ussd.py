@@ -691,6 +691,28 @@ async def test_state_education_level_question():
 
 
 @pytest.mark.asyncio
+async def test_state_education_level_question_valid():
+    user = User(
+        addr="278201234567",
+        state=StateData(name="state_education_level_question"),
+        session_id=1,
+        answers={},
+    )
+    app = Application(user)
+    msg = Message(
+        content="1",
+        to_addr="278201234567",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.USSD,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert len(reply.content) < 160
+    assert user.state.name == "state_education_level"
+
+
+@pytest.mark.asyncio
 async def test_state_education_level():
     user = User(
         addr="278201234567",
