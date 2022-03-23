@@ -89,11 +89,10 @@ class Application(BaseApplication):
                             f"/api/v1/mqrbaselinesurvey/{msisdn}/",
                         ),
                     )
+                    if response.status == 404:
+                        break
                     response.raise_for_status()
-                    response_body = await response.json()
-
-                    if len(response_body["results"]) > 0:
-                        exists = True
+                    exists = True
                     break
                 except HTTP_EXCEPTIONS as e:
                     if i == 2:

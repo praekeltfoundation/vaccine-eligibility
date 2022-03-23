@@ -89,12 +89,12 @@ async def eventstore_mock(sanic_client):
             if app.not_found_errors < app.not_found_errormax:
                 app.not_found_errors += 1
                 return response.json({}, status=500)
-        return response.json({"results": []})
+        return response.json({"detail": "Not found."}, status=404)
 
     @app.route("/api/v1/mqrbaselinesurvey/27820001004/", methods=["GET"])
     def get_baseline_survey_found(request):
         app.requests.append(request)
-        return response.json({"results": [{"dummy": "result"}]})
+        return response.json({"msisdn": "27820001004"})
 
     client = await sanic_client(app)
     url = config.EVENTSTORE_API_URL
