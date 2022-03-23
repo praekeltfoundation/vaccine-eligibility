@@ -3,7 +3,7 @@ import json
 import pytest
 from sanic import Sanic, response
 
-import vaccine.healthcheck_config as config
+from mqr import config
 from mqr.baseline_ussd import Application
 from vaccine.models import Message, StateData, User
 
@@ -54,6 +54,11 @@ async def rapidpro_mock(sanic_client):
             },
             status=200,
         )
+
+    @app.route("/api/v2/flow_starts.json", methods=["POST"])
+    def start_flow(request):
+        app.requests.append(request)
+        return response.json({}, status=200)
 
     client = await sanic_client(app)
     url = config.RAPIDPRO_URL
@@ -833,7 +838,7 @@ async def test_state_education_level():
 
 
 @pytest.mark.asyncio
-async def test_state_education_level_submit(eventstore_mock):
+async def test_state_education_level_submit(rapidpro_mock, eventstore_mock):
     user = User(
         addr="278201234567",
         state=StateData(name="state_education_level"),
@@ -892,4 +897,11 @@ async def test_state_education_level_submit(eventstore_mock):
         "danger_sign2": "swollen_feet_legs",
         "marital_status": "never_married",
         "education_level": "less_grade_7",
+    }
+
+    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/flow_starts.json"]
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "flow": config.RAPIDPRO_BASELINE_SURVEY_COMPLETE_FLOW,
+        "urns": ["whatsapp:27820001003"],
     }
