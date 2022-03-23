@@ -489,7 +489,7 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="vaccinate_baby_statement_answers",
+            next="state_education_level",
         )
 
     async def state_education_level(self):
