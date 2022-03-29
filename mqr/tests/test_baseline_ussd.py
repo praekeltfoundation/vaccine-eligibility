@@ -871,10 +871,12 @@ async def test_state_education_level_submit(rapidpro_mock, eventstore_mock):
     assert len(reply.content) <= 160
     assert user.state.name == "state_start"
 
-    assert reply.content == (
-        "Thank you for answering. You'll get your R5 airtime in the next 24 hours "
-        "& your first message will be sent soon   Dial *134*550*7# (free) "
-        "to update your details"
+    assert reply.content == "\n".join(
+        [
+            "Thank you for answering. You'll get your R5 airtime in the next 24 hours "
+            "& your first message will be sent soon",
+            "Dial *134*550*7# (free) to update your details",
+        ]
     )
 
     assert [r.path for r in eventstore_mock.app.requests] == [
