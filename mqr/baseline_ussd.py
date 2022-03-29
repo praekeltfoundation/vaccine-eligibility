@@ -613,9 +613,13 @@ class Application(BaseApplication):
 
     async def state_end(self):
         text = self._(
-            "Thank you for answering. You'll get your R5 airtime in the next 24 hours "
-            "& your first message will be sent soon   Dial *134*550*7# (free) "
-            "to update your details"
+            "\n".join(
+                [
+                    "Thank you for answering. You'll get your R5 airtime in the next "
+                    "24 hours & your first message will be sent soon",
+                    "Dial *134*550*7# (free) to update your details",
+                ]
+            )
         )
         return EndState(self, text=text, next=self.START_STATE)
 
