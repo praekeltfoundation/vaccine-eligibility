@@ -330,12 +330,12 @@ class Application(BaseApplication):
         question = self._(
             "6/13 \n"
             "\n"
-            "Since becoming pregnant, do you eat vegetables at least once a week?"
+            "Since becoming pregnant, do you eat vegetables at least once a day?"
         )
         error = self._(
             "Please use numbers from list.\n"
             "\n"
-            "Since becoming pregnant, do you eat vegetables at least once a week?"
+            "Since becoming pregnant, do you eat vegetables at least once a day?"
         )
         choices = [
             Choice("yes", "Yes"),
@@ -355,12 +355,12 @@ class Application(BaseApplication):
         question = self._(
             "7/13 \n"
             "\n"
-            "Since becoming pregnant, do you eat fruit at least once a week?"
+            "Since becoming pregnant, do you eat fruit at least once a day?"
         )
         error = self._(
             "Please use numbers from list.\n"
             "\n"
-            "Since becoming pregnant, do you eat fruit at least once a week?"
+            "Since becoming pregnant, do you eat fruit at least once a day?"
         )
         choices = [
             Choice("yes", "Yes"),
@@ -381,13 +381,13 @@ class Application(BaseApplication):
             "8/13 \n"
             "\n"
             "Since becoming pregnant, do you have milk, maas, hard cheese or yoghurt "
-            "at least once a week?"
+            "at least once a day?"
         )
         error = self._(
             "Please use numbers from list.\n"
             "\n"
             "Since becoming pregnant, do you have milk, maas, hard cheese or yoghurt "
-            "at least once a week?"
+            "at least once a day?"
         )
         choices = [
             Choice("yes", "Yes"),
