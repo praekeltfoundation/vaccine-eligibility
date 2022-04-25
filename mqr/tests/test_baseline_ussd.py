@@ -384,7 +384,7 @@ async def test_state_vegetables():
     assert (
         reply.content == "6/13 \n"
         "\n"
-        "Since becoming pregnant, do you eat vegetables at least once a week?\n"
+        "Since becoming pregnant, do you eat vegetables at least once a day?\n"
         "1. Yes\n"
         "2. No\n"
         "3. Skip"
@@ -409,7 +409,7 @@ async def test_state_fruit():
     assert (
         reply.content == "7/13 \n"
         "\n"
-        "Since becoming pregnant, do you eat fruit at least once a week?\n"
+        "Since becoming pregnant, do you eat fruit at least once a day?\n"
         "1. Yes\n"
         "2. No\n"
         "3. Skip"
@@ -435,7 +435,7 @@ async def test_state_dairy():
         reply.content == "8/13 \n"
         "\n"
         "Since becoming pregnant, do you have milk, maas, hard cheese or yoghurt at "
-        "least once a week?\n"
+        "least once a day?\n"
         "1. Yes\n"
         "2. No\n"
         "3. Skip"
