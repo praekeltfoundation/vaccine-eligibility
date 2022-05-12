@@ -1,9 +1,6 @@
-import json
-
 import pytest
 from sanic import Sanic, response
 
-from vaccine.models import Message, StateData, User
 from vaccine.testing import AppTester
 from yal import config
 from yal.main import Application
