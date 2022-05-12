@@ -23,7 +23,7 @@ def get_turn_api():
             "Content-Type": "application/json",
             "Accept": "application/vnd.v1+json",
             "User-Agent": "yal-whatsapp-bot",
-            "Authorization": f"Bearer {config.TURN_TOKEN}",
+            "Authorization": f"Bearer {config.API_TOKEN}",
         },
     )
 
@@ -40,7 +40,7 @@ class Application(BaseApplication):
             for i in range(3):
                 try:
                     response = await session.get(
-                        urljoin(config.TURN_URL, f"/v1/contacts/{whatsapp_id}/profile")
+                        urljoin(config.API_HOST, f"/v1/contacts/{whatsapp_id}/profile")
                     )
                     response.raise_for_status()
                     response_body = await response.json()

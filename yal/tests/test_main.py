@@ -29,10 +29,10 @@ async def turn_api_mock(sanic_client):
         return response.json({"fields": {"prototype_user": msisdn == 27820001001}})
 
     client = await sanic_client(app)
-    url = config.TURN_URL
-    config.TURN_URL = f"http://{client.host}:{client.port}"
+    url = config.API_HOST
+    config.API_HOST = f"http://{client.host}:{client.port}"
     yield client
-    config.TURN_URL = url
+    config.API_HOST = url
 
 
 @pytest.mark.asyncio
