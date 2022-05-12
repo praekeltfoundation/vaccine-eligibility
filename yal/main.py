@@ -1,11 +1,12 @@
 import logging
 from urllib.parse import urljoin
+
 import aiohttp
 
-from yal import config
 from vaccine.base_application import BaseApplication
 from vaccine.states import EndState
 from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
+from yal import config
 
 logger = logging.getLogger(__name__)
 
