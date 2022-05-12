@@ -29,11 +29,7 @@ async def turn_api_mock(sanic_client):
             if app.errors < app.errormax:
                 app.errors += 1
                 return response.json({}, status=500)
-        return response.json(
-            {
-                "fields": {"prototype_user": msisdn == 27820001001}
-            }
-        )
+        return response.json({"fields": {"prototype_user": msisdn == 27820001001}})
 
     client = await sanic_client(app)
     url = config.TURN_URL
