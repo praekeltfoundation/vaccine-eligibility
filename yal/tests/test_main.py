@@ -29,9 +29,12 @@ async def turn_api_mock(sanic_client, tester):
 
     client = await sanic_client(app)
     turn_profile_url = tester.application.turn_profile_url
+
+    host = f"http://{client.host}:{client.port}"
     tester.application.turn_profile_url = (
-        lambda whatsapp_id: f"http://{client.host}:{client.port}/v1/contacts/{whatsapp_id}/profile"
+        lambda whatsapp_id: f"{host}/v1/contacts/{whatsapp_id}/profile"
     )
+
     yield client
     tester.application.turn_profile_url = turn_profile_url
 
