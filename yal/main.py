@@ -1,5 +1,5 @@
 import logging
-from urllib.parse import urljoin
+from urllib.parse import ParseResult, urlunparse
 
 import aiohttp
 
@@ -31,6 +31,19 @@ def get_turn_api():
 class Application(BaseApplication):
     START_STATE = "state_start"
 
+    @staticmethod
+    def turn_profile_url(whatsapp_id):
+        return urlunparse(
+            ParseResult(
+                scheme="https",
+                netloc=config.API_HOST or "",
+                path=f"/v1/contacts/{whatsapp_id}/profile",
+                params="",
+                query="",
+                fragment="",
+            )
+        )
+
     async def state_start(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
@@ -39,9 +52,7 @@ class Application(BaseApplication):
         async with get_turn_api() as session:
             for i in range(3):
                 try:
-                    response = await session.get(
-                        urljoin(config.API_HOST, f"/v1/contacts/{whatsapp_id}/profile")
-                    )
+                    response = await session.get(self.turn_profile_url(whatsapp_id))
                     response.raise_for_status()
                     response_body = await response.json()
 
