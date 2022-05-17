@@ -29,6 +29,15 @@ class Application(TermsApplication, OnboardingApplication, MainMenuApplication):
             )
         )
 
+    async def process_message(self, message):
+        keyword = utils.clean_inbound(message.content or "")
+        # Restart keywords
+        if keyword in GREETING_KEYWORDS:
+            self.user.session_id = None
+            self.state_name = self.START_STATE
+
+        return await super().process_message(message)
+
     async def state_start(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
