@@ -1,8 +1,8 @@
-from vaccine.base_application import BaseApplication
 from vaccine.states import EndState
+from yal.yal_base_application import YalBaseApplication
 
 
-class Application(BaseApplication):
+class Application(YalBaseApplication):
     START_STATE = "state_age_month"
 
     async def state_age_month(self):

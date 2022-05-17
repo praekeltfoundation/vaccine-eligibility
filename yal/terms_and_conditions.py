@@ -1,9 +1,15 @@
-from vaccine.base_application import BaseApplication
+import logging
+
 from vaccine.states import Choice, EndState, WhatsAppButtonState, WhatsAppListState
-from yal.onboarding import BaseApplication as OnboardingApplication
+from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
+from yal import utils
+from yal.onboarding import Application as OnboardingApplication
+from yal.yal_base_application import YalBaseApplication
+
+logger = logging.getLogger(__name__)
 
 
-class Application(BaseApplication):
+class Application(YalBaseApplication):
     START_STATE = "state_welcome"
 
     async def state_welcome(self):
@@ -40,8 +46,8 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("yes", "Talk to a human"),
-                Choice("no", "No, I'm good"),
+                Choice("yes", "Talk to a human 🧑🏾‍🚀"),
+                Choice("no", "No, I'm good 👍"),
             ],
             error=error,
             next={
@@ -64,7 +70,7 @@ class Application(BaseApplication):
                     "Cool 😎\n"
                     "\n"
                     "If you ever do need urgent, human help — just say the magic "
-                    "word (HELP) and I'll link you to a real person."
+                    "word (*HELP*) and I'll link you to a real person."
                 )
             )
         )
@@ -72,13 +78,13 @@ class Application(BaseApplication):
 
     async def state_get_to_know(self):
         question = self._(
-            "Let's get to know each other better\n"
+            "*Let's get to know each other better*\n"
             "-----\n"
             "\n"
             "Before we get started, do you mind if I ask you a few Qs? It will help "
             "me do a better job at answering yours.\n"
             "\n"
-            "Reply:\n"
+            "*Reply:*\n"
             "1 - OK 👍\n"
             "2 - Why? 🤔"
         )
@@ -97,12 +103,12 @@ class Application(BaseApplication):
 
     async def state_get_to_know_why(self):
         question = self._(
-            "ℹ️ QUESTIONS ABOUT YOU\n"
+            "ℹ️ *QUESTIONS ABOUT YOU*\n"
             "Why do we ask these questions?\n"
             "-----\n"
             "\n"
-            "This info helps the B-Wise team make me a better bot. You never have "
-            "to share anything you don't want to."
+            "This info helps the B-Wise team make me a better bot. *You never have "
+            "to share anything you don't want to.*"
         )
         error = self._("TODO")
 
@@ -124,17 +130,17 @@ class Application(BaseApplication):
 
     async def state_terms(self):
         question = self._(
-            "🔒 TERMS & CONDITIONS\n"
+            "🔒 *TERMS & CONDITIONS*\n"
             "Young Africa Live: Privacy Policy\n"
             "-----\n"
             "\n"
-            "Before we chat, I need to make sure you’re 💯% cool with our Privacy "
-            "Policy.\n"
+            "*Before we chat, I need to make sure you’re 💯% cool with our Privacy "
+            "Policy.*\n"
             "\n"
             "It explains your rights and choices when it comes to how we use and "
             "store your info.\n"
             "\n"
-            "We good to keep going?\n"
+            "*We good to keep going?*\n"
             "\n"
             "1 - READ Privacy Policy\n"
             "2 - I ACCEPT (continue)\n"
@@ -161,11 +167,11 @@ class Application(BaseApplication):
 
     async def state_decline_confirm(self):
         question = self._(
-            "🔒 TERMS & CONDITIONS\n"
+            "🔒 *TERMS & CONDITIONS*\n"
             "Young Africa Live: Privacy Policy\n"
             "-----\n"
             "\n"
-            "⚠️ Sure you wanna bounce?\n"
+            "⚠️ *Sure you wanna bounce?*\n"
             "\n"
             "Unfortunately, I can't share any info with you if you haven't accepted "
             "the Privacy Policy 😔.\n"
@@ -191,7 +197,38 @@ class Application(BaseApplication):
             },
         )
 
+    async def state_decline_1(self):
+        # TODO: Add decline 2 and 3
+        return EndState(
+            self,
+            self._(
+                "No stress—I get it. 😌\n"
+                "\n"
+                "It's wise to think these things over. Your online safety is "
+                "important to us too."
+            ),
+            next=self.START_STATE,
+        )
+
     async def state_submit_terms_and_conditions(self):
-        # TODO: Update turn profile terms_accepted=True
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        async with utils.get_turn_api() as session:
+            for i in range(3):
+                try:
+                    data = {"terms_accepted": True}
+                    response = await session.post(
+                        self.turn_profile_url(whatsapp_id),
+                        json=data,
+                    )
+                    response.raise_for_status()
+                    break
+                except HTTP_EXCEPTIONS as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
 
         return await self.go_to_state(OnboardingApplication.START_STATE)

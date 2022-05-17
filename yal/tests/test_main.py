@@ -3,9 +3,9 @@ from sanic import Sanic, response
 
 from vaccine.testing import AppTester
 from yal.main import Application
-from yal.mainmenu import BaseApplication as MainMenuApplication
-from yal.onboarding import BaseApplication as OnboardingApplication
-from yal.terms_and_conditions import BaseApplication as TermsApplication
+from yal.mainmenu import Application as MainMenuApplication
+from yal.onboarding import Application as OnboardingApplication
+from yal.terms_and_conditions import Application as TermsApplication
 
 
 def test_no_state_name_clashes():
