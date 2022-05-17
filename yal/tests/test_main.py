@@ -59,6 +59,17 @@ async def turn_api_mock(sanic_client, tester):
 
 
 @pytest.mark.asyncio
+async def test_reset_keyword(tester: AppTester, turn_api_mock):
+    tester.setup_state("state_catch_all")
+    await tester.user_input("hi")
+    tester.assert_state("state_start")
+    tester.assert_num_messages(1)
+    tester.assert_message("TODO: Main Menu")
+
+    assert len(turn_api_mock.app.requests) == 1
+
+
+@pytest.mark.asyncio
 async def test_state_start_to_catch_all(tester: AppTester, turn_api_mock):
     await tester.user_input("AAA")
     tester.assert_state("state_start")
