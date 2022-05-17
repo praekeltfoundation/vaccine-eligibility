@@ -23,4 +23,4 @@ def get_turn_api():
 
 
 def clean_inbound(content):
-    return re.sub(r"\W+", " ", content).strip().lower()
+    return re.sub(r"\W+", " ", content or "").strip().lower()

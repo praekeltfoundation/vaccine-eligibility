@@ -1,5 +1,5 @@
-from vaccine.base_application import BaseApplication
 from vaccine.states import EndState
+from yal.yal_base_application import BaseApplication
 
 
 class Application(BaseApplication):

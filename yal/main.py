@@ -1,9 +1,8 @@
 import logging
-from urllib.parse import ParseResult, urlunparse
 
 from vaccine.states import EndState
 from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
-from yal import config, utils
+from yal import utils
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
 from yal.terms_and_conditions import Application as TermsApplication
@@ -16,21 +15,8 @@ GREETING_KEYWORDS = {"hi", "hello"}
 class Application(TermsApplication, OnboardingApplication, MainMenuApplication):
     START_STATE = "state_start"
 
-    @staticmethod
-    def turn_profile_url(whatsapp_id):
-        return urlunparse(
-            ParseResult(
-                scheme="https",
-                netloc=config.API_HOST or "",
-                path=f"/v1/contacts/{whatsapp_id}/profile",
-                params="",
-                query="",
-                fragment="",
-            )
-        )
-
     async def process_message(self, message):
-        keyword = utils.clean_inbound(message.content or "")
+        keyword = utils.clean_inbound(message.content)
         # Restart keywords
         if keyword in GREETING_KEYWORDS:
             self.user.session_id = None
@@ -66,7 +52,7 @@ class Application(TermsApplication, OnboardingApplication, MainMenuApplication):
         if not prototype_user:
             return await self.go_to_state("state_coming_soon")
 
-        inbound = utils.clean_inbound(self.inbound.content or "")
+        inbound = utils.clean_inbound(self.inbound.content)
 
         if inbound in GREETING_KEYWORDS:
             if terms_accepted and onboarding_completed:

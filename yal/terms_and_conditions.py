@@ -1,6 +1,6 @@
-from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, WhatsAppButtonState, WhatsAppListState
 from yal.onboarding import Application as OnboardingApplication
+from yal.yal_base_application import BaseApplication
 
 
 class Application(BaseApplication):
