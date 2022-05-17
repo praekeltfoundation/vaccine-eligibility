@@ -1,8 +1,8 @@
 from vaccine.states import EndState
-from yal.yal_base_application import BaseApplication
+from yal.yal_base_application import YalBaseApplication
 
 
-class Application(BaseApplication):
+class Application(YalBaseApplication):
     START_STATE = "state_mainmenu"
 
     async def state_mainmenu(self):

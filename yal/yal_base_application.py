@@ -4,7 +4,7 @@ from vaccine.base_application import BaseApplication
 from yal import config
 
 
-class BaseApplication(BaseApplication):
+class YalBaseApplication(BaseApplication):
     @staticmethod
     def turn_profile_url(whatsapp_id):
         return urlunparse(

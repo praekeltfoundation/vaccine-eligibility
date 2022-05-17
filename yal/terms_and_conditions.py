@@ -4,12 +4,12 @@ from vaccine.states import Choice, EndState, WhatsAppButtonState, WhatsAppListSt
 from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
 from yal import utils
 from yal.onboarding import Application as OnboardingApplication
-from yal.yal_base_application import BaseApplication
+from yal.yal_base_application import YalBaseApplication
 
 logger = logging.getLogger(__name__)
 
 
-class Application(BaseApplication):
+class Application(YalBaseApplication):
     START_STATE = "state_welcome"
 
     async def state_welcome(self):
