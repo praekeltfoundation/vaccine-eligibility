@@ -3,6 +3,17 @@ from sanic import Sanic, response
 
 from vaccine.testing import AppTester
 from yal.main import Application
+from yal.mainmenu import BaseApplication as MainMenuApplication
+from yal.onboarding import BaseApplication as OnboardingApplication
+from yal.terms_and_conditions import BaseApplication as TermsApplication
+
+
+def test_no_state_name_clashes():
+    mm_states = set(s for s in dir(MainMenuApplication) if s.startswith("state_"))
+    on_states = set(s for s in dir(OnboardingApplication) if s.startswith("state_"))
+    te_states = set(s for s in dir(TermsApplication) if s.startswith("state_"))
+    intersection = (mm_states & on_states & te_states) - {"state_name", "state_error"}
+    assert len(intersection) == 0, f"Common states to both apps: {intersection}"
 
 
 @pytest.fixture
@@ -25,7 +36,15 @@ async def turn_api_mock(sanic_client, tester):
             if app.errors < app.errormax:
                 app.errors += 1
                 return response.json({}, status=500)
-        return response.json({"fields": {"prototype_user": msisdn == 27820001001}})
+        return response.json(
+            {
+                "fields": {
+                    "prototype_user": msisdn == 27820001001,
+                    "onboarding_completed": msisdn == 27820001001,
+                    "terms_accepted": msisdn == 27820001001,
+                }
+            }
+        )
 
     client = await sanic_client(app)
     turn_profile_url = tester.application.turn_profile_url
@@ -50,11 +69,11 @@ async def test_state_start_to_catch_all(tester: AppTester, turn_api_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_start_to_welcome(tester: AppTester, turn_api_mock):
+async def test_state_start_to_mainmenu(tester: AppTester, turn_api_mock):
     await tester.user_input("hi")
     tester.assert_state("state_start")
     tester.assert_num_messages(1)
-    tester.assert_message("TODO: welcome")
+    tester.assert_message("TODO: Main Menu")
 
     assert len(turn_api_mock.app.requests) == 1
 
