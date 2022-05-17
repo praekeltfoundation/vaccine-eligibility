@@ -1,6 +1,12 @@
+import logging
+
 from vaccine.states import Choice, EndState, WhatsAppButtonState, WhatsAppListState
+from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
+from yal import utils
 from yal.onboarding import Application as OnboardingApplication
 from yal.yal_base_application import BaseApplication
+
+logger = logging.getLogger(__name__)
 
 
 class Application(BaseApplication):
@@ -191,7 +197,38 @@ class Application(BaseApplication):
             },
         )
 
+    async def state_decline_1(self):
+        # TODO: Add decline 2 and 3
+        return EndState(
+            self,
+            self._(
+                "No stress—I get it. 😌\n"
+                "\n"
+                "It's wise to think these things over. Your online safety is "
+                "important to us too."
+            ),
+            next=self.START_STATE,
+        )
+
     async def state_submit_terms_and_conditions(self):
-        # TODO: Update turn profile terms_accepted=True
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        async with utils.get_turn_api() as session:
+            for i in range(3):
+                try:
+                    data = {"terms_accepted": True}
+                    response = await session.post(
+                        self.turn_profile_url(whatsapp_id),
+                        json=data,
+                    )
+                    response.raise_for_status()
+                    break
+                except HTTP_EXCEPTIONS as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
 
         return await self.go_to_state(OnboardingApplication.START_STATE)
