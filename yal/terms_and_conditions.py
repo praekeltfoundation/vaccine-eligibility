@@ -40,8 +40,8 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("yes", "Talk to a human 🧑🏾‍🚀"),
-                Choice("no", "No, I'm good 👍"),
+                Choice("yes", "Talk to a human"),
+                Choice("no", "No, I'm good"),
             ],
             error=error,
             next={
