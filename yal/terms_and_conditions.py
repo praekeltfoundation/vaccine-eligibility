@@ -218,7 +218,7 @@ class Application(YalBaseApplication):
             for i in range(3):
                 try:
                     data = {"terms_accepted": True}
-                    response = await session.post(
+                    response = await session.patch(
                         self.turn_profile_url(whatsapp_id),
                         json=data,
                     )

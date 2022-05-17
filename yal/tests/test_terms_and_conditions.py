@@ -20,7 +20,7 @@ async def turn_api_mock(sanic_client, tester):
     app.errors = 0
     app.errormax = 0
 
-    @app.route("/v1/contacts/<msisdn:int>/profile", methods=["POST"])
+    @app.route("/v1/contacts/<msisdn:int>/profile", methods=["PATCH"])
     def callback(request, msisdn):
         app.requests.append(request)
         if app.errormax:
