@@ -46,7 +46,7 @@ class Application(YalBaseApplication):
             self,
             question=question,
             choices=[
-                Choice("yes", "Talk to a human 🧑🏾‍🚀"),
+                Choice("yes", "Talk to a human"),
                 Choice("no", "No, I'm good 👍"),
             ],
             error=error,
