@@ -165,6 +165,13 @@ class Application(YalBaseApplication):
             },
         )
 
+    async def state_read_terms(self):
+        return EndState(
+            self,
+            self._("TODO: add real state read more"),
+            next=self.START_STATE,
+        )
+
     async def state_decline_confirm(self):
         question = self._(
             "🔒 *TERMS & CONDITIONS*\n"
