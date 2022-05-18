@@ -79,7 +79,7 @@ class ChoiceState:
         content = self._normalise_text(content)
 
         if self.allow_skip and content == "skip":
-            return Choice(value=content,label=content)
+            return Choice(value=content, label=content)
 
         for i, choice in enumerate(self.choices):
             if content == str(i + 1):
