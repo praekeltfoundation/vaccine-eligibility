@@ -58,7 +58,7 @@ class ChoiceState:
         error_footer: Optional[str] = None,
         header: Optional[str] = None,
         error_header: Optional[str] = None,
-        allow_skip: Optional[bool] = False,
+        buttons: Optional[List[Choice]] = None,
     ):
         self.app = app
         self.question = question
@@ -70,7 +70,7 @@ class ChoiceState:
         self.error_footer = error_footer
         self.header = header
         self.error_header = error_header
-        self.allow_skip = allow_skip
+        self.buttons = buttons
 
     def _normalise_text(self, text: Optional[str]) -> str:
         return (text or "").strip().lower()
@@ -78,8 +78,10 @@ class ChoiceState:
     def _get_choice(self, content: Optional[str]) -> Optional[Choice]:
         content = self._normalise_text(content)
 
-        if self.allow_skip and content == "skip":
-            return Choice(value=content, label=content)
+        if self.buttons:
+            for button in self.buttons:
+                if content == button.value:
+                    return button
 
         for i, choice in enumerate(self.choices):
             if content == str(i + 1):
@@ -124,8 +126,8 @@ class ChoiceState:
 
     async def display(self, message: Message):
         helper_metadata: Dict[str, Any] = {}
-        if self.allow_skip:
-            helper_metadata["buttons"] = ["skip"]
+        if self.buttons:
+            helper_metadata["buttons"] = [choice.label for choice in self.buttons]
         text = f"{self.question}\n{self._display_choices}"
         if self.footer is not None:
             text = f"{text}\n{self.footer}"
@@ -162,7 +164,7 @@ class MenuState(ChoiceState):
         self.error_footer = error_footer
         self.header = header
         self.error_header = error_header
-        self.allow_skip = False
+        self.buttons = None
 
     async def _next(self, choice: Choice):
         return choice.value
@@ -186,11 +188,13 @@ class FreeText:
             List[Callable[[Optional[str]], Awaitable]],
             None,
         ] = None,
+        buttons: Optional[List[Choice]] = None,
     ):
         self.app = app
         self.question = question
         self.next = next
         self.check = check
+        self.buttons = buttons
 
     async def process_message(self, message: Message):
         if self.check is not None:
@@ -207,6 +211,9 @@ class FreeText:
         return await state.display(message)
 
     async def display(self, message: Message):
+        helper_metadata: Dict[str, Any] = {}
+        if self.buttons:
+            helper_metadata["buttons"] = [choice.label for choice in self.buttons]
         return self.app.send_message(self.question)
 
 

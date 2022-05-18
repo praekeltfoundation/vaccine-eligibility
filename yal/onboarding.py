@@ -1,4 +1,5 @@
 from vaccine.states import Choice, ChoiceState, EndState, FreeText
+from yal.validators import day_validator
 from yal.yal_base_application import YalBaseApplication
 
 
@@ -35,27 +36,58 @@ class Application(YalBaseApplication):
             next="state_dob_day",
             error=self._("TODO"),
             error_footer=self._("\n" "Reply with the number next to the month."),
-            allow_skip=True,
+            buttons=[Choice("skip", self._("Skip"))],
         )
 
     async def state_dob_day(self):
+        question = self._(
+            "\n".join(
+                [
+                    "*GET STARTED*",
+                    "Your date of birth",
+                    "-----",
+                    "",
+                    "*Great. And which day were you born on?*",
+                    "",
+                    "Reply with a number. (e.g. *30* - if you were born on the 30th)",
+                    "",
+                    "If you'd rather not say, just tap *SKIP*.",
+                ]
+            )
+        )
         return FreeText(
             self,
-            question=self._(
-                "*GET STARTED*\n"
-                "Your date of birth\n"
-                "-----\n"
-                "\n"
-                "*Great. And which day were you born on?*\n"
-                "\n"
-                "Reply with a number. (e.g. *30* - if you were born on the 30th)\n"
-                "\n"
-                "If you'd rather not say, just tap *SKIP*.\n"
-            ),
+            question=question,
             next="state_dob_year",
+            check=day_validator(question),
+            buttons=[Choice("skip", self._("Skip"))],
         )
 
     async def state_dob_year(self):
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "GET STARTED",
+                        "Date of birth",
+                        "-----",
+                        "",
+                        "Perfect. And finally, which year?",
+                        "",
+                        "Reply with a number. (e.g. 2007)",
+                        "",
+                        "-----",
+                        "Rather not say?",
+                        "No stress! Just tap SKIP.",
+                    ]
+                )
+            ),
+            next="state_end",
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_end(self):
         return EndState(
             self,
             self._("TODO: Onboarding"),
