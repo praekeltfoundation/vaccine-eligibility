@@ -46,9 +46,8 @@ async def test_submit_terms_and_conditions(tester: AppTester, turn_api_mock):
     tester.setup_state("state_terms")
     await tester.user_input("2")
 
-    tester.assert_state("state_start")
+    tester.assert_state("state_dob_month")
     tester.assert_num_messages(1)
-    tester.assert_message("TODO: Onboarding")
 
     assert len(turn_api_mock.app.requests) == 1
     request = turn_api_mock.app.requests[0]

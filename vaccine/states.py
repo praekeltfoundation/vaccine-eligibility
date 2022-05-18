@@ -58,6 +58,7 @@ class ChoiceState:
         error_footer: Optional[str] = None,
         header: Optional[str] = None,
         error_header: Optional[str] = None,
+        allow_skip: Optional[bool] = False,
     ):
         self.app = app
         self.question = question
@@ -69,12 +70,17 @@ class ChoiceState:
         self.error_footer = error_footer
         self.header = header
         self.error_header = error_header
+        self.allow_skip = allow_skip
 
     def _normalise_text(self, text: Optional[str]) -> str:
         return (text or "").strip().lower()
 
     def _get_choice(self, content: Optional[str]) -> Optional[Choice]:
         content = self._normalise_text(content)
+
+        if self.allow_skip and content == "skip":
+            return Choice(value=content, label=content)
+
         for i, choice in enumerate(self.choices):
             if content == str(i + 1):
                 return choice
@@ -117,12 +123,15 @@ class ChoiceState:
         return self.app.send_message(text)
 
     async def display(self, message: Message):
+        helper_metadata: Dict[str, Any] = {}
+        if self.allow_skip:
+            helper_metadata["buttons"] = ["skip"]
         text = f"{self.question}\n{self._display_choices}"
         if self.footer is not None:
             text = f"{text}\n{self.footer}"
         if self.header is not None:
             text = f"{self.header}\n{text}"
-        return self.app.send_message(text)
+        return self.app.send_message(text, helper_metadata=helper_metadata)
 
 
 class LanguageState(ChoiceState):
@@ -153,6 +162,7 @@ class MenuState(ChoiceState):
         self.error_footer = error_footer
         self.header = header
         self.error_header = error_header
+        self.allow_skip = False
 
     async def _next(self, choice: Choice):
         return choice.value
