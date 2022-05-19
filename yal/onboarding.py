@@ -157,6 +157,7 @@ class Application(YalBaseApplication):
         return WhatsAppListState(
             self,
             question=question,
+            button="Relationship Status",
             choices=[
                 Choice("yes", self._("Yes")),
                 Choice("complicated", self._("It's complicated")),
@@ -236,6 +237,7 @@ class Application(YalBaseApplication):
         return WhatsAppListState(
             self,
             question=question,
+            button="Gender",
             choices=[
                 Choice("girl_woman", "Girl/Woman"),
                 Choice("cisgender", "Cisgender"),

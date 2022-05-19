@@ -108,6 +108,57 @@ async def test_state_dob_day_skip(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_state_dob_year_valid(tester: AppTester):
+    tester.setup_state("state_dob_year")
+
+    tester.setup_answer("state_dob_month", "2")
+    tester.setup_answer("state_dob_day", "22")
+
+    await tester.user_input("2007")
+
+    tester.assert_state("state_relationship_status")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_dob_year", "2007")
+
+
+@pytest.mark.asyncio
+async def test_state_relationship_status_valid(tester: AppTester):
+    tester.setup_state("state_relationship_status")
+
+    await tester.user_input("2")
+
+    tester.assert_state("state_gender")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_relationship_status", "complicated")
+
+
+@pytest.mark.asyncio
+async def test_state_gender_valid(tester: AppTester):
+    tester.setup_state("state_gender")
+
+    await tester.user_input("9")
+
+    tester.assert_state("state_name_gender_confirm")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_gender", "other")
+
+
+@pytest.mark.asyncio
+async def test_state_name_gender_confirm_valid(tester: AppTester):
+    tester.setup_state("state_name_gender_confirm")
+
+    await tester.user_input("1")
+
+    tester.assert_state("state_name_gender")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_name_gender_confirm", "yes")
+
+
+@pytest.mark.asyncio
 async def test_submit_onboarding(tester: AppTester, turn_api_mock):
     tester.setup_state("state_name_gender")
 
