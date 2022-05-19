@@ -42,6 +42,42 @@ async def turn_api_mock(sanic_client, tester):
 
 
 @pytest.mark.asyncio
+async def test_state_welcome_valid(tester: AppTester):
+    tester.setup_state("state_welcome")
+    await tester.user_input("2")
+
+    tester.assert_state("state_get_to_know")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+async def test_state_get_to_know_valid(tester: AppTester):
+    tester.setup_state("state_get_to_know")
+    await tester.user_input("2")
+
+    tester.assert_state("state_get_to_know_why")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+async def test_state_get_to_know_why_valid(tester: AppTester):
+    tester.setup_state("state_get_to_know_why")
+    await tester.user_input("OK 👍")
+
+    tester.assert_state("state_terms")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+async def test_state_terms_valid(tester: AppTester):
+    tester.setup_state("state_terms")
+    await tester.user_input("1")
+
+    tester.assert_state("state_start")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
 async def test_submit_terms_and_conditions(tester: AppTester, turn_api_mock):
     tester.setup_state("state_terms")
     await tester.user_input("2")
