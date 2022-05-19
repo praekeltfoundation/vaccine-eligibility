@@ -1,3 +1,4 @@
+import logging
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
@@ -10,12 +11,14 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
-from vaccine.utils import get_today
+from vaccine.utils import HTTP_EXCEPTIONS, get_today, normalise_phonenumber
 from vaccine.validators import nonempty_validator
+from yal import utils
 from yal.mainmenu import Application as MainMenuApplication
-from yal.utils import get_bot_age
 from yal.validators import day_validator
 from yal.yal_base_application import YalBaseApplication
+
+logger = logging.getLogger(__name__)
 
 
 class Application(YalBaseApplication):
@@ -98,7 +101,7 @@ class Application(YalBaseApplication):
                     ]
                 )
             ),
-            next="state_end",
+            next="state_check_birthday",
             buttons=[Choice("skip", self._("Skip"))],
         )
 
@@ -155,9 +158,9 @@ class Application(YalBaseApplication):
             self,
             question=question,
             choices=[
-                Choice("1", self._("Yes")),
-                Choice("2", self._("It's complicated")),
-                Choice("3", self._("No")),
+                Choice("yes", self._("Yes")),
+                Choice("complicated", self._("It's complicated")),
+                Choice("no", self._("No")),
                 Choice("skip", self._("Skip")),
             ],
             next="state_relationship_status_confirm",
@@ -178,7 +181,7 @@ class Application(YalBaseApplication):
                             "◻️ Gender",
                             "-----",
                             "",
-                            f"As for me, it's been {get_bot_age()} days and I'm "
+                            f"As for me, it's been {utils.get_bot_age()} days and I'm "
                             "still waiting to meet that special some-bot 🤖.",
                             "Not that I'm counting...",
                         ]
@@ -193,6 +196,11 @@ class Application(YalBaseApplication):
         return await self.go_to_state("state_gender")
 
     async def state_gender(self):
+        async def next_(choice: Choice):
+            if choice.value == "other":
+                return "state_name_gender_confirm"
+            return "state_submit_onboarding"
+
         question = self._(
             "\n".join(
                 [
@@ -229,18 +237,18 @@ class Application(YalBaseApplication):
             self,
             question=question,
             choices=[
-                Choice("1", "Girl/Woman"),
-                Choice("2", "Cisgender"),
-                Choice("3", "Boy?Man"),
-                Choice("4", "Genderfluid"),
-                Choice("5", "Intersex"),
-                Choice("6", "Non-binary"),
-                Choice("7", "Questioning"),
-                Choice("8", "Transgender"),
-                Choice("9", "Something else"),
-                Choice("10", "Skip"),
+                Choice("girl_woman", "Girl/Woman"),
+                Choice("cisgender", "Cisgender"),
+                Choice("boy_man", "Boy/Man"),
+                Choice("genderfluid", "Genderfluid"),
+                Choice("intersex", "Intersex"),
+                Choice("non_binary", "Non-binary"),
+                Choice("questioning", "Questioning"),
+                Choice("transgender", "Transgender"),
+                Choice("other", "Something else"),
+                Choice("skip", "Skip"),
             ],
-            next="TODO func?",
+            next=next_,
             error=self._("TODO"),
         )
 
@@ -274,7 +282,7 @@ class Application(YalBaseApplication):
             },
         )
 
-    def state_name_gender(self):
+    async def state_name_gender(self):
         question = self._(
             "\n".join(
                 [
@@ -296,7 +304,35 @@ class Application(YalBaseApplication):
         )
 
     async def state_submit_onboarding(self):
-        # TODO: save fields on turn contact profile
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        data = {
+            "onboarding_completed": True,
+            "dob_month": self.user.answers.get("state_dob_month"),
+            "dob_day": self.user.answers.get("state_dob_day"),
+            "dob_year": self.user.answers.get("state_dob_year"),
+            "relationship_status": self.user.answers.get("state_relationship_status"),
+            "gender": self.user.answers.get("state_gender"),
+            "gender_other": self.user.answers.get("state_name_gender"),
+        }
+
+        async with utils.get_turn_api() as session:
+            for i in range(3):
+                try:
+                    response = await session.patch(
+                        self.turn_profile_url(whatsapp_id),
+                        json=data,
+                    )
+                    response.raise_for_status()
+                    break
+                except HTTP_EXCEPTIONS as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
+
         return await self.go_to_state("state_onboarding_complete")
 
     async def state_onboarding_complete(self):
