@@ -214,7 +214,7 @@ class FreeText:
         helper_metadata: Dict[str, Any] = {}
         if self.buttons:
             helper_metadata["buttons"] = [choice.label for choice in self.buttons]
-        return self.app.send_message(self.question)
+        return self.app.send_message(self.question, helper_metadata=helper_metadata)
 
 
 class WhatsAppButtonState(ChoiceState):

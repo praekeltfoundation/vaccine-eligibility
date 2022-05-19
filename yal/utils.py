@@ -1,8 +1,15 @@
 import re
+from datetime import datetime, timedelta, timezone
 
 import aiohttp
 
 from yal import config
+
+TZ_SAST = timezone(timedelta(hours=2), "SAST")
+
+
+def get_today():
+    return datetime.now(tz=TZ_SAST).date()
 
 
 def get_turn_api():
@@ -24,3 +31,8 @@ def get_turn_api():
 
 def clean_inbound(content):
     return re.sub(r"\W+", " ", content or "").strip().lower()
+
+
+def get_bot_age():
+    bot_dob = datetime.strptime(config.YAL_BOT_LAUNCH_DATE, "%Y-%m-%d").date()
+    return (get_today() - bot_dob).days
