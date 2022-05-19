@@ -9,7 +9,7 @@ from yal.terms_and_conditions import Application as TermsApplication
 
 logger = logging.getLogger(__name__)
 
-GREETING_KEYWORDS = {"hi", "hello"}
+GREETING_KEYWORDS = {"hi", "hello", "menu"}
 
 
 class Application(TermsApplication, OnboardingApplication, MainMenuApplication):
