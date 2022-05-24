@@ -121,7 +121,7 @@ class Application(YalBaseApplication):
                 msg = self._(
                     "\n".join(
                         [
-                            f"*Yoh! {age_msg}HAPPY BIRTHDAY! *🎂 🎉 ",
+                            f"*Yoh! {age_msg}HAPPY BIRTHDAY!* 🎂 🎉 ",
                             "",
                             "Hope you're having a great one so far! Remember—age is "
                             "just a number. Here's to always having  wisdom that goes"
