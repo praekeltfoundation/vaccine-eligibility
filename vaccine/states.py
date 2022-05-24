@@ -254,3 +254,31 @@ class WhatsAppListState(ChoiceState):
                 ],
             },
         )
+
+class SectionedChoiceState(ChoiceState):
+    def __init__(self, *args, sections: dict, separator: Optional[str] = "", **kwargs):
+        choices = []
+        for section_choices in sections.values():
+            choices.extend(section_choices)
+
+        kwargs["choices"] = choices
+
+        super().__init__(*args, **kwargs)
+        self.sections = sections
+        self.separator = separator
+
+    @property
+    def _display_choices(self) -> str:
+        lines = []
+
+        i = 1
+        for section, choices in self.sections.items():
+            lines.append(f"*{section}*")
+
+            for choice in choices:
+                lines.append(f"{i}. {choice.label}")
+                i += 1
+
+            lines.append(self.separator or "")
+
+        return "\n".join(lines)

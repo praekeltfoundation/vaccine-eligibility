@@ -1,6 +1,7 @@
 import pytest
 from sanic import Sanic, response
 
+from vaccine.models import Message
 from vaccine.testing import AppTester
 from yal import config
 from yal.main import Application
@@ -115,6 +116,40 @@ async def contentrepo_api_mock(sanic_client):
     config.CONTENTREPO_API_URL = f"http://{client.host}:{client.port}"
     yield client
     config.CONTENTREPO_API_URL = url
+
+
+@pytest.mark.asyncio
+async def test_state_mainmenu_start(tester: AppTester, contentrepo_api_mock):
+    tester.setup_state("state_mainmenu")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+    tester.assert_num_messages(1)
+    tester.assert_message(
+        "\n".join(
+            [
+                "🏡 *MAIN MENU*",
+                "How can I help you today?",
+                "-----",
+                "Send me the number of the topic you're interested in.",
+                "",
+                "*NEED HELP OR ADVICE?*",
+                "1. 📞 Please call me!",
+                "-----",
+                "*Content Repo*",
+                "2. Main Menu 1 💊",
+                "3. Main Menu 2 🤝",
+                "-----",
+                "*WHAT's EVERYONE ELSE ASKING?*",
+                "4. 🤔 FAQs",
+                "-----",
+                "*CHAT SETTINGS*",
+                "5. ⚙️ Change/Update Your Personal Info",
+                "-----",
+                "💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
+            ]
+        )
+    )
+
+    assert [r.path for r in contentrepo_api_mock.app.requests] == ["/api/v2/pages"]
 
 
 @pytest.mark.asyncio
