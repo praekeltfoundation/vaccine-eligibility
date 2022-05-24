@@ -90,7 +90,7 @@ async def test_reset_keyword(tester: AppTester, turn_api_mock, contentrepo_api_m
     tester.assert_num_messages(1)
 
     assert len(turn_api_mock.app.requests) == 1
-    assert len(contentrepo_api_mock.app.requests) == 1
+    assert len(contentrepo_api_mock.app.requests) == 2
 
 
 @pytest.mark.asyncio
@@ -121,7 +121,7 @@ async def test_state_start_to_mainmenu(
     tester.assert_num_messages(1)
 
     assert len(turn_api_mock.app.requests) == 1
-    assert len(contentrepo_api_mock.app.requests) == 1
+    assert len(contentrepo_api_mock.app.requests) == 2
 
 
 @pytest.mark.asyncio
