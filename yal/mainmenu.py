@@ -83,11 +83,10 @@ class Application(YalBaseApplication):
 
     async def state_detail(self):
         return EndState(
-                self,
-                self.user.answers["question"],
-                next=self.START_STATE,
-            )
-
+            self,
+            self.user.answers["question"],
+            next=self.START_STATE,
+        )
 
     async def state_please_call_me(self):
         return EndState(

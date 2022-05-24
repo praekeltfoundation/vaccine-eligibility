@@ -2,8 +2,8 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.testing import AppTester
-from yal.main import Application
 from yal import config
+from yal.main import Application
 
 
 @pytest.fixture
@@ -176,5 +176,5 @@ async def test_state_mainmenu_contentrepo_children(
         "/api/v2/pages/222",
         "/api/v2/pages",
         "/api/v2/pages",
-        "/api/v2/pages/333"
+        "/api/v2/pages/333",
     ]
