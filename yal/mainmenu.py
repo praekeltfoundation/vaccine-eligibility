@@ -1,6 +1,6 @@
 import logging
 
-from vaccine.states import Choice, ChoiceState, EndState
+from vaccine.states import Choice, ChoiceState, EndState, SectionedChoiceState
 from yal import contentrepo
 from yal.yal_base_application import YalBaseApplication
 
@@ -18,20 +18,47 @@ class Application(YalBaseApplication):
                 self.save_answer("selected_page_id", choice.value)
                 return "state_contentrepo_page"
 
-        before_choices = [
-            Choice("state_please_call_me", "📞 Please call me!"),
+        sections = [
+            (
+                "*NEED HELP OR ADVICE?*",
+                [
+                    Choice("state_please_call_me", "📞 Please call me!"),
+                ],
+            )
         ]
         error, contentrepo_choices = await contentrepo.get_choices_by_tag("mainmenu")
         if error:
             return await self.go_to_state("state_error")
 
-        after_choices = [
-            Choice("state_change_info", "⚙️ Change/Update Your Personal Info"),
-        ]
+        sections.append(("*Content Repo*", contentrepo_choices))
+        sections.append(
+            ("*WHAT's EVERYONE ELSE ASKING?*", [Choice("state_faqs", "🤔 FAQs")])
+        )
+        sections.append(
+            (
+                "*CHAT SETTINGS*",
+                [
+                    Choice("state_change_info", "⚙️ Change/Update Your Personal Info"),
+                ],
+            )
+        )
 
-        return ChoiceState(
+        question = self._(
+            "\n".join(
+                [
+                    "🏡 *MAIN MENU*",
+                    "How can I help you today?",
+                    "-----",
+                    "Send me the number of the topic you're interested in.",
+                    "",
+                ]
+            )
+        )
+
+        return SectionedChoiceState(
             self,
-            question=self._("*Main Menu*\n" "\n" "Welcome"),
+            question=question,
+            footer="💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
             error=self._(
                 "⚠️ This service works best when you use the numbered options "
                 "available\n"
@@ -41,8 +68,9 @@ class Application(YalBaseApplication):
                 "-----\n"
                 "Or reply 📌 *0* to end this session and return to the main *MENU*"
             ),
-            choices=[*before_choices, *contentrepo_choices, *after_choices],
             next=next_,
+            sections=sections,
+            separator="-----",
         )
 
     async def state_contentrepo_page(self):
