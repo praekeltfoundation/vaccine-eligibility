@@ -133,9 +133,20 @@ async def test_state_mainmenu_contentrepo(tester: AppTester, contentrepo_api_moc
     tester.setup_state("state_mainmenu")
     await tester.user_input("2")
 
-    title = "Main Menu 1 💊"
-    body = "Message test content 1"
-    question = f"{title}\n\n{body}"
+    question = "\n".join(
+        [
+            "*Main Menu 1 💊*",
+            "-----",
+            "",
+            "Message test content 1",
+            "",
+            "-----",
+            "Or reply:",
+            "",
+            "0. 🏠 Back to Main MENU",
+            "# 🆘 Get HELP",
+        ]
+    )
 
     tester.assert_num_messages(1)
     tester.assert_message(question)
@@ -153,20 +164,43 @@ async def test_state_mainmenu_contentrepo_children(
     tester.setup_state("state_mainmenu")
     await tester.user_input("3")
 
-    title = "Main Menu 2 🤝"
-    body = "Message test content 2"
-    sub1 = "1. Sub menu 1"
-    sub2 = "2. Sub menu 2"
-    question = f"{title}\n\n{body}\n{sub1}\n{sub2}"
+    question = "\n".join(
+        [
+            "*Main Menu 2 🤝*",
+            "-----",
+            "",
+            "Message test content 2",
+            "",
+            "1. Sub menu 1",
+            "2. Sub menu 2",
+            "",
+            "-----",
+            "Or reply:",
+            "",
+            "0. 🏠 Back to Main MENU",
+            "# 🆘 Get HELP",
+        ]
+    )
 
     tester.assert_num_messages(1)
     tester.assert_message(question)
 
     await tester.user_input("1")
 
-    title = "Sub menu 1"
-    body = "Sub menu test content 2"
-    question = f"{title}\n\n{body}"
+    question = "\n".join(
+        [
+            "*Sub menu 1*",
+            "-----",
+            "",
+            "Sub menu test content 2",
+            "",
+            "-----",
+            "Or reply:",
+            "",
+            "0. 🏠 Back to Main MENU",
+            "# 🆘 Get HELP",
+        ]
+    )
 
     tester.assert_num_messages(1)
     tester.assert_message(question)

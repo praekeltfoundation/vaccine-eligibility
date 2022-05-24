@@ -51,9 +51,8 @@ class Application(YalBaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
-        title = page_details["title"]
-        body = page_details["body"]
-        self.save_answer("question", self._(f"{title}\n\n{body}"))
+        self.save_answer("title", page_details["title"])
+        self.save_answer("body", page_details["body"])
 
         if page_details["has_children"]:
             return await self.go_to_state("state_submenu")
@@ -70,21 +69,56 @@ class Application(YalBaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
+        title = self.user.answers["title"]
+        body = self.user.answers["body"]
+        question = self._("\n".join([f"*{title}*", "-----", "", body, ""]))
+
         return ChoiceState(
             self,
-            question=self.user.answers["question"],
+            question=question,
             error=self._(
                 "⚠️ This service works best when you use the numbered options "
                 "available\n"
             ),
             choices=choices,
             next=next_,
+            footer=self._(
+                "\n".join(
+                    [
+                        "",
+                        "-----",
+                        "Or reply:",
+                        "",
+                        "0. 🏠 Back to Main MENU",
+                        "# 🆘 Get HELP",
+                    ]
+                )
+            ),
         )
 
     async def state_detail(self):
+        title = self.user.answers["title"]
+        body = self.user.answers["body"]
+        question = self._(
+            "\n".join(
+                [
+                    f"*{title}*",
+                    "-----",
+                    "",
+                    body,
+                    "",
+                    "-----",
+                    "Or reply:",
+                    "",
+                    "0. 🏠 Back to Main MENU",
+                    "# 🆘 Get HELP",
+                ]
+            )
+        )
+
         return EndState(
             self,
-            self.user.answers["question"],
+            question,
             next=self.START_STATE,
         )
 
