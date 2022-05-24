@@ -58,7 +58,7 @@ async def contentrepo_api_mock(sanic_client):
             pages.append({"id": 222, "title": "Main Menu 2 🤝"})
 
         child_of = request.args.get("child_of")
-        if child_of == "222":
+        if child_of in ["111", "222", "333", "444"]:
             pages.append({"id": 333, "title": "Sub menu 1"})
             pages.append({"id": 444, "title": "Sub menu 2"})
 
@@ -107,6 +107,20 @@ async def contentrepo_api_mock(sanic_client):
                 "subtitle",
                 "Sub menu test content 2",
                 ["test"],
+                True,
+            )
+        )
+
+    @app.route("/api/v2/pages/444", methods=["GET"])
+    def get_page_detail_444(request):
+        app.requests.append(request)
+        return response.json(
+            build_message_detail(
+                444,
+                "Sub menu 2",
+                "subtitle",
+                "Sub menu test content 2",
+                ["test"],
                 False,
             )
         )
@@ -134,22 +148,30 @@ async def test_state_mainmenu_start(tester: AppTester, contentrepo_api_mock):
                 "*NEED HELP OR ADVICE?*",
                 "1. 📞 Please call me!",
                 "-----",
-                "*Content Repo*",
-                "2. Main Menu 1 💊",
-                "3. Main Menu 2 🤝",
+                "*Main Menu 1 💊*",
+                "2. Sub menu 1",
+                "3. Sub menu 2",
+                "-----",
+                "*Main Menu 2 🤝*",
+                "4. Sub menu 1",
+                "5. Sub menu 2",
                 "-----",
                 "*WHAT's EVERYONE ELSE ASKING?*",
-                "4. 🤔 FAQs",
+                "6. 🤔 FAQs",
                 "-----",
                 "*CHAT SETTINGS*",
-                "5. ⚙️ Change/Update Your Personal Info",
+                "7. ⚙️ Change/Update Your Personal Info",
                 "-----",
                 "💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
             ]
         )
     )
 
-    assert [r.path for r in contentrepo_api_mock.app.requests] == ["/api/v2/pages"]
+    assert [r.path for r in contentrepo_api_mock.app.requests] == [
+        "/api/v2/pages",
+        "/api/v2/pages",
+        "/api/v2/pages",
+    ]
 
 
 @pytest.mark.asyncio
@@ -160,20 +182,24 @@ async def test_state_mainmenu_static(tester: AppTester, contentrepo_api_mock):
     tester.assert_num_messages(1)
     tester.assert_message("TODO: Please Call Me")
 
-    assert [r.path for r in contentrepo_api_mock.app.requests] == ["/api/v2/pages"]
+    assert [r.path for r in contentrepo_api_mock.app.requests] == [
+        "/api/v2/pages",
+        "/api/v2/pages",
+        "/api/v2/pages",
+    ]
 
 
 @pytest.mark.asyncio
 async def test_state_mainmenu_contentrepo(tester: AppTester, contentrepo_api_mock):
     tester.setup_state("state_mainmenu")
-    await tester.user_input("2")
+    await tester.user_input("3")
 
     question = "\n".join(
         [
-            "*Main Menu 1 💊*",
+            "*Sub menu 2*",
             "-----",
             "",
-            "Message test content 1",
+            "Sub menu test content 2",
             "",
             "-----",
             "Or reply:",
@@ -186,9 +212,12 @@ async def test_state_mainmenu_contentrepo(tester: AppTester, contentrepo_api_moc
     tester.assert_num_messages(1)
     tester.assert_message(question)
 
+    print([r.path for r in contentrepo_api_mock.app.requests])
     assert [r.path for r in contentrepo_api_mock.app.requests] == [
         "/api/v2/pages",
-        "/api/v2/pages/111",
+        "/api/v2/pages",
+        "/api/v2/pages",
+        "/api/v2/pages/444",
     ]
 
 
@@ -197,14 +226,14 @@ async def test_state_mainmenu_contentrepo_children(
     tester: AppTester, contentrepo_api_mock
 ):
     tester.setup_state("state_mainmenu")
-    await tester.user_input("3")
+    await tester.user_input("2")
 
     question = "\n".join(
         [
-            "*Main Menu 2 🤝*",
+            "*Sub menu 1*",
             "-----",
             "",
-            "Message test content 2",
+            "Sub menu test content 2",
             "",
             "1. Sub menu 1",
             "2. Sub menu 2",
@@ -220,11 +249,11 @@ async def test_state_mainmenu_contentrepo_children(
     tester.assert_num_messages(1)
     tester.assert_message(question)
 
-    await tester.user_input("1")
+    await tester.user_input("2")
 
     question = "\n".join(
         [
-            "*Sub menu 1*",
+            "*Sub menu 2*",
             "-----",
             "",
             "Sub menu test content 2",
@@ -242,8 +271,10 @@ async def test_state_mainmenu_contentrepo_children(
 
     assert [r.path for r in contentrepo_api_mock.app.requests] == [
         "/api/v2/pages",
-        "/api/v2/pages/222",
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages/333",
+        "/api/v2/pages",
+        "/api/v2/pages",
+        "/api/v2/pages/444",
     ]

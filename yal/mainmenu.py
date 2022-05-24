@@ -26,11 +26,18 @@ class Application(YalBaseApplication):
                 ],
             )
         ]
-        error, contentrepo_choices = await contentrepo.get_choices_by_tag("mainmenu")
+
+        error, choices = await contentrepo.get_choices_by_tag("mainmenu")
         if error:
             return await self.go_to_state("state_error")
 
-        sections.append(("*Content Repo*", contentrepo_choices))
+        for choice in choices:
+            error, sub_choices = await contentrepo.get_choices_by_parent(choice.value)
+            if error:
+                return await self.go_to_state("state_error")
+
+            sections.append((f"*{choice.label}*", sub_choices))
+
         sections.append(
             ("*WHAT's EVERYONE ELSE ASKING?*", [Choice("state_faqs", "🤔 FAQs")])
         )
