@@ -275,7 +275,7 @@ class SectionedChoiceState(ChoiceState):
         separator: Optional[str] = None,
         **kwargs,
     ):
-        choices = []
+        choices: List[Choice] = []
         for section_choices in sections:
             choices.extend(section_choices[1])
 
