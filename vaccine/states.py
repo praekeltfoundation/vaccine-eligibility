@@ -255,6 +255,7 @@ class WhatsAppListState(ChoiceState):
             },
         )
 
+
 class SectionedChoiceState(ChoiceState):
     def __init__(self, *args, sections: dict, separator: Optional[str] = "", **kwargs):
         choices = []
