@@ -2,6 +2,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.testing import AppTester
+from yal import config
 from yal.main import Application
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
@@ -58,15 +59,38 @@ async def turn_api_mock(sanic_client, tester):
     tester.application.turn_profile_url = turn_profile_url
 
 
+@pytest.fixture
+async def contentrepo_api_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("contentrepo_api_mock")
+    app.requests = []
+
+    @app.route("/api/v2/pages", methods=["GET"])
+    def get_main_menu(request):
+        app.requests.append(request)
+        return response.json(
+            {
+                "count": 1,
+                "results": [{"id": 111, "title": "Main Menu 1 💊"}],
+            }
+        )
+
+    client = await sanic_client(app)
+    url = config.CONTENTREPO_API_URL
+    config.CONTENTREPO_API_URL = f"http://{client.host}:{client.port}"
+    yield client
+    config.CONTENTREPO_API_URL = url
+
+
 @pytest.mark.asyncio
-async def test_reset_keyword(tester: AppTester, turn_api_mock):
+async def test_reset_keyword(tester: AppTester, turn_api_mock, contentrepo_api_mock):
     tester.setup_state("state_catch_all")
     await tester.user_input("hi")
-    tester.assert_state("state_start")
+    tester.assert_state("state_mainmenu")
     tester.assert_num_messages(1)
-    tester.assert_message("TODO: Main Menu")
 
     assert len(turn_api_mock.app.requests) == 1
+    assert len(contentrepo_api_mock.app.requests) == 1
 
 
 @pytest.mark.asyncio
@@ -80,13 +104,15 @@ async def test_state_start_to_catch_all(tester: AppTester, turn_api_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_start_to_mainmenu(tester: AppTester, turn_api_mock):
+async def test_state_start_to_mainmenu(
+    tester: AppTester, turn_api_mock, contentrepo_api_mock
+):
     await tester.user_input("hi")
-    tester.assert_state("state_start")
+    tester.assert_state("state_mainmenu")
     tester.assert_num_messages(1)
-    tester.assert_message("TODO: Main Menu")
 
     assert len(turn_api_mock.app.requests) == 1
+    assert len(contentrepo_api_mock.app.requests) == 1
 
 
 @pytest.mark.asyncio
