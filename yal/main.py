@@ -10,6 +10,7 @@ from yal.terms_and_conditions import Application as TermsApplication
 logger = logging.getLogger(__name__)
 
 GREETING_KEYWORDS = {"hi", "hello", "menu", "0"}
+HELP_KEYWORDS = {"#", "help"}
 
 
 class Application(TermsApplication, OnboardingApplication, MainMenuApplication):
@@ -21,6 +22,10 @@ class Application(TermsApplication, OnboardingApplication, MainMenuApplication):
         if keyword in GREETING_KEYWORDS:
             self.user.session_id = None
             self.state_name = self.START_STATE
+
+        if keyword in HELP_KEYWORDS:
+            self.user.session_id = None
+            self.state_name = "state_please_call_me"
 
         return await super().process_message(message)
 
@@ -68,6 +73,13 @@ class Application(TermsApplication, OnboardingApplication, MainMenuApplication):
         return EndState(
             self,
             self._("TODO: coming soon"),
+            next=self.START_STATE,
+        )
+
+    async def state_please_call_me(self):
+        return EndState(
+            self,
+            self._("TODO: Please Call Me"),
             next=self.START_STATE,
         )
 

@@ -94,6 +94,15 @@ async def test_reset_keyword(tester: AppTester, turn_api_mock, contentrepo_api_m
 
 
 @pytest.mark.asyncio
+async def test_help_keyword(tester: AppTester):
+    tester.setup_state("state_catch_all")
+    await tester.user_input("help")
+    tester.assert_state("state_start")
+    tester.assert_num_messages(1)
+    tester.assert_message("TODO: Please Call Me")
+
+
+@pytest.mark.asyncio
 async def test_state_start_to_catch_all(tester: AppTester, turn_api_mock):
     await tester.user_input("AAA")
     tester.assert_state("state_start")
