@@ -1,6 +1,17 @@
 from dataclasses import dataclass, field
 from inspect import iscoroutinefunction, isfunction
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Optional, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 from vaccine.models import Message
 from vaccine.utils import get_display_choices
@@ -257,10 +268,16 @@ class WhatsAppListState(ChoiceState):
 
 
 class SectionedChoiceState(ChoiceState):
-    def __init__(self, *args, sections: dict, separator: Optional[str] = "", **kwargs):
+    def __init__(
+        self,
+        *args,
+        sections: Sequence[Tuple[str, Sequence[Choice]]],
+        separator: Optional[str] = None,
+        **kwargs,
+    ):
         choices = []
-        for section_choices in sections.values():
-            choices.extend(section_choices)
+        for section_choices in sections:
+            choices.extend(section_choices[1])
 
         kwargs["choices"] = choices
 
@@ -273,13 +290,14 @@ class SectionedChoiceState(ChoiceState):
         lines = []
 
         i = 1
-        for section, choices in self.sections.items():
-            lines.append(f"*{section}*")
+        for section in self.sections:
+            lines.append(f"{section[0]}")
 
-            for choice in choices:
+            for choice in section[1]:
                 lines.append(f"{i}. {choice.label}")
                 i += 1
 
-            lines.append(self.separator or "")
+            if self.separator is not None:
+                lines.append(self.separator)
 
         return "\n".join(lines)

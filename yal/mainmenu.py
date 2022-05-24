@@ -18,21 +18,30 @@ class Application(YalBaseApplication):
                 self.save_answer("selected_page_id", choice.value)
                 return "state_contentrepo_page"
 
-        sections = {
-            "NEED HELP OR ADVICE?": [
-                Choice("state_please_call_me", "📞 Please call me!"),
-            ]
-        }
+        sections = [
+            (
+                "*NEED HELP OR ADVICE?*",
+                [
+                    Choice("state_please_call_me", "📞 Please call me!"),
+                ],
+            )
+        ]
         error, contentrepo_choices = await contentrepo.get_choices_by_tag("mainmenu")
         if error:
             return await self.go_to_state("state_error")
 
-        sections["Content Repo"] = contentrepo_choices
-
-        sections["WHAT's EVERYONE ELSE ASKING?"] = [Choice("state_faqs", "🤔 FAQs")]
-        sections["CHAT SETTINGS"] = [
-            Choice("state_change_info", "⚙️ Change/Update Your Personal Info"),
-        ]
+        sections.append(("*Content Repo*", contentrepo_choices))
+        sections.append(
+            ("*WHAT's EVERYONE ELSE ASKING?*", [Choice("state_faqs", "🤔 FAQs")])
+        )
+        sections.append(
+            (
+                "*CHAT SETTINGS*",
+                [
+                    Choice("state_change_info", "⚙️ Change/Update Your Personal Info"),
+                ],
+            )
+        )
 
         question = self._(
             "\n".join(
