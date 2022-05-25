@@ -47,7 +47,7 @@ async def test_state_welcome_valid(tester: AppTester):
     await tester.user_input("2")
 
     tester.assert_state("state_get_to_know")
-    tester.assert_num_messages(1)
+    tester.assert_num_messages(3)
 
 
 @pytest.mark.asyncio
@@ -65,7 +65,7 @@ async def test_state_get_to_know_why_valid(tester: AppTester):
     await tester.user_input("OK 👍")
 
     tester.assert_state("state_terms")
-    tester.assert_num_messages(1)
+    tester.assert_num_messages(2)
 
 
 @pytest.mark.asyncio

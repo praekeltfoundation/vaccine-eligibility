@@ -129,7 +129,7 @@ class Application(YalBaseApplication):
                         ]
                     )
                 )
-                await self.worker.publish_message(self.inbound.reply(msg))
+                self.messages.append(self.inbound.reply(msg))
 
         return await self.go_to_state("state_confirm_age")
 
@@ -169,7 +169,7 @@ class Application(YalBaseApplication):
         )
 
     async def state_relationship_status_confirm(self):
-        await self.worker.publish_message(
+        self.messages.append(
             self.inbound.reply(
                 self._(
                     "\n".join(

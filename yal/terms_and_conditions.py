@@ -13,7 +13,7 @@ class Application(YalBaseApplication):
     START_STATE = "state_welcome"
 
     async def state_welcome(self):
-        await self.worker.publish_message(
+        self.messages.append(
             self.inbound.reply(
                 self._(
                     "🙋🏾‍♀️  *HOWZIT! Welcome to B-Wise by Young Africa Live!*\n"
@@ -64,7 +64,7 @@ class Application(YalBaseApplication):
         )
 
     async def state_emergency_info(self):
-        await self.worker.publish_message(
+        self.messages.append(
             self.inbound.reply(
                 self._(
                     "Cool 😎\n"
@@ -123,7 +123,7 @@ class Application(YalBaseApplication):
         )
 
     async def state_pre_terms(self):
-        await self.worker.publish_message(
+        self.messages.append(
             self.inbound.reply(self._("Awesome, thanks 😌  — So, first things first..."))
         )
         return await self.go_to_state("state_terms")
