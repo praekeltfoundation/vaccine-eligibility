@@ -20,9 +20,10 @@ class Application(YalBaseApplication):
 
         sections = [
             (
-                "*NEED HELP OR ADVICE?*",
+                "*📞 NEED HELP OR ADVICE?*",
                 [
-                    Choice("state_please_call_me", "📞 Please call me!"),
+                    Choice("state_please_call_me", "Please call me!"),
+                    Choice("state_clinic_finder", "Find clinics and services"),
                 ],
             )
         ]
@@ -168,5 +169,12 @@ class Application(YalBaseApplication):
         return EndState(
             self,
             self._("TODO: Change info/preferences"),
+            next=self.START_STATE,
+        )
+
+    async def state_clinic_finder(self):
+        return EndState(
+            self,
+            self._("TODO: Clinic finder"),
             next=self.START_STATE,
         )

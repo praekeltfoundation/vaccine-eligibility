@@ -290,10 +290,10 @@ class SectionedChoiceState(ChoiceState):
         lines = []
 
         i = 1
-        for section in self.sections:
-            lines.append(f"{section[0]}")
+        for section_name, section_choices in self.sections:
+            lines.append(section_name)
 
-            for choice in section[1]:
+            for choice in section_choices:
                 lines.append(f"{i}. {choice.label}")
                 i += 1
 

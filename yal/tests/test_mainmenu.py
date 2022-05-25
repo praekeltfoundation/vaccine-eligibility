@@ -145,22 +145,23 @@ async def test_state_mainmenu_start(tester: AppTester, contentrepo_api_mock):
                 "-----",
                 "Send me the number of the topic you're interested in.",
                 "",
-                "*NEED HELP OR ADVICE?*",
-                "1. 📞 Please call me!",
+                "*📞 NEED HELP OR ADVICE?*",
+                "1. Please call me!",
+                "2. Find clinics and services",
                 "-----",
                 "*Main Menu 1 💊*",
-                "2. Sub menu 1",
-                "3. Sub menu 2",
+                "3. Sub menu 1",
+                "4. Sub menu 2",
                 "-----",
                 "*Main Menu 2 🤝*",
-                "4. Sub menu 1",
-                "5. Sub menu 2",
+                "5. Sub menu 1",
+                "6. Sub menu 2",
                 "-----",
                 "*WHAT's EVERYONE ELSE ASKING?*",
-                "6. 🤔 FAQs",
+                "7. 🤔 FAQs",
                 "-----",
                 "*CHAT SETTINGS*",
-                "7. ⚙️ Change/Update Your Personal Info",
+                "8. ⚙️ Change/Update Your Personal Info",
                 "-----",
                 "💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
             ]
@@ -192,7 +193,7 @@ async def test_state_mainmenu_static(tester: AppTester, contentrepo_api_mock):
 @pytest.mark.asyncio
 async def test_state_mainmenu_contentrepo(tester: AppTester, contentrepo_api_mock):
     tester.setup_state("state_mainmenu")
-    await tester.user_input("3")
+    await tester.user_input("4")
 
     question = "\n".join(
         [
@@ -226,7 +227,7 @@ async def test_state_mainmenu_contentrepo_children(
     tester: AppTester, contentrepo_api_mock
 ):
     tester.setup_state("state_mainmenu")
-    await tester.user_input("2")
+    await tester.user_input("3")
 
     question = "\n".join(
         [
