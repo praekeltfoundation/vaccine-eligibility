@@ -44,9 +44,9 @@ class Application(YalBaseApplication):
         )
         sections.append(
             (
-                "*CHAT SETTINGS*",
+                "*⚙️ CHAT SETTINGS*",
                 [
-                    Choice("state_change_info", "⚙️ Change/Update Your Personal Info"),
+                    Choice("state_change_info", "Change/Update Your Personal Info"),
                 ],
             )
         )

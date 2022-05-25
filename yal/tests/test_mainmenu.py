@@ -160,8 +160,8 @@ async def test_state_mainmenu_start(tester: AppTester, contentrepo_api_mock):
                 "*🤔 WHAT's EVERYONE ELSE ASKING?*",
                 "7. FAQs",
                 "-----",
-                "*CHAT SETTINGS*",
-                "8. ⚙️ Change/Update Your Personal Info",
+                "*⚙️ CHAT SETTINGS*",
+                "8. Change/Update Your Personal Info",
                 "-----",
                 "💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
             ]
