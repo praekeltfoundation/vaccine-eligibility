@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from vaccine.states import Choice, EndState, WhatsAppButtonState, WhatsAppListState
@@ -13,7 +14,7 @@ class Application(YalBaseApplication):
     START_STATE = "state_welcome"
 
     async def state_welcome(self):
-        self.messages.append(
+        await self.worker.publish_message(
             self.inbound.reply(
                 self._(
                     "🙋🏾‍♀️  *HOWZIT! Welcome to B-Wise by Young Africa Live!*\n"
@@ -26,6 +27,7 @@ class Application(YalBaseApplication):
                 )
             )
         )
+        await asyncio.sleep(0.5)
         return await self.go_to_state("state_emergency_prompt")
 
     async def state_emergency_prompt(self):
@@ -64,7 +66,7 @@ class Application(YalBaseApplication):
         )
 
     async def state_emergency_info(self):
-        self.messages.append(
+        await self.worker.publish_message(
             self.inbound.reply(
                 self._(
                     "Cool 😎\n"
@@ -74,6 +76,7 @@ class Application(YalBaseApplication):
                 )
             )
         )
+        await asyncio.sleep(0.5)
         return await self.go_to_state("state_get_to_know")
 
     async def state_get_to_know(self):
@@ -123,9 +126,10 @@ class Application(YalBaseApplication):
         )
 
     async def state_pre_terms(self):
-        self.messages.append(
+        await self.worker.publish_message(
             self.inbound.reply(self._("Awesome, thanks 😌  — So, first things first..."))
         )
+        await asyncio.sleep(0.5)
         return await self.go_to_state("state_terms")
 
     async def state_terms(self):

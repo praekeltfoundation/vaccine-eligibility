@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from datetime import date
 
@@ -129,7 +130,8 @@ class Application(YalBaseApplication):
                         ]
                     )
                 )
-                self.messages.append(self.inbound.reply(msg))
+                await self.worker.publish_message(self.inbound.reply(msg))
+                await asyncio.sleep(0.5)
 
         return await self.go_to_state("state_confirm_age")
 
