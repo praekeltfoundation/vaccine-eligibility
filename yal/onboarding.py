@@ -87,7 +87,7 @@ class Application(YalBaseApplication):
             question=self._(
                 "\n".join(
                     [
-                        "GET STARTED",
+                        "*GET STARTED*",
                         "Date of birth",
                         "-----",
                         "",
@@ -258,7 +258,7 @@ class Application(YalBaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "GET STARTED",
+                    "*GET STARTED*",
                     "Choose your gender",
                     "-----",
                     "",
