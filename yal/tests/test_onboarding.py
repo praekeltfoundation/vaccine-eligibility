@@ -129,7 +129,7 @@ async def test_state_relationship_status_valid(tester: AppTester):
     await tester.user_input("2")
 
     tester.assert_state("state_gender")
-    tester.assert_num_messages(2)
+    tester.assert_num_messages(1)
 
     tester.assert_answer("state_relationship_status", "complicated")
 
