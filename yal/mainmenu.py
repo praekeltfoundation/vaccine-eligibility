@@ -40,7 +40,7 @@ class Application(YalBaseApplication):
             sections.append((f"*{choice.label}*", sub_choices))
 
         sections.append(
-            ("*WHAT's EVERYONE ELSE ASKING?*", [Choice("state_faqs", "🤔 FAQs")])
+            ("*🤔 WHAT's EVERYONE ELSE ASKING?*", [Choice("state_faqs", "FAQs")])
         )
         sections.append(
             (
