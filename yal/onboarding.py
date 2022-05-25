@@ -169,27 +169,29 @@ class Application(YalBaseApplication):
         )
 
     async def state_relationship_status_confirm(self):
-        self.messages.append(
-            self.inbound.reply(
-                self._(
-                    "\n".join(
-                        [
-                            "Amazing!",
-                            "",
-                            "✅ ~Birthday~",
-                            "✅ ~Relationship Status~",
-                            "◻️ *Location*",
-                            "◻️ Gender",
-                            "-----",
-                            "",
-                            f"As for me, it's been {utils.get_bot_age()} days and I'm "
-                            "still waiting to meet that special some-bot 🤖.",
-                            "Not that I'm counting...",
-                        ]
-                    )
-                )
-            )
-        )
+        # Skipping this message for Demo
+        # self.messages.append(
+        #     self.inbound.reply(
+        #         self._(
+        #             "\n".join(
+        #                 [
+        #                     "Amazing!",
+        #                     "",
+        #                     "✅ ~Birthday~",
+        #                     "✅ ~Relationship Status~",
+        #                     "◻️ *Location*",
+        #                     "◻️ Gender",
+        #                     "-----",
+        #                     "",
+        #                     f"As for me, it's been {utils.get_bot_age()} days and
+        # I'm "
+        #                     "still waiting to meet that special some-bot 🤖.",
+        #                     "Not that I'm counting...",
+        #                 ]
+        #             )
+        #         )
+        #     )
+        # )
         return await self.go_to_state("state_location")
 
     async def state_location(self):
