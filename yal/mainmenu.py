@@ -83,7 +83,7 @@ class Application(YalBaseApplication):
 
     async def state_contentrepo_page(self):
         page_id = self.user.answers["selected_page_id"]
-        error, page_details = await contentrepo.get_page_details(page_id)
+        error, page_details = await contentrepo.get_page_details(self.user, page_id)
         if error:
             return await self.go_to_state("state_error")
 
