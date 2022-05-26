@@ -16,14 +16,43 @@ from vaccine.utils import HTTP_EXCEPTIONS, get_today, normalise_phonenumber
 from vaccine.validators import nonempty_validator
 from yal import contentrepo, utils
 from yal.mainmenu import Application as MainMenuApplication
-from yal.validators import day_validator
+from yal.validators import day_validator, year_validator
 from yal.yal_base_application import YalBaseApplication
 
 logger = logging.getLogger(__name__)
 
 
 class Application(YalBaseApplication):
-    START_STATE = "state_dob_month"
+    START_STATE = "state_dob_year"
+
+    async def state_dob_year(self):
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "*GET STARTED*",
+                        "Date of birth",
+                        "-----",
+                        "",
+                        "Perfect. And finally, which year?",
+                        "",
+                        "Reply with a number. (e.g. 2007)",
+                        "",
+                        "-----",
+                        "Rather not say?",
+                        "No stress! Just tap SKIP.",
+                    ]
+                )
+            ),
+            next="state_dob_month",
+            check=year_validator(
+                self._(
+                    "⚠️  Please TYPE in only the YEAR you were born.\n" "Example _1980_"
+                )
+            ),
+            buttons=[Choice("skip", self._("Skip"))],
+        )
 
     async def state_dob_month(self):
         return ChoiceState(
@@ -74,35 +103,15 @@ class Application(YalBaseApplication):
                 ]
             )
         )
+
+        dob_year = self.user.answers["state_dob_year"]
+        dob_month = self.user.answers["state_dob_month"]
+
         return FreeText(
             self,
             question=question,
-            next="state_dob_year",
-            check=day_validator(question),
-            buttons=[Choice("skip", self._("Skip"))],
-        )
-
-    async def state_dob_year(self):
-        return FreeText(
-            self,
-            question=self._(
-                "\n".join(
-                    [
-                        "*GET STARTED*",
-                        "Date of birth",
-                        "-----",
-                        "",
-                        "Perfect. And finally, which year?",
-                        "",
-                        "Reply with a number. (e.g. 2007)",
-                        "",
-                        "-----",
-                        "Rather not say?",
-                        "No stress! Just tap SKIP.",
-                    ]
-                )
-            ),
             next="state_check_birthday",
+            check=day_validator(dob_year, dob_month, question),
             buttons=[Choice("skip", self._("Skip"))],
         )
 
