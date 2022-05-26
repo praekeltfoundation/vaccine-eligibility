@@ -14,7 +14,7 @@ from vaccine.states import (
 )
 from vaccine.utils import HTTP_EXCEPTIONS, get_today, normalise_phonenumber
 from vaccine.validators import nonempty_validator
-from yal import utils
+from yal import contentrepo, utils
 from yal.mainmenu import Application as MainMenuApplication
 from yal.validators import day_validator
 from yal.yal_base_application import YalBaseApplication
@@ -130,7 +130,12 @@ class Application(YalBaseApplication):
                         ]
                     )
                 )
-                await self.worker.publish_message(self.inbound.reply(msg))
+                await self.worker.publish_message(
+                    self.inbound.reply(
+                        msg,
+                        helper_metadata={"image": contentrepo.get_image_url("hbd.png")},
+                    )
+                )
                 await asyncio.sleep(0.5)
 
         return await self.go_to_state("state_confirm_age")
