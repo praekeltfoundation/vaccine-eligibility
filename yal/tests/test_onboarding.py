@@ -45,8 +45,34 @@ async def turn_api_mock(sanic_client, tester):
 
 
 @pytest.mark.asyncio
+async def test_state_dob_year_valid(tester: AppTester):
+    tester.setup_state("state_dob_year")
+
+    await tester.user_input("2007")
+
+    tester.assert_state("state_dob_month")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_dob_year", "2007")
+
+
+@pytest.mark.asyncio
+async def test_state_dob_year_invalid(tester: AppTester):
+    tester.setup_state("state_dob_year")
+
+    await tester.user_input("12007")
+
+    tester.assert_state("state_dob_year")
+    tester.assert_num_messages(1)
+
+    tester.assert_no_answer("state_dob_year")
+
+
+@pytest.mark.asyncio
 async def test_state_dob_month_valid(tester: AppTester):
     tester.setup_state("state_dob_month")
+    tester.setup_answer("state_dob_year", "2022")
+
     await tester.user_input("2")
 
     tester.assert_state("state_dob_day")
@@ -58,6 +84,8 @@ async def test_state_dob_month_valid(tester: AppTester):
 @pytest.mark.asyncio
 async def test_state_dob_month_invalid(tester: AppTester):
     tester.setup_state("state_dob_month")
+    tester.setup_answer("state_dob_year", "2022")
+
     await tester.user_input("22")
 
     tester.assert_state("state_dob_month")
@@ -69,6 +97,8 @@ async def test_state_dob_month_invalid(tester: AppTester):
 @pytest.mark.asyncio
 async def test_state_dob_month_skip(tester: AppTester):
     tester.setup_state("state_dob_month")
+    tester.setup_answer("state_dob_year", "2022")
+
     await tester.user_input("skip")
 
     tester.assert_state("state_dob_day")
@@ -80,9 +110,28 @@ async def test_state_dob_month_skip(tester: AppTester):
 @pytest.mark.asyncio
 async def test_state_dob_day_valid(tester: AppTester):
     tester.setup_state("state_dob_day")
+
+    tester.setup_answer("state_dob_year", "2022")
+    tester.setup_answer("state_dob_month", "2")
+
     await tester.user_input("2")
 
-    tester.assert_state("state_dob_year")
+    tester.assert_state("state_relationship_status")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_dob_day", "2")
+
+
+@pytest.mark.asyncio
+async def test_state_dob_day_valid_no_year(tester: AppTester):
+    tester.setup_state("state_dob_day")
+
+    tester.setup_answer("state_dob_year", "skip")
+    tester.setup_answer("state_dob_month", "2")
+
+    await tester.user_input("2")
+
+    tester.assert_state("state_relationship_status")
     tester.assert_num_messages(1)
 
     tester.assert_answer("state_dob_day", "2")
@@ -91,7 +140,26 @@ async def test_state_dob_day_valid(tester: AppTester):
 @pytest.mark.asyncio
 async def test_state_dob_day_invalid(tester: AppTester):
     tester.setup_state("state_dob_day")
+
+    tester.setup_answer("state_dob_year", "skip")
+    tester.setup_answer("state_dob_month", "2")
+
     await tester.user_input("200")
+
+    tester.assert_state("state_dob_day")
+    tester.assert_num_messages(1)
+
+    tester.assert_no_answer("state_dob_day")
+
+
+@pytest.mark.asyncio
+async def test_state_dob_day_invalid_date(tester: AppTester):
+    tester.setup_state("state_dob_day")
+
+    tester.setup_answer("state_dob_year", "2022")
+    tester.setup_answer("state_dob_month", "9")
+
+    await tester.user_input("31")
 
     tester.assert_state("state_dob_day")
     tester.assert_num_messages(1)
@@ -102,27 +170,16 @@ async def test_state_dob_day_invalid(tester: AppTester):
 @pytest.mark.asyncio
 async def test_state_dob_day_skip(tester: AppTester):
     tester.setup_state("state_dob_day")
-    await tester.user_input("skip")
 
-    tester.assert_state("state_dob_year")
-    tester.assert_num_messages(1)
-
-    tester.assert_answer("state_dob_day", "skip")
-
-
-@pytest.mark.asyncio
-async def test_state_dob_year_valid(tester: AppTester):
-    tester.setup_state("state_dob_year")
-
+    tester.setup_answer("state_dob_year", "2022")
     tester.setup_answer("state_dob_month", "2")
-    tester.setup_answer("state_dob_day", "22")
 
-    await tester.user_input("2007")
+    await tester.user_input("skip")
 
     tester.assert_state("state_relationship_status")
     tester.assert_num_messages(1)
 
-    tester.assert_answer("state_dob_year", "2007")
+    tester.assert_answer("state_dob_day", "skip")
 
 
 @pytest.mark.asyncio
@@ -130,17 +187,17 @@ async def test_state_dob_year_valid(tester: AppTester):
 async def test_state_check_birthday(get_today, tester: AppTester):
     get_today.return_value = date(2022, 2, 22)
     config.CONTENTREPO_API_URL = "https://contenrepo/"
-    tester.setup_state("state_dob_year")
+    tester.setup_state("state_dob_day")
 
     tester.setup_answer("state_dob_month", "2")
-    tester.setup_answer("state_dob_day", "22")
+    tester.setup_answer("state_dob_year", "2005")
 
-    await tester.user_input("2005")
+    await tester.user_input("22")
 
     tester.assert_state("state_relationship_status")
     tester.assert_num_messages(1)
 
-    tester.assert_answer("state_dob_year", "2005")
+    tester.assert_answer("state_dob_day", "22")
 
     [msg] = tester.fake_worker.outbound_messages
     assert msg.content == "\n".join(
@@ -161,36 +218,32 @@ async def test_state_check_birthday(get_today, tester: AppTester):
 @mock.patch("yal.onboarding.get_today")
 async def test_state_check_birthday_skip_day(get_today, tester: AppTester):
     get_today.return_value = date(2022, 2, 22)
-    tester.setup_state("state_dob_year")
+    tester.setup_state("state_dob_day")
 
     tester.setup_answer("state_dob_month", "2")
-    tester.setup_answer("state_dob_day", "skip")
+    tester.setup_answer("state_dob_year", "2007")
 
-    await tester.user_input("2007")
+    await tester.user_input("skip")
 
     tester.assert_state("state_relationship_status")
     tester.assert_num_messages(1)
     assert tester.fake_worker.outbound_messages == []
-
-    tester.assert_answer("state_dob_year", "2007")
 
 
 @pytest.mark.asyncio
 @mock.patch("yal.onboarding.get_today")
 async def test_state_check_birthday_skip_month(get_today, tester: AppTester):
     get_today.return_value = date(2022, 2, 22)
-    tester.setup_state("state_dob_year")
+    tester.setup_state("state_dob_day")
 
     tester.setup_answer("state_dob_month", "skip")
-    tester.setup_answer("state_dob_day", "22")
+    tester.setup_answer("state_dob_year", "2007")
 
-    await tester.user_input("2007")
+    await tester.user_input("22")
 
     tester.assert_state("state_relationship_status")
     tester.assert_num_messages(1)
     assert tester.fake_worker.outbound_messages == []
-
-    tester.assert_answer("state_dob_year", "2007")
 
 
 @pytest.mark.asyncio
@@ -198,17 +251,15 @@ async def test_state_check_birthday_skip_month(get_today, tester: AppTester):
 async def test_state_check_birthday_skip_year(get_today, tester: AppTester):
     get_today.return_value = date(2022, 2, 22)
     config.CONTENTREPO_API_URL = "https://contenrepo/"
-    tester.setup_state("state_dob_year")
+    tester.setup_state("state_dob_day")
 
     tester.setup_answer("state_dob_month", "2")
-    tester.setup_answer("state_dob_day", "22")
+    tester.setup_answer("state_dob_year", "skip")
 
-    await tester.user_input("skip")
+    await tester.user_input("22")
 
     tester.assert_state("state_relationship_status")
     tester.assert_num_messages(1)
-
-    tester.assert_answer("state_dob_year", "skip")
 
     [msg] = tester.fake_worker.outbound_messages
     assert msg.content == "\n".join(
