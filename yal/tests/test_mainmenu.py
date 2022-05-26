@@ -1,3 +1,5 @@
+from urllib.parse import parse_qs, urlparse
+
 import pytest
 from sanic import Sanic, response
 
@@ -279,3 +281,11 @@ async def test_state_mainmenu_contentrepo_children(
         "/api/v2/pages",
         "/api/v2/pages/444",
     ]
+
+    detail_request = contentrepo_api_mock.app.requests[-1]
+    parsed_url = urlparse(detail_request.url)
+    params = parse_qs(parsed_url.query)
+
+    assert params["whatsapp"][0] == "true"
+    assert params["data__session_id"][0] == "1"
+    assert params["data__user_addr"][0] == "27820001001"

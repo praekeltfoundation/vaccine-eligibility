@@ -136,7 +136,7 @@ class Application(YalBaseApplication):
                         helper_metadata={"image": contentrepo.get_image_url("hbd.png")},
                     )
                 )
-                await asyncio.sleep(0.5)
+                await asyncio.sleep(1.5)
 
         return await self.go_to_state("state_confirm_age")
 
