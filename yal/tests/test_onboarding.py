@@ -1,9 +1,12 @@
 import json
+from datetime import date
+from unittest import mock
 
 import pytest
 from sanic import Sanic, response
 
 from vaccine.testing import AppTester
+from yal import config
 from yal.main import Application
 
 
@@ -120,6 +123,106 @@ async def test_state_dob_year_valid(tester: AppTester):
     tester.assert_num_messages(1)
 
     tester.assert_answer("state_dob_year", "2007")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_today")
+async def test_state_check_birthday(get_today, tester: AppTester):
+    get_today.return_value = date(2022, 2, 22)
+    config.CONTENTREPO_API_URL = "https://contenrepo/"
+    tester.setup_state("state_dob_year")
+
+    tester.setup_answer("state_dob_month", "2")
+    tester.setup_answer("state_dob_day", "22")
+
+    await tester.user_input("2005")
+
+    tester.assert_state("state_relationship_status")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_dob_year", "2005")
+
+    [msg] = tester.fake_worker.outbound_messages
+    assert msg.content == "\n".join(
+        [
+            "*Yoh! 17 today? HAPPY BIRTHDAY!* 🎂 🎉 ",
+            "",
+            "Hope you're having a great one so far! Remember—age is "
+            "just a number. Here's to always having  wisdom that goes"
+            " beyond your years 😉 🥂",
+        ]
+    )
+    assert msg.helper_metadata == {
+        "image": "https://contenrepo/media/original_images/hbd.png"
+    }
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_today")
+async def test_state_check_birthday_skip_day(get_today, tester: AppTester):
+    get_today.return_value = date(2022, 2, 22)
+    tester.setup_state("state_dob_year")
+
+    tester.setup_answer("state_dob_month", "2")
+    tester.setup_answer("state_dob_day", "skip")
+
+    await tester.user_input("2007")
+
+    tester.assert_state("state_relationship_status")
+    tester.assert_num_messages(1)
+    assert tester.fake_worker.outbound_messages == []
+
+    tester.assert_answer("state_dob_year", "2007")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_today")
+async def test_state_check_birthday_skip_month(get_today, tester: AppTester):
+    get_today.return_value = date(2022, 2, 22)
+    tester.setup_state("state_dob_year")
+
+    tester.setup_answer("state_dob_month", "skip")
+    tester.setup_answer("state_dob_day", "22")
+
+    await tester.user_input("2007")
+
+    tester.assert_state("state_relationship_status")
+    tester.assert_num_messages(1)
+    assert tester.fake_worker.outbound_messages == []
+
+    tester.assert_answer("state_dob_year", "2007")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_today")
+async def test_state_check_birthday_skip_year(get_today, tester: AppTester):
+    get_today.return_value = date(2022, 2, 22)
+    config.CONTENTREPO_API_URL = "https://contenrepo/"
+    tester.setup_state("state_dob_year")
+
+    tester.setup_answer("state_dob_month", "2")
+    tester.setup_answer("state_dob_day", "22")
+
+    await tester.user_input("skip")
+
+    tester.assert_state("state_relationship_status")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_dob_year", "skip")
+
+    [msg] = tester.fake_worker.outbound_messages
+    assert msg.content == "\n".join(
+        [
+            "*Yoh! HAPPY BIRTHDAY!* 🎂 🎉 ",
+            "",
+            "Hope you're having a great one so far! Remember—age is "
+            "just a number. Here's to always having  wisdom that goes"
+            " beyond your years 😉 🥂",
+        ]
+    )
+    assert msg.helper_metadata == {
+        "image": "https://contenrepo/media/original_images/hbd.png"
+    }
 
 
 @pytest.mark.asyncio
