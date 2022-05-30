@@ -8,7 +8,8 @@ from yal import config
 
 TZ_SAST = timezone(timedelta(hours=2), "SAST")
 PROVINCES = sorted(
-    (s.code, s.name) for s in pycountry.subdivisions.get(country_code="ZA")
+    (s.code.split("-")[1], s.name.split(" (")[0])
+    for s in pycountry.subdivisions.get(country_code="ZA")
 )
 
 
