@@ -2,7 +2,6 @@ import asyncio
 import logging
 from datetime import date
 
-import pycountry
 from dateutil.relativedelta import relativedelta
 
 from vaccine.states import (
@@ -211,14 +210,10 @@ class Application(YalBaseApplication):
         return await self.go_to_state("state_province")
 
     async def state_province(self):
-        PROVINCES = sorted(
-            (s.code, s.name) for s in pycountry.subdivisions.get(country_code="ZA")
-        )
-
         province_text = "\n".join(
-            [f"{i+1} - {name}" for i, (code, name) in enumerate(PROVINCES)]
+            [f"{i+1} - {name}" for i, (code, name) in enumerate(utils.PROVINCES)]
         )
-        province_choices = [Choice(code, name) for code, name in PROVINCES]
+        province_choices = [Choice(code, name) for code, name in utils.PROVINCES]
         province_choices.append(Choice("skip", "Skip"))
 
         question = self._(
