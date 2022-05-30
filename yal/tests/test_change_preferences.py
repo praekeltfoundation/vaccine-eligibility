@@ -35,6 +35,10 @@ async def turn_api_mock(sanic_client, tester):
                     "dob_day": "22",
                     "dob_month": "2",
                     "dob_year": "2022",
+                    "province": "ZA-FS",
+                    "suburb": "TestSuburb",
+                    "street_name": "test street",
+                    "street_number": "12",
                 }
             }
         )
@@ -76,7 +80,7 @@ async def test_state_display_preferences(tester: AppTester, turn_api_mock):
             "single",
             "",
             "☑️ 📍 *Location*",
-            "[saved LOCATION]",
+            "12 test street TestSuburb Free State",
             "",
             "☑️ 🌈  *Identity*",
             "male",

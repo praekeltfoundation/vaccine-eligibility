@@ -1,3 +1,4 @@
+import pycountry
 import re
 from datetime import datetime, timedelta, timezone
 
@@ -6,6 +7,9 @@ import aiohttp
 from yal import config
 
 TZ_SAST = timezone(timedelta(hours=2), "SAST")
+PROVINCES = sorted(
+    (s.code, s.name) for s in pycountry.subdivisions.get(country_code="ZA")
+)
 
 
 def get_today():

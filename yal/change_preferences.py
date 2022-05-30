@@ -1,9 +1,11 @@
 import asyncio
 import logging
+import pycountry
 
 from vaccine.states import Choice, WhatsAppListState
 from vaccine.utils import normalise_phonenumber
 from yal import turn
+from yal.utils import PROVINCES
 from yal.yal_base_application import YalBaseApplication
 
 logger = logging.getLogger(__name__)
@@ -36,6 +38,21 @@ class Application(YalBaseApplication):
         relationship_status = get_field("relationship_status")
         gender = get_field("gender")
 
+        province = fields.get("province")
+        suburb = fields.get("suburb")
+        street_name = fields.get("street_name")
+        street_number = fields.get("street_number")
+
+        province = dict(PROVINCES).get(province, "skip")
+
+        location = " ".join(
+            [
+                s
+                for s in [street_number, street_name, suburb, province]
+                if s and s != "skip"
+            ]
+        )
+
         dob = []
         if dob_day != "skip" and dob_month != "skip":
             dob.append(dob_day)
@@ -61,7 +78,7 @@ class Application(YalBaseApplication):
                     relationship_status,
                     "",
                     "☑️ 📍 *Location*",
-                    "[saved LOCATION]",
+                    location or "Empty",
                     "",
                     "☑️ 🌈  *Identity*",
                     gender,
