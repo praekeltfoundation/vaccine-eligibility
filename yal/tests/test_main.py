@@ -3,6 +3,7 @@ from sanic import Sanic, response
 
 from vaccine.testing import AppTester
 from yal import config
+from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.main import Application
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
@@ -13,7 +14,13 @@ def test_no_state_name_clashes():
     mm_states = set(s for s in dir(MainMenuApplication) if s.startswith("state_"))
     on_states = set(s for s in dir(OnboardingApplication) if s.startswith("state_"))
     te_states = set(s for s in dir(TermsApplication) if s.startswith("state_"))
-    intersection = (mm_states & on_states & te_states) - {"state_name", "state_error"}
+    cp_states = set(
+        s for s in dir(ChangePreferencesApplication) if s.startswith("state_")
+    )
+    intersection = (mm_states & on_states & te_states & cp_states) - {
+        "state_name",
+        "state_error",
+    }
     assert len(intersection) == 0, f"Common states to both apps: {intersection}"
 
 

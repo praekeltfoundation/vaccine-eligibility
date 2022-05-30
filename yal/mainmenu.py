@@ -2,6 +2,7 @@ import logging
 
 from vaccine.states import Choice, ChoiceState, EndState, SectionedChoiceState
 from yal import contentrepo
+from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.yal_base_application import YalBaseApplication
 
 logger = logging.getLogger(__name__)
@@ -46,7 +47,10 @@ class Application(YalBaseApplication):
             (
                 "*⚙️ CHAT SETTINGS*",
                 [
-                    Choice("state_change_info", "Change/Update Your Personal Info"),
+                    Choice(
+                        ChangePreferencesApplication.START_STATE,
+                        "Change/Update Your Personal Info",
+                    ),
                 ],
             )
         )
@@ -162,13 +166,6 @@ class Application(YalBaseApplication):
         return EndState(
             self,
             self._("TODO: Please Call Me"),
-            next=self.START_STATE,
-        )
-
-    async def state_change_info(self):
-        return EndState(
-            self,
-            self._("TODO: Change info/preferences"),
             next=self.START_STATE,
         )
 
