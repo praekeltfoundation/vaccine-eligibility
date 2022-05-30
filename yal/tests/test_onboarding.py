@@ -282,7 +282,7 @@ async def test_state_relationship_status_valid(tester: AppTester):
 
     await tester.user_input("2")
 
-    tester.assert_state("state_gender")
+    tester.assert_state("state_province")
     tester.assert_num_messages(1)
 
     tester.assert_answer("state_relationship_status", "complicated")
@@ -322,6 +322,10 @@ async def test_submit_onboarding(tester: AppTester, turn_api_mock):
     tester.setup_answer("state_relationship_status", "yes")
     tester.setup_answer("state_gender", "other")
     tester.setup_answer("state_name_gender", "new gender")
+    tester.setup_answer("state_province", "ZA-FS")
+    tester.setup_answer("state_suburb", "SomeSuburb")
+    tester.setup_answer("state_street_name", "Good street")
+    tester.setup_answer("state_street_number", "12")
 
     await tester.user_input("new gender")
 
@@ -338,4 +342,8 @@ async def test_submit_onboarding(tester: AppTester, turn_api_mock):
         "relationship_status": "yes",
         "gender": "other",
         "gender_other": "new gender",
+        "province": "ZA-FS",
+        "suburb": "SomeSuburb",
+        "street_name": "Good street",
+        "street_number": "12",
     }
