@@ -2,6 +2,7 @@ import asyncio
 import logging
 from datetime import date
 
+import pycountry
 from dateutil.relativedelta import relativedelta
 
 from vaccine.states import (
@@ -185,34 +186,137 @@ class Application(YalBaseApplication):
         )
 
     async def state_relationship_status_confirm(self):
-        # Skipping this message for Demo
-        # self.messages.append(
-        #     self.inbound.reply(
-        #         self._(
-        #             "\n".join(
-        #                 [
-        #                     "Amazing!",
-        #                     "",
-        #                     "✅ ~Birthday~",
-        #                     "✅ ~Relationship Status~",
-        #                     "◻️ *Location*",
-        #                     "◻️ Gender",
-        #                     "-----",
-        #                     "",
-        #                     f"As for me, it's been {utils.get_bot_age()} days and
-        # I'm "
-        #                     "still waiting to meet that special some-bot 🤖.",
-        #                     "Not that I'm counting...",
-        #                 ]
-        #             )
-        #         )
-        #     )
-        # )
-        return await self.go_to_state("state_location")
+        await self.worker.publish_message(
+            self.inbound.reply(
+                self._(
+                    "\n".join(
+                        [
+                            "Amazing!",
+                            "",
+                            "✅ ~Birthday~",
+                            "✅ ~Relationship Status~",
+                            "◻️ *Location*",
+                            "◻️ Gender",
+                            "-----",
+                            "",
+                            f"As for me, it's been {utils.get_bot_age()} days and I'm "
+                            "still waiting to meet that special some-bot 🤖.",
+                            "Not that I'm counting...",
+                        ]
+                    )
+                )
+            )
+        )
+        await asyncio.sleep(0.5)
+        return await self.go_to_state("state_province")
 
-    async def state_location(self):
-        # TODO: Need to confirm in miro first
-        return await self.go_to_state("state_gender")
+    async def state_province(self):
+        PROVINCES = sorted(
+            (s.code, s.name) for s in pycountry.subdivisions.get(country_code="ZA")
+        )
+
+        province_text = "\n".join(
+            [f"{i+1} - {name}" for i, (code, name) in enumerate(PROVINCES)]
+        )
+        province_choices = [Choice(code, name) for code, name in PROVINCES]
+        province_choices.append(Choice("skip", "Skip"))
+
+        question = self._(
+            "\n".join(
+                [
+                    "*ABOUT YOU*",
+                    "📍 Province",
+                    "-----",
+                    "",
+                    "🙍🏾‍♀️ To be able to recommend you youth-friendly clinics and FREE "
+                    "services near you I'll need to know where you're staying "
+                    "currently. 🙂",
+                    "",
+                    "*Which PROVINCE are you in?*",
+                    "You can type the number or choose from the menu.",
+                    "",
+                    province_text,
+                    "-----",
+                    "👩🏾 *Rather not say?*",
+                    "No stress! Just say SKIP.",
+                ]
+            )
+        )
+        return WhatsAppListState(
+            self,
+            question=question,
+            button="Province",
+            choices=province_choices,
+            next="state_suburb",
+            error=self._("TODO"),
+        )
+
+    async def state_suburb(self):
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "*ABOUT YOU*",
+                        "📍 Suburb/Town/Township/Village ",
+                        "-----",
+                        "",
+                        "👩🏾 *OK. And which suburb, town, township or village was"
+                        " that?*",
+                        "Please type it for me and hit send.",
+                        "-----",
+                        "🙍🏾‍♀️ *Rather not say?*",
+                        "No stress! Just tap *SKIP*.",
+                    ]
+                )
+            ),
+            next="state_street_name",
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_street_name(self):
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "*ABOUT YOU*",
+                        "📍 Street Name",
+                        "-----",
+                        "",
+                        "👩🏾 *OK. And what about the street name?*",
+                        "Could you type it for me and hit send?",
+                        "-----",
+                        "🙍🏾‍♀️ *Rather not say?*",
+                        "No stress! Just tap *SKIP*.",
+                    ]
+                )
+            ),
+            next="state_street_number",
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_street_number(self):
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "*ABOUT YOU*",
+                        "📍Street Number",
+                        "-----",
+                        "",
+                        "👩🏾  *And which number was that?*",
+                        "Please type the street number for me and hit send.",
+                        "-----",
+                        "🙍🏾‍♀️ *Rather not say?*",
+                        "No stress! Just tap *SKIP*.",
+                    ]
+                )
+            ),
+            next="state_gender",
+            buttons=[Choice("skip", self._("Skip"))],
+        )
 
     async def state_gender(self):
         async def next_(choice: Choice):
@@ -335,6 +439,10 @@ class Application(YalBaseApplication):
             "relationship_status": self.user.answers.get("state_relationship_status"),
             "gender": self.user.answers.get("state_gender"),
             "gender_other": self.user.answers.get("state_name_gender"),
+            "province": self.user.answers.get("state_province"),
+            "suburb": self.user.answers.get("state_suburb"),
+            "street_name": self.user.answers.get("state_street_name"),
+            "street_number": self.user.answers.get("state_street_number"),
         }
 
         async with utils.get_turn_api() as session:
