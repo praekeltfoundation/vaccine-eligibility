@@ -4,6 +4,7 @@ from datetime import date
 
 from dateutil.relativedelta import relativedelta
 
+from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
     ChoiceState,
@@ -11,18 +12,17 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
-from vaccine.utils import HTTP_EXCEPTIONS, get_today, normalise_phonenumber
+from vaccine.utils import get_today, normalise_phonenumber
 from vaccine.validators import nonempty_validator
-from yal import contentrepo, utils
+from yal import contentrepo, turn, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.validators import day_validator, year_validator
-from yal.yal_base_application import YalBaseApplication
 
 logger = logging.getLogger(__name__)
 
 
-class Application(YalBaseApplication):
+class Application(BaseApplication):
     START_STATE = "state_dob_year"
 
     async def state_dob_year(self):
@@ -440,21 +440,9 @@ class Application(YalBaseApplication):
             "street_number": self.user.answers.get("state_street_number"),
         }
 
-        async with utils.get_turn_api() as session:
-            for i in range(3):
-                try:
-                    response = await session.patch(
-                        self.turn_profile_url(whatsapp_id),
-                        json=data,
-                    )
-                    response.raise_for_status()
-                    break
-                except HTTP_EXCEPTIONS as e:
-                    if i == 2:
-                        logger.exception(e)
-                        return await self.go_to_state("state_error")
-                    else:
-                        continue
+        error = await turn.update_profile(whatsapp_id, data)
+        if error:
+            return await self.go_to_state("state_error")
 
         return await self.go_to_state("state_onboarding_complete")
 

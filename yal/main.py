@@ -1,8 +1,8 @@
 import logging
 
 from vaccine.states import EndState
-from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
-from yal import utils
+from vaccine.utils import normalise_phonenumber
+from yal import turn, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
@@ -38,27 +38,14 @@ class Application(
     async def state_start(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
-        prototype_user = False
 
-        async with utils.get_turn_api() as session:
-            for i in range(3):
-                try:
-                    response = await session.get(self.turn_profile_url(whatsapp_id))
-                    response.raise_for_status()
-                    response_body = await response.json()
+        error, fields = await turn.get_profile(whatsapp_id)
+        if error:
+            return await self.go_to_state("state_error")
 
-                    fields = response_body["fields"]
-                    prototype_user = fields.get("prototype_user")
-                    terms_accepted = fields.get("terms_accepted")
-                    onboarding_completed = fields.get("onboarding_completed")
-
-                    break
-                except HTTP_EXCEPTIONS as e:
-                    if i == 2:
-                        logger.exception(e)
-                        return await self.go_to_state("state_error")
-                    else:
-                        continue
+        prototype_user = fields.get("prototype_user")
+        terms_accepted = fields.get("terms_accepted")
+        onboarding_completed = fields.get("onboarding_completed")
 
         if not prototype_user:
             return await self.go_to_state("state_coming_soon")

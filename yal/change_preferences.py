@@ -1,6 +1,7 @@
 import asyncio
 import logging
 
+from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
     ChoiceState,
@@ -13,12 +14,11 @@ from vaccine.validators import nonempty_validator
 from yal import turn
 from yal.utils import PROVINCES
 from yal.validators import day_validator, year_validator
-from yal.yal_base_application import YalBaseApplication
 
 logger = logging.getLogger(__name__)
 
 
-class Application(YalBaseApplication):
+class Application(BaseApplication):
     START_STATE = "state_display_preferences"
 
     async def state_display_preferences(self):
