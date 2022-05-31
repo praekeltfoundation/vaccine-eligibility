@@ -4,7 +4,7 @@ import logging
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, WhatsAppButtonState, WhatsAppListState
 from vaccine.utils import normalise_phonenumber
-from yal import turn
+from yal import contentrepo, turn
 from yal.onboarding import Application as OnboardingApplication
 
 logger = logging.getLogger(__name__)
@@ -130,6 +130,16 @@ class Application(BaseApplication):
             self.inbound.reply(self._("Awesome, thanks 😌  — So, first things first..."))
         )
         await asyncio.sleep(0.5)
+        return await self.go_to_state("state_terms_pdf")
+
+    async def state_terms_pdf(self):
+        await self.worker.publish_message(
+            self.inbound.reply(
+                None,
+                helper_metadata={"document": contentrepo.get_privacy_policy_url()},
+            )
+        )
+        await asyncio.sleep(1.5)
         return await self.go_to_state("state_terms")
 
     async def state_terms(self):

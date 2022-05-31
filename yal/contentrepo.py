@@ -30,6 +30,12 @@ def get_image_url(image):
     return urljoin(config.CONTENTREPO_API_URL, f"media/original_images/{image}")
 
 
+def get_privacy_policy_url():
+    return urljoin(
+        config.CONTENTREPO_API_URL, f"/documents/{config.PRIVACY_POLICY_PDF}"
+    )
+
+
 async def get_choices_by_tag(tag):
     return await get_choices_by_path(f"/api/v2/pages?tag={tag}")
 
