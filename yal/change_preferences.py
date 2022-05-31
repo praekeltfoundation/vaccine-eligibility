@@ -510,8 +510,8 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         data = {
-            "gender": self.user.answers.get("state_gender"),
-            "gender_other": self.user.answers.get("state_name_gender"),
+            "gender": self.user.answers.get("state_update_gender"),
+            "gender_other": self.user.answers.get("state_update_name_gender"),
         }
 
         error = await turn.update_profile(whatsapp_id, data)
