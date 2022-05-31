@@ -7,7 +7,6 @@ from dateutil.relativedelta import relativedelta
 from vaccine.states import (
     Choice,
     ChoiceState,
-    EndState,
     FreeText,
     WhatsAppButtonState,
     WhatsAppListState,
@@ -15,6 +14,7 @@ from vaccine.states import (
 from vaccine.utils import HTTP_EXCEPTIONS, get_today, normalise_phonenumber
 from vaccine.validators import nonempty_validator
 from yal import contentrepo, utils
+from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.validators import day_validator, year_validator
 from yal.yal_base_application import YalBaseApplication
@@ -489,13 +489,6 @@ class Application(YalBaseApplication):
             error=error,
             next={
                 "ok": MainMenuApplication.START_STATE,
-                "change": "state_change_pref",
+                "change": ChangePreferencesApplication.START_STATE,
             },
-        )
-
-    async def state_change_pref(self):
-        return EndState(
-            self,
-            self._("TODO: Change Pref"),
-            next=self.START_STATE,
         )
