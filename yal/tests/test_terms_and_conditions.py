@@ -4,6 +4,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.testing import AppTester
+from yal import turn
 from yal.main import Application
 
 
@@ -30,15 +31,15 @@ async def turn_api_mock(sanic_client, tester):
         return response.json({})
 
     client = await sanic_client(app)
-    turn_profile_url = tester.application.turn_profile_url
+    get_profile_url = turn.get_profile_url
 
     host = f"http://{client.host}:{client.port}"
-    tester.application.turn_profile_url = (
+    turn.get_profile_url = (
         lambda whatsapp_id: f"{host}/v1/contacts/{whatsapp_id}/profile"
     )
 
     yield client
-    tester.application.turn_profile_url = turn_profile_url
+    turn.get_profile_url = get_profile_url
 
 
 @pytest.mark.asyncio

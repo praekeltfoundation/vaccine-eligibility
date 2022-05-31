@@ -45,7 +45,7 @@ async def update_profile(whatsapp_id, data):
     async with utils.get_turn_api() as session:
         for i in range(3):
             try:
-                response = await session.patch(get_profile_url(whatsapp_id))
+                response = await session.patch(get_profile_url(whatsapp_id), json=data)
                 response.raise_for_status()
                 break
             except HTTP_EXCEPTIONS as e:

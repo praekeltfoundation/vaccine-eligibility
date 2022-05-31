@@ -1,16 +1,16 @@
 import asyncio
 import logging
 
+from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, WhatsAppButtonState, WhatsAppListState
-from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
-from yal import utils
+from vaccine.utils import normalise_phonenumber
+from yal import turn
 from yal.onboarding import Application as OnboardingApplication
-from yal.yal_base_application import YalBaseApplication
 
 logger = logging.getLogger(__name__)
 
 
-class Application(YalBaseApplication):
+class Application(BaseApplication):
     START_STATE = "state_welcome"
 
     async def state_welcome(self):
@@ -225,21 +225,8 @@ class Application(YalBaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        async with utils.get_turn_api() as session:
-            for i in range(3):
-                try:
-                    data = {"terms_accepted": True}
-                    response = await session.patch(
-                        self.turn_profile_url(whatsapp_id),
-                        json=data,
-                    )
-                    response.raise_for_status()
-                    break
-                except HTTP_EXCEPTIONS as e:
-                    if i == 2:
-                        logger.exception(e)
-                        return await self.go_to_state("state_error")
-                    else:
-                        continue
+        error = await turn.update_profile(whatsapp_id, {"terms_accepted": True})
+        if error:
+            return await self.go_to_state("state_error")
 
         return await self.go_to_state(OnboardingApplication.START_STATE)

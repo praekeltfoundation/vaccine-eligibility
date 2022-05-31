@@ -1,14 +1,14 @@
 import logging
 
+from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, ChoiceState, EndState, SectionedChoiceState
 from yal import contentrepo
 from yal.change_preferences import Application as ChangePreferencesApplication
-from yal.yal_base_application import YalBaseApplication
 
 logger = logging.getLogger(__name__)
 
 
-class Application(YalBaseApplication):
+class Application(BaseApplication):
     START_STATE = "state_mainmenu"
 
     async def state_mainmenu(self):
