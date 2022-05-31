@@ -3,6 +3,7 @@ import logging
 from vaccine.states import EndState
 from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
 from yal import utils
+from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
 from yal.terms_and_conditions import Application as TermsApplication
@@ -13,7 +14,12 @@ GREETING_KEYWORDS = {"hi", "hello", "menu", "0"}
 HELP_KEYWORDS = {"#", "help"}
 
 
-class Application(TermsApplication, OnboardingApplication, MainMenuApplication):
+class Application(
+    TermsApplication,
+    OnboardingApplication,
+    MainMenuApplication,
+    ChangePreferencesApplication,
+):
     START_STATE = "state_start"
 
     async def process_message(self, message):
