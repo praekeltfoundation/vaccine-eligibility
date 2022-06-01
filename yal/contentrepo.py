@@ -85,7 +85,20 @@ async def get_page_details(user, page_id):
 
                 page_details["has_children"] = response_body["has_children"]
                 page_details["title"] = response_body["title"]
+                page_details["subtitle"] = response_body["subtitle"]
                 page_details["body"] = response_body["body"]["text"]["value"]["message"]
+
+                if response_body["body"]["text"]["value"]["image"]:
+                    image_id = response_body["body"]["text"]["value"]["image"]
+                    response = await session.get(
+                        urljoin(
+                            config.CONTENTREPO_API_URL, f"/api/v2/images/{image_id}"
+                        )
+                    )
+                    page_details["image_url"] = urljoin(
+                        config.CONTENTREPO_API_URL, response["meta"]["download_url"]
+                    )
+
                 # TODO: handle multiple messages on one page.
 
                 break

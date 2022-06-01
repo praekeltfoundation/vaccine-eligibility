@@ -26,7 +26,7 @@ def build_message_detail(id, title, subtitle, content, tags, has_children):
             "total_messages": 1,
             "text": {
                 "type": "Whatsapp_Message",
-                "value": {"message": content},
+                "value": {"image": None, "message": content},
                 "id": "111b8f05-be1b-4461-ac85-562930747336",
             },
             "revision": id,
@@ -200,6 +200,7 @@ async def test_state_mainmenu_contentrepo(tester: AppTester, contentrepo_api_moc
     question = "\n".join(
         [
             "*Sub menu 2*",
+            "subtitle",
             "-----",
             "",
             "Sub menu test content 2",
@@ -234,6 +235,7 @@ async def test_state_mainmenu_contentrepo_children(
     question = "\n".join(
         [
             "*Sub menu 1*",
+            "subtitle",
             "-----",
             "",
             "Sub menu test content 2",
@@ -257,6 +259,7 @@ async def test_state_mainmenu_contentrepo_children(
     question = "\n".join(
         [
             "*Sub menu 2*",
+            "subtitle",
             "-----",
             "",
             "Sub menu test content 2",

@@ -92,7 +92,9 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         self.save_answer("title", page_details["title"])
+        self.save_answer("subtitle", page_details["subtitle"])
         self.save_answer("body", page_details["body"])
+        self.save_answer("image_url", page_details.get("image_url"))
 
         if page_details["has_children"]:
             return await self.go_to_state("state_submenu")
@@ -110,8 +112,11 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         title = self.user.answers["title"]
+        subtitle = self.user.answers["subtitle"]
         body = self.user.answers["body"]
-        question = self._("\n".join([f"*{title}*", "-----", "", body, ""]))
+
+        parts = [f"*{title}*", subtitle, "-----", "", body, ""]
+        question = self._("\n".join([part for part in parts if part is not None]))
 
         return ChoiceState(
             self,
@@ -137,30 +142,31 @@ class Application(BaseApplication):
         )
 
     async def state_detail(self):
-        title = self.user.answers["title"]
-        body = self.user.answers["body"]
-        question = self._(
-            "\n".join(
-                [
-                    f"*{title}*",
-                    "-----",
-                    "",
-                    body,
-                    "",
-                    "-----",
-                    "Or reply:",
-                    "",
-                    "0. 🏠 Back to Main MENU",
-                    "# 🆘 Get HELP",
-                ]
-            )
-        )
+        answers = self.user.answers
+        title = answers["title"]
+        subtitle = answers["subtitle"]
+        body = answers["body"]
 
-        return EndState(
-            self,
-            question,
-            next=self.START_STATE,
-        )
+        parts = [
+            f"*{title}*",
+            subtitle,
+            "-----",
+            "",
+            body,
+            "",
+            "-----",
+            "Or reply:",
+            "",
+            "0. 🏠 Back to Main MENU",
+            "# 🆘 Get HELP",
+        ]
+        question = self._("\n".join([part for part in parts if part is not None]))
+
+        metadata = {}
+        if "image_url" in answers and answers["image_url"]:
+            metadata["image"] = answers["image_url"]
+
+        return EndState(self, question, next=self.START_STATE, helper_metadata=metadata)
 
     async def state_please_call_me(self):
         return EndState(
