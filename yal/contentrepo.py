@@ -85,6 +85,7 @@ async def get_page_details(user, page_id):
 
                 page_details["has_children"] = response_body["has_children"]
                 page_details["title"] = response_body["title"]
+                page_details["subtitle"] = response_body["subtitle"]
                 page_details["body"] = response_body["body"]["text"]["value"]["message"]
                 # TODO: handle multiple messages on one page.
 

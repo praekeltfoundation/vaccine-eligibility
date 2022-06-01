@@ -200,6 +200,7 @@ async def test_state_mainmenu_contentrepo(tester: AppTester, contentrepo_api_moc
     question = "\n".join(
         [
             "*Sub menu 2*",
+            "subtitle",
             "-----",
             "",
             "Sub menu test content 2",
@@ -234,6 +235,7 @@ async def test_state_mainmenu_contentrepo_children(
     question = "\n".join(
         [
             "*Sub menu 1*",
+            "subtitle",
             "-----",
             "",
             "Sub menu test content 2",
@@ -257,6 +259,7 @@ async def test_state_mainmenu_contentrepo_children(
     question = "\n".join(
         [
             "*Sub menu 2*",
+            "subtitle",
             "-----",
             "",
             "Sub menu test content 2",

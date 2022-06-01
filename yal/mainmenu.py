@@ -92,6 +92,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         self.save_answer("title", page_details["title"])
+        self.save_answer("subtitle", page_details["subtitle"])
         self.save_answer("body", page_details["body"])
 
         if page_details["has_children"]:
@@ -110,8 +111,11 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         title = self.user.answers["title"]
+        subtitle = self.user.answers["subtitle"]
         body = self.user.answers["body"]
-        question = self._("\n".join([f"*{title}*", "-----", "", body, ""]))
+
+        parts = [f"*{title}*", subtitle, "-----", "", body, ""]
+        question = self._("\n".join([part for part in parts if part is not None]))
 
         return ChoiceState(
             self,
@@ -138,23 +142,23 @@ class Application(BaseApplication):
 
     async def state_detail(self):
         title = self.user.answers["title"]
+        subtitle = self.user.answers["subtitle"]
         body = self.user.answers["body"]
-        question = self._(
-            "\n".join(
-                [
-                    f"*{title}*",
-                    "-----",
-                    "",
-                    body,
-                    "",
-                    "-----",
-                    "Or reply:",
-                    "",
-                    "0. 🏠 Back to Main MENU",
-                    "# 🆘 Get HELP",
-                ]
-            )
-        )
+
+        parts = [
+            f"*{title}*",
+            subtitle,
+            "-----",
+            "",
+            body,
+            "",
+            "-----",
+            "Or reply:",
+            "",
+            "0. 🏠 Back to Main MENU",
+            "# 🆘 Get HELP",
+        ]
+        question = self._("\n".join([part for part in parts if part is not None]))
 
         return EndState(
             self,
