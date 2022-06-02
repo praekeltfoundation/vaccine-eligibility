@@ -14,7 +14,7 @@ def tester():
     return AppTester(Application)
 
 
-def build_message_detail(id, title, subtitle, content, tags, has_children):
+def build_message_detail(id, title, subtitle, content, tags, has_children, image=None):
     return {
         "id": id,
         "title": title,
@@ -26,7 +26,7 @@ def build_message_detail(id, title, subtitle, content, tags, has_children):
             "total_messages": 1,
             "text": {
                 "type": "Whatsapp_Message",
-                "value": {"image": None, "message": content},
+                "value": {"image": image, "message": content},
                 "id": "111b8f05-be1b-4461-ac85-562930747336",
             },
             "revision": id,
@@ -63,6 +63,9 @@ async def contentrepo_api_mock(sanic_client):
         if child_of in ["111", "222", "333", "444"]:
             pages.append({"id": 333, "title": "Sub menu 1"})
             pages.append({"id": 444, "title": "Sub menu 2"})
+            pages.append({"id": 1231, "title": "Sub menu 3"})
+        if child_of == "1231":
+            pages.append({"id": 1232, "title": "Sub Menu with image"})
 
         return response.json(
             {
@@ -127,6 +130,43 @@ async def contentrepo_api_mock(sanic_client):
             )
         )
 
+    @app.route("/api/v2/pages/1231", methods=["GET"])
+    def get_page_detail_1231(request):
+        app.requests.append(request)
+        return response.json(
+            build_message_detail(
+                444,
+                "Sub menu 2",
+                "subtitle",
+                "Sub menu test content with image",
+                ["test"],
+                True,
+                "1",
+            )
+        )
+
+    @app.route("/api/v2/pages/1232", methods=["GET"])
+    def get_page_detail_1232(request):
+        app.requests.append(request)
+        return response.json(
+            build_message_detail(
+                444,
+                "Sub menu 2",
+                "subtitle",
+                "Detail test content with image",
+                ["test"],
+                False,
+                "2",
+            )
+        )
+
+    @app.route("/api/v2/images/<image_id:int>", methods=["GET"])
+    def get_image(request, image_id):
+        app.requests.append(request)
+        return response.json(
+            {"meta": {"download_url": f"/media/original_images/test{image_id}.jpg"}}
+        )
+
     client = await sanic_client(app)
     url = config.CONTENTREPO_API_URL
     config.CONTENTREPO_API_URL = f"http://{client.host}:{client.port}"
@@ -154,16 +194,18 @@ async def test_state_mainmenu_start(tester: AppTester, contentrepo_api_mock):
                 "*Main Menu 1 💊*",
                 "3. Sub menu 1",
                 "4. Sub menu 2",
+                "5. Sub menu 3",
                 "-----",
                 "*Main Menu 2 🤝*",
-                "5. Sub menu 1",
-                "6. Sub menu 2",
+                "6. Sub menu 1",
+                "7. Sub menu 2",
+                "8. Sub menu 3",
                 "-----",
                 "*🤔 WHAT's EVERYONE ELSE ASKING?*",
-                "7. FAQs",
+                "9. FAQs",
                 "-----",
                 "*⚙️ CHAT SETTINGS*",
-                "8. Change/Update Your Personal Info",
+                "10. Change/Update Your Personal Info",
                 "-----",
                 "💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
             ]
@@ -216,7 +258,6 @@ async def test_state_mainmenu_contentrepo(tester: AppTester, contentrepo_api_moc
     tester.assert_num_messages(1)
     tester.assert_message(question)
 
-    print([r.path for r in contentrepo_api_mock.app.requests])
     assert [r.path for r in contentrepo_api_mock.app.requests] == [
         "/api/v2/pages",
         "/api/v2/pages",
@@ -242,6 +283,7 @@ async def test_state_mainmenu_contentrepo_children(
             "",
             "1. Sub menu 1",
             "2. Sub menu 2",
+            "3. Sub menu 3",
             "",
             "-----",
             "Or reply:",
@@ -292,3 +334,58 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["whatsapp"][0] == "true"
     assert params["data__session_id"][0] == "1"
     assert params["data__user_addr"][0] == "27820001001"
+
+
+@pytest.mark.asyncio
+async def test_state_submenu_image(tester: AppTester, contentrepo_api_mock):
+    tester.setup_state("state_mainmenu")
+    await tester.user_input("5")
+
+    question = "\n".join(
+        [
+            "*Sub menu 2*",
+            "subtitle",
+            "-----",
+            "",
+            "Sub menu test content with image",
+            "",
+            "1. Sub Menu with image",
+            "",
+            "-----",
+            "Or reply:",
+            "",
+            "0. 🏠 Back to Main MENU",
+            "# 🆘 Get HELP",
+        ]
+    )
+
+    [msg] = tester.application.messages
+    assert "/media/original_images/test1.jpg" in msg.helper_metadata["image"]
+    tester.assert_message(question)
+
+
+@pytest.mark.asyncio
+async def test_state_detail_image(tester: AppTester, contentrepo_api_mock):
+    tester.setup_state("state_mainmenu")
+    await tester.user_input("5")
+    await tester.user_input("1")
+
+    question = "\n".join(
+        [
+            "*Sub menu 2*",
+            "subtitle",
+            "-----",
+            "",
+            "Detail test content with image",
+            "",
+            "-----",
+            "Or reply:",
+            "",
+            "0. 🏠 Back to Main MENU",
+            "# 🆘 Get HELP",
+        ]
+    )
+
+    [msg] = tester.application.messages
+    assert "/media/original_images/test2.jpg" in msg.helper_metadata["image"]
+    tester.assert_message(question)

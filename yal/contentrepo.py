@@ -26,6 +26,10 @@ def get_contentrepo_api():
     )
 
 
+def get_url(path):
+    return urljoin(config.CONTENTREPO_API_URL, path)
+
+
 def get_image_url(image):
     return urljoin(config.CONTENTREPO_API_URL, f"media/original_images/{image}")
 
@@ -95,9 +99,9 @@ async def get_page_details(user, page_id):
                             config.CONTENTREPO_API_URL, f"/api/v2/images/{image_id}"
                         )
                     )
-                    page_details["image_url"] = urljoin(
-                        config.CONTENTREPO_API_URL, response["meta"]["download_url"]
-                    )
+                    response.raise_for_status()
+                    response_body = await response.json()
+                    page_details["image_path"] = response_body["meta"]["download_url"]
 
                 # TODO: handle multiple messages on one page.
 
