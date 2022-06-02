@@ -70,6 +70,7 @@ class ChoiceState:
         header: Optional[str] = None,
         error_header: Optional[str] = None,
         buttons: Optional[List[Choice]] = None,
+        helper_metadata: Optional[dict] = None,
     ):
         self.app = app
         self.question = question
@@ -82,6 +83,7 @@ class ChoiceState:
         self.header = header
         self.error_header = error_header
         self.buttons = buttons
+        self.helper_metadata = helper_metadata
 
     def _normalise_text(self, text: Optional[str]) -> str:
         return (text or "").strip().lower()
@@ -136,7 +138,7 @@ class ChoiceState:
         return self.app.send_message(text)
 
     async def display(self, message: Message):
-        helper_metadata: Dict[str, Any] = {}
+        helper_metadata: Dict[str, Any] = self.helper_metadata or {}
         if self.buttons:
             helper_metadata["buttons"] = [choice.label for choice in self.buttons]
         text = f"{self.question}\n{self._display_choices}"
@@ -176,6 +178,7 @@ class MenuState(ChoiceState):
         self.header = header
         self.error_header = error_header
         self.buttons = None
+        self.helper_metadata = None
 
     async def _next(self, choice: Choice):
         return choice.value

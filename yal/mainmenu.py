@@ -106,17 +106,23 @@ class Application(BaseApplication):
             self.save_answer("selected_page_id", choice.value)
             return "state_contentrepo_page"
 
-        page_id = self.user.answers["selected_page_id"]
+        answers = self.user.answers
+
+        page_id = answers["selected_page_id"]
         error, choices = await contentrepo.get_choices_by_parent(page_id)
         if error:
             return await self.go_to_state("state_error")
 
-        title = self.user.answers["title"]
-        subtitle = self.user.answers["subtitle"]
-        body = self.user.answers["body"]
+        title = answers["title"]
+        subtitle = answers["subtitle"]
+        body = answers["body"]
 
         parts = [f"*{title}*", subtitle, "-----", "", body, ""]
         question = self._("\n".join([part for part in parts if part is not None]))
+
+        metadata = {}
+        if "image_url" in answers and answers["image_url"]:
+            metadata["image"] = answers["image_url"]
 
         return ChoiceState(
             self,
@@ -139,6 +145,7 @@ class Application(BaseApplication):
                     ]
                 )
             ),
+            helper_metadata=metadata,
         )
 
     async def state_detail(self):
