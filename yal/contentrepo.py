@@ -70,13 +70,14 @@ async def get_choices_by_path(path):
     return False, choices
 
 
-async def get_page_details(user, page_id):
+async def get_page_details(user, page_id, message_id):
     page_details = {}
     async with get_contentrepo_api() as session:
         for i in range(3):
             try:
                 params = {
                     "whatsapp": "true",
+                    "message": message_id,
                     "data__session_id": user.session_id,
                     "data__user_addr": user.addr,
                 }
@@ -92,6 +93,15 @@ async def get_page_details(user, page_id):
                 page_details["subtitle"] = response_body["subtitle"]
                 page_details["body"] = response_body["body"]["text"]["value"]["message"]
 
+                if not page_details["has_children"]:
+                    message_number = response_body["body"]["message"]
+                    total_messages = response_body["body"]["total_messages"]
+
+                    if total_messages > message_number:
+                        page_details["next_prompt"] = response_body["body"]["text"][
+                            "value"
+                        ].get("next_prompt", "Next")
+
                 if response_body["body"]["text"]["value"]["image"]:
                     image_id = response_body["body"]["text"]["value"]["image"]
                     response = await session.get(
@@ -102,8 +112,6 @@ async def get_page_details(user, page_id):
                     response.raise_for_status()
                     response_body = await response.json()
                     page_details["image_path"] = response_body["meta"]["download_url"]
-
-                # TODO: handle multiple messages on one page.
 
                 break
             except HTTP_EXCEPTIONS as e:

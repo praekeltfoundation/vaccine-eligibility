@@ -14,7 +14,9 @@ def tester():
     return AppTester(Application)
 
 
-def build_message_detail(id, title, subtitle, content, tags, has_children, image=None):
+def build_message_detail(
+    id, title, subtitle, content, tags, has_children, image=None, total_messages=1
+):
     return {
         "id": id,
         "title": title,
@@ -23,7 +25,7 @@ def build_message_detail(id, title, subtitle, content, tags, has_children, image
             "message": 1,
             "next_message": None,
             "previous_message": None,
-            "total_messages": 1,
+            "total_messages": total_messages,
             "text": {
                 "type": "Whatsapp_Message",
                 "value": {"image": image, "message": content},
@@ -157,6 +159,7 @@ async def contentrepo_api_mock(sanic_client):
                 ["test"],
                 False,
                 "2",
+                2,
             )
         )
 
@@ -377,6 +380,8 @@ async def test_state_detail_image(tester: AppTester, contentrepo_api_mock):
             "-----",
             "",
             "Detail test content with image",
+            "",
+            "1. Next",
             "",
             "-----",
             "Or reply:",

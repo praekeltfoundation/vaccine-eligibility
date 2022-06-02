@@ -17,6 +17,7 @@ class Application(BaseApplication):
                 return choice.value
             else:
                 self.save_answer("selected_page_id", choice.value)
+                self.save_answer("current_message_id", 1)
                 return "state_contentrepo_page"
 
         sections = [
@@ -87,7 +88,10 @@ class Application(BaseApplication):
 
     async def state_contentrepo_page(self):
         page_id = self.user.answers["selected_page_id"]
-        error, page_details = await contentrepo.get_page_details(self.user, page_id)
+        message_id = self.user.answers["current_message_id"]
+        error, page_details = await contentrepo.get_page_details(
+            self.user, page_id, message_id
+        )
         if error:
             return await self.go_to_state("state_error")
 
@@ -98,12 +102,16 @@ class Application(BaseApplication):
 
         if page_details["has_children"]:
             return await self.go_to_state("state_submenu")
+        elif "next_prompt" in page_details:
+            self.save_answer("next_prompt", page_details["next_prompt"])
+            return await self.go_to_state("state_detail_with_next")
         else:
             return await self.go_to_state("state_detail")
 
     async def state_submenu(self):
         async def next_(choice: Choice):
             self.save_answer("selected_page_id", choice.value)
+            self.save_answer("current_message_id", 1)
             return "state_contentrepo_page"
 
         answers = self.user.answers
@@ -132,6 +140,50 @@ class Application(BaseApplication):
                 "available\n"
             ),
             choices=choices,
+            next=next_,
+            footer=self._(
+                "\n".join(
+                    [
+                        "",
+                        "-----",
+                        "Or reply:",
+                        "",
+                        "0. 🏠 Back to Main MENU",
+                        "# 🆘 Get HELP",
+                    ]
+                )
+            ),
+            helper_metadata=metadata,
+        )
+
+    async def state_detail_with_next(self):
+        async def next_(choice: Choice):
+            message_id = self.user.answers["current_message_id"]
+            self.save_answer("current_message_id", message_id + 1)
+            return "state_contentrepo_page"
+
+        answers = self.user.answers
+        title = answers["title"]
+        subtitle = answers["subtitle"]
+        body = answers["body"]
+        next_prompt = answers["next_prompt"]
+
+        parts = [f"*{title}*", subtitle, "-----", "", body, ""]
+        question = self._("\n".join([part for part in parts if part is not None]))
+
+        metadata = {}
+        if "image_path" in answers and answers["image_path"]:
+            metadata["image"] = contentrepo.get_url(answers["image_path"])
+
+        return ChoiceState(
+            self,
+            question=question,
+            error=self._(
+                "⚠️ This service works best when you use the numbered options "
+                "available\n"
+            ),
+            choices=[Choice("next", next_prompt)],
+            buttons=[Choice("next", next_prompt)],
             next=next_,
             footer=self._(
                 "\n".join(
