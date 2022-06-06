@@ -98,9 +98,10 @@ async def get_page_details(user, page_id, message_id):
                     total_messages = response_body["body"]["total_messages"]
 
                     if total_messages > message_number:
-                        page_details["next_prompt"] = response_body["body"]["text"][
-                            "value"
-                        ].get("next_prompt", "Next")
+                        page_details["next_prompt"] = (
+                            response_body["body"]["text"]["value"].get("next_prompt")
+                            or "Next"
+                        )
 
                 if response_body["body"]["text"]["value"]["image"]:
                     image_id = response_body["body"]["text"]["value"]["image"]
