@@ -6,13 +6,13 @@ from typing import Callable, List
 from urllib.parse import urljoin
 
 import aiohttp
-import aioredis
+import redis.asyncio as aioredis
 import sentry_sdk
 from aio_pika import Connection, ExchangeType, IncomingMessage
 from aio_pika import Message as AMQPMessage
 from aio_pika import connect_robust
 from aio_pika.message import DeliveryMode
-from aioredis.exceptions import LockNotOwnedError
+from redis.exceptions import LockNotOwnedError
 
 from vaccine import config
 from vaccine.models import Answer, Event, Message, User

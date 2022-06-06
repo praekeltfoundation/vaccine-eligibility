@@ -4,8 +4,8 @@ from asyncio import Future, sleep
 from datetime import datetime, timezone
 from io import StringIO
 
-import aioredis
 import pytest
+import redis.asyncio as aioredis
 from aio_pika import DeliveryMode, Exchange
 from aio_pika import Message as AMQPMessage
 from aio_pika import Queue, connect_robust
