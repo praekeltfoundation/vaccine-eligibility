@@ -28,7 +28,7 @@ def build_message_detail(
             "total_messages": total_messages,
             "text": {
                 "type": "Whatsapp_Message",
-                "value": {"image": image, "message": content},
+                "value": {"image": image, "message": content, "next_prompt": ""},
                 "id": "111b8f05-be1b-4461-ac85-562930747336",
             },
             "revision": id,
