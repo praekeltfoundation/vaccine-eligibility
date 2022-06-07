@@ -25,23 +25,74 @@ logger = logging.getLogger(__name__)
 class Application(BaseApplication):
     START_STATE = "state_dob_year"
 
+    async def state_dob_full(self):
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "*ABOUT YOU*",
+                        "🎂 Date of Birth",
+                        "-----",
+                        "🙍🏾‍♀️ *Great! I'm just going to ask you a few quick "
+                        "questions*",
+                        "",
+                        "*What is your Date of birth?*",
+                        "Type the numbers that match when you were born e.g. "
+                        "(30/09/2007)",
+                    ]
+                )
+            ),
+            next="state_validate_full_dob",
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_validate_full_dob(self):
+        value = self.user.answers["state_dob_full"]
+
+        if value == "skip":
+            return await self.go_to_state("state_relationship_status")
+
+        try:
+            dob = date.strptime(value, "%d/%m/%Y")
+
+            self.save_answer("state_dob_day", dob.day)
+            self.save_answer("state_dob_month", dob.month)
+            self.save_answer("state_dob_year", dob.year)
+
+            return await self.go_to_state("state_check_birthday")
+        except ValueError:
+            msg = self._(
+                "Umm...I'm sorry but I'm not sure what that means🤦🏾‍♀️ You can help "
+                "me by trying again. This time, we'll break it up into year, "
+                "month and day.👍🏽"
+            )
+            await self.worker.publish_message(
+                self.inbound.reply(
+                    msg,
+                    helper_metadata={"image": contentrepo.get_image_url("hbd.png")},
+                )
+            )
+            await asyncio.sleep(1.5)
+            return await self.go_to_state("state_dob_year")
+
     async def state_dob_year(self):
         return FreeText(
             self,
             question=self._(
                 "\n".join(
                     [
-                        "*GET STARTED*",
-                        "Date of birth",
+                        "*ABOUT YOU*",
+                        "🎂 Date of Birth",
                         "-----",
+                        "🙍🏾‍♀️ *Great! I'm just going to ask you a few quick "
+                        "questions*",
                         "",
-                        "Perfect. And finally, which year?",
+                        "*Which year were you born?*",
+                        "Reply with a number. (e.g.2007)",
                         "",
-                        "Reply with a number. (e.g. 2007)",
                         "",
-                        "-----",
-                        "Rather not say?",
-                        "No stress! Just tap SKIP.",
+                        "If you'd rather not say, just tap *SKIP*.",
                     ]
                 )
             ),
@@ -58,13 +109,16 @@ class Application(BaseApplication):
         return ChoiceState(
             self,
             question=self._(
-                "*GETTING STARTED*\n"
-                "Your date of birth\n"
-                "-----\n"
-                "Great! I'm just going to ask you a few quick questions\n"
-                "\n"
-                "*What month where you born in?*\n"
-                "Reply with a number:"
+                "\n".join(
+                    [
+                        "*ABOUT YOU*",
+                        "🎂 Date of Birth",
+                        "-----",
+                        "🙍🏾‍♀️ *Great!  And What month where you born in?*",
+                        "",
+                        "Reply with a number:",
+                    ]
+                )
             ),
             choices=[
                 Choice("1", self._("January")),
@@ -91,15 +145,16 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "*GET STARTED*",
-                    "Your date of birth",
+                    "*ABOUT YOU*",
+                    "🎂 Date of Birth",
                     "-----",
                     "",
-                    "*Great. And which day were you born on?*",
+                    "🙍🏾‍♀️ *Perfect! And finally, which day were you born on?*",
                     "",
-                    "Reply with a number. (e.g. *30* - if you were born on the 30th)",
+                    "Reply with a number from 1-31",
+                    "(e.g. 30 - if you were born on the 30th)",
                     "",
-                    "If you'd rather not say, just tap *SKIP*.",
+                    "*If you'd rather not say, just tap SKIP.*",
                 ]
             )
         )
@@ -147,26 +202,28 @@ class Application(BaseApplication):
                 )
                 await asyncio.sleep(1.5)
 
-        return await self.go_to_state("state_confirm_age")
-
-    async def state_confirm_age(self):
-        # TODO: Need to confirm in miro first
         return await self.go_to_state("state_relationship_status")
 
     async def state_relationship_status(self):
         question = self._(
             "\n".join(
                 [
-                    "*GET STARTED*",
-                    "Your Relationship Status",
+                    "*Fantastic!*",
+                    "✅  Birthday",
+                    "◻️  *Relationship Status*",
+                    "◻️  Location",
+                    "◻️  Gender",
+                    "",
                     "-----",
+                    "*ABOUT YOU*",
+                    "💟 Relationship Status",
                     "",
-                    "*And what about love? Seeing someone special right now?*",
+                    "🙍🏾‍♀️ *And what about love? Seeing someone special right now?*",
                     "",
-                    "*1*. Yes",
-                    "*2*. It's complicated",
-                    "*3*. No",
-                    "*4*. Skip",
+                    "1. Yes",
+                    "2. It's complicated",
+                    "3. No",
+                    "4. Skip",
                 ]
             )
         )
@@ -175,39 +232,14 @@ class Application(BaseApplication):
             question=question,
             button="Relationship Status",
             choices=[
-                Choice("yes", self._("Yes")),
+                Choice("yes", self._("I'm seeing someone")),
                 Choice("complicated", self._("It's complicated")),
-                Choice("no", self._("No")),
+                Choice("no", self._("I'm not seeing anyone")),
                 Choice("skip", self._("Skip")),
             ],
-            next="state_relationship_status_confirm",
+            next="state_province",
             error=self._("TODO"),
         )
-
-    async def state_relationship_status_confirm(self):
-        await self.worker.publish_message(
-            self.inbound.reply(
-                self._(
-                    "\n".join(
-                        [
-                            "Amazing!",
-                            "",
-                            "✅ ~Birthday~",
-                            "✅ ~Relationship Status~",
-                            "◻️ *Location*",
-                            "◻️ Gender",
-                            "-----",
-                            "",
-                            f"As for me, it's been {utils.get_bot_age()} days and I'm "
-                            "still waiting to meet that special some-bot 🤖.",
-                            "Not that I'm counting...",
-                        ]
-                    )
-                )
-            )
-        )
-        await asyncio.sleep(0.5)
-        return await self.go_to_state("state_province")
 
     async def state_province(self):
         province_text = "\n".join(
@@ -219,21 +251,25 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "*ABOUT YOU*",
-                    "📍 Province",
+                    "Amazing!",
+                    "",
+                    "✅ Birthday",
+                    "✅ Relationship Status",
+                    "◻️ Location",
+                    "◻️ Gender",
+                    "",
+                    "You're half way there👍🏾",
                     "-----",
+                    "ABOUT YOU",
+                    "📍 Province",
                     "",
-                    "🙍🏾‍♀️ To be able to recommend you youth-friendly clinics and FREE "
-                    "services near you I'll need to know where you're staying "
-                    "currently. 🙂",
+                    "To be able to suggest youth-friendly clinics and FREE services "
+                    "near you, I need to know where you live.",
                     "",
-                    "*Which PROVINCE are you in?*",
-                    "You can type the number or choose from the menu.",
+                    "🙍🏾‍♀️Which PROVINCE are you in?",
+                    "Type the number or choose from the list.",
                     "",
                     province_text,
-                    "-----",
-                    "👩🏾 *Rather not say?*",
-                    "No stress! Just say SKIP.",
                 ]
             )
         )
@@ -316,38 +352,38 @@ class Application(BaseApplication):
     async def state_gender(self):
         async def next_(choice: Choice):
             if choice.value == "other":
-                return "state_name_gender_confirm"
+                return "state_name_gender"
             return "state_submit_onboarding"
 
         question = self._(
             "\n".join(
                 [
-                    "*GET STARTED*",
-                    "Choose your gender",
+                    "*ABOUT YOU*",
+                    "🌈 How you identify",
                     "-----",
                     "",
-                    "*Nearly there!*",
+                    "*You're almost done!*🙌🏾",
                     "",
-                    "✅ ~Birthday~",
-                    "✅ ~Relationship Status~",
-                    "✅ ~Location~",
-                    "◻️ *Gender*",
+                    "✅ Birthday",
+                    "✅ Relationship Status",
+                    "✅ Location",
+                    "◻️ Gender",
                     "-----",
                     "",
                     "*What's your gender?*",
-                    " ",
+                    "",
                     "Please select the option you think best describes you:",
-                    " ",
-                    "1 - Girl/Woman",
-                    "2 - Cisgender",
-                    "3 - Boy?Man",
-                    "4 - Genderfluid",
-                    "5 - Intersex",
-                    "6 - Non-binary",
-                    "7 - Questioning",
-                    "8 - Transgender",
-                    "9 - Something else",
-                    "10 - Skip",
+                    "",
+                    "*1* - Girl/Woman",
+                    "*2* - Cisgender",
+                    "*3* - Boy/Man",
+                    "*4* - Genderfluid",
+                    "*5* - Intersex",
+                    "*6* - Non-binary",
+                    "*7* - Questioning",
+                    "*8* - Transgender",
+                    "*9* - Something else",
+                    "*10* - Skip",
                 ]
             )
         )
@@ -371,47 +407,18 @@ class Application(BaseApplication):
             error=self._("TODO"),
         )
 
-    async def state_name_gender_confirm(self):
-        question = self._(
-            "\n".join(
-                [
-                    "*GET STARTED*",
-                    "Choose your gender",
-                    "-----",
-                    "",
-                    "Sure. I want to make double sure you feel included.",
-                    "",
-                    "Would you like to name your own gender?",
-                    "",
-                    "1. Yes",
-                    "2. No",
-                ]
-            )
-        )
-        error = self._("TODO")
-
-        return WhatsAppButtonState(
-            self,
-            question=question,
-            choices=[Choice("yes", "Yes"), Choice("no", "No")],
-            error=error,
-            next={
-                "yes": "state_name_gender",
-                "no": "state_submit_onboarding",
-            },
-        )
-
     async def state_name_gender(self):
         question = self._(
             "\n".join(
                 [
-                    "*GET STARTED*",
-                    "Name your gender",
+                    "*ABOUT YOU*",
+                    "🌈 Preferred Identity",
                     "-----",
                     "",
-                    "No problem 😌  Go ahead and let me know what you'd prefer.",
+                    "🙍🏾‍♀️ Sure. I want to make double sure you feel included.",
                     "",
-                    "*Type something and hit send.*",
+                    "*Go ahead and let me know what you'd prefer. Type something and "
+                    "hit send. *😌",
                 ]
             )
         )
@@ -420,6 +427,7 @@ class Application(BaseApplication):
             question=question,
             next="state_submit_onboarding",
             check=nonempty_validator(question),
+            buttons=[Choice("skip", self._("Skip"))],
         )
 
     async def state_submit_onboarding(self):
