@@ -32,15 +32,15 @@ class Application(BaseApplication):
 
     async def state_emergency_prompt(self):
         question = self._(
-            "🆘 *Got an emergency?*\n"
+            "🆘 *Are you in trouble?*\n"
             "-----\n"
             "\n"
-            "Before we continue, I just wanna check whether you're in an emergency "
-            "situation and need to speak to a human.\n"
+            "🙍🏾‍♀️ Before we continue, I just want to check - *do you need to speak "
+            "to a human now?*\n"
             "\n"
             "*REPLY:*\n"
-            "1 - Talk to a human 🧑🏾‍🚀\n"
-            "2 - No, I'm good 👍\n"
+            "*1* - Yes, I need human help\n"
+            "*2* - No, I'm good"
         )
         error = self._("TODO")
 
@@ -48,7 +48,7 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("yes", "Talk to a human"),
+                Choice("yes", "Yes, I need help now"),
                 Choice("no", "No, I'm good 👍"),
             ],
             error=error,
@@ -82,21 +82,20 @@ class Application(BaseApplication):
     async def state_get_to_know(self):
         question = self._(
             "*Let's get to know each other better*\n"
-            "-----\n"
             "\n"
-            "Before we get started, do you mind if I ask you a few Qs? It will help "
-            "me do a better job at answering yours.\n"
+            "Do you mind if I ask you a few Qs? It will help me do a better job at "
+            "answering your questions. 🙃\n"
             "\n"
             "*Reply:*\n"
-            "1 - OK 👍\n"
-            "2 - Why? 🤔"
+            "*1* - OK\n"
+            "*2* - Why?"
         )
         error = self._("TODO")
 
         return WhatsAppButtonState(
             self,
             question=question,
-            choices=[Choice("ok", "OK 👍"), Choice("why", "Why? 🤔")],
+            choices=[Choice("ok", "Ok"), Choice("why", "Why?")],
             error=error,
             next={
                 "ok": "state_pre_terms",
@@ -106,24 +105,44 @@ class Application(BaseApplication):
 
     async def state_get_to_know_why(self):
         question = self._(
-            "ℹ️ *QUESTIONS ABOUT YOU*\n"
-            "Why do we ask these questions?\n"
-            "-----\n"
+            "🤔 *Why the questions?*\n"
             "\n"
-            "This info helps the B-Wise team make me a better bot. *You never have "
-            "to share anything you don't want to.*"
+            "🙍🏾‍♀️ These questions help the B-Wise team improve your experience with "
+            "me. The more I learn from you, the better the service will be for you.\n"
+            "\n"
+            "*Don't worry, you never have to share anything you don't want to. 🙂*\n"
+            "\n"
+            "*Ready?*\n"
+            "*1* - Ok"
+            "*2* - No Thanks"
         )
         error = self._("TODO")
 
         return WhatsAppButtonState(
             self,
             question=question,
-            choices=[Choice("ok", "OK 👍")],
+            choices=[Choice("ok", "Ok"), Choice("no", "No thanks")],
             error=error,
             next={
                 "ok": "state_pre_terms",
+                "no": "state_decline_get_to_know"
             },
         )
+
+    async def state_decline_get_to_know(self):
+        await self.worker.publish_message(
+            self.inbound.reply(
+                self._(
+                    "😫 *We're sad to see you go.\n"
+                "\n"
+                "🙍🏾‍♀️ Although we'd love to chat, we understand that you might not be ready. If you change your mind, just sent the word HI to this number and we can start again.\n"
+                "\n"
+                "*See you next time*👋🏾"
+                )
+            )
+        )
+        await asyncio.sleep(0.5)
+        return await self.go_to_state("state_decline_2")
 
     async def state_pre_terms(self):
         await self.worker.publish_message(
@@ -145,7 +164,7 @@ class Application(BaseApplication):
     async def state_terms(self):
         question = self._(
             "🔒 *TERMS & CONDITIONS*\n"
-            "Young Africa Live: Privacy Policy\n"
+            "~B-Wise by Young Africa Live: Privacy Policy~\n"
             "-----\n"
             "\n"
             "*Before we chat, I need to make sure you’re 💯% cool with our Privacy "
@@ -156,9 +175,9 @@ class Application(BaseApplication):
             "\n"
             "*We good to keep going?*\n"
             "\n"
-            "1 - READ Privacy Policy\n"
-            "2 - I ACCEPT (continue)\n"
-            "3 - I DON'T ACCEPT"
+            "*1 - READ* Privacy Policy\n"
+            "*2 - I ACCEPT* (continue)\n"
+            "*3 - I DON'T ACCEPT*"
         )
         error = self._("TODO")
 
@@ -189,18 +208,18 @@ class Application(BaseApplication):
     async def state_decline_confirm(self):
         question = self._(
             "🔒 *TERMS & CONDITIONS*\n"
-            "Young Africa Live: Privacy Policy\n"
+            "~Young Africa Live: Privacy Policy~\n"
             "-----\n"
             "\n"
-            "⚠️ *Sure you wanna bounce?*\n"
+            "⚠️ *Are you Sure?*\n"
             "\n"
             "Unfortunately, I can't share any info with you if you haven't accepted "
             "the Privacy Policy 😔.\n"
             "\n"
             "It's important for your safety and confidentiality...\n"
             "\n"
-            "1. ✅ ACCEPT Privacy Policy\n"
-            "2. 🛑  END chat"
+            "*1. ACCEPT* Privacy Policy\n"
+            "*2. END* chat"
         )
         error = self._("TODO")
 
@@ -208,8 +227,8 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("end", "End chat"),
-                Choice("accept", "Accept Privacy Policy"),
+                Choice("end", "END chat"),
+                Choice("accept", "ACCEPT Privacy Policy"),
             ],
             error=error,
             next={
@@ -219,16 +238,49 @@ class Application(BaseApplication):
         )
 
     async def state_decline_1(self):
-        # TODO: Add decline 2 and 3
-        return EndState(
+        await self.worker.publish_message(
+            self.inbound.reply(
+                self._(
+                    "*No stress—I get it.* 😌\n"
+                    "\n"
+                    "It's wise to think these things over. Your online safety is "
+                    "important to us too.\n"
+                    "\n"
+                    "If you change your mind though, we'll be here! Just send me a *HI* "
+                    "whenever you're ready to chat again. In the mean time, be wise, "
+                    "and look after yourself 😉👋🏾"
+                )
+            )
+        )
+        await asyncio.sleep(0.5)
+        return await self.go_to_state("state_decline_2")
+
+    async def state_decline_2(self):
+        error = self._("Send *HI* to start again.")
+
+        return WhatsAppButtonState(
             self,
-            self._(
-                "No stress—I get it. 😌\n"
+            question=self._(
+                "*Need quick answers?*\n"
+                "*Check out B-Wise online!*👆🏾\n"
                 "\n"
-                "It's wise to think these things over. Your online safety is "
-                "important to us too."
+                "https://bwisehealth.com/ \n"
+                "\n"
+                "You'll find loads of sex, relationships and health info there. It's "
+                "also my other virtual office.\n"
+                "\n"
+                "Feel free to drop me a virtual ~howzit~ there too!\n"
+                "\n"
+                "-----\n"
+                "Send *HI* to start again."
             ),
-            next=self.START_STATE,
+            choices=[
+                Choice("hi", "HI"),
+            ],
+            error=error,
+            next={
+                "hi": "state_welcome",
+            },
         )
 
     async def state_submit_terms_and_conditions(self):
