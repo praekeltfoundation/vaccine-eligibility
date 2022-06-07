@@ -49,7 +49,7 @@ class Application(BaseApplication):
             question=question,
             choices=[
                 Choice("yes", "Yes, I need help now"),
-                Choice("no", "No, I'm good 👍"),
+                Choice("no", "No, I'm good"),
             ],
             error=error,
             next={
@@ -148,16 +148,6 @@ class Application(BaseApplication):
             self.inbound.reply(self._("Awesome, thanks 😌  — So, first things first..."))
         )
         await asyncio.sleep(0.5)
-        return await self.go_to_state("state_terms_pdf")
-
-    async def state_terms_pdf(self):
-        await self.worker.publish_message(
-            self.inbound.reply(
-                None,
-                helper_metadata={"document": contentrepo.get_privacy_policy_url()},
-            )
-        )
-        await asyncio.sleep(1.5)
         return await self.go_to_state("state_terms")
 
     async def state_terms(self):
@@ -191,16 +181,30 @@ class Application(BaseApplication):
             ],
             error=error,
             next={
-                "read": "state_read_terms",
+                "read": "state_terms_pdf",
                 "accept": "state_submit_terms_and_conditions",
                 "decline": "state_decline_confirm",
             },
         )
 
+    async def state_terms_pdf(self):
+        await self.worker.publish_message(
+            self.inbound.reply(
+                None,
+                helper_metadata={"document": contentrepo.get_privacy_policy_url()},
+            )
+        )
+        await asyncio.sleep(1.5)
+        return await self.go_to_state("state_read_terms")
+
     async def state_read_terms(self):
         return EndState(
             self,
-            self._("TODO: add real state read more"),
+            self._(
+                "*Roo: Your Sexual Health Bot*\n\n"
+                "Questions about sex, masturbation, pregnancy, relationships? Roo "
+                "has answers powered by Planned Parenthood."
+            ),
             next=self.START_STATE,
         )
 

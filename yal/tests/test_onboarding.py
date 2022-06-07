@@ -294,22 +294,10 @@ async def test_state_gender_valid(tester: AppTester):
 
     await tester.user_input("9")
 
-    tester.assert_state("state_name_gender_confirm")
-    tester.assert_num_messages(1)
-
-    tester.assert_answer("state_gender", "other")
-
-
-@pytest.mark.asyncio
-async def test_state_name_gender_confirm_valid(tester: AppTester):
-    tester.setup_state("state_name_gender_confirm")
-
-    await tester.user_input("1")
-
     tester.assert_state("state_name_gender")
     tester.assert_num_messages(1)
 
-    tester.assert_answer("state_name_gender_confirm", "yes")
+    tester.assert_answer("state_gender", "other")
 
 
 @pytest.mark.asyncio
