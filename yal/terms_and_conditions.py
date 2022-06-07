@@ -123,10 +123,7 @@ class Application(BaseApplication):
             question=question,
             choices=[Choice("ok", "Ok"), Choice("no", "No thanks")],
             error=error,
-            next={
-                "ok": "state_pre_terms",
-                "no": "state_decline_get_to_know"
-            },
+            next={"ok": "state_pre_terms", "no": "state_decline_get_to_know"},
         )
 
     async def state_decline_get_to_know(self):
@@ -134,10 +131,12 @@ class Application(BaseApplication):
             self.inbound.reply(
                 self._(
                     "😫 *We're sad to see you go.\n"
-                "\n"
-                "🙍🏾‍♀️ Although we'd love to chat, we understand that you might not be ready. If you change your mind, just sent the word HI to this number and we can start again.\n"
-                "\n"
-                "*See you next time*👋🏾"
+                    "\n"
+                    "🙍🏾‍♀️ Although we'd love to chat, we understand that you might "
+                    "not be ready. If you change your mind, just sent the word HI "
+                    "to this number and we can start again.\n"
+                    "\n"
+                    "*See you next time*👋🏾"
                 )
             )
         )
@@ -246,9 +245,9 @@ class Application(BaseApplication):
                     "It's wise to think these things over. Your online safety is "
                     "important to us too.\n"
                     "\n"
-                    "If you change your mind though, we'll be here! Just send me a *HI* "
-                    "whenever you're ready to chat again. In the mean time, be wise, "
-                    "and look after yourself 😉👋🏾"
+                    "If you change your mind though, we'll be here! Just send me a "
+                    "*HI* whenever you're ready to chat again. In the mean time, be "
+                    "wise, and look after yourself 😉👋🏾"
                 )
             )
         )
