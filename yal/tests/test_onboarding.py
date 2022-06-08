@@ -290,7 +290,7 @@ async def test_state_relationship_status_valid(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_full_address_invalid(tester: AppTester):
-    tester.setup_answer("age", 22)
+    tester.setup_answer("age", "22")
     tester.setup_state("state_full_address")
 
     await tester.user_input("2 test street \n test suburb")
@@ -300,7 +300,7 @@ async def test_state_full_address_invalid(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_full_address_valid(tester: AppTester):
-    tester.setup_answer("age", 22)
+    tester.setup_answer("age", "22")
     tester.setup_state("state_full_address")
 
     await tester.user_input("2\ntest street\n test suburb")
@@ -310,7 +310,7 @@ async def test_state_full_address_valid(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_full_address_minor(tester: AppTester):
-    tester.setup_answer("age", 17)
+    tester.setup_answer("age", "17")
     tester.setup_state("state_province")
 
     await tester.user_input("2")

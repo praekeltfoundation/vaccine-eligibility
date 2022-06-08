@@ -280,7 +280,7 @@ class Application(BaseApplication):
         )
 
     async def state_full_address(self):
-        age = self.user.answers.get("age", -1)
+        age = int(self.user.answers.get("age", -1))
         if age < 18:
             return await self.go_to_state("state_gender")
 
