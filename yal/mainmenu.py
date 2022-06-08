@@ -22,7 +22,7 @@ class Application(BaseApplication):
 
         sections = [
             (
-                "*📞 NEED HELP OR ADVICE?*",
+                "*🏥 NEED HELP?*",
                 [
                     Choice("state_please_call_me", "Please call me!"),
                     Choice("state_clinic_finder", "Find clinics and services"),
@@ -42,7 +42,7 @@ class Application(BaseApplication):
             sections.append((f"*{choice.label}*", sub_choices))
 
         sections.append(
-            ("*🤔 WHAT's EVERYONE ELSE ASKING?*", [Choice("state_faqs", "FAQs")])
+            ("🙋🏿‍♂️ *QUESTIONS?*", [Choice("state_faqs", "FAQs")])
         )
         sections.append(
             (
@@ -50,7 +50,7 @@ class Application(BaseApplication):
                 [
                     Choice(
                         ChangePreferencesApplication.START_STATE,
-                        "Change/Update Your Personal Info",
+                        "Change Profile",
                     ),
                 ],
             )
