@@ -25,10 +25,11 @@ def day_validator(dob_year, dob_month, error_text):
 def year_validator(error_text):
     async def validator(value):
         try:
-            assert isinstance(value, str)
-            assert value.isdigit()
-            assert int(value) > get_today().year - config.MAX_AGE
-            assert int(value) <= get_today().year
+            if value != "skip":
+                assert isinstance(value, str)
+                assert value.isdigit()
+                assert int(value) > get_today().year - config.MAX_AGE
+                assert int(value) <= get_today().year
         except AssertionError:
             raise ErrorMessage(error_text)
 
