@@ -20,6 +20,8 @@ class Application(BaseApplication):
                 self.save_answer("current_message_id", 1)
                 return "state_contentrepo_page"
 
+        self.save_answer("menu_level", "0")
+
         sections = [
             (
                 "*🏥 NEED HELP?*",
@@ -98,6 +100,13 @@ class Application(BaseApplication):
         self.save_answer("body", page_details["body"])
         self.save_answer("image_path", page_details.get("image_path"))
 
+        menu_level = int(self.user.answers["menu_level"]) + 1
+        self.save_answer("menu_level", str(menu_level))
+
+        if menu_level == 2:
+            self.save_answer("back_page_id", page_id)
+            self.save_answer("back_to_title", page_details["title"])
+
         if page_details["has_children"]:
             return await self.go_to_state("state_submenu")
         elif "next_prompt" in page_details:
@@ -108,6 +117,9 @@ class Application(BaseApplication):
 
     async def state_submenu(self):
         async def next_(choice: Choice):
+            if choice.value == "back":
+                return "state_back"
+
             self.save_answer("selected_page_id", choice.value)
             self.save_answer("current_message_id", 1)
             return "state_contentrepo_page"
@@ -129,6 +141,10 @@ class Application(BaseApplication):
         metadata = {}
         if "image_path" in answers and answers["image_path"]:
             metadata["image"] = contentrepo.get_url(answers["image_path"])
+
+        menu_level = int(answers["menu_level"])
+        if menu_level > 2:
+            choices.append(Choice("back", answers["back_to_title"]))
 
         return ChoiceState(
             self,
@@ -224,6 +240,14 @@ class Application(BaseApplication):
             metadata["image"] = contentrepo.get_url(answers["image_path"])
 
         return EndState(self, question, next=self.START_STATE, helper_metadata=metadata)
+
+    async def state_back(self):
+        page_id = self.user.answers["back_page_id"]
+
+        self.save_answer("selected_page_id", page_id)
+        self.save_answer("current_message_id", 1)
+
+        return await self.go_to_state("state_contentrepo_page")
 
     async def state_please_call_me(self):
         return EndState(
