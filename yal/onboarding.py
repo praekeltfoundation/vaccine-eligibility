@@ -175,7 +175,7 @@ class Application(BaseApplication):
             if year != "skip":
                 dob = date(int(year), int(month), int(day))
                 age = relativedelta(today, dob).years
-                self.save_answer("age", age)
+                self.save_answer("age", str(age))
 
             if today.day == int(day) and today.month == int(month):
                 age_msg = ""

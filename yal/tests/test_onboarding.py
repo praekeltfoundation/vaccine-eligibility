@@ -198,7 +198,7 @@ async def test_state_check_birthday(get_today, tester: AppTester):
     tester.assert_num_messages(1)
 
     tester.assert_answer("state_dob_day", "22")
-    tester.assert_answer("age", 17)
+    tester.assert_answer("age", "17")
 
     [msg] = tester.fake_worker.outbound_messages
     assert msg.content == "\n".join(
