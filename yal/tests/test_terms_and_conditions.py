@@ -83,7 +83,7 @@ async def test_submit_terms_and_conditions(tester: AppTester, turn_api_mock):
     tester.setup_state("state_terms")
     await tester.user_input("2")
 
-    tester.assert_state("state_dob_year")
+    tester.assert_state("state_dob_full")
     tester.assert_num_messages(1)
 
     assert len(turn_api_mock.app.requests) == 1

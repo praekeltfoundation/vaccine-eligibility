@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 class Application(BaseApplication):
-    START_STATE = "state_dob_year"
+    START_STATE = "state_dob_full"
 
     async def state_dob_full(self):
         return FreeText(
@@ -172,12 +172,14 @@ class Application(BaseApplication):
 
         if day != "skip" and month != "skip":
             today = get_today()
+            if year != "skip":
+                dob = date(int(year), int(month), int(day))
+                age = relativedelta(today, dob).years
+                self.save_answer("age", str(age))
+
             if today.day == int(day) and today.month == int(month):
                 age_msg = ""
                 if year != "skip":
-                    dob = date(int(year), int(month), int(day))
-                    age = relativedelta(today, dob).years
-                    self.save_answer("age", age)
                     age_msg = f"{age} today? "
 
                 msg = self._(
