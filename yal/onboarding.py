@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from datetime import date
+from datetime import date, datetime
 
 from dateutil.relativedelta import relativedelta
 
@@ -51,14 +51,17 @@ class Application(BaseApplication):
         value = self.user.answers["state_dob_full"]
 
         if value == "skip":
+            self.save_answer("state_dob_day", "skip")
+            self.save_answer("state_dob_month", "skip")
+            self.save_answer("state_dob_year", "skip")
             return await self.go_to_state("state_relationship_status")
 
         try:
-            dob = date.strptime(value, "%d/%m/%Y")
+            dob = datetime.strptime(value, "%d/%m/%Y")
 
-            self.save_answer("state_dob_day", dob.day)
-            self.save_answer("state_dob_month", dob.month)
-            self.save_answer("state_dob_year", dob.year)
+            self.save_answer("state_dob_day", str(dob.day))
+            self.save_answer("state_dob_month", str(dob.month))
+            self.save_answer("state_dob_year", str(dob.year))
 
             return await self.go_to_state("state_check_birthday")
         except ValueError:

@@ -45,6 +45,51 @@ async def turn_api_mock(sanic_client, tester):
 
 
 @pytest.mark.asyncio
+async def test_state_dob_full_valid(tester: AppTester):
+    tester.setup_state("state_dob_full")
+
+    await tester.user_input("1/1/2007")
+
+    tester.assert_state("state_relationship_status")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_dob_year", "2007")
+    tester.assert_answer("state_dob_month", "1")
+    tester.assert_answer("state_dob_day", "1")
+    tester.assert_answer("age", "15")
+
+
+@pytest.mark.asyncio
+async def test_state_dob_full_invalid(tester: AppTester):
+    tester.setup_state("state_dob_full")
+
+    await tester.user_input("1/1/20071")
+
+    tester.assert_state("state_dob_year")
+    tester.assert_num_messages(1)
+
+    tester.assert_no_answer("state_dob_year")
+    tester.assert_no_answer("state_dob_month")
+    tester.assert_no_answer("state_dob_day")
+    tester.assert_no_answer("age")
+
+
+@pytest.mark.asyncio
+async def test_state_dob_full_skip(tester: AppTester):
+    tester.setup_state("state_dob_full")
+
+    await tester.user_input("skip")
+
+    tester.assert_state("state_relationship_status")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_dob_year", "skip")
+    tester.assert_answer("state_dob_month", "skip")
+    tester.assert_answer("state_dob_day", "skip")
+    tester.assert_no_answer("age")
+
+
+@pytest.mark.asyncio
 async def test_state_dob_year_valid(tester: AppTester):
     tester.setup_state("state_dob_year")
 
