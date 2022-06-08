@@ -41,9 +41,7 @@ class Application(BaseApplication):
 
             sections.append((f"*{choice.label}*", sub_choices))
 
-        sections.append(
-            ("🙋🏿‍♂️ *QUESTIONS?*", [Choice("state_faqs", "FAQs")])
-        )
+        sections.append(("🙋🏿‍♂️ *QUESTIONS?*", [Choice("state_faqs", "FAQs")]))
         sections.append(
             (
                 "*⚙️ CHAT SETTINGS*",
