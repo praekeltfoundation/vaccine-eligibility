@@ -67,13 +67,8 @@ class Application(BaseApplication):
                 "me by trying again. This time, we'll break it up into year, "
                 "month and day.👍🏽"
             )
-            await self.worker.publish_message(
-                self.inbound.reply(
-                    msg,
-                    helper_metadata={"image": contentrepo.get_image_url("hbd.png")},
-                )
-            )
-            await asyncio.sleep(1.5)
+            await self.worker.publish_message(self.inbound.reply(msg))
+            await asyncio.sleep(0.5)
             return await self.go_to_state("state_dob_year")
 
     async def state_dob_year(self):
@@ -181,7 +176,9 @@ class Application(BaseApplication):
                 age_msg = ""
                 if year != "skip":
                     dob = date(int(year), int(month), int(day))
-                    age_msg = f"{relativedelta(today, dob).years} today? "
+                    age = relativedelta(today, dob).years
+                    self.save_answer("age", age)
+                    age_msg = f"{age} today? "
 
                 msg = self._(
                     "\n".join(
@@ -278,9 +275,68 @@ class Application(BaseApplication):
             question=question,
             button="Province",
             choices=province_choices,
-            next="state_suburb",
+            next="state_full_address",
             error=self._("TODO"),
         )
+
+    async def state_full_address(self):
+        age = int(self.user.answers.get("age", -1))
+        if age < 18:
+            return await self.go_to_state("state_gender")
+
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "ABOUT YOU",
+                        "📍Address ",
+                        "-----",
+                        "",
+                        "👩🏾 OK. Lets see which facilities are close to you. What is "
+                        "your address?",
+                        "Type the name of your neighbourhood, your street and your "
+                        "house number.",
+                        "",
+                        "e.g.",
+                        "Mofolo South",
+                        "Lekoropo street",
+                        "1876",
+                        "-----",
+                        "🙍🏾‍♀️ Rather not say?",
+                        "No stress! Just tap SKIP.",
+                    ]
+                )
+            ),
+            next="state_validate_full_address",
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_validate_full_address(self):
+        value = self.user.answers["state_full_address"]
+
+        if value == "skip":
+            return await self.go_to_state("state_gender")
+
+        try:
+            lines = value.split("\n")
+
+            assert len(lines) == 3
+
+            self.save_answer("state_suburb", lines[0].strip())
+            self.save_answer("state_street_name", lines[1].strip())
+            self.save_answer("state_street_number", lines[2].strip())
+
+            return await self.go_to_state("state_gender")
+        except (AssertionError, IndexError):
+            msg = self._(
+                "Umm...I'm sorry but I'm not sure what that means🤦🏾‍♀️ You can help "
+                "me by trying again. This time, we'll break it up into "
+                "neighbourhood, street and number.👍🏽"
+            )
+            await self.worker.publish_message(self.inbound.reply(msg))
+            await asyncio.sleep(0.5)
+            return await self.go_to_state("state_suburb")
 
     async def state_suburb(self):
         return FreeText(
