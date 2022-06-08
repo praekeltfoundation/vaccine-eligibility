@@ -198,6 +198,7 @@ async def test_state_check_birthday(get_today, tester: AppTester):
     tester.assert_num_messages(1)
 
     tester.assert_answer("state_dob_day", "22")
+    tester.assert_answer("age", 17)
 
     [msg] = tester.fake_worker.outbound_messages
     assert msg.content == "\n".join(
@@ -224,6 +225,7 @@ async def test_state_check_birthday_skip_day(get_today, tester: AppTester):
     tester.setup_answer("state_dob_year", "2007")
 
     await tester.user_input("skip")
+    tester.assert_no_answer("age")
 
     tester.assert_state("state_relationship_status")
     tester.assert_num_messages(1)
@@ -240,6 +242,7 @@ async def test_state_check_birthday_skip_month(get_today, tester: AppTester):
     tester.setup_answer("state_dob_year", "2007")
 
     await tester.user_input("22")
+    tester.assert_no_answer("age")
 
     tester.assert_state("state_relationship_status")
     tester.assert_num_messages(1)
@@ -260,6 +263,8 @@ async def test_state_check_birthday_skip_year(get_today, tester: AppTester):
 
     tester.assert_state("state_relationship_status")
     tester.assert_num_messages(1)
+
+    tester.assert_no_answer("age")
 
     [msg] = tester.fake_worker.outbound_messages
     assert msg.content == "\n".join(
