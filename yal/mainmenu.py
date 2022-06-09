@@ -109,7 +109,7 @@ class Application(BaseApplication):
             {"back_page_id": page_id, "back_to_title": page_details["title"]},
         )
         title = page_details["title"]
-        print(f"Saving menu level {menu_level} - {title}")
+        logger.info(f"Saving menu level {menu_level} - {title}")
 
         if page_details["has_children"]:
             return await self.go_to_state("state_submenu")
@@ -148,12 +148,11 @@ class Application(BaseApplication):
 
         menu_level = metadata["current_menu_level"]
         if menu_level > 2:
+            logger.info(metadata)
             previous_menu_level = menu_level - 1
             if previous_menu_level in metadata:
                 back_title = metadata[previous_menu_level]["back_to_title"]
                 choices.append(Choice("back", f"⬅️ {back_title}"))
-            else:
-                print(metadata)
 
         return ChoiceState(
             self,
