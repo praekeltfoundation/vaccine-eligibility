@@ -105,7 +105,7 @@ class Application(BaseApplication):
         self.save_metadata("current_menu_level", menu_level)
 
         self.save_metadata(
-            menu_level,
+            f"back_{menu_level}",
             {"back_page_id": page_id, "back_to_title": page_details["title"]},
         )
         title = page_details["title"]
@@ -149,7 +149,7 @@ class Application(BaseApplication):
         menu_level = metadata["current_menu_level"]
         if menu_level > 2:
             logger.info(metadata)
-            previous_menu_level = menu_level - 1
+            previous_menu_level = f"back_{menu_level-1}"
             if previous_menu_level in metadata:
                 back_title = metadata[previous_menu_level]["back_to_title"]
                 choices.append(Choice("back", f"⬅️ {back_title}"))
@@ -250,7 +250,7 @@ class Application(BaseApplication):
 
     async def state_back(self):
         menu_level = self.user.metadata["current_menu_level"]
-        page_id = self.user.metadata[menu_level - 1]["back_page_id"]
+        page_id = self.user.metadata[f"back_{menu_level-1}"]["back_page_id"]
 
         self.save_metadata("selected_page_id", page_id)
         self.save_metadata("current_message_id", 1)
