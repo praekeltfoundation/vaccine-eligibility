@@ -251,8 +251,7 @@ async def test_state_mainmenu_contentrepo(tester: AppTester, contentrepo_api_moc
             "Sub menu test content 2",
             "",
             "-----",
-            "Or reply:",
-            "",
+            "*Or reply:*",
             "0. 🏠 Back to Main MENU",
             "# 🆘 Get HELP",
         ]
@@ -289,8 +288,7 @@ async def test_state_mainmenu_contentrepo_children(
             "3. Sub menu 3",
             "",
             "-----",
-            "Or reply:",
-            "",
+            "*Or reply:*",
             "0. 🏠 Back to Main MENU",
             "# 🆘 Get HELP",
         ]
@@ -310,8 +308,7 @@ async def test_state_mainmenu_contentrepo_children(
             "Sub menu test content 2",
             "",
             "-----",
-            "Or reply:",
-            "",
+            "*Or reply:*",
             "0. 🏠 Back to Main MENU",
             "# 🆘 Get HELP",
         ]
@@ -355,8 +352,7 @@ async def test_state_submenu_image(tester: AppTester, contentrepo_api_mock):
             "1. Sub Menu with image",
             "",
             "-----",
-            "Or reply:",
-            "",
+            "*Or reply:*",
             "0. 🏠 Back to Main MENU",
             "# 🆘 Get HELP",
         ]
@@ -384,8 +380,7 @@ async def test_state_detail_image(tester: AppTester, contentrepo_api_mock):
             "1. Next",
             "",
             "-----",
-            "Or reply:",
-            "",
+            "*Or reply:*",
             "0. 🏠 Back to Main MENU",
             "# 🆘 Get HELP",
         ]

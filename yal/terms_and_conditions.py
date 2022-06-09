@@ -153,7 +153,7 @@ class Application(BaseApplication):
     async def state_terms(self):
         question = self._(
             "🔒 *TERMS & CONDITIONS*\n"
-            "~B-Wise by Young Africa Live: Privacy Policy~\n"
+            "_B-Wise by Young Africa Live: Privacy Policy_\n"
             "-----\n"
             "\n"
             "*Before we chat, I need to make sure you’re 💯% cool with our Privacy "
@@ -211,7 +211,7 @@ class Application(BaseApplication):
     async def state_decline_confirm(self):
         question = self._(
             "🔒 *TERMS & CONDITIONS*\n"
-            "~Young Africa Live: Privacy Policy~\n"
+            "_Young Africa Live: Privacy Policy_\n"
             "-----\n"
             "\n"
             "⚠️ *Are you Sure?*\n"
@@ -272,7 +272,7 @@ class Application(BaseApplication):
                 "You'll find loads of sex, relationships and health info there. It's "
                 "also my other virtual office.\n"
                 "\n"
-                "Feel free to drop me a virtual ~howzit~ there too!\n"
+                "Feel free to drop me a virtual _howzit_ there too!\n"
                 "\n"
                 "-----\n"
                 "Send *HI* to start again."
