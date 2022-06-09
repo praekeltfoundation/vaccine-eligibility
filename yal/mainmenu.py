@@ -144,7 +144,8 @@ class Application(BaseApplication):
 
         menu_level = int(answers["menu_level"])
         if menu_level > 2:
-            choices.append(Choice("back", answers["back_to_title"]))
+            back_title = answers["back_to_title"]
+            choices.append(Choice("back", f"⬅️ {back_title}"))
 
         return ChoiceState(
             self,
@@ -160,8 +161,7 @@ class Application(BaseApplication):
                     [
                         "",
                         "-----",
-                        "Or reply:",
-                        "",
+                        "*Or reply:*",
                         "0. 🏠 Back to Main MENU",
                         "# 🆘 Get HELP",
                     ]
@@ -204,8 +204,7 @@ class Application(BaseApplication):
                     [
                         "",
                         "-----",
-                        "Or reply:",
-                        "",
+                        "*Or reply:*",
                         "0. 🏠 Back to Main MENU",
                         "# 🆘 Get HELP",
                     ]
@@ -228,8 +227,7 @@ class Application(BaseApplication):
             body,
             "",
             "-----",
-            "Or reply:",
-            "",
+            "*Or reply:*",
             "0. 🏠 Back to Main MENU",
             "# 🆘 Get HELP",
         ]
@@ -246,6 +244,7 @@ class Application(BaseApplication):
 
         self.save_answer("selected_page_id", page_id)
         self.save_answer("current_message_id", 1)
+        self.save_answer("menu_level", "2")
 
         return await self.go_to_state("state_contentrepo_page")
 
