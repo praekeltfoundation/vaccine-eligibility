@@ -104,11 +104,10 @@ class Application(BaseApplication):
         menu_level = metadata["current_menu_level"] + 1
         self.save_metadata("current_menu_level", menu_level)
 
-        if menu_level >= 2:
-            self.save_metadata(
-                menu_level,
-                {"back_page_id": page_id, "back_to_title": page_details["title"]},
-            )
+        self.save_metadata(
+            menu_level,
+            {"back_page_id": page_id, "back_to_title": page_details["title"]},
+        )
 
         if page_details["has_children"]:
             return await self.go_to_state("state_submenu")
