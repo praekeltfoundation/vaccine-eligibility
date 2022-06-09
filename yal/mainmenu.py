@@ -244,7 +244,7 @@ class Application(BaseApplication):
 
         self.save_answer("selected_page_id", page_id)
         self.save_answer("current_message_id", 1)
-        self.save_answer("menu_level", "2")
+        self.save_answer("menu_level", "1")
 
         return await self.go_to_state("state_contentrepo_page")
 
