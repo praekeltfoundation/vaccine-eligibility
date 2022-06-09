@@ -16,11 +16,11 @@ class Application(BaseApplication):
             if choice.value.startswith("state_"):
                 return choice.value
             else:
-                self.save_answer("selected_page_id", choice.value)
-                self.save_answer("current_message_id", 1)
+                self.save_metadata("selected_page_id", choice.value)
+                self.save_metadata("current_message_id", 1)
                 return "state_contentrepo_page"
 
-        self.save_answer("menu_level", "0")
+        self.save_metadata("current_menu_level", 0)
 
         sections = [
             (
@@ -87,30 +87,33 @@ class Application(BaseApplication):
         )
 
     async def state_contentrepo_page(self):
-        page_id = self.user.answers["selected_page_id"]
-        message_id = self.user.answers["current_message_id"]
+        metadata = self.user.metadata
+        page_id = metadata["selected_page_id"]
+        message_id = metadata["current_message_id"]
         error, page_details = await contentrepo.get_page_details(
             self.user, page_id, message_id
         )
         if error:
             return await self.go_to_state("state_error")
 
-        self.save_answer("title", page_details["title"])
-        self.save_answer("subtitle", page_details["subtitle"])
-        self.save_answer("body", page_details["body"])
-        self.save_answer("image_path", page_details.get("image_path"))
+        self.save_metadata("title", page_details["title"])
+        self.save_metadata("subtitle", page_details["subtitle"])
+        self.save_metadata("body", page_details["body"])
+        self.save_metadata("image_path", page_details.get("image_path"))
 
-        menu_level = int(self.user.answers["menu_level"]) + 1
-        self.save_answer("menu_level", str(menu_level))
+        menu_level = metadata["current_menu_level"] + 1
+        self.save_metadata("current_menu_level", menu_level)
 
-        if menu_level == 2:
-            self.save_answer("back_page_id", page_id)
-            self.save_answer("back_to_title", page_details["title"])
+        if menu_level >= 2:
+            self.save_metadata(
+                menu_level,
+                {"back_page_id": page_id, "back_to_title": page_details["title"]},
+            )
 
         if page_details["has_children"]:
             return await self.go_to_state("state_submenu")
         elif "next_prompt" in page_details:
-            self.save_answer("next_prompt", page_details["next_prompt"])
+            self.save_metadata("next_prompt", page_details["next_prompt"])
             return await self.go_to_state("state_detail_with_next")
         else:
             return await self.go_to_state("state_detail")
@@ -120,31 +123,31 @@ class Application(BaseApplication):
             if choice.value == "back":
                 return "state_back"
 
-            self.save_answer("selected_page_id", choice.value)
-            self.save_answer("current_message_id", 1)
+            self.save_metadata("selected_page_id", choice.value)
+            self.save_metadata("current_message_id", 1)
             return "state_contentrepo_page"
 
-        answers = self.user.answers
+        metadata = self.user.metadata
 
-        page_id = answers["selected_page_id"]
+        page_id = metadata["selected_page_id"]
         error, choices = await contentrepo.get_choices_by_parent(page_id)
         if error:
             return await self.go_to_state("state_error")
 
-        title = answers["title"]
-        subtitle = answers["subtitle"]
-        body = answers["body"]
+        title = metadata["title"]
+        subtitle = metadata["subtitle"]
+        body = metadata["body"]
 
         parts = [f"*{title}*", subtitle, "-----", "", body, ""]
         question = self._("\n".join([part for part in parts if part is not None]))
 
-        metadata = {}
-        if "image_path" in answers and answers["image_path"]:
-            metadata["image"] = contentrepo.get_url(answers["image_path"])
+        helper_metadata = {}
+        if "image_path" in metadata and metadata["image_path"]:
+            helper_metadata["image"] = contentrepo.get_url(metadata["image_path"])
 
-        menu_level = int(answers["menu_level"])
+        menu_level = metadata["current_menu_level"]
         if menu_level > 2:
-            back_title = answers["back_to_title"]
+            back_title = metadata[menu_level - 1]["back_to_title"]
             choices.append(Choice("back", f"⬅️ {back_title}"))
 
         return ChoiceState(
@@ -167,27 +170,27 @@ class Application(BaseApplication):
                     ]
                 )
             ),
-            helper_metadata=metadata,
+            helper_metadata=helper_metadata,
         )
 
     async def state_detail_with_next(self):
         async def next_(choice: Choice):
-            message_id = self.user.answers["current_message_id"]
-            self.save_answer("current_message_id", message_id + 1)
+            message_id = self.user.metadata["current_message_id"]
+            self.save_metadata("current_message_id", message_id + 1)
             return "state_contentrepo_page"
 
-        answers = self.user.answers
-        title = answers["title"]
-        subtitle = answers["subtitle"]
-        body = answers["body"]
-        next_prompt = answers["next_prompt"]
+        metadata = self.user.metadata
+        title = metadata["title"]
+        subtitle = metadata["subtitle"]
+        body = metadata["body"]
+        next_prompt = metadata["next_prompt"]
 
         parts = [f"*{title}*", subtitle, "-----", "", body, ""]
         question = self._("\n".join([part for part in parts if part is not None]))
 
-        metadata = {}
-        if "image_path" in answers and answers["image_path"]:
-            metadata["image"] = contentrepo.get_url(answers["image_path"])
+        helper_metadata = {}
+        if "image_path" in metadata and metadata["image_path"]:
+            helper_metadata["image"] = contentrepo.get_url(metadata["image_path"])
 
         return ChoiceState(
             self,
@@ -210,14 +213,14 @@ class Application(BaseApplication):
                     ]
                 )
             ),
-            helper_metadata=metadata,
+            helper_metadata=helper_metadata,
         )
 
     async def state_detail(self):
-        answers = self.user.answers
-        title = answers["title"]
-        subtitle = answers["subtitle"]
-        body = answers["body"]
+        metadata = self.user.metadata
+        title = metadata["title"]
+        subtitle = metadata["subtitle"]
+        body = metadata["body"]
 
         parts = [
             f"*{title}*",
@@ -233,18 +236,21 @@ class Application(BaseApplication):
         ]
         question = self._("\n".join([part for part in parts if part is not None]))
 
-        metadata = {}
-        if "image_path" in answers and answers["image_path"]:
-            metadata["image"] = contentrepo.get_url(answers["image_path"])
+        helper_metadata = {}
+        if "image_path" in metadata and metadata["image_path"]:
+            helper_metadata["image"] = contentrepo.get_url(metadata["image_path"])
 
-        return EndState(self, question, next=self.START_STATE, helper_metadata=metadata)
+        return EndState(
+            self, question, next=self.START_STATE, helper_metadata=helper_metadata
+        )
 
     async def state_back(self):
-        page_id = self.user.answers["back_page_id"]
+        menu_level = self.user.metadata["current_menu_level"]
+        page_id = self.user.metadata[menu_level - 1]["back_page_id"]
 
-        self.save_answer("selected_page_id", page_id)
-        self.save_answer("current_message_id", 1)
-        self.save_answer("menu_level", "1")
+        self.save_metadata("selected_page_id", page_id)
+        self.save_metadata("current_message_id", 1)
+        self.save_metadata("current_menu_level", menu_level - 2)
 
         return await self.go_to_state("state_contentrepo_page")
 

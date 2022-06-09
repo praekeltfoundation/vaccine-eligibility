@@ -101,6 +101,12 @@ class BaseApplication:
             )
         )
 
+    def save_metadata(self, name: str, value: Any):
+        """
+        Saves metadata on the user
+        """
+        self.user.metadata[name] = value
+
     def send_message(self, content, continue_session=True, **kw):
         """
         Sends a reply to the user
