@@ -421,7 +421,7 @@ async def test_state_display_page_submenu_back(tester: AppTester, contentrepo_ap
                 "",
                 "-----",
                 "*Or reply:*",
-                "4. Previous thing",
+                "4. ⬅️Previous thing",
                 "0. 🏠 Back to Main MENU",
                 "# 🆘 Get HELP",
             ]
@@ -521,7 +521,7 @@ async def test_state_display_page_detail_back(tester: AppTester):
                 "",
                 "-----",
                 "*Or reply:*",
-                "1. Previous thing",
+                "1. ⬅️Previous thing",
                 "0. 🏠 Back to Main MENU",
                 "# 🆘 Get HELP",
             ]
@@ -559,7 +559,7 @@ async def test_state_display_page_detail_next_and_back(tester: AppTester):
                 "",
                 "-----",
                 "*Or reply:*",
-                "2. Previous thing",
+                "2. ⬅️Previous thing",
                 "0. 🏠 Back to Main MENU",
                 "# 🆘 Get HELP",
             ]

@@ -194,7 +194,7 @@ class Application(BaseApplication):
             previous_menu_level = f"back_{menu_level-1}"
             if previous_menu_level in metadata:
                 back_title = metadata[previous_menu_level]["back_to_title"]
-                back_menu_item = f"{len(choices) + 1}. {back_title}"
+                back_menu_item = f"{len(choices) + 1}. ⬅️{back_title}"
 
         parts.extend(
             [
