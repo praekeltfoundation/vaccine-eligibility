@@ -389,3 +389,179 @@ async def test_state_detail_image(tester: AppTester, contentrepo_api_mock):
     [msg] = tester.application.messages
     assert "/media/original_images/test2.jpg" in msg.helper_metadata["image"]
     tester.assert_message(question)
+
+
+@pytest.mark.asyncio
+async def test_state_display_page_submenu_back(tester: AppTester, contentrepo_api_mock):
+    tester.setup_state("state_display_page")
+    tester.user.metadata["page_type"] = "submenu"
+    tester.user.metadata["selected_page_id"] = "111"
+    tester.user.metadata["title"] = "title"
+    tester.user.metadata["subtitle"] = "subtitle"
+    tester.user.metadata["body"] = "body"
+    tester.user.metadata["current_menu_level"] = 3
+    tester.user.metadata["current_message_id"] = 1
+
+    tester.user.metadata["back_2"] = {"back_to_title": "Previous thing"}
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*title*",
+                "subtitle",
+                "-----",
+                "",
+                "body",
+                "",
+                "1. Sub menu 1",
+                "2. Sub menu 2",
+                "3. Sub menu 3",
+                "",
+                "-----",
+                "*Or reply:*",
+                "4. Previous thing",
+                "0. 🏠 Back to Main MENU",
+                "# 🆘 Get HELP",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_display_page_detail(tester: AppTester, contentrepo_api_mock):
+    tester.setup_state("state_display_page")
+    tester.user.metadata["page_type"] = "detail"
+    tester.user.metadata["selected_page_id"] = "111"
+    tester.user.metadata["title"] = "title"
+    tester.user.metadata["subtitle"] = "subtitle"
+    tester.user.metadata["body"] = "body"
+    tester.user.metadata["current_menu_level"] = 3
+    tester.user.metadata["current_message_id"] = 1
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*title*",
+                "subtitle",
+                "-----",
+                "",
+                "body",
+                "",
+                "-----",
+                "*Or reply:*",
+                "0. 🏠 Back to Main MENU",
+                "# 🆘 Get HELP",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_display_page_detail_next(tester: AppTester):
+    tester.setup_state("state_display_page")
+    tester.user.metadata["page_type"] = "detail"
+    tester.user.metadata["selected_page_id"] = "111"
+    tester.user.metadata["title"] = "title"
+    tester.user.metadata["subtitle"] = "subtitle"
+    tester.user.metadata["body"] = "body"
+    tester.user.metadata["current_menu_level"] = 3
+    tester.user.metadata["current_message_id"] = 1
+
+    tester.user.metadata["next_prompt"] = "Continue"
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*title*",
+                "subtitle",
+                "-----",
+                "",
+                "body",
+                "",
+                "1. Continue",
+                "",
+                "-----",
+                "*Or reply:*",
+                "0. 🏠 Back to Main MENU",
+                "# 🆘 Get HELP",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_display_page_detail_back(tester: AppTester):
+    tester.setup_state("state_display_page")
+    tester.user.metadata["page_type"] = "detail"
+    tester.user.metadata["selected_page_id"] = "111"
+    tester.user.metadata["title"] = "title"
+    tester.user.metadata["subtitle"] = "subtitle"
+    tester.user.metadata["body"] = "body"
+    tester.user.metadata["current_menu_level"] = 3
+    tester.user.metadata["current_message_id"] = 1
+
+    tester.user.metadata["back_2"] = {"back_to_title": "Previous thing"}
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*title*",
+                "subtitle",
+                "-----",
+                "",
+                "body",
+                "",
+                "-----",
+                "*Or reply:*",
+                "1. Previous thing",
+                "0. 🏠 Back to Main MENU",
+                "# 🆘 Get HELP",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_display_page_detail_next_and_back(tester: AppTester):
+    tester.setup_state("state_display_page")
+    tester.user.metadata["page_type"] = "detail"
+    tester.user.metadata["selected_page_id"] = "111"
+    tester.user.metadata["title"] = "title"
+    tester.user.metadata["subtitle"] = "subtitle"
+    tester.user.metadata["body"] = "body"
+    tester.user.metadata["current_menu_level"] = 3
+    tester.user.metadata["current_message_id"] = 1
+
+    tester.user.metadata["next_prompt"] = "Continue"
+
+    tester.user.metadata["back_2"] = {"back_to_title": "Previous thing"}
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*title*",
+                "subtitle",
+                "-----",
+                "",
+                "body",
+                "",
+                "1. Continue",
+                "",
+                "-----",
+                "*Or reply:*",
+                "2. Previous thing",
+                "0. 🏠 Back to Main MENU",
+                "# 🆘 Get HELP",
+            ]
+        )
+    )

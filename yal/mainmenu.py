@@ -2,10 +2,20 @@ import logging
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, ChoiceState, EndState, SectionedChoiceState
+from vaccine.utils import get_display_choices
 from yal import contentrepo
 from yal.change_preferences import Application as ChangePreferencesApplication
 
 logger = logging.getLogger(__name__)
+
+
+class CustomChoiceState(ChoiceState):
+    async def display(self, message):
+        helper_metadata = self.helper_metadata or {}
+        if self.buttons:
+            helper_metadata["buttons"] = [choice.label for choice in self.buttons]
+
+        return self.app.send_message(self.question, helper_metadata=helper_metadata)
 
 
 class Application(BaseApplication):
@@ -90,6 +100,7 @@ class Application(BaseApplication):
         metadata = self.user.metadata
         page_id = metadata["selected_page_id"]
         message_id = metadata["current_message_id"]
+
         error, page_details = await contentrepo.get_page_details(
             self.user, page_id, message_id
         )
@@ -101,6 +112,11 @@ class Application(BaseApplication):
         self.save_metadata("body", page_details["body"])
         self.save_metadata("image_path", page_details.get("image_path"))
 
+        if "next_prompt" in page_details:
+            self.save_metadata("next_prompt", page_details["next_prompt"])
+        else:
+            self.save_metadata("next_prompt", None)
+
         menu_level = metadata["current_menu_level"] + 1
         self.save_metadata("current_menu_level", menu_level)
 
@@ -108,123 +124,41 @@ class Application(BaseApplication):
             f"back_{menu_level}",
             {"back_page_id": page_id, "back_to_title": page_details["title"]},
         )
-        title = page_details["title"]
-        logger.info(f"Saving menu level {menu_level} - {title}")
 
         if page_details["has_children"]:
-            return await self.go_to_state("state_submenu")
-        elif "next_prompt" in page_details:
-            self.save_metadata("next_prompt", page_details["next_prompt"])
-            return await self.go_to_state("state_detail_with_next")
+            self.save_metadata("page_type", "submenu")
         else:
-            return await self.go_to_state("state_detail")
+            self.save_metadata("page_type", "detail")
 
-    async def state_submenu(self):
+        return await self.go_to_state("state_display_page")
+
+    async def state_display_page(self):
         async def next_(choice: Choice):
             if choice.value == "back":
                 return "state_back"
+            elif choice.value == "next":
+                message_id = self.user.metadata["current_message_id"]
+                self.save_metadata("current_message_id", message_id + 1)
+                return "state_contentrepo_page"
 
             self.save_metadata("selected_page_id", choice.value)
             self.save_metadata("current_message_id", 1)
             return "state_contentrepo_page"
 
         metadata = self.user.metadata
+        choices = []
+        buttons = []
 
-        page_id = metadata["selected_page_id"]
-        error, choices = await contentrepo.get_choices_by_parent(page_id)
-        if error:
-            return await self.go_to_state("state_error")
+        if metadata["page_type"] == "submenu":
+            page_id = metadata["selected_page_id"]
+            error, choices = await contentrepo.get_choices_by_parent(page_id)
+            if error:
+                return await self.go_to_state("state_error")
 
         title = metadata["title"]
         subtitle = metadata["subtitle"]
         body = metadata["body"]
-
-        parts = [f"*{title}*", subtitle, "-----", "", body, ""]
-        question = self._("\n".join([part for part in parts if part is not None]))
-
-        helper_metadata = {}
-        if "image_path" in metadata and metadata["image_path"]:
-            helper_metadata["image"] = contentrepo.get_url(metadata["image_path"])
-
-        menu_level = metadata["current_menu_level"]
-        if menu_level > 2:
-            logger.info(metadata)
-            previous_menu_level = f"back_{menu_level-1}"
-            if previous_menu_level in metadata:
-                back_title = metadata[previous_menu_level]["back_to_title"]
-                choices.append(Choice("back", f"⬅️ {back_title}"))
-
-        return ChoiceState(
-            self,
-            question=question,
-            error=self._(
-                "⚠️ This service works best when you use the numbered options "
-                "available\n"
-            ),
-            choices=choices,
-            next=next_,
-            footer=self._(
-                "\n".join(
-                    [
-                        "",
-                        "-----",
-                        "*Or reply:*",
-                        "0. 🏠 Back to Main MENU",
-                        "# 🆘 Get HELP",
-                    ]
-                )
-            ),
-            helper_metadata=helper_metadata,
-        )
-
-    async def state_detail_with_next(self):
-        async def next_(choice: Choice):
-            message_id = self.user.metadata["current_message_id"]
-            self.save_metadata("current_message_id", message_id + 1)
-            return "state_contentrepo_page"
-
-        metadata = self.user.metadata
-        title = metadata["title"]
-        subtitle = metadata["subtitle"]
-        body = metadata["body"]
-        next_prompt = metadata["next_prompt"]
-
-        parts = [f"*{title}*", subtitle, "-----", "", body, ""]
-        question = self._("\n".join([part for part in parts if part is not None]))
-
-        helper_metadata = {}
-        if "image_path" in metadata and metadata["image_path"]:
-            helper_metadata["image"] = contentrepo.get_url(metadata["image_path"])
-
-        return ChoiceState(
-            self,
-            question=question,
-            error=self._(
-                "⚠️ This service works best when you use the numbered options "
-                "available\n"
-            ),
-            choices=[Choice("next", next_prompt)],
-            buttons=[Choice("next", next_prompt)],
-            next=next_,
-            footer=self._(
-                "\n".join(
-                    [
-                        "",
-                        "-----",
-                        "*Or reply:*",
-                        "0. 🏠 Back to Main MENU",
-                        "# 🆘 Get HELP",
-                    ]
-                )
-            ),
-            helper_metadata=helper_metadata,
-        )
-
-    async def state_detail(self):
-        metadata = self.user.metadata
-        title = metadata["title"]
-        subtitle = metadata["subtitle"]
-        body = metadata["body"]
+        next_prompt = metadata.get("next_prompt")
 
         parts = [
             f"*{title}*",
@@ -233,19 +167,63 @@ class Application(BaseApplication):
             "",
             body,
             "",
-            "-----",
-            "*Or reply:*",
-            "0. 🏠 Back to Main MENU",
-            "# 🆘 Get HELP",
         ]
+
+        if metadata["page_type"] == "submenu":
+            parts.extend(
+                [
+                    get_display_choices(choices),
+                    "",
+                ]
+            )
+        elif next_prompt:
+            choices.append(Choice("next", next_prompt))
+            buttons.append(Choice("next", next_prompt))
+
+            parts.extend(
+                [
+                    get_display_choices(choices),
+                    "",
+                ]
+            )
+
+        back_title = None
+        back_menu_item = None
+        menu_level = metadata["current_menu_level"]
+        if menu_level > 2:
+            previous_menu_level = f"back_{menu_level-1}"
+            if previous_menu_level in metadata:
+                back_title = metadata[previous_menu_level]["back_to_title"]
+                back_menu_item = f"{len(choices) + 1}. {back_title}"
+
+        parts.extend(
+            [
+                "-----",
+                "*Or reply:*",
+                back_menu_item,
+                "0. 🏠 Back to Main MENU",
+                "# 🆘 Get HELP",
+            ]
+        )
         question = self._("\n".join([part for part in parts if part is not None]))
 
         helper_metadata = {}
         if "image_path" in metadata and metadata["image_path"]:
             helper_metadata["image"] = contentrepo.get_url(metadata["image_path"])
 
-        return EndState(
-            self, question, next=self.START_STATE, helper_metadata=helper_metadata
+        if back_title:
+            choices.append(Choice("back", f"⬅️ {back_title}"))
+
+        return CustomChoiceState(
+            self,
+            question=question,
+            error=self._(
+                "⚠️ This service works best when you use the numbered options "
+                "available\n"
+            ),
+            choices=choices,
+            next=next_,
+            helper_metadata=helper_metadata,
         )
 
     async def state_back(self):
