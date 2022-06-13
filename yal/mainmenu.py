@@ -111,19 +111,12 @@ class Application(BaseApplication):
         self.save_metadata("subtitle", page_details["subtitle"])
         self.save_metadata("body", page_details["body"])
         self.save_metadata("image_path", page_details.get("image_path"))
-
-        if "next_prompt" in page_details:
-            self.save_metadata("next_prompt", page_details["next_prompt"])
-        else:
-            self.save_metadata("next_prompt", None)
+        self.save_metadata("next_prompt", page_details.get("next_prompt"))
+        self.save_metadata("parent_id", page_details["parent_id"])
+        self.save_metadata("parent_title", page_details["parent_title"])
 
         menu_level = metadata["current_menu_level"] + 1
         self.save_metadata("current_menu_level", menu_level)
-
-        self.save_metadata(
-            f"back_{menu_level}",
-            {"back_page_id": page_id, "back_to_title": page_details["title"]},
-        )
 
         if page_details["has_children"]:
             self.save_metadata("page_type", "submenu")
@@ -187,14 +180,13 @@ class Application(BaseApplication):
                 ]
             )
 
-        back_title = None
         back_menu_item = None
         menu_level = metadata["current_menu_level"]
         if menu_level > 2:
-            previous_menu_level = f"back_{menu_level-1}"
-            if previous_menu_level in metadata:
-                back_title = metadata[previous_menu_level]["back_to_title"]
-                back_menu_item = f"{len(choices) + 1}. ⬅️{back_title}"
+            back_title = metadata["parent_title"]
+            back_menu_item = f"{len(choices) + 1}. ⬅️{back_title}"
+
+            choices.append(Choice("back", f"⬅️ {back_title}"))
 
         parts.extend(
             [
@@ -211,9 +203,6 @@ class Application(BaseApplication):
         if "image_path" in metadata and metadata["image_path"]:
             helper_metadata["image"] = contentrepo.get_url(metadata["image_path"])
 
-        if back_title:
-            choices.append(Choice("back", f"⬅️ {back_title}"))
-
         return CustomChoiceState(
             self,
             question=question,
@@ -228,7 +217,7 @@ class Application(BaseApplication):
 
     async def state_back(self):
         menu_level = self.user.metadata["current_menu_level"]
-        page_id = self.user.metadata[f"back_{menu_level-1}"]["back_page_id"]
+        page_id = self.user.metadata["parent_id"]
 
         self.save_metadata("selected_page_id", page_id)
         self.save_metadata("current_message_id", 1)
