@@ -93,6 +93,9 @@ async def get_page_details(user, page_id, message_id):
                 page_details["subtitle"] = response_body["subtitle"]
                 page_details["body"] = response_body["body"]["text"]["value"]["message"]
 
+                page_details["parent_id"] = response_body["meta"]["parent"]["id"]
+                page_details["parent_title"] = response_body["meta"]["parent"]["title"]
+
                 if not page_details["has_children"]:
                     message_number = response_body["body"]["message"]
                     total_messages = response_body["body"]["total_messages"]

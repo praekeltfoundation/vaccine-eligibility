@@ -35,6 +35,7 @@ def build_message_detail(
         },
         "tags": tags,
         "has_children": has_children,
+        "meta": {"parent": {"id": 123, "title": "Parent Title"}},
     }
 
 
@@ -402,7 +403,7 @@ async def test_state_display_page_submenu_back(tester: AppTester, contentrepo_ap
     tester.user.metadata["current_menu_level"] = 3
     tester.user.metadata["current_message_id"] = 1
 
-    tester.user.metadata["back_2"] = {"back_to_title": "Previous thing"}
+    tester.user.metadata["parent_title"] = "Previous thing"
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
@@ -437,7 +438,7 @@ async def test_state_display_page_detail(tester: AppTester, contentrepo_api_mock
     tester.user.metadata["title"] = "title"
     tester.user.metadata["subtitle"] = "subtitle"
     tester.user.metadata["body"] = "body"
-    tester.user.metadata["current_menu_level"] = 3
+    tester.user.metadata["current_menu_level"] = 1
     tester.user.metadata["current_message_id"] = 1
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
@@ -468,7 +469,7 @@ async def test_state_display_page_detail_next(tester: AppTester):
     tester.user.metadata["title"] = "title"
     tester.user.metadata["subtitle"] = "subtitle"
     tester.user.metadata["body"] = "body"
-    tester.user.metadata["current_menu_level"] = 3
+    tester.user.metadata["current_menu_level"] = 1
     tester.user.metadata["current_message_id"] = 1
 
     tester.user.metadata["next_prompt"] = "Continue"
@@ -506,7 +507,7 @@ async def test_state_display_page_detail_back(tester: AppTester):
     tester.user.metadata["current_menu_level"] = 3
     tester.user.metadata["current_message_id"] = 1
 
-    tester.user.metadata["back_2"] = {"back_to_title": "Previous thing"}
+    tester.user.metadata["parent_title"] = "Previous thing"
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
@@ -542,7 +543,7 @@ async def test_state_display_page_detail_next_and_back(tester: AppTester):
 
     tester.user.metadata["next_prompt"] = "Continue"
 
-    tester.user.metadata["back_2"] = {"back_to_title": "Previous thing"}
+    tester.user.metadata["parent_title"] = "Previous thing"
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
