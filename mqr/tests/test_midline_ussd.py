@@ -1,12 +1,8 @@
-import json
 
 import pytest
-from sanic import Sanic, response
 
-from mqr import config
-from mqr.baseline_ussd import Application
 from mqr.midline_ussd import Application
-from vaccine.models import Message, StateData, User
+from vaccine.models import Message
 from vaccine.testing import AppTester
 
 
@@ -897,7 +893,7 @@ async def test_state_likelihood_of_following_schedule(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_likelihood_of_following_schedule(tester: AppTester):
+async def test_state_likelihood_of_following_schedule_valid(tester: AppTester):
     tester.setup_state("state_likelihood_of_following_schedule")
     await tester.user_input("1")
     tester.assert_state("state_end")
@@ -906,7 +902,7 @@ async def test_state_likelihood_of_following_schedule(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_likelihood_of_following_schedule(tester: AppTester):
+async def test_state_likelihood_of_following_schedule_invalid(tester: AppTester):
     tester.setup_state("state_likelihood_of_following_schedule")
     await tester.user_input("invalid")
     tester.assert_state("state_likelihood_of_following_schedule")

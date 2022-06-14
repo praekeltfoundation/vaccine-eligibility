@@ -10,6 +10,7 @@ from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
 
 logger = logging.getLogger(__name__)
 
+
 def get_rapidpro():
     return aiohttp.ClientSession(
         timeout=aiohttp.ClientTimeout(total=5),
@@ -103,7 +104,8 @@ class Application(BaseApplication):
 
     async def state_amount_alcohol_since_pregnant(self):
         question = self._(
-            "Since becoming pregnant, has the number of alcoholic drinks you have per week:"
+            "Since becoming pregnant, has the number of alcoholic drinks"
+            " you have per week:"
         )
         error = self._("Please use numbers from list.\n")
         choices = [
@@ -171,7 +173,8 @@ class Application(BaseApplication):
         question = self._(
             "8/16\n"
             "\n"
-            "Do you think baby kicks should be felt every day in the third trimester of pregnancy?"
+            "Do you think baby kicks should be felt every day in the"
+            " third trimester of pregnancy?"
         )
         error = self._("Please use numbers from list.\n")
         choices = [
@@ -242,13 +245,12 @@ class Application(BaseApplication):
             next=next_state,
         )
 
-    # split
-
     async def state_why_not_intend_breastfeeding_question(self):
         question = self._(
             "11/16\n"
             "\n"
-            "What is the biggest reason why you don't intend on breastfeeding your baby after he/she is born?"
+            "What is the biggest reason why you don't intend on breastfeeding"
+            " your baby after he/she is born?"
         )
         error = self._("Please use numbers from list.\n")
         choices = [Choice("1", "Next")]
@@ -349,7 +351,8 @@ class Application(BaseApplication):
         question = self._(
             "13/16\n"
             "\n"
-            "How long do you plan to give your baby only breastmilk before giving other foods and water?"
+            "How long do you plan to give your baby only breastmilk before"
+            " giving other foods and water?"
         )
         error = self._("Please use numbers from list.\n")
         choices = [Choice("1", "Next")]
@@ -389,7 +392,8 @@ class Application(BaseApplication):
             "\n"
             "What do you think about this statement?\n"
             "\n"
-            "I think it is important to vaccinate my baby against severe diseases like measles, polio, and tetanus"
+            "I think it is important to vaccinate my baby against severe"
+            " diseases like measles, polio, and tetanus"
         )
         error = self._("Please use numbers from list.\n")
         choices = [Choice("1", "Next")]
@@ -429,7 +433,8 @@ class Application(BaseApplication):
             "\n"
             "What do you think about this statement?\n"
             "\n"
-            "The benefits of vaccinating my child outweighs the risks my child will develop side effects from them"
+            "The benefits of vaccinating my child outweighs the risks my child"
+            " will develop side effects from them"
         )
         error = self._("Please use numbers from list.\n")
         choices = [Choice("1", "Next")]
@@ -515,7 +520,8 @@ class Application(BaseApplication):
         text = self._(
             "\n".join(
                 [
-                    "Thank you for answering these questions. Your R5 airtime will be sent within 24 hours."
+                    "Thank you for answering these questions. Your R5 airtime will"
+                    " be sent within 24 hours."
                     "You will get your next MomConnect message soon.",
                     "Have a lovely day!",
                 ]
@@ -532,7 +538,3 @@ class Application(BaseApplication):
             ),
             next=self.START_SURVEY,
         )
-
-
-
- 
