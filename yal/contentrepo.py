@@ -136,13 +136,13 @@ async def get_page_details(user, page_id, message_id):
 
 
 async def find_related_pages(tags):
-    choices = []
+    related_pages = {}
     for tag in tags:
         if tag.startswith("related_"):
             page_id = tag.replace("related_", "")
             error, related_choices = await get_choices_by_id(page_id)
             if not error:
                 for choice in related_choices:
-                    choice.label = f"Learn more about {choice.label}"
-                    choices.append(choice)
-    return choices
+                    related_pages[choice.value] = f"Learn more about {choice.label}"
+
+    return related_pages

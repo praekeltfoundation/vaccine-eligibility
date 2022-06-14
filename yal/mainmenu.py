@@ -167,7 +167,8 @@ class Application(BaseApplication):
             choices.append(Choice("next", next_prompt))
             buttons.append(Choice("next", next_prompt))
         elif metadata["related_pages"]:
-            choices.extend(metadata["related_pages"])
+            for value, label in metadata["related_pages"].items():
+                choices.append(Choice(value, label))
 
         if choices:
             parts.extend(
