@@ -114,6 +114,7 @@ class Application(BaseApplication):
         self.save_metadata("next_prompt", page_details.get("next_prompt"))
         self.save_metadata("parent_id", page_details["parent_id"])
         self.save_metadata("parent_title", page_details["parent_title"])
+        self.save_metadata("related_pages", page_details.get("related_pages"))
 
         menu_level = metadata["current_menu_level"] + 1
         self.save_metadata("current_menu_level", menu_level)
@@ -162,17 +163,13 @@ class Application(BaseApplication):
             "",
         ]
 
-        if metadata["page_type"] == "submenu":
-            parts.extend(
-                [
-                    get_display_choices(choices),
-                    "",
-                ]
-            )
-        elif next_prompt:
+        if next_prompt:
             choices.append(Choice("next", next_prompt))
             buttons.append(Choice("next", next_prompt))
+        elif metadata["related_pages"]:
+            choices.extend(metadata["related_pages"])
 
+        if choices:
             parts.extend(
                 [
                     get_display_choices(choices),
