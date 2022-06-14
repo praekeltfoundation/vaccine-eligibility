@@ -11,6 +11,7 @@ from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
 logger = logging.getLogger(__name__)
 # TODO: FWB
 
+
 def get_eventstore():
     # TODO: Cache the session globally. Things that don't work:
     # - Declaring the session at the top of the file
@@ -36,6 +37,7 @@ def get_rapidpro():
             "User-Agent": "mqr-midline-study-ussd",
         },
     )
+
 
 class Application(BaseApplication):
     START_SURVEY = "state_start"
@@ -104,14 +106,8 @@ class Application(BaseApplication):
         return await self.go_to_state("state_eat_fruits")
 
     async def state_eat_fruits(self):
-        question = self._(
-            "1/16\n" "\n" "Do you eat fruits at least once a day?"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "Do you eat fruits at least once a day?"
-        )
+        question = self._("1/16\n" "\n" "Do you eat fruits at least once a day?")
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("yes", "Yes"),
             Choice("no", "No"),
@@ -127,14 +123,8 @@ class Application(BaseApplication):
         )
 
     async def state_eat_vegetables(self):
-        question = self._(
-            "2/16\n" "\n" "Do you eat vegetables at least once a day?"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "Do you eat vegetables at least once a day?"
-        )
+        question = self._("2/16\n" "\n" "Do you eat vegetables at least once a day?")
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("yes", "Yes"),
             Choice("no", "No"),
@@ -150,14 +140,8 @@ class Application(BaseApplication):
         )
 
     async def state_eat_liver(self):
-        question = self._(
-            "3/16\n" "\n" "How often do you eat liver?"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "How often do you eat liver?"
-        )
+        question = self._("3/16\n" "\n" "How often do you eat liver?")
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("once_week", "Once a week"),
             Choice("once_2_weeks", "Once every 2 weeks"),
@@ -177,13 +161,11 @@ class Application(BaseApplication):
 
     async def state_foods_contain(self):
         question = self._(
-            "4/16\n" "\n" "Nuts, eggs, meat, fish, and green vegetables have a lot of what in them?"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
+            "4/16\n"
             "\n"
             "Nuts, eggs, meat, fish, and green vegetables have a lot of what in them?"
         )
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("calcium", "Calcium"),
             Choice("vitamin_c", "Vitamin C"),
@@ -204,11 +186,7 @@ class Application(BaseApplication):
         question = self._(
             "Since becoming pregnant, has the number of alcoholic drinks you have per week:"
         )
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "Since becoming pregnant, has the number of alcoholic drinks you have per week:"
-        )
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("no_change", "Stayed the same"),
             Choice("reduced", "Reduced"),
@@ -228,13 +206,11 @@ class Application(BaseApplication):
 
     async def state_swollen_feet_symptom_of(self):
         question = self._(
-            "6/16\n" "\n" "What can severe swollen feet even after a night's sleep be a symptom of?"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
+            "6/16\n"
             "\n"
             "What can severe swollen feet even after a night's sleep be a symptom of?"
         )
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("urinary_tract_infection", "Urinary tract infection"),
             Choice("pre_eclampsia", "Pre-eclampsia"),
@@ -252,13 +228,11 @@ class Application(BaseApplication):
 
     async def state_dizzy_weak_symptom_of(self):
         question = self._(
-            "7/16\n" "\n" "What could a mix of feeling dizzy and weak/tired be a symptom of?"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
+            "7/16\n"
             "\n"
             "What could a mix of feeling dizzy and weak/tired be a symptom of?"
         )
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("urinary_tract_infection", "Urinary tract infection"),
             Choice("pre_eclampsia", "Pre-eclampsia"),
@@ -272,17 +246,15 @@ class Application(BaseApplication):
             error=error,
             choices=choices,
             next="state_baby_kicks_felt",
-        )        
+        )
 
     async def state_baby_kicks_felt(self):
         question = self._(
-            "8/16\n" "\n" "Do you think baby kicks should be felt every day in the third trimester of pregnancy?"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
+            "8/16\n"
             "\n"
             "Do you think baby kicks should be felt every day in the third trimester of pregnancy?"
         )
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("yes", "Yes"),
             Choice("maybe", "Maybe"),
@@ -301,13 +273,11 @@ class Application(BaseApplication):
 
     async def state_biggest_danger_sign_pregnancy(self):
         question = self._(
-            "9/16\n" "\n" "In your view, what is the biggest pregnancy danger sign on this list?"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
+            "9/16\n"
             "\n"
             "In your view, what is the biggest pregnancy danger sign on this list?"
         )
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("4_5kg_weight_gain", "Weight gain of 4-5 kilograms"),
             Choice("vaginal_bleeding", "Vaginal bleeding"),
@@ -329,18 +299,16 @@ class Application(BaseApplication):
                 return "state_biggest_reason_to_breastfeed_question"
             if choice.value == "no":
                 return "state_why_not_intend_breastfeeding_question"
-            if choice.value == "skip":        
+            if choice.value == "skip":
                 return "state_important_to_vaccinate"
             return "state_important_to_vaccinate"
 
         question = self._(
-            "10/16\n" "\n" "Are you planning on breastfeeding your baby after he/she is born?"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
+            "10/16\n"
             "\n"
             "Are you planning on breastfeeding your baby after he/she is born?"
         )
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("yes", "Yes"),
             Choice("no", "No"),
@@ -354,17 +322,16 @@ class Application(BaseApplication):
             choices=choices,
             next=next_state,
         )
-    #split
-    
+
+    # split
+
     async def state_why_not_intend_breastfeeding_question(self):
         question = self._(
-            "11/16\n" "\n" "What is the biggest reason why you don't intend on breastfeeding your baby after he/she is born?"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
+            "11/16\n"
             "\n"
             "What is the biggest reason why you don't intend on breastfeeding your baby after he/she is born?"
         )
+        error = self._("Please use numbers from list.\n")
         choices = [Choice("1", "Next")]
 
         return ChoiceState(
@@ -376,14 +343,9 @@ class Application(BaseApplication):
         )
 
     async def state_why_not_intend_breastfeeding(self):
-        question = self._(
-            ""
-        )
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "What is the biggest reason why you don't intend on breastfeeding your baby after he/she is born?"
-        )
+        question = self._("")
+        # TODO removed "Please use numbers from list.\n" from below error message
+        error = self._("")
         choices = [
             Choice("not_nutritious", "Breastmilk is not nutritious"),
             Choice("low_milk_supply", "Low milk supply"),
@@ -402,16 +364,15 @@ class Application(BaseApplication):
             choices=choices,
             next="state_important_to_vaccinate_question",
         )
-    #split
+
+    # split
     async def state_biggest_reason_to_breastfeed_question(self):
         question = self._(
-            "11/16\n" "\n" "What is the biggest reason why you want to breastfeed your baby?"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
+            "11/16\n"
             "\n"
             "What is the biggest reason why you want to breastfeed your baby?"
         )
+        error = self._("Please use numbers from list.\n")
         choices = [Choice("1", "Next")]
 
         return ChoiceState(
@@ -423,21 +384,16 @@ class Application(BaseApplication):
         )
 
     async def state_biggest_reason_to_breastfeed(self):
-        question = self._(
-            ""
-        )
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "What is the biggest reason why you want to breastfeed your baby?"
-        )
+        question = self._("")
+        # TODO removed "Please use numbers from list.\n" from below error message
+        error = self._("")
         choices = [
             Choice("boosts_baby_immunity", "Breastmilk boosts my baby's immunity"),
             Choice("tastier_than_formula", "Breastmilk is tastier than formula"),
             Choice("improves_my_health", "Breastfeeding improves my health"),
             Choice("was_told_to", "I was told to breastfeed"),
             Choice("other_reason", "Other"),
-            Choice("skip", "Skip"),            
+            Choice("skip", "Skip"),
         ]
 
         return ChoiceState(
@@ -452,11 +408,7 @@ class Application(BaseApplication):
         question = self._(
             "12/16\n" "\n" "When do you plan to start breastfeeding your baby?"
         )
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "When do you plan to start breastfeeding your baby?"
-        )
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("within_1_hour", "Within 1 hour of birth"),
             Choice("after_1_hour", "After 1 hour post-delivery"),
@@ -471,18 +423,16 @@ class Application(BaseApplication):
             error=error,
             choices=choices,
             next="state_how_long_only_breastmilk_question",
-        )    
+        )
 
-    #split
+    # split
     async def state_how_long_only_breastmilk_question(self):
         question = self._(
-            "13/16\n" "\n" "How long do you plan to give your baby only breastmilk before giving other foods and water?"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
+            "13/16\n"
             "\n"
             "How long do you plan to give your baby only breastmilk before giving other foods and water?"
         )
+        error = self._("Please use numbers from list.\n")
         choices = [Choice("1", "Next")]
 
         return ChoiceState(
@@ -492,15 +442,10 @@ class Application(BaseApplication):
             choices=choices,
             next="state_how_long_only_breastmilk",
         )
+
     async def state_how_long_only_breastmilk(self):
-        question = self._(
-            ""
-        )
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "How long do you plan to give your baby only breastmilk before giving other foods and water?"
-        )
+        question = self._("")
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("0_to_3_months", "0-3 months"),
             Choice("4_to_5_months", "4-5 months"),
@@ -517,20 +462,17 @@ class Application(BaseApplication):
             error=error,
             choices=choices,
             next="state_important_to_vaccinate_question",
-        )    
+        )
+
     async def state_important_to_vaccinate_question(self):
         question = self._(
-            "14/16\n" "\n" "What do you think about this statement?\n"
-            "\n"
-            "I think it is important to vaccinate my baby against severe diseases like measles, polio, and tetanus"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
+            "14/16\n"
             "\n"
             "What do you think about this statement?\n"
             "\n"
             "I think it is important to vaccinate my baby against severe diseases like measles, polio, and tetanus"
         )
+        error = self._("Please use numbers from list.\n")
         choices = [Choice("1", "Next")]
 
         return ChoiceState(
@@ -542,16 +484,8 @@ class Application(BaseApplication):
         )
 
     async def state_important_to_vaccinate(self):
-        question = self._(
-            ""
-        )
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "What do you think about this statement?\n"
-            "\n"
-            "I think it is important to vaccinate my baby against severe diseases like measles, polio, and tetanus"
-        )
+        question = self._("")
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("strongly_agree", "I strongly agree"),
             Choice("agree", "I agree"),
@@ -567,22 +501,18 @@ class Application(BaseApplication):
             error=error,
             choices=choices,
             next="state_vaccine_benefits_outweighs_risk_question",
-        )            
+        )
 
-    #split
+    # split
     async def state_vaccine_benefits_outweighs_risk_question(self):
         question = self._(
-            "15/16\n" "\n" "What do you think about this statement?\n"
-             "\n"
-             "The benefits of vaccinating my child outweighs the risks my child will develop side effects from them"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
+            "15/16\n"
             "\n"
             "What do you think about this statement?\n"
-             "\n"
-             "The benefits of vaccinating my child outweighs the risks my child will develop side effects from them"
+            "\n"
+            "The benefits of vaccinating my child outweighs the risks my child will develop side effects from them"
         )
+        error = self._("Please use numbers from list.\n")
         choices = [Choice("1", "Next")]
 
         return ChoiceState(
@@ -591,21 +521,11 @@ class Application(BaseApplication):
             error=error,
             choices=choices,
             next="state_vaccine_benefits_outweighs_risk",
-        ) 
+        )
 
     async def state_vaccine_benefits_outweighs_risk(self):
-        question = self._(
-            "15/16\n" "\n" "What do you think about this statement?\n"
-             "\n"
-             "The benefits of vaccinating my child outweighs the risks my child will develop side effects from them"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
-            "\n"
-            "What do you think about this statement?\n"
-             "\n"
-             "The benefits of vaccinating my child outweighs the risks my child will develop side effects from them"
-        )
+        question = self._("")
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("strongly_agree", "I strongly agree"),
             Choice("agree", "I agree"),
@@ -621,17 +541,15 @@ class Application(BaseApplication):
             error=error,
             choices=choices,
             next="state_likelihood_of_following_schedule",
-        )    
+        )
 
     async def state_likelihood_of_following_schedule(self):
         question = self._(
-            "16/16\n" "\n" "How likely are you to follow the recommended shot schedule for your child?"
-        )
-        error = self._(
-            "Please use numbers from list.\n"
+            "16/16\n"
             "\n"
             "How likely are you to follow the recommended shot schedule for your child?"
         )
+        error = self._("Please use numbers from list.\n")
         choices = [
             Choice("very_unlikely", "Very unlikely"),
             Choice("unlikely", "Unlikely"),
@@ -647,8 +565,9 @@ class Application(BaseApplication):
             error=error,
             choices=choices,
             next="state_end",
-        )    
-    # TODO FWB - Update all functions below this line (copied from baseline) 
+        )
+
+    # TODO FWB - Update all functions below this line (copied from baseline)
     async def state_submit_data(self):
         async with get_eventstore() as session:
             for i in range(3):
@@ -768,4 +687,3 @@ class Application(BaseApplication):
             ),
             next=self.START_SURVEY,
         )
-
