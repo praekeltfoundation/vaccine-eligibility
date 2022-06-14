@@ -4,7 +4,6 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
-from vaccine.states import Choice
 from vaccine.testing import AppTester
 from yal import config
 from yal.main import Application
@@ -584,9 +583,7 @@ async def test_state_display_page_detail_related(
     tester.user.metadata["body"] = "body"
     tester.user.metadata["current_menu_level"] = 1
     tester.user.metadata["current_message_id"] = 1
-    tester.user.metadata["related_pages"] = [
-        Choice("123", "Learn more about Related Content")
-    ]
+    tester.user.metadata["related_pages"] = {"123": "Learn more about Related Content"}
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
@@ -598,6 +595,71 @@ async def test_state_display_page_detail_related(
                 "-----",
                 "",
                 "body",
+                "",
+                "1. Learn more about Related Content",
+                "",
+                "-----",
+                "*Or reply:*",
+                "0. 🏠 Back to Main MENU",
+                "# 🆘 Get HELP",
+            ]
+        )
+    )
+
+
+@pytest.fixture
+async def contentrepo_api_mock2(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("contentrepo_api_mock2")
+
+    @app.route("/api/v2/pages/1", methods=["GET"])
+    def get_page_detail_1(request):
+        return response.json(
+            build_message_detail(
+                111,
+                "Main Menu 1 💊",
+                "subtitle",
+                "Message test content 1",
+                ["related_2"],
+                False,
+            )
+        )
+
+    @app.route("/api/v2/pages", methods=["GET"])
+    def get_related_by_id(request):
+        return response.json(
+            {
+                "count": 1,
+                "results": [{"id": 111, "title": "Related Content"}],
+            }
+        )
+
+    client = await sanic_client(app)
+    url = config.CONTENTREPO_API_URL
+    config.CONTENTREPO_API_URL = f"http://{client.host}:{client.port}"
+    yield client
+    config.CONTENTREPO_API_URL = url
+
+
+@pytest.mark.asyncio
+async def test_state_content_page_related(tester: AppTester, contentrepo_api_mock2):
+    tester.setup_state("state_contentrepo_page")
+    tester.user.metadata["selected_page_id"] = "1"
+    tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["current_menu_level"] = 1
+
+    tester.user.session_id = 123
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*Main Menu 1 💊*",
+                "subtitle",
+                "-----",
+                "",
+                "Message test content 1",
                 "",
                 "1. Learn more about Related Content",
                 "",
