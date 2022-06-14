@@ -48,6 +48,10 @@ async def get_choices_by_parent(parent_id):
     return await get_choices_by_path(f"/api/v2/pages?child_of={parent_id}")
 
 
+async def get_choices_by_id(page_id):
+    return await get_choices_by_path(f"/api/v2/pages?id={page_id}")
+
+
 async def get_choices_by_path(path):
     choices = []
     async with get_contentrepo_api() as session:
@@ -106,6 +110,10 @@ async def get_page_details(user, page_id, message_id):
                             or "Next"
                         )
 
+                    related_pages = find_related_pages(response_body["tags"])
+                    if related_pages:
+                        page_details["related_pages"] = related_pages
+
                 if response_body["body"]["text"]["value"]["image"]:
                     image_id = response_body["body"]["text"]["value"]["image"]
                     response = await session.get(
@@ -125,3 +133,14 @@ async def get_page_details(user, page_id, message_id):
                 else:
                     continue
     return False, page_details
+
+
+def find_related_pages(tags):
+    choices = []
+    for tag in tags:
+        if tag.startswith("related_"):
+            page_id = tag.replace("related_", "")
+            for choice in get_choices_by_id(page_id):
+                choice.label = f"Learn more about {choice.label}"
+                choices.append(choice)
+    return choices

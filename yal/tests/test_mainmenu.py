@@ -4,6 +4,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
+from vaccine.states import Choice
 from vaccine.testing import AppTester
 from yal import config
 from yal.main import Application
@@ -402,6 +403,7 @@ async def test_state_display_page_submenu_back(tester: AppTester, contentrepo_ap
     tester.user.metadata["body"] = "body"
     tester.user.metadata["current_menu_level"] = 3
     tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["related_pages"] = None
 
     tester.user.metadata["parent_title"] = "Previous thing"
 
@@ -440,6 +442,7 @@ async def test_state_display_page_detail(tester: AppTester, contentrepo_api_mock
     tester.user.metadata["body"] = "body"
     tester.user.metadata["current_menu_level"] = 1
     tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["related_pages"] = None
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
@@ -506,6 +509,7 @@ async def test_state_display_page_detail_back(tester: AppTester):
     tester.user.metadata["body"] = "body"
     tester.user.metadata["current_menu_level"] = 3
     tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["related_pages"] = None
 
     tester.user.metadata["parent_title"] = "Previous thing"
 
@@ -561,6 +565,44 @@ async def test_state_display_page_detail_next_and_back(tester: AppTester):
                 "-----",
                 "*Or reply:*",
                 "2. ⬅️Previous thing",
+                "0. 🏠 Back to Main MENU",
+                "# 🆘 Get HELP",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_display_page_detail_related(
+    tester: AppTester, contentrepo_api_mock
+):
+    tester.setup_state("state_display_page")
+    tester.user.metadata["page_type"] = "detail"
+    tester.user.metadata["selected_page_id"] = "111"
+    tester.user.metadata["title"] = "title"
+    tester.user.metadata["subtitle"] = "subtitle"
+    tester.user.metadata["body"] = "body"
+    tester.user.metadata["current_menu_level"] = 1
+    tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["related_pages"] = [
+        Choice("123", "Learn more about Related Content")
+    ]
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*title*",
+                "subtitle",
+                "-----",
+                "",
+                "body",
+                "",
+                "1. Learn more about Related Content",
+                "",
+                "-----",
+                "*Or reply:*",
                 "0. 🏠 Back to Main MENU",
                 "# 🆘 Get HELP",
             ]
