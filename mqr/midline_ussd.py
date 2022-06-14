@@ -9,24 +9,6 @@ from vaccine.states import Choice, ChoiceState, EndState
 from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
 
 logger = logging.getLogger(__name__)
-# TODO: FWB
-
-
-def get_eventstore():
-    # TODO: Cache the session globally. Things that don't work:
-    # - Declaring the session at the top of the file
-    #   You get a `Timeout context manager should be used inside a task` error
-    # - Declaring it here but caching it in a global variable for reuse
-    #   You get a `Event loop is closed` error
-    return aiohttp.ClientSession(
-        timeout=aiohttp.ClientTimeout(total=5),
-        headers={
-            "Authorization": f"Token {config.EVENTSTORE_API_TOKEN}",
-            "Content-Type": "application/json",
-            "User-Agent": "mqr-baseline-study-ussd",
-        },
-    )
-
 
 def get_rapidpro():
     return aiohttp.ClientSession(
@@ -40,70 +22,7 @@ def get_rapidpro():
 
 
 class Application(BaseApplication):
-    START_SURVEY = "state_start"
-
-    async def state_start(self):
-        msisdn = normalise_phonenumber(self.inbound.from_addr)
-        urn = f"whatsapp:{msisdn.lstrip(' + ')}"
-
-        sms_mqr_contact = False
-
-        async with get_rapidpro() as session:
-            for i in range(3):
-                try:
-                    response = await session.get(
-                        urljoin(config.RAPIDPRO_URL, "/api/v2/contacts.json"),
-                        params={"urn": urn},
-                    )
-                    response.raise_for_status()
-                    response_body = await response.json()
-
-                    if len(response_body["results"]) > 0:
-                        contact = response_body["results"][0]
-
-                        if (
-                            contact["fields"]["mqr_consent"] == "Accepted"
-                            and contact["fields"]["mqr_arm"] == "RCM_SMS"
-                        ):
-                            sms_mqr_contact = True
-                    break
-                except HTTP_EXCEPTIONS as e:
-                    if i == 2:
-                        logger.exception(e)
-                        return await self.go_to_state("state_error")
-                    else:
-                        continue
-        if sms_mqr_contact:
-            return await self.go_to_state("state_check_existing_result")
-        return await self.go_to_state("state_contact_not_found")
-
-    async def state_check_existing_result(self):
-        msisdn = self.inbound.from_addr
-        exists = False
-
-        async with get_eventstore() as session:
-            for i in range(3):
-                try:
-                    response = await session.get(
-                        urljoin(
-                            config.EVENTSTORE_API_URL,
-                            f"/api/v1/mqrmidlinesurvey/{msisdn}/",
-                        ),
-                    )
-                    if response.status == 404:
-                        break
-                    response.raise_for_status()
-                    exists = True
-                    break
-                except HTTP_EXCEPTIONS as e:
-                    if i == 2:
-                        logger.exception(e)
-                        return await self.go_to_state("state_error")
-                    else:
-                        continue
-        if exists:
-            return await self.go_to_state("state_already_completed")
-        return await self.go_to_state("state_eat_fruits")
+    START_SURVEY = "state_eat_fruits"
 
     async def state_eat_fruits(self):
         question = self._("1/16\n" "\n" "Do you eat fruits at least once a day?")
@@ -564,51 +483,8 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="state_end",
+            next="state_update_rapidpro_contact",
         )
-
-    # TODO FWB - Update all functions below this line (copied from baseline)
-    async def state_submit_data(self):
-        async with get_eventstore() as session:
-            for i in range(3):
-                try:
-                    answers = self.user.answers
-                    data = {
-                        "msisdn": self.inbound.from_addr,
-                        "breastfeed": answers.get("state_breastfeed"),
-                        "breastfeed_period": answers.get("state_breastfeed_period"),
-                        "vaccine_importance": answers.get("state_vaccine_importance"),
-                        "vaccine_benefits": answers.get("state_vaccine_benefits"),
-                        "clinic_visit_frequency": answers.get(
-                            "state_clinic_visit_frequency"
-                        ),
-                        "vegetables": answers.get("state_vegetables"),
-                        "fruit": answers.get("state_fruit"),
-                        "dairy": answers.get("state_dairy"),
-                        "liver_frequency": answers.get("state_liver_frequency"),
-                        "danger_sign1": answers.get("state_danger_sign1"),
-                        "danger_sign2": answers.get("state_danger_sign2"),
-                        "marital_status": answers.get("state_marital_status"),
-                        "education_level": answers.get("state_education_level"),
-                    }
-                    logger.info(">>>> state_submit_data /api/v1/mqrbaselinesurvey/")
-                    logger.info(config.EVENTSTORE_API_URL)
-                    logger.info(data)
-                    response = await session.post(
-                        urljoin(
-                            config.EVENTSTORE_API_URL, "/api/v1/mqrbaselinesurvey/"
-                        ),
-                        json=data,
-                    )
-                    response.raise_for_status()
-                    break
-                except HTTP_EXCEPTIONS as e:
-                    if i == 2:
-                        logger.exception(e)
-                        return await self.go_to_state("state_error")
-                    else:
-                        continue
-        return await self.go_to_state("state_update_rapidpro_contact")
 
     async def state_update_rapidpro_contact(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -618,7 +494,7 @@ class Application(BaseApplication):
             for i in range(3):
                 try:
                     data = {
-                        "flow": config.RAPIDPRO_BASELINE_SURVEY_COMPLETE_FLOW,
+                        "flow": config.RAPIDPRO_MIDLINE_SURVEY_COMPLETE_FLOW,
                         "urns": [urn],
                     }
                     response = await session.post(
@@ -657,33 +533,6 @@ class Application(BaseApplication):
             next=self.START_SURVEY,
         )
 
-    async def state_contact_not_found(self):
-        return EndState(
-            self,
-            self._(
-                "\n".join(
-                    [
-                        "You have dialed the wrong number.",
-                        "",
-                        "Dial *134*550*2# when you're at a clinic to register on "
-                        "MomConnect or dial *134*550*7# to update details",
-                    ]
-                )
-            ),
-            next=self.START_SURVEY,
-        )
 
-    async def state_already_completed(self):
-        return EndState(
-            self,
-            self._(
-                "\n".join(
-                    [
-                        "Thanks, you have already completed this survey.",
-                        "",
-                        "You will get your weekly message soon.",
-                    ]
-                )
-            ),
-            next=self.START_SURVEY,
-        )
+
+ 
