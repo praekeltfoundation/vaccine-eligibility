@@ -620,7 +620,7 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="state_breastfeed_period_question",
+            next="state_likelihood_of_following_schedule",
         )    
 
     async def state_likelihood_of_following_schedule(self):
@@ -646,7 +646,7 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="state_breastfeed_period_question",
+            next="state_end",
         )    
     # TODO FWB - Update all functions below this line (copied from baseline) 
     async def state_submit_data(self):
@@ -720,9 +720,9 @@ class Application(BaseApplication):
         text = self._(
             "\n".join(
                 [
-                    "Thank you for answering. You'll get your R5 airtime in the next "
-                    "24 hours & your first message will be sent soon",
-                    "Dial *134*550*7# (free) to update your details",
+                    "Thank you for answering these questions. Your R5 airtime will be sent within 24 hours."
+                    "You will get your next MomConnect message soon.",
+                    "Have a lovely day!",
                 ]
             )
         )
