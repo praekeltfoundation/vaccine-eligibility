@@ -100,6 +100,7 @@ class AppTester:
         session: Optional[Message.SESSION_EVENT] = None,
         buttons: Optional[List[str]] = None,
         header: Optional[str] = None,
+        max_length: Optional[int] = None,
     ):
         """
         Asserts that the application sent a single message, with the provided parameters
@@ -120,6 +121,10 @@ class AppTester:
         if header is not None:
             hdr = message.helper_metadata.get("header")
             assert hdr == header, f"Header is {hdr}, not {header}"
+        if max_length is not None:
+            assert (
+                len(str(message.content)) <= max_length
+            ), f"Message length is over {max_length}"
 
 
 class FakeWorker(Worker):
