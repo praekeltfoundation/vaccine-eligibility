@@ -810,6 +810,38 @@ async def test_state_how_long_only_breastmilk_invalid(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_state_important_to_vaccinate_question(tester: AppTester):
+    tester.setup_state("state_important_to_vaccinate_question")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_state("state_important_to_vaccinate_question")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "14/16",
+                "",
+                "What do you think about this statement?",
+                "",
+                "I think it is important to vaccinate my baby against severe"
+                " diseases like measles, polio, and tetanus",
+                "1. Next",
+            ]
+        ),
+        max_length=160,
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_important_to_vaccinate_question_valid(tester: AppTester):
+    tester.setup_state("state_important_to_vaccinate_question")
+    await tester.user_input("1")
+    tester.assert_state("state_important_to_vaccinate")
+
+    tester.assert_answer("state_important_to_vaccinate_question", "1")
+
+
+@pytest.mark.asyncio
 async def test_state_important_to_vaccinate(tester: AppTester):
     tester.setup_state("state_important_to_vaccinate")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
