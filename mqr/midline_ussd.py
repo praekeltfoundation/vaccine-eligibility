@@ -403,7 +403,7 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="state_breastfeed_period_question",
+            next="state_important_to_vaccinate",
         )
 
     async def state_important_to_vaccinate(self):
