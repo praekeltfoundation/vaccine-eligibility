@@ -123,7 +123,7 @@ class AppTester:
             assert hdr == header, f"Header is {hdr}, not {header}"
         if max_length is not None:
             assert (
-                len(message.content) <= max_length
+                len(str(message.content)) <= max_length
             ), f"Message length is over {max_length}"
 
 
