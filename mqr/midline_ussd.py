@@ -488,10 +488,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="state_update_rapidpro_contact",
+            next="state_update_rapidpro_contact_midline",
         )
 
-    async def state_update_rapidpro_contact(self):
+    async def state_update_rapidpro_contact_midline(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         urn = f"whatsapp:{msisdn.lstrip(' + ')}"
 
