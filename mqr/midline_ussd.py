@@ -23,7 +23,7 @@ def get_rapidpro():
 
 
 class Application(BaseApplication):
-    START_SURVEY = "state_eat_fruits"
+    START_STATE = "state_eat_fruits"
 
     async def state_eat_fruits(self):
         question = self._("1/16\n" "\n" "Do you eat fruits at least once a day?")
@@ -536,5 +536,5 @@ class Application(BaseApplication):
                 "Sorry, something went wrong. We have been notified. Please try again "
                 "later"
             ),
-            next=self.START_SURVEY,
+            next=self.START_STATE,
         )

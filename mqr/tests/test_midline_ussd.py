@@ -1,6 +1,9 @@
+import json
 
 import pytest
+from sanic import Sanic, response
 
+from mqr import config
 from mqr.midline_ussd import Application
 from vaccine.models import Message
 from vaccine.testing import AppTester
@@ -9,6 +12,27 @@ from vaccine.testing import AppTester
 @pytest.fixture
 def tester():
     return AppTester(Application)
+
+
+@pytest.fixture
+async def rapidpro_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("mock_rapidpro")
+    app.requests = []
+    app.errors = 0
+    app.errormax = 0
+
+    @app.route("/api/v2/flow_starts.json", methods=["POST"])
+    def start_flow(request):
+        app.requests.append(request)
+        return response.json({}, status=200)
+
+    client = await sanic_client(app)
+    url = config.RAPIDPRO_URL
+    config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
+    config.RAPIDPRO_TOKEN = "testtoken"
+    yield client
+    config.RAPIDPRO_URL = url
 
 
 @pytest.mark.asyncio
@@ -229,7 +253,8 @@ async def test_amount_alcohol_since_pregnant(tester: AppTester):
     assert len(reply.content) < 160
     assert reply.content == "\n".join(
         [
-            "Since becoming pregnant, has the number of alcoholic drinks you have per week:",
+            "Since becoming pregnant, has the number of alcoholic drinks you have "
+            "per week:",
             "1. Stayed the same",
             "2. Reduced",
             "3. Increased",
@@ -387,7 +412,8 @@ async def test_baby_kicks_felt(tester: AppTester):
         [
             "8/16",
             "",
-            "Do you think baby kicks should be felt every day in the third trimester of pregnancy?",
+            "Do you think baby kicks should be felt every day in the third trimester"
+            " of pregnancy?",
             "1. Yes",
             "2. Maybe",
             "3. No",
@@ -579,7 +605,8 @@ async def test_state_why_not_intend_breastfeeding_invalid(tester: AppTester):
 
     [reply] = tester.application.messages
 
-    # TODO this is non standard, removed "Please use numbers from list.\n" due to char count
+    # TODO this is non standard, removed "Please use numbers from list.\n" due
+    # to char count
     assert len(reply.content) < 160
     assert reply.content == "\n".join(
         [
@@ -634,7 +661,8 @@ async def test_state_biggest_reason_to_breastfeed_invalid(tester: AppTester):
     tester.assert_state("state_biggest_reason_to_breastfeed")
 
     [reply] = tester.application.messages
-    # TODO this is non standard, removed "Please use numbers from list.\n" due to char count
+    # TODO this is non standard, removed "Please use numbers from list.\n"
+    # due to char count
     assert len(reply.content) < 160
     assert reply.content == "\n".join(
         [
@@ -881,7 +909,8 @@ async def test_state_likelihood_of_following_schedule(tester: AppTester):
         [
             "16/16",
             "",
-            "How likely are you to follow the recommended shot schedule for your child?",
+            "How likely are you to follow the recommended shot schedule for your "
+            "child?",
             "1. Very unlikely",
             "2. Unlikely",
             "3. Not sure",
@@ -893,12 +922,19 @@ async def test_state_likelihood_of_following_schedule(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_likelihood_of_following_schedule_valid(tester: AppTester):
+async def test_state_likelihood_of_following_schedule_valid(
+    tester: AppTester, rapidpro_mock
+):
     tester.setup_state("state_likelihood_of_following_schedule")
     await tester.user_input("1")
-    tester.assert_state("state_end")
+    tester.assert_state("state_eat_fruits")
 
-    tester.assert_answer("state_likelihood_of_following_schedule", "yes")
+    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/flow_starts.json"]
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "flow": config.RAPIDPRO_MIDLINE_SURVEY_COMPLETE_FLOW,
+        "urns": ["whatsapp:27820001001"],
+    }
 
 
 @pytest.mark.asyncio
