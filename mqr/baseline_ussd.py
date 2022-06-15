@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 import aiohttp
 
 from mqr import config
-from vaccine.base_application import BaseApplication
+from mqr.midline_ussd import Application as MidlineApplication
 from vaccine.states import Choice, ChoiceState, EndState
 from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
 
@@ -38,8 +38,8 @@ def get_rapidpro():
     )
 
 
-class Application(BaseApplication):
-    START_SURVEY = "state_start"
+class Application(MidlineApplication):
+    START_STATE = "state_start"
 
     async def state_start(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -65,6 +65,11 @@ class Application(BaseApplication):
                             and contact["fields"]["mqr_arm"] == "RCM_SMS"
                         ):
                             sms_mqr_contact = True
+
+                            if contact["fields"]["midline_survey_completed"] == "False":
+                                return await self.go_to_state(
+                                    MidlineApplication.START_STATE
+                                )
                     break
                 except HTTP_EXCEPTIONS as e:
                     if i == 2:
@@ -630,7 +635,7 @@ class Application(BaseApplication):
                 "Sorry, something went wrong. We have been notified. Please try again "
                 "later"
             ),
-            next=self.START_SURVEY,
+            next=self.START_STATE,
         )
 
     async def state_contact_not_found(self):
@@ -646,7 +651,7 @@ class Application(BaseApplication):
                     ]
                 )
             ),
-            next=self.START_SURVEY,
+            next=self.START_STATE,
         )
 
     async def state_already_completed(self):
@@ -661,5 +666,5 @@ class Application(BaseApplication):
                     ]
                 )
             ),
-            next=self.START_SURVEY,
+            next=self.START_STATE,
         )

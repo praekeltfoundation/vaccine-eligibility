@@ -8,13 +8,19 @@ from mqr.baseline_ussd import Application
 from vaccine.models import Message, StateData, User
 
 
-def get_rapidpro_contact(urn, mqr_consent="Accepted", mqr_arm="RCM_SMS"):
+def get_rapidpro_contact(
+    urn, mqr_consent="Accepted", mqr_arm="RCM_SMS", midline_started=""
+):
     return {
         "uuid": "b733e997-b0b4-4d4d-a3ad-0546e1644aa9",
         "name": "",
         "language": "zul",
         "groups": [],
-        "fields": {"mqr_consent": mqr_consent, "mqr_arm": mqr_arm},
+        "fields": {
+            "mqr_consent": mqr_consent,
+            "mqr_arm": mqr_arm,
+            "midline_survey_completed": midline_started,
+        },
         "blocked": False,
         "stopped": False,
         "created_on": "2015-11-11T08:30:24.922024+00:00",
@@ -46,6 +52,9 @@ async def rapidpro_mock(sanic_client):
 
         if urn == "whatsapp:27820001004":
             contacts = [get_rapidpro_contact(urn, "Declined", "BCM")]
+
+        if urn == "whatsapp:27820001006":
+            contacts = [get_rapidpro_contact(urn, midline_started="False")]
 
         return response.json(
             {
@@ -137,6 +146,34 @@ async def test_state_survey_start(rapidpro_mock, eventstore_mock):
     assert [r.path for r in eventstore_mock.app.requests] == [
         "/api/v1/mqrbaselinesurvey/27820001003/"
     ]
+
+
+@pytest.mark.asyncio
+async def test_state_survey_start_midline(rapidpro_mock):
+    u = User(addr="27820001006", state=StateData())
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001006",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+    assert len(reply.content) < 140
+    assert reply.content == "\n".join(
+        [
+            "1/16",
+            "",
+            "Do you eat fruits at least once a day?",
+            "1. Yes",
+            "2. No",
+            "3. Skip",
+        ]
+    )
+
+    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
