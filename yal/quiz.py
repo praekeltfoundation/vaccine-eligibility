@@ -19,11 +19,11 @@ class Application(BaseApplication):
     async def state_quiz_question(self):
         async def next_(choice: Choice):
             if choice.value == "callme":
-                return await self.go_to_state("state_please_call")
+                return "state_please_call"
             elif choice.value == "menu":
-                return await self.go_to_state("state_mainmenu")
+                return "state_mainmenu"
             elif choice.value == "redo":
-                return await self.go_to_state("state_quiz_start")
+                return "state_quiz_start"
 
             self.save_metadata("selected_answer_id", choice.value)
             return "state_quiz_answer"
