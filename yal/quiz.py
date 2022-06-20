@@ -64,9 +64,10 @@ class Application(BaseApplication):
                     result_page_details["image_path"]
                 )
 
+            result_msg = result_page_details["body"].replace("[SCORE]", str(score))
             await self.worker.publish_message(
                 self.inbound.reply(
-                    self._(result_page_details["body"]),
+                    self._(result_msg),
                     helper_metadata=helper_metadata,
                 )
             )

@@ -58,7 +58,7 @@ async def contentrepo_api_mock(sanic_client):
             tags.extend(["quiz_end", "pass_percentage_90"])
         if page_id == 5:
             title = "Quiz pass message"
-            body = "The pass message for this quiz"
+            body = "[SCORE] out of 2\nThe pass message for this quiz."
 
         return response.json(
             {
@@ -129,7 +129,7 @@ async def test_state_quiz_start(tester: AppTester, contentrepo_api_mock):
     )
     assert result_msg.content == "\n".join(
         [
-            "The pass message for this quiz",
+            "1 out of 2\nThe pass message for this quiz.",
         ]
     )
 
