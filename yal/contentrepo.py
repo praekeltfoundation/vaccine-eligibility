@@ -52,6 +52,15 @@ async def get_choices_by_id(page_id):
     return await get_choices_by_path(f"/api/v2/pages?id={page_id}")
 
 
+async def get_page_detail_by_tag(user, tag):
+    error, choices = await get_choices_by_path(f"/api/v2/pages?tag={tag}")
+
+    if error:
+        return error, choices
+
+    return await get_page_details(user, choices[0].value, 1)
+
+
 async def get_choices_by_path(path):
     choices = []
     async with get_contentrepo_api() as session:
@@ -92,6 +101,7 @@ async def get_page_details(user, page_id, message_id):
                 response.raise_for_status()
                 response_body = await response.json()
 
+                page_details["page_id"] = page_id
                 page_details["has_children"] = response_body["has_children"]
                 page_details["title"] = response_body["title"]
                 page_details["subtitle"] = response_body["subtitle"]
@@ -99,6 +109,8 @@ async def get_page_details(user, page_id, message_id):
 
                 page_details["parent_id"] = response_body["meta"]["parent"]["id"]
                 page_details["parent_title"] = response_body["meta"]["parent"]["title"]
+
+                page_details["tags"] = response_body["tags"]
 
                 if not page_details["has_children"]:
                     message_number = response_body["body"]["message"]
@@ -109,6 +121,13 @@ async def get_page_details(user, page_id, message_id):
                             response_body["body"]["text"]["value"].get("next_prompt")
                             or "Next"
                         )
+                    else:
+
+                        if "prompt_quiz" in page_details["tags"]:
+                            quiz_tag = [
+                                i for i in page_details["tags"] if i.startswith("quiz_")
+                            ][0]
+                            page_details["quiz_tag"] = quiz_tag
 
                     related_pages = await find_related_pages(response_body["tags"])
                     if related_pages:

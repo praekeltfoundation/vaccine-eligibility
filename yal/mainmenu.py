@@ -5,6 +5,7 @@ from vaccine.states import Choice, ChoiceState, EndState, SectionedChoiceState
 from vaccine.utils import get_display_choices
 from yal import contentrepo
 from yal.change_preferences import Application as ChangePreferencesApplication
+from yal.quiz import Application as QuizApplication
 
 logger = logging.getLogger(__name__)
 
@@ -115,6 +116,7 @@ class Application(BaseApplication):
         self.save_metadata("parent_id", page_details["parent_id"])
         self.save_metadata("parent_title", page_details["parent_title"])
         self.save_metadata("related_pages", page_details.get("related_pages"))
+        self.save_metadata("quiz_tag", page_details.get("quiz_tag"))
 
         menu_level = metadata["current_menu_level"] + 1
         self.save_metadata("current_menu_level", menu_level)
@@ -134,6 +136,8 @@ class Application(BaseApplication):
                 message_id = self.user.metadata["current_message_id"]
                 self.save_metadata("current_message_id", message_id + 1)
                 return "state_contentrepo_page"
+            elif choice.value == "quiz":
+                return QuizApplication.START_STATE
 
             self.save_metadata("selected_page_id", choice.value)
             self.save_metadata("current_message_id", 1)
@@ -153,6 +157,7 @@ class Application(BaseApplication):
         subtitle = metadata["subtitle"]
         body = metadata["body"]
         next_prompt = metadata.get("next_prompt")
+        quiz_tag = metadata.get("quiz_tag")
 
         parts = [
             f"*{title}*",
@@ -169,8 +174,21 @@ class Application(BaseApplication):
         elif metadata["related_pages"]:
             for value, label in metadata["related_pages"].items():
                 choices.append(Choice(value, label))
+        elif quiz_tag:
+            choices.append(Choice("quiz", "Yes (take the quiz)"))
+            buttons.append(Choice("quiz", "Yes (take the quiz)"))
 
         if choices:
+            parts.extend(
+                [
+                    get_display_choices(choices),
+                    "",
+                ]
+            )
+        elif quiz_tag:
+            choices.append(Choice("quiz", "Yes (take the quiz)"))
+            buttons.append(Choice("quiz", "Yes (take the quiz)"))
+
             parts.extend(
                 [
                     get_display_choices(choices),
