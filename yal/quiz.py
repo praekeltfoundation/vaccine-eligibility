@@ -40,7 +40,38 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         if "quiz_end" in page_details["tags"]:
-            # TODO - send results message here
+            pass_percentage = 70
+            for tag in page_details["tags"]:
+                if tag.startswith("pass_percentage_"):
+                    pass_percentage = int(tag.replace("pass_percentage_", ""))
+
+            score = metadata["quiz_score"]
+            total = metadata["quiz_sequence"] - 1
+
+            result_tag = f"{quiz_tag}_pass"
+            if (score / total) * 100 < pass_percentage:
+                result_tag = f"{quiz_tag}_fail"
+
+            error, result_page_details = await contentrepo.get_page_detail_by_tag(
+                self.user, result_tag
+            )
+            if error:
+                return await self.go_to_state("state_error")
+
+            helper_metadata = {}
+            if result_page_details.get("image_path"):
+                helper_metadata["image"] = contentrepo.get_url(
+                    result_page_details["image_path"]
+                )
+
+            await self.worker.publish_message(
+                self.inbound.reply(
+                    self._(result_page_details["body"]),
+                    helper_metadata=helper_metadata,
+                )
+            )
+            await asyncio.sleep(0.5)
+
             choices = [
                 Choice("callme", "Chat with a loveLife counsellor"),
                 Choice("menu", "Not right now"),
@@ -69,7 +100,7 @@ class Application(BaseApplication):
 
         helper_metadata = {}
         if page_details.get("image_path"):
-            helper_metadata["image"] = contentrepo.get_url(metadata["image_path"])
+            helper_metadata["image"] = contentrepo.get_url(page_details["image_path"])
 
         return ChoiceState(
             self,
@@ -107,7 +138,7 @@ class Application(BaseApplication):
 
         helper_metadata = {}
         if page_details.get("image_path"):
-            helper_metadata["image"] = contentrepo.get_url(metadata["image_path"])
+            helper_metadata["image"] = contentrepo.get_url(page_details["image_path"])
 
         await self.worker.publish_message(
             self.inbound.reply(
