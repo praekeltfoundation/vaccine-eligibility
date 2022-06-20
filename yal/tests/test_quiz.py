@@ -28,6 +28,8 @@ async def contentrepo_api_mock(sanic_client):
             pages.append({"id": 1, "title": "Question 1"})
         if tag == "first_quiz_2":
             pages.append({"id": 4, "title": "Question 2"})
+        if tag == "first_quiz_pass":
+            pages.append({"id": 5, "title": "Quiz pass message"})
 
         child_of = request.args.get("child_of")
         if child_of in ["1"]:
@@ -47,13 +49,16 @@ async def contentrepo_api_mock(sanic_client):
 
         title = "Question 1"
         body = "The body of question 1"
-        tags = []
+        tags = ["score_1"]
         if page_id == 2:
             body = "Answer 1"
         if page_id == 4:
             title = "Question 2"
             body = "The body of question 2"
-            tags = ["quiz_end"]
+            tags.extend(["quiz_end", "pass_percentage_90"])
+        if page_id == 5:
+            title = "Quiz pass message"
+            body = "[SCORE] out of 2\nThe pass message for this quiz."
 
         return response.json(
             {
@@ -116,10 +121,15 @@ async def test_state_quiz_start(tester: AppTester, contentrepo_api_mock):
 
     await tester.user_input("1")
 
-    [msg] = tester.fake_worker.outbound_messages
-    assert msg.content == "\n".join(
+    [answer_msg, result_msg] = tester.fake_worker.outbound_messages
+    assert answer_msg.content == "\n".join(
         [
             "Answer 1",
+        ]
+    )
+    assert result_msg.content == "\n".join(
+        [
+            "1 out of 2\nThe pass message for this quiz.",
         ]
     )
 
