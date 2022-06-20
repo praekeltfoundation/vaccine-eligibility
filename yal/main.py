@@ -6,6 +6,7 @@ from yal import turn, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
+from yal.quiz import Application as QuizApplication
 from yal.terms_and_conditions import Application as TermsApplication
 
 logger = logging.getLogger(__name__)
@@ -19,6 +20,7 @@ class Application(
     OnboardingApplication,
     MainMenuApplication,
     ChangePreferencesApplication,
+    QuizApplication,
 ):
     START_STATE = "state_start"
 
