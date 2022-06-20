@@ -55,8 +55,6 @@ async def get_choices_by_id(page_id):
 async def get_page_detail_by_tag(user, tag):
     error, choices = await get_choices_by_path(f"/api/v2/pages?tag={tag}")
 
-    print("A")
-
     if error:
         return error, choices
 
@@ -86,7 +84,6 @@ async def get_choices_by_path(path):
 
 
 async def get_page_details(user, page_id, message_id):
-    print(f"> get_page_details {page_id} - {message_id}")
     page_details = {}
     async with get_contentrepo_api() as session:
         for i in range(3):
@@ -97,7 +94,6 @@ async def get_page_details(user, page_id, message_id):
                     "data__session_id": user.session_id,
                     "data__user_addr": user.addr,
                 }
-                print(urljoin(config.CONTENTREPO_API_URL, f"/api/v2/pages/{page_id}"))
                 response = await session.get(
                     urljoin(config.CONTENTREPO_API_URL, f"/api/v2/pages/{page_id}"),
                     params=params,
@@ -150,7 +146,6 @@ async def get_page_details(user, page_id, message_id):
 
                 break
             except HTTP_EXCEPTIONS as e:
-                print(e)
                 if i == 2:
                     logger.exception(e)
                     return True, []

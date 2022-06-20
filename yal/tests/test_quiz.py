@@ -20,7 +20,6 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/pages", methods=["GET"])
     def get_pages(request):
-        print(">get_pages")
         app.requests.append(request)
         tag = request.args.get("tag")
 
@@ -44,7 +43,6 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/pages/<page_id:int>", methods=["GET"])
     def get_page_detail(request, page_id):
-        print(">get_page_detail_1")
         app.requests.append(request)
 
         title = "Question 1"
