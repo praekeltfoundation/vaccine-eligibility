@@ -14,6 +14,7 @@ class Application(BaseApplication):
     async def state_quiz_start(self):
         self.save_metadata("quiz_sequence", 1)
         self.save_metadata("quiz_score", 0)
+        self.save_metadata("quiz_result_sent", False)
         return await self.go_to_state("state_quiz_question")
 
     async def state_quiz_question(self):
@@ -40,38 +41,40 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         if "quiz_end" in page_details["tags"]:
-            pass_percentage = 70
-            for tag in page_details["tags"]:
-                if tag.startswith("pass_percentage_"):
-                    pass_percentage = int(tag.replace("pass_percentage_", ""))
+            if not metadata.get("quiz_result_sent"):
+                pass_percentage = 70
+                for tag in page_details["tags"]:
+                    if tag.startswith("pass_percentage_"):
+                        pass_percentage = int(tag.replace("pass_percentage_", ""))
 
-            score = metadata["quiz_score"]
-            total = metadata["quiz_sequence"] - 1
+                score = metadata["quiz_score"]
+                total = metadata["quiz_sequence"] - 1
 
-            result_tag = f"{quiz_tag}_pass"
-            if (score / total) * 100 < pass_percentage:
-                result_tag = f"{quiz_tag}_fail"
+                result_tag = f"{quiz_tag}_pass"
+                if (score / total) * 100 < pass_percentage:
+                    result_tag = f"{quiz_tag}_fail"
 
-            error, result_page_details = await contentrepo.get_page_detail_by_tag(
-                self.user, result_tag
-            )
-            if error:
-                return await self.go_to_state("state_error")
-
-            helper_metadata = {}
-            if result_page_details.get("image_path"):
-                helper_metadata["image"] = contentrepo.get_url(
-                    result_page_details["image_path"]
+                error, result_page_details = await contentrepo.get_page_detail_by_tag(
+                    self.user, result_tag
                 )
+                if error:
+                    return await self.go_to_state("state_error")
 
-            result_msg = result_page_details["body"].replace("[SCORE]", str(score))
-            await self.worker.publish_message(
-                self.inbound.reply(
-                    self._(result_msg),
-                    helper_metadata=helper_metadata,
+                helper_metadata = {}
+                if result_page_details.get("image_path"):
+                    helper_metadata["image"] = contentrepo.get_url(
+                        result_page_details["image_path"]
+                    )
+
+                result_msg = result_page_details["body"].replace("[SCORE]", str(score))
+                await self.worker.publish_message(
+                    self.inbound.reply(
+                        self._(result_msg),
+                        helper_metadata=helper_metadata,
+                    )
                 )
-            )
-            await asyncio.sleep(0.5)
+                await asyncio.sleep(0.5)
+                self.save_metadata("quiz_result_sent", True)
 
             choices = [
                 Choice("callme", "Chat with a loveLife counsellor"),
