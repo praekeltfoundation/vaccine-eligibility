@@ -30,6 +30,14 @@ async def test_start_in_hours(get_current_datetime, tester: AppTester):
     tester.setup_state("state_please_call_start")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
+    [greeting_msg] = tester.fake_worker.outbound_messages
+    assert greeting_msg.content == "\n".join(
+        [
+            "👩🏾 *Say no more—I'm on it!*",
+            "☝🏾 Hold tight just a sec...",
+        ]
+    )
+
     tester.assert_state("state_in_hours")
 
 

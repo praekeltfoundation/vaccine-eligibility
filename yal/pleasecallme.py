@@ -23,7 +23,7 @@ class Application(BaseApplication):
             max_hour = 16
 
         if current_datetime.hour >= min_hour and current_datetime.hour <= max_hour:
-            return await self.go_to_state("state_in_hours")
+            return await self.go_to_state("state_in_hours_greeting")
         return await self.go_to_state("state_out_of_hours")
 
     async def state_out_of_hours(self):
@@ -101,14 +101,16 @@ class Application(BaseApplication):
             next=self.START_STATE,
         )
 
-    async def state_in_hours(self):
+    async def state_in_hours_greeting(self):
         await self.worker.publish_message(
             self.inbound.reply(
                 self._("👩🏾 *Say no more—I'm on it!*\n☝🏾 Hold tight just a sec..."),
             )
         )
         await asyncio.sleep(0.5)
+        return await self.go_to_state("state_in_hours")
 
+    async def state_in_hours(self):
         question = self._(
             "\n".join(
                 [
