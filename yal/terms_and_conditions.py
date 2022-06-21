@@ -6,6 +6,7 @@ from vaccine.states import Choice, EndState, WhatsAppButtonState, WhatsAppListSt
 from vaccine.utils import normalise_phonenumber
 from yal import contentrepo, turn
 from yal.onboarding import Application as OnboardingApplication
+from yal.pleasecallme import Application as PleaseCallMeApplication
 
 logger = logging.getLogger(__name__)
 
@@ -53,16 +54,9 @@ class Application(BaseApplication):
             ],
             error=error,
             next={
-                "yes": "state_emergency",
+                "yes": PleaseCallMeApplication.START_STATE,
                 "no": "state_emergency_info",
             },
-        )
-
-    async def state_emergency(self):
-        return EndState(
-            self,
-            self._("TODO: Emergency"),
-            next=self.START_STATE,
         )
 
     async def state_emergency_info(self):

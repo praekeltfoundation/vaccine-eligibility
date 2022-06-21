@@ -5,6 +5,7 @@ from vaccine.states import Choice, ChoiceState, EndState, SectionedChoiceState
 from vaccine.utils import get_display_choices
 from yal import contentrepo
 from yal.change_preferences import Application as ChangePreferencesApplication
+from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
 
 logger = logging.getLogger(__name__)
@@ -37,7 +38,7 @@ class Application(BaseApplication):
             (
                 "*🏥 NEED HELP?*",
                 [
-                    Choice("state_please_call_me", "Please call me!"),
+                    Choice(PleaseCallMeApplication.START_STATE, "Please call me!"),
                     Choice("state_clinic_finder", "Find clinics and services"),
                 ],
             )
@@ -240,13 +241,6 @@ class Application(BaseApplication):
         self.save_metadata("current_menu_level", menu_level - 2)
 
         return await self.go_to_state("state_contentrepo_page")
-
-    async def state_please_call_me(self):
-        return EndState(
-            self,
-            self._("TODO: Please Call Me"),
-            next=self.START_STATE,
-        )
 
     async def state_clinic_finder(self):
         return EndState(
