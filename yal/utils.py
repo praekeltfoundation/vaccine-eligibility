@@ -11,6 +11,10 @@ PROVINCES = sorted(
     (s.code.split("-")[1], s.name.split(" (")[0])
     for s in pycountry.subdivisions.get(country_code="ZA")
 )
+GENERIC_ERROR = (
+    "Eish 👀, I didn't understand your reply, sorry. Do you mind trying "
+    "again? This time, try replying with the number that matches your choice.👍🏽"
+)
 
 
 def get_today():
