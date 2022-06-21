@@ -13,7 +13,7 @@ from yal.terms_and_conditions import Application as TermsApplication
 logger = logging.getLogger(__name__)
 
 GREETING_KEYWORDS = {"hi", "hello", "menu", "0"}
-HELP_KEYWORDS = {"#", "help"}
+HELP_KEYWORDS = {"#", "help", "please call me"}
 
 
 class Application(

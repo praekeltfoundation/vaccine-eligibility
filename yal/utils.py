@@ -17,6 +17,10 @@ def get_today():
     return datetime.now(tz=TZ_SAST).date()
 
 
+def get_current_datetime():
+    return datetime.now(tz=TZ_SAST)
+
+
 def get_turn_api():
     # TODO: Cache the session globally. Things that don't work:
     # - Declaring the session at the top of the file

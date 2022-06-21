@@ -1,3 +1,6 @@
+from datetime import datetime
+from unittest import mock
+
 import pytest
 from sanic import Sanic, response
 
@@ -107,12 +110,14 @@ async def test_reset_keyword(tester: AppTester, turn_api_mock, contentrepo_api_m
 
 
 @pytest.mark.asyncio
-async def test_help_keyword(tester: AppTester):
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_help_keyword(get_current_datetime, tester: AppTester):
+    get_current_datetime.return_value = datetime(2022, 6, 21, 13, 30)
+
     tester.setup_state("state_catch_all")
     await tester.user_input("help")
-    tester.assert_state("state_start")
+    tester.assert_state("state_in_hours")
     tester.assert_num_messages(1)
-    tester.assert_message("TODO: Please Call Me")
 
 
 @pytest.mark.asyncio
