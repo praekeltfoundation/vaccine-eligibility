@@ -6,13 +6,14 @@ from yal import turn, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
+from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
 from yal.terms_and_conditions import Application as TermsApplication
 
 logger = logging.getLogger(__name__)
 
 GREETING_KEYWORDS = {"hi", "hello", "menu", "0"}
-HELP_KEYWORDS = {"#", "help"}
+HELP_KEYWORDS = {"#", "help", "please call me"}
 
 
 class Application(
@@ -21,6 +22,7 @@ class Application(
     MainMenuApplication,
     ChangePreferencesApplication,
     QuizApplication,
+    PleaseCallMeApplication,
 ):
     START_STATE = "state_start"
 
@@ -33,7 +35,7 @@ class Application(
 
         if keyword in HELP_KEYWORDS:
             self.user.session_id = None
-            self.state_name = "state_please_call_me"
+            self.state_name = PleaseCallMeApplication.START_STATE
 
         return await super().process_message(message)
 
@@ -68,13 +70,6 @@ class Application(
         return EndState(
             self,
             self._("TODO: coming soon"),
-            next=self.START_STATE,
-        )
-
-    async def state_please_call_me(self):
-        return EndState(
-            self,
-            self._("TODO: Please Call Me"),
             next=self.START_STATE,
         )
 

@@ -226,10 +226,10 @@ async def test_state_mainmenu_start(tester: AppTester, contentrepo_api_mock):
 @pytest.mark.asyncio
 async def test_state_mainmenu_static(tester: AppTester, contentrepo_api_mock):
     tester.setup_state("state_mainmenu")
-    await tester.user_input("1")
+    await tester.user_input("2")
 
     tester.assert_num_messages(1)
-    tester.assert_message("TODO: Please Call Me")
+    tester.assert_message("TODO: Clinic finder")
 
     assert [r.path for r in contentrepo_api_mock.app.requests] == [
         "/api/v2/pages",

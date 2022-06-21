@@ -2,8 +2,9 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, ChoiceState, EndState
+from vaccine.states import Choice, ChoiceState
 from yal import contentrepo
+from yal.pleasecallme import Application as PleaseCallMeApplication
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ class Application(BaseApplication):
     async def state_quiz_question(self):
         async def next_(choice: Choice):
             if choice.value == "callme":
-                return "state_please_call"
+                return PleaseCallMeApplication.START_STATE
             elif choice.value == "menu":
                 return "state_mainmenu"
             elif choice.value == "redo":
@@ -155,10 +156,3 @@ class Application(BaseApplication):
         self.save_metadata("quiz_sequence", metadata["quiz_sequence"] + 1)
 
         return await self.go_to_state("state_quiz_question")
-
-    async def state_please_call(self):
-        return EndState(
-            self,
-            self._("TODO: Please Call Me"),
-            next=self.START_STATE,
-        )

@@ -1,3 +1,6 @@
+from datetime import datetime
+from unittest import mock
+
 import pytest
 from sanic import Sanic, response
 
@@ -7,6 +10,7 @@ from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.main import Application
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
+from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
 from yal.terms_and_conditions import Application as TermsApplication
 
@@ -19,7 +23,10 @@ def test_no_state_name_clashes():
         s for s in dir(ChangePreferencesApplication) if s.startswith("state_")
     )
     q_states = set(s for s in dir(QuizApplication) if s.startswith("state_"))
-    intersection = (mm_states & on_states & te_states & cp_states & q_states) - {
+    pc_states = set(s for s in dir(PleaseCallMeApplication) if s.startswith("state_"))
+    intersection = (
+        mm_states & on_states & te_states & cp_states & q_states & pc_states
+    ) - {
         "state_name",
         "state_error",
     }
@@ -103,12 +110,14 @@ async def test_reset_keyword(tester: AppTester, turn_api_mock, contentrepo_api_m
 
 
 @pytest.mark.asyncio
-async def test_help_keyword(tester: AppTester):
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_help_keyword(get_current_datetime, tester: AppTester):
+    get_current_datetime.return_value = datetime(2022, 6, 21, 13, 30)
+
     tester.setup_state("state_catch_all")
     await tester.user_input("help")
-    tester.assert_state("state_start")
+    tester.assert_state("state_in_hours")
     tester.assert_num_messages(1)
-    tester.assert_message("TODO: Please Call Me")
 
 
 @pytest.mark.asyncio
