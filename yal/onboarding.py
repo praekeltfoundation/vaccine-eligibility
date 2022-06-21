@@ -17,6 +17,7 @@ from vaccine.validators import nonempty_validator
 from yal import contentrepo, turn, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
+from yal.utils import GENERIC_ERROR
 from yal.validators import day_validator, year_validator
 
 logger = logging.getLogger(__name__)
@@ -134,7 +135,7 @@ class Application(BaseApplication):
             ],
             footer=self._("\n" "If you'd rather not say, just tap *SKIP*."),
             next="state_dob_day",
-            error=self._("TODO"),
+            error=self._(GENERIC_ERROR),
             error_footer=self._("\n" "Reply with the number next to the month."),
             buttons=[Choice("skip", self._("Skip"))],
         )
@@ -240,7 +241,7 @@ class Application(BaseApplication):
                 Choice("skip", self._("Skip")),
             ],
             next="state_province",
-            error=self._("TODO"),
+            error=self._(GENERIC_ERROR),
         )
 
     async def state_province(self):
@@ -281,7 +282,7 @@ class Application(BaseApplication):
             button="Province",
             choices=province_choices,
             next="state_full_address",
-            error=self._("TODO"),
+            error=self._(GENERIC_ERROR),
         )
 
     async def state_full_address(self):
@@ -465,7 +466,7 @@ class Application(BaseApplication):
                 Choice("skip", "Skip"),
             ],
             next=next_,
-            error=self._("TODO"),
+            error=self._(GENERIC_ERROR),
         )
 
     async def state_name_gender(self):
@@ -537,7 +538,7 @@ class Application(BaseApplication):
                 ]
             )
         )
-        error = self._("TODO")
+        error = self._(GENERIC_ERROR)
 
         return WhatsAppButtonState(
             self,

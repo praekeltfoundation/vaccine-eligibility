@@ -5,7 +5,7 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
 from vaccine.validators import phone_number_validator
 from yal.config import EMERGENCY_NUMBER
-from yal.utils import get_current_datetime
+from yal.utils import GENERIC_ERROR, get_current_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -46,13 +46,11 @@ class Application(BaseApplication):
                 ]
             )
         )
-        error = self._("TODO")
-
         return WhatsAppButtonState(
             self,
             question=question,
             choices=[Choice("see", "See Opening Hours")],
-            error=error,
+            error=self._(GENERIC_ERROR),
             next="state_open_hours",
         )
 
@@ -78,8 +76,6 @@ class Application(BaseApplication):
                 ]
             )
         )
-        error = self._("TODO")
-
         return WhatsAppButtonState(
             self,
             question=question,
@@ -87,7 +83,7 @@ class Application(BaseApplication):
                 Choice("ok", "Ok"),
                 Choice("reminder", "Set a reminder"),
             ],
-            error=error,
+            error=self._(GENERIC_ERROR),
             next={
                 "ok": "state_mainmenu",
                 "reminder": "state_set_reminder",
@@ -130,7 +126,6 @@ class Application(BaseApplication):
                 ]
             )
         )
-        error = self._("TODO")
 
         return WhatsAppButtonState(
             self,
@@ -139,7 +134,7 @@ class Application(BaseApplication):
                 Choice("yes", "Use this number"),
                 Choice("specify", "Use another number"),
             ],
-            error=error,
+            error=self._(GENERIC_ERROR),
             next={
                 "yes": "state_get_wait_time",
                 "specify": "state_specify_msisdn",
@@ -176,8 +171,6 @@ class Application(BaseApplication):
                 ]
             )
         )
-        error = self._("TODO")
-
         return WhatsAppButtonState(
             self,
             question=question,
@@ -186,7 +179,7 @@ class Application(BaseApplication):
                 Choice("help", "I need help now"),
                 Choice("hours", "Opening hours"),
             ],
-            error=error,
+            error=self._(GENERIC_ERROR),
             next={
                 "ok": "state_submit_callback",
                 "help": "state_out_of_hours",
@@ -252,8 +245,6 @@ class Application(BaseApplication):
                 ]
             )
         )
-        error = self._("TODO")
-
         return WhatsAppButtonState(
             self,
             question=question,
@@ -261,7 +252,7 @@ class Application(BaseApplication):
                 Choice("yes", "Yes, that's it"),
                 Choice("no", "No, it's wrong"),
             ],
-            error=error,
+            error=self._(GENERIC_ERROR),
             next={
                 "yes": "state_ask_to_save_emergency_number",
                 "no": "state_specify_msisdn",
@@ -286,8 +277,6 @@ class Application(BaseApplication):
                 ]
             )
         )
-        error = self._("TODO")
-
         return WhatsAppButtonState(
             self,
             question=question,
@@ -295,7 +284,7 @@ class Application(BaseApplication):
                 Choice("yes", "Yes, please"),
                 Choice("no", "No thanks"),
             ],
-            error=error,
+            error=self._(GENERIC_ERROR),
             next={
                 "yes": "state_save_emergency_contact",
                 "no": "state_get_wait_time",

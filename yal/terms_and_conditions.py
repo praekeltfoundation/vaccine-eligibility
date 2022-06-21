@@ -7,6 +7,7 @@ from vaccine.utils import normalise_phonenumber
 from yal import contentrepo, turn
 from yal.onboarding import Application as OnboardingApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
+from yal.utils import GENERIC_ERROR
 
 logger = logging.getLogger(__name__)
 
@@ -43,8 +44,6 @@ class Application(BaseApplication):
             "*1* - Yes, I need human help\n"
             "*2* - No, I'm good"
         )
-        error = self._("TODO")
-
         return WhatsAppButtonState(
             self,
             question=question,
@@ -52,7 +51,7 @@ class Application(BaseApplication):
                 Choice("yes", "Yes, I need help now"),
                 Choice("no", "No, I'm good"),
             ],
-            error=error,
+            error=self._(GENERIC_ERROR),
             next={
                 "yes": PleaseCallMeApplication.START_STATE,
                 "no": "state_emergency_info",
@@ -84,13 +83,11 @@ class Application(BaseApplication):
             "*1* - OK\n"
             "*2* - Why?"
         )
-        error = self._("TODO")
-
         return WhatsAppButtonState(
             self,
             question=question,
             choices=[Choice("ok", "Ok"), Choice("why", "Why?")],
-            error=error,
+            error=self._(GENERIC_ERROR),
             next={
                 "ok": "state_pre_terms",
                 "why": "state_get_to_know_why",
@@ -110,13 +107,11 @@ class Application(BaseApplication):
             "*1* - Ok"
             "*2* - No Thanks"
         )
-        error = self._("TODO")
-
         return WhatsAppButtonState(
             self,
             question=question,
             choices=[Choice("ok", "Ok"), Choice("no", "No thanks")],
-            error=error,
+            error=self._(GENERIC_ERROR),
             next={"ok": "state_pre_terms", "no": "state_decline_get_to_know"},
         )
 
@@ -162,8 +157,6 @@ class Application(BaseApplication):
             "*2 - I ACCEPT* (continue)\n"
             "*3 - I DON'T ACCEPT*"
         )
-        error = self._("TODO")
-
         return WhatsAppListState(
             self,
             question=question,
@@ -173,7 +166,7 @@ class Application(BaseApplication):
                 Choice("accept", "I Accept"),
                 Choice("decline", "I Don't Accept"),
             ],
-            error=error,
+            error=self._(GENERIC_ERROR),
             next={
                 "read": "state_terms_pdf",
                 "accept": "state_submit_terms_and_conditions",
@@ -218,8 +211,6 @@ class Application(BaseApplication):
             "*1. ACCEPT* Privacy Policy\n"
             "*2. END* chat"
         )
-        error = self._("TODO")
-
         return WhatsAppButtonState(
             self,
             question=question,
@@ -227,7 +218,7 @@ class Application(BaseApplication):
                 Choice("end", "END chat"),
                 Choice("accept", "ACCEPT Privacy Policy"),
             ],
-            error=error,
+            error=self._(GENERIC_ERROR),
             next={
                 "end": "state_decline",
                 "accept": "state_submit_terms_and_conditions",

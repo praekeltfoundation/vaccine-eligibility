@@ -5,6 +5,7 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, ChoiceState
 from yal import contentrepo
 from yal.pleasecallme import Application as PleaseCallMeApplication
+from yal.utils import GENERIC_ERROR
 
 logger = logging.getLogger(__name__)
 
@@ -123,8 +124,7 @@ class Application(BaseApplication):
                 )
             ),
             next=next_,
-            error=self._("TODO"),
-            error_footer=self._("\n" "todo."),
+            error=self._(GENERIC_ERROR),
             helper_metadata=helper_metadata,
         )
 
