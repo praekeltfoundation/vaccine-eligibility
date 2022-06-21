@@ -2,15 +2,35 @@ from datetime import datetime
 from unittest import mock
 
 import pytest
+from sanic import Sanic, response
 
 from vaccine.models import Message
 from vaccine.testing import AppTester
+from yal import config
 from yal.main import Application
 
 
 @pytest.fixture
 def tester():
     return AppTester(Application)
+
+
+@pytest.fixture
+async def lovelife_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("mock_lovelife")
+    app.requests = []
+
+    @app.route("/lovelife/v1/queuemessage", methods=["POST"])
+    def callback(request):
+        app.requests.append(request)
+        return response.json({"call_ref_id": "1655818013000", "status": "Success"})
+
+    client = await sanic_client(app)
+    url = config.LOVELIFE_URL
+    config.LOVELIFE_URL = f"http://{client.host}:{client.port}"
+    yield client
+    config.LOVELIFE_URL = url
 
 
 @pytest.mark.asyncio
@@ -56,11 +76,18 @@ async def test_state_in_hours(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_callback_confirmation(tester: AppTester):
+async def test_state_callback_confirmation(tester: AppTester, lovelife_mock):
     tester.setup_state("state_callback_confirmation")
     tester.user.metadata["callback_wait"] = "5 - 7min"
     await tester.user_input("1")
+
     tester.assert_state("state_start")
+
+    [req] = lovelife_mock.app.requests
+    assert req.json == {
+        "PhoneNumber": "+27820001001",
+        "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
+    }
 
 
 @pytest.mark.asyncio

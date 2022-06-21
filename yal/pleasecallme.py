@@ -1,13 +1,27 @@
 import asyncio
 import logging
+from urllib.parse import urljoin
+
+import aiohttp
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
+from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
 from vaccine.validators import phone_number_validator
-from yal.config import EMERGENCY_NUMBER
+from yal import config
 from yal.utils import GENERIC_ERROR, get_current_datetime
 
 logger = logging.getLogger(__name__)
+
+
+def get_lovelife_api():
+    return aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=5),
+        headers={
+            "Ocp-Apim-Subscription-Key": config.LOVELIFE_TOKEN or "",
+            "Content-Type": "application/json",
+        },
+    )
 
 
 class Application(BaseApplication):
@@ -36,7 +50,7 @@ class Application(BaseApplication):
                     "",
                     "*👩🏾 Are you in trouble?*",
                     "",
-                    f"🚨If you are, please call {EMERGENCY_NUMBER} now!",
+                    f"🚨If you are, please call {config.EMERGENCY_NUMBER} now!",
                     "",
                     "*1* - See opening hours",
                     "",
@@ -188,6 +202,29 @@ class Application(BaseApplication):
         )
 
     async def state_submit_callback(self):
+        answers = self.user.answers
+        msisdn = normalise_phonenumber(
+            answers.get("state_specify_msisdn", self.inbound.from_addr)
+        )
+        async with get_lovelife_api() as session:
+            for i in range(3):
+                try:
+                    response = await session.post(
+                        url=urljoin(config.LOVELIFE_URL, "/lovelife/v1/queuemessage"),
+                        json={
+                            "PhoneNumber": msisdn,
+                            "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
+                        },
+                    )
+                    response.raise_for_status()
+                    break
+                except HTTP_EXCEPTIONS as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
+
         return EndState(
             self,
             self._("Done"),
