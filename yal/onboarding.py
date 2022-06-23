@@ -12,7 +12,7 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
-from vaccine.utils import get_today, normalise_phonenumber
+from vaccine.utils import get_today
 from vaccine.validators import nonempty_validator
 from yal import contentrepo, turn, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
@@ -493,7 +493,7 @@ class Application(BaseApplication):
         )
 
     async def state_submit_onboarding(self):
-        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
         data = {

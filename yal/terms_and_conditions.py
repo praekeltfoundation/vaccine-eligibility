@@ -3,11 +3,10 @@ import logging
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, WhatsAppButtonState, WhatsAppListState
-from vaccine.utils import normalise_phonenumber
 from yal import contentrepo, turn
 from yal.onboarding import Application as OnboardingApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
-from yal.utils import GENERIC_ERROR
+from yal.utils import GENERIC_ERROR, normalise_phonenumber
 
 logger = logging.getLogger(__name__)
 

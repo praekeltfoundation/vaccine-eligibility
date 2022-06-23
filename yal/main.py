@@ -1,7 +1,6 @@
 import logging
 
 from vaccine.states import EndState
-from vaccine.utils import normalise_phonenumber
 from yal import turn, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
@@ -40,7 +39,7 @@ class Application(
         return await super().process_message(message)
 
     async def state_start(self):
-        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
         error, fields = await turn.get_profile(whatsapp_id)
