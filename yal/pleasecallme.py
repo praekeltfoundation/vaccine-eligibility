@@ -8,7 +8,7 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
 from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
 from vaccine.validators import phone_number_validator
-from yal import config
+from yal import config, turn
 from yal.utils import GENERIC_ERROR, get_current_datetime
 
 logger = logging.getLogger(__name__)
@@ -325,5 +325,13 @@ class Application(BaseApplication):
         )
 
     async def state_save_emergency_contact(self):
-        # TODO: save emergency contact details
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "emergency_contact": self.user.answers.get("state_specify_msisdn"),
+        }
+
+        error = await turn.update_profile(whatsapp_id, data)
+        if error:
+            return await self.go_to_state("state_error")
         return await self.go_to_state("state_submit_callback")

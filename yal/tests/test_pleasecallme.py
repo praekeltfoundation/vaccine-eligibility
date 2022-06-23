@@ -6,7 +6,7 @@ from sanic import Sanic, response
 
 from vaccine.models import Message
 from vaccine.testing import AppTester
-from yal import config
+from yal import config, turn
 from yal.main import Application
 
 
@@ -31,6 +31,29 @@ async def lovelife_mock(sanic_client):
     config.LOVELIFE_URL = f"http://{client.host}:{client.port}"
     yield client
     config.LOVELIFE_URL = url
+
+
+@pytest.fixture
+async def turn_api_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("mock_turn_api")
+    app.requests = []
+
+    @app.route("/v1/contacts/<msisdn:int>/profile", methods=["PATCH"])
+    def update_profile(request, msisdn):
+        app.requests.append(request)
+        return response.json({})
+
+    client = await sanic_client(app)
+    get_profile_url = turn.get_profile_url
+
+    host = f"http://{client.host}:{client.port}"
+    turn.get_profile_url = (
+        lambda whatsapp_id: f"{host}/v1/contacts/{whatsapp_id}/profile"
+    )
+
+    yield client
+    turn.get_profile_url = get_profile_url
 
 
 @pytest.mark.asyncio
@@ -137,3 +160,22 @@ async def test_state_ask_to_save_emergency_number(tester: AppTester, lovelife_mo
         "PhoneNumber": "+27820001001",
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
+
+
+@pytest.mark.asyncio
+async def test_state_save_emergency_contact(
+    tester: AppTester, lovelife_mock, turn_api_mock
+):
+    tester.setup_state("state_ask_to_save_emergency_number")
+    await tester.user_input("1")
+    tester.assert_state("state_callback_confirmation")
+
+    [req] = lovelife_mock.app.requests
+    assert req.json == {
+        "PhoneNumber": "+27820001001",
+        "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
+    }
+
+    assert [r.path for r in turn_api_mock.app.requests] == [
+        "/v1/contacts/27820001001/profile"
+    ]
