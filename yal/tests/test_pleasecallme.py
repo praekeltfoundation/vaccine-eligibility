@@ -69,25 +69,24 @@ async def test_state_out_of_hours(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_in_hours(tester: AppTester):
+async def test_state_in_hours(tester: AppTester, lovelife_mock):
     tester.setup_state("state_in_hours")
     await tester.user_input("1")
     tester.assert_state("state_callback_confirmation")
-
-
-@pytest.mark.asyncio
-async def test_state_callback_confirmation(tester: AppTester, lovelife_mock):
-    tester.setup_state("state_callback_confirmation")
-    tester.user.metadata["callback_wait"] = "5 - 7min"
-    await tester.user_input("1")
-
-    tester.assert_state("state_start")
 
     [req] = lovelife_mock.app.requests
     assert req.json == {
         "PhoneNumber": "+27820001001",
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
+
+
+@pytest.mark.asyncio
+async def test_state_callback_confirmation(tester: AppTester):
+    tester.setup_state("state_callback_confirmation")
+    await tester.user_input("1")
+
+    tester.assert_state("state_start")
 
 
 @pytest.mark.asyncio
@@ -128,7 +127,13 @@ async def test_state_confirm_specified_msisdn(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_ask_to_save_emergency_number(tester: AppTester):
+async def test_state_ask_to_save_emergency_number(tester: AppTester, lovelife_mock):
     tester.setup_state("state_ask_to_save_emergency_number")
     await tester.user_input("2")
     tester.assert_state("state_callback_confirmation")
+
+    [req] = lovelife_mock.app.requests
+    assert req.json == {
+        "PhoneNumber": "+27820001001",
+        "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
+    }

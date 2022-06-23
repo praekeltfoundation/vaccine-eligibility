@@ -150,54 +150,8 @@ class Application(BaseApplication):
             ],
             error=self._(GENERIC_ERROR),
             next={
-                "yes": "state_get_wait_time",
+                "yes": "state_submit_callback",
                 "specify": "state_specify_msisdn",
-            },
-        )
-
-    async def state_get_wait_time(self):
-        # TODO: Add API call to get this
-        self.save_metadata("callback_wait", "5 - 7 min")
-        return await self.go_to_state("state_callback_confirmation")
-
-    async def state_callback_confirmation(self):
-        wait_time = self.user.metadata["callback_wait"]
-        question = self._(
-            "\n".join(
-                [
-                    "🆘HELP!",
-                    "*Please call me*",
-                    "-----",
-                    "",
-                    "👩🏾 *Hold tight... I'm getting one of our loveLife counsellors to "
-                    "call you back ASAP, OK?*",
-                    "",
-                    f"It should take around *{wait_time}* minutes or so. Hang in "
-                    "there.",
-                    "",
-                    "*1* - Ok",
-                    "*2* - I need help now",
-                    "*3* - loveLife OPENING HOURS",
-                    "",
-                    "-----",
-                    "*Or Reply:*",
-                    "*0* - 🏠 Back to Main *MENU*",
-                ]
-            )
-        )
-        return WhatsAppButtonState(
-            self,
-            question=question,
-            choices=[
-                Choice("ok", "Ok"),
-                Choice("help", "I need help now"),
-                Choice("hours", "Opening hours"),
-            ],
-            error=self._(GENERIC_ERROR),
-            next={
-                "ok": "state_submit_callback",
-                "help": "state_out_of_hours",
-                "hours": "state_open_hours",
             },
         )
 
@@ -225,6 +179,48 @@ class Application(BaseApplication):
                     else:
                         continue
 
+        return await self.go_to_state("state_callback_confirmation")
+
+    async def state_callback_confirmation(self):
+        question = self._(
+            "\n".join(
+                [
+                    "🆘HELP!",
+                    "*Please call me*",
+                    "-----",
+                    "",
+                    "👩🏾 *Hold tight... I'm getting one of our loveLife counsellors to "
+                    "call you back ASAP, OK?*",
+                    "",
+                    "It should take around 5 - 7 min minutes or so. Hang in " "there.",
+                    "",
+                    "*1* - Ok",
+                    "*2* - I need help now",
+                    "*3* - loveLife OPENING HOURS",
+                    "",
+                    "-----",
+                    "*Or Reply:*",
+                    "*0* - 🏠 Back to Main *MENU*",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("ok", "Ok"),
+                Choice("help", "I need help now"),
+                Choice("hours", "Opening hours"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "ok": "state_callme_done",
+                "help": "state_out_of_hours",
+                "hours": "state_open_hours",
+            },
+        )
+
+    async def state_callme_done(self):
         return EndState(
             self,
             self._("Done"),
@@ -324,10 +320,10 @@ class Application(BaseApplication):
             error=self._(GENERIC_ERROR),
             next={
                 "yes": "state_save_emergency_contact",
-                "no": "state_get_wait_time",
+                "no": "state_submit_callback",
             },
         )
 
     async def state_save_emergency_contact(self):
         # TODO: save emergency contact details
-        return await self.go_to_state("state_get_wait_time")
+        return await self.go_to_state("state_submit_callback")
