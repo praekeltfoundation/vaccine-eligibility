@@ -74,7 +74,7 @@ async def test_state_terms_valid(tester: AppTester):
     tester.setup_state("state_terms")
     await tester.user_input("1")
 
-    tester.assert_state("state_start")
+    tester.assert_state("state_terms")
     tester.assert_num_messages(1)
 
 

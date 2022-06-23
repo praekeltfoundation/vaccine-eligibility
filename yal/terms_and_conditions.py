@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, EndState, WhatsAppButtonState, WhatsAppListState
+from vaccine.states import Choice, WhatsAppButtonState, WhatsAppListState
 from yal import contentrepo, turn
 from yal.onboarding import Application as OnboardingApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
@@ -184,15 +184,17 @@ class Application(BaseApplication):
         return await self.go_to_state("state_read_terms")
 
     async def state_read_terms(self):
-        return EndState(
-            self,
-            self._(
-                "*Roo: Your Sexual Health Bot*\n\n"
-                "Questions about sex, masturbation, pregnancy, relationships? Roo "
-                "has answers powered by Planned Parenthood."
-            ),
-            next=self.START_STATE,
+        await self.worker.publish_message(
+            self.inbound.reply(
+                self._(
+                    "*Roo: Your Sexual Health Bot*\n\n"
+                    "Questions about sex, masturbation, pregnancy, relationships? Roo "
+                    "has answers powered by Planned Parenthood."
+                )
+            )
         )
+        await asyncio.sleep(0.5)
+        return await self.go_to_state("state_terms")
 
     async def state_decline_confirm(self):
         question = self._(
