@@ -2,6 +2,7 @@ import re
 from datetime import datetime, timedelta, timezone
 
 import aiohttp
+import phonenumbers
 import pycountry
 
 from yal import config
@@ -49,3 +50,15 @@ def clean_inbound(content):
 def get_bot_age():
     bot_dob = datetime.strptime(config.YAL_BOT_LAUNCH_DATE, "%Y-%m-%d").date()
     return (get_today() - bot_dob).days
+
+
+def normalise_phonenumber(phonenumber):
+    try:
+        if not phonenumber.startswith("+"):
+            phonenumber = f"+{phonenumber}"
+        pn = phonenumbers.parse(phonenumber, None)
+        assert phonenumbers.is_possible_number(pn)
+        assert phonenumbers.is_valid_number(pn)
+        return phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.E164)
+    except (phonenumbers.phonenumberutil.NumberParseException, AssertionError):
+        raise ValueError("Invalid phone number")

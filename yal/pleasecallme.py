@@ -6,10 +6,10 @@ import aiohttp
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
-from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
+from vaccine.utils import HTTP_EXCEPTIONS
 from vaccine.validators import phone_number_validator
 from yal import config, turn
-from yal.utils import GENERIC_ERROR, get_current_datetime
+from yal.utils import GENERIC_ERROR, get_current_datetime, normalise_phonenumber
 
 logger = logging.getLogger(__name__)
 

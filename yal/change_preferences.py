@@ -9,10 +9,9 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
-from vaccine.utils import normalise_phonenumber
 from vaccine.validators import nonempty_validator
 from yal import turn
-from yal.utils import GENERIC_ERROR, PROVINCES
+from yal.utils import GENERIC_ERROR, PROVINCES, normalise_phonenumber
 from yal.validators import day_validator, year_validator
 
 logger = logging.getLogger(__name__)
@@ -22,6 +21,8 @@ class Application(BaseApplication):
     START_STATE = "state_display_preferences"
 
     async def state_display_preferences(self):
+        print(">>> self.inbound.from_addr")
+        print(self.inbound.from_addr)
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
