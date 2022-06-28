@@ -131,7 +131,16 @@ async def test_state_start_to_catch_all(tester: AppTester, turn_api_mock):
     await tester.user_input("AAA")
     tester.assert_state("state_start")
     tester.assert_num_messages(1)
-    tester.assert_message("TODO: Catch all temp flow")
+    tester.assert_message(
+        "\n".join(
+            [
+                "👩🏾 *Howzit! Welcome to B-Wise by Young Africa Live!*",
+                "",
+                "If you're looking for answers to questions about bodies, sex, "
+                "relationships and health, please reply with the word *HI*.",
+            ]
+        )
+    )
 
     assert len(turn_api_mock.app.requests) == 1
 
