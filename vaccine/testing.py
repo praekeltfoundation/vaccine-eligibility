@@ -85,6 +85,15 @@ class AppTester:
             self.user.answers.get(answer_name) is None
         ), f"{answer_name} has a value {self.user.answers[answer_name]}"
 
+    def assert_metadata(self, metadata_name: str, metadata_value: str):
+        """
+        Assert that a user's metadata matches the given value
+        """
+        assert metadata_name in self.user.metadata, f"{metadata_name} not in user metadata"
+        assert (
+            self.user.metadata[metadata_name] == metadata_value
+        ), f"{metadata_name} is {self.user.metadata[metadata_name]}, not {metadata_value}"
+
     def assert_num_messages(self, num: int):
         """
         Assert that the application sent a specific number of messages. Useful for if

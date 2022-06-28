@@ -59,6 +59,10 @@ async def turn_api_mock(sanic_client, tester):
                     "prototype_user": msisdn == 27820001001,
                     "onboarding_completed": msisdn == 27820001001,
                     "terms_accepted": msisdn == 27820001001,
+                    "province": "FS",
+                    "suburb": "cape town",
+                    "street_name": "high level",
+                    "street_number": "99",
                 }
             }
         )
@@ -140,6 +144,11 @@ async def test_state_start_to_mainmenu(
 
     assert len(turn_api_mock.app.requests) == 1
     assert len(contentrepo_api_mock.app.requests) == 2
+
+    tester.assert_metadata("province", "FS")
+    tester.assert_metadata("suburb", "cape town")
+    tester.assert_metadata("street_name", "high level")
+    tester.assert_metadata("street_number", "99")
 
 
 @pytest.mark.asyncio

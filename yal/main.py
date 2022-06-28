@@ -53,6 +53,10 @@ class Application(
         if not prototype_user:
             return await self.go_to_state("state_coming_soon")
 
+        for field in ("province", "suburb", "street_name", "street_number"):
+            if fields.get(field):
+                self.save_metadata(field, fields[field])
+
         inbound = utils.clean_inbound(self.inbound.content)
 
         if inbound in GREETING_KEYWORDS:

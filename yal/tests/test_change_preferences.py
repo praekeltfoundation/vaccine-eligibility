@@ -147,3 +147,23 @@ async def test_state_update_relationship_status_submit(
     await tester.user_input("2")
     tester.assert_num_messages(1)
     tester.assert_state("state_change_info_prompt")
+
+
+@pytest.mark.asyncio
+async def test_state_update_location_submit(tester: AppTester, turn_api_mock):
+    tester.setup_state("state_update_location_submit")
+
+    tester.setup_answer("state_update_province", "FS")
+    tester.setup_answer("state_update_suburb", "SomeSuburb")
+    tester.setup_answer("state_update_street_name", "Good street")
+    tester.setup_answer("state_update_street_number", "12")
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_metadata("province", "FS")
+    tester.assert_metadata("suburb", "SomeSuburb")
+    tester.assert_metadata("street_name", "Good street")
+    tester.assert_metadata("street_number", "12")
+
+    tester.assert_num_messages(1)
+    tester.assert_state("state_change_info_prompt")
