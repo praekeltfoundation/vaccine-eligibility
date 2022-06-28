@@ -1,4 +1,4 @@
-from typing import Callable, List, Optional, Type
+from typing import Any, Callable, List, Optional, Type
 
 from aio_pika import IncomingMessage
 
@@ -85,7 +85,7 @@ class AppTester:
             self.user.answers.get(answer_name) is None
         ), f"{answer_name} has a value {self.user.answers[answer_name]}"
 
-    def assert_metadata(self, metadata_name: str, metadata_value: str):
+    def assert_metadata(self, metadata_name: str, metadata_value: Any):
         """
         Assert that a user's metadata matches the given value
         """
