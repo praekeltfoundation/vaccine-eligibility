@@ -12,6 +12,7 @@ from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
+from yal.servicefinder import Application as ServiceFinderApplication
 from yal.terms_and_conditions import Application as TermsApplication
 
 
@@ -24,8 +25,9 @@ def test_no_state_name_clashes():
     )
     q_states = set(s for s in dir(QuizApplication) if s.startswith("state_"))
     pc_states = set(s for s in dir(PleaseCallMeApplication) if s.startswith("state_"))
+    sf_states = set(s for s in dir(ServiceFinderApplication) if s.startswith("state_"))
     intersection = (
-        mm_states & on_states & te_states & cp_states & q_states & pc_states
+        mm_states & on_states & te_states & cp_states & q_states & pc_states & sf_states
     ) - {
         "state_name",
         "state_error",

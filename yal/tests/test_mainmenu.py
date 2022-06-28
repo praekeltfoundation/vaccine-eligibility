@@ -229,7 +229,7 @@ async def test_state_mainmenu_static(tester: AppTester, contentrepo_api_mock):
     await tester.user_input("2")
 
     tester.assert_num_messages(1)
-    tester.assert_message("TODO: Clinic finder")
+    tester.assert_state("state_servicefinder_start")
 
     assert [r.path for r in contentrepo_api_mock.app.requests] == [
         "/api/v2/pages",

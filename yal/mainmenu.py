@@ -1,12 +1,13 @@
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, ChoiceState, EndState, SectionedChoiceState
+from vaccine.states import Choice, ChoiceState, SectionedChoiceState
 from vaccine.utils import get_display_choices
 from yal import contentrepo
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
+from yal.servicefinder import Application as ServiceFinderApplication
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,10 @@ class Application(BaseApplication):
                 "*🏥 NEED HELP?*",
                 [
                     Choice(PleaseCallMeApplication.START_STATE, "Please call me!"),
-                    Choice("state_clinic_finder", "Find clinics and services"),
+                    Choice(
+                        ServiceFinderApplication.START_STATE,
+                        "Find clinics and services",
+                    ),
                 ],
             )
         ]
@@ -241,10 +245,3 @@ class Application(BaseApplication):
         self.save_metadata("current_menu_level", menu_level - 2)
 
         return await self.go_to_state("state_contentrepo_page")
-
-    async def state_clinic_finder(self):
-        return EndState(
-            self,
-            self._("TODO: Clinic finder"),
-            next=self.START_STATE,
-        )

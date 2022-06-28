@@ -7,6 +7,7 @@ from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
+from yal.servicefinder import Application as ServiceFinderApplication
 from yal.terms_and_conditions import Application as TermsApplication
 
 logger = logging.getLogger(__name__)
@@ -22,6 +23,7 @@ class Application(
     ChangePreferencesApplication,
     QuizApplication,
     PleaseCallMeApplication,
+    ServiceFinderApplication,
 ):
     START_STATE = "state_start"
 
