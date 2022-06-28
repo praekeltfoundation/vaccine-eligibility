@@ -89,7 +89,9 @@ class AppTester:
         """
         Assert that a user's metadata matches the given value
         """
-        assert metadata_name in self.user.metadata, f"{metadata_name} not in user metadata"
+        assert (
+            metadata_name in self.user.metadata
+        ), f"{metadata_name} not in user metadata"
         assert (
             self.user.metadata[metadata_name] == metadata_value
         ), f"{metadata_name} is {self.user.metadata[metadata_name]}, not {metadata_value}"
