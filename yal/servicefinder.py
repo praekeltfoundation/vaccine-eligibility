@@ -402,13 +402,15 @@ class Application(BaseApplication):
                 self.save_metadata("longitude", longitude)
             else:
                 raise ErrorMessage(
-                    "\n".join([
-                        "🙍🏾‍♀️*Hmmm, for some reason I couldn't find that location. Let's try again.*",
-                        "",
-                        "*OR*",
-                        "",
-                        "*Send HELP to talk to to a human.*",
-                    ])
+                    "\n".join(
+                        [
+                            "🙍🏾‍♀️*Hmmm, for some reason I couldn't find that location. Let's try again.*",
+                            "",
+                            "*OR*",
+                            "",
+                            "*Send HELP to talk to to a human.*",
+                        ]
+                    )
                 )
 
         return FreeText(
