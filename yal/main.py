@@ -81,6 +81,15 @@ class Application(
     async def state_catch_all(self):
         return EndState(
             self,
-            self._("TODO: Catch all temp flow"),
+            self._(
+                "\n".join(
+                    [
+                        "👩🏾 *Howzit! Welcome to B-Wise by Young Africa Live!*",
+                        "",
+                        "If you're looking for answers to questions about bodies, sex, "
+                        "relationships and health, please reply with the word *HI*.",
+                    ]
+                )
+            ),
             next=self.START_STATE,
         )
