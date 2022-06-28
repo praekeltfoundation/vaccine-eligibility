@@ -404,7 +404,8 @@ class Application(BaseApplication):
                 raise ErrorMessage(
                     "\n".join(
                         [
-                            "🙍🏾‍♀️*Hmmm, for some reason I couldn't find that location. Let's try again.*",
+                            "🙍🏾‍♀️*Hmmm, for some reason I couldn't find that "
+                            "location. Let's try again.*",
                             "",
                             "*OR*",
                             "",
