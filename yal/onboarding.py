@@ -510,6 +510,10 @@ class Application(BaseApplication):
             "street_number": self.user.answers.get("state_street_number"),
         }
 
+        for field in ("province", "suburb", "street_name", "street_number"):
+            if data.get(field):
+                self.save_metadata(field, data[field])
+
         error = await turn.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")

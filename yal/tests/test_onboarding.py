@@ -415,3 +415,8 @@ async def test_submit_onboarding(tester: AppTester, turn_api_mock):
         "street_name": "Good street",
         "street_number": "12",
     }
+
+    tester.assert_metadata("province", "FS")
+    tester.assert_metadata("suburb", "SomeSuburb")
+    tester.assert_metadata("street_name", "Good street")
+    tester.assert_metadata("street_number", "12")

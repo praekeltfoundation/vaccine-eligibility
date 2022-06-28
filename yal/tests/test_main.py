@@ -12,6 +12,7 @@ from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
+from yal.servicefinder import Application as ServiceFinderApplication
 from yal.terms_and_conditions import Application as TermsApplication
 
 
@@ -24,8 +25,9 @@ def test_no_state_name_clashes():
     )
     q_states = set(s for s in dir(QuizApplication) if s.startswith("state_"))
     pc_states = set(s for s in dir(PleaseCallMeApplication) if s.startswith("state_"))
+    sf_states = set(s for s in dir(ServiceFinderApplication) if s.startswith("state_"))
     intersection = (
-        mm_states & on_states & te_states & cp_states & q_states & pc_states
+        mm_states & on_states & te_states & cp_states & q_states & pc_states & sf_states
     ) - {
         "state_name",
         "state_error",
@@ -59,6 +61,10 @@ async def turn_api_mock(sanic_client, tester):
                     "prototype_user": msisdn == 27820001001,
                     "onboarding_completed": msisdn == 27820001001,
                     "terms_accepted": msisdn == 27820001001,
+                    "province": "FS",
+                    "suburb": "cape town",
+                    "street_name": "high level",
+                    "street_number": "99",
                 }
             }
         )
@@ -140,6 +146,11 @@ async def test_state_start_to_mainmenu(
 
     assert len(turn_api_mock.app.requests) == 1
     assert len(contentrepo_api_mock.app.requests) == 2
+
+    tester.assert_metadata("province", "FS")
+    tester.assert_metadata("suburb", "cape town")
+    tester.assert_metadata("street_name", "high level")
+    tester.assert_metadata("street_number", "99")
 
 
 @pytest.mark.asyncio
