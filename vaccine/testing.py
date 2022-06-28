@@ -92,9 +92,11 @@ class AppTester:
         assert (
             metadata_name in self.user.metadata
         ), f"{metadata_name} not in user metadata"
+
+        actual_value = self.user.metadata[metadata_name]
         assert (
             self.user.metadata[metadata_name] == metadata_value
-        ), f"{metadata_name} is {self.user.metadata[metadata_name]}, not {metadata_value}"
+        ), f"{metadata_name} is {actual_value}, not {metadata_value}"
 
     def assert_num_messages(self, num: int):
         """
