@@ -1,7 +1,7 @@
 import logging
 
 from vaccine.states import EndState
-from yal import turn, utils
+from yal import rapidpro, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
@@ -44,7 +44,7 @@ class Application(
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        error, fields = await turn.get_profile(whatsapp_id)
+        error, fields = await rapidpro.get_profile(whatsapp_id)
         if error:
             return await self.go_to_state("state_error")
 

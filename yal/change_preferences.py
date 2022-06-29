@@ -10,7 +10,7 @@ from vaccine.states import (
     WhatsAppListState,
 )
 from vaccine.validators import nonempty_validator
-from yal import turn
+from yal import rapidpro
 from yal.utils import GENERIC_ERROR, PROVINCES, normalise_phonenumber
 from yal.validators import day_validator, year_validator
 
@@ -21,12 +21,10 @@ class Application(BaseApplication):
     START_STATE = "state_display_preferences"
 
     async def state_display_preferences(self):
-        print(">>> self.inbound.from_addr")
-        print(self.inbound.from_addr)
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        error, fields = await turn.get_profile(whatsapp_id)
+        error, fields = await rapidpro.get_profile(whatsapp_id)
         if error:
             return await self.go_to_state("state_error")
 
@@ -235,7 +233,7 @@ class Application(BaseApplication):
             "dob_year": self.user.answers.get("state_update_dob_year"),
         }
 
-        error = await turn.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")
 
@@ -278,7 +276,9 @@ class Application(BaseApplication):
 
         status = self.user.answers.get("state_update_relationship_status")
 
-        error = await turn.update_profile(whatsapp_id, {"relationship_status": status})
+        error = await rapidpro.update_profile(
+            whatsapp_id, {"relationship_status": status}
+        )
         if error:
             return await self.go_to_state("state_error")
 
@@ -403,7 +403,7 @@ class Application(BaseApplication):
             if data.get(field):
                 self.save_metadata(field, data[field])
 
-        error = await turn.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")
 
@@ -517,7 +517,7 @@ class Application(BaseApplication):
             "gender_other": self.user.answers.get("state_update_name_gender"),
         }
 
-        error = await turn.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")
 

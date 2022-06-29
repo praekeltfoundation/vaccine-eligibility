@@ -3,7 +3,7 @@ import logging
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, WhatsAppButtonState, WhatsAppListState
-from yal import contentrepo, turn
+from yal import contentrepo, rapidpro
 from yal.onboarding import Application as OnboardingApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.utils import GENERIC_ERROR, normalise_phonenumber
@@ -276,7 +276,7 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        error = await turn.update_profile(whatsapp_id, {"terms_accepted": True})
+        error = await rapidpro.update_profile(whatsapp_id, {"terms_accepted": True})
         if error:
             return await self.go_to_state("state_error")
 

@@ -1,3 +1,6 @@
+from datetime import datetime
+from unittest import mock
+
 import pytest
 from sanic import Sanic, response
 
@@ -207,7 +210,9 @@ async def test_state_category(tester: AppTester, servicefinder_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_category_talk(tester: AppTester):
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_state_category_talk(get_current_datetime, tester: AppTester):
+    get_current_datetime.return_value = datetime(2022, 6, 20, 17, 30)
     tester.setup_state("state_category")
 
     tester.user.metadata["categories"] = {

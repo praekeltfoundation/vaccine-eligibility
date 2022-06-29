@@ -14,7 +14,7 @@ from vaccine.states import (
 )
 from vaccine.utils import get_today
 from vaccine.validators import nonempty_validator
-from yal import contentrepo, turn, utils
+from yal import contentrepo, rapidpro, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.utils import GENERIC_ERROR
@@ -514,7 +514,7 @@ class Application(BaseApplication):
             if data.get(field):
                 self.save_metadata(field, data[field])
 
-        error = await turn.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")
 

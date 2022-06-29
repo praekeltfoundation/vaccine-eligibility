@@ -3,7 +3,7 @@ from sanic import Sanic, response
 
 from vaccine.models import Message
 from vaccine.testing import AppTester
-from yal import turn
+from yal import config
 from yal.change_preferences import Application
 
 
@@ -12,60 +12,73 @@ def tester():
     return AppTester(Application)
 
 
+def get_rapidpro_contact(urn):
+    return {
+        "uuid": "b733e997-b0b4-4d4d-a3ad-0546e1644aa9",
+        "name": "",
+        "language": "eng",
+        "groups": [],
+        "fields": {
+            "relationship_status": "single",
+            "gender": "male",
+            "dob_day": "22",
+            "dob_month": "2",
+            "dob_year": "2022",
+            "province": "FS",
+            "suburb": "TestSuburb",
+            "street_name": "test street",
+            "street_number": "12",
+        },
+        "blocked": False,
+        "stopped": False,
+        "created_on": "2015-11-11T08:30:24.922024+00:00",
+        "modified_on": "2015-11-11T08:30:25.525936+00:00",
+        "urns": [urn],
+    }
+
+
 @pytest.fixture
-async def turn_api_mock(sanic_client, tester):
+async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
-    app = Sanic("mock_turn_api")
+    app = Sanic("mock_rapidpro")
     app.requests = []
     app.errors = 0
     app.errormax = 0
 
-    @app.route("/v1/contacts/<msisdn:int>/profile", methods=["GET"])
-    def get_profile(request, msisdn):
+    @app.route("/api/v2/contacts.json", methods=["GET"])
+    def get_contact(request):
         app.requests.append(request)
         if app.errormax:
             if app.errors < app.errormax:
                 app.errors += 1
                 return response.json({}, status=500)
+
+        urn = request.args.get("urn")
+        contacts = [get_rapidpro_contact(urn)]
+
         return response.json(
             {
-                "fields": {
-                    "relationship_status": "single",
-                    "gender": "male",
-                    "dob_day": "22",
-                    "dob_month": "2",
-                    "dob_year": "2022",
-                    "province": "FS",
-                    "suburb": "TestSuburb",
-                    "street_name": "test street",
-                    "street_number": "12",
-                }
-            }
+                "results": contacts,
+                "next": None,
+            },
+            status=200,
         )
 
-    @app.route("/v1/contacts/<msisdn:int>/profile", methods=["PATCH"])
-    def update_profile(request, msisdn):
+    @app.route("/api/v2/contacts.json", methods=["POST"])
+    def update_contact(request):
         app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
-                return response.json({}, status=500)
-        return response.json({})
+        return response.json({}, status=200)
 
     client = await sanic_client(app)
-    get_profile_url = turn.get_profile_url
-
-    host = f"http://{client.host}:{client.port}"
-    turn.get_profile_url = (
-        lambda whatsapp_id: f"{host}/v1/contacts/{whatsapp_id}/profile"
-    )
-
+    url = config.RAPIDPRO_URL
+    config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
+    config.RAPIDPRO_TOKEN = "testtoken"
     yield client
-    turn.get_profile_url = get_profile_url
+    config.RAPIDPRO_URL = url
 
 
 @pytest.mark.asyncio
-async def test_state_display_preferences(tester: AppTester, turn_api_mock):
+async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_display_preferences")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
     tester.assert_num_messages(1)
@@ -109,13 +122,11 @@ async def test_state_display_preferences(tester: AppTester, turn_api_mock):
         )
     )
 
-    assert [r.path for r in turn_api_mock.app.requests] == [
-        "/v1/contacts/27820001001/profile"
-    ]
+    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
-async def test_state_update_relationship_status(tester: AppTester, turn_api_mock):
+async def test_state_update_relationship_status(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_display_preferences")
     await tester.user_input("2")
     tester.assert_num_messages(1)
@@ -138,19 +149,26 @@ async def test_state_update_relationship_status(tester: AppTester, turn_api_mock
         )
     )
 
+    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
+
 
 @pytest.mark.asyncio
 async def test_state_update_relationship_status_submit(
-    tester: AppTester, turn_api_mock
+    tester: AppTester, rapidpro_mock
 ):
     tester.setup_state("state_update_relationship_status")
     await tester.user_input("2")
     tester.assert_num_messages(1)
     tester.assert_state("state_change_info_prompt")
 
+    assert [r.path for r in rapidpro_mock.app.requests] == [
+        "/api/v2/contacts.json",
+        "/api/v2/contacts.json",
+    ]
+
 
 @pytest.mark.asyncio
-async def test_state_update_location_submit(tester: AppTester, turn_api_mock):
+async def test_state_update_location_submit(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_update_location_submit")
 
     tester.setup_answer("state_update_province", "FS")
@@ -167,3 +185,8 @@ async def test_state_update_location_submit(tester: AppTester, turn_api_mock):
 
     tester.assert_num_messages(1)
     tester.assert_state("state_change_info_prompt")
+
+    assert [r.path for r in rapidpro_mock.app.requests] == [
+        "/api/v2/contacts.json",
+        "/api/v2/contacts.json",
+    ]
