@@ -8,7 +8,7 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
 from vaccine.utils import HTTP_EXCEPTIONS
 from vaccine.validators import phone_number_validator
-from yal import config, turn
+from yal import config, rapidpro
 from yal.utils import GENERIC_ERROR, get_current_datetime, normalise_phonenumber
 
 logger = logging.getLogger(__name__)
@@ -331,7 +331,7 @@ class Application(BaseApplication):
             "emergency_contact": self.user.answers.get("state_specify_msisdn"),
         }
 
-        error = await turn.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")
         return await self.go_to_state("state_submit_callback")

@@ -6,7 +6,7 @@ from sanic import Sanic, response
 
 from vaccine.models import Message
 from vaccine.testing import AppTester
-from yal import config, turn
+from yal import config
 from yal.main import Application
 
 
@@ -34,26 +34,22 @@ async def lovelife_mock(sanic_client):
 
 
 @pytest.fixture
-async def turn_api_mock(sanic_client):
+async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
-    app = Sanic("mock_turn_api")
+    app = Sanic("mock_rapidpro")
     app.requests = []
 
-    @app.route("/v1/contacts/<msisdn:int>/profile", methods=["PATCH"])
-    def update_profile(request, msisdn):
+    @app.route("/api/v2/contacts.json", methods=["POST"])
+    def update_contact(request):
         app.requests.append(request)
-        return response.json({})
+        return response.json({}, status=200)
 
     client = await sanic_client(app)
-    get_profile_url = turn.get_profile_url
-
-    host = f"http://{client.host}:{client.port}"
-    turn.get_profile_url = (
-        lambda whatsapp_id: f"{host}/v1/contacts/{whatsapp_id}/profile"
-    )
-
+    url = config.RAPIDPRO_URL
+    config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
+    config.RAPIDPRO_TOKEN = "testtoken"
     yield client
-    turn.get_profile_url = get_profile_url
+    config.RAPIDPRO_URL = url
 
 
 @pytest.mark.asyncio
@@ -164,7 +160,7 @@ async def test_state_ask_to_save_emergency_number(tester: AppTester, lovelife_mo
 
 @pytest.mark.asyncio
 async def test_state_save_emergency_contact(
-    tester: AppTester, lovelife_mock, turn_api_mock
+    tester: AppTester, lovelife_mock, rapidpro_mock
 ):
     tester.setup_state("state_ask_to_save_emergency_number")
     await tester.user_input("1")
@@ -176,6 +172,4 @@ async def test_state_save_emergency_contact(
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert [r.path for r in turn_api_mock.app.requests] == [
-        "/v1/contacts/27820001001/profile"
-    ]
+    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
