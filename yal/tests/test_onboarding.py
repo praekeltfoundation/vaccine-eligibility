@@ -376,7 +376,6 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
 
     tester.setup_answer("state_dob_month", "2")
     tester.setup_answer("state_dob_day", "22")
-    tester.setup_answer("state_dob_year", "2007")
     tester.setup_answer("state_relationship_status", "yes")
     tester.setup_answer("state_gender", "other")
     tester.setup_answer("state_name_gender", "new gender")
@@ -397,7 +396,6 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
             "onboarding_completed": "True",
             "dob_month": "2",
             "dob_day": "22",
-            "dob_year": "2007",
             "relationship_status": "yes",
             "gender": "other",
             "gender_other": "new gender",

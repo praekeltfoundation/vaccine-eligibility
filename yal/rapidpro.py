@@ -53,7 +53,11 @@ async def update_profile(whatsapp_id, fields):
     async with get_rapidpro_api() as session:
         for i in range(3):
             try:
-                params = {"fields": fields}
+                params = {"fields": {}}
+
+                for key, value in fields.items():
+                    if value is not None:
+                        params["fields"][key] = value
 
                 response = await session.post(
                     urljoin(config.RAPIDPRO_URL, f"/api/v2/contacts.json?urn={urn}"),
