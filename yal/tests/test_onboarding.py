@@ -394,7 +394,7 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
     request = rapidpro_mock.app.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
-            "onboarding_completed": True,
+            "onboarding_completed": "True",
             "dob_month": "2",
             "dob_day": "22",
             "dob_year": "2007",

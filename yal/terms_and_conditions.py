@@ -276,7 +276,7 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        error = await rapidpro.update_profile(whatsapp_id, {"terms_accepted": True})
+        error = await rapidpro.update_profile(whatsapp_id, {"terms_accepted": "True"})
         if error:
             return await self.go_to_state("state_error")
 
