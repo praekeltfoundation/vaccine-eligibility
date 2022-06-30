@@ -16,6 +16,17 @@ GENERIC_ERROR = (
     "Eish 👀, I didn't understand your reply, sorry. Do you mind trying "
     "again? This time, try replying with the number that matches your choice.👍🏽"
 )
+GENDERS = {
+    "girl_woman": "Girl/Woman",
+    "cisgender": "Cisgender",
+    "boy_man": "Boy/Man",
+    "genderfluid": "Genderfluid",
+    "intersex": "Intersex",
+    "non_binary": "Non-binary",
+    "questioning": "Questioning",
+    "transgender": "Transgender",
+    "other": "Something else",
+}
 
 
 def get_today():

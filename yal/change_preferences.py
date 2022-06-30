@@ -11,7 +11,7 @@ from vaccine.states import (
 )
 from vaccine.validators import nonempty_validator
 from yal import rapidpro
-from yal.utils import GENERIC_ERROR, PROVINCES, normalise_phonenumber
+from yal.utils import GENDERS, GENERIC_ERROR, PROVINCES, normalise_phonenumber
 from yal.validators import day_validator, year_validator
 
 logger = logging.getLogger(__name__)
@@ -33,15 +33,17 @@ class Application(BaseApplication):
             if value == "skip":
                 return "Empty"
 
-            if name == "gender" and value == "other":
-                return get_field("gender_other")
+            if name == "gender":
+                if value == "other":
+                    return get_field("gender_other")
+                return GENDERS[value]
 
             return value
 
         dob_year = fields.get("dob_year")
         dob_month = fields.get("dob_month")
         dob_day = fields.get("dob_day")
-        relationship_status = get_field("relationship_status")
+        relationship_status = get_field("relationship_status").title()
         gender = get_field("gender")
 
         province = fields.get("province")
