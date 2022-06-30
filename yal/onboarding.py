@@ -417,6 +417,15 @@ class Application(BaseApplication):
                 return "state_name_gender"
             return "state_submit_onboarding"
 
+        gender_text = "\n".join(
+            [
+                f"*{i+1}* - {name}"
+                for i, (code, name) in enumerate(utils.GENDERS.items())
+            ]
+        )
+        gender_choices = [Choice(code, name) for code, name in utils.GENDERS.items()]
+        gender_choices.append(Choice("skip", "Skip"))
+
         question = self._(
             "\n".join(
                 [
@@ -436,16 +445,8 @@ class Application(BaseApplication):
                     "",
                     "Please select the option you think best describes you:",
                     "",
-                    "*1* - Girl/Woman",
-                    "*2* - Cisgender",
-                    "*3* - Boy/Man",
-                    "*4* - Genderfluid",
-                    "*5* - Intersex",
-                    "*6* - Non-binary",
-                    "*7* - Questioning",
-                    "*8* - Transgender",
-                    "*9* - Something else",
-                    "*10* - Skip",
+                    gender_text,
+                    f"*{len(gender_choices)}* - Skip",
                 ]
             )
         )
@@ -453,18 +454,7 @@ class Application(BaseApplication):
             self,
             question=question,
             button="Gender",
-            choices=[
-                Choice("girl_woman", "Girl/Woman"),
-                Choice("cisgender", "Cisgender"),
-                Choice("boy_man", "Boy/Man"),
-                Choice("genderfluid", "Genderfluid"),
-                Choice("intersex", "Intersex"),
-                Choice("non_binary", "Non-binary"),
-                Choice("questioning", "Questioning"),
-                Choice("transgender", "Transgender"),
-                Choice("other", "Something else"),
-                Choice("skip", "Skip"),
-            ],
+            choices=gender_choices,
             next=next_,
             error=self._(GENERIC_ERROR),
         )

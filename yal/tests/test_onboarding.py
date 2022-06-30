@@ -5,6 +5,7 @@ from unittest import mock
 import pytest
 from sanic import Sanic, response
 
+from vaccine.models import Message
 from vaccine.testing import AppTester
 from yal import config
 from yal.main import Application
@@ -356,6 +357,46 @@ async def test_state_full_address_minor(tester: AppTester):
     await tester.user_input("2")
 
     tester.assert_state("state_gender")
+
+
+@pytest.mark.asyncio
+async def test_state_gender(tester: AppTester):
+    tester.setup_state("state_gender")
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*ABOUT YOU*",
+                "🌈 How you identify",
+                "-----",
+                "",
+                "*You're almost done!*🙌🏾",
+                "",
+                "✅ Birthday",
+                "✅ Relationship Status",
+                "✅ Location",
+                "◻️ Gender",
+                "-----",
+                "",
+                "*What's your gender?*",
+                "",
+                "Please select the option you think best describes you:",
+                "",
+                "*1* - Girl/Woman",
+                "*2* - Cisgender",
+                "*3* - Boy/Man",
+                "*4* - Genderfluid",
+                "*5* - Intersex",
+                "*6* - Non-binary",
+                "*7* - Questioning",
+                "*8* - Transgender",
+                "*9* - Something else",
+                "*10* - Skip",
+            ]
+        )
+    )
 
 
 @pytest.mark.asyncio
