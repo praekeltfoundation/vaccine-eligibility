@@ -189,12 +189,12 @@ class Application(BaseApplication):
                     "*Please call me*",
                     "-----",
                     "",
-                    "👩🏾 *Hold tight... I'm getting one of our loveLife counsellors to "
-                    "call you back ASAP, OK?*",
+                    "👩🏾 *Great! I've successfully arranged for a loveLife counsellor to "
+                    "call you back.* ✅",
                     "",
-                    "It should take around 5 - 7 min minutes or so. Hang in " "there.",
+                    "It should take around 3 minutes or so. Hang in there.",
                     "",
-                    "*1* - Ok",
+                    "*1* - OK",
                     "*2* - I need help now",
                     "*3* - loveLife OPENING HOURS",
                     "",
