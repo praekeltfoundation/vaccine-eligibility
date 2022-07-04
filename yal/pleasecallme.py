@@ -189,8 +189,8 @@ class Application(BaseApplication):
                     "*Please call me*",
                     "-----",
                     "",
-                    "👩🏾 *Great! I've successfully arranged for a loveLife counsellor to "
-                    "call you back.* ✅",
+                    "👩🏾 *Great! I've successfully arranged for a loveLife counsellor to"
+                    " call you back.* ✅",
                     "",
                     "It should take around 3 minutes or so. Hang in there.",
                     "",
