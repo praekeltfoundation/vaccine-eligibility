@@ -17,7 +17,7 @@ from vaccine.validators import nonempty_validator
 from yal import contentrepo, rapidpro, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
-from yal.utils import GENERIC_ERROR
+from yal.utils import GENERIC_ERROR, get_current_datetime
 from yal.validators import day_validator, year_validator
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,15 @@ logger = logging.getLogger(__name__)
 class Application(BaseApplication):
     START_STATE = "state_dob_full"
 
+    async def update_last_onboarding_time(self):
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {"last_onboarding_time": get_current_datetime().isoformat()}
+
+        return await rapidpro.update_profile(whatsapp_id, data)
+
     async def state_dob_full(self):
+        await self.update_last_onboarding_time()
         return FreeText(
             self,
             question=self._(
@@ -76,6 +84,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_dob_year")
 
     async def state_dob_year(self):
+        await self.update_last_onboarding_time()
         return FreeText(
             self,
             question=self._(
@@ -105,6 +114,7 @@ class Application(BaseApplication):
         )
 
     async def state_dob_month(self):
+        await self.update_last_onboarding_time()
         return ChoiceState(
             self,
             question=self._(
@@ -141,6 +151,7 @@ class Application(BaseApplication):
         )
 
     async def state_dob_day(self):
+        await self.update_last_onboarding_time()
         question = self._(
             "\n".join(
                 [
@@ -208,6 +219,7 @@ class Application(BaseApplication):
         return await self.go_to_state("state_relationship_status")
 
     async def state_relationship_status(self):
+        await self.update_last_onboarding_time()
         question = self._(
             "\n".join(
                 [
@@ -245,6 +257,7 @@ class Application(BaseApplication):
         )
 
     async def state_province(self):
+        await self.update_last_onboarding_time()
         province_text = "\n".join(
             [f"{i+1} - {name}" for i, (code, name) in enumerate(utils.PROVINCES)]
         )
@@ -286,6 +299,7 @@ class Application(BaseApplication):
         )
 
     async def state_full_address(self):
+        await self.update_last_onboarding_time()
         age = int(self.user.answers.get("age", -1))
         if age < 18:
             return await self.go_to_state("state_gender")
@@ -345,6 +359,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_suburb")
 
     async def state_suburb(self):
+        await self.update_last_onboarding_time()
         return FreeText(
             self,
             question=self._(
@@ -368,6 +383,7 @@ class Application(BaseApplication):
         )
 
     async def state_street_name(self):
+        await self.update_last_onboarding_time()
         return FreeText(
             self,
             question=self._(
@@ -390,6 +406,7 @@ class Application(BaseApplication):
         )
 
     async def state_street_number(self):
+        await self.update_last_onboarding_time()
         return FreeText(
             self,
             question=self._(
@@ -412,6 +429,8 @@ class Application(BaseApplication):
         )
 
     async def state_gender(self):
+        await self.update_last_onboarding_time()
+
         async def next_(choice: Choice):
             if choice.value == "other":
                 return "state_name_gender"
@@ -460,6 +479,7 @@ class Application(BaseApplication):
         )
 
     async def state_name_gender(self):
+        await self.update_last_onboarding_time()
         question = self._(
             "\n".join(
                 [
