@@ -1,5 +1,8 @@
 import asyncio
 import logging
+from datetime import timedelta
+from subprocess import call
+from time import strftime
 from urllib.parse import urljoin
 
 import aiohttp
@@ -178,6 +181,22 @@ class Application(BaseApplication):
                         return await self.go_to_state("state_error")
                     else:
                         continue
+
+        return await self.go_to_state("state_save_time_for_callback_check")
+
+    async def state_save_time_for_callback_check(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        call_time = get_current_datetime() + timedelta(hours=2)
+
+        data = {
+            "callback_check_time": call_time.isoformat(),
+        }
+
+        error = await rapidpro.update_profile(whatsapp_id, data)
+        if error:
+            return await self.go_to_state("state_error")
 
         return await self.go_to_state("state_callback_confirmation")
 
