@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 GREETING_KEYWORDS = {"hi", "hello", "menu", "0"}
 HELP_KEYWORDS = {"#", "help", "please call me"}
-
+ONBOARDING_REMINDER_KEYWORDS = {"yes", "no, thanks", "remind me later", "not interested"}
 
 class Application(
     TermsApplication,
@@ -51,6 +51,8 @@ class Application(
         prototype_user = fields.get("prototype_user")
         terms_accepted = fields.get("terms_accepted")
         onboarding_completed = fields.get("onboarding_completed")
+        # We set this in RapidPro when we send a reminder so this user is probably responding to it
+        onboarding_reminder_sent = fields.get("onboarding_reminder_sent")
 
         if not prototype_user:
             return await self.go_to_state("state_coming_soon")
@@ -68,6 +70,9 @@ class Application(
                 return await self.go_to_state(OnboardingApplication.START_STATE)
             else:
                 return await self.go_to_state(TermsApplication.START_STATE)
+
+        if onboarding_reminder_sent and (inbound.lower() in ONBOARDING_REMINDER_KEYWORDS):
+            return await self.go_to_state(OnboardingApplication.REMINDER_STATE)
 
         return await self.go_to_state("state_catch_all")
 

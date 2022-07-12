@@ -14,6 +14,7 @@ from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.terms_and_conditions import Application as TermsApplication
+from vaccine.models import Message
 
 
 def test_no_state_name_clashes():
@@ -49,6 +50,7 @@ def get_rapidpro_contact(urn):
         "fields": {
             "prototype_user": "27820001001" in urn,
             "onboarding_completed": "27820001001" in urn,
+            "onboarding_reminder_sent": "27820001001" in urn,
             "terms_accepted": "27820001001" in urn,
             "province": "FS",
             "suburb": "cape town",
@@ -89,6 +91,10 @@ async def rapidpro_mock(sanic_client):
             },
             status=200,
         )
+    @app.route("/api/v2/contacts.json", methods=["POST"])
+    def update_contact(request):
+        app.requests.append(request)
+        return response.json({}, status=200)
 
     client = await sanic_client(app)
     url = config.RAPIDPRO_URL
@@ -188,3 +194,12 @@ async def test_state_start_to_coming_soon(tester: AppTester, rapidpro_mock):
     tester.assert_message("TODO: coming soon")
 
     assert len(rapidpro_mock.app.requests) == 1
+
+
+@pytest.mark.asyncio
+async def test_onboarding_reminder_response_to_reminder_handler(tester: AppTester, rapidpro_mock):
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="not interested")
+    tester.assert_state("state_stop_onboarding_reminders")
+    tester.assert_num_messages(1)
+    
+    assert len(rapidpro_mock.app.requests) == 2
