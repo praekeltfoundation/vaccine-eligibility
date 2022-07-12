@@ -58,6 +58,7 @@ async def test_state_dob_full_valid(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -85,6 +86,7 @@ async def test_state_dob_full_invalid(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -112,6 +114,7 @@ async def test_state_dob_full_skip(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -136,6 +139,7 @@ async def test_state_dob_year_valid(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -160,6 +164,7 @@ async def test_state_dob_year_invalid(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -185,6 +190,7 @@ async def test_state_dob_month_valid(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -210,6 +216,7 @@ async def test_state_dob_month_invalid(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -235,6 +242,7 @@ async def test_state_dob_month_skip(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -262,6 +270,7 @@ async def test_state_dob_day_valid(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -289,6 +298,7 @@ async def test_state_dob_day_valid_no_year(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -316,6 +326,7 @@ async def test_state_dob_day_invalid(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -343,6 +354,7 @@ async def test_state_dob_day_invalid_date(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -370,6 +382,7 @@ async def test_state_dob_day_skip(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -415,6 +428,7 @@ async def test_state_check_birthday(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -444,6 +458,7 @@ async def test_state_check_birthday_skip_day(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -473,6 +488,7 @@ async def test_state_check_birthday_skip_month(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -517,6 +533,7 @@ async def test_state_check_birthday_skip_year(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -541,6 +558,7 @@ async def test_state_relationship_status_valid(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -563,6 +581,7 @@ async def test_state_full_address_invalid(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -585,6 +604,7 @@ async def test_state_full_address_valid(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -607,6 +627,7 @@ async def test_state_full_address_minor(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -657,6 +678,7 @@ async def test_state_gender(get_current_datetime, tester: AppTester, rapidpro_mo
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -681,6 +703,7 @@ async def test_state_gender_valid(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
         },
     }
 
@@ -718,6 +741,7 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
             "suburb": "SomeSuburb",
             "street_name": "Good street",
             "street_number": "12",
+            "onboarding_reminder_type": "",
         },
     }
 

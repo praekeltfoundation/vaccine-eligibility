@@ -25,11 +25,13 @@ logger = logging.getLogger(__name__)
 
 class Application(BaseApplication):
     START_STATE = "state_dob_full"
-
     async def update_last_onboarding_time(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
-        data = {"last_onboarding_time": get_current_datetime().isoformat()}
+        data = {
+            "last_onboarding_time": get_current_datetime().isoformat(),
+            "onboarding_reminder_type": "5 min"
+        }
 
         return await rapidpro.update_profile(whatsapp_id, data)
 
@@ -518,6 +520,7 @@ class Application(BaseApplication):
             "suburb": self.user.answers.get("state_suburb"),
             "street_name": self.user.answers.get("state_street_name"),
             "street_number": self.user.answers.get("state_street_number"),
+            "onboarding_reminder_type": "",
         }
 
         for field in ("province", "suburb", "street_name", "street_number"):
