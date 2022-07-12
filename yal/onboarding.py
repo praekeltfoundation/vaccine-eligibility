@@ -25,6 +25,8 @@ logger = logging.getLogger(__name__)
 
 class Application(BaseApplication):
     START_STATE = "state_dob_full"
+    REMINDER_STATE = "state_handle_onboarding_reminder_response"
+
     async def update_last_onboarding_time(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
@@ -520,6 +522,7 @@ class Application(BaseApplication):
             "suburb": self.user.answers.get("state_suburb"),
             "street_name": self.user.answers.get("state_street_name"),
             "street_number": self.user.answers.get("state_street_number"),
+            "onboarding_reminder_sent": "",
             "onboarding_reminder_type": "",
         }
 
@@ -567,3 +570,84 @@ class Application(BaseApplication):
                 "change": ChangePreferencesApplication.START_STATE,
             },
         )
+
+    async def state_stop_onboarding_reminders(self):
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "onboarding_reminder_sent": "",
+            "onboarding_reminder_type": ""
+        }  # Reset the fields
+
+        error = await rapidpro.update_profile(whatsapp_id, data)
+        if error:
+            return await self.go_to_state("state_error")
+
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "🙍🏾‍♀️Got it.",
+                        "",
+                        "👩🏾 *Remember* — you can update your info at any time. ",
+                        "Just choose *UPDATE/CHANGE PERSONAL INFO* from the Main *MENU*.",
+                        "",
+                        "*1* - OK, got it 👍",
+                    ]
+                )
+            ),
+            next=self.START_STATE,
+            buttons=[Choice("ok", self._("OK, got it 👍"))],
+        )
+
+    async def state_reschedule_onboarding_reminders(self):
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "onboarding_reminder_sent": "",  # Reset the field
+            "onboarding_reminder_type": "2 hrs",
+            "last_onboarding_time": get_current_datetime().isoformat(),
+        }
+
+        error = await rapidpro.update_profile(whatsapp_id, data)
+        if error:
+            return await self.go_to_state("state_error")
+
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "🙍🏾‍♀️Got it.",
+                        "",
+                        "👩🏾 *Remember* — you can update your info at any time. ",
+                        "Just choose *UPDATE/CHANGE PERSONAL INFO* from the Main *MENU*.",
+                        "",
+                        "*1* - OK, got it 👍",
+                    ]
+                )
+            ),
+            next=self.START_STATE,
+            buttons=[Choice("ok", self._("1 - OK, got it 👍"))],
+        )
+
+    async def state_handle_onboarding_reminder_response(self):
+        inbound = utils.clean_inbound(self.inbound.content)
+        if inbound == "yes":
+            msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+            whatsapp_id = msisdn.lstrip(" + ")
+            data = {
+                "onboarding_reminder_sent": "",  # Reset the field
+            }
+
+            error = await rapidpro.update_profile(whatsapp_id, data)
+            if error:
+                return await self.go_to_state("state_error")
+            return await self.go_to_state("state_dob_full")
+
+        if inbound == "no thanks" or inbound == "not interested":
+            return await self.go_to_state("state_stop_onboarding_reminders")
+
+        if inbound == "remind me later":
+            return await self.go_to_state("state_reschedule_onboarding_reminders")
