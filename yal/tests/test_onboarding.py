@@ -777,7 +777,9 @@ async def test_onboarding_reminder_no_thanks_response(tester: AppTester, rapidpr
 
 
 @pytest.mark.asyncio
-async def test_onboarding_reminder_no_thanks_response_actioned(tester: AppTester, rapidpro_mock):
+async def test_onboarding_reminder_no_thanks_response_actioned(
+    tester: AppTester, rapidpro_mock
+):
     tester.setup_state("state_stop_onboarding_reminders")
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="no, thanks")
 
@@ -786,34 +788,37 @@ async def test_onboarding_reminder_no_thanks_response_actioned(tester: AppTester
     assert len(rapidpro_mock.app.requests) == 1
     request = rapidpro_mock.app.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields":  {
-            "onboarding_reminder_sent": "",
-            "onboarding_reminder_type": ""
-        },
+        "fields": {"onboarding_reminder_sent": "", "onboarding_reminder_type": ""},
     }
 
 
 @pytest.mark.asyncio
 async def test_onboarding_reminder_later_response(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_handle_onboarding_reminder_response")
-    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="remind me later")
+    await tester.user_input(
+        session=Message.SESSION_EVENT.NEW, content="remind me later"
+    )
 
     tester.assert_state("state_reschedule_onboarding_reminders")
 
 
 @pytest.mark.asyncio
 @mock.patch("yal.onboarding.get_current_datetime")
-async def test_onboarding_reminder_later_response_actioned(get_current_datetime, tester: AppTester, rapidpro_mock):
+async def test_onboarding_reminder_later_response_actioned(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_reschedule_onboarding_reminders")
-    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="remind me later")
+    await tester.user_input(
+        session=Message.SESSION_EVENT.NEW, content="remind me later"
+    )
 
     tester.assert_num_messages(1)
 
     assert len(rapidpro_mock.app.requests) == 1
     request = rapidpro_mock.app.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields":  {
+        "fields": {
             "onboarding_reminder_sent": "",
             "onboarding_reminder_type": "2 hrs",
             "last_onboarding_time": "2022-06-19T17:30:00",

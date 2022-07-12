@@ -32,7 +32,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
             "last_onboarding_time": get_current_datetime().isoformat(),
-            "onboarding_reminder_type": "5 min"
+            "onboarding_reminder_type": "5 min",
         }
 
         return await rapidpro.update_profile(whatsapp_id, data)
@@ -576,7 +576,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
             "onboarding_reminder_sent": "",
-            "onboarding_reminder_type": ""
+            "onboarding_reminder_type": "",
         }  # Reset the fields
 
         error = await rapidpro.update_profile(whatsapp_id, data)
@@ -590,8 +590,8 @@ class Application(BaseApplication):
                     [
                         "🙍🏾‍♀️Got it.",
                         "",
-                        "👩🏾 *Remember* — you can update your info at any time. ",
-                        "Just choose *UPDATE/CHANGE PERSONAL INFO* from the Main *MENU*.",
+                        "👩🏾 *Remember* — you can update your info at any time. Just ",
+                        "choose *UPDATE/CHANGE PERSONAL INFO* from the Main *MENU*.",
                         "",
                         "*1* - OK, got it 👍",
                     ]
@@ -621,8 +621,8 @@ class Application(BaseApplication):
                     [
                         "🙍🏾‍♀️Got it.",
                         "",
-                        "👩🏾 *Remember* — you can update your info at any time. ",
-                        "Just choose *UPDATE/CHANGE PERSONAL INFO* from the Main *MENU*.",
+                        "👩🏾 *Remember* — you can update your info at any time. Just ",
+                        "choose *UPDATE/CHANGE PERSONAL INFO* from the Main *MENU*.",
                         "",
                         "*1* - OK, got it 👍",
                     ]

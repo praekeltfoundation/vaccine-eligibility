@@ -4,6 +4,7 @@ from unittest import mock
 import pytest
 from sanic import Sanic, response
 
+from vaccine.models import Message
 from vaccine.testing import AppTester
 from yal import config
 from yal.change_preferences import Application as ChangePreferencesApplication
@@ -14,7 +15,6 @@ from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.terms_and_conditions import Application as TermsApplication
-from vaccine.models import Message
 
 
 def test_no_state_name_clashes():
@@ -91,6 +91,7 @@ async def rapidpro_mock(sanic_client):
             },
             status=200,
         )
+
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
         app.requests.append(request)
@@ -197,9 +198,11 @@ async def test_state_start_to_coming_soon(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
-async def test_onboarding_reminder_response_to_reminder_handler(tester: AppTester, rapidpro_mock):
+async def test_onboarding_reminder_response_to_reminder_handler(
+    tester: AppTester, rapidpro_mock
+):
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="not interested")
     tester.assert_state("state_stop_onboarding_reminders")
     tester.assert_num_messages(1)
-    
+
     assert len(rapidpro_mock.app.requests) == 2
