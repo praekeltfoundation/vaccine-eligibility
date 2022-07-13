@@ -76,7 +76,7 @@ async def test_submit_terms_and_conditions(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_dob_full")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.app.requests) == 1
+    assert len(rapidpro_mock.app.requests) == 2
     request = rapidpro_mock.app.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"terms_accepted": "True"},
