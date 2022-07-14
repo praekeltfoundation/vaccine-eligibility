@@ -5,6 +5,7 @@ from yal import rapidpro, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
+from yal.optout import Application as OptOutApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 GREETING_KEYWORDS = {"hi", "hello", "menu", "0"}
 HELP_KEYWORDS = {"#", "help", "please call me"}
+OPTOUT_KEYWORDS = {"stop"}
 
 
 class Application(
@@ -24,6 +26,7 @@ class Application(
     QuizApplication,
     PleaseCallMeApplication,
     ServiceFinderApplication,
+    OptOutApplication,
 ):
     START_STATE = "state_start"
 
@@ -38,6 +41,9 @@ class Application(
             self.user.session_id = None
             self.state_name = PleaseCallMeApplication.START_STATE
 
+        if keyword in OPTOUT_KEYWORDS:
+            self.user.session_id = None
+            self.state_name = OptOutApplication.START_STATE
         return await super().process_message(message)
 
     async def state_start(self):
@@ -61,6 +67,8 @@ class Application(
 
         inbound = utils.clean_inbound(self.inbound.content)
 
+        if inbound in OPTOUT_KEYWORDS:
+            return await self.go_to_state(OptOutApplication.START_STATE)
         if inbound in GREETING_KEYWORDS:
             if terms_accepted and onboarding_completed:
                 return await self.go_to_state(MainMenuApplication.START_STATE)
