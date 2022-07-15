@@ -11,8 +11,8 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
 from vaccine.utils import HTTP_EXCEPTIONS
 from vaccine.validators import phone_number_validator
-from yal import config, rapidpro
-from yal.utils import GENERIC_ERROR, get_current_datetime, normalise_phonenumber
+from yal import config, rapidpro, contentrepo
+from yal.utils import GENERIC_ERROR, get_current_datetime, normalise_phonenumber, clean_inbound
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +29,7 @@ def get_lovelife_api():
 
 class Application(BaseApplication):
     START_STATE = "state_please_call_start"
+    CALLBACK_RESPONSE_STATE = "state_handle_callback_check_response"
 
     async def state_please_call_start(self):
         current_datetime = get_current_datetime()
@@ -354,3 +355,491 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
         return await self.go_to_state("state_submit_callback")
+
+    async def state_handle_callback_check_response(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "callback_check_sent": "",
+        }
+
+        error = await rapidpro.update_profile(whatsapp_id, data)
+        if error:
+            return await self.go_to_state("state_error")
+
+        inbound = clean_inbound(self.inbound.content)
+
+        if inbound == "yes i got a callback":
+            return await self.go_to_state("state_mainmenu")
+        if inbound == "yes but i missed it":
+            return await self.go_to_state("state_ask_to_call_again")
+        if inbound == "no i m still waiting":
+            return await self.go_to_state("state_no_callback_received")
+
+    async def state_no_callback_received(self):
+        msg = self._(
+            "\n".join(
+                [
+                    "👩🏾 *Eish! Sorry about that!*",
+                    "",
+                    "Something must have gone wrong on our side. Apologies for that.",
+                ]
+            )
+        )
+        await self.worker.publish_message(self.inbound.reply(msg))
+        await asyncio.sleep(0.5)
+        return await self.go_to_state("state_ask_to_call_again")
+
+    async def state_ask_to_call_again(self):
+        question = self._(
+            "\n".join(
+                [
+                    "🆘HELP!",
+                    "*Please call me*",
+                    "-----",
+                    "",
+                    "👩🏾 *Want me to try again?*",
+                    "I can try and contact one of my colleagues at loveLife again",
+                    " to call you back.",
+                    "",
+                    "*1* - OK",
+                    "*2* - Get help another way",
+                    "*3* - No, thanks",
+                    "",
+                    "----",
+                    "*Or reply:*",
+                    "*0* - 🏠 Back to Main MENU",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("ok", "OK"),
+                Choice("another way", "Get help another way"),
+                Choice("no", "No, thanks"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "ok": "state_retry_callback_choose_number",
+                "another way": "state_contact_bwise",
+                "no": "state_help_no_longer_needed"
+            },
+        )
+
+    async def state_retry_callback_choose_number(self):
+        question = self._(
+            "\n".join(
+                [
+                    "🆘HELP!",
+                    "*Please call me*",
+                    "-----",
+                    "",
+                    "👩🏾 *Which number should we use?*",
+                    "",
+                    "*1* - My Whatsapp number",
+                    "*2* - The previously saved number",
+                    "*3* - Another number",
+                    "",
+                    "----",
+                    "*Or reply:*",
+                    "*0* - 🏠 Back to Main MENU",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("whatsapp", "Whatsapp number"),
+                Choice("previously saved", "Previously saved"),
+                Choice("another", "Another number"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "whatsapp": "state_submit_callback",
+                "previously saved": "state_offer_saved_emergency_contact",
+                "another": "state_specify_msisdn"
+            },
+        )
+
+    async def state_offer_saved_emergency_contact(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        error, fields = await rapidpro.get_profile(whatsapp_id)
+        if error:
+            return await self.go_to_state("state_error")
+        msisdn = fields.get("emergency_contact")
+        if msisdn:
+            self.save_answer("state_specify_msisdn", msisdn)
+
+            question = self._(
+                "\n".join(
+                    [
+                        "🆘HELP!",
+                        "*Please call me*",
+                        "-----",
+                        "",
+                        "*👩🏾Is this the right number?*",
+                        "",
+                        msisdn,
+                        "",
+                        "*1* - Yes, that's it",
+                        "*2* - No, it's wrong",
+                        "",
+                        "-----",
+                        "*Or reply:*",
+                        "*0* - 🏠Back to Main *MENU*",
+                    ]
+                )
+            )
+            return WhatsAppButtonState(
+                self,
+                question=question,
+                choices=[
+                    Choice("yes", "Yes, that's it"),
+                    Choice("no", "No, it's wrong"),
+                ],
+                error=self._(GENERIC_ERROR),
+                next={
+                    "yes": "state_submit_callback",
+                    "no": "state_specify_msisdn",
+                },
+            )
+        else:
+            question = self._(
+                "\n".join(
+                    [
+                        "🆘HELP!",
+                        "*Please call me*",
+                        "-----",
+                        "",
+                        "*👩🏾 Whoops! I don't have another number saved for you.*",
+                        "*Which number should we use?*",
+                        "",
+                        "*1* - My Whatsapp number",
+                        "*2* - Another number",
+                        "",
+                        "----",
+                        "*Or reply:*",
+                        "*0* - 🏠 Back to Main MENU",
+                    ]
+                )
+            )
+            return WhatsAppButtonState(
+                self,
+                question=question,
+                choices=[
+                    Choice("whatsapp", "Whatsapp number"),
+                    Choice("another", "Another number"),
+                ],
+                error=self._(GENERIC_ERROR),
+                next={
+                    "whatsapp": "state_submit_callback",
+                    "another": "state_specify_msisdn"
+                },
+            )
+
+    async def state_help_no_longer_needed(self):
+        question = self._(
+            "\n".join(
+                [
+                    "🆘HELP!",
+                    "*Please call me*",
+                    "-----",
+                    "",
+                    "👩🏾 *Are you sure you no longer need help?*",
+                    "",
+                    "*1* - Yes, I got help",
+                    "*2* - This way is too long",
+                    "*3* - I've changed my mind",
+                    "",
+                    "----",
+                    "*Or reply:*",
+                    "*0* - 🏠 Back to Main MENU",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("yes", "Yes, I got help"),
+                Choice("long", "This way is too long"),
+                Choice("changed mind", "I've changed my mind"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "yes": "state_got_help",
+                "long": "state_too_long",
+                "changed mind": "state_changed_mind"
+            },
+        )
+
+    async def state_got_help(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "callback_abandon_reason": "got help",
+        }
+
+        error = await rapidpro.update_profile(whatsapp_id, data)
+        if error:
+            return await self.go_to_state("state_error")
+
+        question = self._(
+            "\n".join(
+                [
+                    "🆘HELP!",
+                    "*Please call me*",
+                    "-----",
+                    "",
+                    "👩🏾*I'm glad you got the help you needed.*",
+                    "",
+                    "If you need help again, just reply *HELP* at anytime and ",
+                    "one of our loveLife counsellors can call you back.",
+                    "",
+                    "----",
+                    "*0* - 🏠 Back to Main MENU",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("menu", "Main Menu"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "menu": "state_mainmenu",
+            },
+        )
+
+    async def state_too_long(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "callback_abandon_reason": "too long",
+        }
+
+        error = await rapidpro.update_profile(whatsapp_id, data)
+        if error:
+            return await self.go_to_state("state_error")
+        question = self._(
+            "\n".join(
+                [
+                    "🆘HELP!",
+                    "*Please call me*",
+                    "-----",
+                    "",
+                    "👩🏾 *Thank you for that feedback, we'll work on it.*",
+                    "",
+                    "If you need help again, just reply *HELP* at anytime and ",
+                    "one of our loveLife counsellors can call you back.",
+                    "",
+                    "*What do you want to do next?*",
+                    "",
+                    "*1* - Get help another way"
+                    "----",
+                    "*Or reply:*",
+                    "*0* - 🏠 Back to Main MENU",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("another way", "Get help another way"),
+                Choice("menu", "Main Menu"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "another way": "state_contact_bwise",
+                "menu": "state_mainmenu",
+            },
+        )
+
+    async def state_changed_mind(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "callback_abandon_reason": "changed mind",
+        }
+
+        error = await rapidpro.update_profile(whatsapp_id, data)
+        if error:
+            return await self.go_to_state("state_error")
+        question = self._(
+            "\n".join(
+                [
+                    "🆘HELP!",
+                    "*Please call me*",
+                    "-----",
+                    "",
+                    "👩🏾 *No problem. I hope you're no longer in trouble.*",
+                    "",
+                    "If you need help again, just reply *HELP* at anytime and ",
+                    "one of our loveLife counsellors can call you back.",
+                    "",
+                    "*What do you want to do next?*",
+                    "",
+                    "*1* - Get help another way"
+                    "----",
+                    "*Or reply:*",
+                    "*0* - 🏠 Back to Main MENU",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("another way", "Get help another way"),
+                Choice("menu", "Main Menu"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "another way": "state_contact_bwise",
+                "menu": "state_mainmenu",
+            },
+        )
+
+    async def state_contact_bwise(self):
+        question = self._(
+            "\n".join(
+                [
+                    "🆘HELP!",
+                    "*Get in touch with B-Wise*",
+                    "-----",
+                    "",
+                    "🙍🏾‍♀️*Don't stress. My team at B-Wise have got your back too.* 👊🏾",
+                    "",
+                    "You can get in touch with one of my them via social media now.",
+                    "",
+                    "*How would you like to connect with B-Wise?*",
+                    "",
+                    "*1* - Facebook",
+                    "*2* - Twitter",
+                    "*3* - Website",
+                    "",
+                    "----",
+                    "*Or reply:*",
+                    "*0* - 🏠 Back to Main MENU",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("facebook", "Facebook"),
+                Choice("twitter", "Twitter"),
+                Choice("website", "Website"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "facebook": "state_facebook_page",
+                "twitter": "state_twitter_page",
+                "website": "state_website"
+            },
+        )
+
+    async def state_facebook_page(self):
+        question = self._(
+            "\n".join(
+                [
+                    "*B-Wise by Young Africa Live on Facebook*",
+                    "",
+                    "www.facebook.com/BWiseHealth/👆🏾",
+                    "",
+                    "We are here to help you find sex-positive, youth-friendly, and ",
+                    "non-judgmental information on your sexual and reproductive health.",
+                    "",
+                    "----",
+                    "*Or reply:*",
+                    "*0* - 🏠 Back to Main MENU",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            # TODO: Add image to content repo
+            # helper_metadata={"image": contentrepo.get_image_url("Screenshot 2022-06-07 at 09.29.20.png")},
+            choices=[
+                Choice("menu", "Main Menu"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "menu": "state_mainmenu",
+            },
+        )
+
+    async def state_twitter_page(self):
+        question = self._(
+            "\n".join(
+                [
+                    "*@BWiseHealth (B-Wise by Young Africa Live) · Twitter*",
+                    "",
+                    "https://twitter.com/BWiseHealth👆🏾",
+                    "",
+                    "We are here to help you find sex-positive, youth-friendly, and ",
+                    "non-judgmental information on your sexual and reproductive health.",
+                    "",
+                    "----",
+                    "*Or reply:*",
+                    "*0* - 🏠 Back to Main MENU",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            # TODO: Add image to content repo
+            # helper_metadata={"image": contentrepo.get_image_url("Screenshot 2022-06-07 at 09.56.48.png")},
+            choices=[
+                Choice("menu", "Main Menu"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "menu": "state_mainmenu",
+            },
+        )
+
+    async def state_website(self):
+        question = self._(
+            "\n".join(
+                [
+                    "*Need quick answers?*",
+                    "*Check out B-Wise online!*",
+                    "",
+                    "https://bwisehealth.com/👆🏾",
+                    "",
+                    "You'll find loads of sex, relationships and health info there. ",
+                    "It's also my other virtual office.",
+                    "",
+                    "Feel free to drop me a virtual _howzit_ there too!",
+                    "",
+                    "----",
+                    "*Or reply:*",
+                    "*0* - 🏠 Back to Main MENU",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            # TODO: Add image to content repo
+            # helper_metadata={"image": contentrepo.get_image_url("Screenshot 2022-06-06 at 15.02.53.png")},
+            choices=[
+                Choice("menu", "Main Menu"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "menu": "state_mainmenu",
+            },
+        )
