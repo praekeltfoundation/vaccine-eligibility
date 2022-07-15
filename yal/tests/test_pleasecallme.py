@@ -2,6 +2,7 @@ from datetime import datetime
 from unittest import mock
 
 import pytest
+import json
 from sanic import Sanic, response
 
 from vaccine.models import Message
@@ -88,7 +89,9 @@ async def test_state_out_of_hours(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_in_hours(tester: AppTester, lovelife_mock):
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_state_in_hours(get_current_datetime, tester: AppTester, lovelife_mock, rapidpro_mock):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_in_hours")
     await tester.user_input("1")
     tester.assert_state("state_callback_confirmation")
@@ -97,6 +100,12 @@ async def test_state_in_hours(tester: AppTester, lovelife_mock):
     assert req.json == {
         "PhoneNumber": "+27820001001",
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
+    }
+
+    assert len(rapidpro_mock.app.requests) == 1
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"callback_check_time": "2022-06-19T19:30:00"},
     }
 
 
@@ -146,30 +155,50 @@ async def test_state_confirm_specified_msisdn(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_ask_to_save_emergency_number(tester: AppTester, lovelife_mock):
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_state_ask_to_save_emergency_number(get_current_datetime, tester: AppTester, lovelife_mock, rapidpro_mock):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_ask_to_save_emergency_number")
+    tester.setup_answer("state_specify_msisdn", "+27831231234")
     await tester.user_input("2")
     tester.assert_state("state_callback_confirmation")
 
     [req] = lovelife_mock.app.requests
     assert req.json == {
-        "PhoneNumber": "+27820001001",
+        "PhoneNumber": "+27831231234",
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
+    }
+
+    assert len(rapidpro_mock.app.requests) == 1
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"callback_check_time": "2022-06-19T19:30:00"},
     }
 
 
 @pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
 async def test_state_save_emergency_contact(
-    tester: AppTester, lovelife_mock, rapidpro_mock
+    get_current_datetime, tester: AppTester, lovelife_mock, rapidpro_mock
 ):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_ask_to_save_emergency_number")
+    tester.setup_answer("state_specify_msisdn", "+27831231234")
     await tester.user_input("1")
     tester.assert_state("state_callback_confirmation")
 
     [req] = lovelife_mock.app.requests
     assert req.json == {
-        "PhoneNumber": "+27820001001",
+        "PhoneNumber": "+27831231234",
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"emergency_contact": "+27831231234"},
+    }
+    request = rapidpro_mock.app.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"callback_check_time": "2022-06-19T19:30:00"},
+    }
