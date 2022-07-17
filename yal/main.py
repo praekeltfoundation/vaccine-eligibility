@@ -20,7 +20,11 @@ ONBOARDING_REMINDER_KEYWORDS = {
     "remind me later",
     "not interested",
 }
-CALLBACK_CHECK_KEYWORDS = {"yes i got a callback", "yes but i missed it", "no i m still waiting"}
+CALLBACK_CHECK_KEYWORDS = {
+    "yes i got a callback",
+    "yes but i missed it",
+    "no i m still waiting",
+}
 
 
 class Application(
@@ -58,7 +62,8 @@ class Application(
         prototype_user = fields.get("prototype_user")
         terms_accepted = fields.get("terms_accepted")
         onboarding_completed = fields.get("onboarding_completed")
-        # If one of these values is True then the user might be responding to a scheduled msg
+        # If one of these values is True then the user might be responding
+        # to a scheduled msg
         onboarding_reminder_sent = fields.get("onboarding_reminder_sent")
         callback_check_sent = fields.get("callback_check_sent")
 
@@ -80,7 +85,9 @@ class Application(
                 return await self.go_to_state(TermsApplication.START_STATE)
 
         if callback_check_sent and (inbound.lower() in CALLBACK_CHECK_KEYWORDS):
-            return await self.go_to_state(PleaseCallMeApplication.CALLBACK_RESPONSE_STATE)
+            return await self.go_to_state(
+                PleaseCallMeApplication.CALLBACK_RESPONSE_STATE
+            )
 
         if onboarding_reminder_sent and (
             inbound.lower() in ONBOARDING_REMINDER_KEYWORDS

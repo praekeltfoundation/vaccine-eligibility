@@ -1,8 +1,8 @@
+import json
 from datetime import datetime
 from unittest import mock
 
 import pytest
-import json
 from sanic import Sanic, response
 
 from vaccine.models import Message
@@ -33,12 +33,14 @@ async def lovelife_mock(sanic_client):
     yield client
     config.LOVELIFE_URL = url
 
+
 def get_rapidpro_contact(urn):
     return {
         "fields": {
             "emergency_contact": "" if ("27820001001" in urn) else "+27831231234",
         },
     }
+
 
 @pytest.fixture
 async def rapidpro_mock(sanic_client):
@@ -73,6 +75,7 @@ async def rapidpro_mock(sanic_client):
     yield client
     config.RAPIDPRO_URL = url
 
+
 @pytest.fixture
 async def contentrepo_api_mock(sanic_client):
     Sanic.test_mode = True
@@ -94,6 +97,7 @@ async def contentrepo_api_mock(sanic_client):
     config.CONTENTREPO_API_URL = f"http://{client.host}:{client.port}"
     yield client
     config.CONTENTREPO_API_URL = url
+
 
 @pytest.mark.asyncio
 @mock.patch("yal.pleasecallme.get_current_datetime")
@@ -132,7 +136,9 @@ async def test_state_out_of_hours(tester: AppTester):
 
 @pytest.mark.asyncio
 @mock.patch("yal.pleasecallme.get_current_datetime")
-async def test_state_in_hours(get_current_datetime, tester: AppTester, lovelife_mock, rapidpro_mock):
+async def test_state_in_hours(
+    get_current_datetime, tester: AppTester, lovelife_mock, rapidpro_mock
+):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_in_hours")
     await tester.user_input("1")
@@ -198,7 +204,9 @@ async def test_state_confirm_specified_msisdn(tester: AppTester):
 
 @pytest.mark.asyncio
 @mock.patch("yal.pleasecallme.get_current_datetime")
-async def test_state_ask_to_save_emergency_number(get_current_datetime, tester: AppTester, lovelife_mock, rapidpro_mock):
+async def test_state_ask_to_save_emergency_number(
+    get_current_datetime, tester: AppTester, lovelife_mock, rapidpro_mock
+):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_ask_to_save_emergency_number")
     tester.setup_answer("state_specify_msisdn", "+27831231234")
@@ -287,7 +295,8 @@ async def test_state_callback_response_handles_no_call(
             "👩🏾 *Eish! Sorry about that!*",
             "",
             "Something must have gone wrong on our side. Apologies for that.",
-        ])
+        ]
+    )
 
     tester.assert_state("state_ask_to_call_again")
 
@@ -311,9 +320,7 @@ async def test_state_callback_response_handles_missed_call(
 
 
 @pytest.mark.asyncio
-async def test_state_ask_to_call_again_yes(
-    tester: AppTester, rapidpro_mock
-):
+async def test_state_ask_to_call_again_yes(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_ask_to_call_again")
 
     await tester.user_input("ok")
@@ -325,9 +332,7 @@ async def test_state_ask_to_call_again_yes(
 
 
 @pytest.mark.asyncio
-async def test_state_ask_to_call_again_another_way(
-    tester: AppTester, rapidpro_mock
-):
+async def test_state_ask_to_call_again_another_way(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_ask_to_call_again")
 
     await tester.user_input("Get help another way")
@@ -339,9 +344,7 @@ async def test_state_ask_to_call_again_another_way(
 
 
 @pytest.mark.asyncio
-async def test_state_ask_to_call_again_no(
-    tester: AppTester, rapidpro_mock
-):
+async def test_state_ask_to_call_again_no(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_ask_to_call_again")
 
     await tester.user_input("No, thanks")
@@ -376,6 +379,7 @@ async def test_state_retry_callback_choose_number_whatsapp(
         "fields": {"callback_check_time": "2022-06-19T19:30:00"},
     }
 
+
 @pytest.mark.asyncio
 async def test_state_retry_callback_choose_number_saved_and_exists(
     tester: AppTester, rapidpro_mock
@@ -408,6 +412,7 @@ async def test_state_retry_callback_choose_number_saved_and_exists(
             ]
         )
     )
+
 
 @pytest.mark.asyncio
 async def test_state_retry_callback_choose_number_saved_no_number_found(
@@ -480,9 +485,7 @@ async def test_retry_callback_no_number_found_another_number(
 
 
 @pytest.mark.asyncio
-async def test_state_help_no_longer_needed_got_help(
-    tester: AppTester, rapidpro_mock
-):
+async def test_state_help_no_longer_needed_got_help(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_help_no_longer_needed")
 
     await tester.user_input("Yes, I got help")
@@ -498,9 +501,7 @@ async def test_state_help_no_longer_needed_got_help(
 
 
 @pytest.mark.asyncio
-async def test_state_help_no_longer_needed_too_long(
-    tester: AppTester, rapidpro_mock
-):
+async def test_state_help_no_longer_needed_too_long(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_help_no_longer_needed")
 
     await tester.user_input("This way is too long")
@@ -534,9 +535,7 @@ async def test_state_help_no_longer_needed_changed_mind(
 
 
 @pytest.mark.asyncio
-async def test_state_too_long(
-    tester: AppTester, rapidpro_mock
-):
+async def test_state_too_long(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_too_long")
 
     await tester.user_input("Get help another way")
@@ -552,9 +551,7 @@ async def test_state_too_long(
 
 
 @pytest.mark.asyncio
-async def test_state_changed_mind(
-    tester: AppTester, rapidpro_mock
-):
+async def test_state_changed_mind(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_changed_mind")
 
     await tester.user_input("Get help another way")
@@ -570,9 +567,7 @@ async def test_state_changed_mind(
 
 
 @pytest.mark.asyncio
-async def test_state_contact_bwise_facebook(
-    tester: AppTester
-):
+async def test_state_contact_bwise_facebook(tester: AppTester):
     config.CONTENTREPO_API_URL = "https://contenrepo/"
     tester.setup_state("state_contact_bwise")
 
@@ -583,14 +578,13 @@ async def test_state_contact_bwise_facebook(
     # TODO: Add image to content repo
     # [msg] = tester.fake_worker.outbound_messages
     # assert msg.helper_metadata == {
-    #     "image": "https://contenrepo/media/original_images/Screenshot 2022-06-07 at 09.29.20.png"
+    #     "image": "https://contenrepo/media/original_images/"
+    #               "Screenshot 2022-06-07 at 09.29.20.png"
     # }
 
 
 @pytest.mark.asyncio
-async def test_state_contact_bwise_twitter(
-    tester: AppTester
-):
+async def test_state_contact_bwise_twitter(tester: AppTester):
     config.CONTENTREPO_API_URL = "https://contenrepo/"
     tester.setup_state("state_contact_bwise")
 
@@ -601,14 +595,13 @@ async def test_state_contact_bwise_twitter(
     # TODO: Add image to content repo
     # [msg] = tester.fake_worker.outbound_messages
     # assert msg.helper_metadata == {
-    #     "image": "https://contenrepo/media/original_images/Screenshot 2022-06-07 at 09.56.48.png"
+    #     "image": "https://contenrepo/media/original_images/"
+    #               "Screenshot 2022-06-07 at 09.56.48.png"
     # }
 
 
 @pytest.mark.asyncio
-async def test_state_contact_bwise_website(
-    tester: AppTester
-):
+async def test_state_contact_bwise_website(tester: AppTester):
     config.CONTENTREPO_API_URL = "https://contenrepo/"
     tester.setup_state("state_contact_bwise")
 
@@ -619,5 +612,6 @@ async def test_state_contact_bwise_website(
     # TODO: Add image to content repo
     # [msg] = tester.fake_worker.outbound_messages
     # assert msg.helper_metadata == {
-    #     "image": "https://contenrepo/media/original_images/Screenshot 2022-06-06 at 15.02.53.png"
+    #     "image": "https://contenrepo/media/original_images/"
+    #               "Screenshot 2022-06-06 at 15.02.53.png"
     # }

@@ -1,8 +1,6 @@
 import asyncio
 import logging
 from datetime import timedelta
-from subprocess import call
-from time import strftime
 from urllib.parse import urljoin
 
 import aiohttp
@@ -11,8 +9,13 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
 from vaccine.utils import HTTP_EXCEPTIONS
 from vaccine.validators import phone_number_validator
-from yal import config, rapidpro, contentrepo
-from yal.utils import GENERIC_ERROR, get_current_datetime, normalise_phonenumber, clean_inbound
+from yal import config, rapidpro
+from yal.utils import (
+    GENERIC_ERROR,
+    clean_inbound,
+    get_current_datetime,
+    normalise_phonenumber,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -424,7 +427,7 @@ class Application(BaseApplication):
             next={
                 "ok": "state_retry_callback_choose_number",
                 "another way": "state_contact_bwise",
-                "no": "state_help_no_longer_needed"
+                "no": "state_help_no_longer_needed",
             },
         )
 
@@ -460,7 +463,7 @@ class Application(BaseApplication):
             next={
                 "whatsapp": "state_submit_callback",
                 "previously saved": "state_offer_saved_emergency_contact",
-                "another": "state_specify_msisdn"
+                "another": "state_specify_msisdn",
             },
         )
 
@@ -538,7 +541,7 @@ class Application(BaseApplication):
                 error=self._(GENERIC_ERROR),
                 next={
                     "whatsapp": "state_submit_callback",
-                    "another": "state_specify_msisdn"
+                    "another": "state_specify_msisdn",
                 },
             )
 
@@ -574,7 +577,7 @@ class Application(BaseApplication):
             next={
                 "yes": "state_got_help",
                 "long": "state_too_long",
-                "changed mind": "state_changed_mind"
+                "changed mind": "state_changed_mind",
             },
         )
 
@@ -642,8 +645,7 @@ class Application(BaseApplication):
                     "",
                     "*What do you want to do next?*",
                     "",
-                    "*1* - Get help another way"
-                    "----",
+                    "*1* - Get help another way" "----",
                     "*Or reply:*",
                     "*0* - 🏠 Back to Main MENU",
                 ]
@@ -687,8 +689,7 @@ class Application(BaseApplication):
                     "",
                     "*What do you want to do next?*",
                     "",
-                    "*1* - Get help another way"
-                    "----",
+                    "*1* - Get help another way" "----",
                     "*Or reply:*",
                     "*0* - 🏠 Back to Main MENU",
                 ]
@@ -744,7 +745,7 @@ class Application(BaseApplication):
             next={
                 "facebook": "state_facebook_page",
                 "twitter": "state_twitter_page",
-                "website": "state_website"
+                "website": "state_website",
             },
         )
 
@@ -757,7 +758,8 @@ class Application(BaseApplication):
                     "www.facebook.com/BWiseHealth/👆🏾",
                     "",
                     "We are here to help you find sex-positive, youth-friendly, and ",
-                    "non-judgmental information on your sexual and reproductive health.",
+                    "non-judgmental information on your sexual and reproductive "
+                    "health.",
                     "",
                     "----",
                     "*Or reply:*",
@@ -769,7 +771,8 @@ class Application(BaseApplication):
             self,
             question=question,
             # TODO: Add image to content repo
-            # helper_metadata={"image": contentrepo.get_image_url("Screenshot 2022-06-07 at 09.29.20.png")},
+            # helper_metadata={"image": contentrepo.get_image_url(
+            #   "Screenshot 2022-06-07 at 09.29.20.png")},
             choices=[
                 Choice("menu", "Main Menu"),
             ],
@@ -788,7 +791,8 @@ class Application(BaseApplication):
                     "https://twitter.com/BWiseHealth👆🏾",
                     "",
                     "We are here to help you find sex-positive, youth-friendly, and ",
-                    "non-judgmental information on your sexual and reproductive health.",
+                    "non-judgmental information on your sexual and reproductive "
+                    "health.",
                     "",
                     "----",
                     "*Or reply:*",
@@ -800,7 +804,8 @@ class Application(BaseApplication):
             self,
             question=question,
             # TODO: Add image to content repo
-            # helper_metadata={"image": contentrepo.get_image_url("Screenshot 2022-06-07 at 09.56.48.png")},
+            # helper_metadata={"image": contentrepo.get_image_url(
+            #   "Screenshot 2022-06-07 at 09.56.48.png")},
             choices=[
                 Choice("menu", "Main Menu"),
             ],
@@ -834,7 +839,8 @@ class Application(BaseApplication):
             self,
             question=question,
             # TODO: Add image to content repo
-            # helper_metadata={"image": contentrepo.get_image_url("Screenshot 2022-06-06 at 15.02.53.png")},
+            # helper_metadata={"image": contentrepo.get_image_url(
+            #   "Screenshot 2022-06-06 at 15.02.53.png")},
             choices=[
                 Choice("menu", "Main Menu"),
             ],
