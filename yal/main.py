@@ -2,6 +2,7 @@ import logging
 
 from vaccine.states import EndState
 from yal import rapidpro, utils
+from yal.askaquestion import Application as AaqApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
@@ -21,6 +22,7 @@ ONBOARDING_REMINDER_KEYWORDS = {
     "not interested",
 }
 CALLBACK_CHECK_KEYWORDS = {"yes i got a callback", "yes but i missed it", "no i m still waiting"}
+AAQ_TIMEOUT_KEYWORDS = {"yes", "no", "yes ask again", "no i m good"}
 
 
 class Application(
@@ -31,6 +33,7 @@ class Application(
     QuizApplication,
     PleaseCallMeApplication,
     ServiceFinderApplication,
+    AaqApplication,
 ):
     START_STATE = "state_start"
 
@@ -58,9 +61,11 @@ class Application(
         prototype_user = fields.get("prototype_user")
         terms_accepted = fields.get("terms_accepted")
         onboarding_completed = fields.get("onboarding_completed")
-        # If one of these values is True then the user might be responding to a scheduled msg
+        # If one of these values is True then the user might be responding
+        # to a scheduled msg
         onboarding_reminder_sent = fields.get("onboarding_reminder_sent")
         callback_check_sent = fields.get("callback_check_sent")
+        aaq_timeout_sent = fields.get("aaq_timeout_sent")
 
         if not prototype_user:
             return await self.go_to_state("state_coming_soon")
@@ -86,6 +91,9 @@ class Application(
             inbound.lower() in ONBOARDING_REMINDER_KEYWORDS
         ):
             return await self.go_to_state(OnboardingApplication.REMINDER_STATE)
+
+        if aaq_timeout_sent and (inbound.lower() in AAQ_TIMEOUT_KEYWORDS):
+            return await self.go_to_state(AaqApplication.TIMEOUT_RESPONSE_STATE)
 
         return await self.go_to_state("state_catch_all")
 
