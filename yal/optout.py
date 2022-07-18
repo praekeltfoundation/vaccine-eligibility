@@ -229,22 +229,20 @@ class Application(BaseApplication):
         return EndState(
             self,
             text=self._(
-                    "\n".join(
-                        [
-                            "Need quick answers?",
-                            "Check out B-Wise online!👆🏾",
-                            "",
-                            "https://bwisehealth.com/",
-                            "",
-                            "You'll find loads of sex, relationships",
-                            "and health info there.",
-                            "It's also my other virtual office.",
-                        ]
-                    )
-                ),
-            helper_metadata={
-                    "image": contentrepo.get_image_url("bwise_header.png")
-                },
+                "\n".join(
+                    [
+                        "Need quick answers?",
+                        "Check out B-Wise online!👆🏾",
+                        "",
+                        "https://bwisehealth.com/",
+                        "",
+                        "You'll find loads of sex, relationships",
+                        "and health info there.",
+                        "It's also my other virtual office.",
+                    ]
+                )
+            ),
+            helper_metadata={"image": contentrepo.get_image_url("bwise_header.png")},
         )
 
     def __get_user_details(self, fields):
