@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, FreeText, WhatsAppListState
+from vaccine.states import Choice, EndState, FreeText, WhatsAppListState
 from yal import contentrepo, rapidpro, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
@@ -234,10 +234,10 @@ class Application(BaseApplication):
                 )
             )
         )
-        await asyncio.sleep(0.5)
-        await self.worker.publish_message(
-            self.inbound.reply(
-                self._(
+        # await asyncio.sleep(0.5)
+        return EndState(
+            self,
+            text=self._(
                     "\n".join(
                         [
                             "Need quick answers?",
@@ -251,12 +251,10 @@ class Application(BaseApplication):
                         ]
                     )
                 ),
-                helper_metadata={
+            helper_metadata={
                     "image": contentrepo.get_image_url("bwise_header.png")
                 },
-            )
         )
-        await asyncio.sleep(1.5)
 
     def __get_user_details(self, fields):
         def get_field(name):
