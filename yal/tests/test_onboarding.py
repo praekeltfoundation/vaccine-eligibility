@@ -1,5 +1,5 @@
 import json
-from datetime import date
+from datetime import date, datetime
 from unittest import mock
 
 import pytest
@@ -36,7 +36,11 @@ async def rapidpro_mock(sanic_client):
 
 
 @pytest.mark.asyncio
-async def test_state_dob_full_valid(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_dob_full_valid(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_dob_full")
 
     await tester.user_input("1/1/2007")
@@ -49,9 +53,22 @@ async def test_state_dob_full_valid(tester: AppTester):
     tester.assert_answer("state_dob_day", "1")
     tester.assert_answer("age", "15")
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_dob_full_invalid(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_dob_full_invalid(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_dob_full")
 
     await tester.user_input("1/1/20071")
@@ -64,9 +81,22 @@ async def test_state_dob_full_invalid(tester: AppTester):
     tester.assert_no_answer("state_dob_day")
     tester.assert_no_answer("age")
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_dob_full_skip(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_dob_full_skip(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_dob_full")
 
     await tester.user_input("skip")
@@ -79,9 +109,22 @@ async def test_state_dob_full_skip(tester: AppTester):
     tester.assert_answer("state_dob_day", "skip")
     tester.assert_no_answer("age")
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_dob_year_valid(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_dob_year_valid(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_dob_year")
 
     await tester.user_input("2007")
@@ -91,9 +134,22 @@ async def test_state_dob_year_valid(tester: AppTester):
 
     tester.assert_answer("state_dob_year", "2007")
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_dob_year_invalid(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_dob_year_invalid(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_dob_year")
 
     await tester.user_input("12007")
@@ -103,9 +159,22 @@ async def test_state_dob_year_invalid(tester: AppTester):
 
     tester.assert_no_answer("state_dob_year")
 
+    assert len(rapidpro_mock.app.requests) == 1
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_dob_month_valid(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_dob_month_valid(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_dob_month")
     tester.setup_answer("state_dob_year", "2022")
 
@@ -116,9 +185,22 @@ async def test_state_dob_month_valid(tester: AppTester):
 
     tester.assert_answer("state_dob_month", "2")
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_dob_month_invalid(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_dob_month_invalid(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_dob_month")
     tester.setup_answer("state_dob_year", "2022")
 
@@ -129,9 +211,22 @@ async def test_state_dob_month_invalid(tester: AppTester):
 
     tester.assert_no_answer("state_dob_month")
 
+    assert len(rapidpro_mock.app.requests) == 1
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_dob_month_skip(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_dob_month_skip(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_dob_month")
     tester.setup_answer("state_dob_year", "2022")
 
@@ -142,9 +237,22 @@ async def test_state_dob_month_skip(tester: AppTester):
 
     tester.assert_answer("state_dob_month", "skip")
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_dob_day_valid(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_dob_day_valid(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_dob_day")
 
     tester.setup_answer("state_dob_year", "2022")
@@ -157,9 +265,22 @@ async def test_state_dob_day_valid(tester: AppTester):
 
     tester.assert_answer("state_dob_day", "2")
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_dob_day_valid_no_year(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_dob_day_valid_no_year(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_dob_day")
 
     tester.setup_answer("state_dob_year", "skip")
@@ -172,9 +293,22 @@ async def test_state_dob_day_valid_no_year(tester: AppTester):
 
     tester.assert_answer("state_dob_day", "2")
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_dob_day_invalid(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_dob_day_invalid(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_dob_day")
 
     tester.setup_answer("state_dob_year", "skip")
@@ -187,9 +321,22 @@ async def test_state_dob_day_invalid(tester: AppTester):
 
     tester.assert_no_answer("state_dob_day")
 
+    assert len(rapidpro_mock.app.requests) == 1
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_dob_day_invalid_date(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_dob_day_invalid_date(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_dob_day")
 
     tester.setup_answer("state_dob_year", "2022")
@@ -202,9 +349,22 @@ async def test_state_dob_day_invalid_date(tester: AppTester):
 
     tester.assert_no_answer("state_dob_day")
 
+    assert len(rapidpro_mock.app.requests) == 1
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_dob_day_skip(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_dob_day_skip(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_dob_day")
 
     tester.setup_answer("state_dob_year", "2022")
@@ -217,10 +377,23 @@ async def test_state_dob_day_skip(tester: AppTester):
 
     tester.assert_answer("state_dob_day", "skip")
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
 @mock.patch("yal.onboarding.get_today")
-async def test_state_check_birthday(get_today, tester: AppTester):
+async def test_state_check_birthday(
+    get_today, get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     get_today.return_value = date(2022, 2, 22)
     config.CONTENTREPO_API_URL = "https://contenrepo/"
     tester.setup_state("state_dob_day")
@@ -250,10 +423,23 @@ async def test_state_check_birthday(get_today, tester: AppTester):
         "image": "https://contenrepo/media/original_images/hbd.png"
     }
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
 @mock.patch("yal.onboarding.get_today")
-async def test_state_check_birthday_skip_day(get_today, tester: AppTester):
+async def test_state_check_birthday_skip_day(
+    get_today, get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     get_today.return_value = date(2022, 2, 22)
     tester.setup_state("state_dob_day")
 
@@ -267,10 +453,23 @@ async def test_state_check_birthday_skip_day(get_today, tester: AppTester):
     tester.assert_num_messages(1)
     assert tester.fake_worker.outbound_messages == []
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
 @mock.patch("yal.onboarding.get_today")
-async def test_state_check_birthday_skip_month(get_today, tester: AppTester):
+async def test_state_check_birthday_skip_month(
+    get_today, get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     get_today.return_value = date(2022, 2, 22)
     tester.setup_state("state_dob_day")
 
@@ -284,10 +483,23 @@ async def test_state_check_birthday_skip_month(get_today, tester: AppTester):
     tester.assert_num_messages(1)
     assert tester.fake_worker.outbound_messages == []
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
 @mock.patch("yal.onboarding.get_today")
-async def test_state_check_birthday_skip_year(get_today, tester: AppTester):
+async def test_state_check_birthday_skip_year(
+    get_today, get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     get_today.return_value = date(2022, 2, 22)
     config.CONTENTREPO_API_URL = "https://contenrepo/"
     tester.setup_state("state_dob_day")
@@ -316,9 +528,22 @@ async def test_state_check_birthday_skip_year(get_today, tester: AppTester):
         "image": "https://contenrepo/media/original_images/hbd.png"
     }
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_relationship_status_valid(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_relationship_status_valid(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_relationship_status")
 
     await tester.user_input("2")
@@ -328,9 +553,22 @@ async def test_state_relationship_status_valid(tester: AppTester):
 
     tester.assert_answer("state_relationship_status", "complicated")
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_full_address_invalid(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_full_address_invalid(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_answer("age", "22")
     tester.setup_state("state_full_address")
 
@@ -338,9 +576,22 @@ async def test_state_full_address_invalid(tester: AppTester):
 
     tester.assert_state("state_suburb")
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_full_address_valid(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_full_address_valid(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_answer("age", "22")
     tester.setup_state("state_full_address")
 
@@ -348,9 +599,22 @@ async def test_state_full_address_valid(tester: AppTester):
 
     tester.assert_state("state_gender")
 
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_full_address_minor(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_full_address_minor(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_answer("age", "17")
     tester.setup_state("state_province")
 
@@ -358,9 +622,20 @@ async def test_state_full_address_minor(tester: AppTester):
 
     tester.assert_state("state_gender")
 
+    assert len(rapidpro_mock.app.requests) == 3
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_gender(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_gender(get_current_datetime, tester: AppTester, rapidpro_mock):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_gender")
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
@@ -398,9 +673,22 @@ async def test_state_gender(tester: AppTester):
         )
     )
 
+    assert len(rapidpro_mock.app.requests) == 1
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_gender_valid(tester: AppTester):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_gender_valid(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_gender")
 
     await tester.user_input("9")
@@ -409,6 +697,15 @@ async def test_state_gender_valid(tester: AppTester):
     tester.assert_num_messages(1)
 
     tester.assert_answer("state_gender", "other")
+
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
 
 
 @pytest.mark.asyncio
@@ -430,8 +727,8 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_onboarding_complete")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "onboarding_completed": "True",
@@ -444,6 +741,8 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
             "suburb": "SomeSuburb",
             "street_name": "Good street",
             "street_number": "12",
+            "onboarding_reminder_sent": "",
+            "onboarding_reminder_type": "",
         },
     }
 
@@ -451,3 +750,77 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
     tester.assert_metadata("suburb", "SomeSuburb")
     tester.assert_metadata("street_name", "Good street")
     tester.assert_metadata("street_number", "12")
+
+
+@pytest.mark.asyncio
+async def test_onboarding_reminder_yes_response(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_handle_onboarding_reminder_response")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="Yes")
+
+    tester.assert_state("state_dob_full")
+    tester.assert_num_messages(1)
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "onboarding_reminder_sent": "",
+        },
+    }
+
+
+@pytest.mark.asyncio
+async def test_onboarding_reminder_no_thanks_response(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_handle_onboarding_reminder_response")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="no, thanks")
+
+    tester.assert_state("state_stop_onboarding_reminders")
+
+
+@pytest.mark.asyncio
+async def test_onboarding_reminder_no_thanks_response_actioned(
+    tester: AppTester, rapidpro_mock
+):
+    tester.setup_state("state_stop_onboarding_reminders")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="no, thanks")
+
+    tester.assert_num_messages(1)
+
+    assert len(rapidpro_mock.app.requests) == 1
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"onboarding_reminder_sent": "", "onboarding_reminder_type": ""},
+    }
+
+
+@pytest.mark.asyncio
+async def test_onboarding_reminder_later_response(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_handle_onboarding_reminder_response")
+    await tester.user_input(
+        session=Message.SESSION_EVENT.NEW, content="remind me later"
+    )
+
+    tester.assert_state("state_reschedule_onboarding_reminders")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_onboarding_reminder_later_response_actioned(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_reschedule_onboarding_reminders")
+    await tester.user_input(
+        session=Message.SESSION_EVENT.NEW, content="remind me later"
+    )
+
+    tester.assert_num_messages(1)
+
+    assert len(rapidpro_mock.app.requests) == 1
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "onboarding_reminder_sent": "",
+            "onboarding_reminder_type": "2 hrs",
+            "last_onboarding_time": "2022-06-19T17:30:00",
+        },
+    }

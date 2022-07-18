@@ -16,6 +16,17 @@ logger = logging.getLogger(__name__)
 GREETING_KEYWORDS = {"hi", "hello", "menu", "0"}
 HELP_KEYWORDS = {"#", "help", "please call me"}
 OPTOUT_KEYWORDS = {"stop"}
+ONBOARDING_REMINDER_KEYWORDS = {
+    "yes",
+    "no, thanks",
+    "remind me later",
+    "not interested",
+}
+CALLBACK_CHECK_KEYWORDS = {
+    "yes i got a callback",
+    "yes but i missed it",
+    "no i m still waiting",
+}
 
 
 class Application(
@@ -57,6 +68,10 @@ class Application(
         prototype_user = fields.get("prototype_user")
         terms_accepted = fields.get("terms_accepted")
         onboarding_completed = fields.get("onboarding_completed")
+        # If one of these values is True then the user might be responding
+        # to a scheduled msg
+        onboarding_reminder_sent = fields.get("onboarding_reminder_sent")
+        callback_check_sent = fields.get("callback_check_sent")
 
         if not prototype_user:
             return await self.go_to_state("state_coming_soon")
@@ -76,6 +91,16 @@ class Application(
                 return await self.go_to_state(OnboardingApplication.START_STATE)
             else:
                 return await self.go_to_state(TermsApplication.START_STATE)
+
+        if callback_check_sent and (inbound.lower() in CALLBACK_CHECK_KEYWORDS):
+            return await self.go_to_state(
+                PleaseCallMeApplication.CALLBACK_RESPONSE_STATE
+            )
+
+        if onboarding_reminder_sent and (
+            inbound.lower() in ONBOARDING_REMINDER_KEYWORDS
+        ):
+            return await self.go_to_state(OnboardingApplication.REMINDER_STATE)
 
         return await self.go_to_state("state_catch_all")
 
