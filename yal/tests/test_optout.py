@@ -159,7 +159,7 @@ async def test_state_optout_stop_notifications(tester: AppTester):
 async def test_state_tell_us_more(tester: AppTester):
     tester.setup_state("state_tell_us_more")
     await tester.user_input("I am just a test human")
-    tester.assert_answer("state_tell_us_more", "i am just a test human")
+    tester.assert_state(None)
 
 
 @pytest.mark.asyncio
