@@ -203,8 +203,13 @@ class Application(BaseApplication):
                     ]
                 )
             ),
-            next="state_farewell_optout",
+            next="state_save_tell_us_more",
         )
+
+    async def state_save_tell_us_more(self):
+        inbound = utils.clean_inbound(self.inbound.content)
+        self.save_answer("state_tell_us_more", inbound)
+        return await self.go_to_state("state_farewell_optout")
 
     async def state_farewell_optout(self):
         await self.worker.publish_message(
