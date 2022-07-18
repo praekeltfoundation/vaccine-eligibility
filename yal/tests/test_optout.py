@@ -156,6 +156,13 @@ async def test_state_optout_stop_notifications(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_state_tell_us_more(tester: AppTester):
+    tester.setup_state("state_tell_us_more")
+    await tester.user_input("I am just a test human")
+    tester.assert_answer("state_tell_us_more", "i am just a test human")
+
+
+@pytest.mark.asyncio
 async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_optout")
     await tester.user_input("3")
