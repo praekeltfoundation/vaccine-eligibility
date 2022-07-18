@@ -7,6 +7,7 @@ from sanic import Sanic, response
 from vaccine.models import Message
 from vaccine.testing import AppTester
 from yal import config
+from yal.askaquestion import Application as AaqApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.main import Application
 from yal.mainmenu import Application as MainMenuApplication
@@ -27,8 +28,16 @@ def test_no_state_name_clashes():
     q_states = set(s for s in dir(QuizApplication) if s.startswith("state_"))
     pc_states = set(s for s in dir(PleaseCallMeApplication) if s.startswith("state_"))
     sf_states = set(s for s in dir(ServiceFinderApplication) if s.startswith("state_"))
+    aaq_states = set(s for s in dir(AaqApplication) if s.startswith("state_"))
     intersection = (
-        mm_states & on_states & te_states & cp_states & q_states & pc_states & sf_states
+        mm_states
+        & on_states
+        & te_states
+        & cp_states
+        & q_states
+        & pc_states
+        & sf_states
+        & aaq_states
     ) - {
         "state_name",
         "state_error",
@@ -52,6 +61,8 @@ def get_rapidpro_contact(urn):
             "onboarding_completed": "27820001001" in urn,
             "onboarding_reminder_sent": "27820001001" in urn,
             "callback_check_sent": "27820001001" in urn,
+            "aaq_timeout_sent": "27820001001" in urn,
+            "aaq_timeout_type": "2" if "27820001001" in urn else "",
             "terms_accepted": "27820001001" in urn,
             "province": "FS",
             "suburb": "cape town",
@@ -218,3 +229,12 @@ async def test_callback_check_response_to_handler(tester: AppTester, rapidpro_mo
     tester.assert_num_messages(1)
 
     assert len(rapidpro_mock.app.requests) == 2
+
+
+@pytest.mark.asyncio
+async def test_aaq_timeout_response_to_handler(tester: AppTester, rapidpro_mock):
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="no")
+    tester.assert_num_messages(1)
+    tester.assert_message("TODO: Handle question not answered")
+
+    assert len(rapidpro_mock.app.requests) == 3
