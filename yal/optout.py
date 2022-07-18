@@ -257,7 +257,6 @@ class Application(BaseApplication):
             )
         )
         await asyncio.sleep(1.5)
-        return
 
     def __get_user_details(self, fields):
         def get_field(name):
