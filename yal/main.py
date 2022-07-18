@@ -21,7 +21,11 @@ ONBOARDING_REMINDER_KEYWORDS = {
     "remind me later",
     "not interested",
 }
-CALLBACK_CHECK_KEYWORDS = {"yes i got a callback", "yes but i missed it", "no i m still waiting"}
+CALLBACK_CHECK_KEYWORDS = {
+    "yes i got a callback",
+    "yes but i missed it",
+    "no i m still waiting",
+}
 AAQ_TIMEOUT_KEYWORDS = {"yes", "no", "yes ask again", "no i m good"}
 
 
@@ -85,7 +89,9 @@ class Application(
                 return await self.go_to_state(TermsApplication.START_STATE)
 
         if callback_check_sent and (inbound.lower() in CALLBACK_CHECK_KEYWORDS):
-            return await self.go_to_state(PleaseCallMeApplication.CALLBACK_RESPONSE_STATE)
+            return await self.go_to_state(
+                PleaseCallMeApplication.CALLBACK_RESPONSE_STATE
+            )
 
         if onboarding_reminder_sent and (
             inbound.lower() in ONBOARDING_REMINDER_KEYWORDS

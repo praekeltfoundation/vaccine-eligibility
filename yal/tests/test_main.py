@@ -221,10 +221,10 @@ async def test_onboarding_reminder_response_to_reminder_handler(
 
 
 @pytest.mark.asyncio
-async def test_callback_check_response_to_handler(
-    tester: AppTester, rapidpro_mock
-):
-    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="yes but I missed it")
+async def test_callback_check_response_to_handler(tester: AppTester, rapidpro_mock):
+    await tester.user_input(
+        session=Message.SESSION_EVENT.NEW, content="yes but I missed it"
+    )
     tester.assert_state("state_ask_to_call_again")
     tester.assert_num_messages(1)
 
