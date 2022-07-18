@@ -82,6 +82,11 @@ class Application(BaseApplication):
         return await self.go_to_state("state_optout_survey")
 
     async def state_optout_survey(self):
+        async def _next(choice: Choice):
+            if choice.value == "other":
+                return "state_tell_us_more"
+            return "state_farewell_optout"
+
         question = self._(
             "\n".join(
                 [
@@ -118,16 +123,7 @@ class Application(BaseApplication):
                 Choice("none", self._("Rather not say")),
                 Choice("skip", self._("Skip")),
             ],
-            next={
-                "message volume": "state_farewell_optout",
-                "user-friendliness": "state_farewell_optout",
-                "irrelevant": "state_farewell_optout",
-                "boring": "state_farewell_optout",
-                "lengthy": "state_farewell_optout",
-                "skip": "state_farewell_optout",
-                "none": "state_farewell_optout",
-                "other": "state_tell_us_more",
-            },
+            next=_next,
             error=self._(GENERIC_ERROR),
         )
 
