@@ -106,7 +106,7 @@ async def test_start_out_of_hours_sunday_after(get_current_datetime, tester: App
     tester.setup_state("state_please_call_start")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
-    tester.assert_answer("next_available", datetime(2022, 6, 20, 9, 00, 00))
+    tester.assert_metadata("next_available", "2022-06-20T09:00:00")
     tester.assert_state("state_out_of_hours")
     tester.assert_message(
         "\n".join(
@@ -139,7 +139,7 @@ async def test_start_out_of_hours_sunday_before(
     tester.setup_state("state_please_call_start")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
-    tester.assert_answer("next_available", datetime(2022, 6, 19, 12, 00, 00))
+    tester.assert_metadata("next_available", "2022-06-19T12:00:00")
     tester.assert_state("state_out_of_hours")
     tester.assert_message(
         "\n".join(
@@ -172,7 +172,7 @@ async def test_start_out_of_hours_weekday_before(
     tester.setup_state("state_please_call_start")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
-    tester.assert_answer("next_available", datetime(2022, 6, 20, 9, 00, 00))
+    tester.assert_metadata("next_available", "2022-06-20T09:00:00")
     tester.assert_state("state_out_of_hours")
     tester.assert_message(
         "\n".join(
@@ -205,7 +205,7 @@ async def test_start_out_of_hours_weekday_after(
     tester.setup_state("state_please_call_start")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
-    tester.assert_answer("next_available", datetime(2022, 6, 21, 9, 00, 00))
+    tester.assert_metadata("next_available", "2022-06-21T09:00:00")
     tester.assert_state("state_out_of_hours")
     tester.assert_message(
         "\n".join(
@@ -249,7 +249,7 @@ async def test_start_in_hours(get_current_datetime, tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_out_of_hours_to_emergency(tester: AppTester):
-    tester.setup_answer("next_available", datetime(2022, 6, 20, 17, 30))
+    tester.user.metadata["next_available"] = "2022-06-20T17:30:00"
     tester.setup_state("state_out_of_hours")
     await tester.user_input("1")
     tester.assert_state("state_emergency")
@@ -257,7 +257,7 @@ async def test_state_out_of_hours_to_emergency(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_out_of_hours_to_open_hours(tester: AppTester):
-    tester.setup_answer("next_available", datetime(2022, 6, 20, 17, 30))
+    tester.user.metadata["next_available"] = "2022-06-20T17:30:00"
     tester.setup_state("state_out_of_hours")
     await tester.user_input("2")
     tester.assert_state("state_open_hours")
@@ -282,7 +282,7 @@ async def test_state_open_hours_chose_to_call_when_open(tester: AppTester):
 async def test_callback_check_scheduled_if_out_of_hours(
     tester: AppTester, lovelife_mock, rapidpro_mock
 ):
-    tester.setup_answer("next_available", datetime(2022, 6, 20, 9, 0))
+    tester.user.metadata["next_available"] = "2022-06-20T09:00:00"
     tester.setup_state("state_in_hours")
     await tester.user_input("1")
     tester.assert_state("state_callback_confirmation")

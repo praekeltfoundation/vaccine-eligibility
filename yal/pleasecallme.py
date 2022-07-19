@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
 from urllib.parse import urljoin
 
 import aiohttp
@@ -54,11 +54,12 @@ class Application(BaseApplication):
                 next_available = next_available.replace(hour=12, minute=0, second=0)
             else:
                 next_available = next_available.replace(hour=9, minute=0, second=0)
-        self.save_answer("next_available", next_available)
+        self.save_metadata("next_available", next_available.isoformat())
         return await self.go_to_state("state_out_of_hours")
 
     async def state_out_of_hours(self):
-        next_avail_time = self.user.answers.get("next_available")
+        next_available = self.user.metadata.get("next_available")
+        next_avail_time = datetime.fromisoformat(next_available)
         next_avail_str = next_avail_time.strftime("%H:00")
         if next_avail_time.date() != get_current_datetime().date():
             next_avail_str = f"{next_avail_str} tomorrow"
@@ -234,8 +235,10 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        answers = self.user.answers
-        next_available = answers.get("next_available", get_current_datetime())
+        meta = self.user.metadata
+        next_available = meta.get("next_available", get_current_datetime())
+        if type(next_available) == str:
+            next_available = datetime.fromisoformat(next_available)
         call_time = next_available + timedelta(hours=2)
 
         data = {
