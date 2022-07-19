@@ -101,12 +101,125 @@ async def contentrepo_api_mock(sanic_client):
 
 @pytest.mark.asyncio
 @mock.patch("yal.pleasecallme.get_current_datetime")
-async def test_start_out_of_hours(get_current_datetime, tester: AppTester):
+async def test_start_out_of_hours_sunday_after(get_current_datetime, tester: AppTester):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_please_call_start")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
+    tester.assert_answer("next_available", datetime(2022, 6, 20, 9, 00, 00))
     tester.assert_state("state_out_of_hours")
+    tester.assert_message(
+        "\n".join(
+            [
+                "🆘HELP!",
+                "*Please call me*",
+                "-----",
+                "",
+                "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
+                "",
+                f"A loveLife counsellor will be available from 09:00 tomorrow",
+                "",
+                "*1* - 🚨I need help now!",
+                "*2* - See opening hours",
+                "",
+                "-----",
+                "*Or reply:*",
+                "*0* - 🏠Back to Main *MENU*",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_start_out_of_hours_sunday_before(get_current_datetime, tester: AppTester):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 9, 30)
+    tester.setup_state("state_please_call_start")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_answer("next_available", datetime(2022, 6, 19, 12, 00, 00))
+    tester.assert_state("state_out_of_hours")
+    tester.assert_message(
+        "\n".join(
+            [
+                "🆘HELP!",
+                "*Please call me*",
+                "-----",
+                "",
+                "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
+                "",
+                f"A loveLife counsellor will be available from 12:00",
+                "",
+                "*1* - 🚨I need help now!",
+                "*2* - See opening hours",
+                "",
+                "-----",
+                "*Or reply:*",
+                "*0* - 🏠Back to Main *MENU*",
+            ]
+        )
+    )
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_start_out_of_hours_weekday_before(get_current_datetime, tester: AppTester):
+    get_current_datetime.return_value = datetime(2022, 6, 20, 8, 30)
+    tester.setup_state("state_please_call_start")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_answer("next_available", datetime(2022, 6, 20, 9, 00, 00))
+    tester.assert_state("state_out_of_hours")
+    tester.assert_message(
+        "\n".join(
+            [
+                "🆘HELP!",
+                "*Please call me*",
+                "-----",
+                "",
+                "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
+                "",
+                f"A loveLife counsellor will be available from 09:00",
+                "",
+                "*1* - 🚨I need help now!",
+                "*2* - See opening hours",
+                "",
+                "-----",
+                "*Or reply:*",
+                "*0* - 🏠Back to Main *MENU*",
+            ]
+        )
+    )
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_start_out_of_hours_weekday_after(get_current_datetime, tester: AppTester):
+    get_current_datetime.return_value = datetime(2022, 6, 20, 20, 30)
+    tester.setup_state("state_please_call_start")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_answer("next_available", datetime(2022, 6, 21, 9, 00, 00))
+    tester.assert_state("state_out_of_hours")
+    tester.assert_message(
+        "\n".join(
+            [
+                "🆘HELP!",
+                "*Please call me*",
+                "-----",
+                "",
+                "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
+                "",
+                f"A loveLife counsellor will be available from 09:00 tomorrow",
+                "",
+                "*1* - 🚨I need help now!",
+                "*2* - See opening hours",
+                "",
+                "-----",
+                "*Or reply:*",
+                "*0* - 🏠Back to Main *MENU*",
+            ]
+        )
+    )
+
 
 
 @pytest.mark.asyncio
@@ -128,9 +241,18 @@ async def test_start_in_hours(get_current_datetime, tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_out_of_hours(tester: AppTester):
+async def test_state_out_of_hours_to_emergency(tester: AppTester):
+    tester.setup_answer("next_available", datetime(2022, 6, 20, 17, 30))
     tester.setup_state("state_out_of_hours")
     await tester.user_input("1")
+    tester.assert_state("state_emergency")
+
+
+@pytest.mark.asyncio
+async def test_state_out_of_hours_to_open_hours(tester: AppTester):
+    tester.setup_answer("next_available", datetime(2022, 6, 20, 17, 30))
+    tester.setup_state("state_out_of_hours")
+    await tester.user_input("2")
     tester.assert_state("state_open_hours")
 
 

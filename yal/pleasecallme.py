@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from datetime import timedelta
+from datetime import timedelta, datetime
 from urllib.parse import urljoin
 
 import aiohttp
@@ -45,9 +45,57 @@ class Application(BaseApplication):
 
         if current_datetime.hour >= min_hour and current_datetime.hour <= max_hour:
             return await self.go_to_state("state_in_hours_greeting")
+
+        if current_datetime.hour < min_hour:
+            next_available = current_datetime.replace(hour=min_hour, minute=0, second=0)
+        if current_datetime.hour > max_hour:
+            next_available = current_datetime + timedelta(days=1)
+            if current_datetime.weekday() in [4, 5]:
+                next_available = next_available.replace(hour=12, minute=0, second=0)
+            else:
+                next_available = next_available.replace(hour=9, minute=0, second=0)
+        self.save_answer("next_available", next_available)
         return await self.go_to_state("state_out_of_hours")
 
     async def state_out_of_hours(self):
+        next_avail_time = self.user.answers.get("next_available")
+        next_avail_str = next_avail_time.strftime("%H:00")
+        if next_avail_time.date() != get_current_datetime().date():
+            next_avail_str = f"{next_avail_str} tomorrow"
+        question = self._(
+            "\n".join(
+                [
+                    "🆘HELP!",
+                    "*Please call me*",
+                    "-----",
+                    "",
+                    "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
+                    "",
+                    f"A loveLife counsellor will be available from {next_avail_str}",
+                    "",
+                    "*1* - 🚨I need help now!",
+                    "*2* - See opening hours",
+                    "",
+                    "-----",
+                    "*Or reply:*",
+                    "*0* - 🏠Back to Main *MENU*",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("help now", "I need help now!"),
+                Choice("opening hours", "See opening hours"),],
+            error=self._(GENERIC_ERROR),
+            next={
+                "help now": "state_emergency",
+                "opening hours": "state_open_hours",
+            },
+        )
+
+    async def state_emergency(self):
         question = self._(
             "\n".join(
                 [
