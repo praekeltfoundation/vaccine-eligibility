@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from datetime import timedelta, datetime
+from datetime import timedelta
 from urllib.parse import urljoin
 
 import aiohttp
@@ -87,7 +87,8 @@ class Application(BaseApplication):
             question=question,
             choices=[
                 Choice("help now", "I need help now!"),
-                Choice("opening hours", "See opening hours"),],
+                Choice("opening hours", "See opening hours"),
+            ],
             error=self._(GENERIC_ERROR),
             next={
                 "help now": "state_emergency",
@@ -141,7 +142,7 @@ class Application(BaseApplication):
                     "callback.",
                     "",
                     "*1* - Ok",
-                    "*2* - Set a reminder",
+                    "*2* - Call me when you open",
                 ]
             )
         )
@@ -150,20 +151,13 @@ class Application(BaseApplication):
             question=question,
             choices=[
                 Choice("ok", "Ok"),
-                Choice("reminder", "Set a reminder"),
+                Choice("callback in hours", "Call me when you open"),
             ],
             error=self._(GENERIC_ERROR),
             next={
                 "ok": "state_mainmenu",
-                "reminder": "state_set_reminder",
+                "callback in hours": "state_in_hours_greeting",
             },
-        )
-
-    async def state_set_reminder(self):
-        return EndState(
-            self,
-            self._("TODO: set reminder"),
-            next=self.START_STATE,
         )
 
     async def state_in_hours_greeting(self):
@@ -240,7 +234,9 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        call_time = get_current_datetime() + timedelta(hours=2)
+        answers = self.user.answers
+        next_available = answers.get("next_available", get_current_datetime())
+        call_time = next_available + timedelta(hours=2)
 
         data = {
             "callback_check_time": call_time.isoformat(),

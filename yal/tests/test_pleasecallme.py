@@ -117,7 +117,7 @@ async def test_start_out_of_hours_sunday_after(get_current_datetime, tester: App
                 "",
                 "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
                 "",
-                f"A loveLife counsellor will be available from 09:00 tomorrow",
+                "A loveLife counsellor will be available from 09:00 tomorrow",
                 "",
                 "*1* - 🚨I need help now!",
                 "*2* - See opening hours",
@@ -132,7 +132,9 @@ async def test_start_out_of_hours_sunday_after(get_current_datetime, tester: App
 
 @pytest.mark.asyncio
 @mock.patch("yal.pleasecallme.get_current_datetime")
-async def test_start_out_of_hours_sunday_before(get_current_datetime, tester: AppTester):
+async def test_start_out_of_hours_sunday_before(
+    get_current_datetime, tester: AppTester
+):
     get_current_datetime.return_value = datetime(2022, 6, 19, 9, 30)
     tester.setup_state("state_please_call_start")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
@@ -148,7 +150,7 @@ async def test_start_out_of_hours_sunday_before(get_current_datetime, tester: Ap
                 "",
                 "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
                 "",
-                f"A loveLife counsellor will be available from 12:00",
+                "A loveLife counsellor will be available from 12:00",
                 "",
                 "*1* - 🚨I need help now!",
                 "*2* - See opening hours",
@@ -160,9 +162,12 @@ async def test_start_out_of_hours_sunday_before(get_current_datetime, tester: Ap
         )
     )
 
+
 @pytest.mark.asyncio
 @mock.patch("yal.pleasecallme.get_current_datetime")
-async def test_start_out_of_hours_weekday_before(get_current_datetime, tester: AppTester):
+async def test_start_out_of_hours_weekday_before(
+    get_current_datetime, tester: AppTester
+):
     get_current_datetime.return_value = datetime(2022, 6, 20, 8, 30)
     tester.setup_state("state_please_call_start")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
@@ -178,7 +183,7 @@ async def test_start_out_of_hours_weekday_before(get_current_datetime, tester: A
                 "",
                 "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
                 "",
-                f"A loveLife counsellor will be available from 09:00",
+                "A loveLife counsellor will be available from 09:00",
                 "",
                 "*1* - 🚨I need help now!",
                 "*2* - See opening hours",
@@ -190,9 +195,12 @@ async def test_start_out_of_hours_weekday_before(get_current_datetime, tester: A
         )
     )
 
+
 @pytest.mark.asyncio
 @mock.patch("yal.pleasecallme.get_current_datetime")
-async def test_start_out_of_hours_weekday_after(get_current_datetime, tester: AppTester):
+async def test_start_out_of_hours_weekday_after(
+    get_current_datetime, tester: AppTester
+):
     get_current_datetime.return_value = datetime(2022, 6, 20, 20, 30)
     tester.setup_state("state_please_call_start")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
@@ -208,7 +216,7 @@ async def test_start_out_of_hours_weekday_after(get_current_datetime, tester: Ap
                 "",
                 "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
                 "",
-                f"A loveLife counsellor will be available from 09:00 tomorrow",
+                "A loveLife counsellor will be available from 09:00 tomorrow",
                 "",
                 "*1* - 🚨I need help now!",
                 "*2* - See opening hours",
@@ -219,7 +227,6 @@ async def test_start_out_of_hours_weekday_after(get_current_datetime, tester: Ap
             ]
         )
     )
-
 
 
 @pytest.mark.asyncio
@@ -254,6 +261,43 @@ async def test_state_out_of_hours_to_open_hours(tester: AppTester):
     tester.setup_state("state_out_of_hours")
     await tester.user_input("2")
     tester.assert_state("state_open_hours")
+
+
+@pytest.mark.asyncio
+async def test_state_open_hours_chose_to_call_when_open(tester: AppTester):
+    tester.setup_state("state_open_hours")
+    await tester.user_input("2")
+    tester.assert_state("state_in_hours")
+
+    [greeting_msg] = tester.fake_worker.outbound_messages
+    assert greeting_msg.content == "\n".join(
+        [
+            "👩🏾 *Say no more—I'm on it!*",
+            "☝🏾 Hold tight just a sec...",
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_callback_check_scheduled_if_out_of_hours(
+    tester: AppTester, lovelife_mock, rapidpro_mock
+):
+    tester.setup_answer("next_available", datetime(2022, 6, 20, 9, 0))
+    tester.setup_state("state_in_hours")
+    await tester.user_input("1")
+    tester.assert_state("state_callback_confirmation")
+
+    [req] = lovelife_mock.app.requests
+    assert req.json == {
+        "PhoneNumber": "+27820001001",
+        "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
+    }
+
+    assert len(rapidpro_mock.app.requests) == 1
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"callback_check_time": "2022-06-20T11:00:00"},
+    }
 
 
 @pytest.mark.asyncio
