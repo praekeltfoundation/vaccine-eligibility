@@ -54,7 +54,6 @@ class Application(BaseApplication):
         )
 
     async def state_stop_messages(self):
-        self.save_answer("state_optout_messages", True)
         msg = self._(
             "\n".join(
                 [
@@ -69,7 +68,6 @@ class Application(BaseApplication):
         return await self.go_to_state("state_optout_survey")
 
     async def state_stop_notifications(self):
-        self.save_answer("state_optout_notifications", True)
         msg = self._(
             "\n".join(
                 [
@@ -128,7 +126,6 @@ class Application(BaseApplication):
         )
 
     async def state_delete_saved(self):
-        self.save_answer("state_optout_delete_data", True)
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
