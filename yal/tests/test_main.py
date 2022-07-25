@@ -133,6 +133,16 @@ async def contentrepo_api_mock(sanic_client):
             }
         )
 
+    @app.route("/suggestedcontent", methods=["GET"])
+    def get_suggested_content(request):
+        app.requests.append(request)
+        return response.json(
+            {
+                "count": 1,
+                "results": [{"id": 311, "title": "Suggested Content 1"}],
+            }
+        )
+
     client = await sanic_client(app)
     url = config.CONTENTREPO_API_URL
     config.CONTENTREPO_API_URL = f"http://{client.host}:{client.port}"
@@ -147,8 +157,8 @@ async def test_reset_keyword(tester: AppTester, rapidpro_mock, contentrepo_api_m
     tester.assert_state("state_mainmenu")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.app.requests) == 1
-    assert len(contentrepo_api_mock.app.requests) == 2
+    assert len(rapidpro_mock.app.requests) == 2
+    assert len(contentrepo_api_mock.app.requests) == 3
 
 
 @pytest.mark.asyncio
@@ -189,8 +199,8 @@ async def test_state_start_to_mainmenu(
     tester.assert_state("state_mainmenu")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.app.requests) == 1
-    assert len(contentrepo_api_mock.app.requests) == 2
+    assert len(rapidpro_mock.app.requests) == 2
+    assert len(contentrepo_api_mock.app.requests) == 3
 
     tester.assert_metadata("province", "FS")
     tester.assert_metadata("suburb", "cape town")
