@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
 from urllib.parse import urljoin
 
 import aiohttp
@@ -45,9 +45,59 @@ class Application(BaseApplication):
 
         if current_datetime.hour >= min_hour and current_datetime.hour <= max_hour:
             return await self.go_to_state("state_in_hours_greeting")
+
+        if current_datetime.hour < min_hour:
+            next_available = current_datetime.replace(hour=min_hour, minute=0, second=0)
+        if current_datetime.hour > max_hour:
+            next_available = current_datetime + timedelta(days=1)
+            if current_datetime.weekday() in [4, 5]:
+                next_available = next_available.replace(hour=12, minute=0, second=0)
+            else:
+                next_available = next_available.replace(hour=9, minute=0, second=0)
+        self.save_metadata("next_available", next_available.isoformat())
         return await self.go_to_state("state_out_of_hours")
 
     async def state_out_of_hours(self):
+        next_available = self.user.metadata.get("next_available")
+        next_avail_time = datetime.fromisoformat(next_available)
+        next_avail_str = next_avail_time.strftime("%H:00")
+        if next_avail_time.date() != get_current_datetime().date():
+            next_avail_str = f"{next_avail_str} tomorrow"
+        question = self._(
+            "\n".join(
+                [
+                    "🆘HELP!",
+                    "*Please call me*",
+                    "-----",
+                    "",
+                    "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
+                    "",
+                    f"A loveLife counsellor will be available from {next_avail_str}",
+                    "",
+                    "*1* - 🚨I need help now!",
+                    "*2* - See opening hours",
+                    "",
+                    "-----",
+                    "*Or reply:*",
+                    "*0* - 🏠Back to Main *MENU*",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("help now", "I need help now!"),
+                Choice("opening hours", "See opening hours"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "help now": "state_emergency",
+                "opening hours": "state_open_hours",
+            },
+        )
+
+    async def state_emergency(self):
         question = self._(
             "\n".join(
                 [
@@ -93,7 +143,7 @@ class Application(BaseApplication):
                     "callback.",
                     "",
                     "*1* - Ok",
-                    "*2* - Set a reminder",
+                    "*2* - Call me when you open",
                 ]
             )
         )
@@ -102,20 +152,13 @@ class Application(BaseApplication):
             question=question,
             choices=[
                 Choice("ok", "Ok"),
-                Choice("reminder", "Set a reminder"),
+                Choice("callback in hours", "Call me when you open"),
             ],
             error=self._(GENERIC_ERROR),
             next={
                 "ok": "state_pre_mainmenu",
-                "reminder": "state_set_reminder",
+                "callback in hours": "state_in_hours_greeting",
             },
-        )
-
-    async def state_set_reminder(self):
-        return EndState(
-            self,
-            self._("TODO: set reminder"),
-            next=self.START_STATE,
         )
 
     async def state_in_hours_greeting(self):
@@ -192,7 +235,11 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        call_time = get_current_datetime() + timedelta(hours=2)
+        meta = self.user.metadata
+        next_available = meta.get("next_available", get_current_datetime())
+        if type(next_available) == str:
+            next_available = datetime.fromisoformat(next_available)
+        call_time = next_available + timedelta(hours=2)
 
         data = {
             "callback_check_time": call_time.isoformat(),
