@@ -23,7 +23,7 @@ class CustomChoiceState(ChoiceState):
 
 
 class Application(BaseApplication):
-    START_STATE = "state_mainmenu"
+    START_STATE = "state_pre_mainmenu"
 
     async def update_suggested_content_details(self, suggested_text):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
@@ -42,6 +42,10 @@ class Application(BaseApplication):
             "suggested_text": "",
         }
         return await rapidpro.update_profile(whatsapp_id, data)
+
+    async def state_pre_mainmenu(self):
+        self.save_metadata("suggested_content", {})
+        return await self.go_to_state("state_mainmenu")
 
     async def state_mainmenu(self):
         self.save_metadata("current_menu_level", 0)
@@ -118,16 +122,24 @@ class Application(BaseApplication):
 
             menu_lines.append("-----")
 
-        topics_viewed = set(
-            self.user.metadata.get(
-                "topics_viewed", list(parent_topic_links.values())[:1]
+        if self.user.metadata["suggested_content"] == {}:
+            topics_viewed = set(
+                self.user.metadata.get(
+                    "topics_viewed", list(parent_topic_links.values())[:1]
+                )
             )
-        )
-        error, suggested_choices = await contentrepo.get_suggested_choices(
-            topics_viewed
-        )
-        if error:
-            return await self.go_to_state("state_error")
+            error, suggested_choices = await contentrepo.get_suggested_choices(
+                topics_viewed
+            )
+            if error:
+                return await self.go_to_state("state_error")
+            self.save_metadata(
+                "suggested_content", {c.value: c.label for c in suggested_choices}
+            )
+        else:
+            suggested_choices = [
+                Choice(k, v) for k, v in self.user.metadata["suggested_content"].items()
+            ]
 
         choices.extend(suggested_choices)
         suggested_text = "\n".join(

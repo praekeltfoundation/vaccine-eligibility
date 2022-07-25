@@ -103,8 +103,8 @@ async def contentrepo_api_mock(sanic_client):
     def get_suggested_content(request):
         app.requests.append(request)
         pages = []
-        pages.append({"id": 311, "title": "Suggested Content 1"})
-        pages.append({"id": 312, "title": "Suggested Content 2"})
+        pages.append({"id": 444, "title": "Suggested Content 1"})
+        pages.append({"id": 555, "title": "Suggested Content 2"})
 
         return response.json(
             {
@@ -220,7 +220,7 @@ async def test_state_mainmenu_start(
     get_current_datetime, tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_state("state_mainmenu")
+    tester.setup_state("state_pre_mainmenu")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
     tester.assert_num_messages(1)
     tester.assert_message(
@@ -274,10 +274,72 @@ async def test_state_mainmenu_start(
 
 
 @pytest.mark.asyncio
+@mock.patch("yal.mainmenu.get_current_datetime")
+async def test_state_mainmenu_start_suggested_populated(
+    get_current_datetime, tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_mainmenu")
+    tester.user.metadata["suggested_content"] = {
+        "444": "Suggested Content 1",
+        "555": "Suggested Content 2",
+    }
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+    tester.assert_num_messages(1)
+    tester.assert_message(
+        "\n".join(
+            [
+                "🏡 *MAIN MENU*",
+                "How can I help you today?",
+                "-----",
+                "Send me the number of the topic you're interested in.",
+                "",
+                "*🏥 NEED HELP?*",
+                "1. Please call me!",
+                "2. Find clinics and services",
+                "-----",
+                "*Main Menu 1 💊*",
+                "3. Sub menu 1",
+                "4. Sub menu 2",
+                "5. Sub menu 3",
+                "-----",
+                "*Main Menu 2 🤝*",
+                "6. Sub menu 1",
+                "7. Sub menu 2",
+                "8. Sub menu 3",
+                "-----",
+                "🙋🏿‍♂️ *QUESTIONS?*",
+                "9. FAQs",
+                "-----",
+                "*⚙️ CHAT SETTINGS*",
+                "10. Change Profile",
+                "-----",
+                "💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
+            ]
+        )
+    )
+
+    assert [r.path for r in contentrepo_api_mock.app.requests] == [
+        "/api/v2/pages",
+        "/api/v2/pages",
+        "/api/v2/pages",
+    ]
+
+    assert len(rapidpro_mock.app.requests) == 1
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_mainmenu_time": "2022-06-19T17:30:00",
+            "suggested_text": "*11* - Suggested Content 1\n*12* - Suggested Content 2",
+        },
+    }
+
+
+@pytest.mark.asyncio
 async def test_state_mainmenu_static(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
-    tester.setup_state("state_mainmenu")
+    tester.setup_state("state_pre_mainmenu")
     await tester.user_input("2")
 
     tester.assert_num_messages(1)
@@ -297,7 +359,7 @@ async def test_state_mainmenu_static(
 async def test_state_mainmenu_contentrepo(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
-    tester.setup_state("state_mainmenu")
+    tester.setup_state("state_pre_mainmenu")
     await tester.user_input("4")
 
     question = "\n".join(
@@ -342,7 +404,7 @@ async def test_state_mainmenu_contentrepo(
 async def test_state_mainmenu_contentrepo_children(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
-    tester.setup_state("state_mainmenu")
+    tester.setup_state("state_pre_mainmenu")
     await tester.user_input("3")
 
     question = "\n".join(
@@ -413,7 +475,7 @@ async def test_state_mainmenu_contentrepo_children(
 async def test_state_submenu_image(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
-    tester.setup_state("state_mainmenu")
+    tester.setup_state("state_pre_mainmenu")
     await tester.user_input("5")
 
     question = "\n".join(
@@ -442,7 +504,7 @@ async def test_state_submenu_image(
 async def test_state_detail_image(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
-    tester.setup_state("state_mainmenu")
+    tester.setup_state("state_pre_mainmenu")
     await tester.user_input("5")
     await tester.user_input("1")
 

@@ -106,7 +106,7 @@ class Application(BaseApplication):
             ],
             error=self._(GENERIC_ERROR),
             next={
-                "ok": "state_mainmenu",
+                "ok": "state_pre_mainmenu",
                 "reminder": "state_set_reminder",
             },
         )
@@ -373,7 +373,7 @@ class Application(BaseApplication):
         inbound = clean_inbound(self.inbound.content)
 
         if inbound == "yes i got a callback":
-            return await self.go_to_state("state_mainmenu")
+            return await self.go_to_state("state_pre_mainmenu")
         if inbound == "yes but i missed it":
             return await self.go_to_state("state_ask_to_call_again")
         if inbound == "no i m still waiting":
@@ -617,7 +617,7 @@ class Application(BaseApplication):
             ],
             error=self._(GENERIC_ERROR),
             next={
-                "menu": "state_mainmenu",
+                "menu": "state_pre_mainmenu",
             },
         )
 
@@ -661,7 +661,7 @@ class Application(BaseApplication):
             error=self._(GENERIC_ERROR),
             next={
                 "another way": "state_contact_bwise",
-                "menu": "state_mainmenu",
+                "menu": "state_pre_mainmenu",
             },
         )
 
@@ -705,7 +705,7 @@ class Application(BaseApplication):
             error=self._(GENERIC_ERROR),
             next={
                 "another way": "state_contact_bwise",
-                "menu": "state_mainmenu",
+                "menu": "state_pre_mainmenu",
             },
         )
 
@@ -778,7 +778,7 @@ class Application(BaseApplication):
             ],
             error=self._(GENERIC_ERROR),
             next={
-                "menu": "state_mainmenu",
+                "menu": "state_pre_mainmenu",
             },
         )
 
@@ -811,7 +811,7 @@ class Application(BaseApplication):
             ],
             error=self._(GENERIC_ERROR),
             next={
-                "menu": "state_mainmenu",
+                "menu": "state_pre_mainmenu",
             },
         )
 
@@ -846,6 +846,6 @@ class Application(BaseApplication):
             ],
             error=self._(GENERIC_ERROR),
             next={
-                "menu": "state_mainmenu",
+                "menu": "state_pre_mainmenu",
             },
         )
