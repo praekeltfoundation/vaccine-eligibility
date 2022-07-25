@@ -1,13 +1,14 @@
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, ChoiceState, SectionedChoiceState
+from vaccine.states import Choice, ChoiceState
 from vaccine.utils import get_display_choices
-from yal import contentrepo
+from yal import contentrepo, rapidpro, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
+from yal.utils import get_current_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -24,15 +25,25 @@ class CustomChoiceState(ChoiceState):
 class Application(BaseApplication):
     START_STATE = "state_mainmenu"
 
-    async def state_mainmenu(self):
-        async def next_(choice: Choice):
-            if choice.value.startswith("state_"):
-                return choice.value
-            else:
-                self.save_metadata("selected_page_id", choice.value)
-                self.save_metadata("current_message_id", 1)
-                return "state_contentrepo_page"
+    async def update_suggested_content_details(self, suggested_text):
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "last_mainmenu_time": get_current_datetime().isoformat(),
+            "suggested_text": suggested_text,
+        }
+        return await rapidpro.update_profile(whatsapp_id, data)
 
+    async def reset_suggested_content_details(self):
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "last_mainmenu_time": "",
+            "suggested_text": "",
+        }
+        return await rapidpro.update_profile(whatsapp_id, data)
+
+    async def state_mainmenu(self):
         self.save_metadata("current_menu_level", 0)
 
         sections = [
@@ -52,10 +63,14 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
+        parent_topic_links = {}
         for choice in choices:
             error, sub_choices = await contentrepo.get_choices_by_parent(choice.value)
             if error:
                 return await self.go_to_state("state_error")
+
+            for sub_choice in sub_choices:
+                parent_topic_links[sub_choice.value] = choice.value
 
             sections.append((f"*{choice.label}*", sub_choices))
 
@@ -72,6 +87,56 @@ class Application(BaseApplication):
             )
         )
 
+        async def next_(choice: Choice):
+            error = await self.reset_suggested_content_details()
+            if error:
+                return await self.go_to_state("state_error")
+
+            if choice.value.startswith("state_"):
+                return choice.value
+            else:
+                topics_viewed = set(self.user.metadata.get("topics_viewed", []))
+                if choice.value in parent_topic_links:
+                    topics_viewed.add(parent_topic_links[choice.value])
+                    self.save_metadata("topics_viewed", list(topics_viewed))
+
+                self.save_metadata("selected_page_id", choice.value)
+                self.save_metadata("current_message_id", 1)
+                return "state_contentrepo_page"
+
+        choices = []
+        menu_lines = []
+
+        i = 1
+        for section_name, section_choices in sections:
+            menu_lines.append(section_name)
+
+            for choice in section_choices:
+                choices.append(choice)
+                menu_lines.append(f"{i}. {choice.label}")
+                i += 1
+
+            menu_lines.append("-----")
+
+        topics_viewed = set(
+            self.user.metadata.get(
+                "topics_viewed", list(parent_topic_links.values())[:1]
+            )
+        )
+        error, suggested_choices = await contentrepo.get_suggested_choices(
+            topics_viewed
+        )
+        if error:
+            return await self.go_to_state("state_error")
+
+        choices.extend(suggested_choices)
+        suggested_text = "\n".join(
+            [f"*{i+k}* - {c.label}" for k, c in enumerate(suggested_choices)]
+        )
+        error = await self.update_suggested_content_details(suggested_text)
+        if error:
+            return await self.go_to_state("state_error")
+
         question = self._(
             "\n".join(
                 [
@@ -80,26 +145,23 @@ class Application(BaseApplication):
                     "-----",
                     "Send me the number of the topic you're interested in.",
                     "",
+                    "\n".join(menu_lines),
+                    "💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
                 ]
             )
         )
 
-        return SectionedChoiceState(
+        return CustomChoiceState(
             self,
             question=question,
-            footer="💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
             error=self._(
                 "⚠️ This service works best when you use the numbered options "
-                "available\n"
-            ),
-            error_footer=self._(
-                "\n"
+                "available\n\n"
                 "-----\n"
                 "Or reply 📌 *0* to end this session and return to the main *MENU*"
             ),
+            choices=choices,
             next=next_,
-            sections=sections,
-            separator="-----",
         )
 
     async def state_contentrepo_page(self):

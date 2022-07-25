@@ -92,6 +92,16 @@ async def contentrepo_api_mock(sanic_client):
             }
         )
 
+    @app.route("/suggestedcontent", methods=["GET"])
+    def get_suggested_content(request):
+        app.requests.append(request)
+        return response.json(
+            {
+                "count": 1,
+                "results": [{"id": 311, "title": "Suggested Content 1"}],
+            }
+        )
+
     client = await sanic_client(app)
     url = config.CONTENTREPO_API_URL
     config.CONTENTREPO_API_URL = f"http://{client.host}:{client.port}"
@@ -255,22 +265,30 @@ async def test_state_save_emergency_contact(
 
 
 @pytest.mark.asyncio
+@mock.patch("yal.mainmenu.get_current_datetime")
 async def test_state_callback_response_handles_call_received(
-    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+    get_current_datetime, tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_handle_callback_check_response")
     await tester.user_input(
         session=Message.SESSION_EVENT.NEW, content="yes, i got a callback"
     )
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
+    assert len(rapidpro_mock.app.requests) == 2
+    [request1, request2] = rapidpro_mock.app.requests
+    assert json.loads(request1.body.decode("utf-8")) == {
         "fields": {"callback_check_sent": ""},
+    }
+    assert json.loads(request2.body.decode("utf-8")) == {
+        "fields": {
+            "last_mainmenu_time": "2022-06-19T17:30:00",
+            "suggested_text": "*6* - Suggested Content 1",
+        },
     }
 
     tester.assert_state("state_mainmenu")
-    assert len(contentrepo_api_mock.app.requests) == 2
+    assert len(contentrepo_api_mock.app.requests) == 3
 
 
 @pytest.mark.asyncio

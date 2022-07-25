@@ -1,3 +1,6 @@
+import json
+from datetime import datetime
+from unittest import mock
 from urllib.parse import parse_qs, urlparse
 
 import pytest
@@ -40,6 +43,25 @@ def build_message_detail(
 
 
 @pytest.fixture
+async def rapidpro_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("mock_rapidpro")
+    app.requests = []
+
+    @app.route("/api/v2/contacts.json", methods=["POST"])
+    def update_contact(request):
+        app.requests.append(request)
+        return response.json({}, status=200)
+
+    client = await sanic_client(app)
+    url = config.RAPIDPRO_URL
+    config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
+    config.RAPIDPRO_TOKEN = "testtoken"
+    yield client
+    config.RAPIDPRO_URL = url
+
+
+@pytest.fixture
 async def contentrepo_api_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("contentrepo_api_mock")
@@ -69,6 +91,20 @@ async def contentrepo_api_mock(sanic_client):
             pages.append({"id": 1231, "title": "Sub menu 3"})
         if child_of == "1231":
             pages.append({"id": 1232, "title": "Sub Menu with image"})
+
+        return response.json(
+            {
+                "count": len(pages),
+                "results": pages,
+            }
+        )
+
+    @app.route("/suggestedcontent", methods=["GET"])
+    def get_suggested_content(request):
+        app.requests.append(request)
+        pages = []
+        pages.append({"id": 311, "title": "Suggested Content 1"})
+        pages.append({"id": 312, "title": "Suggested Content 2"})
 
         return response.json(
             {
@@ -179,7 +215,11 @@ async def contentrepo_api_mock(sanic_client):
 
 
 @pytest.mark.asyncio
-async def test_state_mainmenu_start(tester: AppTester, contentrepo_api_mock):
+@mock.patch("yal.mainmenu.get_current_datetime")
+async def test_state_mainmenu_start(
+    get_current_datetime, tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_mainmenu")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
     tester.assert_num_messages(1)
@@ -220,11 +260,23 @@ async def test_state_mainmenu_start(tester: AppTester, contentrepo_api_mock):
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
+        "/suggestedcontent/",
     ]
+
+    assert len(rapidpro_mock.app.requests) == 1
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_mainmenu_time": "2022-06-19T17:30:00",
+            "suggested_text": "*11* - Suggested Content 1\n*12* - Suggested Content 2",
+        },
+    }
 
 
 @pytest.mark.asyncio
-async def test_state_mainmenu_static(tester: AppTester, contentrepo_api_mock):
+async def test_state_mainmenu_static(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
     tester.setup_state("state_mainmenu")
     await tester.user_input("2")
 
@@ -235,11 +287,16 @@ async def test_state_mainmenu_static(tester: AppTester, contentrepo_api_mock):
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
+        "/suggestedcontent/",
     ]
+
+    assert len(rapidpro_mock.app.requests) == 2
 
 
 @pytest.mark.asyncio
-async def test_state_mainmenu_contentrepo(tester: AppTester, contentrepo_api_mock):
+async def test_state_mainmenu_contentrepo(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
     tester.setup_state("state_mainmenu")
     await tester.user_input("4")
 
@@ -265,13 +322,25 @@ async def test_state_mainmenu_contentrepo(tester: AppTester, contentrepo_api_moc
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
+        "/suggestedcontent/",
         "/api/v2/pages/444",
     ]
+
+    tester.assert_metadata("topics_viewed", ["222"])
+
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_mainmenu_time": "",
+            "suggested_text": "",
+        },
+    }
 
 
 @pytest.mark.asyncio
 async def test_state_mainmenu_contentrepo_children(
-    tester: AppTester, contentrepo_api_mock
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
     tester.setup_state("state_mainmenu")
     await tester.user_input("3")
@@ -322,6 +391,7 @@ async def test_state_mainmenu_contentrepo_children(
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
+        "/suggestedcontent/",
         "/api/v2/pages/333",
         "/api/v2/pages",
         "/api/v2/pages",
@@ -336,9 +406,13 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["data__session_id"][0] == "1"
     assert params["data__user_addr"][0] == "27820001001"
 
+    assert len(rapidpro_mock.app.requests) == 2
+
 
 @pytest.mark.asyncio
-async def test_state_submenu_image(tester: AppTester, contentrepo_api_mock):
+async def test_state_submenu_image(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
     tester.setup_state("state_mainmenu")
     await tester.user_input("5")
 
@@ -365,7 +439,9 @@ async def test_state_submenu_image(tester: AppTester, contentrepo_api_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_detail_image(tester: AppTester, contentrepo_api_mock):
+async def test_state_detail_image(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
     tester.setup_state("state_mainmenu")
     await tester.user_input("5")
     await tester.user_input("1")

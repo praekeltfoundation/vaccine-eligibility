@@ -52,6 +52,12 @@ async def get_choices_by_id(page_id):
     return await get_choices_by_path(f"/api/v2/pages?id={page_id}")
 
 
+async def get_suggested_choices(topics_viewed):
+    return await get_choices_by_path(
+        f"/suggestedcontent/?topics_viewed={','.join(topics_viewed)}"
+    )
+
+
 async def get_page_detail_by_tag(user, tag):
     error, choices = await get_choices_by_path(f"/api/v2/pages?tag={tag}")
 
