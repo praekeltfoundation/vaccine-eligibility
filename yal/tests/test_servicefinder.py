@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Dict, List
 from unittest import mock
 
 import pytest
@@ -14,7 +15,7 @@ def tester():
     return AppTester(Application)
 
 
-CATEGORIES = [
+CATEGORIES: List[Dict] = [
     {
         "_id": "62dd86b24d7d919468144ed3",
         "name": "Clinics & Hospitals",
@@ -44,11 +45,11 @@ CATEGORIES = [
     },
 ]
 
-FACILITIES = [
+FACILITIES: List[Dict] = [
     {
         "location": {"type": "Point", "coordinates": [28.0151783, -26.1031026]},
         "_id": "62ddcc71981c9d7ba465e67e",
-        "name": "South West Gauteng TVET College - Central Office South West Gauteng TVET College - Technisa Campus",
+        "name": "South West Gauteng TVET College - Technisa Campus",
         "description": "Technical and vocational education and training",
         "category": "62dd91904d7d919468144edf",
         "serviceType": "Education",
@@ -63,7 +64,7 @@ FACILITIES = [
     {
         "location": {"type": "Point", "coordinates": [27.8677946, -26.1404831]},
         "_id": "62ddcc6f981c9d7ba465e661",
-        "name": "South West Gauteng TVET College - Central Office South West Gauteng TVET College - Roodepoort West Campus",
+        "name": "South West Gauteng TVET College - Roodepoort West Campus",
         "description": "Technical and vocational education and training",
         "category": "62dd91904d7d919468144edf",
         "serviceType": "Education",
@@ -260,13 +261,13 @@ async def test_state_category(tester: AppTester, servicefinder_mock):
             "HIV Prevention near you",
             "-----",
             "",
-            "1️⃣ *South West Gauteng TVET College - Central Office South West Gauteng TVET College - Technisa Campus*",
+            "1️⃣ *South West Gauteng TVET College - Technisa Campus*",
             "📍 Huguenot Avenue & Main Street",
             "📞 825 797 593",
             "🦶 10 km",
             "----",
             "",
-            "2️⃣ *South West Gauteng TVET College - Central Office South West Gauteng TVET College - Roodepoort West Campus*",
+            "2️⃣ *South West Gauteng TVET College - Roodepoort West Campus*",
             "📍 Pheasant St Roodepoort 1724",
             "📞 861768849",
             "🦶 18 km",
