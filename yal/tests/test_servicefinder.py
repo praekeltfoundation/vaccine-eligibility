@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Dict, List
 from unittest import mock
 
 import pytest
@@ -14,35 +15,85 @@ def tester():
     return AppTester(Application)
 
 
+CATEGORIES: List[Dict] = [
+    {
+        "_id": "62dd86b24d7d919468144ed3",
+        "name": "Clinics & Hospitals",
+        "parent": None,
+        "createdBy": "5eb125d604a3eb3b4859a022",
+        "createdAt": 1658685106316,
+        "updatedAt": 1658685106316,
+        "__v": 0,
+    },
+    {
+        "_id": "62dd86c14d7d919468144ed4",
+        "name": "HIV Prevention",
+        "parent": None,
+        "createdBy": "5eb125d604a3eb3b4859a022",
+        "createdAt": 1658685121941,
+        "updatedAt": 1658685121941,
+        "__v": 0,
+    },
+    {
+        "_id": "62dd86d24d7d919468144ed5",
+        "name": "Where to get PrEP",
+        "parent": "62dd86c14d7d919468144ed4",
+        "createdBy": "5eb125d604a3eb3b4859a022",
+        "createdAt": 1658685138331,
+        "updatedAt": 1658685138331,
+        "__v": 0,
+    },
+]
+
+FACILITIES: List[Dict] = [
+    {
+        "location": {"type": "Point", "coordinates": [28.0151783, -26.1031026]},
+        "_id": "62ddcc71981c9d7ba465e67e",
+        "name": "South West Gauteng TVET College - Technisa Campus",
+        "description": "Technical and vocational education and training",
+        "category": "62dd91904d7d919468144edf",
+        "serviceType": "Education",
+        "telephoneNumber": "825 797 593",
+        "emailAddress": "tech@swgc.co.za",
+        "fullAddress": "Huguenot Avenue & Main Street",
+        "createdBy": "5eb125d604a3eb3b4859a022",
+        "createdAt": 1658702961660,
+        "updatedAt": 1658702961660,
+        "__v": 0,
+    },
+    {
+        "location": {"type": "Point", "coordinates": [27.8677946, -26.1404831]},
+        "_id": "62ddcc6f981c9d7ba465e661",
+        "name": "South West Gauteng TVET College - Roodepoort West Campus",
+        "description": "Technical and vocational education and training",
+        "category": "62dd91904d7d919468144edf",
+        "serviceType": "Education",
+        "telephoneNumber": "861768849",
+        "emailAddress": "",
+        "fullAddress": "Pheasant St Roodepoort 1724",
+        "createdBy": "5eb125d604a3eb3b4859a022",
+        "createdAt": 1658702959684,
+        "updatedAt": 1658702959684,
+        "__v": 0,
+    },
+]
+
+
 @pytest.fixture
 async def servicefinder_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_servicefinder")
     app.requests = []
 
-    # TODO: update this when we get the details from Devlin
     @app.route("/categories", methods=["GET"])
     def callback_get(request):
         app.requests.append(request)
-        return response.json(
-            {
-                "categories": {"1": "category 1", "2": "category 2", "3": "category 3"},
-            }
-        )
+        return response.json(CATEGORIES)
 
-    # TODO: update this when we get the details from Devlin
-    @app.route("/facilities", methods=["POST"])
+    @app.route("/locations", methods=["GET"])
     def callback_post(request):
         app.requests.append(request)
-        return response.json(
-            {
-                "facilities": [
-                    "facility 1",
-                    "facility 2",
-                    "facility 3",
-                ]
-            }
-        )
+        return response.json(FACILITIES)
 
     client = await sanic_client(app)
     url = config.SERVICEFINDER_URL
@@ -156,9 +207,9 @@ async def test_state_confirm_existing_address_yes(
             "",
             "🙍🏾‍♀️ *Choose an option from the list:*",
             "",
-            "1 - category 1",
-            "2 - category 2",
-            "3 - category 3",
+            "1 - Clinics & Hospitals",
+            "2 - HIV Prevention",
+            "3 - Where to get PrEP",
             "",
             "*OR*",
             "",
@@ -195,18 +246,44 @@ async def test_state_confirm_existing_address_no(tester: AppTester):
 async def test_state_category(tester: AppTester, servicefinder_mock):
     tester.setup_state("state_category")
 
-    tester.user.metadata["categories"] = {
-        "1": "category 1",
-        "2": "category 2",
-        "3": "category 3",
-    }
-    tester.user.metadata["latitude"] = 123
-    tester.user.metadata["longitude"] = 123
+    categories = {c["_id"]: c["name"] for c in CATEGORIES}
+    tester.user.metadata["categories"] = categories
+    tester.user.metadata["latitude"] = 28.0251783
+    tester.user.metadata["longitude"] = -26.2031026
 
     await tester.user_input("2")
 
     tester.assert_state("state_start")
-    assert [r.path for r in servicefinder_mock.app.requests] == ["/facilities"]
+
+    question = "\n".join(
+        [
+            "🏥 Find Clinics and Services",
+            "HIV Prevention near you",
+            "-----",
+            "",
+            "1️⃣ *South West Gauteng TVET College - Technisa Campus*",
+            "📍 Huguenot Avenue & Main Street",
+            "📞 825 797 593",
+            "🦶 10 km",
+            "----",
+            "",
+            "2️⃣ *South West Gauteng TVET College - Roodepoort West Campus*",
+            "📍 Pheasant St Roodepoort 1724",
+            "📞 861768849",
+            "🦶 18 km",
+            "----",
+            "",
+            "",
+            "-----",
+            "*Or reply:*",
+            "*0* - 🏠 Back to Main *MENU*",
+            "*#* - 🆘 Get *HELP*",
+        ]
+    )
+
+    tester.assert_message(question)
+
+    assert [r.path for r in servicefinder_mock.app.requests] == ["/locations"]
 
 
 @pytest.mark.asyncio
@@ -215,11 +292,8 @@ async def test_state_category_talk(get_current_datetime, tester: AppTester):
     get_current_datetime.return_value = datetime(2022, 6, 20, 17, 30)
     tester.setup_state("state_category")
 
-    tester.user.metadata["categories"] = {
-        "1": "category 1",
-        "2": "category 2",
-        "3": "category 3",
-    }
+    categories = {c["_id"]: c["name"] for c in CATEGORIES}
+    tester.user.metadata["categories"] = categories
 
     await tester.user_input("4")
 
