@@ -4,6 +4,7 @@ import secrets
 from urllib.parse import urljoin
 
 import aiohttp
+import geopy.distance
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
@@ -26,7 +27,7 @@ def get_servicefinder_api():
     return aiohttp.ClientSession(
         timeout=aiohttp.ClientTimeout(total=5),
         headers={
-            "Ocp-Apim-Subscription-Key": config.LOVELIFE_TOKEN or "",
+            "Authorization": f"Basic {config.SERVICEFINDER_TOKEN}",
             "Content-Type": "application/json",
         },
     )
@@ -232,7 +233,8 @@ class Application(BaseApplication):
                     response.raise_for_status()
                     response_body = await response.json()
 
-                    self.save_metadata("categories", response_body["categories"])
+                    categories = {c["_id"]: c["name"] for c in response_body}
+                    self.save_metadata("categories", categories)
                     break
                 except HTTP_EXCEPTIONS as e:
                     if i == 2:
@@ -268,14 +270,9 @@ class Application(BaseApplication):
 
         metadata = self.user.metadata
         category_text = "\n".join(
-            [
-                f"{i+1} - {name}"
-                for i, (key, name) in enumerate(metadata["categories"].items())
-            ]
+            [f"{i+1} - {v}" for i, v in enumerate(metadata["categories"].values())]
         )
-        category_choices = [
-            Choice(code, name) for code, name in metadata["categories"].items()
-        ]
+        category_choices = [Choice(k, v) for k, v in metadata["categories"].items()]
         category_choices.append(Choice("talk", "Talk to someone"))
 
         question = self._(
@@ -313,18 +310,19 @@ class Application(BaseApplication):
         async with get_servicefinder_api() as session:
             for i in range(3):
                 try:
-                    response = await session.post(
-                        url=urljoin(config.SERVICEFINDER_URL, "/facilities"),
-                        json={
+                    response = await session.get(
+                        url=urljoin(config.SERVICEFINDER_URL, "/locations"),
+                        params={
                             "category": self.user.answers["state_category"],
                             "latitude": self.user.metadata["latitude"],
                             "longitude": self.user.metadata["longitude"],
+                            "radius": 50,
                         },
                     )
                     response.raise_for_status()
                     response_body = await response.json()
 
-                    self.save_metadata("facilities", response_body["facilities"])
+                    self.save_metadata("facilities", response_body)
                     break
                 except HTTP_EXCEPTIONS as e:
                     if i == 2:
@@ -336,6 +334,7 @@ class Application(BaseApplication):
         return await self.go_to_state("state_display_facilities")
 
     async def state_display_facilities(self):
+        metadata = self.user.metadata
         msg = "\n".join(
             [
                 "🏥 Find Clinics and Services",
@@ -348,13 +347,32 @@ class Application(BaseApplication):
         await self.worker.publish_message(self.inbound.reply(self._(msg)))
         await asyncio.sleep(0.5)
 
-        # TODO: format these as per miro
-        services = "\n".join(self.user.metadata["facilities"])
+        user_location = (metadata["latitude"], metadata["longitude"])
+
+        def format_facility(i, facility):
+            numbers = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
+            facility_location = facility["location"]["coordinates"]
+            distance = geopy.distance.geodesic(user_location, facility_location).km
+            details = [
+                f"{numbers[i]} *{facility['name']}*",
+                f"📍 {facility['fullAddress']}",
+                f"📞 {facility['telephoneNumber']}",
+                f"🦶 {round(distance)} km",
+                "----",
+                "",
+            ]
+            return "\n".join(details)
+
+        services = "\n".join(
+            [format_facility(i, f) for i, f in enumerate(metadata["facilities"][:5])]
+        )
+
+        category = metadata["categories"][self.user.answers["state_category"]]
 
         msg = "\n".join(
             [
                 "🏥 Find Clinics and Services",
-                "[Service Category] near you",
+                f"{category} near you",
                 "-----",
                 "",
                 services,
