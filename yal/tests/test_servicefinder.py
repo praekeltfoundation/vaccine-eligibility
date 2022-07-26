@@ -85,12 +85,12 @@ async def servicefinder_mock(sanic_client):
     app = Sanic("mock_servicefinder")
     app.requests = []
 
-    @app.route("/categories", methods=["GET"])
+    @app.route("/api/categories", methods=["GET"])
     def callback_get(request):
         app.requests.append(request)
         return response.json(CATEGORIES)
 
-    @app.route("/locations", methods=["GET"])
+    @app.route("/api/locations", methods=["GET"])
     def callback_post(request):
         app.requests.append(request)
         return response.json(FACILITIES)
@@ -224,7 +224,7 @@ async def test_state_confirm_existing_address_yes(
 
     tester.assert_message(question)
 
-    assert [r.path for r in servicefinder_mock.app.requests] == ["/categories"]
+    assert [r.path for r in servicefinder_mock.app.requests] == ["/api/categories"]
     assert [r.path for r in google_api_mock.app.requests] == [
         "/maps/api/place/details/json"
     ]
@@ -283,7 +283,7 @@ async def test_state_category(tester: AppTester, servicefinder_mock):
 
     tester.assert_message(question)
 
-    assert [r.path for r in servicefinder_mock.app.requests] == ["/locations"]
+    assert [r.path for r in servicefinder_mock.app.requests] == ["/api/locations"]
 
 
 @pytest.mark.asyncio
