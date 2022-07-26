@@ -228,7 +228,7 @@ class Application(BaseApplication):
             for i in range(3):
                 try:
                     response = await session.get(
-                        url=urljoin(config.SERVICEFINDER_URL, "/categories"),
+                        url=urljoin(config.SERVICEFINDER_URL, "/api/categories"),
                     )
                     response.raise_for_status()
                     response_body = await response.json()
@@ -311,7 +311,7 @@ class Application(BaseApplication):
             for i in range(3):
                 try:
                     response = await session.get(
-                        url=urljoin(config.SERVICEFINDER_URL, "/locations"),
+                        url=urljoin(config.SERVICEFINDER_URL, "/api/locations"),
                         params={
                             "category": self.user.answers["state_category"],
                             "latitude": self.user.metadata["latitude"],
