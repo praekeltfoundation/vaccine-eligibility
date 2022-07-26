@@ -24,7 +24,7 @@ class Application(BaseApplication):
             if choice.value == "callme":
                 return PleaseCallMeApplication.START_STATE
             elif choice.value == "menu":
-                return "state_mainmenu"
+                return "state_pre_mainmenu"
             elif choice.value == "redo":
                 return "state_quiz_start"
 
