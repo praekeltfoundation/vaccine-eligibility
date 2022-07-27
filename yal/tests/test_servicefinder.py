@@ -307,7 +307,7 @@ async def test_state_location(tester: AppTester, servicefinder_mock):
     await tester.user_input(
         "test location",
         transport_metadata={
-            "msg": {"location": {"longitude": 12.34, "latitude": 56.78}}
+            "message": {"location": {"longitude": 12.34, "latitude": 56.78}}
         },
     )
     tester.assert_state("state_category")

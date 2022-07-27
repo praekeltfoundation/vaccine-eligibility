@@ -411,7 +411,7 @@ class Application(BaseApplication):
         async def store_location_coords(content):
             if not self.inbound:
                 return
-            loc = self.inbound.transport_metadata.get("msg", {}).get("location", {})
+            loc = self.inbound.transport_metadata.get("message", {}).get("location", {})
             latitude = loc.get("latitude")
             longitude = loc.get("longitude")
             if isinstance(latitude, float) and isinstance(longitude, float):
