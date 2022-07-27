@@ -9,11 +9,11 @@ import geopy.distance
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
+    CustomChoiceState,
     EndState,
     ErrorMessage,
     FreeText,
     WhatsAppButtonState,
-    CustomChoiceState,
 )
 from vaccine.utils import HTTP_EXCEPTIONS
 from yal import config
