@@ -9,11 +9,11 @@ import geopy.distance
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
+    CustomChoiceState,
     EndState,
     ErrorMessage,
     FreeText,
     WhatsAppButtonState,
-    WhatsAppListState,
 )
 from vaccine.utils import HTTP_EXCEPTIONS
 from yal import config
@@ -297,10 +297,9 @@ class Application(BaseApplication):
                 ]
             )
         )
-        return WhatsAppListState(
+        return CustomChoiceState(
             self,
             question=question,
-            button="Type of service",
             choices=category_choices,
             next=next_,
             error=self._(GENERIC_ERROR),
