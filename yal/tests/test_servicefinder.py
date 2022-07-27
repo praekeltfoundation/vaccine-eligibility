@@ -248,8 +248,8 @@ async def test_state_category(tester: AppTester, servicefinder_mock):
 
     categories = {c["_id"]: c["name"] for c in CATEGORIES}
     tester.user.metadata["categories"] = categories
-    tester.user.metadata["latitude"] = 28.0251783
-    tester.user.metadata["longitude"] = -26.2031026
+    tester.user.metadata["latitude"] = -26.2031026
+    tester.user.metadata["longitude"] = 28.0251783
 
     await tester.user_input("2")
 
@@ -264,13 +264,13 @@ async def test_state_category(tester: AppTester, servicefinder_mock):
             "1️⃣ *South West Gauteng TVET College - Technisa Campus*",
             "📍 Huguenot Avenue & Main Street",
             "📞 825 797 593",
-            "🦶 10 km",
+            "🦶 11 km",
             "----",
             "",
             "2️⃣ *South West Gauteng TVET College - Roodepoort West Campus*",
             "📍 Pheasant St Roodepoort 1724",
             "📞 861768849",
-            "🦶 18 km",
+            "🦶 17 km",
             "----",
             "",
             "",
