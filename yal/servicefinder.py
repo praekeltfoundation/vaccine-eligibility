@@ -350,8 +350,8 @@ class Application(BaseApplication):
 
         def format_facility(i, facility):
             numbers = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
-            facility_location = facility["location"]["coordinates"]
-            distance = geopy.distance.geodesic(user_location, facility_location).km
+            lng, lat = facility["location"]["coordinates"]
+            distance = geopy.distance.geodesic(user_location, (lat, lng)).km
             details = [
                 f"{numbers[i]} *{facility['name']}*",
                 f"📍 {facility['fullAddress']}",
