@@ -13,7 +13,7 @@ from vaccine.states import (
     ErrorMessage,
     FreeText,
     WhatsAppButtonState,
-    WhatsAppListState,
+    CustomChoiceState,
 )
 from vaccine.utils import HTTP_EXCEPTIONS
 from yal import config
@@ -297,10 +297,9 @@ class Application(BaseApplication):
                 ]
             )
         )
-        return WhatsAppListState(
+        return CustomChoiceState(
             self,
             question=question,
-            button="Type of service",
             choices=category_choices,
             next=next_,
             error=self._(GENERIC_ERROR),

@@ -1,7 +1,7 @@
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, ChoiceState
+from vaccine.states import Choice, CustomChoiceState
 from vaccine.utils import get_display_choices
 from yal import contentrepo, rapidpro, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
@@ -11,15 +11,6 @@ from yal.servicefinder import Application as ServiceFinderApplication
 from yal.utils import get_current_datetime
 
 logger = logging.getLogger(__name__)
-
-
-class CustomChoiceState(ChoiceState):
-    async def display(self, message):
-        helper_metadata = self.helper_metadata or {}
-        if self.buttons:
-            helper_metadata["buttons"] = [choice.label for choice in self.buttons]
-
-        return self.app.send_message(self.question, helper_metadata=helper_metadata)
 
 
 class Application(BaseApplication):

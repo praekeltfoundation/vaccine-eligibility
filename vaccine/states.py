@@ -304,3 +304,12 @@ class SectionedChoiceState(ChoiceState):
                 lines.append(self.separator)
 
         return "\n".join(lines)
+
+
+class CustomChoiceState(ChoiceState):
+    async def display(self, message):
+        helper_metadata = self.helper_metadata or {}
+        if self.buttons:
+            helper_metadata["buttons"] = [choice.label for choice in self.buttons]
+
+        return self.app.send_message(self.question, helper_metadata=helper_metadata)
