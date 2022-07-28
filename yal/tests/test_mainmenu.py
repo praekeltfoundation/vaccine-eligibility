@@ -18,7 +18,15 @@ def tester():
 
 
 def build_message_detail(
-    id, title, subtitle, content, tags, has_children, image=None, total_messages=1
+    id,
+    title,
+    subtitle,
+    content,
+    tags,
+    has_children,
+    image=None,
+    total_messages=1,
+    quick_replies=[],
 ):
     return {
         "id": id,
@@ -39,6 +47,7 @@ def build_message_detail(
         "tags": tags,
         "has_children": has_children,
         "meta": {"parent": {"id": 123, "title": "Parent Title"}},
+        "quick_replies": quick_replies,
     }
 
 
@@ -124,6 +133,21 @@ async def contentrepo_api_mock(sanic_client):
                 "Message test content 1",
                 ["test"],
                 False,
+            )
+        )
+
+    @app.route("/api/v2/pages/1112", methods=["GET"])
+    def get_page_detail_1112(request):
+        app.requests.append(request)
+        return response.json(
+            build_message_detail(
+                1112,
+                "Main Menu 1 💊",
+                "subtitle",
+                "Message test content 1",
+                ["test"],
+                False,
+                quick_replies=["No, thanks"],
             )
         )
 
@@ -594,6 +618,59 @@ async def test_state_display_page_detail(tester: AppTester, contentrepo_api_mock
                 "",
                 "-----",
                 "*Or reply:*",
+                "0. 🏠 Back to Main MENU",
+                "# 🆘 Get HELP",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_display_page_detail_quick_replies(
+    tester: AppTester, contentrepo_api_mock
+):
+    tester.setup_state("state_contentrepo_page")
+    tester.user.metadata["selected_page_id"] = "1112"
+    tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["current_menu_level"] = 3
+    tester.user.metadata["last_topic_viewed"] = "1"
+    tester.user.metadata["parent_title"] = "Test Back"
+
+    tester.user.session_id = 123
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*Main Menu 1 💊*",
+                "subtitle",
+                "-----",
+                "",
+                "Message test content 1",
+                "",
+                "1. No, thanks",
+                "",
+                "-----",
+                "*Or reply:*",
+                "2. ⬅️Parent Title",
+                "0. 🏠 Back to Main MENU",
+                "# 🆘 Get HELP",
+            ]
+        )
+    )
+
+    await tester.user_input("1")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Okay, what would you like to talk about?",
+                "",
+                "1. Suggested Content 1",
+                "2. Suggested Content 2",
+                "-----",
+                "*Or reply:*",
+                "3. ⬅️Parent Title",
                 "0. 🏠 Back to Main MENU",
                 "# 🆘 Get HELP",
             ]
