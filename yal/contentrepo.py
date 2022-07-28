@@ -139,7 +139,8 @@ async def get_page_details(user, page_id, message_id):
                     if related_pages:
                         page_details["related_pages"] = related_pages
 
-                    page_details["quick_replies"] = response_body["quick_replies"]
+                    if message_number == 1:
+                        page_details["quick_replies"] = response_body["quick_replies"]
 
                 if response_body["body"]["text"]["value"]["image"]:
                     image_id = response_body["body"]["text"]["value"]["image"]
