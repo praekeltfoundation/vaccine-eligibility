@@ -94,6 +94,9 @@ class Application(BaseApplication):
                 if choice.value in parent_topic_links:
                     topics_viewed.add(parent_topic_links[choice.value])
                     self.save_metadata("topics_viewed", list(topics_viewed))
+                    self.save_metadata(
+                        "last_topic_viewed", parent_topic_links[choice.value]
+                    )
 
                 self.save_metadata("selected_page_id", choice.value)
                 self.save_metadata("current_message_id", 1)
@@ -187,6 +190,7 @@ class Application(BaseApplication):
         self.save_metadata("parent_title", page_details["parent_title"])
         self.save_metadata("related_pages", page_details.get("related_pages"))
         self.save_metadata("quiz_tag", page_details.get("quiz_tag"))
+        self.save_metadata("quick_replies", page_details.get("quick_replies"))
 
         menu_level = metadata["current_menu_level"] + 1
         self.save_metadata("current_menu_level", menu_level)
@@ -208,6 +212,8 @@ class Application(BaseApplication):
                 return "state_contentrepo_page"
             elif choice.value == "quiz":
                 return QuizApplication.START_STATE
+            elif choice.value.startswith("no"):
+                return "state_get_suggestions"
 
             self.save_metadata("selected_page_id", choice.value)
             self.save_metadata("current_message_id", 1)
@@ -228,6 +234,7 @@ class Application(BaseApplication):
         body = metadata["body"]
         next_prompt = metadata.get("next_prompt")
         quiz_tag = metadata.get("quiz_tag")
+        quick_replies = metadata.get("quick_replies", [])
 
         parts = [
             f"*{title}*",
@@ -247,6 +254,11 @@ class Application(BaseApplication):
         elif quiz_tag:
             choices.append(Choice("quiz", "Yes (take the quiz)"))
             buttons.append(Choice("quiz", "Yes (take the quiz)"))
+
+        for quick_reply in quick_replies:
+            stub = quick_reply.replace(" ", "-").lower()
+            choices.append(Choice(stub, quick_reply))
+            buttons.append(Choice(stub, quick_reply))
 
         if choices:
             parts.extend(
@@ -299,6 +311,69 @@ class Application(BaseApplication):
             choices=choices,
             next=next_,
             helper_metadata=helper_metadata,
+        )
+
+    async def state_get_suggestions(self):
+        topics_viewed = [self.user.metadata["last_topic_viewed"]]
+        error, suggested_choices = await contentrepo.get_suggested_choices(
+            topics_viewed
+        )
+        if error:
+            return await self.go_to_state("state_error")
+        self.save_metadata(
+            "suggested_content", {c.value: c.label for c in suggested_choices}
+        )
+        return await self.go_to_state("state_display_suggestions")
+
+    async def state_display_suggestions(self):
+        async def next_(choice: Choice):
+            if choice.value == "back":
+                return "state_back"
+            self.save_metadata("selected_page_id", choice.value)
+            self.save_metadata("current_message_id", 1)
+            return "state_contentrepo_page"
+
+        metadata = self.user.metadata
+
+        choices = [
+            Choice(k, v) for k, v in self.user.metadata["suggested_content"].items()
+        ]
+
+        parts = [
+            "Okay, what would you like to talk about?",
+            "",
+            get_display_choices(choices),
+        ]
+
+        back_menu_item = None
+        menu_level = metadata["current_menu_level"]
+        if menu_level > 2:
+            back_title = metadata["parent_title"]
+            back_menu_item = f"{len(choices) + 1}. ⬅️{back_title}"
+
+            choices.append(Choice("back", f"⬅️ {back_title}"))
+
+        parts.extend(
+            [
+                "-----",
+                "*Or reply:*",
+                back_menu_item,
+                "0. 🏠 Back to Main MENU",
+                "# 🆘 Get HELP",
+            ]
+        )
+
+        question = self._("\n".join([part for part in parts if part is not None]))
+
+        return CustomChoiceState(
+            self,
+            question=question,
+            error=self._(
+                "⚠️ This service works best when you use the numbered options "
+                "available\n"
+            ),
+            choices=choices,
+            next=next_,
         )
 
     async def state_back(self):
