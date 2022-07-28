@@ -190,7 +190,7 @@ class Application(BaseApplication):
         self.save_metadata("parent_title", page_details["parent_title"])
         self.save_metadata("related_pages", page_details.get("related_pages"))
         self.save_metadata("quiz_tag", page_details.get("quiz_tag"))
-        self.save_metadata("quick_replies", page_details.get("quick_replies"))
+        self.save_metadata("quick_replies", page_details.get("quick_replies", []))
 
         menu_level = metadata["current_menu_level"] + 1
         self.save_metadata("current_menu_level", menu_level)
