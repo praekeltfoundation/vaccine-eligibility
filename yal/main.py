@@ -62,7 +62,6 @@ class Application(
         if error:
             return await self.go_to_state("state_error")
 
-        prototype_user = fields.get("prototype_user")
         terms_accepted = fields.get("terms_accepted")
         onboarding_completed = fields.get("onboarding_completed")
         # If one of these values is True then the user might be responding
@@ -70,9 +69,6 @@ class Application(
         onboarding_reminder_sent = fields.get("onboarding_reminder_sent")
         callback_check_sent = fields.get("callback_check_sent")
         aaq_timeout_sent = fields.get("aaq_timeout_sent")
-
-        if not prototype_user:
-            return await self.go_to_state("state_coming_soon")
 
         for field in ("province", "suburb", "street_name", "street_number"):
             if fields.get(field):
@@ -102,13 +98,6 @@ class Application(
             return await self.go_to_state(AaqApplication.TIMEOUT_RESPONSE_STATE)
 
         return await self.go_to_state("state_catch_all")
-
-    async def state_coming_soon(self):
-        return EndState(
-            self,
-            self._("TODO: coming soon"),
-            next=self.START_STATE,
-        )
 
     async def state_catch_all(self):
         return EndState(
