@@ -57,7 +57,6 @@ def get_rapidpro_contact(urn):
         "language": "eng",
         "groups": [],
         "fields": {
-            "prototype_user": "27820001001" in urn,
             "onboarding_completed": "27820001001" in urn,
             "onboarding_reminder_sent": "27820001001" in urn,
             "callback_check_sent": "27820001001" in urn,
@@ -206,17 +205,6 @@ async def test_state_start_to_mainmenu(
     tester.assert_metadata("suburb", "cape town")
     tester.assert_metadata("street_name", "high level")
     tester.assert_metadata("street_number", "99")
-
-
-@pytest.mark.asyncio
-async def test_state_start_to_coming_soon(tester: AppTester, rapidpro_mock):
-    tester.setup_user_address("27820001002")
-    await tester.user_input("hi")
-    tester.assert_state("state_start")
-    tester.assert_num_messages(1)
-    tester.assert_message("TODO: coming soon")
-
-    assert len(rapidpro_mock.app.requests) == 1
 
 
 @pytest.mark.asyncio
