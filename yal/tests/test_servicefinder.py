@@ -93,7 +93,6 @@ async def servicefinder_mock(sanic_client):
     @app.route("/api/locations", methods=["GET"])
     def callback_post(request):
         app.requests.append(request)
-        print(">>>")
         if request.args.get("category") == "62dd86d24d7d919468144ed5":
             return response.json([])
         return response.json(FACILITIES)
