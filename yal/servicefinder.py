@@ -13,6 +13,7 @@ from vaccine.states import (
     EndState,
     ErrorMessage,
     FreeText,
+    MenuState,
     WhatsAppButtonState,
 )
 from vaccine.utils import HTTP_EXCEPTIONS
@@ -321,6 +322,8 @@ class Application(BaseApplication):
                     response.raise_for_status()
                     response_body = await response.json()
 
+                    facility_count = len(response_body)
+
                     self.save_metadata("facilities", response_body)
                     break
                 except HTTP_EXCEPTIONS as e:
@@ -330,7 +333,29 @@ class Application(BaseApplication):
                     else:
                         continue
 
-        return await self.go_to_state("state_display_facilities")
+        if facility_count > 0:
+            return await self.go_to_state("state_display_facilities")
+        else:
+            return await self.go_to_state("state_no_facilities_found")
+
+    async def state_no_facilities_found(self):
+        question = "\n".join(
+            [
+                "🙍🏾‍♀️ *Sorry, we can't find any services near you.*",
+                "",
+                "But don't worry, here are some other options you can try:",
+                "",
+            ]
+        )
+        return MenuState(
+            self,
+            question=self._(question),
+            error=self._(GENERIC_ERROR),
+            choices=[
+                Choice("state_location", self._("Try another location")),
+                Choice("state_category", self._("Try another service")),
+            ],
+        )
 
     async def state_display_facilities(self):
         metadata = self.user.metadata

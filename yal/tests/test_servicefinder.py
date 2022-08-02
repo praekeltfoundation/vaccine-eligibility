@@ -93,6 +93,8 @@ async def servicefinder_mock(sanic_client):
     @app.route("/api/locations", methods=["GET"])
     def callback_post(request):
         app.requests.append(request)
+        if request.args.get("category") == "62dd86d24d7d919468144ed5":
+            return response.json([])
         return response.json(FACILITIES)
 
     client = await sanic_client(app)
@@ -278,6 +280,35 @@ async def test_state_category(tester: AppTester, servicefinder_mock):
             "*Or reply:*",
             "*0* - 🏠 Back to Main *MENU*",
             "*#* - 🆘 Get *HELP*",
+        ]
+    )
+
+    tester.assert_message(question)
+
+    assert [r.path for r in servicefinder_mock.app.requests] == ["/api/locations"]
+
+
+@pytest.mark.asyncio
+async def test_state_category_no_facilities(tester: AppTester, servicefinder_mock):
+    tester.setup_state("state_category")
+
+    categories = {c["_id"]: c["name"] for c in CATEGORIES}
+    tester.user.metadata["categories"] = categories
+    tester.user.metadata["latitude"] = -26.2031026
+    tester.user.metadata["longitude"] = 28.0251783
+
+    await tester.user_input("3")
+
+    tester.assert_state("state_no_facilities_found")
+
+    question = "\n".join(
+        [
+            "🙍🏾‍♀️ *Sorry, we can't find any services near you.*",
+            "",
+            "But don't worry, here are some other options you can try:",
+            "",
+            "1. Try another location",
+            "2. Try another service",
         ]
     )
 
