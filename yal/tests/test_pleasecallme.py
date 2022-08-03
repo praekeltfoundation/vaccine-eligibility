@@ -361,6 +361,26 @@ async def test_state_specify_msisdn(tester: AppTester):
     await tester.user_input("0831231234")
     tester.assert_state("state_confirm_specified_msisdn")
 
+    tester.assert_answer("state_specify_msisdn", "0831231234")
+
+
+@pytest.mark.asyncio
+async def test_state_specify_msisdn_country_code(tester: AppTester):
+    tester.setup_state("state_specify_msisdn")
+    await tester.user_input("27831231234")
+    tester.assert_state("state_confirm_specified_msisdn")
+
+    tester.assert_answer("state_specify_msisdn", "27831231234")
+
+
+@pytest.mark.asyncio
+async def test_state_specify_msisdn_country_code_plus(tester: AppTester):
+    tester.setup_state("state_specify_msisdn")
+    await tester.user_input("+27831231234")
+    tester.assert_state("state_confirm_specified_msisdn")
+
+    tester.assert_answer("state_specify_msisdn", "+27831231234")
+
 
 @pytest.mark.asyncio
 async def test_state_confirm_specified_msisdn_incorrect(tester: AppTester):
