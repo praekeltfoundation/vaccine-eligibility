@@ -65,9 +65,12 @@ def get_bot_age():
 
 def normalise_phonenumber(phonenumber):
     try:
-        if not phonenumber.startswith("+"):
-            phonenumber = f"+{phonenumber}"
-        pn = phonenumbers.parse(phonenumber, None)
+        if phonenumber.startswith("0"):
+            pn = phonenumbers.parse(phonenumber, "ZA")
+        else:
+            if not phonenumber.startswith("+") and not phonenumber.startswith("0"):
+                phonenumber = f"+{phonenumber}"
+            pn = phonenumbers.parse(phonenumber, None)
         assert phonenumbers.is_possible_number(pn)
         assert phonenumbers.is_valid_number(pn)
         return phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.E164)

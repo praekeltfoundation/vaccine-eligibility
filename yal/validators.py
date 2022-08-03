@@ -3,6 +3,7 @@ from datetime import date
 from vaccine.states import ErrorMessage
 from vaccine.utils import get_today
 from yal import config
+from yal.utils import normalise_phonenumber
 
 
 def day_validator(dob_year, dob_month, error_text):
@@ -31,6 +32,17 @@ def year_validator(error_text):
                 assert int(value) > get_today().year - config.MAX_AGE
                 assert int(value) <= get_today().year
         except AssertionError:
+            raise ErrorMessage(error_text)
+
+    return validator
+
+
+def phone_number_validator(error_text):
+    async def validator(value):
+        try:
+            normalise_phonenumber(value)
+        except ValueError as e:
+            print(e)
             raise ErrorMessage(error_text)
 
     return validator

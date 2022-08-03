@@ -8,7 +8,6 @@ import aiohttp
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
 from vaccine.utils import HTTP_EXCEPTIONS
-from vaccine.validators import phone_number_validator
 from yal import config, rapidpro
 from yal.utils import (
     GENERIC_ERROR,
@@ -16,6 +15,7 @@ from yal.utils import (
     get_current_datetime,
     normalise_phonenumber,
 )
+from yal.validators import phone_number_validator
 
 logger = logging.getLogger(__name__)
 
