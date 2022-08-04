@@ -16,13 +16,13 @@ logger = logging.getLogger(__name__)
 class Application(BaseApplication):
     START_STATE = "state_pre_mainmenu"
 
-    async def update_suggested_content_details(self, suggested_text):
+    async def update_suggested_content_details(self, level, suggested_text=None):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
-        data = {
-            "last_mainmenu_time": get_current_datetime().isoformat(),
-            "suggested_text": suggested_text,
-        }
+        data = {f"last_{level}_time": get_current_datetime().isoformat()}
+        if suggested_text:
+            data["suggested_text"] = suggested_text
+
         return await rapidpro.update_profile(whatsapp_id, data)
 
     async def reset_suggested_content_details(self):
@@ -33,6 +33,28 @@ class Application(BaseApplication):
             "suggested_text": "",
         }
         return await rapidpro.update_profile(whatsapp_id, data)
+
+    async def get_suggested_choices(self, parent_topic_links={}):
+        if self.user.metadata["suggested_content"] == {}:
+            topics_viewed = set(
+                self.user.metadata.get(
+                    "topics_viewed", list(parent_topic_links.values())[:1]
+                )
+            )
+            error, suggested_choices = await contentrepo.get_suggested_choices(
+                topics_viewed
+            )
+            if error:
+                return await self.go_to_state("state_error")
+            self.save_metadata(
+                "suggested_content", {c.value: c.label for c in suggested_choices}
+            )
+        else:
+            suggested_choices = [
+                Choice(k, v) for k, v in self.user.metadata["suggested_content"].items()
+            ]
+
+        return suggested_choices
 
     async def state_pre_mainmenu(self):
         self.save_metadata("suggested_content", {})
@@ -116,30 +138,12 @@ class Application(BaseApplication):
 
             menu_lines.append("-----")
 
-        if self.user.metadata["suggested_content"] == {}:
-            topics_viewed = set(
-                self.user.metadata.get(
-                    "topics_viewed", list(parent_topic_links.values())[:1]
-                )
-            )
-            error, suggested_choices = await contentrepo.get_suggested_choices(
-                topics_viewed
-            )
-            if error:
-                return await self.go_to_state("state_error")
-            self.save_metadata(
-                "suggested_content", {c.value: c.label for c in suggested_choices}
-            )
-        else:
-            suggested_choices = [
-                Choice(k, v) for k, v in self.user.metadata["suggested_content"].items()
-            ]
-
+        suggested_choices = await self.get_suggested_choices(parent_topic_links)
         choices.extend(suggested_choices)
         suggested_text = "\n".join(
             [f"*{i+k}* - {c.label}" for k, c in enumerate(suggested_choices)]
         )
-        error = await self.update_suggested_content_details(suggested_text)
+        error = await self.update_suggested_content_details("mainmenu", suggested_text)
         if error:
             return await self.go_to_state("state_error")
 
@@ -200,6 +204,8 @@ class Application(BaseApplication):
         else:
             self.save_metadata("page_type", "detail")
 
+        await self.get_suggested_choices()
+
         return await self.go_to_state("state_display_page")
 
     async def state_display_page(self):
@@ -215,6 +221,9 @@ class Application(BaseApplication):
             elif choice.value.startswith("no"):
                 return "state_get_suggestions"
 
+            self.update_suggested_content_details("menu")
+            if choice.value in self.user.metadata["suggested_choices"]:
+                self.save_metadata("suggested_content", {})
             self.save_metadata("selected_page_id", choice.value)
             self.save_metadata("current_message_id", 1)
             return "state_contentrepo_page"
@@ -300,6 +309,20 @@ class Application(BaseApplication):
         helper_metadata = {}
         if "image_path" in metadata and metadata["image_path"]:
             helper_metadata["image"] = contentrepo.get_url(metadata["image_path"])
+
+        i = len(choices)
+        suggested_choices = await self.get_suggested_choices()
+        choices.extend(suggested_choices)
+        suggested_text = "\n".join(
+            [f"*{i+k}* - {c.label}" for k, c in enumerate(suggested_choices)]
+        )
+        self.save_metadata(
+            "suggested_choices", [str(i + k) for k in range(len(suggested_choices))]
+        )
+
+        error = await self.update_suggested_content_details(suggested_text, "main")
+        if error:
+            return await self.go_to_state("state_error")
 
         return CustomChoiceState(
             self,
