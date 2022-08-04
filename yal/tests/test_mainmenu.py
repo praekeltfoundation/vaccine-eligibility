@@ -494,12 +494,12 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["data__session_id"][0] == "1"
     assert params["data__user_addr"][0] == "27820001001"
 
-    assert len(rapidpro_mock.app.requests) == 5
+    assert len(rapidpro_mock.app.requests) == 6
 
     update_request = rapidpro_mock.app.requests[-1]
     assert update_request.json["fields"] == {
         "last_main_time": "2022-06-19T17:30:00",
-        "suggested_text": "*0* - Suggested Content 1\n*1* - Suggested Content 2",
+        "suggested_text": "*1* - Suggested Content 1\n*2* - Suggested Content 2",
     }
 
 

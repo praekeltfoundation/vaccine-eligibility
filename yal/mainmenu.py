@@ -221,7 +221,7 @@ class Application(BaseApplication):
             elif choice.value.startswith("no"):
                 return "state_get_suggestions"
 
-            self.update_suggested_content_details("menu")
+            await self.update_suggested_content_details("menu")
             if choice.value in self.user.metadata["suggested_choices"]:
                 self.save_metadata("suggested_content", {})
             self.save_metadata("selected_page_id", choice.value)
@@ -310,7 +310,7 @@ class Application(BaseApplication):
         if "image_path" in metadata and metadata["image_path"]:
             helper_metadata["image"] = contentrepo.get_url(metadata["image_path"])
 
-        i = len(choices)
+        i = len(choices) + 1
         suggested_choices = await self.get_suggested_choices()
         choices.extend(suggested_choices)
         suggested_text = "\n".join(
