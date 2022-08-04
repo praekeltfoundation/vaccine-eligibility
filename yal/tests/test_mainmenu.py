@@ -555,7 +555,9 @@ async def test_state_detail_image(
 
 
 @pytest.mark.asyncio
-async def test_state_display_page_submenu_back(tester: AppTester, contentrepo_api_mock, rapidpro_mock):
+async def test_state_display_page_submenu_back(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
     tester.setup_state("state_display_page")
     tester.user.metadata["page_type"] = "submenu"
     tester.user.metadata["selected_page_id"] = "111"
@@ -595,7 +597,9 @@ async def test_state_display_page_submenu_back(tester: AppTester, contentrepo_ap
 
 
 @pytest.mark.asyncio
-async def test_state_display_page_detail(tester: AppTester, contentrepo_api_mock, rapidpro_mock):
+async def test_state_display_page_detail(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
     tester.setup_state("state_display_page")
     tester.user.metadata["page_type"] = "detail"
     tester.user.metadata["selected_page_id"] = "111"
@@ -682,7 +686,9 @@ async def test_state_display_page_detail_quick_replies(
 
 
 @pytest.mark.asyncio
-async def test_state_display_page_detail_next(tester: AppTester, contentrepo_api_mock, rapidpro_mock):
+async def test_state_display_page_detail_next(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
     tester.setup_state("state_display_page")
     tester.user.metadata["page_type"] = "detail"
     tester.user.metadata["selected_page_id"] = "111"
@@ -718,7 +724,9 @@ async def test_state_display_page_detail_next(tester: AppTester, contentrepo_api
 
 
 @pytest.mark.asyncio
-async def test_state_display_page_detail_back(tester: AppTester, contentrepo_api_mock, rapidpro_mock):
+async def test_state_display_page_detail_back(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
     tester.setup_state("state_display_page")
     tester.user.metadata["page_type"] = "detail"
     tester.user.metadata["selected_page_id"] = "111"
@@ -754,7 +762,9 @@ async def test_state_display_page_detail_back(tester: AppTester, contentrepo_api
 
 
 @pytest.mark.asyncio
-async def test_state_display_page_detail_next_and_back(tester: AppTester, contentrepo_api_mock, rapidpro_mock):
+async def test_state_display_page_detail_next_and_back(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
     tester.setup_state("state_display_page")
     tester.user.metadata["page_type"] = "detail"
     tester.user.metadata["selected_page_id"] = "111"
@@ -864,7 +874,9 @@ async def contentrepo_api_mock2(sanic_client):
 
 
 @pytest.mark.asyncio
-async def test_state_content_page_related(tester: AppTester, contentrepo_api_mock2, rapidpro_mock):
+async def test_state_content_page_related(
+    tester: AppTester, contentrepo_api_mock2, rapidpro_mock
+):
     tester.setup_state("state_contentrepo_page")
     tester.user.metadata["selected_page_id"] = "1"
     tester.user.metadata["current_message_id"] = 1
