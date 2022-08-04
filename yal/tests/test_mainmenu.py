@@ -8,6 +8,7 @@ from sanic import Sanic, response
 
 from vaccine.models import Message
 from vaccine.testing import AppTester
+from yal import config
 from yal.main import Application
 
 
