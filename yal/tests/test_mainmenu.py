@@ -8,7 +8,6 @@ from sanic import Sanic, response
 
 from vaccine.models import Message
 from vaccine.testing import AppTester
-from yal import config
 from yal.main import Application
 
 
@@ -425,9 +424,11 @@ async def test_state_mainmenu_contentrepo(
 
 
 @pytest.mark.asyncio
+@mock.patch("yal.mainmenu.get_current_datetime")
 async def test_state_mainmenu_contentrepo_children(
-    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+    get_current_datetime, tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input("3")
 
@@ -493,6 +494,12 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["data__user_addr"][0] == "27820001001"
 
     assert len(rapidpro_mock.app.requests) == 5
+
+    update_request = rapidpro_mock.app.requests[-1]
+    assert update_request.json["fields"] == {
+        "last_main_time": "2022-06-19T17:30:00",
+        "suggested_text": "*0* - Suggested Content 1\n*1* - Suggested Content 2",
+    }
 
 
 @pytest.mark.asyncio

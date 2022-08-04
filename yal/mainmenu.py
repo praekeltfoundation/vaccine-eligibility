@@ -320,7 +320,7 @@ class Application(BaseApplication):
             "suggested_choices", [str(i + k) for k in range(len(suggested_choices))]
         )
 
-        error = await self.update_suggested_content_details(suggested_text, "main")
+        error = await self.update_suggested_content_details("main", suggested_text)
         if error:
             return await self.go_to_state("state_error")
 
