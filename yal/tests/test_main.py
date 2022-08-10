@@ -170,6 +170,13 @@ async def test_help_keyword(get_current_datetime, tester: AppTester):
     tester.assert_state("state_in_hours")
     tester.assert_num_messages(1)
 
+@pytest.mark.asyncio
+async def test_stop_keyword(tester: AppTester):
+    tester.setup_state("state_catch_all")
+    await tester.user_input("stop")
+    tester.assert_state("state_optout")
+    tester.assert_num_messages(1)
+
 
 @pytest.mark.asyncio
 async def test_state_start_to_catch_all(tester: AppTester, rapidpro_mock):

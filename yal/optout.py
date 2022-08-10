@@ -39,8 +39,8 @@ class Application(BaseApplication):
             question=question,
             button="Opt Out",
             choices=[
-                Choice("stop messages", self._("Stop receiving messages")),
-                Choice("stop notifications", self._("Stop receiving notifications")),
+                Choice("stop messages", self._("Stop messages")),
+                Choice("stop notifications", self._("Stop notifications")),
                 Choice("delete saved", self._("Delete all save data")),
                 Choice("skip", self._("No change")),
             ],
@@ -114,9 +114,9 @@ class Application(BaseApplication):
             choices=[
                 Choice("message volume", self._("Too many messages")),
                 Choice("user-friendliness", self._("Difficult to use")),
-                Choice("irrelevant", self._("Content is irrelevant")),
-                Choice("boring", self._("Content is boring/repetitive")),
-                Choice("lengthy", self._("Messages are too long")),
+                Choice("irrelevant", self._("Content irrelevant")),
+                Choice("boring", self._("Content is boring")),
+                Choice("lengthy", self._("Messages too long")),
                 Choice("other", self._("Other")),
                 Choice("none", self._("Rather not say")),
                 Choice("skip", self._("Skip")),
