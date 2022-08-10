@@ -72,6 +72,7 @@ async def get_choices_by_path(path):
     async with get_contentrepo_api() as session:
         for i in range(3):
             try:
+                logger.info(f">>>> get_choices_by_path {path}")
                 response = await session.get(urljoin(config.CONTENTREPO_API_URL, path))
                 response.raise_for_status()
                 response_body = await response.json()
@@ -100,6 +101,8 @@ async def get_page_details(user, page_id, message_id):
                     "data__session_id": user.session_id,
                     "data__user_addr": user.addr,
                 }
+                logger.info(f">>>> get_page_details /api/v2/pages/{page_id}")
+                logger.info(params)
                 response = await session.get(
                     urljoin(config.CONTENTREPO_API_URL, f"/api/v2/pages/{page_id}"),
                     params=params,
