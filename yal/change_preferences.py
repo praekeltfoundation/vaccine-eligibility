@@ -40,9 +40,9 @@ class Application(BaseApplication):
 
             return value
 
-        dob_year = fields.get("dob_year")
-        dob_month = fields.get("dob_month")
-        dob_day = fields.get("dob_day")
+        dob_year = fields.get("dob_year") or "skip"
+        dob_month = fields.get("dob_month") or "skip"
+        dob_day = fields.get("dob_day") or "skip"
         relationship_status = get_field("relationship_status").title()
         gender = get_field("gender")
 
