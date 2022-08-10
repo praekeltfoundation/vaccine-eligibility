@@ -19,7 +19,6 @@ def get_rapidpro_contact(urn):
         "language": "eng",
         "groups": [],
         "fields": {
-            "relationship_status": "yes",
             "gender": "boy_man",
             "dob_day": "22",
             "dob_month": "2",
@@ -95,7 +94,7 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
             "22/2/2022",
             "",
             "☑️ 💟 *In a Relationship?*",
-            "Yes",
+            "Empty",
             "",
             "☑️ 📍 *Location*",
             "12 test street TestSuburb Free State",
