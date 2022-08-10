@@ -221,7 +221,6 @@ class Application(BaseApplication):
             elif choice.value.startswith("no"):
                 return "state_get_suggestions"
 
-            await self.update_suggested_content_details("menu")
             if choice.value in self.user.metadata["suggested_choices"]:
                 self.save_metadata("suggested_content", {})
             self.save_metadata("selected_page_id", choice.value)
