@@ -29,7 +29,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         def get_field(name):
-            value = fields.get(name)
+            value = fields.get(name, "skip")
             if value == "skip":
                 return "Empty"
 
