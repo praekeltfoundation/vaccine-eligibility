@@ -80,7 +80,7 @@ class Application(BaseApplication):
                     "*👩🏾 No problem. Here's the info you've saved:*",
                     "",
                     "☑️ 🎂 *Birthday*",
-                    "/".join(dob),
+                    "/".join(dob) if dob != [] else "Empty",
                     "",
                     "☑️ 💟 *In a Relationship?*",
                     relationship_status,
