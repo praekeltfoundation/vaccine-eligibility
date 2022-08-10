@@ -19,6 +19,7 @@ def get_rapidpro_contact(urn):
         "language": "eng",
         "groups": [],
         "fields": {
+            "relationship_status": None,
             "gender": "boy_man",
             "dob_day": "22",
             "dob_month": "2",
