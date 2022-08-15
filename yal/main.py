@@ -11,6 +11,7 @@ from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.terms_and_conditions import Application as TermsApplication
+from yal.usertest_feedback import Application as FeedbackApplication
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,7 @@ CALLBACK_CHECK_KEYWORDS = {
     "no i m still waiting",
 }
 AAQ_TIMEOUT_KEYWORDS = {"yes", "no", "yes ask again", "no i m good"}
+FEEDBACK_KEYWORDS = {"feedback"}
 
 
 class Application(
@@ -41,6 +43,7 @@ class Application(
     ServiceFinderApplication,
     OptOutApplication,
     AaqApplication,
+    FeedbackApplication,
 ):
     START_STATE = "state_start"
 
@@ -58,6 +61,11 @@ class Application(
         if keyword in OPTOUT_KEYWORDS:
             self.user.session_id = None
             self.state_name = OptOutApplication.START_STATE
+
+        if keyword in FEEDBACK_KEYWORDS:
+            self.user.session_id = None
+            self.state_name = FeedbackApplication.START_STATE
+
         return await super().process_message(message)
 
     async def state_start(self):
