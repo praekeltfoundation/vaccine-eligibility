@@ -14,7 +14,6 @@ def tester():
 
 
 def get_rapidpro_contact(urn):
-    print(urn)
     status = {
         "whatsapp:27820001001": "PENDING",
         "whatsapp:27820001002": "TRUE",
