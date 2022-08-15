@@ -49,7 +49,7 @@ class Application(BaseApplication):
         return WhatsAppListState(
             self,
             question=question,
-            button="Opt Out",
+            button="Feedback",
             choices=[
                 Choice("excellent", self._("Excellent")),
                 Choice("good", self._("Good")),
@@ -81,7 +81,7 @@ class Application(BaseApplication):
         return WhatsAppListState(
             self,
             question=question,
-            button="Opt Out",
+            button="Feedback",
             choices=[
                 Choice("excellent", self._("Excellent")),
                 Choice("good", self._("Good")),
@@ -114,7 +114,7 @@ class Application(BaseApplication):
         return WhatsAppListState(
             self,
             question=question,
-            button="Opt Out",
+            button="Feedback",
             choices=[
                 Choice("excellent", self._("Excellent")),
                 Choice("good", self._("Good")),
@@ -147,7 +147,7 @@ class Application(BaseApplication):
         return WhatsAppListState(
             self,
             question=question,
-            button="Opt Out",
+            button="Feedback",
             choices=[
                 Choice("excellent", self._("Excellent")),
                 Choice("good", self._("Good")),
@@ -180,7 +180,7 @@ class Application(BaseApplication):
         return WhatsAppListState(
             self,
             question=question,
-            button="Opt Out",
+            button="Feedback",
             choices=[
                 Choice("excellent", self._("Excellent")),
                 Choice("good", self._("Good")),
@@ -213,7 +213,7 @@ class Application(BaseApplication):
         return WhatsAppListState(
             self,
             question=question,
-            button="Opt Out",
+            button="Feedback",
             choices=[
                 Choice("excellent", self._("Excellent")),
                 Choice("good", self._("Good")),
@@ -245,7 +245,7 @@ class Application(BaseApplication):
         return WhatsAppListState(
             self,
             question=question,
-            button="Opt Out",
+            button="Feedback",
             choices=[
                 Choice("extremely_useful", self._("Extremely useful")),
                 Choice("very_useful", self._("Very useful")),
@@ -277,7 +277,7 @@ class Application(BaseApplication):
         return WhatsAppListState(
             self,
             question=question,
-            button="Opt Out",
+            button="Feedback",
             choices=[
                 Choice("extremely_likely", self._("Extremely likely")),
                 Choice("very_likely", self._("Very likely")),
@@ -309,7 +309,7 @@ class Application(BaseApplication):
         return WhatsAppListState(
             self,
             question=question,
-            button="Opt Out",
+            button="Feedback",
             choices=[
                 Choice("all_the_time", self._("All the time")),
                 Choice("a_lot", self._("Quite a lot")),
