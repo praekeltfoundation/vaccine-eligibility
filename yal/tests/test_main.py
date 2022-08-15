@@ -12,15 +12,19 @@ from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.main import Application
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
+from yal.optout import Application as OptoutApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.terms_and_conditions import Application as TermsApplication
+from yal.usertest_feedback import Application as FeedbackApplication
 
 
 def test_no_state_name_clashes():
+    m_states = set(s for s in dir(Application) if s.startswith("state_"))
     mm_states = set(s for s in dir(MainMenuApplication) if s.startswith("state_"))
     on_states = set(s for s in dir(OnboardingApplication) if s.startswith("state_"))
+    oo_states = set(s for s in dir(OptoutApplication) if s.startswith("state_"))
     te_states = set(s for s in dir(TermsApplication) if s.startswith("state_"))
     cp_states = set(
         s for s in dir(ChangePreferencesApplication) if s.startswith("state_")
@@ -29,19 +33,24 @@ def test_no_state_name_clashes():
     pc_states = set(s for s in dir(PleaseCallMeApplication) if s.startswith("state_"))
     sf_states = set(s for s in dir(ServiceFinderApplication) if s.startswith("state_"))
     aaq_states = set(s for s in dir(AaqApplication) if s.startswith("state_"))
+    fb_states = set(s for s in dir(FeedbackApplication) if s.startswith("state_"))
     intersection = (
-        mm_states
+        m_states
+        & mm_states
         & on_states
+        & oo_states
         & te_states
         & cp_states
         & q_states
         & pc_states
         & sf_states
         & aaq_states
+        & fb_states
     ) - {
         "state_name",
         "state_error",
     }
+
     assert len(intersection) == 0, f"Common states to both apps: {intersection}"
 
 
