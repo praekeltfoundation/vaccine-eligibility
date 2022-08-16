@@ -145,7 +145,7 @@ async def get_page_details(user, page_id, message_id):
                     if message_number == 1:
                         page_details["quick_replies"] = response_body["quick_replies"]
 
-                if response_body["body"]["text"]["value"]["image"]:
+                if response_body["body"]["text"]["value"].get("image"):
                     image_id = response_body["body"]["text"]["value"]["image"]
                     response = await session.get(
                         urljoin(
