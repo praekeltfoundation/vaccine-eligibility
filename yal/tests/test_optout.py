@@ -1,6 +1,9 @@
 import json
 
 # from datetime import date
+from datetime import datetime
+from unittest import mock
+
 # from unittest import mock
 #
 import pytest
@@ -85,14 +88,6 @@ async def rapidpro_mock(sanic_client):
 
 
 @pytest.mark.asyncio
-async def test_state_optout_stop_messages(tester: AppTester):
-    tester.setup_state("state_optout")
-    await tester.user_input("1")
-    tester.assert_state("state_optout_survey")
-    tester.assert_answer("state_optout", "stop messages")
-
-
-@pytest.mark.asyncio
 async def test_state_optout_survey_other(tester: AppTester):
     tester.setup_state("state_optout_survey")
     await tester.user_input("6")
@@ -149,10 +144,27 @@ async def test_state_optout_survey_skip(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_optout_stop_notifications(tester: AppTester):
+@mock.patch("yal.optout.get_current_datetime")
+async def test_state_optout_stop_notifications(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+
     tester.setup_state("state_optout")
-    await tester.user_input("2")
+    await tester.user_input("1")
     tester.assert_state("state_optout_survey")
+
+    assert len(rapidpro_mock.app.requests) == 1
+
+    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
+
+    post_request = rapidpro_mock.app.requests[0]
+    assert json.loads(post_request.body.decode("utf-8")) == {
+        "fields": {
+            "opted_out": "TRUE",
+            "opted_out_timestamp": "2022-06-19T17:30:00",
+        },
+    }
 
 
 @pytest.mark.asyncio
@@ -165,7 +177,7 @@ async def test_state_tell_us_more(tester: AppTester):
 @pytest.mark.asyncio
 async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_optout")
-    await tester.user_input("3")
+    await tester.user_input("2")
     tester.assert_state("state_change_info_prompt")
 
     # Three API calls:
@@ -177,7 +189,6 @@ async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
     post_request = rapidpro_mock.app.requests[1]
     assert json.loads(post_request.body.decode("utf-8")) == {
         "fields": {
-            "onboarding_completed": "True",
             "dob_year": "",
             "dob_month": "",
             "dob_day": "",
@@ -195,5 +206,5 @@ async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
 @pytest.mark.asyncio
 async def test_state_optout_skip(tester: AppTester):
     tester.setup_state("state_optout")
-    await tester.user_input("4")
+    await tester.user_input("3")
     tester.assert_state(None)
