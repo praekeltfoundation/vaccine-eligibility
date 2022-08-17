@@ -6,7 +6,7 @@ from vaccine.states import Choice, EndState, FreeText, WhatsAppListState
 from yal import contentrepo, rapidpro, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
-from yal.utils import GENDERS, GENERIC_ERROR
+from yal.utils import GENDERS, GENERIC_ERROR, get_current_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -26,11 +26,9 @@ class Application(BaseApplication):
                     "",
                     "What would you like to do?",
                     "",
-                    "1 - I want to stop getting",
-                    "messages from B-Wise",
-                    "2 - I  want to stop receiving notifications",
-                    "3 - I  want to delete all data saved about me.",
-                    "4 - No change. I still want to receive messages from B-Wise",
+                    "1 - I  want to stop receiving notifications",
+                    "2 - I  want to delete all data saved about me.",
+                    "3 - No change. I still want to receive messages from B-Wise",
                 ]
             )
         )
@@ -39,21 +37,35 @@ class Application(BaseApplication):
             question=question,
             button="Opt Out",
             choices=[
-                Choice("stop messages", self._("Stop messages")),
                 Choice("stop notifications", self._("Stop notifications")),
                 Choice("delete saved", self._("Delete all save data")),
                 Choice("skip", self._("No change")),
             ],
             next={
-                "stop messages": "state_stop_messages",
-                "stop notifications": "state_stop_notifications",
+                "stop notifications": "state_submit_optout",
                 "delete saved": "state_delete_saved",
                 "skip": MainMenuApplication.START_STATE,
             },
             error=self._(GENERIC_ERROR),
         )
 
-    async def state_stop_messages(self):
+    async def state_submit_optout(self):
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        error = await rapidpro.update_profile(
+            whatsapp_id,
+            {
+                "opted_out": "TRUE",
+                "opted_out_timestamp": get_current_datetime().isoformat(),
+            },
+        )
+        if error:
+            return await self.go_to_state("state_error")
+
+        return await self.go_to_state("state_stop_notifications")
+
+    async def state_stop_notifications(self):
         msg = self._(
             "\n".join(
                 [
@@ -61,17 +73,6 @@ class Application(BaseApplication):
                     "------",
                     "",
                     "👩🏾 I'm sorry to see you go. It's been a pleasure talking to you.",
-                ]
-            )
-        )
-        await self.worker.publish_message(self.inbound.reply(msg))
-        return await self.go_to_state("state_optout_survey")
-
-    async def state_stop_notifications(self):
-        msg = self._(
-            "\n".join(
-                [
-                    "✅ B-Wise by Young Africa Live will stop sending you messages.",
                 ]
             )
         )
@@ -130,7 +131,6 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         data = {
-            "onboarding_completed": "True",
             "dob_month": "",
             "dob_day": "",
             "dob_year": "",
@@ -147,7 +147,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
         old_details = self.__get_user_details(fields)
 
-        await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")
 
