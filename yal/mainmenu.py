@@ -120,6 +120,13 @@ class Application(BaseApplication):
                         "last_topic_viewed", parent_topic_links[choice.value]
                     )
 
+                suggested = False
+                if choice.value in self.user.metadata.get("suggested_choices", {}):
+                    self.save_metadata("suggested_content", {})
+                    suggested = True
+
+                self.save_metadata("is_suggested_page", suggested)
+
                 self.save_metadata("selected_page_id", choice.value)
                 self.save_metadata("current_message_id", 1)
                 return "state_contentrepo_page"
@@ -180,7 +187,7 @@ class Application(BaseApplication):
         message_id = metadata["current_message_id"]
 
         error, page_details = await contentrepo.get_page_details(
-            self.user, page_id, message_id
+            self.user, page_id, message_id, metadata.get("is_suggested_page")
         )
         if error:
             return await self.go_to_state("state_error")
@@ -221,8 +228,12 @@ class Application(BaseApplication):
             elif choice.value.startswith("no"):
                 return "state_get_suggestions"
 
-            if choice.value in self.user.metadata["suggested_choices"]:
+            suggested = False
+            if choice.value in self.user.metadata.get("suggested_choices", {}):
                 self.save_metadata("suggested_content", {})
+                suggested = True
+
+            self.save_metadata("is_suggested_page", suggested)
             self.save_metadata("selected_page_id", choice.value)
             self.save_metadata("current_message_id", 1)
             return "state_contentrepo_page"
