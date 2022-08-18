@@ -91,12 +91,10 @@ class Application(BaseApplication):
                 return await self.go_to_state("state_error")
 
         title = page_details["title"]
-        subtitle = page_details["subtitle"]
         body = page_details["body"]
 
         parts = [
             f"*{title}*",
-            subtitle,
             "-----",
             "",
             body,

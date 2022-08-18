@@ -21,7 +21,6 @@ def tester():
 def build_message_detail(
     id,
     title,
-    subtitle,
     content,
     tags,
     has_children,
@@ -32,7 +31,7 @@ def build_message_detail(
     return {
         "id": id,
         "title": title,
-        "subtitle": subtitle,
+        "subtitle": None,
         "body": {
             "message": 1,
             "next_message": None,
@@ -130,7 +129,6 @@ async def contentrepo_api_mock(sanic_client):
             build_message_detail(
                 111,
                 "Main Menu 1 💊",
-                "subtitle",
                 "Message test content 1",
                 ["test"],
                 False,
@@ -144,7 +142,6 @@ async def contentrepo_api_mock(sanic_client):
             build_message_detail(
                 1112,
                 "Main Menu 1 💊",
-                "subtitle",
                 "Message test content 1",
                 ["test"],
                 False,
@@ -159,7 +156,6 @@ async def contentrepo_api_mock(sanic_client):
             build_message_detail(
                 222,
                 "Main Menu 2 🤝",
-                "subtitle",
                 "Message test content 2",
                 ["test"],
                 True,
@@ -173,7 +169,6 @@ async def contentrepo_api_mock(sanic_client):
             build_message_detail(
                 333,
                 "Sub menu 1",
-                "subtitle",
                 "Sub menu test content 2",
                 ["test"],
                 True,
@@ -187,7 +182,6 @@ async def contentrepo_api_mock(sanic_client):
             build_message_detail(
                 444,
                 "Sub menu 2",
-                "subtitle",
                 "Sub menu test content 2",
                 ["test"],
                 False,
@@ -201,7 +195,6 @@ async def contentrepo_api_mock(sanic_client):
             build_message_detail(
                 444,
                 "Sub menu 2",
-                "subtitle",
                 "Sub menu test content with image",
                 ["test"],
                 True,
@@ -216,7 +209,6 @@ async def contentrepo_api_mock(sanic_client):
             build_message_detail(
                 444,
                 "Sub menu 2",
-                "subtitle",
                 "Detail test content with image",
                 ["test"],
                 False,
@@ -390,7 +382,6 @@ async def test_state_mainmenu_contentrepo(
     question = "\n".join(
         [
             "*Sub menu 2*",
-            "subtitle",
             "-----",
             "",
             "Sub menu test content 2",
@@ -437,7 +428,6 @@ async def test_state_mainmenu_contentrepo_children(
     question = "\n".join(
         [
             "*Sub menu 1*",
-            "subtitle",
             "-----",
             "",
             "Sub menu test content 2",
@@ -461,7 +451,6 @@ async def test_state_mainmenu_contentrepo_children(
     question = "\n".join(
         [
             "*Sub menu 2*",
-            "subtitle",
             "-----",
             "",
             "Sub menu test content 2",
@@ -514,7 +503,6 @@ async def test_state_submenu_image(
     question = "\n".join(
         [
             "*Sub menu 2*",
-            "subtitle",
             "-----",
             "",
             "Sub menu test content with image",
@@ -544,7 +532,6 @@ async def test_state_detail_image(
     question = "\n".join(
         [
             "*Sub menu 2*",
-            "subtitle",
             "-----",
             "",
             "Detail test content with image",
@@ -571,7 +558,6 @@ async def test_state_display_page_submenu_back(
     tester.user.metadata["page_type"] = "submenu"
     tester.user.metadata["selected_page_id"] = "111"
     tester.user.metadata["title"] = "title"
-    tester.user.metadata["subtitle"] = "subtitle"
     tester.user.metadata["body"] = "body"
     tester.user.metadata["current_menu_level"] = 3
     tester.user.metadata["current_message_id"] = 1
@@ -586,7 +572,6 @@ async def test_state_display_page_submenu_back(
         "\n".join(
             [
                 "*title*",
-                "subtitle",
                 "-----",
                 "",
                 "body",
@@ -613,7 +598,6 @@ async def test_state_display_page_detail(
     tester.user.metadata["page_type"] = "detail"
     tester.user.metadata["selected_page_id"] = "111"
     tester.user.metadata["title"] = "title"
-    tester.user.metadata["subtitle"] = "subtitle"
     tester.user.metadata["body"] = "body"
     tester.user.metadata["current_menu_level"] = 1
     tester.user.metadata["current_message_id"] = 1
@@ -626,7 +610,6 @@ async def test_state_display_page_detail(
         "\n".join(
             [
                 "*title*",
-                "subtitle",
                 "-----",
                 "",
                 "body",
@@ -659,7 +642,6 @@ async def test_state_display_page_detail_quick_replies(
         "\n".join(
             [
                 "*Main Menu 1 💊*",
-                "subtitle",
                 "-----",
                 "",
                 "Message test content 1",
@@ -702,7 +684,6 @@ async def test_state_display_page_detail_next(
     tester.user.metadata["page_type"] = "detail"
     tester.user.metadata["selected_page_id"] = "111"
     tester.user.metadata["title"] = "title"
-    tester.user.metadata["subtitle"] = "subtitle"
     tester.user.metadata["body"] = "body"
     tester.user.metadata["current_menu_level"] = 1
     tester.user.metadata["current_message_id"] = 1
@@ -716,7 +697,6 @@ async def test_state_display_page_detail_next(
         "\n".join(
             [
                 "*title*",
-                "subtitle",
                 "-----",
                 "",
                 "body",
@@ -740,7 +720,6 @@ async def test_state_display_page_detail_back(
     tester.user.metadata["page_type"] = "detail"
     tester.user.metadata["selected_page_id"] = "111"
     tester.user.metadata["title"] = "title"
-    tester.user.metadata["subtitle"] = "subtitle"
     tester.user.metadata["body"] = "body"
     tester.user.metadata["current_menu_level"] = 3
     tester.user.metadata["current_message_id"] = 1
@@ -755,7 +734,6 @@ async def test_state_display_page_detail_back(
         "\n".join(
             [
                 "*title*",
-                "subtitle",
                 "-----",
                 "",
                 "body",
@@ -778,7 +756,6 @@ async def test_state_display_page_detail_next_and_back(
     tester.user.metadata["page_type"] = "detail"
     tester.user.metadata["selected_page_id"] = "111"
     tester.user.metadata["title"] = "title"
-    tester.user.metadata["subtitle"] = "subtitle"
     tester.user.metadata["body"] = "body"
     tester.user.metadata["current_menu_level"] = 3
     tester.user.metadata["current_message_id"] = 1
@@ -794,7 +771,6 @@ async def test_state_display_page_detail_next_and_back(
         "\n".join(
             [
                 "*title*",
-                "subtitle",
                 "-----",
                 "",
                 "body",
@@ -819,7 +795,6 @@ async def test_state_display_page_detail_related(
     tester.user.metadata["page_type"] = "detail"
     tester.user.metadata["selected_page_id"] = "111"
     tester.user.metadata["title"] = "title"
-    tester.user.metadata["subtitle"] = "subtitle"
     tester.user.metadata["body"] = "body"
     tester.user.metadata["current_menu_level"] = 1
     tester.user.metadata["current_message_id"] = 1
@@ -832,7 +807,6 @@ async def test_state_display_page_detail_related(
         "\n".join(
             [
                 "*title*",
-                "subtitle",
                 "-----",
                 "",
                 "body",
@@ -859,7 +833,6 @@ async def contentrepo_api_mock2(sanic_client):
             build_message_detail(
                 111,
                 "Main Menu 1 💊",
-                "subtitle",
                 "Message test content 1",
                 ["related_2"],
                 False,
@@ -900,7 +873,6 @@ async def test_state_content_page_related(
         "\n".join(
             [
                 "*Main Menu 1 💊*",
-                "subtitle",
                 "-----",
                 "",
                 "Message test content 1",

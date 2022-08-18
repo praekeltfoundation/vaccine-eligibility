@@ -65,7 +65,7 @@ async def contentrepo_api_mock(sanic_client):
             {
                 "id": page_id,
                 "title": title,
-                "subtitle": "subtitle",
+                "subtitle": None,
                 "body": {
                     "message": page_id,
                     "total_messages": page_id,
@@ -104,7 +104,6 @@ async def test_state_quiz_start(tester: AppTester, contentrepo_api_mock):
         "\n".join(
             [
                 "*Question 1*",
-                "subtitle",
                 "-----",
                 "",
                 "The body of question 1",
@@ -139,7 +138,6 @@ async def test_state_quiz_start(tester: AppTester, contentrepo_api_mock):
         "\n".join(
             [
                 "*Question 2*",
-                "subtitle",
                 "-----",
                 "",
                 "The body of question 2",

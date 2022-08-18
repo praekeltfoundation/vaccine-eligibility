@@ -193,7 +193,6 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         self.save_metadata("title", page_details["title"])
-        self.save_metadata("subtitle", page_details["subtitle"])
         self.save_metadata("body", page_details["body"])
         self.save_metadata("image_path", page_details.get("image_path"))
         self.save_metadata("next_prompt", page_details.get("next_prompt"))
@@ -249,7 +248,6 @@ class Application(BaseApplication):
                 return await self.go_to_state("state_error")
 
         title = metadata["title"]
-        subtitle = metadata["subtitle"]
         body = metadata["body"]
         next_prompt = metadata.get("next_prompt")
         quiz_tag = metadata.get("quiz_tag")
@@ -257,7 +255,6 @@ class Application(BaseApplication):
 
         parts = [
             f"*{title}*",
-            subtitle,
             "-----",
             "",
             body,
