@@ -150,8 +150,6 @@ class Application(BaseApplication):
             "It explains your rights and choices when it comes to how we use and "
             "store your info.\n"
             "\n"
-            "*We good to keep going?*\n"
-            "\n"
             "*1 - READ* Privacy Policy\n"
             "*2 - I ACCEPT* (continue)\n"
             "*3 - I DON'T ACCEPT*"
@@ -181,19 +179,6 @@ class Application(BaseApplication):
             )
         )
         await asyncio.sleep(1.5)
-        return await self.go_to_state("state_read_terms")
-
-    async def state_read_terms(self):
-        await self.worker.publish_message(
-            self.inbound.reply(
-                self._(
-                    "*Roo: Your Sexual Health Bot*\n\n"
-                    "Questions about sex, masturbation, pregnancy, relationships? Roo "
-                    "has answers powered by Planned Parenthood."
-                )
-            )
-        )
-        await asyncio.sleep(0.5)
         return await self.go_to_state("state_terms")
 
     async def state_decline_confirm(self):
