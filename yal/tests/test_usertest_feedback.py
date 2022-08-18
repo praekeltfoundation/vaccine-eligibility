@@ -331,7 +331,10 @@ async def test_state_submit_completed_feedback(tester: AppTester, rapidpro_mock)
 
     tester.assert_state("state_start")
 
-    tester.assert_message("Thank you for your feedback. Have a great day.")
+    tester.assert_message(
+        "Thank you for your participation and your feedback. We will send you 1GB "
+        "of data to this number as reimbursement for your time. Have a great day."
+    )
 
     assert len(rapidpro_mock.app.requests) == 1
     request = rapidpro_mock.app.requests[0]
