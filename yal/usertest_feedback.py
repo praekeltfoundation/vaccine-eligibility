@@ -335,5 +335,8 @@ class Application(BaseApplication):
         return await self.go_to_state("state_completed_feedback")
 
     async def state_completed_feedback(self):
-        text = self._("Thank you for your feedback. Have a great day.")
+        text = self._(
+            "Thank you for your participation and your feedback. We will send you 1GB "
+            "of data to this number as reimbursement for your time. Have a great day."
+        )
         return EndState(self, text=text, next=self.START_STATE)
