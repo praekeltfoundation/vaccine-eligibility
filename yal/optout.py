@@ -6,7 +6,13 @@ from vaccine.states import Choice, EndState, FreeText, WhatsAppListState
 from yal import contentrepo, rapidpro, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
-from yal.utils import GENDERS, GENERIC_ERROR, get_current_datetime
+from yal.utils import (
+    BACK_TO_MAIN,
+    GENDERS,
+    GENERIC_ERROR,
+    GET_HELP,
+    get_current_datetime,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -166,8 +172,8 @@ class Application(BaseApplication):
                             "*------*",
                             "*Reply:*",
                             "*1* - to see your personal data",
-                            "*0* - 🏠Back to Main *MENU*",
-                            "*#* - 🆘Get *HELP*",
+                            BACK_TO_MAIN,
+                            GET_HELP,
                         ]
                     )
                 ),

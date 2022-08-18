@@ -9,6 +9,7 @@ from vaccine.models import Message
 from vaccine.testing import AppTester
 from yal import config
 from yal.main import Application
+from yal.utils import BACK_TO_MAIN
 
 
 @pytest.fixture
@@ -80,7 +81,7 @@ async def test_aaq_start(tester: AppTester, rapidpro_mock):
                 "",
                 "-----",
                 "*Or reply:*",
-                "*0* - 🏠 Back to Main *MENU*",
+                BACK_TO_MAIN,
             ]
         )
     )
