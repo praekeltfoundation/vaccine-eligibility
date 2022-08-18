@@ -10,6 +10,7 @@ from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
 from vaccine.utils import HTTP_EXCEPTIONS
 from yal import config, rapidpro
 from yal.utils import (
+    BACK_TO_MAIN,
     GENERIC_ERROR,
     clean_inbound,
     get_current_datetime,
@@ -79,7 +80,7 @@ class Application(BaseApplication):
                     "",
                     "-----",
                     "*Or reply:*",
-                    "*0* - 🏠Back to Main *MENU*",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -113,7 +114,7 @@ class Application(BaseApplication):
                     "",
                     "-----",
                     "*Or reply:*",
-                    "*0* - 🏠Back to Main *MENU*",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -186,7 +187,7 @@ class Application(BaseApplication):
                     "",
                     "-----",
                     "Or reply:",
-                    "0 - 🏠 Back to Main MENU",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -270,7 +271,7 @@ class Application(BaseApplication):
                     "",
                     "-----",
                     "*Or Reply:*",
-                    "*0* - 🏠 Back to Main *MENU*",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -311,7 +312,7 @@ class Application(BaseApplication):
                     "",
                     "-----",
                     "*Or reply:*",
-                    "*0* - 🏠Back to Main *MENU*",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -344,7 +345,7 @@ class Application(BaseApplication):
                     "",
                     "-----",
                     "*Or reply:*",
-                    "*0* - 🏠Back to Main *MENU*",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -376,7 +377,7 @@ class Application(BaseApplication):
                     "*2* - No thanks",
                     "-----",
                     "*Or reply:*",
-                    "*0* - 🏠Back to Main *MENU*",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -458,7 +459,7 @@ class Application(BaseApplication):
                     "",
                     "----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main MENU",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -494,7 +495,7 @@ class Application(BaseApplication):
                     "",
                     "----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main MENU",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -541,7 +542,7 @@ class Application(BaseApplication):
                         "",
                         "-----",
                         "*Or reply:*",
-                        "*0* - 🏠Back to Main *MENU*",
+                        BACK_TO_MAIN,
                     ]
                 )
             )
@@ -574,7 +575,7 @@ class Application(BaseApplication):
                         "",
                         "----",
                         "*Or reply:*",
-                        "*0* - 🏠 Back to Main MENU",
+                        BACK_TO_MAIN,
                     ]
                 )
             )
@@ -608,7 +609,7 @@ class Application(BaseApplication):
                     "",
                     "----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main MENU",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -652,7 +653,7 @@ class Application(BaseApplication):
                     "one of our loveLife counsellors can call you back.",
                     "",
                     "----",
-                    "*0* - 🏠 Back to Main MENU",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -694,7 +695,7 @@ class Application(BaseApplication):
                     "",
                     "*1* - Get help another way" "----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main MENU",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -738,7 +739,7 @@ class Application(BaseApplication):
                     "",
                     "*1* - Get help another way" "----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main MENU",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -776,7 +777,7 @@ class Application(BaseApplication):
                     "",
                     "----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main MENU",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -810,7 +811,7 @@ class Application(BaseApplication):
                     "",
                     "----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main MENU",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -843,7 +844,7 @@ class Application(BaseApplication):
                     "",
                     "----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main MENU",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -878,7 +879,7 @@ class Application(BaseApplication):
                     "",
                     "----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main MENU",
+                    BACK_TO_MAIN,
                 ]
             )
         )

@@ -12,7 +12,9 @@ from vaccine.states import (
 )
 from yal import rapidpro
 from yal.utils import (
+    BACK_TO_MAIN,
     GENERIC_ERROR,
+    GET_HELP,
     clean_inbound,
     get_current_datetime,
     normalise_phonenumber,
@@ -40,7 +42,7 @@ class Application(BaseApplication):
                     "",
                     "-----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main *MENU*",
+                    BACK_TO_MAIN,
                 ]
             )
         )
@@ -86,8 +88,8 @@ class Application(BaseApplication):
                     "",
                     "-----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main *MENU*",
-                    "# - 🆘 Get HELP",
+                    BACK_TO_MAIN,
+                    GET_HELP,
                 ]
             )
         )

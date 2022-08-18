@@ -5,6 +5,7 @@ from vaccine.models import Message
 from vaccine.testing import AppTester
 from yal import config
 from yal.main import Application
+from yal.utils import BACK_TO_MAIN, GET_HELP
 
 
 @pytest.fixture
@@ -113,8 +114,8 @@ async def test_state_quiz_start(tester: AppTester, contentrepo_api_mock):
                 "",
                 "-----",
                 "*Or reply:*",
-                "0. 🏠 Back to Main MENU",
-                "# 🆘 Get HELP",
+                BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
     )
@@ -149,8 +150,8 @@ async def test_state_quiz_start(tester: AppTester, contentrepo_api_mock):
                 "",
                 "-----",
                 "*Or reply:*",
-                "0. 🏠 Back to Main MENU",
-                "# 🆘 Get HELP",
+                BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
     )

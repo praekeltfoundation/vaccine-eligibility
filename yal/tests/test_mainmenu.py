@@ -10,6 +10,7 @@ from vaccine.models import Message
 from vaccine.testing import AppTester
 from yal import config
 from yal.main import Application
+from yal.utils import BACK_TO_MAIN, GET_HELP
 
 
 @pytest.fixture
@@ -396,8 +397,8 @@ async def test_state_mainmenu_contentrepo(
             "",
             "-----",
             "*Or reply:*",
-            "0. 🏠 Back to Main MENU",
-            "# 🆘 Get HELP",
+            BACK_TO_MAIN,
+            GET_HELP,
         ]
     )
 
@@ -447,8 +448,8 @@ async def test_state_mainmenu_contentrepo_children(
             "",
             "-----",
             "*Or reply:*",
-            "0. 🏠 Back to Main MENU",
-            "# 🆘 Get HELP",
+            BACK_TO_MAIN,
+            GET_HELP,
         ]
     )
 
@@ -467,8 +468,8 @@ async def test_state_mainmenu_contentrepo_children(
             "",
             "-----",
             "*Or reply:*",
-            "0. 🏠 Back to Main MENU",
-            "# 🆘 Get HELP",
+            BACK_TO_MAIN,
+            GET_HELP,
         ]
     )
 
@@ -522,8 +523,8 @@ async def test_state_submenu_image(
             "",
             "-----",
             "*Or reply:*",
-            "0. 🏠 Back to Main MENU",
-            "# 🆘 Get HELP",
+            BACK_TO_MAIN,
+            GET_HELP,
         ]
     )
 
@@ -552,8 +553,8 @@ async def test_state_detail_image(
             "",
             "-----",
             "*Or reply:*",
-            "0. 🏠 Back to Main MENU",
-            "# 🆘 Get HELP",
+            BACK_TO_MAIN,
+            GET_HELP,
         ]
     )
 
@@ -597,8 +598,8 @@ async def test_state_display_page_submenu_back(
                 "-----",
                 "*Or reply:*",
                 "4. ⬅️Previous thing",
-                "0. 🏠 Back to Main MENU",
-                "# 🆘 Get HELP",
+                BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
     )
@@ -632,8 +633,8 @@ async def test_state_display_page_detail(
                 "",
                 "-----",
                 "*Or reply:*",
-                "0. 🏠 Back to Main MENU",
-                "# 🆘 Get HELP",
+                BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
     )
@@ -668,8 +669,8 @@ async def test_state_display_page_detail_quick_replies(
                 "-----",
                 "*Or reply:*",
                 "2. ⬅️Parent Title",
-                "0. 🏠 Back to Main MENU",
-                "# 🆘 Get HELP",
+                BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
     )
@@ -686,8 +687,8 @@ async def test_state_display_page_detail_quick_replies(
                 "-----",
                 "*Or reply:*",
                 "3. ⬅️Parent Title",
-                "0. 🏠 Back to Main MENU",
-                "# 🆘 Get HELP",
+                BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
     )
@@ -724,8 +725,8 @@ async def test_state_display_page_detail_next(
                 "",
                 "-----",
                 "*Or reply:*",
-                "0. 🏠 Back to Main MENU",
-                "# 🆘 Get HELP",
+                BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
     )
@@ -762,8 +763,8 @@ async def test_state_display_page_detail_back(
                 "-----",
                 "*Or reply:*",
                 "1. ⬅️Previous thing",
-                "0. 🏠 Back to Main MENU",
-                "# 🆘 Get HELP",
+                BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
     )
@@ -803,8 +804,8 @@ async def test_state_display_page_detail_next_and_back(
                 "-----",
                 "*Or reply:*",
                 "2. ⬅️Previous thing",
-                "0. 🏠 Back to Main MENU",
-                "# 🆘 Get HELP",
+                BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
     )
@@ -840,8 +841,8 @@ async def test_state_display_page_detail_related(
                 "",
                 "-----",
                 "*Or reply:*",
-                "0. 🏠 Back to Main MENU",
-                "# 🆘 Get HELP",
+                BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
     )
@@ -908,8 +909,8 @@ async def test_state_content_page_related(
                 "",
                 "-----",
                 "*Or reply:*",
-                "0. 🏠 Back to Main MENU",
-                "# 🆘 Get HELP",
+                BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
     )

@@ -19,7 +19,7 @@ from vaccine.states import (
 from vaccine.utils import HTTP_EXCEPTIONS
 from yal import config
 from yal.pleasecallme import Application as PleaseCallMeApplication
-from yal.utils import GENERIC_ERROR
+from yal.utils import BACK_TO_MAIN, GENERIC_ERROR, GET_HELP
 
 logger = logging.getLogger(__name__)
 
@@ -60,8 +60,8 @@ class Application(BaseApplication):
                     "",
                     "-----",
                     "Or reply:",
-                    "0 - 🏠 Back to Main MENU",
-                    "# - 🆘 Get HELP",
+                    BACK_TO_MAIN,
+                    GET_HELP,
                 ]
             )
         )
@@ -144,8 +144,8 @@ class Application(BaseApplication):
                     metadata["suburb"],
                     "-----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main *MENU*",
-                    "*#* - 🆘 Get *HELP*",
+                    BACK_TO_MAIN,
+                    GET_HELP,
                 ]
             )
         )
@@ -170,8 +170,8 @@ class Application(BaseApplication):
                     "",
                     "-----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main *MENU*",
-                    "*#* - 🆘 Get *HELP*",
+                    BACK_TO_MAIN,
+                    GET_HELP,
                 ]
             )
         )
@@ -293,8 +293,8 @@ class Application(BaseApplication):
                     "",
                     "-----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main *MENU*",
-                    "*#* - 🆘 Get *HELP*",
+                    BACK_TO_MAIN,
+                    GET_HELP,
                 ]
             )
         )
@@ -403,8 +403,8 @@ class Application(BaseApplication):
                 "",
                 "-----",
                 "*Or reply:*",
-                "*0* - 🏠 Back to Main *MENU*",
-                "*#* - 🆘 Get *HELP*",
+                BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
 
@@ -475,8 +475,8 @@ class Application(BaseApplication):
                     "",
                     "-----",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to Main *MENU*",
-                    "*#* - 🆘 Get *HELP*",
+                    BACK_TO_MAIN,
+                    GET_HELP,
                 ]
             ),
             next="state_category_lookup",

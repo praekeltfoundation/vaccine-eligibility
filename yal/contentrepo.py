@@ -90,7 +90,7 @@ async def get_choices_by_path(path):
     return False, choices
 
 
-async def get_page_details(user, page_id, message_id):
+async def get_page_details(user, page_id, message_id, suggested=False):
     page_details = {}
     async with get_contentrepo_api() as session:
         for i in range(3):
@@ -101,6 +101,9 @@ async def get_page_details(user, page_id, message_id):
                     "data__session_id": user.session_id,
                     "data__user_addr": user.addr,
                 }
+                if suggested:
+                    params["data__suggested"] = True
+
                 logger.info(f">>>> get_page_details /api/v2/pages/{page_id}")
                 logger.info(params)
                 response = await session.get(
