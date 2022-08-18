@@ -161,6 +161,7 @@ async def test_state_optout_stop_notifications(
     post_request = rapidpro_mock.app.requests[0]
     assert json.loads(post_request.body.decode("utf-8")) == {
         "fields": {
+            "onboarding_completed": "",
             "opted_out": "TRUE",
             "opted_out_timestamp": "2022-06-19T17:30:00",
         },
