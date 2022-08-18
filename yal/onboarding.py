@@ -493,6 +493,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         data = {
+            "opted_out": "FALSE",
             "onboarding_completed": "True",
             "dob_month": self.user.answers.get("state_dob_month"),
             "dob_day": self.user.answers.get("state_dob_day"),

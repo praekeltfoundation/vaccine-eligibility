@@ -62,6 +62,7 @@ class Application(BaseApplication):
         error = await rapidpro.update_profile(
             whatsapp_id,
             {
+                "onboarding_completed": "",
                 "opted_out": "TRUE",
                 "opted_out_timestamp": get_current_datetime().isoformat(),
             },
@@ -216,10 +217,11 @@ class Application(BaseApplication):
                             "-",
                             "",
                             "🙍🏾‍♀️Thanks so much for your help.",
-                            "You won't get any more messages from us.",
-                            "For any medical issues,",
-                            "please visit your nearest clinic.",
                             "",
+                            "You won't get any more messages from us unless you *send "
+                            "the word HI* to this number.",
+                            "",
+                            "For any medical issues, please visit your nearest clinic.",
                             "You're also welcome to visit us online, any time. 🙂👇🏾",
                             "",
                             "*Have a lovely day!* ☀️",
