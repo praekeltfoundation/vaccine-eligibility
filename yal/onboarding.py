@@ -57,17 +57,10 @@ class Application(BaseApplication):
                 )
             ),
             next="state_validate_full_dob",
-            buttons=[Choice("skip", self._("Skip"))],
         )
 
     async def state_validate_full_dob(self):
         value = self.user.answers["state_dob_full"]
-
-        if value == "skip":
-            self.save_answer("state_dob_day", "skip")
-            self.save_answer("state_dob_month", "skip")
-            self.save_answer("state_dob_year", "skip")
-            return await self.go_to_state("state_relationship_status")
 
         try:
             dob = datetime.strptime(value, "%d/%m/%Y")
@@ -102,9 +95,6 @@ class Application(BaseApplication):
                         "",
                         "*Which year were you born?*",
                         "Reply with a number. (e.g.2007)",
-                        "",
-                        "",
-                        "If you'd rather not say, just tap *SKIP*.",
                     ]
                 )
             ),
@@ -114,7 +104,6 @@ class Application(BaseApplication):
                     "⚠️  Please TYPE in only the YEAR you were born.\n" "Example _1980_"
                 )
             ),
-            buttons=[Choice("skip", self._("Skip"))],
         )
 
     async def state_dob_month(self):
@@ -147,11 +136,9 @@ class Application(BaseApplication):
                 Choice("11", self._("November")),
                 Choice("12", self._("December")),
             ],
-            footer=self._("\n" "If you'd rather not say, just tap *SKIP*."),
             next="state_dob_day",
             error=self._(GENERIC_ERROR),
             error_footer=self._("\n" "Reply with the number next to the month."),
-            buttons=[Choice("skip", self._("Skip"))],
         )
 
     async def state_dob_day(self):
@@ -167,8 +154,6 @@ class Application(BaseApplication):
                     "",
                     "Reply with a number from 1-31",
                     "(e.g. 30 - if you were born on the 30th)",
-                    "",
-                    "*If you'd rather not say, just tap SKIP.*",
                 ]
             )
         )
@@ -181,7 +166,6 @@ class Application(BaseApplication):
             question=question,
             next="state_check_birthday",
             check=day_validator(dob_year, dob_month, question),
-            buttons=[Choice("skip", self._("Skip"))],
         )
 
     async def state_check_birthday(self):
@@ -189,36 +173,34 @@ class Application(BaseApplication):
         month = self.user.answers["state_dob_month"]
         year = self.user.answers["state_dob_year"]
 
-        if day != "skip" and month != "skip":
-            today = get_today()
+        today = get_today()
+        dob = date(int(year), int(month), int(day))
+        age = relativedelta(today, dob).years
+        self.save_answer("age", str(age))
+
+        if today.day == int(day) and today.month == int(month):
+            age_msg = ""
             if year != "skip":
-                dob = date(int(year), int(month), int(day))
-                age = relativedelta(today, dob).years
-                self.save_answer("age", str(age))
+                age_msg = f"{age} today? "
 
-            if today.day == int(day) and today.month == int(month):
-                age_msg = ""
-                if year != "skip":
-                    age_msg = f"{age} today? "
-
-                msg = self._(
-                    "\n".join(
-                        [
-                            f"*Yoh! {age_msg}HAPPY BIRTHDAY!* 🎂 🎉 ",
-                            "",
-                            "Hope you're having a great one so far! Remember—age is "
-                            "just a number. Here's to always having  wisdom that goes"
-                            " beyond your years 😉 🥂",
-                        ]
-                    )
+            msg = self._(
+                "\n".join(
+                    [
+                        f"*Yoh! {age_msg}HAPPY BIRTHDAY!* 🎂 🎉 ",
+                        "",
+                        "Hope you're having a great one so far! Remember—age is "
+                        "just a number. Here's to always having  wisdom that goes"
+                        " beyond your years 😉 🥂",
+                    ]
                 )
-                await self.worker.publish_message(
-                    self.inbound.reply(
-                        msg,
-                        helper_metadata={"image": contentrepo.get_image_url("hbd.png")},
-                    )
+            )
+            await self.worker.publish_message(
+                self.inbound.reply(
+                    msg,
+                    helper_metadata={"image": contentrepo.get_image_url("hbd.png")},
                 )
-                await asyncio.sleep(1.5)
+            )
+            await asyncio.sleep(1.5)
 
         return await self.go_to_state("state_relationship_status")
 

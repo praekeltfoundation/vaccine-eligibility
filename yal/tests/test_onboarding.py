@@ -93,34 +93,6 @@ async def test_state_dob_full_invalid(
 
 @pytest.mark.asyncio
 @mock.patch("yal.onboarding.get_current_datetime")
-async def test_state_dob_full_skip(
-    get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_state("state_dob_full")
-
-    await tester.user_input("skip")
-
-    tester.assert_state("state_relationship_status")
-    tester.assert_num_messages(1)
-
-    tester.assert_answer("state_dob_year", "skip")
-    tester.assert_answer("state_dob_month", "skip")
-    tester.assert_answer("state_dob_day", "skip")
-    tester.assert_no_answer("age")
-
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_onboarding_time": "2022-06-19T17:30:00",
-            "onboarding_reminder_type": "5 min",
-        },
-    }
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
 async def test_state_dob_year_valid(
     get_current_datetime, tester: AppTester, rapidpro_mock
 ):
@@ -223,32 +195,6 @@ async def test_state_dob_month_invalid(
 
 @pytest.mark.asyncio
 @mock.patch("yal.onboarding.get_current_datetime")
-async def test_state_dob_month_skip(
-    get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_state("state_dob_month")
-    tester.setup_answer("state_dob_year", "2022")
-
-    await tester.user_input("skip")
-
-    tester.assert_state("state_dob_day")
-    tester.assert_num_messages(1)
-
-    tester.assert_answer("state_dob_month", "skip")
-
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_onboarding_time": "2022-06-19T17:30:00",
-            "onboarding_reminder_type": "5 min",
-        },
-    }
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
 async def test_state_dob_day_valid(
     get_current_datetime, tester: AppTester, rapidpro_mock
 ):
@@ -277,41 +223,13 @@ async def test_state_dob_day_valid(
 
 @pytest.mark.asyncio
 @mock.patch("yal.onboarding.get_current_datetime")
-async def test_state_dob_day_valid_no_year(
-    get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_state("state_dob_day")
-
-    tester.setup_answer("state_dob_year", "skip")
-    tester.setup_answer("state_dob_month", "2")
-
-    await tester.user_input("2")
-
-    tester.assert_state("state_relationship_status")
-    tester.assert_num_messages(1)
-
-    tester.assert_answer("state_dob_day", "2")
-
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_onboarding_time": "2022-06-19T17:30:00",
-            "onboarding_reminder_type": "5 min",
-        },
-    }
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
 async def test_state_dob_day_invalid(
     get_current_datetime, tester: AppTester, rapidpro_mock
 ):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_dob_day")
 
-    tester.setup_answer("state_dob_year", "skip")
+    tester.setup_answer("state_dob_year", "2007")
     tester.setup_answer("state_dob_month", "2")
 
     await tester.user_input("200")
@@ -361,34 +279,6 @@ async def test_state_dob_day_invalid_date(
 
 @pytest.mark.asyncio
 @mock.patch("yal.onboarding.get_current_datetime")
-async def test_state_dob_day_skip(
-    get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_state("state_dob_day")
-
-    tester.setup_answer("state_dob_year", "2022")
-    tester.setup_answer("state_dob_month", "2")
-
-    await tester.user_input("skip")
-
-    tester.assert_state("state_relationship_status")
-    tester.assert_num_messages(1)
-
-    tester.assert_answer("state_dob_day", "skip")
-
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_onboarding_time": "2022-06-19T17:30:00",
-            "onboarding_reminder_type": "5 min",
-        },
-    }
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
 @mock.patch("yal.onboarding.get_today")
 async def test_state_check_birthday(
     get_today, get_current_datetime, tester: AppTester, rapidpro_mock
@@ -413,111 +303,6 @@ async def test_state_check_birthday(
     assert msg.content == "\n".join(
         [
             "*Yoh! 17 today? HAPPY BIRTHDAY!* 🎂 🎉 ",
-            "",
-            "Hope you're having a great one so far! Remember—age is "
-            "just a number. Here's to always having  wisdom that goes"
-            " beyond your years 😉 🥂",
-        ]
-    )
-    assert msg.helper_metadata == {
-        "image": "https://contenrepo/media/original_images/hbd.png"
-    }
-
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_onboarding_time": "2022-06-19T17:30:00",
-            "onboarding_reminder_type": "5 min",
-        },
-    }
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
-@mock.patch("yal.onboarding.get_today")
-async def test_state_check_birthday_skip_day(
-    get_today, get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    get_today.return_value = date(2022, 2, 22)
-    tester.setup_state("state_dob_day")
-
-    tester.setup_answer("state_dob_month", "2")
-    tester.setup_answer("state_dob_year", "2007")
-
-    await tester.user_input("skip")
-    tester.assert_no_answer("age")
-
-    tester.assert_state("state_relationship_status")
-    tester.assert_num_messages(1)
-    assert tester.fake_worker.outbound_messages == []
-
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_onboarding_time": "2022-06-19T17:30:00",
-            "onboarding_reminder_type": "5 min",
-        },
-    }
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
-@mock.patch("yal.onboarding.get_today")
-async def test_state_check_birthday_skip_month(
-    get_today, get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    get_today.return_value = date(2022, 2, 22)
-    tester.setup_state("state_dob_day")
-
-    tester.setup_answer("state_dob_month", "skip")
-    tester.setup_answer("state_dob_year", "2007")
-
-    await tester.user_input("22")
-    tester.assert_no_answer("age")
-
-    tester.assert_state("state_relationship_status")
-    tester.assert_num_messages(1)
-    assert tester.fake_worker.outbound_messages == []
-
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_onboarding_time": "2022-06-19T17:30:00",
-            "onboarding_reminder_type": "5 min",
-        },
-    }
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
-@mock.patch("yal.onboarding.get_today")
-async def test_state_check_birthday_skip_year(
-    get_today, get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    get_today.return_value = date(2022, 2, 22)
-    config.CONTENTREPO_API_URL = "https://contenrepo/"
-    tester.setup_state("state_dob_day")
-
-    tester.setup_answer("state_dob_month", "2")
-    tester.setup_answer("state_dob_year", "skip")
-
-    await tester.user_input("22")
-
-    tester.assert_state("state_relationship_status")
-    tester.assert_num_messages(1)
-
-    tester.assert_no_answer("age")
-
-    [msg] = tester.fake_worker.outbound_messages
-    assert msg.content == "\n".join(
-        [
-            "*Yoh! HAPPY BIRTHDAY!* 🎂 🎉 ",
             "",
             "Hope you're having a great one so far! Remember—age is "
             "just a number. Here's to always having  wisdom that goes"
