@@ -167,6 +167,30 @@ async def test_state_servicefinder_start_no_address(tester: AppTester):
     await tester.user_input("1")
     tester.assert_state("state_location")
 
+    tester.assert_message(
+        "\n".join(
+            [
+                "🏥 Find Clinics and Services",
+                "*Get help near you*",
+                "-----",
+                "",
+                "🙍🏾‍♀️*You can share a location by sending me a pin (📍). To do "
+                "this:*",
+                "",
+                "1️⃣ Tap the *+* button on the bottom left of this screen.",
+                "2️⃣ Tap *Location*",
+                "3️⃣ Select *Send Your Current Location* (or *use the search "
+                "bar* at the top of the screen to look up the address or area "
+                "you want to share).",
+                "",
+                "-----",
+                "Or reply:",
+                "*0* 🏠Back to Main *MENU*",
+                "*#* 🆘Get *HELP*",
+            ]
+        )
+    )
+
 
 @pytest.mark.asyncio
 async def test_state_servicefinder_start_existing_address(

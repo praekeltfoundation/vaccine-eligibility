@@ -467,14 +467,14 @@ class Application(BaseApplication):
                     "🙍🏾‍♀️*You can share a location by sending me a pin (📍). To do "
                     "this:*",
                     "",
-                    "✨ Tap the + button below",
-                    "✨ Tap *Location* then select *Send Your Current Location*",
-                    "",
-                    "✨ *You can also use the search 🔎 to type  in the address or "
-                    "area you want to share.*",
+                    "1️⃣ Tap the *+* button on the bottom left of this screen.",
+                    "2️⃣ Tap *Location*",
+                    "3️⃣ Select *Send Your Current Location* (or *use the search "
+                    "bar* at the top of the screen to look up the address or area "
+                    "you want to share).",
                     "",
                     "-----",
-                    "*Or reply:*",
+                    "Or reply:",
                     BACK_TO_MAIN,
                     GET_HELP,
                 ]
