@@ -123,39 +123,6 @@ class Application(BaseApplication):
                 Choice("really_bad", self._("Really bad")),
                 Choice("skip", self._("Skip")),
             ],
-            next="state_feedback_askaquestion",
-            error=self._(GENERIC_ERROR),
-        )
-
-    async def state_feedback_askaquestion(self):
-        question = self._(
-            "\n".join(
-                [
-                    "How would your rate your experience using the *Ask a Question "
-                    "service?*",
-                    "",
-                    "*1* - Excellent",
-                    "*2* - Good",
-                    "*3* - Ok",
-                    "*4* - Not so good",
-                    "*5* - Really bad",
-                    "",
-                    "*6* - Skip",
-                ]
-            )
-        )
-        return WhatsAppListState(
-            self,
-            question=question,
-            button="Feedback",
-            choices=[
-                Choice("excellent", self._("Excellent")),
-                Choice("good", self._("Good")),
-                Choice("ok", self._("Ok")),
-                Choice("not_so_good", self._("Not so good")),
-                Choice("really_bad", self._("Really bad")),
-                Choice("skip", self._("Skip")),
-            ],
             next="state_feedback_quickreply",
             error=self._(GENERIC_ERROR),
         )
@@ -336,7 +303,15 @@ class Application(BaseApplication):
 
     async def state_completed_feedback(self):
         text = self._(
-            "Thank you for your participation and your feedback. We will send you 1GB "
-            "of data to this number as reimbursement for your time. Have a great day."
+            "\n".join(
+                [
+                    "Thank you for your participation and your feedback.",
+                    "",
+                    "We have sent R100 airtime to this number, which you can choose "
+                    "to convert into data, as reimbursement for your time.",
+                    "",
+                    "*Have a great day.* 👋🏾",
+                ]
+            )
         )
         return EndState(self, text=text, next=self.START_STATE)
