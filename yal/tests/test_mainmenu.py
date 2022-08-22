@@ -457,6 +457,7 @@ async def test_state_mainmenu_contentrepo_children(
             "",
             "-----",
             "*Or reply:*",
+            "1. ⬅️Parent Title",
             BACK_TO_MAIN,
             GET_HELP,
         ]
@@ -489,7 +490,7 @@ async def test_state_mainmenu_contentrepo_children(
     update_request = rapidpro_mock.app.requests[-1]
     assert update_request.json["fields"] == {
         "last_main_time": "2022-06-19T17:30:00",
-        "suggested_text": "*1* - Suggested Content 1\n*2* - Suggested Content 2",
+        "suggested_text": "*2* - Suggested Content 1\n*3* - Suggested Content 2",
     }
 
 
@@ -540,6 +541,7 @@ async def test_state_detail_image(
             "",
             "-----",
             "*Or reply:*",
+            "2. ⬅️Parent Title",
             BACK_TO_MAIN,
             GET_HELP,
         ]
@@ -862,7 +864,7 @@ async def test_state_content_page_related(
     tester.setup_state("state_contentrepo_page")
     tester.user.metadata["selected_page_id"] = "1"
     tester.user.metadata["current_message_id"] = 1
-    tester.user.metadata["current_menu_level"] = 1
+    tester.user.metadata["current_menu_level"] = 0
     tester.user.metadata["suggested_content"] = {"123": "Suggested"}
 
     tester.user.session_id = 123
