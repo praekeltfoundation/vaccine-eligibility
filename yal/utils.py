@@ -27,7 +27,7 @@ GENDERS = {
     "transgender": "Transgender",
     "other": "Something else",
 }
-BACK_TO_MAIN = "*0* 🏠Back to Main *MENU*"
+BACK_TO_MAIN = "*0* 🏠 *Back* to Main *MENU*"
 GET_HELP = "*#* 🆘Get *HELP*"
 
 

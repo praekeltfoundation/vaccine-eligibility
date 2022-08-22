@@ -381,7 +381,7 @@ async def test_state_mainmenu_contentrepo(
 
     question = "\n".join(
         [
-            "*Sub menu 2*",
+            "Sub menu 2",
             "-----",
             "",
             "Sub menu test content 2",
@@ -427,7 +427,7 @@ async def test_state_mainmenu_contentrepo_children(
 
     question = "\n".join(
         [
-            "*Sub menu 1*",
+            "Sub menu 1",
             "-----",
             "",
             "Sub menu test content 2",
@@ -450,7 +450,7 @@ async def test_state_mainmenu_contentrepo_children(
 
     question = "\n".join(
         [
-            "*Sub menu 2*",
+            "Sub menu 2",
             "-----",
             "",
             "Sub menu test content 2",
@@ -502,7 +502,7 @@ async def test_state_submenu_image(
 
     question = "\n".join(
         [
-            "*Sub menu 2*",
+            "Sub menu 2",
             "-----",
             "",
             "Sub menu test content with image",
@@ -531,7 +531,7 @@ async def test_state_detail_image(
 
     question = "\n".join(
         [
-            "*Sub menu 2*",
+            "Sub menu 2",
             "-----",
             "",
             "Detail test content with image",
@@ -571,7 +571,7 @@ async def test_state_display_page_submenu_back(
     tester.assert_message(
         "\n".join(
             [
-                "*title*",
+                "title",
                 "-----",
                 "",
                 "body",
@@ -609,7 +609,7 @@ async def test_state_display_page_detail(
     tester.assert_message(
         "\n".join(
             [
-                "*title*",
+                "title",
                 "-----",
                 "",
                 "body",
@@ -641,7 +641,7 @@ async def test_state_display_page_detail_quick_replies(
     tester.assert_message(
         "\n".join(
             [
-                "*Main Menu 1 💊*",
+                "Main Menu 1 💊",
                 "-----",
                 "",
                 "Message test content 1",
@@ -696,7 +696,7 @@ async def test_state_display_page_detail_next(
     tester.assert_message(
         "\n".join(
             [
-                "*title*",
+                "title",
                 "-----",
                 "",
                 "body",
@@ -733,7 +733,7 @@ async def test_state_display_page_detail_back(
     tester.assert_message(
         "\n".join(
             [
-                "*title*",
+                "title",
                 "-----",
                 "",
                 "body",
@@ -770,7 +770,7 @@ async def test_state_display_page_detail_next_and_back(
     tester.assert_message(
         "\n".join(
             [
-                "*title*",
+                "title",
                 "-----",
                 "",
                 "body",
@@ -798,7 +798,7 @@ async def test_state_display_page_detail_related(
     tester.user.metadata["body"] = "body"
     tester.user.metadata["current_menu_level"] = 1
     tester.user.metadata["current_message_id"] = 1
-    tester.user.metadata["related_pages"] = {"123": "Learn more about Related Content"}
+    tester.user.metadata["related_pages"] = {"123": "Related Content"}
     tester.user.metadata["suggested_content"] = {}
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
@@ -806,12 +806,12 @@ async def test_state_display_page_detail_related(
     tester.assert_message(
         "\n".join(
             [
-                "*title*",
+                "title",
                 "-----",
                 "",
                 "body",
                 "",
-                "1. Learn more about Related Content",
+                "1. Related Content",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -872,12 +872,12 @@ async def test_state_content_page_related(
     tester.assert_message(
         "\n".join(
             [
-                "*Main Menu 1 💊*",
+                "Main Menu 1 💊",
                 "-----",
                 "",
                 "Message test content 1",
                 "",
-                "1. Learn more about Related Content",
+                "1. Related Content",
                 "",
                 "-----",
                 "*Or reply:*",
