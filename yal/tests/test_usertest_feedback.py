@@ -311,7 +311,8 @@ async def test_state_submit_completed_feedback(tester: AppTester, rapidpro_mock)
             [
                 "Thank you for your participation and your feedback.",
                 "",
-                "We have sent R100 airtime to this number, which you can choose to convert into data, as reimbursement for your time.",
+                "We have sent R100 airtime to this number, which you can choose to "
+                "convert into data, as reimbursement for your time.",
                 "",
                 "*Have a great day.* 👋🏾",
             ]

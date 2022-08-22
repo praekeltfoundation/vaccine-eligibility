@@ -307,7 +307,8 @@ class Application(BaseApplication):
                 [
                     "Thank you for your participation and your feedback.",
                     "",
-                    "We have sent R100 airtime to this number, which you can choose to convert into data, as reimbursement for your time.",
+                    "We have sent R100 airtime to this number, which you can choose "
+                    "to convert into data, as reimbursement for your time.",
                     "",
                     "*Have a great day.* 👋🏾",
                 ]
