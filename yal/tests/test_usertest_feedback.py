@@ -177,33 +177,8 @@ async def test_state_feedback_changepreferences(tester: AppTester, rapidpro_mock
 
 
 @pytest.mark.asyncio
-async def test_state_feedback_askaquestion(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_feedback_changepreferences")
-    await tester.user_input("1")
-
-    tester.assert_state("state_feedback_askaquestion")
-
-    tester.assert_message(
-        "\n".join(
-            [
-                "How would your rate your experience using the *Ask a Question "
-                "service?*",
-                "",
-                "*1* - Excellent",
-                "*2* - Good",
-                "*3* - Ok",
-                "*4* - Not so good",
-                "*5* - Really bad",
-                "",
-                "*6* - Skip",
-            ]
-        )
-    )
-
-
-@pytest.mark.asyncio
 async def test_state_feedback_quickreply(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_feedback_askaquestion")
+    tester.setup_state("state_feedback_changepreferences")
     await tester.user_input("1")
 
     tester.assert_state("state_feedback_quickreply")
@@ -332,8 +307,15 @@ async def test_state_submit_completed_feedback(tester: AppTester, rapidpro_mock)
     tester.assert_state("state_start")
 
     tester.assert_message(
-        "Thank you for your participation and your feedback. We will send you 1GB "
-        "of data to this number as reimbursement for your time. Have a great day."
+        "\n".join(
+            [
+                "Thank you for your participation and your feedback.",
+                "",
+                "We have sent R100 airtime to this number, which you can choose to convert into data, as reimbursement for your time.",
+                "",
+                "*Have a great day.* 👋🏾",
+            ]
+        )
     )
 
     assert len(rapidpro_mock.app.requests) == 1
