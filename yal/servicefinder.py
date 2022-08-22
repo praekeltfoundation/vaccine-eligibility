@@ -474,7 +474,7 @@ class Application(BaseApplication):
                     "you want to share).",
                     "",
                     "-----",
-                    "Or reply:",
+                    "*Or reply:*",
                     BACK_TO_MAIN,
                     GET_HELP,
                 ]

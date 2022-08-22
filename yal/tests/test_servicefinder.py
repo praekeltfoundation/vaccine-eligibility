@@ -184,7 +184,7 @@ async def test_state_servicefinder_start_no_address(tester: AppTester):
                 "you want to share).",
                 "",
                 "-----",
-                "Or reply:",
+                "*Or reply:*",
                 "*0* 🏠Back to Main *MENU*",
                 "*#* 🆘Get *HELP*",
             ]
