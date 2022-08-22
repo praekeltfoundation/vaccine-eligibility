@@ -138,7 +138,7 @@ class Application(BaseApplication):
                     "🏥 Find Clinics and Services",
                     "*Get help near you*",
                     "-----",
-                    "🙍🏾‍♀️*The address I have for you right now is:*",
+                    "🙍🏾‍♀️ *The address I have for you right now is:*",
                     "",
                     f"{metadata['street_number']} {metadata['street_name']},",
                     metadata["suburb"],
@@ -162,7 +162,7 @@ class Application(BaseApplication):
                     "*Get help near you*",
                     "-----",
                     "",
-                    "🙍🏾‍♀️*Would you like me to recommend helpful services close to "
+                    "🙍🏾‍♀️ *Would you like me to recommend helpful services close to "
                     "this address?*",
                     "",
                     "1 - Yes please",
@@ -467,11 +467,11 @@ class Application(BaseApplication):
                     "🙍🏾‍♀️*You can share a location by sending me a pin (📍). To do "
                     "this:*",
                     "",
-                    "✨ Tap the + button below",
-                    "✨ Tap *Location* then select *Send Your Current Location*",
-                    "",
-                    "✨ *You can also use the search 🔎 to type  in the address or "
-                    "area you want to share.*",
+                    "1️⃣ Tap the *+* button on the bottom left of this screen.",
+                    "2️⃣ Tap *Location*",
+                    "3️⃣ Select *Send Your Current Location* (or *use the search "
+                    "bar* at the top of the screen to look up the address or area "
+                    "you want to share).",
                     "",
                     "-----",
                     "*Or reply:*",
