@@ -254,7 +254,7 @@ class Application(BaseApplication):
         quick_replies = metadata.get("quick_replies", [])
 
         parts = [
-            f"*{title}*",
+            title,
             "-----",
             "",
             body,

@@ -176,6 +176,6 @@ async def find_related_pages(tags):
             error, related_choices = await get_choices_by_id(page_id)
             if not error:
                 for choice in related_choices:
-                    related_pages[choice.value] = f"Learn more about {choice.label}"
+                    related_pages[choice.value] = choice.label
 
     return related_pages

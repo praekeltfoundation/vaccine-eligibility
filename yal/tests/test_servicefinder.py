@@ -185,8 +185,8 @@ async def test_state_servicefinder_start_no_address(tester: AppTester):
                 "",
                 "-----",
                 "*Or reply:*",
-                "*0* 🏠Back to Main *MENU*",
-                "*#* 🆘Get *HELP*",
+                BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
     )
@@ -219,8 +219,8 @@ async def test_state_servicefinder_start_existing_address(
             "cape town",
             "-----",
             "*Or reply:*",
-            "*0* 🏠Back to Main *MENU*",
-            "*#* 🆘Get *HELP*",
+            BACK_TO_MAIN,
+            GET_HELP,
         ]
     )
 
@@ -239,8 +239,8 @@ async def test_state_servicefinder_start_existing_address(
                 "",
                 "-----",
                 "*Or reply:*",
-                "*0* 🏠Back to Main *MENU*",
-                "*#* 🆘Get *HELP*",
+                BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
     )
