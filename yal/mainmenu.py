@@ -267,6 +267,7 @@ class Application(BaseApplication):
         elif metadata["related_pages"]:
             for value, label in metadata["related_pages"].items():
                 choices.append(Choice(value, label))
+                buttons.append(Choice(value, label))
         elif quiz_tag:
             choices.append(Choice("quiz", "Yes (take the quiz)"))
             buttons.append(Choice("quiz", "Yes (take the quiz)"))
@@ -341,6 +342,8 @@ class Application(BaseApplication):
             choices=choices,
             next=next_,
             helper_metadata=helper_metadata,
+            button="See my options",
+            buttons=buttons,
         )
 
     async def state_get_suggestions(self):
@@ -404,6 +407,10 @@ class Application(BaseApplication):
             ),
             choices=choices,
             next=next_,
+            button="See my options",
+            buttons=[
+                Choice(k, v) for k, v in self.user.metadata["suggested_content"].items()
+            ],
         )
 
     async def state_back(self):
