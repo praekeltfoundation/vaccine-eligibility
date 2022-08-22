@@ -138,7 +138,7 @@ class Application(BaseApplication):
                     "🏥 Find Clinics and Services",
                     "*Get help near you*",
                     "-----",
-                    "🙍🏾‍♀️*The address I have for you right now is:*",
+                    "🙍🏾‍♀️ *The address I have for you right now is:*",
                     "",
                     f"{metadata['street_number']} {metadata['street_name']},",
                     metadata["suburb"],
@@ -162,7 +162,7 @@ class Application(BaseApplication):
                     "*Get help near you*",
                     "-----",
                     "",
-                    "🙍🏾‍♀️*Would you like me to recommend helpful services close to "
+                    "🙍🏾‍♀️ *Would you like me to recommend helpful services close to "
                     "this address?*",
                     "",
                     "1 - Yes please",

@@ -206,6 +206,45 @@ async def test_state_servicefinder_start_existing_address(
     await tester.user_input("1")
     tester.assert_state("state_confirm_existing_address")
 
+    [msg1, msg2] = tester.fake_worker.outbound_messages
+    assert msg1.content == "👩🏾 *Okay, I just need to confirm some details...*"
+    assert msg2.content == "\n".join(
+        [
+            "🏥 Find Clinics and Services",
+            "*Get help near you*",
+            "-----",
+            "🙍🏾‍♀️ *The address I have for you right now is:*",
+            "",
+            "99 high level,",
+            "cape town",
+            "-----",
+            "*Or reply:*",
+            "*0* 🏠Back to Main *MENU*",
+            "*#* 🆘Get *HELP*",
+        ]
+    )
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "🏥 Find Clinics and Services",
+                "*Get help near you*",
+                "-----",
+                "",
+                "🙍🏾‍♀️ *Would you like me to recommend helpful services close to "
+                "this address?*",
+                "",
+                "1 - Yes please",
+                "2 - Use a different location",
+                "",
+                "-----",
+                "*Or reply:*",
+                "*0* 🏠Back to Main *MENU*",
+                "*#* 🆘Get *HELP*",
+            ]
+        )
+    )
+
     assert [r.path for r in google_api_mock.app.requests] == [
         "/maps/api/place/autocomplete/json"
     ]
