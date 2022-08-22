@@ -244,6 +244,7 @@ class Application(BaseApplication):
         if metadata["page_type"] == "submenu":
             page_id = metadata["selected_page_id"]
             error, choices = await contentrepo.get_choices_by_parent(page_id)
+            buttons += choices
             if error:
                 return await self.go_to_state("state_error")
 
