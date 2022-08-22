@@ -296,7 +296,7 @@ class Application(BaseApplication):
 
         back_menu_item = None
         menu_level = metadata["current_menu_level"]
-        if menu_level > 2:
+        if menu_level >= 2:
             back_title = metadata["parent_title"]
             back_menu_item = f"{len(choices) + 1}. ⬅️{back_title}"
 
@@ -377,7 +377,7 @@ class Application(BaseApplication):
 
         back_menu_item = None
         menu_level = metadata["current_menu_level"]
-        if menu_level > 2:
+        if menu_level >= 2:
             back_title = metadata["parent_title"]
             back_menu_item = f"{len(choices) + 1}. ⬅️{back_title}"
 
