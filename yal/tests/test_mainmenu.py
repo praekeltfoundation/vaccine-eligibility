@@ -141,7 +141,7 @@ async def contentrepo_api_mock(sanic_client):
         )
 
     @app.route("/api/v2/pages/1111", methods=["GET"])
-    def get_page_detail_111(request):
+    def get_page_detail_1111(request):
         app.requests.append(request)
         return response.json(
             build_message_detail(
