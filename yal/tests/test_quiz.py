@@ -103,7 +103,7 @@ async def test_state_quiz_start(tester: AppTester, contentrepo_api_mock):
     tester.assert_message(
         "\n".join(
             [
-                "*Question 1*",
+                "Question 1",
                 "-----",
                 "",
                 "The body of question 1",
@@ -116,7 +116,8 @@ async def test_state_quiz_start(tester: AppTester, contentrepo_api_mock):
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
-        )
+        ),
+        buttons=["Answer 1", "Answer 2"],
     )
 
     await tester.user_input("1")
@@ -137,7 +138,7 @@ async def test_state_quiz_start(tester: AppTester, contentrepo_api_mock):
     tester.assert_message(
         "\n".join(
             [
-                "*Question 2*",
+                "Question 2",
                 "-----",
                 "",
                 "The body of question 2",
@@ -151,5 +152,6 @@ async def test_state_quiz_start(tester: AppTester, contentrepo_api_mock):
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
-        )
+        ),
+        buttons=["Chat with a loveLife", "Not right now", "Redo Quiz"],
     )

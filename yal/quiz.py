@@ -2,7 +2,8 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, ChoiceState
+from vaccine.states import Choice, CustomChoiceState
+from vaccine.utils import get_display_choices
 from yal import contentrepo
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.utils import BACK_TO_MAIN, GENERIC_ERROR, GET_HELP
@@ -94,36 +95,36 @@ class Application(BaseApplication):
         body = page_details["body"]
 
         parts = [
-            f"*{title}*",
+            title,
             "-----",
             "",
             body,
             "",
+            get_display_choices(choices),
+            "",
+            "-----",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
         ]
+
         question = self._("\n".join([part for part in parts if part is not None]))
 
         helper_metadata = {}
         if page_details.get("image_path"):
             helper_metadata["image"] = contentrepo.get_url(page_details["image_path"])
 
-        return ChoiceState(
+        buttons = [Choice(c.value, c.label[:20]) for c in choices]
+
+        return CustomChoiceState(
             self,
             question=question,
             choices=choices,
-            footer=self._(
-                "\n".join(
-                    [
-                        "",
-                        "-----",
-                        "*Or reply:*",
-                        BACK_TO_MAIN,
-                        GET_HELP,
-                    ]
-                )
-            ),
             next=next_,
             error=self._(GENERIC_ERROR),
             helper_metadata=helper_metadata,
+            button="Answer",
+            buttons=buttons,
         )
 
     async def state_quiz_answer(self):

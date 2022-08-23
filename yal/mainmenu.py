@@ -8,7 +8,7 @@ from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
-from yal.utils import BACK_TO_MAIN, GET_HELP, get_current_datetime
+from yal.utils import BACK_TO_MAIN, GENERIC_ERROR, GET_HELP, get_current_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -338,10 +338,7 @@ class Application(BaseApplication):
         return CustomChoiceState(
             self,
             question=question,
-            error=self._(
-                "⚠️ This service works best when you use the numbered options "
-                "available\n"
-            ),
+            error=self._(GENERIC_ERROR),
             choices=choices,
             next=next_,
             helper_metadata=helper_metadata,
