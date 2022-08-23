@@ -91,7 +91,9 @@ class Application(BaseApplication):
 
             sections.append((f"*{choice.label}*", sub_choices))
 
-        sections.append(("🙋🏿‍♂️ *QUESTIONS?*", [Choice("state_faqs", "FAQs")]))
+        sections.append(
+            ("🙋🏿‍♂️ *QUESTIONS?*", [Choice("state_faqs", "Ask a Question")])
+        )
         sections.append(
             (
                 "*⚙️ CHAT SETTINGS*",
@@ -300,7 +302,7 @@ class Application(BaseApplication):
         menu_level = metadata["current_menu_level"]
         if menu_level >= 2:
             back_title = metadata["parent_title"]
-            back_menu_item = f"{len(choices) + 1}. ⬅️{back_title}"
+            back_menu_item = f"{len(choices) + 1}. ⬅️ {back_title}"
 
             choices.append(Choice("back", f"⬅️ {back_title}"))
 
@@ -383,7 +385,7 @@ class Application(BaseApplication):
         menu_level = metadata["current_menu_level"]
         if menu_level >= 2:
             back_title = metadata["parent_title"]
-            back_menu_item = f"{len(choices) + 1}. ⬅️{back_title}"
+            back_menu_item = f"{len(choices) + 1}. ⬅️ {back_title}"
 
             choices.append(Choice("back", f"⬅️ {back_title}"))
 
