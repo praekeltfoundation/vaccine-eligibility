@@ -281,7 +281,7 @@ async def test_state_mainmenu_start(
                 "8. Sub menu 3",
                 "-----",
                 "🙋🏿‍♂️ *QUESTIONS?*",
-                "9. FAQs",
+                "9. Ask a Question",
                 "-----",
                 "*⚙️ CHAT SETTINGS*",
                 "10. Change Profile",
@@ -344,7 +344,7 @@ async def test_state_mainmenu_start_suggested_populated(
                 "8. Sub menu 3",
                 "-----",
                 "🙋🏿‍♂️ *QUESTIONS?*",
-                "9. FAQs",
+                "9. Ask a Question",
                 "-----",
                 "*⚙️ CHAT SETTINGS*",
                 "10. Change Profile",
@@ -475,7 +475,7 @@ async def test_state_mainmenu_contentrepo_children(
             "",
             "-----",
             "*Or reply:*",
-            "1. ⬅️Parent Title",
+            "1. ⬅️ Parent Title",
             BACK_TO_MAIN,
             GET_HELP,
         ]
@@ -559,7 +559,7 @@ async def test_state_detail_image(
             "",
             "-----",
             "*Or reply:*",
-            "2. ⬅️Parent Title",
+            "2. ⬅️ Parent Title",
             BACK_TO_MAIN,
             GET_HELP,
         ]
@@ -602,7 +602,7 @@ async def test_state_display_page_submenu_back(
                 "",
                 "-----",
                 "*Or reply:*",
-                "4. ⬅️Previous thing",
+                "4. ⬅️ Previous thing",
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
@@ -645,7 +645,7 @@ async def test_state_display_page_list(
                 "",
                 "-----",
                 "*Or reply:*",
-                "6. ⬅️Previous thing",
+                "6. ⬅️ Previous thing",
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
@@ -721,7 +721,7 @@ async def test_state_display_page_detail_quick_replies(
                 "",
                 "-----",
                 "*Or reply:*",
-                "2. ⬅️Parent Title",
+                "2. ⬅️ Parent Title",
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
@@ -739,7 +739,7 @@ async def test_state_display_page_detail_quick_replies(
                 "2. Suggested Content 2",
                 "-----",
                 "*Or reply:*",
-                "3. ⬅️Parent Title",
+                "3. ⬅️ Parent Title",
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
@@ -811,7 +811,7 @@ async def test_state_display_page_detail_back(
                 "",
                 "-----",
                 "*Or reply:*",
-                "1. ⬅️Previous thing",
+                "1. ⬅️ Previous thing",
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
@@ -850,7 +850,7 @@ async def test_state_display_page_detail_next_and_back(
                 "",
                 "-----",
                 "*Or reply:*",
-                "2. ⬅️Previous thing",
+                "2. ⬅️ Previous thing",
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
