@@ -317,18 +317,9 @@ class CustomChoiceState(ChoiceState):
             if len(self.buttons) <= 3:
                 helper_metadata["buttons"] = [choice.label for choice in self.buttons]
             else:
-                helper_metadata = (
-                    {
-                        "button": self.button,
-                        "sections": [
-                            {
-                                "rows": [
-                                    {"id": c.label, "title": c.label}
-                                    for c in self.buttons
-                                ]
-                            }
-                        ],
-                    },
-                )
+                helper_metadata["button"] = self.button
+                helper_metadata["sections"] = [
+                    {"rows": [{"id": c.label, "title": c.label} for c in self.buttons]}
+                ]
 
         return self.app.send_message(self.question, helper_metadata=helper_metadata)

@@ -98,6 +98,11 @@ async def contentrepo_api_mock(sanic_client):
             pages.append({"id": 333, "title": "Sub menu 1"})
             pages.append({"id": 444, "title": "Sub menu 2"})
             pages.append({"id": 1231, "title": "Sub menu 3"})
+
+        if child_of in ["1111"]:
+            for i in range(5):
+                pages.append({"id": i, "title": f"Sub menu {i+1}"})
+
         if child_of == "1231":
             pages.append({"id": 1232, "title": "Sub Menu with image"})
 
@@ -123,6 +128,19 @@ async def contentrepo_api_mock(sanic_client):
         )
 
     @app.route("/api/v2/pages/111", methods=["GET"])
+    def get_page_detail_111(request):
+        app.requests.append(request)
+        return response.json(
+            build_message_detail(
+                111,
+                "Main Menu 1 💊",
+                "Message test content 1",
+                ["test"],
+                False,
+            )
+        )
+
+    @app.route("/api/v2/pages/1111", methods=["GET"])
     def get_page_detail_111(request):
         app.requests.append(request)
         return response.json(
@@ -588,7 +606,58 @@ async def test_state_display_page_submenu_back(
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
-        )
+        ),
+        buttons=["Sub menu 1", "Sub menu 2", "Sub menu 3"],
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_display_page_list(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_display_page")
+    tester.user.metadata["page_type"] = "submenu"
+    tester.user.metadata["selected_page_id"] = "1111"
+    tester.user.metadata["title"] = "title"
+    tester.user.metadata["body"] = "body"
+    tester.user.metadata["current_menu_level"] = 3
+    tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["related_pages"] = None
+    tester.user.metadata["suggested_content"] = {}
+
+    tester.user.metadata["parent_title"] = "Previous thing"
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "title",
+                "-----",
+                "",
+                "body",
+                "",
+                "1. Sub menu 1",
+                "2. Sub menu 2",
+                "3. Sub menu 3",
+                "4. Sub menu 4",
+                "5. Sub menu 5",
+                "",
+                "-----",
+                "*Or reply:*",
+                "6. ⬅️Previous thing",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        ),
+        button="See my options",
+        list_items=[
+            "Sub menu 1",
+            "Sub menu 2",
+            "Sub menu 3",
+            "Sub menu 4",
+            "Sub menu 5",
+        ],
     )
 
 

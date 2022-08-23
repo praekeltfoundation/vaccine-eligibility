@@ -112,6 +112,8 @@ class AppTester:
         content: Optional[str] = None,
         session: Optional[Message.SESSION_EVENT] = None,
         buttons: Optional[List[str]] = None,
+        button: Optional[str] = None,
+        list_items: Optional[List[str]] = None,
         header: Optional[str] = None,
         max_length: Optional[int] = None,
     ):
@@ -131,6 +133,14 @@ class AppTester:
         if buttons is not None:
             btns = message.helper_metadata.get("buttons")
             assert btns == buttons, f"Buttons are {btns}, not {buttons}"
+        if button is not None:
+            btn = message.helper_metadata.get("button")
+            assert btn == button, f"Button is {btn}, not {button}"
+        if list_items is not None:
+            items = message.helper_metadata.get("sections", [])
+            assert items != [], "No list sections found"
+            labels = [i["id"] for i in items[0].get("rows", [])]
+            assert labels == list_items, f"List Items are {labels}, not {list_items}"
         if header is not None:
             hdr = message.helper_metadata.get("header")
             assert hdr == header, f"Header is {hdr}, not {header}"
