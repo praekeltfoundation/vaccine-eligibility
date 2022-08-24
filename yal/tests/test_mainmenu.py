@@ -240,7 +240,7 @@ async def contentrepo_api_mock(sanic_client):
     def get_image(request, image_id):
         app.requests.append(request)
         return response.json(
-            {"meta": {"download_url": f"/media/original_images/test{image_id}.jpg"}}
+            {"meta": {"download_url": f"http://aws.test/test{image_id}.jpg"}}
         )
 
     client = await sanic_client(app)
@@ -537,7 +537,7 @@ async def test_state_submenu_image(
     )
 
     [msg] = tester.application.messages
-    assert "/media/original_images/test1.jpg" in msg.helper_metadata["image"]
+    assert msg.helper_metadata["image"] == "http://aws.test/test1.jpg"
     tester.assert_message(question)
 
 
@@ -567,7 +567,7 @@ async def test_state_detail_image(
     )
 
     [msg] = tester.application.messages
-    assert "/media/original_images/test2.jpg" in msg.helper_metadata["image"]
+    assert msg.helper_metadata["image"] == "http://aws.test/test2.jpg"
     tester.assert_message(question)
 
 

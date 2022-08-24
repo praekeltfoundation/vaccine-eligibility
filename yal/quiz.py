@@ -65,9 +65,7 @@ class Application(BaseApplication):
 
                 helper_metadata = {}
                 if result_page_details.get("image_path"):
-                    helper_metadata["image"] = contentrepo.get_url(
-                        result_page_details["image_path"]
-                    )
+                    helper_metadata["image"] = result_page_details["image_path"]
 
                 result_msg = result_page_details["body"].replace("[SCORE]", str(score))
                 await self.worker.publish_message(
@@ -112,7 +110,7 @@ class Application(BaseApplication):
 
         helper_metadata = {}
         if page_details.get("image_path"):
-            helper_metadata["image"] = contentrepo.get_url(page_details["image_path"])
+            helper_metadata["image"] = page_details["image_path"]
 
         buttons = [Choice(c.value, c.label[:20]) for c in choices]
 
@@ -142,7 +140,7 @@ class Application(BaseApplication):
 
         helper_metadata = {}
         if page_details.get("image_path"):
-            helper_metadata["image"] = contentrepo.get_url(page_details["image_path"])
+            helper_metadata["image"] = page_details["image_path"]
 
         await self.worker.publish_message(
             self.inbound.reply(

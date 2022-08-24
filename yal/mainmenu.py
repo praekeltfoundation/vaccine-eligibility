@@ -319,7 +319,7 @@ class Application(BaseApplication):
 
         helper_metadata = {}
         if "image_path" in metadata and metadata["image_path"]:
-            helper_metadata["image"] = contentrepo.get_url(metadata["image_path"])
+            helper_metadata["image"] = metadata["image_path"]
 
         i = len(choices) + 1
         suggested_choices = await self.get_suggested_choices()
