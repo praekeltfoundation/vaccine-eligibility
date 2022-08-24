@@ -102,6 +102,7 @@ async def contentrepo_api_mock(sanic_client):
         if child_of in ["1111"]:
             for i in range(5):
                 pages.append({"id": i, "title": f"Sub menu {i+1}"})
+            pages.append({"id": 123, "title": "Sub menu that is very long"})
 
         if child_of == "1231":
             pages.append({"id": 1232, "title": "Sub Menu with image"})
@@ -642,10 +643,11 @@ async def test_state_display_page_list(
                 "3. Sub menu 3",
                 "4. Sub menu 4",
                 "5. Sub menu 5",
+                "6. Sub menu that is very long",
                 "",
                 "-----",
                 "*Or reply:*",
-                "6. ⬅️ Previous thing",
+                "7. ⬅️ Previous thing",
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
@@ -657,6 +659,7 @@ async def test_state_display_page_list(
             "Sub menu 3",
             "Sub menu 4",
             "Sub menu 5",
+            "Sub menu that is ver",
         ],
     )
 

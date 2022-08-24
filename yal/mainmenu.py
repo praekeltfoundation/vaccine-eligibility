@@ -335,6 +335,8 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
+        buttons = [Choice(c.value, c.label[:20]) for c in buttons]
+
         return CustomChoiceState(
             self,
             question=question,
