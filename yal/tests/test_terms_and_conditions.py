@@ -48,6 +48,18 @@ async def test_state_get_to_know_valid(tester: AppTester):
 
     tester.assert_state("state_get_to_know_why")
     tester.assert_num_messages(1)
+    tester.assert_message(
+        "🤔 *Why the questions?*\n"
+        "\n"
+        "🙍🏾‍♀️ These questions help the B-Wise team improve your experience with "
+        "me. The more I learn from you, the better the service will be for you.\n"
+        "\n"
+        "*Don't worry, you never have to share anything you don't want to. 🙂*\n"
+        "\n"
+        "*Ready?*\n"
+        "*1* - Ok\n"
+        "*2* - No Thanks"
+    )
 
 
 @pytest.mark.asyncio
