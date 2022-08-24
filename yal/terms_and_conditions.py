@@ -103,7 +103,7 @@ class Application(BaseApplication):
             "*Don't worry, you never have to share anything you don't want to. 🙂*\n"
             "\n"
             "*Ready?*\n"
-            "*1* - Ok"
+            "*1* - Ok\n"
             "*2* - No Thanks"
         )
         return WhatsAppButtonState(
