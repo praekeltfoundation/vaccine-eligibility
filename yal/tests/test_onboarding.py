@@ -31,6 +31,7 @@ async def rapidpro_mock(sanic_client):
     url = config.RAPIDPRO_URL
     config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
     config.RAPIDPRO_TOKEN = "testtoken"
+    config.AWS_MEDIA_URL = "http://aws.com"
     yield client
     config.RAPIDPRO_URL = url
 
@@ -61,6 +62,51 @@ async def test_state_dob_full_valid(
             "onboarding_reminder_type": "5 min",
         },
     }
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
+@mock.patch("yal.onboarding.get_today")
+async def test_state_dob_full_valid_bday(
+    get_today, get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    get_today.return_value = date(2022, 6, 19)
+    tester.setup_state("state_dob_full")
+
+    await tester.user_input("19/06/2007")
+
+    tester.assert_state("state_relationship_status")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_dob_year", "2007")
+    tester.assert_answer("state_dob_month", "6")
+    tester.assert_answer("state_dob_day", "19")
+    tester.assert_answer("age", "15")
+
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
+    [bday_msg] = tester.fake_worker.outbound_messages
+    assert bday_msg.content == "\n".join(
+        [
+            "*Yoh! 15 today? HAPPY BIRTHDAY!* 🎂 🎉 ",
+            "",
+            "Hope you're having a great one so far! Remember—age is "
+            "just a number. Here's to always having  wisdom that goes"
+            " beyond your years 😉 🥂",
+        ]
+    )
+    assert (
+        bday_msg.helper_metadata.get("image")
+        == "http://aws.com/original_images/hbd.png"
+    )
 
 
 @pytest.mark.asyncio
@@ -309,9 +355,10 @@ async def test_state_check_birthday(
             " beyond your years 😉 🥂",
         ]
     )
-    assert msg.helper_metadata == {
-        "image": "https://contenrepo/media/original_images/hbd.png"
-    }
+    assert (
+        msg.helper_metadata.get("image")
+        == "http://aws.com/original_images/hbd.png"
+    )
 
     assert len(rapidpro_mock.app.requests) == 2
     request = rapidpro_mock.app.requests[0]

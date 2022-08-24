@@ -27,7 +27,7 @@ def get_contentrepo_api():
 
 
 def get_image_url(image):
-    return urljoin(config.CONTENTREPO_API_URL, f"media/original_images/{image}")
+    return urljoin(config.AWS_MEDIA_URL, f"original_images/{image}")
 
 
 def get_privacy_policy_url():
