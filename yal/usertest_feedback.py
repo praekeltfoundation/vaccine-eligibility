@@ -1,6 +1,6 @@
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, WhatsAppListState
-from yal import rapidpro, utils
+from yal import config, rapidpro, utils
 from yal.utils import GENERIC_ERROR
 
 
@@ -292,11 +292,7 @@ class Application(BaseApplication):
     async def state_submit_completed_feedback(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
-        data = {
-            "usertesting_feedback_complete": "TRUE",
-        }
-
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.start_flow(whatsapp_id, config.USERTESTING_FLOW_UUID)
         if error:
             return await self.go_to_state("state_error")
         return await self.go_to_state("state_completed_feedback")

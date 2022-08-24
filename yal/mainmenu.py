@@ -317,10 +317,6 @@ class Application(BaseApplication):
         )
         question = self._("\n".join([part for part in parts if part is not None]))
 
-        helper_metadata = {}
-        if "image_path" in metadata and metadata["image_path"]:
-            helper_metadata["image"] = metadata["image_path"]
-
         i = len(choices) + 1
         suggested_choices = await self.get_suggested_choices()
         choices.extend(suggested_choices)
@@ -335,7 +331,12 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
-        buttons = [Choice(c.value, c.label[:20]) for c in buttons]
+        helper_metadata = {}
+        if "image_path" in metadata and metadata["image_path"]:
+            helper_metadata["image"] = metadata["image_path"]
+            buttons = None
+        else:
+            buttons = [Choice(c.value, c.label[:20]) for c in buttons]
 
         return CustomChoiceState(
             self,

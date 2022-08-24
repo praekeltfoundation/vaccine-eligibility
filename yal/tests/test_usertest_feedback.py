@@ -61,8 +61,8 @@ async def rapidpro_mock(sanic_client):
             status=200,
         )
 
-    @app.route("/api/v2/contacts.json", methods=["POST"])
-    def update_contact(request):
+    @app.route("/api/v2/flow_starts.json", methods=["POST"])
+    def start_flow(request):
         app.requests.append(request)
         return response.json({}, status=200)
 
@@ -70,6 +70,7 @@ async def rapidpro_mock(sanic_client):
     url = config.RAPIDPRO_URL
     config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
     config.RAPIDPRO_TOKEN = "testtoken"
+    config.USERTESTING_FLOW_UUID = "usertesting-flow-uid"
     yield client
     config.RAPIDPRO_URL = url
 
@@ -322,5 +323,6 @@ async def test_state_submit_completed_feedback(tester: AppTester, rapidpro_mock)
     assert len(rapidpro_mock.app.requests) == 1
     request = rapidpro_mock.app.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"usertesting_feedback_complete": "TRUE"},
+        "flow": "usertesting-flow-uid",
+        "urns": ["whatsapp:27820001001"],
     }
