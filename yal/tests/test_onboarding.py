@@ -355,10 +355,7 @@ async def test_state_check_birthday(
             " beyond your years 😉 🥂",
         ]
     )
-    assert (
-        msg.helper_metadata.get("image")
-        == "http://aws.com/original_images/hbd.png"
-    )
+    assert msg.helper_metadata.get("image") == "http://aws.com/original_images/hbd.png"
 
     assert len(rapidpro_mock.app.requests) == 2
     request = rapidpro_mock.app.requests[0]
