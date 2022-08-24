@@ -15,3 +15,4 @@ GOOGLE_PLACES_URL = "https://maps.googleapis.com"
 GOOGLE_PLACES_KEY = environ.get("GOOGLE_PLACES_KEY")
 RAPIDPRO_URL = environ.get("RAPIDPRO_URL")
 RAPIDPRO_TOKEN = environ.get("RAPIDPRO_TOKEN")
+USERTESTING_FLOW_UUID = environ.get("USERTESTING_FLOW_UUID")

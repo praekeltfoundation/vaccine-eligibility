@@ -72,3 +72,27 @@ async def update_profile(whatsapp_id, fields):
                 else:
                     continue
     return False
+
+
+async def start_flow(whatsapp_id, flow_uuid):
+    urn = f"whatsapp:{whatsapp_id}"
+    async with get_rapidpro_api() as session:
+        for i in range(3):
+            try:
+                data = {
+                    "flow": flow_uuid,
+                    "urns": [urn],
+                }
+                response = await session.post(
+                    urljoin(config.RAPIDPRO_URL, "/api/v2/flow_starts.json"),
+                    json=data,
+                )
+                response.raise_for_status()
+                break
+            except HTTP_EXCEPTIONS as e:
+                if i == 2:
+                    logger.exception(e)
+                    return True
+                else:
+                    continue
+    return False
