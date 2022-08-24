@@ -25,6 +25,7 @@ def get_contentrepo_api():
         },
     )
 
+
 def get_image_url(image):
     return urljoin(config.CONTENTREPO_API_URL, f"media/original_images/{image}")
 
