@@ -123,6 +123,7 @@ async def test_state_decline_confirm_valid(tester: AppTester):
         "wise, and look after yourself 😉👋🏾"
     )
 
+
 @pytest.mark.asyncio
 async def test_state_decline_confirm_accept(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_decline_confirm")
