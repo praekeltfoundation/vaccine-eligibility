@@ -136,9 +136,16 @@ async def get_page_details(user, page_id, message_id, suggested=False):
                             ][0]
                             page_details["quiz_tag"] = quiz_tag
 
-                    related_pages = await find_related_pages(response_body["tags"])
-                    if related_pages:
-                        page_details["related_pages"] = related_pages
+                    if response_body["related_pages"]:
+                        page_details["related_pages"] = {
+                            page["value"]: page["title"]
+                            for page in response_body["related_pages"]
+                        }
+                    else:
+                        # TODO: deprecate using tags for related content
+                        related_pages = await find_related_pages(response_body["tags"])
+                        if related_pages:
+                            page_details["related_pages"] = related_pages
 
                     if message_number == 1:
                         page_details["quick_replies"] = response_body["quick_replies"]

@@ -27,6 +27,7 @@ def build_message_detail(
     image=None,
     total_messages=1,
     quick_replies=[],
+    related_pages=[],
 ):
     return {
         "id": id,
@@ -48,6 +49,7 @@ def build_message_detail(
         "has_children": has_children,
         "meta": {"parent": {"id": 123, "title": "Parent Title"}},
         "quick_replies": quick_replies,
+        "related_pages": related_pages,
     }
 
 
@@ -913,6 +915,21 @@ async def contentrepo_api_mock2(sanic_client):
             )
         )
 
+    @app.route("/api/v2/pages/2", methods=["GET"])
+    def get_page_detail_2(request):
+        return response.json(
+            build_message_detail(
+                222,
+                "Main Menu 2 💊",
+                "Message test content 2",
+                [],
+                False,
+                related_pages=[
+                    {"title": "Related Content 2", "value": 107, "id": "page-uuid"}
+                ],
+            )
+        )
+
     @app.route("/api/v2/pages", methods=["GET"])
     def get_related_by_id(request):
         return response.json(
@@ -930,7 +947,7 @@ async def contentrepo_api_mock2(sanic_client):
 
 
 @pytest.mark.asyncio
-async def test_state_content_page_related(
+async def test_state_content_page_related_tags(
     tester: AppTester, contentrepo_api_mock2, rapidpro_mock
 ):
     tester.setup_state("state_contentrepo_page")
@@ -952,6 +969,39 @@ async def test_state_content_page_related(
                 "Message test content 1",
                 "",
                 "1. Related Content",
+                "",
+                "-----",
+                "*Or reply:*",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_content_page_related(
+    tester: AppTester, contentrepo_api_mock2, rapidpro_mock
+):
+    tester.setup_state("state_contentrepo_page")
+    tester.user.metadata["selected_page_id"] = "2"
+    tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["current_menu_level"] = 0
+    tester.user.metadata["suggested_content"] = {"123": "Suggested"}
+
+    tester.user.session_id = 123
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Main Menu 2 💊",
+                "-----",
+                "",
+                "Message test content 2",
+                "",
+                "1. Related Content 2",
                 "",
                 "-----",
                 "*Or reply:*",
