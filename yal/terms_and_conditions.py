@@ -206,7 +206,7 @@ class Application(BaseApplication):
             ],
             error=self._(GENERIC_ERROR),
             next={
-                "end": "state_decline",
+                "end": "state_decline_1",
                 "accept": "state_submit_terms_and_conditions",
             },
         )
@@ -236,7 +236,7 @@ class Application(BaseApplication):
             self,
             question=self._(
                 "*Need quick answers?*\n"
-                "*Check out B-Wise online!*👆🏾\n"
+                "*Check out B-Wise online!* 👆🏾\n"
                 "\n"
                 "https://bwisehealth.com/ \n"
                 "\n"
