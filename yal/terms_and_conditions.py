@@ -202,7 +202,7 @@ class Application(BaseApplication):
             question=question,
             choices=[
                 Choice("end", "END chat"),
-                Choice("accept", "ACCEPT Privacy Policy"),
+                Choice("accept", "ACCEPT"),
             ],
             error=self._(GENERIC_ERROR),
             next={
