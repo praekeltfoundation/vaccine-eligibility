@@ -16,11 +16,34 @@ def tester():
     return AppTester(Application)
 
 
+def get_rapidpro_contact(urn):
+    return {
+        "fields": {
+            "onboarding_reminder_sent": "True",
+        },
+    }
+
+
 @pytest.fixture
 async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
     app.requests = []
+
+    @app.route("/api/v2/contacts.json", methods=["GET"])
+    def get_contact(request):
+        app.requests.append(request)
+
+        urn = request.args.get("urn")
+        contacts = [get_rapidpro_contact(urn)]
+
+        return response.json(
+            {
+                "results": contacts,
+                "next": None,
+            },
+            status=200,
+        )
 
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
@@ -585,12 +608,12 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
 @pytest.mark.asyncio
 async def test_onboarding_reminder_yes_response(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_handle_onboarding_reminder_response")
-    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="Yes")
+    await tester.user_input("Continue")
 
     tester.assert_state("state_dob_full")
     tester.assert_num_messages(1)
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.app.requests) == 3
+    request = rapidpro_mock.app.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "onboarding_reminder_sent": "",
@@ -645,8 +668,8 @@ async def test_onboarding_reminder_later_response_actioned(
 
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "onboarding_reminder_sent": "",

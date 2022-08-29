@@ -617,7 +617,7 @@ class Application(BaseApplication):
 
     async def state_handle_onboarding_reminder_response(self):
         inbound = utils.clean_inbound(self.inbound.content)
-        if inbound == "yes":
+        if inbound == "continue":
             msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
             whatsapp_id = msisdn.lstrip(" + ")
             data = {

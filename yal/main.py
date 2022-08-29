@@ -19,7 +19,7 @@ GREETING_KEYWORDS = {"hi", "hello", "menu", "0"}
 HELP_KEYWORDS = {"#", "help", "please call me"}
 OPTOUT_KEYWORDS = {"stop"}
 ONBOARDING_REMINDER_KEYWORDS = {
-    "yes",
+    "continue",
     "no, thanks",
     "remind me later",
     "not interested",
@@ -66,6 +66,18 @@ class Application(
             self.user.session_id = None
             self.state_name = PleaseCallMeApplication.CALLBACK_RESPONSE_STATE
 
+        if keyword in ONBOARDING_REMINDER_KEYWORDS:
+            msisdn = utils.normalise_phonenumber(message.from_addr)
+            whatsapp_id = msisdn.lstrip(" + ")
+            error, fields = await rapidpro.get_profile(whatsapp_id)
+            if error:
+                return await self.go_to_state("state_error")
+
+            onboarding_reminder_sent = fields.get("onboarding_reminder_sent")
+            if onboarding_reminder_sent:
+                self.user.session_id = None
+                self.state_name = OnboardingApplication.REMINDER_STATE
+
         return await super().process_message(message)
 
     async def state_start(self):
@@ -80,7 +92,6 @@ class Application(
         onboarding_completed = fields.get("onboarding_completed")
         # If one of these values is True then the user might be responding
         # to a scheduled msg
-        onboarding_reminder_sent = fields.get("onboarding_reminder_sent")
         aaq_timeout_sent = fields.get("aaq_timeout_sent")
 
         for field in ("province", "suburb", "street_name", "street_number"):
@@ -98,11 +109,6 @@ class Application(
                 return await self.go_to_state(OnboardingApplication.START_STATE)
             else:
                 return await self.go_to_state(TermsApplication.START_STATE)
-
-        if onboarding_reminder_sent and (
-            inbound.lower() in ONBOARDING_REMINDER_KEYWORDS
-        ):
-            return await self.go_to_state(OnboardingApplication.REMINDER_STATE)
 
         if aaq_timeout_sent and (inbound.lower() in AAQ_TIMEOUT_KEYWORDS):
             return await self.go_to_state(AaqApplication.TIMEOUT_RESPONSE_STATE)
