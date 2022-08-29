@@ -68,7 +68,6 @@ def get_rapidpro_contact(urn):
         "fields": {
             "onboarding_completed": "27820001001" in urn,
             "onboarding_reminder_sent": "27820001001" in urn,
-            "callback_check_sent": "27820001001" in urn,
             "aaq_timeout_sent": "27820001001" in urn,
             "aaq_timeout_type": "2" if "27820001001" in urn else "",
             "terms_accepted": "27820001001" in urn,
@@ -236,14 +235,10 @@ async def test_onboarding_reminder_response_to_reminder_handler(
 
 
 @pytest.mark.asyncio
-async def test_callback_check_response_to_handler(tester: AppTester, rapidpro_mock):
-    await tester.user_input(
-        session=Message.SESSION_EVENT.NEW, content="yes but I missed it"
-    )
-    tester.assert_state("state_ask_to_call_again")
+async def test_callback_check_response_to_handler(tester: AppTester):
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="callback")
+    tester.assert_state("state_handle_callback_check_response")
     tester.assert_num_messages(1)
-
-    assert len(rapidpro_mock.app.requests) == 2
 
 
 @pytest.mark.asyncio

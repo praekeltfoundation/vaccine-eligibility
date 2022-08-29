@@ -24,11 +24,7 @@ ONBOARDING_REMINDER_KEYWORDS = {
     "remind me later",
     "not interested",
 }
-CALLBACK_CHECK_KEYWORDS = {
-    "yes i got a callback",
-    "yes but i missed it",
-    "no i m still waiting",
-}
+CALLBACK_CHECK_KEYWORDS = {"callback"}
 AAQ_TIMEOUT_KEYWORDS = {"yes", "no", "yes ask again", "no i m good"}
 FEEDBACK_KEYWORDS = {"feedback"}
 
@@ -66,6 +62,10 @@ class Application(
             self.user.session_id = None
             self.state_name = FeedbackApplication.START_STATE
 
+        if keyword in CALLBACK_CHECK_KEYWORDS:
+            self.user.session_id = None
+            self.state_name = PleaseCallMeApplication.CALLBACK_RESPONSE_STATE
+
         return await super().process_message(message)
 
     async def state_start(self):
@@ -81,7 +81,6 @@ class Application(
         # If one of these values is True then the user might be responding
         # to a scheduled msg
         onboarding_reminder_sent = fields.get("onboarding_reminder_sent")
-        callback_check_sent = fields.get("callback_check_sent")
         aaq_timeout_sent = fields.get("aaq_timeout_sent")
 
         for field in ("province", "suburb", "street_name", "street_number"):
@@ -99,11 +98,6 @@ class Application(
                 return await self.go_to_state(OnboardingApplication.START_STATE)
             else:
                 return await self.go_to_state(TermsApplication.START_STATE)
-
-        if callback_check_sent and (inbound.lower() in CALLBACK_CHECK_KEYWORDS):
-            return await self.go_to_state(
-                PleaseCallMeApplication.CALLBACK_RESPONSE_STATE
-            )
 
         if onboarding_reminder_sent and (
             inbound.lower() in ONBOARDING_REMINDER_KEYWORDS
