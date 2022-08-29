@@ -12,7 +12,6 @@ from yal import config, rapidpro
 from yal.utils import (
     BACK_TO_MAIN,
     GENERIC_ERROR,
-    clean_inbound,
     get_current_datetime,
     normalise_phonenumber,
 )
@@ -408,24 +407,30 @@ class Application(BaseApplication):
         return await self.go_to_state("state_submit_callback")
 
     async def state_handle_callback_check_response(self):
-        msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
-        data = {
-            "callback_check_sent": "",
-        }
-
-        error = await rapidpro.update_profile(whatsapp_id, data)
-        if error:
-            return await self.go_to_state("state_error")
-
-        inbound = clean_inbound(self.inbound.content)
-
-        if inbound == "yes i got a callback":
-            return await self.go_to_state("state_pre_mainmenu")
-        if inbound == "yes but i missed it":
-            return await self.go_to_state("state_ask_to_call_again")
-        if inbound == "no i m still waiting":
-            return await self.go_to_state("state_no_callback_received")
+        question = self._(
+            "\n".join(
+                [
+                    "*1* - 😌 Yes, I got a callback",
+                    "*2* - 😬 Yes, but I missed it",
+                    "*3* - 😠 No I'm still waiting",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("yes", "I got the call"),
+                Choice("missed", "I missed the call"),
+                Choice("no", "No call yet"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "yes": "state_pre_mainmenu",
+                "missed": "state_ask_to_call_again",
+                "no": "state_no_callback_received",
+            },
+        )
 
     async def state_no_callback_received(self):
         msg = self._(

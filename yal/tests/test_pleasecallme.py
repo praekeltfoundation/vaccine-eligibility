@@ -458,16 +458,11 @@ async def test_state_callback_response_handles_call_received(
 ):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_handle_callback_check_response")
-    await tester.user_input(
-        session=Message.SESSION_EVENT.NEW, content="yes, i got a callback"
-    )
+    await tester.user_input("I got the call")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    [request1, request2] = rapidpro_mock.app.requests
-    assert json.loads(request1.body.decode("utf-8")) == {
-        "fields": {"callback_check_sent": ""},
-    }
-    assert json.loads(request2.body.decode("utf-8")) == {
+    assert len(rapidpro_mock.app.requests) == 1
+    [request] = rapidpro_mock.app.requests
+    assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "2022-06-19T17:30:00",
             "suggested_text": "*6* - Suggested Content 1",
@@ -483,15 +478,9 @@ async def test_state_callback_response_handles_no_call(
     tester: AppTester, rapidpro_mock
 ):
     tester.setup_state("state_handle_callback_check_response")
-    await tester.user_input(
-        session=Message.SESSION_EVENT.NEW, content="no i'm still waiting"
-    )
+    await tester.user_input("No call yet")
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"callback_check_sent": ""},
-    }
+    assert len(rapidpro_mock.app.requests) == 0
 
     tester.assert_num_messages(1)
     [msg] = tester.fake_worker.outbound_messages
@@ -511,16 +500,9 @@ async def test_state_callback_response_handles_missed_call(
     tester: AppTester, rapidpro_mock
 ):
     tester.setup_state("state_handle_callback_check_response")
-    await tester.user_input(
-        session=Message.SESSION_EVENT.NEW, content="yes, but i missed it"
-    )
+    await tester.user_input("I missed the call")
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"callback_check_sent": ""},
-    }
-
+    assert len(rapidpro_mock.app.requests) == 0
     tester.assert_state("state_ask_to_call_again")
 
 
