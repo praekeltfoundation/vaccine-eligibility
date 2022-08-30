@@ -624,7 +624,7 @@ async def test_onboarding_reminder_yes_response(tester: AppTester, rapidpro_mock
 @pytest.mark.asyncio
 async def test_onboarding_reminder_no_thanks_response(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_handle_onboarding_reminder_response")
-    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="no, thanks")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="Not Interested")
 
     tester.assert_state("state_stop_onboarding_reminders")
 
@@ -634,12 +634,12 @@ async def test_onboarding_reminder_no_thanks_response_actioned(
     tester: AppTester, rapidpro_mock
 ):
     tester.setup_state("state_stop_onboarding_reminders")
-    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="no, thanks")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="Not Interested")
 
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.app.requests) == 2
+    request = rapidpro_mock.app.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"onboarding_reminder_sent": "", "onboarding_reminder_type": ""},
     }

@@ -20,7 +20,6 @@ HELP_KEYWORDS = {"#", "help", "please call me"}
 OPTOUT_KEYWORDS = {"stop"}
 ONBOARDING_REMINDER_KEYWORDS = {
     "continue",
-    "no thanks",
     "remind me later",
     "not interested",
 }

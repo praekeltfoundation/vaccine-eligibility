@@ -235,17 +235,6 @@ async def test_onboarding_reminder_response_to_reminder_handler(
 
 
 @pytest.mark.asyncio
-async def test_onboarding_reminder_response_to_reminder_handler_no_thanks(
-    tester: AppTester, rapidpro_mock
-):
-    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="No, Thanks")
-    tester.assert_state("state_stop_onboarding_reminders")
-    tester.assert_num_messages(1)
-
-    assert len(rapidpro_mock.app.requests) == 2
-
-
-@pytest.mark.asyncio
 async def test_callback_check_response_to_handler(tester: AppTester):
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="callback")
     tester.assert_state("state_handle_callback_check_response")
