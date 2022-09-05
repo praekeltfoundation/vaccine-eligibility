@@ -394,6 +394,27 @@ async def test_state_mainmenu_static(
 
 
 @pytest.mark.asyncio
+async def test_state_mainmenu_aaq(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_pre_mainmenu")
+    await tester.user_input("9")
+
+    tester.assert_num_messages(1)
+    tester.assert_state("state_start")
+    tester.assert_message("Coming soon...")
+
+    assert [r.path for r in contentrepo_api_mock.app.requests] == [
+        "/api/v2/pages",
+        "/api/v2/pages",
+        "/api/v2/pages",
+        "/suggestedcontent/",
+    ]
+
+    assert len(rapidpro_mock.app.requests) == 2
+
+
+@pytest.mark.asyncio
 async def test_state_mainmenu_contentrepo(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
