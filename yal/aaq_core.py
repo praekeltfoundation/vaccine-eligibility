@@ -59,6 +59,8 @@ async def inbound_check(user, message_id, question):
         "model_answers": answers,
         "next_page_url": response_data.get("next_page_url"),
         "prev_page_url": response_data.get("prev_page_url"),
+        "inbound_id": response_data["inbound_id"],
+        "feedback_secret_key": response_data["feedback_secret_key"],
     }
 
 
@@ -86,4 +88,37 @@ async def get_page(url):
         "model_answers": answers,
         "next_page_url": response_data.get("next_page_url"),
         "prev_page_url": response_data.get("prev_page_url"),
+        "inbound_id": response_data["inbound_id"],
+        "feedback_secret_key": response_data["feedback_secret_key"],
     }
+
+
+async def add_feedback(secret_key, inbound_id, feedback_type):
+    data = {
+        "feedback_secret_key": secret_key,
+        "inbound_id": inbound_id,
+        "feedback": {"feedback_type": feedback_type},
+    }
+
+    async with get_aaq_api() as session:
+        for i in range(3):
+            try:
+                response = await session.put(
+                    url=urljoin(config.AAQ_URL, "/inbound/feedback"),
+                    json=data,
+                )
+                response_data = await response.json()
+                sentry_sdk.set_context(
+                    "model", {"request_data": data, "response_data": response_data}
+                )
+                response.raise_for_status()
+
+                break
+            except HTTP_EXCEPTIONS as e:
+                if i == 2:
+                    logger.exception(e)
+                    return True
+                else:
+                    continue
+
+    return False

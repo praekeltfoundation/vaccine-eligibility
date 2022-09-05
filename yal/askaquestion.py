@@ -13,6 +13,7 @@ from vaccine.states import (
     WhatsAppListState,
 )
 from vaccine.utils import get_display_choices
+from vaccine.validators import nonempty_validator
 from yal import aaq_core, config, rapidpro
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.utils import (
@@ -42,6 +43,10 @@ class Application(BaseApplication):
     TIMEOUT_RESPONSE_STATE = "state_handle_timeout_response"
 
     async def state_aaq_start(self):
+
+        if not config.AAQ_URL:
+            return await self.go_to_state("state_coming_soon")
+
         self.save_metadata("aaq_page", 0)
 
         question = self._(
@@ -65,8 +70,15 @@ class Application(BaseApplication):
         return FreeText(
             self,
             question=question,
-            next="state_set_aaq_timeout_1",  # TODO send question to api
-            # TODO add validator
+            next="state_set_aaq_timeout_1",
+            check=nonempty_validator(question),
+        )
+
+    async def state_coming_soon(self):
+        return EndState(
+            self,
+            self._("Coming soon..."),
+            next=self.START_STATE,
         )
 
     async def state_set_aaq_timeout_1(self):
@@ -223,8 +235,20 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
-        if self.user.answers.get("state_display_content", None) == "yes":
+        feedback_answer = self.user.answers.get("state_display_content", None)
+
+        inbound_id = self.user.metadata["inbound_id"]
+        feedback_secret_key = self.user.metadata["feedback_secret_key"]
+        feedback_type = "positive" if feedback_answer == "yes" else "negative"
+        error = await aaq_core.add_feedback(
+            feedback_secret_key, inbound_id, feedback_type
+        )
+        if error:
+            return await self.go_to_state("state_error")
+
+        if feedback_answer == "yes":
             return await self.go_to_state("state_yes_question_answered")
+
         return await self.go_to_state("state_no_question_not_answered")
 
     async def state_yes_question_answered(self):
