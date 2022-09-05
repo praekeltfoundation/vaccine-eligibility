@@ -4,6 +4,7 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, CustomChoiceState
 from vaccine.utils import get_display_choices
 from yal import contentrepo, rapidpro, utils
+from yal.askaquestion import Application as AskaQuestionApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
@@ -92,7 +93,10 @@ class Application(BaseApplication):
             sections.append((f"*{choice.label}*", sub_choices))
 
         sections.append(
-            ("🙋🏿‍♂️ *QUESTIONS?*", [Choice("state_faqs", "Ask a Question")])
+            (
+                "🙋🏿‍♂️ *QUESTIONS?*",
+                [Choice(AskaQuestionApplication.START_STATE, "Ask a Question")],
+            )
         )
         sections.append(
             (
