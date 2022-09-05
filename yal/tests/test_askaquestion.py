@@ -71,6 +71,11 @@ async def aaq_mock(sanic_client):
         body = get_aaq_response(MODEL_ANSWERS_PAGE_2, prev="/inbound/92567/0")
         return response.json(body, status=200)
 
+    @app.route("/inbound/feedback", methods=["PUT"])
+    def add_feedback(request):
+        app.requests.append(request)
+        return response.json({}, status=200)
+
     client = await sanic_client(app)
     url = config.AAQ_URL
     config.AAQ_URL = f"http://{client.host}:{client.port}"
@@ -114,7 +119,9 @@ async def rapidpro_mock(sanic_client):
 
 
 @pytest.mark.asyncio
-async def test_aaq_start(tester: AppTester, rapidpro_mock):
+@mock.patch("yal.askaquestion.config")
+async def test_aaq_start(mock_config, tester: AppTester, rapidpro_mock):
+    mock_config.AAQ_URL = "http://aaq-test.com"
     tester.setup_state("state_aaq_start")
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
@@ -139,6 +146,16 @@ async def test_aaq_start(tester: AppTester, rapidpro_mock):
             ]
         )
     )
+
+
+@pytest.mark.asyncio
+async def test_aaq_start_coming_soon(tester: AppTester):
+    tester.setup_state("state_aaq_start")
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_state("state_start")
+    tester.assert_message("Coming soon...")
 
 
 @pytest.mark.asyncio
@@ -275,7 +292,11 @@ async def test_state_display_results_next(tester: AppTester, aaq_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_display_results_pleasecallme(tester: AppTester, aaq_mock):
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_state_display_results_pleasecallme(
+    get_current_datetime, tester: AppTester, aaq_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 20, 17, 30)
     tester.setup_state("state_display_results")
     tester.user.metadata["aaq_page"] = 0
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
@@ -299,8 +320,10 @@ async def test_state_display_results_back(tester: AppTester, aaq_mock):
 
 @pytest.mark.asyncio
 async def test_state_display_content_question_answered(
-    tester: AppTester, rapidpro_mock
+    tester: AppTester, rapidpro_mock, aaq_mock
 ):
+    tester.user.metadata["inbound_id"] = "inbound-id"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.setup_state("state_display_content")
     tester.setup_answer("state_display_results", "FAQ #1 Title")
@@ -315,6 +338,14 @@ async def test_state_display_content_question_answered(
         "fields": {"aaq_timeout_type": ""},
     }
 
+    assert len(aaq_mock.app.requests) == 1
+    request = aaq_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "feedback": {"feedback_type": "positive"},
+        "feedback_secret_key": "feedback-secret-key",
+        "inbound_id": "inbound-id",
+    }
+
     tester.assert_num_messages(1)
     tester.assert_message(
         "🙍🏾‍♀️*So glad I could help! If you have another question, "
@@ -324,8 +355,10 @@ async def test_state_display_content_question_answered(
 
 @pytest.mark.asyncio
 async def test_state_display_content_question_not_answered(
-    tester: AppTester, rapidpro_mock
+    tester: AppTester, rapidpro_mock, aaq_mock
 ):
+    tester.user.metadata["inbound_id"] = "inbound-id"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.setup_state("state_display_content")
     tester.setup_answer("state_display_results", "FAQ #1 Title")
@@ -340,14 +373,24 @@ async def test_state_display_content_question_not_answered(
         "fields": {"aaq_timeout_type": ""},
     }
 
+    assert len(aaq_mock.app.requests) == 1
+    request = aaq_mock.app.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "feedback": {"feedback_type": "negative"},
+        "feedback_secret_key": "feedback-secret-key",
+        "inbound_id": "inbound-id",
+    }
+
     tester.assert_num_messages(1)
     tester.assert_message("TODO: Handle question not answered")
 
 
 @pytest.mark.asyncio
+@mock.patch("yal.askaquestion.config")
 async def test_state_handle_timeout_handles_type_1_yes(
-    tester: AppTester, rapidpro_mock
+    mock_config, tester: AppTester, rapidpro_mock
 ):
+    mock_config.AAQ_URL = "http://aaq-test.com"
     tester.setup_state("state_handle_timeout_response")
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="yes ask again")
 
