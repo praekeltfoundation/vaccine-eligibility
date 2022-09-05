@@ -25,6 +25,60 @@ def get_rapidpro_contact(urn):
     }
 
 
+MODEL_ANSWERS_PAGE_1 = {
+    "FAQ #1 Title": "This is FAQ #1's content.",
+    "FAQ #2 Title": "This is FAQ #2's content.",
+    "FAQ #3 Title": "This is FAQ #3's content.",
+}
+
+MODEL_ANSWERS_PAGE_2 = {
+    "FAQ #4 Title": "This is FAQ #4's content.",
+    "FAQ #5 Title": "This is FAQ #5's content.",
+    "FAQ #6 Title": "This is FAQ #6's content.",
+}
+
+
+def get_aaq_response(answers, next=None, prev=None):
+    top_responses = [[k, v] for k, v in answers.items()]
+    response = {
+        "top_responses": top_responses,
+        "feedback_secret_key": "abcde12345",
+        "inbound_secret_key": "secret_123",
+        "inbound_id": 28,
+    }
+    if next:
+        response["next_page_url"] = f"{next}?inbound_secret_key=secret_123"
+    if prev:
+        response["prev_page_url"] = f"{prev}?inbound_secret_key=secret_123"
+    return response
+
+
+@pytest.fixture
+async def aaq_mock(sanic_client):
+    Sanic.test_mode = True
+    app = Sanic("mock_aaq")
+    app.requests = []
+
+    @app.route("/inbound/check", methods=["POST"])
+    def inbound_check(request):
+        app.requests.append(request)
+        body = get_aaq_response(MODEL_ANSWERS_PAGE_1, next="/inbound/92567/1")
+        return response.json(body, status=200)
+
+    @app.route("/inbound/92567/1", methods=["GET"])
+    def inbound_check_page_2(request):
+        app.requests.append(request)
+        body = get_aaq_response(MODEL_ANSWERS_PAGE_2, prev="/inbound/92567/0")
+        return response.json(body, status=200)
+
+    client = await sanic_client(app)
+    url = config.AAQ_URL
+    config.AAQ_URL = f"http://{client.host}:{client.port}"
+    config.AAQ_TOKEN = "testtoken"
+    yield client
+    config.AAQ_URL = url
+
+
 @pytest.fixture
 async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
@@ -90,7 +144,7 @@ async def test_aaq_start(tester: AppTester, rapidpro_mock):
 @pytest.mark.asyncio
 @mock.patch("yal.askaquestion.get_current_datetime")
 async def test_start_state_response_sets_timeout(
-    get_current_datetime, tester: AppTester, rapidpro_mock
+    get_current_datetime, tester: AppTester, rapidpro_mock, aaq_mock
 ):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_aaq_start")
@@ -107,17 +161,51 @@ async def test_start_state_response_sets_timeout(
             "aaq_timeout_type": "1",
         },
     }
+    assert len(aaq_mock.app.requests) == 1
+    request = aaq_mock.app.requests[0].json
+    request["metadata"].pop("message_id")
+    request["metadata"].pop("session_id")
+    assert request == {
+        "text_to_match": "How do you do?",
+        "metadata": {"whatsapp_id": "27820001001"},
+    }
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "🙋🏿‍♂️ QUESTIONS?",
+                "*Ask A Question*",
+                "-----",
+                "",
+                "🙍🏾‍♀️Here are some FAQs that might answer your question." "",
+                "*To see the answer, reply with the number of the FAQ "
+                "you're interested in:*",
+                "",
+                "1. FAQ #1 Title",
+                "2. FAQ #2 Title",
+                "3. FAQ #3 Title",
+                "4. Show me more",
+                "",
+                "-----",
+                "*Or reply:*",
+                "0. 🏠 *Back* to Main *MENU*",
+                "#. 🆘Get *HELP*",
+            ]
+        )
+    )
 
 
 @pytest.mark.asyncio
 @mock.patch("yal.askaquestion.get_current_datetime")
 async def test_state_display_results_choose_an_answer(
-    get_current_datetime, tester: AppTester, rapidpro_mock
+    get_current_datetime, tester: AppTester, rapidpro_mock, aaq_mock
 ):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_display_results")
+    tester.user.metadata["aaq_page"] = 0
+    tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
 
-    await tester.user_input("AAQ Title #1")
+    await tester.user_input("FAQ #1 Title")
 
     tester.assert_state("state_display_content")
 
@@ -130,30 +218,92 @@ async def test_state_display_results_choose_an_answer(
         },
     }
 
+    [msg] = tester.fake_worker.outbound_messages
+    assert msg.content == "\n".join(
+        ["🙋🏿‍♂️ QUESTIONS?", "FAQ #1 Title", "-----", "", "This is FAQ #1's content."]
+    )
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*Did we answer your question?*",
+                "",
+                "*Reply:*",
+                "*1* - Yes 👍",
+                "*2* - No, go back to list",
+            ]
+        )
+    )
+
 
 @pytest.mark.asyncio
-async def test_state_display_results_no_match(tester: AppTester, rapidpro_mock):
+async def test_state_display_results_next(tester: AppTester, aaq_mock):
     tester.setup_state("state_display_results")
+    tester.user.metadata["aaq_page"] = 0
+    tester.user.metadata["next_page_url"] = "/inbound/92567/1"
+    tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
 
-    await tester.user_input("None of these help")
+    await tester.user_input("Show me more")
 
-    tester.assert_state("state_start")
-
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"aaq_timeout_type": ""},
-    }
+    tester.assert_state("state_display_results")
 
     tester.assert_num_messages(1)
-    tester.assert_message("TODO: Handle question not answered")
+    tester.assert_message(
+        "\n".join(
+            [
+                "🙋🏿‍♂️ QUESTIONS?",
+                "*Ask A Question*",
+                "-----",
+                "",
+                "🙍🏾‍♀️Here are some FAQs that might answer your question." "",
+                "*To see the answer, reply with the number of the FAQ "
+                "you're interested in:*",
+                "",
+                "1. FAQ #4 Title",
+                "2. FAQ #5 Title",
+                "3. FAQ #6 Title",
+                "4. Back to first list",
+                "5. Please call me",
+                "",
+                "-----",
+                "*Or reply:*",
+                "0. 🏠 *Back* to Main *MENU*",
+                "#. 🆘Get *HELP*",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_display_results_pleasecallme(tester: AppTester, aaq_mock):
+    tester.setup_state("state_display_results")
+    tester.user.metadata["aaq_page"] = 0
+    tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
+
+    await tester.user_input("Please call me")
+
+    tester.assert_state("state_in_hours")
+
+
+@pytest.mark.asyncio
+async def test_state_display_results_back(tester: AppTester, aaq_mock):
+    tester.setup_state("state_display_results")
+    tester.user.metadata["aaq_page"] = 1
+    tester.user.metadata["prev_page_url"] = "/inbound/92567/1"
+    tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_2
+
+    await tester.user_input("Back to first list")
+
+    tester.assert_state("state_display_results")
 
 
 @pytest.mark.asyncio
 async def test_state_display_content_question_answered(
     tester: AppTester, rapidpro_mock
 ):
+    tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.setup_state("state_display_content")
+    tester.setup_answer("state_display_results", "FAQ #1 Title")
 
     await tester.user_input("Yes")
 
@@ -176,7 +326,9 @@ async def test_state_display_content_question_answered(
 async def test_state_display_content_question_not_answered(
     tester: AppTester, rapidpro_mock
 ):
+    tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.setup_state("state_display_content")
+    tester.setup_answer("state_display_results", "FAQ #1 Title")
 
     await tester.user_input("No")
 

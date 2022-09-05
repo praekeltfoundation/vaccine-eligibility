@@ -2,6 +2,8 @@ import asyncio
 import logging
 from datetime import timedelta
 
+import aiohttp
+
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
@@ -10,7 +12,9 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
-from yal import rapidpro
+from vaccine.utils import get_display_choices
+from yal import aaq_core, config, rapidpro
+from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.utils import (
     BACK_TO_MAIN,
     GENERIC_ERROR,
@@ -23,11 +27,23 @@ from yal.utils import (
 logger = logging.getLogger(__name__)
 
 
+def get_aaq_api():
+    return aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=5),
+        headers={
+            "Authorization": f"BEARER {config.AAQ_TOKEN}",
+            "Content-Type": "application/json",
+        },
+    )
+
+
 class Application(BaseApplication):
     START_STATE = "state_aaq_start"
     TIMEOUT_RESPONSE_STATE = "state_handle_timeout_response"
 
     async def state_aaq_start(self):
+        self.save_metadata("aaq_page", 0)
+
         question = self._(
             "\n".join(
                 [
@@ -67,9 +83,42 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
+        return await self.go_to_state("state_aaq_model_request")
+
+    async def state_aaq_model_request(self):
+        error, response_data = await aaq_core.inbound_check(
+            self.user, self.inbound.message_id, self.user.answers["state_aaq_start"]
+        )
+        if error:
+            return await self.go_to_state("state_error")
+
+        for key, value in response_data.items():
+            self.save_metadata(key, value)
+        return await self.go_to_state("state_display_results")
+
+    async def state_aaq_get_page(self):
+        error, response_data = await aaq_core.get_page(self.user.metadata["page_url"])
+        if error:
+            return await self.go_to_state("state_error")
+
+        for key, value in response_data.items():
+            self.save_metadata(key, value)
         return await self.go_to_state("state_display_results")
 
     async def state_display_results(self):
+        answers = self.user.metadata["model_answers"]
+        page = self.user.metadata["aaq_page"]
+
+        choices = []
+        for title in answers.keys():
+            choices.append(Choice(title, title))
+
+        if page == 0 and self.user.metadata.get("next_page_url"):
+            choices.append(Choice("more", "Show me more"))
+        else:
+            choices.append(Choice("back", "Back to first list"))
+            choices.append(Choice("callme", "Please call me"))
+
         question = self._(
             "\n".join(
                 [
@@ -81,10 +130,7 @@ class Application(BaseApplication):
                     "*To see the answer, reply with the number of the FAQ "
                     "you're interested in:*",
                     "",
-                    "*1* - {{AAQ Title #1}}",
-                    "*2* - {{AAQ Title #2}}",
-                    "*3* - {{AAQ Title #3}}",
-                    "*4* - None of these answer my question",
+                    get_display_choices(choices),
                     "",
                     "-----",
                     "*Or reply:*",
@@ -97,12 +143,7 @@ class Application(BaseApplication):
             self,
             question=question,
             button="Choose an option",
-            choices=[
-                Choice("title_1", self._("AAQ Title #1")),
-                Choice("title_2", self._("AAQ Title #2")),
-                Choice("title_3", self._("AAQ Title #3")),
-                Choice("no match", self._("None of these help")),
-            ],
+            choices=choices,
             next="state_set_aaq_timeout_2",
             error=self._(GENERIC_ERROR),
         )
@@ -110,8 +151,18 @@ class Application(BaseApplication):
     async def state_set_aaq_timeout_2(self):
         chosen_answer = self.user.answers.get("state_display_results")
 
-        if chosen_answer == "no match":
-            return await self.go_to_state("state_is_question_answered")
+        if chosen_answer == "more":
+            self.user.metadata["aaq_page"] = 1
+            self.save_metadata("page_url", self.user.metadata["next_page_url"])
+            return await self.go_to_state("state_aaq_get_page")
+
+        if chosen_answer == "back":
+            self.user.metadata["aaq_page"] = 0
+            self.save_metadata("page_url", self.user.metadata["prev_page_url"])
+            return await self.go_to_state("state_aaq_get_page")
+
+        if chosen_answer == "callme":
+            return await self.go_to_state(PleaseCallMeApplication.START_STATE)
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
@@ -129,19 +180,15 @@ class Application(BaseApplication):
         return await self.go_to_state("state_display_content")
 
     async def state_display_content(self):
-        msg = self._(
-            "\n".join(
-                [
-                    "TODO: display chosen answer",
-                ]
-            )
+        answers = self.user.metadata["model_answers"]
+        chosen_answer = self.user.answers.get("state_display_results")
+
+        question = "\n".join(
+            ["🙋🏿‍♂️ QUESTIONS?", chosen_answer, "-----", "", answers[chosen_answer]]
         )
-        await self.worker.publish_message(
-            self.inbound.reply(
-                msg,
-            )
-        )
+        await self.worker.publish_message(self.inbound.reply(question))
         await asyncio.sleep(1.5)
+
         question = self._(
             "\n".join(
                 [
@@ -149,7 +196,7 @@ class Application(BaseApplication):
                     "",
                     "*Reply:*",
                     "*1* - Yes 👍",
-                    "*2* - No 👎",
+                    "*2* - No, go back to list",
                 ]
             )
         )
