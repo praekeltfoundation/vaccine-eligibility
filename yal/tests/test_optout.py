@@ -30,7 +30,7 @@ def get_rapidpro_contact(urn):
         "groups": [],
         "fields": {
             "relationship_status": "yes",
-            "gender": "boy_man",
+            "gender": "",
             "dob_day": "22",
             "dob_month": "2",
             "dob_year": "2022",
@@ -202,6 +202,24 @@ async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
             "street_number": "",
         },
     }
+
+    [msg1, msg2] = tester.fake_worker.outbound_messages
+    assert msg1.content == "\n".join(
+        [
+            "✅ *We've deleted all your saved personal data including:*",
+            "",
+            "- *22 2 2022*",
+            "- *yes*",
+            "- *12, test street, TestSuburb, FS*",
+            "- *Empty*",
+            "",
+            "*------*",
+            "*Reply:*",
+            "*1* - to see your personal data",
+            "0. 🏠 *Back* to Main *MENU*",
+            "#. 🆘Get *HELP*",
+        ]
+    )
 
 
 @pytest.mark.asyncio

@@ -258,7 +258,7 @@ class Application(BaseApplication):
             if name == "gender":
                 if value == "other":
                     return get_field("gender_other")
-                return GENDERS[value]
+                return GENDERS.get(value, "Empty")
             return value
 
         dob_year = fields.get("dob_year")

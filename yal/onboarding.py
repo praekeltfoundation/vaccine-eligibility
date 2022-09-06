@@ -301,6 +301,7 @@ class Application(BaseApplication):
                         "",
                         "👩🏾 OK. Lets see which facilities are close to you. What is "
                         "your address?",
+                        "",
                         "Type the name of your neighbourhood, your street and your "
                         "house number.",
                         "",
@@ -476,7 +477,7 @@ class Application(BaseApplication):
                     "🙍🏾‍♀️ Sure. I want to make double sure you feel included.",
                     "",
                     "*Go ahead and let me know what you'd prefer. Type something and "
-                    "hit send. *😌",
+                    "hit send.* 😌",
                 ]
             )
         )
