@@ -20,13 +20,33 @@ from yal.validators import phone_number_validator
 logger = logging.getLogger(__name__)
 
 
+async def on_request_start(session, context, params):
+    context.request_start = asyncio.get_event_loop().time()
+
+
+async def on_request_end(session, context, params):
+    elapsed_time = round(
+        (asyncio.get_event_loop().time() - context.request_start) * 1000
+    )
+    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+    msisdn = context.trace_request_ctx["msisdn"]
+    logger.info(
+        f"[{now}] Lovelife request (msisdn:{msisdn}) - {elapsed_time}ms <{params.url}>"
+    )
+
+
 def get_lovelife_api():
+    trace_config = aiohttp.TraceConfig()
+    trace_config.on_request_start.append(on_request_start)
+    trace_config.on_request_end.append(on_request_end)
+
     return aiohttp.ClientSession(
         timeout=aiohttp.ClientTimeout(total=5),
         headers={
             "Ocp-Apim-Subscription-Key": config.LOVELIFE_TOKEN or "",
             "Content-Type": "application/json",
         },
+        trace_configs=[trace_config],
     )
 
 
@@ -219,6 +239,7 @@ class Application(BaseApplication):
                             "PhoneNumber": msisdn,
                             "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
                         },
+                        trace_request_ctx={"msisdn": f"*{msisdn[-4:]}"},
                     )
                     response.raise_for_status()
                     break
