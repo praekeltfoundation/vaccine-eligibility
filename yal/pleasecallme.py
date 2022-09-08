@@ -306,7 +306,7 @@ class Application(BaseApplication):
             error=self._(GENERIC_ERROR),
             next={
                 "ok": "state_callme_done",
-                "help": "state_out_of_hours",
+                "help": "state_emergency",
                 "hours": "state_open_hours",
             },
         )

@@ -343,6 +343,22 @@ async def test_state_callback_confirmation(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_state_callback_confirmation_need_help(tester: AppTester):
+    tester.setup_state("state_callback_confirmation")
+    await tester.user_input("2")
+
+    tester.assert_state("state_emergency")
+
+
+@pytest.mark.asyncio
+async def test_state_callback_confirmation_opening_hours(tester: AppTester):
+    tester.setup_state("state_callback_confirmation")
+    await tester.user_input("3")
+
+    tester.assert_state("state_open_hours")
+
+
+@pytest.mark.asyncio
 async def test_state_in_hours_specify(tester: AppTester):
     tester.setup_state("state_in_hours")
     await tester.user_input("2")
