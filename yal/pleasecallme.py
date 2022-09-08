@@ -28,10 +28,10 @@ async def on_request_end(session, context, params):
     elapsed_time = round(
         (asyncio.get_event_loop().time() - context.request_start) * 1000
     )
-    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
     msisdn = context.trace_request_ctx["msisdn"]
     logger.info(
-        f"[{timestamp}] Lovelife request (msisdn:{msisdn}) - {elapsed_time}ms <{params.url}>"
+        f"[{now}] Lovelife request (msisdn:{msisdn}) - {elapsed_time}ms <{params.url}>"
     )
 
 
