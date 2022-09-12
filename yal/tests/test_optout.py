@@ -23,12 +23,20 @@ def tester():
 
 
 def get_rapidpro_contact(urn):
-    return {
+    contact = {
         "uuid": "b733e997-b0b4-4d4d-a3ad-0546e1644aa9",
         "name": "Test Human",
         "language": "eng",
         "groups": [],
-        "fields": {
+        "fields": {},
+        "blocked": False,
+        "stopped": False,
+        "created_on": "2015-11-11T08:30:24.922024+00:00",
+        "modified_on": "2015-11-11T08:30:25.525936+00:00",
+        "urns": [urn],
+    }
+    if urn == "whatsapp:27820001001":
+        contact["fields"] = {
             "relationship_status": "yes",
             "gender": "",
             "dob_day": "22",
@@ -38,13 +46,8 @@ def get_rapidpro_contact(urn):
             "suburb": "TestSuburb",
             "street_name": "test street",
             "street_number": "12",
-        },
-        "blocked": False,
-        "stopped": False,
-        "created_on": "2015-11-11T08:30:24.922024+00:00",
-        "modified_on": "2015-11-11T08:30:25.525936+00:00",
-        "urns": [urn],
-    }
+        }
+    return contact
 
 
 @pytest.fixture
@@ -207,10 +210,37 @@ async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
             [
                 "✅ *We've deleted all your saved personal data including:*",
                 "",
-                "- *22 2 2022*",
-                "- *yes*",
-                "- *12, test street, TestSuburb, FS*",
-                "- *Empty*",
+                "*- Date of Birth:* 22/2/2022",
+                "*- Relationship Status:* Yes",
+                "*- Location:* 12 test street TestSuburb FS",
+                "*- Gender:* Empty",
+                "",
+                "*------*",
+                "*Reply:*",
+                "*1* - to see your personal data",
+                "0. 🏠 *Back* to Main *MENU*",
+                "#. 🆘Get *HELP*",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_optout_delete_no_data(tester: AppTester, rapidpro_mock):
+    tester.setup_user_address("27820001002")
+    tester.setup_state("state_optout")
+    await tester.user_input("2")
+    tester.assert_state("state_delete_saved")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "✅ *We've deleted all your saved personal data including:*",
+                "",
+                "*- Date of Birth:* Empty",
+                "*- Relationship Status:* Empty",
+                "*- Location:* Empty",
+                "*- Gender:* Empty",
                 "",
                 "*------*",
                 "*Reply:*",

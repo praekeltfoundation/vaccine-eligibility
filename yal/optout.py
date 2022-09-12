@@ -169,10 +169,10 @@ class Application(BaseApplication):
                 [
                     "✅ *We've deleted all your saved personal data including:*",
                     "",
-                    f"- *{old_details['dob']}*",
-                    f"- *{old_details['relationship_status']}*",
-                    f"- *{old_details['location']}*",
-                    f"- *{old_details['gender']}*",
+                    f"*- Date of Birth:* {old_details['dob']}",
+                    f"*- Relationship Status:* {old_details['relationship_status']}",
+                    f"*- Location:* {old_details['location']}",
+                    f"*- Gender:* {old_details['gender']}",
                     "",
                     "*------*",
                     "*Reply:*",
@@ -261,7 +261,7 @@ class Application(BaseApplication):
     def __get_user_details(self, fields):
         def get_field(name):
             value = fields.get(name)
-            if value == "skip":
+            if not value or value == "skip":
                 return "Empty"
             if name == "gender":
                 if value == "other":
@@ -272,7 +272,7 @@ class Application(BaseApplication):
         dob_year = fields.get("dob_year")
         dob_month = fields.get("dob_month")
         dob_day = fields.get("dob_day")
-        relationship_status = get_field("relationship_status")
+        relationship_status = get_field("relationship_status").title()
         gender = get_field("gender")
 
         province = fields.get("province")
@@ -280,10 +280,28 @@ class Application(BaseApplication):
         street_name = fields.get("street_name")
         street_number = fields.get("street_number")
 
+        dob = []
+        if dob_day and dob_month:
+            dob.append(dob_day)
+            dob.append(dob_month)
+        elif dob_day:
+            dob.append(dob_month)
+
+        if dob_year:
+            dob.append(dob_year)
+
+        location = " ".join(
+            [
+                s
+                for s in [street_number, street_name, suburb, province]
+                if s and s != "skip"
+            ]
+        )
+
         result = {
-            "dob": f"{dob_day} {dob_month} {dob_year}",
+            "dob": "/".join(dob) if dob != [] else "Empty",
             "relationship_status": f"{relationship_status}",
-            "location": f"{street_number}, {street_name}, {suburb}, {province}",
+            "location": location or "Empty",
             "gender": f"{gender}",
         }
         return result
