@@ -2,7 +2,13 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, EndState, FreeText, WhatsAppListState
+from vaccine.states import (
+    Choice,
+    EndState,
+    FreeText,
+    WhatsAppButtonState,
+    WhatsAppListState,
+)
 from yal import contentrepo, rapidpro, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
@@ -158,33 +164,35 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
-        await self.worker.publish_message(
-            self.inbound.reply(
-                self._(
-                    "\n".join(
-                        [
-                            "✅ *We've deleted all your saved personal data including:*",
-                            "",
-                            f"- *{old_details['dob']}*",
-                            f"- *{old_details['relationship_status']}*",
-                            f"- *{old_details['location']}*",
-                            f"- *{old_details['gender']}*",
-                            "",
-                            "*------*",
-                            "*Reply:*",
-                            "*1* - to see your personal data",
-                            BACK_TO_MAIN,
-                            GET_HELP,
-                        ]
-                    )
-                ),
-                helper_metadata={
-                    "image": contentrepo.get_image_url("bwise_header.png")
-                },
+        question = self._(
+            "\n".join(
+                [
+                    "✅ *We've deleted all your saved personal data including:*",
+                    "",
+                    f"- *{old_details['dob']}*",
+                    f"- *{old_details['relationship_status']}*",
+                    f"- *{old_details['location']}*",
+                    f"- *{old_details['gender']}*",
+                    "",
+                    "*------*",
+                    "*Reply:*",
+                    "*1* - to see your personal data",
+                    BACK_TO_MAIN,
+                    GET_HELP,
+                ]
             )
         )
-
-        return await self.go_to_state(ChangePreferencesApplication.START_STATE)
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("see", "See personal data"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "see": ChangePreferencesApplication.START_STATE,
+            },
+        )
 
     async def state_tell_us_more(self):
         return FreeText(
