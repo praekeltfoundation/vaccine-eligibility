@@ -119,6 +119,8 @@ async def get_page_details(user, page_id, message_id, suggested=False):
 
                 page_details["tags"] = response_body["tags"]
 
+                page_details["feature_redirects"] = []
+
                 if not page_details["has_children"]:
                     message_number = response_body["body"]["message"]
                     total_messages = response_body["body"]["total_messages"]
@@ -129,12 +131,15 @@ async def get_page_details(user, page_id, message_id, suggested=False):
                             or "Next"
                         )
                     else:
-
                         if "prompt_quiz" in page_details["tags"]:
                             quiz_tag = [
                                 i for i in page_details["tags"] if i.startswith("quiz_")
                             ][0]
                             page_details["quiz_tag"] = quiz_tag
+
+                        for tag in ["servicefinder", "aaq", "pleasecallme"]:
+                            if tag in page_details["tags"]:
+                                page_details["feature_redirects"].append(tag)
 
                     if response_body["related_pages"]:
                         page_details["related_pages"] = {
