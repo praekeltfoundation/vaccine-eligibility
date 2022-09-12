@@ -179,13 +179,12 @@ async def test_state_tell_us_more(tester: AppTester):
 async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_optout")
     await tester.user_input("2")
-    tester.assert_state("state_change_info_prompt")
+    tester.assert_state("state_delete_saved")
 
-    # Three API calls:
+    # Two API calls:
     # Get profile to get old details, update profile
-    # and redirect to change preferences menu
-    assert len(rapidpro_mock.app.requests) == 3
-    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"] * 3
+    assert len(rapidpro_mock.app.requests) == 2
+    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"] * 2
 
     post_request = rapidpro_mock.app.requests[1]
     assert json.loads(post_request.body.decode("utf-8")) == {
@@ -203,23 +202,31 @@ async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
         },
     }
 
-    [msg1, msg2] = tester.fake_worker.outbound_messages
-    assert msg1.content == "\n".join(
-        [
-            "✅ *We've deleted all your saved personal data including:*",
-            "",
-            "- *22 2 2022*",
-            "- *yes*",
-            "- *12, test street, TestSuburb, FS*",
-            "- *Empty*",
-            "",
-            "*------*",
-            "*Reply:*",
-            "*1* - to see your personal data",
-            "0. 🏠 *Back* to Main *MENU*",
-            "#. 🆘Get *HELP*",
-        ]
+    tester.assert_message(
+        "\n".join(
+            [
+                "✅ *We've deleted all your saved personal data including:*",
+                "",
+                "- *22 2 2022*",
+                "- *yes*",
+                "- *12, test street, TestSuburb, FS*",
+                "- *Empty*",
+                "",
+                "*------*",
+                "*Reply:*",
+                "*1* - to see your personal data",
+                "0. 🏠 *Back* to Main *MENU*",
+                "#. 🆘Get *HELP*",
+            ]
+        )
     )
+
+
+@pytest.mark.asyncio
+async def test_state_optout_delete_saved_see_data(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_delete_saved")
+    await tester.user_input("1")
+    tester.assert_state("state_change_info_prompt")
 
 
 @pytest.mark.asyncio
