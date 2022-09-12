@@ -207,6 +207,9 @@ class Application(BaseApplication):
         self.save_metadata("related_pages", page_details.get("related_pages"))
         self.save_metadata("quiz_tag", page_details.get("quiz_tag"))
         self.save_metadata("quick_replies", page_details.get("quick_replies", []))
+        self.save_metadata(
+            "feature_redirects", page_details.get("feature_redirects", [])
+        )
 
         menu_level = metadata["current_menu_level"] + 1
         self.save_metadata("current_menu_level", menu_level)
@@ -230,6 +233,12 @@ class Application(BaseApplication):
                 return "state_contentrepo_page"
             elif choice.value == "quiz":
                 return QuizApplication.START_STATE
+            elif choice.value == "feature_servicefinder":
+                return ServiceFinderApplication.START_STATE
+            elif choice.value == "feature_aaq":
+                return AskaQuestionApplication.START_STATE
+            elif choice.value == "feature_pleasecallme":
+                return PleaseCallMeApplication.START_STATE
             elif choice.value.startswith("no"):
                 return "state_get_suggestions"
 
@@ -283,6 +292,17 @@ class Application(BaseApplication):
             stub = quick_reply.replace(" ", "-").lower()
             choices.append(Choice(stub, quick_reply))
             buttons.append(Choice(stub, quick_reply))
+
+        feature_redirects = metadata.get("feature_redirects", [])
+        if "servicefinder" in feature_redirects:
+            choices.append(Choice("feature_servicefinder", "Find a clinic"))
+            buttons.append(Choice("feature_servicefinder", "Find a clinic"))
+        if "aaq" in feature_redirects:
+            choices.append(Choice("feature_aaq", "Ask a Question"))
+            buttons.append(Choice("feature_aaq", "Ask a Question"))
+        if "pleasecallme" in feature_redirects:
+            choices.append(Choice("feature_pleasecallme", "Call Lovelife"))
+            buttons.append(Choice("feature_pleasecallme", "Call Lovelife"))
 
         if choices:
             parts.extend(

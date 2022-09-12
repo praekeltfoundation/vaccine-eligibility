@@ -22,8 +22,8 @@ def build_message_detail(
     id,
     title,
     content,
-    tags,
-    has_children,
+    tags=[],
+    has_children=False,
     image=None,
     total_messages=1,
     quick_replies=[],
@@ -138,8 +138,6 @@ async def contentrepo_api_mock(sanic_client):
                 111,
                 "Main Menu 1 💊",
                 "Message test content 1",
-                ["test"],
-                False,
             )
         )
 
@@ -151,8 +149,6 @@ async def contentrepo_api_mock(sanic_client):
                 111,
                 "Main Menu 1 💊",
                 "Message test content 1",
-                ["test"],
-                False,
             )
         )
 
@@ -164,8 +160,6 @@ async def contentrepo_api_mock(sanic_client):
                 1112,
                 "Main Menu 1 💊",
                 "Message test content 1",
-                ["test"],
-                False,
                 quick_replies=["No, thanks"],
             )
         )
@@ -178,8 +172,7 @@ async def contentrepo_api_mock(sanic_client):
                 222,
                 "Main Menu 2 🤝",
                 "Message test content 2",
-                ["test"],
-                True,
+                has_children=True,
             )
         )
 
@@ -191,8 +184,7 @@ async def contentrepo_api_mock(sanic_client):
                 333,
                 "Sub menu 1",
                 "Sub menu test content 2",
-                ["test"],
-                True,
+                has_children=True,
             )
         )
 
@@ -204,8 +196,6 @@ async def contentrepo_api_mock(sanic_client):
                 444,
                 "Sub menu 2",
                 "Sub menu test content 2",
-                ["test"],
-                False,
             )
         )
 
@@ -231,10 +221,44 @@ async def contentrepo_api_mock(sanic_client):
                 444,
                 "Sub menu 2",
                 "Detail test content with image",
-                ["test"],
-                False,
-                "2",
-                2,
+                image="2",
+                total_messages=2,
+            )
+        )
+
+    @app.route("/api/v2/pages/1234", methods=["GET"])
+    def get_page_detail_1234(request):
+        app.requests.append(request)
+        return response.json(
+            build_message_detail(
+                1234,
+                "Main Menu 1 💊",
+                "Message test content 1",
+                ["aaq"],
+            )
+        )
+
+    @app.route("/api/v2/pages/1235", methods=["GET"])
+    def get_page_detail_1235(request):
+        app.requests.append(request)
+        return response.json(
+            build_message_detail(
+                1235,
+                "Main Menu 1 💊",
+                "Message test content 1",
+                ["servicefinder"],
+            )
+        )
+
+    @app.route("/api/v2/pages/1236", methods=["GET"])
+    def get_page_detail_1236(request):
+        app.requests.append(request)
+        return response.json(
+            build_message_detail(
+                1236,
+                "Main Menu 1 💊",
+                "Message test content 1",
+                ["pleasecallme"],
             )
         )
 
@@ -774,6 +798,122 @@ async def test_state_display_page_detail_quick_replies(
 
 
 @pytest.mark.asyncio
+async def test_state_display_page_detail_aaq_feature(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_contentrepo_page")
+    tester.user.metadata["selected_page_id"] = "1234"
+    tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["current_menu_level"] = 1
+    tester.user.metadata["last_topic_viewed"] = "1"
+    tester.user.metadata["suggested_content"] = {}
+
+    tester.user.session_id = 123
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Main Menu 1 💊",
+                "-----",
+                "",
+                "Message test content 1",
+                "",
+                "1. Ask a Question",
+                "",
+                "-----",
+                "*Or reply:*",
+                "2. ⬅️ Parent Title",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
+    )
+
+    await tester.user_input("1")
+
+    tester.assert_state("state_start")
+
+
+@pytest.mark.asyncio
+async def test_state_display_page_detail_servicefinder_feature(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_contentrepo_page")
+    tester.user.metadata["selected_page_id"] = "1235"
+    tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["current_menu_level"] = 1
+    tester.user.metadata["last_topic_viewed"] = "1"
+    tester.user.metadata["suggested_content"] = {}
+
+    tester.user.session_id = 123
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Main Menu 1 💊",
+                "-----",
+                "",
+                "Message test content 1",
+                "",
+                "1. Find a clinic",
+                "",
+                "-----",
+                "*Or reply:*",
+                "2. ⬅️ Parent Title",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
+    )
+
+    await tester.user_input("1")
+
+    tester.assert_state("state_servicefinder_start")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_state_display_page_detail_pleasecallme_feature(
+    get_current_datetime, tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 20, 17, 30)
+    tester.setup_state("state_contentrepo_page")
+    tester.user.metadata["selected_page_id"] = "1236"
+    tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["current_menu_level"] = 1
+    tester.user.metadata["last_topic_viewed"] = "1"
+    tester.user.metadata["suggested_content"] = {}
+
+    tester.user.session_id = 123
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Main Menu 1 💊",
+                "-----",
+                "",
+                "Message test content 1",
+                "",
+                "1. Call Lovelife",
+                "",
+                "-----",
+                "*Or reply:*",
+                "2. ⬅️ Parent Title",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
+    )
+
+    await tester.user_input("1")
+
+    tester.assert_state("state_in_hours")
+
+
+@pytest.mark.asyncio
 async def test_state_display_page_detail_next(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
@@ -932,7 +1072,6 @@ async def contentrepo_api_mock2(sanic_client):
                 "Main Menu 1 💊",
                 "Message test content 1",
                 ["related_2"],
-                False,
             )
         )
 
@@ -943,8 +1082,6 @@ async def contentrepo_api_mock2(sanic_client):
                 222,
                 "Main Menu 2 💊",
                 "Message test content 2",
-                [],
-                False,
                 related_pages=[
                     {"title": "Related Content 2", "value": 107, "id": "page-uuid"}
                 ],
