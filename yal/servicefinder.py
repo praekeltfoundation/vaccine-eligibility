@@ -240,7 +240,7 @@ class Application(BaseApplication):
                     for c in response_body:
                         categories[c["parent"]][c["_id"]] = c["name"]
 
-                    self.save_metadata("categories", categories)
+                    self.save_metadata("categories", dict(categories))
                     break
                 except HTTP_EXCEPTIONS as e:
                     if i == 2:
