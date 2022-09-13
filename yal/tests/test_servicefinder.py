@@ -291,7 +291,7 @@ async def test_state_confirm_existing_address_no(tester: AppTester):
 async def test_state_category_sub(tester: AppTester, servicefinder_mock):
     tester.setup_state("state_category")
 
-    categories = defaultdict(dict)
+    categories: Dict[str, Dict] = defaultdict(dict)
     for c in CATEGORIES:
         categories[c["parent"]][c["_id"]] = c["name"]
     tester.user.metadata["categories"] = categories
@@ -328,7 +328,7 @@ async def test_state_category_sub(tester: AppTester, servicefinder_mock):
 async def test_state_category(tester: AppTester, servicefinder_mock):
     tester.setup_state("state_category")
 
-    categories = defaultdict(dict)
+    categories: Dict[str, Dict] = defaultdict(dict)
     for c in CATEGORIES:
         categories[c["parent"]][c["_id"]] = c["name"]
 
@@ -376,7 +376,7 @@ async def test_state_category(tester: AppTester, servicefinder_mock):
 async def test_state_category_no_facilities(tester: AppTester, servicefinder_mock):
     tester.setup_state("state_category")
 
-    categories = defaultdict(dict)
+    categories: Dict[str, Dict] = defaultdict(dict)
     for c in CATEGORIES:
         categories[c["parent"]][c["_id"]] = c["name"]
 
@@ -413,7 +413,7 @@ async def test_state_category_talk(get_current_datetime, tester: AppTester):
     get_current_datetime.return_value = datetime(2022, 6, 20, 17, 30)
     tester.setup_state("state_category")
 
-    categories = defaultdict(dict)
+    categories: Dict[str, Dict] = defaultdict(dict)
     for c in CATEGORIES:
         categories[c["parent"]][c["_id"]] = c["name"]
 
