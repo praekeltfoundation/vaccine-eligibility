@@ -268,6 +268,11 @@ class Application(BaseApplication):
 
         return await self.go_to_state("state_category")
 
+    async def state_save_parent_category(self):
+        parent_category = self.user.answers["state_category"]
+        self.save_metadata("parent_category", parent_category)
+        return await self.go_to_state("state_category")
+
     async def state_category(self):
         async def next_(choice: Choice):
             if choice.value == "talk":
@@ -275,10 +280,8 @@ class Application(BaseApplication):
                 return PleaseCallMeApplication.START_STATE
 
             categories = self.user.metadata["categories"]
-
             if choice.value in categories:
-                self.save_metadata("parent_category", choice.value)
-                return "state_category"
+                return "state_save_parent_category"
 
             return "state_service_lookup"
 
