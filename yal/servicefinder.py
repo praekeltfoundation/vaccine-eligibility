@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import secrets
+from collections import defaultdict
 from urllib.parse import urljoin
 
 import aiohttp
@@ -45,6 +46,7 @@ class Application(BaseApplication):
     START_STATE = "state_servicefinder_start"
 
     async def state_servicefinder_start(self):
+        self.save_metadata("parent_category", None)
         self.save_metadata("google_session_token", secrets.token_bytes(20).hex())
         question = self._(
             "\n".join(
@@ -234,7 +236,10 @@ class Application(BaseApplication):
                     response.raise_for_status()
                     response_body = await response.json()
 
-                    categories = {c["_id"]: c["name"] for c in response_body}
+                    categories = defaultdict(dict)
+                    for c in response_body:
+                        categories[c["parent"]][c["_id"]] = c["name"]
+
                     self.save_metadata("categories", categories)
                     break
                 except HTTP_EXCEPTIONS as e:
@@ -266,14 +271,24 @@ class Application(BaseApplication):
     async def state_category(self):
         async def next_(choice: Choice):
             if choice.value == "talk":
+                self.save_metadata("parent_category", None)
                 return PleaseCallMeApplication.START_STATE
+
+            categories = self.user.metadata["categories"]
+
+            if choice.value in categories:
+                self.save_metadata("parent_category", choice.value)
+                return "state_category"
+
             return "state_service_lookup"
 
         metadata = self.user.metadata
+        categories = metadata["categories"][metadata.get("parent_category")]
+
         category_text = "\n".join(
-            [f"{i+1} - {v}" for i, v in enumerate(metadata["categories"].values())]
+            [f"{i+1} - {v}" for i, v in enumerate(categories.values())]
         )
-        category_choices = [Choice(k, v) for k, v in metadata["categories"].items()]
+        category_choices = [Choice(k, v) for k, v in categories.items()]
         category_choices.append(Choice("talk", "Talk to someone"))
 
         question = self._(
@@ -339,6 +354,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_no_facilities_found")
 
     async def state_no_facilities_found(self):
+        self.save_metadata("parent_category", None)
         question = "\n".join(
             [
                 "🙍🏾‍♀️ *Sorry, we can't find any services near you.*",
@@ -391,7 +407,9 @@ class Application(BaseApplication):
             [format_facility(i, f) for i, f in enumerate(metadata["facilities"][:5])]
         )
 
-        category = metadata["categories"][self.user.answers["state_category"]]
+        category = metadata["categories"][metadata.get("parent_category")][
+            self.user.answers["state_category"]
+        ]
 
         msg = "\n".join(
             [

@@ -1,0 +1,200 @@
+[
+	{
+		"_id": "62dd86b24d7d919468144ed3",
+		"name": "Clinics & Hospitals",
+		"parent": null,
+		"createdBy": "5eb125d604a3eb3b4859a022",
+		"createdAt": 1658685106316,
+		"updatedAt": 1658685106316,
+		"__v": 0
+	},
+	{
+		"_id": "62dd86c14d7d919468144ed4",
+		"name": "HIV Prevention",
+		"parent": null,
+		"createdBy": "5eb125d604a3eb3b4859a022",
+		"createdAt": 1658685121941,
+		"updatedAt": 1658685121941,
+		"__v": 0
+	},
+	{
+		"_id": "62dd86d24d7d919468144ed5",
+		"name": "Where to get PrEP",
+		"parent": "62dd86c14d7d919468144ed4",
+		"createdBy": "5eb125d604a3eb3b4859a022",
+		"createdAt": 1658685138331,
+		"updatedAt": 1658685138331,
+		"__v": 0
+	},
+	{
+		"_id": "62dd86e14d7d919468144ed6",
+		"name": "Where to get PEP",
+		"parent": "62dd86c14d7d919468144ed4",
+		"createdBy": "5eb125d604a3eb3b4859a022",
+		"createdAt": 1658685153763,
+		"updatedAt": 1658685153763,
+		"__v": 0
+	},
+	{
+		"_id": "62dd87004d7d919468144ed7",
+		"name": "Family Planning",
+		"parent": null,
+		"createdBy": "5eb125d604a3eb3b4859a022",
+		"createdAt": 1658685184940,
+		"updatedAt": 1658685184940,
+		"__v": 0
+	},
+	{
+		"_id": "62dd90dd4d7d919468144ed8",
+		"name": "Contraception (Private facilities)",
+		"parent": "62dd87004d7d919468144ed7",
+		"createdBy": "5eb125d604a3eb3b4859a022",
+		"createdAt": 1658687709989,
+		"updatedAt": 1658687709989,
+		"__v": 0
+	},
+	{
+		"_id": "62dd90ee4d7d919468144ed9",
+		"name": "Contraception (Public facilities)",
+		"parent": "62dd87004d7d919468144ed7",
+		"createdBy": "5eb125d604a3eb3b4859a022",
+		"createdAt": 1658687726427,
+		"updatedAt": 1658687726427,
+		"__v": 0
+	},
+	{
+		"_id": "62dd91254d7d919468144eda",
+		"name": "Morning after/emergency contraception (Private facilities)",
+		"parent": "62dd87004d7d919468144ed7",
+		"createdBy": "5eb125d604a3eb3b4859a022",
+		"createdAt": 1658687781233,
+		"updatedAt": 1658687781233,
+		"__v": 0
+	},
+	{
+		"_id": "62dd913c4d7d919468144edb",
+		"name": "Morning after/emergency contraception (Public facilities)",
+		"parent": "62dd87004d7d919468144ed7",
+		"createdBy": "5eb125d604a3eb3b4859a022",
+		"createdAt": 1658687804833,
+		"updatedAt": 1658687804833,
+		"__v": 0
+	},
+	{
+		"_id": "62dd915e4d7d919468144edc",
+		"name": "Abortion services (Private facilities)",
+		"parent": "62dd87004d7d919468144ed7",
+		"createdBy": "5eb125d604a3eb3b4859a022",
+		"createdAt": 1658687838665,
+		"updatedAt": 1658687838665,
+		"__v": 0
+	},
+	{
+		"_id": "62dd91694d7d919468144edd",
+		"name": "Abortion services (Public facilities)",
+		"parent": "62dd87004d7d919468144ed7",
+		"createdBy": "5eb125d604a3eb3b4859a022",
+		"createdAt": 1658687849219,
+		"updatedAt": 1658687849219,
+		"__v": 0
+	},
+	{
+		"_id": "62dd917e4d7d919468144ede",
+		"name": "Sexual Violence Support",
+		"parent": null,
+		"createdBy": "5eb125d604a3eb3b4859a022",
+		"createdAt": 1658687870457,
+		"updatedAt": 1658687870457,
+		"__v": 0
+	},
+	{
+		"_id": "62dd91904d7d919468144edf",
+		"name": "Educational Opportunities",
+		"parent": null,
+		"createdBy": "5eb125d604a3eb3b4859a022",
+		"createdAt": 1658687888783,
+		"updatedAt": 1658687888783,
+		"__v": 0
+	},
+	{
+		"_id": "62dd91a34d7d919468144ee0",
+		"name": "Talk to Somebody",
+		"parent": null,
+		"createdBy": "5eb125d604a3eb3b4859a022",
+		"createdAt": 1658687907329,
+		"updatedAt": 1661982515658,
+		"__v": 0
+	},
+	{
+		"_id": "630fd618b030977388439b5d",
+		"name": "Get Support",
+		"parent": null,
+		"createdBy": "62dd22237ce66732209ded0e",
+		"createdAt": 1661982232288,
+		"updatedAt": 1661982232288,
+		"__v": 0
+	},
+	{
+		"_id": "630fd639b030977388439b5e",
+		"name": "For kids",
+		"parent": "630fd618b030977388439b5d",
+		"createdBy": "62dd22237ce66732209ded0e",
+		"createdAt": 1661982265071,
+		"updatedAt": 1661982539374,
+		"__v": 0
+	},
+	{
+		"_id": "630fd64db030977388439b5f",
+		"name": "For young people",
+		"parent": "630fd618b030977388439b5d",
+		"createdBy": "62dd22237ce66732209ded0e",
+		"createdAt": 1661982285671,
+		"updatedAt": 1661982556645,
+		"__v": 0
+	},
+	{
+		"_id": "630fd667b030977388439b60",
+		"name": "For differently abled people",
+		"parent": "630fd618b030977388439b5d",
+		"createdBy": "62dd22237ce66732209ded0e",
+		"createdAt": 1661982311494,
+		"updatedAt": 1661982618735,
+		"__v": 0
+	},
+	{
+		"_id": "630fd686b030977388439b61",
+		"name": "From faith-based organisations",
+		"parent": "630fd618b030977388439b5d",
+		"createdBy": "62dd22237ce66732209ded0e",
+		"createdAt": 1661982342277,
+		"updatedAt": 1661982644717,
+		"__v": 0
+	},
+	{
+		"_id": "630fd6a7b030977388439b62",
+		"name": "For people living with HIV",
+		"parent": "630fd618b030977388439b5d",
+		"createdBy": "62dd22237ce66732209ded0e",
+		"createdAt": 1661982375374,
+		"updatedAt": 1661982656140,
+		"__v": 0
+	},
+	{
+		"_id": "630fd6c0b030977388439b63",
+		"name": "Home-based care",
+		"parent": "630fd618b030977388439b5d",
+		"createdBy": "62dd22237ce66732209ded0e",
+		"createdAt": 1661982400128,
+		"updatedAt": 1661982665323,
+		"__v": 0
+	},
+	{
+		"_id": "630fd6d5b030977388439b64",
+		"name": "General",
+		"parent": "630fd618b030977388439b5d",
+		"createdBy": "62dd22237ce66732209ded0e",
+		"createdAt": 1661982421268,
+		"updatedAt": 1661982421268,
+		"__v": 0
+	}
+]

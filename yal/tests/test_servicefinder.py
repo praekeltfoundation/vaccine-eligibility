@@ -1,3 +1,5 @@
+import json
+from collections import defaultdict
 from datetime import datetime
 from typing import Dict, List
 from unittest import mock
@@ -16,35 +18,8 @@ def tester():
     return AppTester(Application)
 
 
-CATEGORIES: List[Dict] = [
-    {
-        "_id": "62dd86b24d7d919468144ed3",
-        "name": "Clinics & Hospitals",
-        "parent": None,
-        "createdBy": "5eb125d604a3eb3b4859a022",
-        "createdAt": 1658685106316,
-        "updatedAt": 1658685106316,
-        "__v": 0,
-    },
-    {
-        "_id": "62dd86c14d7d919468144ed4",
-        "name": "HIV Prevention",
-        "parent": None,
-        "createdBy": "5eb125d604a3eb3b4859a022",
-        "createdAt": 1658685121941,
-        "updatedAt": 1658685121941,
-        "__v": 0,
-    },
-    {
-        "_id": "62dd86d24d7d919468144ed5",
-        "name": "Where to get PrEP",
-        "parent": "62dd86c14d7d919468144ed4",
-        "createdBy": "5eb125d604a3eb3b4859a022",
-        "createdAt": 1658685138331,
-        "updatedAt": 1658685138331,
-        "__v": 0,
-    },
-]
+with open("yal/tests/servicefinder_categories.json") as f:
+    CATEGORIES: List[Dict] = json.loads(f.read())
 
 FACILITIES: List[Dict] = [
     {
@@ -275,11 +250,15 @@ async def test_state_confirm_existing_address_yes(
             "",
             "1 - Clinics & Hospitals",
             "2 - HIV Prevention",
-            "3 - Where to get PrEP",
+            "3 - Family Planning",
+            "4 - Sexual Violence Support",
+            "5 - Educational Opportunities",
+            "6 - Talk to Somebody",
+            "7 - Get Support",
             "",
             "*OR*",
             "",
-            "4 - Talk to somebody",
+            "8 - Talk to somebody",
             "",
             "-----",
             "*Or reply:*",
@@ -309,11 +288,52 @@ async def test_state_confirm_existing_address_no(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_state_category_sub(tester: AppTester, servicefinder_mock):
+    tester.setup_state("state_category")
+
+    categories: Dict[str, Dict] = defaultdict(dict)
+    for c in CATEGORIES:
+        categories[c["parent"]][c["_id"]] = c["name"]
+    tester.user.metadata["categories"] = categories
+
+    await tester.user_input("2")
+
+    tester.assert_state("state_category")
+    question = "\n".join(
+        [
+            "🏥 Find Clinics and Services",
+            "*Get help near you*",
+            "-----",
+            "",
+            "🙍🏾‍♀️ *Choose an option from the list:*",
+            "",
+            "1 - Where to get PrEP",
+            "2 - Where to get PEP",
+            "",
+            "*OR*",
+            "",
+            "3 - Talk to somebody",
+            "",
+            "-----",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
+    )
+
+    tester.assert_message(question)
+
+
+@pytest.mark.asyncio
 async def test_state_category(tester: AppTester, servicefinder_mock):
     tester.setup_state("state_category")
 
-    categories = {c["_id"]: c["name"] for c in CATEGORIES}
+    categories: Dict[str, Dict] = defaultdict(dict)
+    for c in CATEGORIES:
+        categories[c["parent"]][c["_id"]] = c["name"]
+
     tester.user.metadata["categories"] = categories
+    tester.user.metadata["parent_category"] = "62dd86c14d7d919468144ed4"
     tester.user.metadata["latitude"] = -26.2031026
     tester.user.metadata["longitude"] = 28.0251783
 
@@ -324,7 +344,7 @@ async def test_state_category(tester: AppTester, servicefinder_mock):
     question = "\n".join(
         [
             "🏥 Find Clinics and Services",
-            "HIV Prevention near you",
+            "Where to get PEP near you",
             "-----",
             "",
             "1️⃣ *South West Gauteng TVET College - Technisa Campus*",
@@ -356,12 +376,16 @@ async def test_state_category(tester: AppTester, servicefinder_mock):
 async def test_state_category_no_facilities(tester: AppTester, servicefinder_mock):
     tester.setup_state("state_category")
 
-    categories = {c["_id"]: c["name"] for c in CATEGORIES}
+    categories: Dict[str, Dict] = defaultdict(dict)
+    for c in CATEGORIES:
+        categories[c["parent"]][c["_id"]] = c["name"]
+
     tester.user.metadata["categories"] = categories
+    tester.user.metadata["parent_category"] = "62dd86c14d7d919468144ed4"
     tester.user.metadata["latitude"] = -26.2031026
     tester.user.metadata["longitude"] = 28.0251783
 
-    await tester.user_input("3")
+    await tester.user_input("1")
 
     tester.assert_state("state_no_facilities_found")
 
@@ -380,6 +404,8 @@ async def test_state_category_no_facilities(tester: AppTester, servicefinder_moc
 
     assert [r.path for r in servicefinder_mock.app.requests] == ["/api/locations"]
 
+    tester.assert_metadata("parent_category", None)
+
 
 @pytest.mark.asyncio
 @mock.patch("yal.pleasecallme.get_current_datetime")
@@ -387,12 +413,16 @@ async def test_state_category_talk(get_current_datetime, tester: AppTester):
     get_current_datetime.return_value = datetime(2022, 6, 20, 17, 30)
     tester.setup_state("state_category")
 
-    categories = {c["_id"]: c["name"] for c in CATEGORIES}
+    categories: Dict[str, Dict] = defaultdict(dict)
+    for c in CATEGORIES:
+        categories[c["parent"]][c["_id"]] = c["name"]
+
     tester.user.metadata["categories"] = categories
 
-    await tester.user_input("4")
+    await tester.user_input("8")
 
     tester.assert_state("state_in_hours")
+    tester.assert_metadata("parent_category", None)
 
 
 @pytest.mark.asyncio
