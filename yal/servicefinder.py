@@ -46,7 +46,7 @@ class Application(BaseApplication):
     START_STATE = "state_servicefinder_start"
 
     async def state_servicefinder_start(self):
-        self.save_metadata("parent_category", None)
+        self.save_metadata("parent_category", "root")
         self.save_metadata("google_session_token", secrets.token_bytes(20).hex())
         question = self._(
             "\n".join(
@@ -277,7 +277,7 @@ class Application(BaseApplication):
     async def state_category(self):
         async def next_(choice: Choice):
             if choice.value == "talk":
-                self.save_metadata("parent_category", None)
+                self.save_metadata("parent_category", "root")
                 return PleaseCallMeApplication.START_STATE
 
             if choice.value in self.user.metadata["categories"]:
@@ -357,7 +357,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_no_facilities_found")
 
     async def state_no_facilities_found(self):
-        self.save_metadata("parent_category", None)
+        self.save_metadata("parent_category", "root")
         question = "\n".join(
             [
                 "🙍🏾‍♀️ *Sorry, we can't find any services near you.*",
