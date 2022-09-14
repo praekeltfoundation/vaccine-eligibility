@@ -21,6 +21,15 @@ def tester():
 with open("yal/tests/servicefinder_categories.json") as f:
     CATEGORIES: List[Dict] = json.loads(f.read())
 
+
+def get_processed_categories():
+    categories: Dict[str, Dict] = defaultdict(dict)
+    for c in CATEGORIES:
+        parent = c["parent"] or "root"
+        categories[parent][c["_id"]] = c["name"]
+    return dict(categories)
+
+
 FACILITIES: List[Dict] = [
     {
         "location": {"type": "Point", "coordinates": [28.0151783, -26.1031026]},
@@ -291,10 +300,7 @@ async def test_state_confirm_existing_address_no(tester: AppTester):
 async def test_state_category_sub(tester: AppTester, servicefinder_mock):
     tester.setup_state("state_category")
 
-    categories: Dict[str, Dict] = defaultdict(dict)
-    for c in CATEGORIES:
-        categories[c["parent"]][c["_id"]] = c["name"]
-    tester.user.metadata["categories"] = categories
+    tester.user.metadata["categories"] = get_processed_categories()
 
     await tester.user_input("2")
 
@@ -328,11 +334,7 @@ async def test_state_category_sub(tester: AppTester, servicefinder_mock):
 async def test_state_category(tester: AppTester, servicefinder_mock):
     tester.setup_state("state_category")
 
-    categories: Dict[str, Dict] = defaultdict(dict)
-    for c in CATEGORIES:
-        categories[c["parent"]][c["_id"]] = c["name"]
-
-    tester.user.metadata["categories"] = categories
+    tester.user.metadata["categories"] = get_processed_categories()
     tester.user.metadata["parent_category"] = "62dd86c14d7d919468144ed4"
     tester.user.metadata["latitude"] = -26.2031026
     tester.user.metadata["longitude"] = 28.0251783
@@ -376,11 +378,7 @@ async def test_state_category(tester: AppTester, servicefinder_mock):
 async def test_state_category_no_facilities(tester: AppTester, servicefinder_mock):
     tester.setup_state("state_category")
 
-    categories: Dict[str, Dict] = defaultdict(dict)
-    for c in CATEGORIES:
-        categories[c["parent"]][c["_id"]] = c["name"]
-
-    tester.user.metadata["categories"] = categories
+    tester.user.metadata["categories"] = get_processed_categories()
     tester.user.metadata["parent_category"] = "62dd86c14d7d919468144ed4"
     tester.user.metadata["latitude"] = -26.2031026
     tester.user.metadata["longitude"] = 28.0251783
@@ -413,12 +411,7 @@ async def test_state_category_talk(get_current_datetime, tester: AppTester):
     get_current_datetime.return_value = datetime(2022, 6, 20, 17, 30)
     tester.setup_state("state_category")
 
-    categories: Dict[str, Dict] = defaultdict(dict)
-    for c in CATEGORIES:
-        categories[c["parent"]][c["_id"]] = c["name"]
-
-    tester.user.metadata["categories"] = categories
-
+    tester.user.metadata["categories"] = get_processed_categories()
     await tester.user_input("8")
 
     tester.assert_state("state_in_hours")
