@@ -197,7 +197,6 @@ async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
             "dob_day": "",
             "relationship_status": "",
             "gender": "",
-            "gender_other": "",
             "province": "",
             "suburb": "",
             "street_name": "",
