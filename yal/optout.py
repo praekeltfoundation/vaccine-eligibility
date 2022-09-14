@@ -149,7 +149,6 @@ class Application(BaseApplication):
             "dob_year": "",
             "relationship_status": "",
             "gender": "",
-            "gender_other": "",
             "province": "",
             "suburb": "",
             "street_name": "",
@@ -264,8 +263,6 @@ class Application(BaseApplication):
             if not value or value == "skip":
                 return "Empty"
             if name == "gender":
-                if value == "other":
-                    return get_field("gender_other")
                 return GENDERS.get(value, "Empty")
             return value
 

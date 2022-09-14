@@ -18,13 +18,8 @@ GENERIC_ERROR = (
 )
 GENDERS = {
     "girl_woman": "Girl/Woman",
-    "cisgender": "Cisgender",
     "boy_man": "Boy/Man",
-    "genderfluid": "Genderfluid",
-    "intersex": "Intersex",
     "non_binary": "Non-binary",
-    "questioning": "Questioning",
-    "transgender": "Transgender",
     "other": "Something else",
 }
 BACK_TO_MAIN = "0. 🏠 *Back* to Main *MENU*"

@@ -6,10 +6,8 @@ from vaccine.states import (
     Choice,
     ChoiceState,
     FreeText,
-    WhatsAppButtonState,
     WhatsAppListState,
 )
-from vaccine.validators import nonempty_validator
 from yal import rapidpro
 from yal.utils import GENDERS, GENERIC_ERROR, PROVINCES, normalise_phonenumber
 from yal.validators import day_validator, year_validator
@@ -34,8 +32,6 @@ class Application(BaseApplication):
                 return "Empty"
 
             if name == "gender":
-                if value == "other":
-                    return get_field("gender_other")
                 return GENDERS[value]
 
             return value
@@ -412,10 +408,11 @@ class Application(BaseApplication):
         return await self.go_to_state("state_display_preferences")
 
     async def state_update_gender(self):
-        async def next_(choice: Choice):
-            if choice.value == "other":
-                return "state_update_name_gender_confirm"
-            return "state_update_gender_submit"
+        gender_text = "\n".join(
+            [f"*{i+1}* - {name}" for i, (code, name) in enumerate(GENDERS.items())]
+        )
+        gender_choices = [Choice(code, name) for code, name in GENDERS.items()]
+        gender_choices.append(Choice("skip", "Skip"))
 
         question = self._(
             "\n".join(
@@ -428,16 +425,8 @@ class Application(BaseApplication):
                     "",
                     "Please select the option you think best describes you:",
                     "",
-                    "1 - Girl/Woman",
-                    "2 - Cisgender",
-                    "3 - Boy?Man",
-                    "4 - Genderfluid",
-                    "5 - Intersex",
-                    "6 - Non-binary",
-                    "7 - Questioning",
-                    "8 - Transgender",
-                    "9 - Something else",
-                    "10 - Skip",
+                    gender_text,
+                    f"*{len(gender_choices)}* - Skip",
                 ]
             )
         )
@@ -445,79 +434,16 @@ class Application(BaseApplication):
             self,
             question=question,
             button="Gender",
-            choices=[
-                Choice("girl_woman", "Girl/Woman"),
-                Choice("cisgender", "Cisgender"),
-                Choice("boy_man", "Boy/Man"),
-                Choice("genderfluid", "Genderfluid"),
-                Choice("intersex", "Intersex"),
-                Choice("non_binary", "Non-binary"),
-                Choice("questioning", "Questioning"),
-                Choice("transgender", "Transgender"),
-                Choice("other", "Something else"),
-                Choice("skip", "Skip"),
-            ],
-            next=next_,
-            error=self._(GENERIC_ERROR),
-        )
-
-    async def state_update_name_gender_confirm(self):
-        question = self._(
-            "\n".join(
-                [
-                    "*CHAT SETTINGS*",
-                    "Choose your gender",
-                    "-----",
-                    "",
-                    "Sure. I want to make double sure you feel included.",
-                    "",
-                    "Would you like to name your own gender?",
-                    "",
-                    "1. Yes",
-                    "2. No",
-                ]
-            )
-        )
-        return WhatsAppButtonState(
-            self,
-            question=question,
-            choices=[Choice("yes", "Yes"), Choice("no", "No")],
-            error=self._(GENERIC_ERROR),
-            next={
-                "yes": "state_update_name_gender",
-                "no": "state_update_gender_submit",
-            },
-        )
-
-    async def state_update_name_gender(self):
-        question = self._(
-            "\n".join(
-                [
-                    "*CHAT SETTINGS*",
-                    "Name your gender",
-                    "-----",
-                    "",
-                    "No problem 😌  Go ahead and let me know what you'd prefer.",
-                    "",
-                    "*Type something and hit send.*",
-                ]
-            )
-        )
-        return FreeText(
-            self,
-            question=question,
+            choices=gender_choices,
             next="state_update_gender_submit",
-            check=nonempty_validator(question),
+            error=self._(GENERIC_ERROR),
         )
 
     async def state_update_gender_submit(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        data = {
-            "gender": self.user.answers.get("state_update_gender"),
-            "gender_other": self.user.answers.get("state_update_name_gender"),
-        }
+        data = {"gender": self.user.answers.get("state_update_gender")}
 
         error = await rapidpro.update_profile(whatsapp_id, data)
         if error:

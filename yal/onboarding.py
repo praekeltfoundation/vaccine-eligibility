@@ -13,7 +13,6 @@ from vaccine.states import (
     WhatsAppListState,
 )
 from vaccine.utils import get_today
-from vaccine.validators import nonempty_validator
 from yal import contentrepo, rapidpro, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
@@ -418,11 +417,6 @@ class Application(BaseApplication):
     async def state_gender(self):
         await self.update_last_onboarding_time()
 
-        async def next_(choice: Choice):
-            if choice.value == "other":
-                return "state_name_gender"
-            return "state_submit_onboarding"
-
         gender_text = "\n".join(
             [
                 f"*{i+1}* - {name}"
@@ -461,32 +455,8 @@ class Application(BaseApplication):
             question=question,
             button="Gender",
             choices=gender_choices,
-            next=next_,
-            error=self._(GENERIC_ERROR),
-        )
-
-    async def state_name_gender(self):
-        await self.update_last_onboarding_time()
-        question = self._(
-            "\n".join(
-                [
-                    "*ABOUT YOU*",
-                    "🌈 Preferred Identity",
-                    "-----",
-                    "",
-                    "🙍🏾‍♀️ Sure. I want to make double sure you feel included.",
-                    "",
-                    "*Go ahead and let me know what you'd prefer. Type something and "
-                    "hit send.* 😌",
-                ]
-            )
-        )
-        return FreeText(
-            self,
-            question=question,
             next="state_submit_onboarding",
-            check=nonempty_validator(question),
-            buttons=[Choice("skip", self._("Skip"))],
+            error=self._(GENERIC_ERROR),
         )
 
     async def state_submit_onboarding(self):
@@ -501,7 +471,6 @@ class Application(BaseApplication):
             "dob_year": self.user.answers.get("state_dob_year"),
             "relationship_status": self.user.answers.get("state_relationship_status"),
             "gender": self.user.answers.get("state_gender"),
-            "gender_other": self.user.answers.get("state_name_gender"),
             "province": self.user.answers.get("state_province"),
             "suburb": self.user.answers.get("state_suburb"),
             "street_name": self.user.answers.get("state_street_name"),

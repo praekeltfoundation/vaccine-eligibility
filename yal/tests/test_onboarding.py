@@ -512,15 +512,10 @@ async def test_state_gender(get_current_datetime, tester: AppTester, rapidpro_mo
                 "Please select the option you think best describes you:",
                 "",
                 "*1* - Girl/Woman",
-                "*2* - Cisgender",
-                "*3* - Boy/Man",
-                "*4* - Genderfluid",
-                "*5* - Intersex",
-                "*6* - Non-binary",
-                "*7* - Questioning",
-                "*8* - Transgender",
-                "*9* - Something else",
-                "*10* - Skip",
+                "*2* - Boy/Man",
+                "*3* - Non-binary",
+                "*4* - Something else",
+                "*5* - Skip",
             ]
         )
     )
@@ -543,12 +538,12 @@ async def test_state_gender_valid(
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_gender")
 
-    await tester.user_input("9")
+    await tester.user_input("2")
 
-    tester.assert_state("state_name_gender")
+    tester.assert_state("state_onboarding_complete")
     tester.assert_num_messages(1)
 
-    tester.assert_answer("state_gender", "other")
+    tester.assert_answer("state_gender", "boy_man")
 
     assert len(rapidpro_mock.app.requests) == 2
     request = rapidpro_mock.app.requests[0]
@@ -562,19 +557,18 @@ async def test_state_gender_valid(
 
 @pytest.mark.asyncio
 async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_name_gender")
+    tester.setup_state("state_gender")
 
     tester.setup_answer("state_dob_month", "2")
     tester.setup_answer("state_dob_day", "22")
     tester.setup_answer("state_relationship_status", "yes")
     tester.setup_answer("state_gender", "other")
-    tester.setup_answer("state_name_gender", "new gender")
     tester.setup_answer("state_province", "FS")
     tester.setup_answer("state_suburb", "SomeSuburb")
     tester.setup_answer("state_street_name", "Good street")
     tester.setup_answer("state_street_number", "12")
 
-    await tester.user_input("new gender")
+    await tester.user_input("4")
 
     tester.assert_state("state_onboarding_complete")
     tester.assert_num_messages(1)
@@ -589,7 +583,6 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
             "dob_day": "22",
             "relationship_status": "yes",
             "gender": "other",
-            "gender_other": "new gender",
             "province": "FS",
             "suburb": "SomeSuburb",
             "street_name": "Good street",
