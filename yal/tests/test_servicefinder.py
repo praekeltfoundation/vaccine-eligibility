@@ -244,6 +244,7 @@ async def test_state_confirm_existing_address_yes(
 
     tester.user.metadata["place_id"] = "ChIJD7fiBh9u5kcRYJSMaMOCCwQ"
     tester.user.metadata["google_session_token"] = "123"
+    tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
 
     await tester.user_input("1")
 
@@ -290,6 +291,7 @@ async def test_state_confirm_existing_address_yes(
 @pytest.mark.asyncio
 async def test_state_confirm_existing_address_no(tester: AppTester):
     tester.setup_state("state_confirm_existing_address")
+    tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
 
     await tester.user_input("2")
 
@@ -301,6 +303,8 @@ async def test_state_category_sub(tester: AppTester, servicefinder_mock):
     tester.setup_state("state_category")
 
     tester.user.metadata["categories"] = get_processed_categories()
+    tester.user.metadata["parent_category"] = "root"
+    tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
 
     await tester.user_input("2")
 
@@ -308,7 +312,7 @@ async def test_state_category_sub(tester: AppTester, servicefinder_mock):
     question = "\n".join(
         [
             "🏥 Find Clinics and Services",
-            "*Get help near you*",
+            "Get help near you / *HIV Prevention*",
             "-----",
             "",
             "🙍🏾‍♀️ *Choose an option from the list:*",
@@ -335,6 +339,7 @@ async def test_state_category(tester: AppTester, servicefinder_mock):
     tester.setup_state("state_category")
 
     tester.user.metadata["categories"] = get_processed_categories()
+    tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
     tester.user.metadata["parent_category"] = "62dd86c14d7d919468144ed4"
     tester.user.metadata["latitude"] = -26.2031026
     tester.user.metadata["longitude"] = 28.0251783
@@ -379,6 +384,7 @@ async def test_state_category_no_facilities(tester: AppTester, servicefinder_moc
     tester.setup_state("state_category")
 
     tester.user.metadata["categories"] = get_processed_categories()
+    tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
     tester.user.metadata["parent_category"] = "62dd86c14d7d919468144ed4"
     tester.user.metadata["latitude"] = -26.2031026
     tester.user.metadata["longitude"] = 28.0251783
@@ -403,6 +409,7 @@ async def test_state_category_no_facilities(tester: AppTester, servicefinder_moc
     assert [r.path for r in servicefinder_mock.app.requests] == ["/api/locations"]
 
     tester.assert_metadata("parent_category", "root")
+    tester.assert_metadata("servicefinder_breadcrumb", "*Get help near you*")
 
 
 @pytest.mark.asyncio
@@ -412,15 +419,18 @@ async def test_state_category_talk(get_current_datetime, tester: AppTester):
     tester.setup_state("state_category")
 
     tester.user.metadata["categories"] = get_processed_categories()
+    tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
     await tester.user_input("8")
 
     tester.assert_state("state_in_hours")
     tester.assert_metadata("parent_category", "root")
+    tester.assert_metadata("servicefinder_breadcrumb", "*Get help near you*")
 
 
 @pytest.mark.asyncio
 async def test_state_location(tester: AppTester, servicefinder_mock):
     tester.setup_state("state_location")
+    tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
 
     await tester.user_input(
         "test location",

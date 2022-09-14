@@ -45,8 +45,17 @@ def get_google_api():
 class Application(BaseApplication):
     START_STATE = "state_servicefinder_start"
 
-    async def state_servicefinder_start(self):
+    def reset_metadata(self):
         self.save_metadata("parent_category", "root")
+        self.save_metadata("servicefinder_breadcrumb", "*Get help near you*")
+
+    def append_breadcrumb(self, category):
+        breadcrumb = self.user.metadata["servicefinder_breadcrumb"]
+        breadcrumb = breadcrumb.replace("*", "") + f" / *{category}*"
+        self.save_metadata("servicefinder_breadcrumb", breadcrumb)
+
+    async def state_servicefinder_start(self):
+        self.reset_metadata()
         self.save_metadata("google_session_token", secrets.token_bytes(20).hex())
         question = self._(
             "\n".join(
@@ -270,14 +279,22 @@ class Application(BaseApplication):
         return await self.go_to_state("state_category")
 
     async def state_save_parent_category(self):
+        metadata = self.user.metadata
+
         parent_category = self.user.answers["state_category"]
+
+        category = metadata["categories"][metadata["parent_category"]][parent_category]
+
         self.save_metadata("parent_category", parent_category)
+
+        self.append_breadcrumb(category)
+
         return await self.go_to_state("state_category")
 
     async def state_category(self):
         async def next_(choice: Choice):
             if choice.value == "talk":
-                self.save_metadata("parent_category", "root")
+                self.reset_metadata()
                 return PleaseCallMeApplication.START_STATE
 
             if choice.value in self.user.metadata["categories"]:
@@ -298,7 +315,7 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🏥 Find Clinics and Services",
-                    "*Get help near you*",
+                    metadata["servicefinder_breadcrumb"],
                     "-----",
                     "",
                     "🙍🏾‍♀️ *Choose an option from the list:*",
@@ -357,7 +374,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_no_facilities_found")
 
     async def state_no_facilities_found(self):
-        self.save_metadata("parent_category", "root")
+        self.reset_metadata()
         question = "\n".join(
             [
                 "🙍🏾‍♀️ *Sorry, we can't find any services near you.*",
