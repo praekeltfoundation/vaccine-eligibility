@@ -402,7 +402,7 @@ async def test_state_category_no_facilities(tester: AppTester, servicefinder_moc
 
     assert [r.path for r in servicefinder_mock.app.requests] == ["/api/locations"]
 
-    tester.assert_metadata("parent_category", None)
+    tester.assert_metadata("parent_category", "root")
 
 
 @pytest.mark.asyncio
@@ -415,7 +415,7 @@ async def test_state_category_talk(get_current_datetime, tester: AppTester):
     await tester.user_input("8")
 
     tester.assert_state("state_in_hours")
-    tester.assert_metadata("parent_category", None)
+    tester.assert_metadata("parent_category", "root")
 
 
 @pytest.mark.asyncio
@@ -440,3 +440,27 @@ async def test_state_location_invalid(tester: AppTester):
 
     await tester.user_input("invalid location")
     tester.assert_state("state_location")
+
+
+@pytest.mark.asyncio
+async def test_servicefinder_start_to_end(
+    tester: AppTester, google_api_mock, servicefinder_mock
+):
+    tester.setup_state("state_servicefinder_start")
+
+    tester.user.metadata["province"] = "FS"
+    tester.user.metadata["suburb"] = "cape town"
+    tester.user.metadata["street_name"] = "high level"
+    tester.user.metadata["street_number"] = "99"
+
+    await tester.user_input("1")
+    tester.assert_state("state_confirm_existing_address")
+
+    await tester.user_input("1")
+    tester.assert_state("state_category")
+
+    await tester.user_input("2")
+    tester.assert_state("state_category")
+
+    await tester.user_input("2")
+    tester.assert_state("state_start")
