@@ -2,12 +2,7 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import (
-    Choice,
-    ChoiceState,
-    FreeText,
-    WhatsAppListState,
-)
+from vaccine.states import Choice, ChoiceState, FreeText, WhatsAppListState
 from yal import rapidpro
 from yal.utils import GENDERS, GENERIC_ERROR, PROVINCES, normalise_phonenumber
 from yal.validators import day_validator, year_validator
