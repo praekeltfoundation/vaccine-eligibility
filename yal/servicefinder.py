@@ -238,7 +238,8 @@ class Application(BaseApplication):
 
                     categories = defaultdict(dict)
                     for c in response_body:
-                        categories[c["parent"]][c["_id"]] = c["name"]
+                        parent = c["parent"] or "root"
+                        categories[parent][c["_id"]] = c["name"]
 
                     self.save_metadata("categories", dict(categories))
                     break
@@ -279,14 +280,13 @@ class Application(BaseApplication):
                 self.save_metadata("parent_category", None)
                 return PleaseCallMeApplication.START_STATE
 
-            categories = self.user.metadata["categories"]
-            if choice.value in categories:
+            if choice.value in self.user.metadata["categories"]:
                 return "state_save_parent_category"
 
             return "state_service_lookup"
 
         metadata = self.user.metadata
-        categories = metadata["categories"][metadata.get("parent_category")]
+        categories = metadata["categories"][metadata.get("parent_category", "root")]
 
         category_text = "\n".join(
             [f"{i+1} - {v}" for i, v in enumerate(categories.values())]
@@ -410,7 +410,7 @@ class Application(BaseApplication):
             [format_facility(i, f) for i, f in enumerate(metadata["facilities"][:5])]
         )
 
-        category = metadata["categories"][metadata.get("parent_category")][
+        category = metadata["categories"][metadata.get("parent_category", "root")][
             self.user.answers["state_category"]
         ]
 
