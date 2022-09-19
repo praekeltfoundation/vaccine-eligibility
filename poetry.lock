@@ -1143,6 +1143,14 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "types-emoji"
+version = "2.0.1"
+description = "Typing stubs for emoji"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "types-python-dateutil"
 version = "2.8.17"
 description = "Typing stubs for python-dateutil"
@@ -1285,7 +1293,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "0b6def801ec02cc3a20404658c9c9c0b5b024d75cd4d08caeff3768f577e3b04"
+content-hash = "6076971cdf73a0836f4f45c7855b36036e0839cdcfa6840423e3e90f486551f7"
 
 [metadata.files]
 aio-pika = []
@@ -1384,6 +1392,7 @@ sniffio = []
 text-unidecode = []
 toml = []
 tomli = []
+types-emoji = []
 types-python-dateutil = []
 types-redis = []
 typing-extensions = []
