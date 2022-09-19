@@ -25,6 +25,8 @@ zbar-py = "^1.0.4"
 opencv-python-headless = "^4.5.3"
 redis = "^4.3.3"
 geopy = "2.2.0"
+emoji = "^2.1.0"
+types-emoji = "^2.0.1"
 
 [tool.poetry.dev-dependencies]
 black = "^21.10b0"
@@ -50,4 +52,4 @@ profile = "black"
 multi_line_output = 3
 
 [tool.pytest.ini_options]
-addopts = "--cov=vaccine"
+addopts = "--cov=vaccine --cov=yal"

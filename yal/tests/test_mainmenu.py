@@ -269,6 +269,11 @@ async def contentrepo_api_mock(sanic_client):
             {"meta": {"download_url": f"http://aws.test/test{image_id}.jpg"}}
         )
 
+    @app.route("/api/v2/custom/ratings/", methods=["POST"])
+    def add_page_rating(request):
+        app.requests.append(request)
+        return response.json({}, status=201)
+
     client = await sanic_client(app)
     url = config.CONTENTREPO_API_URL
     config.CONTENTREPO_API_URL = f"http://{client.host}:{client.port}"
@@ -1168,3 +1173,82 @@ async def test_state_content_page_related(
             ]
         )
     )
+
+
+@pytest.mark.asyncio
+async def test_state_prompt_info_useful(tester: AppTester):
+    tester.setup_state("state_prompt_info_useful")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Great.😊 Was the info useful?",
+                "",
+                "Reply:",
+                "1. 👍🏾 Yes",
+                "2. 👎🏾 No",
+                "",
+                "--",
+                "",
+                "0. 🏠 *Back* to Main *MENU*",
+                "#. 🆘Get *HELP*",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_prompt_info_useful_emoticon(tester: AppTester):
+    tester.setup_state("state_prompt_info_useful")
+    await tester.user_input("👎🏾")
+    tester.assert_state("state_prompt_feedback_comment")
+
+    tester.setup_state("state_prompt_info_useful")
+    await tester.user_input("👎")
+    tester.assert_state("state_prompt_feedback_comment")
+
+
+@pytest.mark.asyncio
+async def test_state_prompt_info_useful_submit(tester: AppTester, contentrepo_api_mock):
+    tester.setup_state("state_prompt_info_useful")
+    tester.user.metadata["selected_page_id"] = "111"
+
+    await tester.user_input("1")
+
+    post_request = contentrepo_api_mock.app.requests[0]
+    assert post_request.path == "/api/v2/custom/ratings/"
+    assert json.loads(post_request.body.decode("utf-8")) == {
+        "page": "111",
+        "helpful": True,
+        "comment": "",
+        "data": {"session_id": 1, "user_addr": "27820001001"},
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_prompt_feedback_comment(tester: AppTester):
+    tester.setup_state("state_prompt_info_useful")
+    await tester.user_input("2")
+
+    tester.assert_state("state_prompt_feedback_comment")
+
+
+@pytest.mark.asyncio
+async def test_state_prompt_feedback_comment_submit(
+    tester: AppTester, contentrepo_api_mock
+):
+    tester.setup_state("state_prompt_feedback_comment")
+    tester.user.metadata["selected_page_id"] = "111"
+    tester.setup_answer("state_prompt_info_useful", "no")
+
+    await tester.user_input("I don't understand")
+
+    post_request = contentrepo_api_mock.app.requests[0]
+    assert post_request.path == "/api/v2/custom/ratings/"
+    assert json.loads(post_request.body.decode("utf-8")) == {
+        "page": "111",
+        "helpful": False,
+        "comment": "I don't understand",
+        "data": {"session_id": 1, "user_addr": "27820001001"},
+    }
