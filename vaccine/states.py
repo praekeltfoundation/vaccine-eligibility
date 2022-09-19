@@ -93,7 +93,6 @@ class ChoiceState:
             return text[0]
         return text
 
-
     def _get_choice(self, content: Optional[str]) -> Optional[Choice]:
         content = self._normalise_text(content)
 
