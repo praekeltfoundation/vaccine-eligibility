@@ -13,6 +13,8 @@ from typing import (
     Union,
 )
 
+import emoji
+
 from vaccine.models import Message
 from vaccine.utils import get_display_choices
 
@@ -86,7 +88,11 @@ class ChoiceState:
         self.helper_metadata = helper_metadata
 
     def _normalise_text(self, text: Optional[str]) -> str:
-        return (text or "").strip().lower()
+        text = (text or "").strip().lower()
+        if emoji.is_emoji(text):
+            return text[0]
+        return text
+
 
     def _get_choice(self, content: Optional[str]) -> Optional[Choice]:
         content = self._normalise_text(content)

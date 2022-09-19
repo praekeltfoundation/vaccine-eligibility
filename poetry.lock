@@ -312,6 +312,17 @@ dnspython = ">=1.15.0"
 idna = ">=2.0.0"
 
 [[package]]
+name = "emoji"
+version = "2.1.0"
+description = "Emoji for Python"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[package.extras]
+dev = ["pytest", "coverage", "coveralls"]
+
+[[package]]
 name = "faker"
 version = "8.1.0"
 description = "Faker is a Python package that generates fake data for you."
@@ -1274,7 +1285,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "d68e3ef313d33e138d6bf0600699345c920a425e0fde948da0bff935f9c1a94d"
+content-hash = "0b6def801ec02cc3a20404658c9c9c0b5b024d75cd4d08caeff3768f577e3b04"
 
 [metadata.files]
 aio-pika = []
@@ -1302,6 +1313,7 @@ coverage = []
 deprecated = []
 dnspython = []
 email-validator = []
+emoji = []
 faker = []
 flake8 = []
 flask = []

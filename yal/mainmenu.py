@@ -1,7 +1,13 @@
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, CustomChoiceState
+from vaccine.states import (
+    Choice,
+    CustomChoiceState,
+    EndState,
+    FreeText,
+    WhatsAppButtonState,
+)
 from vaccine.utils import get_display_choices
 from yal import contentrepo, rapidpro, utils
 from yal.askaquestion import Application as AskaQuestionApplication
@@ -449,3 +455,83 @@ class Application(BaseApplication):
         self.save_metadata("current_menu_level", menu_level - 2)
 
         return await self.go_to_state("state_contentrepo_page")
+
+    async def state_prompt_info_useful(self):
+        question = self._(
+            "\n".join(
+                [
+                    "Great.😊 Was the info useful?",
+                    "",
+                    "Reply:",
+                    "1. 👍🏾 Yes",
+                    "2. 👎🏾 No",
+                    "",
+                    "--",
+                    "",
+                    BACK_TO_MAIN,
+                    GET_HELP,
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("yes", "Yes", additional_keywords="👍🏾"),
+                Choice("no", "No", additional_keywords="👎🏾"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "yes": "state_submit_feedback",
+                "no": "state_prompt_feedback_comment",
+            },
+        )
+
+    async def state_prompt_feedback_comment(self):
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "Hmm, I'm sorry about that.😕",
+                        "Please tell me a bit more about what info you're looking for "
+                        "so that I can help you next time.",
+                    ]
+                )
+            ),
+            next="state_submit_feedback",
+        )
+
+    async def state_submit_feedback(self):
+        metadata = self.user.metadata
+        helpful = self.user.answers["state_prompt_info_useful"] == "yes"
+        comment = (
+            "" if helpful else self.user.answers.get("state_prompt_feedback_comment")
+        )
+
+        error = await contentrepo.add_page_rating(
+            self.user, metadata["selected_page_id"], helpful, comment
+        )
+
+        if error:
+            return await self.go_to_state("state_error")
+
+        text = self._(
+            "\n".join(
+                [
+                    "I'm so happy I could help you learn more about you sexual health "
+                    "and pleasure. 🙌🏾😎",
+                    "",
+                    "--",
+                    "",
+                    BACK_TO_MAIN,
+                    GET_HELP,
+                ]
+            )
+        )
+        if not helpful:
+            text = self._(
+                "Ok got it. Thank you for the feedback, I'm working on it already👍🏾."
+            )
+
+        return EndState(self, text=text)

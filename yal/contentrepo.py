@@ -187,3 +187,30 @@ async def find_related_pages(tags):
                     related_pages[choice.value] = choice.label
 
     return related_pages
+
+
+async def add_page_rating(user, page_id, helpful, comment=""):
+    async with get_contentrepo_api() as session:
+        for i in range(3):
+            try:
+                response = await session.post(
+                    urljoin(config.CONTENTREPO_API_URL, "api/v2/custom/ratings/"),
+                    json={
+                        "page": page_id,
+                        "helpful": helpful,
+                        "comment": comment,
+                        "data": {
+                            "session_id": user.session_id,
+                            "user_addr": user.addr,
+                        },
+                    },
+                )
+                response.raise_for_status()
+                break
+            except HTTP_EXCEPTIONS as e:
+                if i == 2:
+                    logger.exception(e)
+                    return True
+                else:
+                    continue
+    return False
