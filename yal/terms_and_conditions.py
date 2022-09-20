@@ -6,7 +6,7 @@ from vaccine.states import Choice, WhatsAppButtonState, WhatsAppListState
 from yal import contentrepo, rapidpro
 from yal.onboarding import Application as OnboardingApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
-from yal.utils import GENERIC_ERROR, normalise_phonenumber
+from yal.utils import get_generic_error, normalise_phonenumber
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ class Application(BaseApplication):
                 Choice("yes", "Yes, I need help now"),
                 Choice("no", "No, I'm good"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "yes": PleaseCallMeApplication.START_STATE,
                 "no": "state_emergency_info",
@@ -86,7 +86,7 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[Choice("ok", "Ok"), Choice("why", "Why?")],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "ok": "state_pre_terms",
                 "why": "state_get_to_know_why",
@@ -110,7 +110,7 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[Choice("ok", "Ok"), Choice("no", "No thanks")],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={"ok": "state_pre_terms", "no": "state_decline_get_to_know"},
         )
 
@@ -163,7 +163,7 @@ class Application(BaseApplication):
                 Choice("accept", "I Accept"),
                 Choice("decline", "I Don't Accept"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "read": "state_terms_pdf",
                 "accept": "state_submit_terms_and_conditions",
@@ -204,7 +204,7 @@ class Application(BaseApplication):
                 Choice("end", "END chat"),
                 Choice("accept", "ACCEPT"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "end": "state_decline_1",
                 "accept": "state_submit_terms_and_conditions",

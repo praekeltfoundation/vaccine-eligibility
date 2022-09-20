@@ -1,7 +1,7 @@
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, WhatsAppListState
 from yal import config, rapidpro, utils
-from yal.utils import GENERIC_ERROR
+from yal.utils import get_generic_error
 
 
 class Application(BaseApplication):
@@ -59,7 +59,7 @@ class Application(BaseApplication):
                 Choice("skip", self._("Skip")),
             ],
             next="state_feedback_servicefinder",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_feedback_servicefinder(self):
@@ -91,7 +91,7 @@ class Application(BaseApplication):
                 Choice("skip", self._("Skip")),
             ],
             next="state_feedback_changepreferences",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_feedback_changepreferences(self):
@@ -124,7 +124,7 @@ class Application(BaseApplication):
                 Choice("skip", self._("Skip")),
             ],
             next="state_feedback_quickreply",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_feedback_quickreply(self):
@@ -157,7 +157,7 @@ class Application(BaseApplication):
                 Choice("skip", self._("Skip")),
             ],
             next="state_feedback_numberskeywords",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_feedback_numberskeywords(self):
@@ -190,7 +190,7 @@ class Application(BaseApplication):
                 Choice("skip", self._("Skip")),
             ],
             next="state_feedback_usefulinformation",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_feedback_usefulinformation(self):
@@ -222,7 +222,7 @@ class Application(BaseApplication):
                 Choice("skip", self._("Skip")),
             ],
             next="state_feedback_lookforinformation",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_feedback_lookforinformation(self):
@@ -253,7 +253,7 @@ class Application(BaseApplication):
                 Choice("skip", self._("Skip")),
             ],
             next="state_feedback_willreturn",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_feedback_willreturn(self):
@@ -286,7 +286,7 @@ class Application(BaseApplication):
                 Choice("skip", self._("Skip")),
             ],
             next="state_submit_completed_feedback",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_submit_completed_feedback(self):

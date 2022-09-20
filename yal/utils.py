@@ -1,3 +1,4 @@
+import random
 import re
 from datetime import datetime, timedelta, timezone
 
@@ -11,9 +12,13 @@ PROVINCES = sorted(
     (s.code.split("-")[1], s.name.split(" (")[0])
     for s in pycountry.subdivisions.get(country_code="ZA")
 )
-GENERIC_ERROR = (
-    "Eish 👀, I didn't understand your reply, sorry. Do you mind trying "
-    "again? This time, try replying with the number that matches your choice.👍🏽"
+GENERIC_ERRORS = (
+    "Oh oh 👀, I don't understand your reply. But don't worry, we can try again. This "
+    "time, please reply with the number that matches your choice.👍🏽",
+    "Oops, looks like I don't have that option available.🤔Please try again - I'll get "
+    "it if you use the number that matches your choice, promise.👍",
+    "Umm...I'm sorry but I'm not sure what that means🤦🏾‍♀️. You can help me by trying "
+    "again. This time, look for the number matching your choice and send that👍🏽",
 )
 GENDERS = {
     "girl_woman": "Girl/Woman",
@@ -23,6 +28,10 @@ GENDERS = {
 }
 BACK_TO_MAIN = "0. 🏠 *Back* to Main *MENU*"
 GET_HELP = "#. 🆘Get *HELP*"
+
+
+def get_generic_error():
+    return random.choice(GENERIC_ERRORS)
 
 
 def get_today():

@@ -6,7 +6,7 @@ from vaccine.states import Choice, CustomChoiceState
 from vaccine.utils import get_display_choices
 from yal import contentrepo
 from yal.pleasecallme import Application as PleaseCallMeApplication
-from yal.utils import BACK_TO_MAIN, GENERIC_ERROR, GET_HELP
+from yal.utils import BACK_TO_MAIN, GET_HELP, get_generic_error
 
 logger = logging.getLogger(__name__)
 
@@ -119,7 +119,7 @@ class Application(BaseApplication):
             question=question,
             choices=choices,
             next=next_,
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             helper_metadata=helper_metadata,
             button="Answer",
             buttons=buttons,

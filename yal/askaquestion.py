@@ -18,10 +18,10 @@ from yal import aaq_core, config, rapidpro
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.utils import (
     BACK_TO_MAIN,
-    GENERIC_ERROR,
     GET_HELP,
     clean_inbound,
     get_current_datetime,
+    get_generic_error,
     normalise_phonenumber,
 )
 
@@ -157,7 +157,7 @@ class Application(BaseApplication):
             button="Choose an option",
             choices=choices,
             next="state_set_aaq_timeout_2",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_set_aaq_timeout_2(self):
@@ -219,7 +219,7 @@ class Application(BaseApplication):
                 Choice("yes", "Yes"),
                 Choice("no", "No"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next="state_is_question_answered",
         )
 
