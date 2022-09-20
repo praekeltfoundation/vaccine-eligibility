@@ -316,7 +316,8 @@ class CustomChoiceState(ChoiceState):
         super().__init__(*args, **kwargs)
         self.button = button
 
-    async def display(self, message):
+    @property
+    def _helper_metadata(self):
         helper_metadata = self.helper_metadata or {}
         if self.buttons:
             if len(self.buttons) <= 3:
@@ -326,5 +327,12 @@ class CustomChoiceState(ChoiceState):
                 helper_metadata["sections"] = [
                     {"rows": [{"id": c.label, "title": c.label} for c in self.buttons]}
                 ]
+        return helper_metadata
 
-        return self.app.send_message(self.question, helper_metadata=helper_metadata)
+    async def display(self, message):
+        return self.app.send_message(
+            self.question, helper_metadata=self._helper_metadata
+        )
+
+    async def display_error(self, message):
+        return self.app.send_message(self.error, helper_metadata=self._helper_metadata)

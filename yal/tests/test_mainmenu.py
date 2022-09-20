@@ -1,4 +1,5 @@
 import json
+import random
 from datetime import datetime
 from unittest import mock
 from urllib.parse import parse_qs, urlparse
@@ -972,6 +973,46 @@ async def test_state_display_page_detail_next(
                 "-----",
                 "",
                 "body",
+                "",
+                "1. Continue",
+                "",
+                "-----",
+                "*Or reply:*",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_display_page_detail_next_error(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    """
+    If the user responds with an invalid prompt, then the error message should contain
+    no title, a generic error, and options and footer the same as the original message
+    """
+    random.seed(0)
+    tester.setup_state("state_display_page")
+    tester.user.metadata["page_type"] = "detail"
+    tester.user.metadata["selected_page_id"] = "111"
+    tester.user.metadata["title"] = "title"
+    tester.user.metadata["body"] = "body"
+    tester.user.metadata["current_menu_level"] = 1
+    tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["suggested_content"] = {}
+
+    tester.user.metadata["next_prompt"] = "Continue"
+
+    await tester.user_input("invalid")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Oops, looks like I don't have that option available.🤔Please try "
+                "again - I'll get it if you use the number that matches your choice, "
+                "promise.👍",
                 "",
                 "1. Continue",
                 "",

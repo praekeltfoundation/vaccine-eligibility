@@ -277,13 +277,7 @@ class Application(BaseApplication):
         quiz_tag = metadata.get("quiz_tag")
         quick_replies = metadata.get("quick_replies", [])
 
-        parts = [
-            title,
-            "-----",
-            "",
-            body,
-            "",
-        ]
+        parts = []
 
         if next_prompt:
             choices.append(Choice("next", next_prompt))
@@ -351,7 +345,18 @@ class Application(BaseApplication):
                 GET_HELP,
             ]
         )
+        error_parts = [get_generic_error(), ""] + parts
+        parts = [
+            title,
+            "-----",
+            "",
+            body,
+            "",
+        ] + parts
         question = self._("\n".join([part for part in parts if part is not None]))
+        error_text = self._(
+            "\n".join([part for part in error_parts if part is not None])
+        )
 
         i = len(choices) + 1
         suggested_choices = await self.get_suggested_choices()
@@ -377,7 +382,7 @@ class Application(BaseApplication):
         return CustomChoiceState(
             self,
             question=question,
-            error=self._(get_generic_error()),
+            error=error_text,
             choices=choices,
             next=next_,
             helper_metadata=helper_metadata,
