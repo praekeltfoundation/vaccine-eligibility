@@ -27,7 +27,7 @@ def get_rapidpro_contact(urn):
 
 MODEL_ANSWERS_PAGE_1 = {
     "FAQ #1 Title": "This is FAQ #1's content.",
-    "FAQ #2 Title": "This is FAQ #2's content.",
+    "FAQ #2 Title that is very long": "This is FAQ #2's content.",
     "FAQ #3 Title": "This is FAQ #3's content.",
 }
 
@@ -199,7 +199,7 @@ async def test_start_state_response_sets_timeout(
                 "you're interested in:*",
                 "",
                 "1. FAQ #1 Title",
-                "2. FAQ #2 Title",
+                "2. FAQ #2 Title that is very long",
                 "3. FAQ #3 Title",
                 "4. Show me more",
                 "",
@@ -208,7 +208,14 @@ async def test_start_state_response_sets_timeout(
                 "0. 🏠 *Back* to Main *MENU*",
                 "#. 🆘Get *HELP*",
             ]
-        )
+        ),
+        button="Choose an option",
+        list_items=[
+            "FAQ #1 Title",
+            "FAQ #2 Title that is",
+            "FAQ #3 Title",
+            "Show me more",
+        ],
     )
 
 
