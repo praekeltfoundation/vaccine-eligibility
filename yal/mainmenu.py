@@ -9,7 +9,7 @@ from vaccine.states import (
     WhatsAppButtonState,
 )
 from vaccine.utils import get_display_choices
-from yal import contentrepo, rapidpro, utils
+from yal import contentrepo, rapidpro, turn, utils
 from yal.askaquestion import Application as AskaQuestionApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
@@ -245,6 +245,8 @@ class Application(BaseApplication):
                 return AskaQuestionApplication.START_STATE
             elif choice.value == "feature_pleasecallme":
                 return PleaseCallMeApplication.START_STATE
+            elif choice.value == "feedback":
+                return "state_prompt_info_found"
             elif choice.value.startswith("no"):
                 return "state_get_suggestions"
 
@@ -309,6 +311,10 @@ class Application(BaseApplication):
         if "pleasecallme" in feature_redirects:
             choices.append(Choice("feature_pleasecallme", "Call Lovelife"))
             buttons.append(Choice("feature_pleasecallme", "Call Lovelife"))
+
+        if next_prompt is None and metadata["page_type"] == "detail":
+            choices.append(Choice("feedback", "Pls give us feedback"))
+            buttons.append(Choice("feedback", "Pls give us feedback"))
 
         if choices:
             parts.extend(
@@ -456,6 +462,66 @@ class Application(BaseApplication):
 
         return await self.go_to_state("state_contentrepo_page")
 
+    async def state_prompt_info_found(self):
+        question = self._(
+            "\n".join(
+                [
+                    "Did you find the info you were looking for?",
+                    "",
+                    "Reply:",
+                    "1. 👍🏾 Yes",
+                    "2. 👎🏾 No",
+                    "",
+                    "--",
+                    "",
+                    BACK_TO_MAIN,
+                    GET_HELP,
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("yes", "Yes", additional_keywords="👍🏾"),
+                Choice("no", "No", additional_keywords="👎🏾"),
+            ],
+            error=self._(GENERIC_ERROR),
+            next={
+                "yes": "state_prompt_info_useful",
+                "no": "state_prompt_not_found_comment",
+            },
+        )
+
+    async def state_prompt_not_found_comment(self):
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "Hmm, I'm sorry about that.😕",
+                        "Please tell me a bit more about what info you're looking for "
+                        "so that I can help you next time.",
+                    ]
+                )
+            ),
+            next="state_label_comment",
+        )
+
+    async def state_label_comment(self):
+        error = await turn.label_message(self.inbound.message_id, "Priority Question")
+        if error:
+            return await self.go_to_state("state_error")
+        return await self.go_to_state("state_feedback_completed")
+
+    async def state_feedback_completed(self):
+        return EndState(
+            self,
+            text=self._(
+                "Ok got it. Thank you for the feedback, I'm working on it already👍🏾."
+            ),
+        )
+
     async def state_prompt_info_useful(self):
         question = self._(
             "\n".join(
@@ -512,26 +578,25 @@ class Application(BaseApplication):
         error = await contentrepo.add_page_rating(
             self.user, metadata["selected_page_id"], helpful, comment
         )
-
         if error:
             return await self.go_to_state("state_error")
 
-        text = self._(
-            "\n".join(
-                [
-                    "I'm so happy I could help you learn more about you sexual health "
-                    "and pleasure. 🙌🏾😎",
-                    "",
-                    "--",
-                    "",
-                    BACK_TO_MAIN,
-                    GET_HELP,
-                ]
-            )
-        )
         if not helpful:
-            text = self._(
-                "Ok got it. Thank you for the feedback, I'm working on it already👍🏾."
-            )
+            return await self.go_to_state("state_label_comment")
 
-        return EndState(self, text=text)
+        return EndState(
+            self,
+            text=self._(
+                "\n".join(
+                    [
+                        "I'm so happy I could help you learn more about you sexual "
+                        "health and pleasure. 🙌🏾😎",
+                        "",
+                        "--",
+                        "",
+                        BACK_TO_MAIN,
+                        GET_HELP,
+                    ]
+                )
+            ),
+        )
