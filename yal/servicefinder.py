@@ -20,7 +20,7 @@ from vaccine.states import (
 from vaccine.utils import HTTP_EXCEPTIONS
 from yal import config
 from yal.pleasecallme import Application as PleaseCallMeApplication
-from yal.utils import BACK_TO_MAIN, GENERIC_ERROR, GET_HELP
+from yal.utils import BACK_TO_MAIN, GET_HELP, get_generic_error
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +83,7 @@ class Application(BaseApplication):
             choices=[
                 Choice("yes", "Yes, sounds good"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "yes": "state_check_address",
             },
@@ -194,7 +194,7 @@ class Application(BaseApplication):
                 Choice("yes", "Use this location"),
                 Choice("new", "Use another location"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "yes": "state_address_coords_lookup",
                 "new": "state_pre_different_location",
@@ -338,7 +338,7 @@ class Application(BaseApplication):
             question=question,
             choices=category_choices,
             next=next_,
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_service_lookup(self):
@@ -386,7 +386,7 @@ class Application(BaseApplication):
         return MenuState(
             self,
             question=self._(question),
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             choices=[
                 Choice("state_location", self._("Try another location")),
                 Choice("state_category", self._("Try another service")),

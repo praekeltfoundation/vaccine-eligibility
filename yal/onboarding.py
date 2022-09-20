@@ -16,7 +16,7 @@ from vaccine.utils import get_today
 from yal import contentrepo, rapidpro, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
-from yal.utils import GENERIC_ERROR, get_current_datetime
+from yal.utils import get_current_datetime, get_generic_error
 from yal.validators import day_validator, year_validator
 
 logger = logging.getLogger(__name__)
@@ -136,7 +136,7 @@ class Application(BaseApplication):
                 Choice("12", self._("December")),
             ],
             next="state_dob_day",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             error_footer=self._("\n" "Reply with the number next to the month."),
         )
 
@@ -238,7 +238,7 @@ class Application(BaseApplication):
                 Choice("skip", self._("Skip")),
             ],
             next="state_province",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_province(self):
@@ -280,7 +280,7 @@ class Application(BaseApplication):
             button="Province",
             choices=province_choices,
             next="state_full_address",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_full_address(self):
@@ -456,7 +456,7 @@ class Application(BaseApplication):
             button="Gender",
             choices=gender_choices,
             next="state_submit_onboarding",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_submit_onboarding(self):
@@ -511,7 +511,7 @@ class Application(BaseApplication):
                 ]
             )
         )
-        error = self._(GENERIC_ERROR)
+        error = self._(get_generic_error())
 
         return WhatsAppButtonState(
             self,

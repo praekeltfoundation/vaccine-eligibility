@@ -11,8 +11,8 @@ from vaccine.utils import HTTP_EXCEPTIONS
 from yal import config, rapidpro
 from yal.utils import (
     BACK_TO_MAIN,
-    GENERIC_ERROR,
     get_current_datetime,
+    get_generic_error,
     normalise_phonenumber,
 )
 from yal.validators import phone_number_validator
@@ -110,7 +110,7 @@ class Application(BaseApplication):
                 Choice("help now", "I need help now!"),
                 Choice("opening hours", "See opening hours"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "help now": "state_emergency",
                 "opening hours": "state_open_hours",
@@ -141,7 +141,7 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[Choice("see", "See Opening Hours")],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next="state_open_hours",
         )
 
@@ -174,7 +174,7 @@ class Application(BaseApplication):
                 Choice("ok", "Ok"),
                 Choice("callback in hours", "Call me when you open"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "ok": "state_pre_mainmenu",
                 "callback in hours": "state_in_hours_greeting",
@@ -218,7 +218,7 @@ class Application(BaseApplication):
                 Choice("yes", "Use this number"),
                 Choice("specify", "Use another number"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "yes": "state_submit_callback",
                 "specify": "state_specify_msisdn",
@@ -303,7 +303,7 @@ class Application(BaseApplication):
                 Choice("help", "I need help now"),
                 Choice("hours", "Opening hours"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "ok": "state_callme_done",
                 "help": "state_emergency",
@@ -376,7 +376,7 @@ class Application(BaseApplication):
                 Choice("yes", "Yes, that's it"),
                 Choice("no", "No, it's wrong"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "yes": "state_ask_to_save_emergency_number",
                 "no": "state_specify_msisdn",
@@ -408,7 +408,7 @@ class Application(BaseApplication):
                 Choice("yes", "Yes, please"),
                 Choice("no", "No thanks"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "yes": "state_save_emergency_contact",
                 "no": "state_submit_callback",
@@ -445,7 +445,7 @@ class Application(BaseApplication):
                 Choice("missed", "I missed the call"),
                 Choice("no", "No call yet"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "yes": "state_pre_mainmenu",
                 "missed": "state_ask_to_call_again",
@@ -497,7 +497,7 @@ class Application(BaseApplication):
                 Choice("another way", "Get help another way"),
                 Choice("no", "No, thanks"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "ok": "state_retry_callback_choose_number",
                 "another way": "state_contact_bwise",
@@ -533,7 +533,7 @@ class Application(BaseApplication):
                 Choice("previously saved", "Previously saved"),
                 Choice("another", "Another number"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "whatsapp": "state_submit_callback",
                 "previously saved": "state_offer_saved_emergency_contact",
@@ -579,7 +579,7 @@ class Application(BaseApplication):
                     Choice("yes", "Yes, that's it"),
                     Choice("no", "No, it's wrong"),
                 ],
-                error=self._(GENERIC_ERROR),
+                error=self._(get_generic_error()),
                 next={
                     "yes": "state_submit_callback",
                     "no": "state_specify_msisdn",
@@ -612,7 +612,7 @@ class Application(BaseApplication):
                     Choice("whatsapp", "Whatsapp number"),
                     Choice("another", "Another number"),
                 ],
-                error=self._(GENERIC_ERROR),
+                error=self._(get_generic_error()),
                 next={
                     "whatsapp": "state_submit_callback",
                     "another": "state_specify_msisdn",
@@ -647,7 +647,7 @@ class Application(BaseApplication):
                 Choice("long", "This way is too long"),
                 Choice("changed mind", "I've changed my mind"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "yes": "state_got_help",
                 "long": "state_too_long",
@@ -689,7 +689,7 @@ class Application(BaseApplication):
             choices=[
                 Choice("menu", "Main Menu"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "menu": "state_pre_mainmenu",
             },
@@ -732,7 +732,7 @@ class Application(BaseApplication):
                 Choice("another way", "Get help another way"),
                 Choice("menu", "Main Menu"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "another way": "state_contact_bwise",
                 "menu": "state_pre_mainmenu",
@@ -776,7 +776,7 @@ class Application(BaseApplication):
                 Choice("another way", "Get help another way"),
                 Choice("menu", "Main Menu"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "another way": "state_contact_bwise",
                 "menu": "state_pre_mainmenu",
@@ -815,7 +815,7 @@ class Application(BaseApplication):
                 Choice("twitter", "Twitter"),
                 Choice("website", "Website"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "facebook": "state_facebook_page",
                 "twitter": "state_twitter_page",
@@ -850,7 +850,7 @@ class Application(BaseApplication):
             choices=[
                 Choice("menu", "Main Menu"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "menu": "state_pre_mainmenu",
             },
@@ -883,7 +883,7 @@ class Application(BaseApplication):
             choices=[
                 Choice("menu", "Main Menu"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "menu": "state_pre_mainmenu",
             },
@@ -918,7 +918,7 @@ class Application(BaseApplication):
             choices=[
                 Choice("menu", "Main Menu"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "menu": "state_pre_mainmenu",
             },

@@ -4,7 +4,7 @@ import logging
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, ChoiceState, FreeText, WhatsAppListState
 from yal import rapidpro
-from yal.utils import GENDERS, GENERIC_ERROR, PROVINCES, normalise_phonenumber
+from yal.utils import GENDERS, PROVINCES, get_generic_error, normalise_phonenumber
 from yal.validators import day_validator, year_validator
 
 logger = logging.getLogger(__name__)
@@ -123,7 +123,7 @@ class Application(BaseApplication):
                 Choice("state_update_gender", self._("Identity")),
             ],
             next=next_,
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             error_footer=self._("\n" "Reply with the number next to the month."),
             button="Change Preferences",
         )
@@ -183,7 +183,7 @@ class Application(BaseApplication):
             ],
             footer=self._("\n" "If you'd rather not say, just tap *SKIP*."),
             next="state_update_dob_day",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             error_footer=self._("\n" "Reply with the number next to the month."),
             buttons=[Choice("skip", self._("Skip"))],
         )
@@ -260,7 +260,7 @@ class Application(BaseApplication):
                 Choice("skip", self._("Skip")),
             ],
             next="state_update_relationship_status_submit",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_update_relationship_status_submit(self):
@@ -311,7 +311,7 @@ class Application(BaseApplication):
             button="Province",
             choices=province_choices,
             next="state_update_suburb",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_update_suburb(self):
@@ -431,7 +431,7 @@ class Application(BaseApplication):
             button="Gender",
             choices=gender_choices,
             next="state_update_gender_submit",
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_update_gender_submit(self):

@@ -15,9 +15,9 @@ from yal.mainmenu import Application as MainMenuApplication
 from yal.utils import (
     BACK_TO_MAIN,
     GENDERS,
-    GENERIC_ERROR,
     GET_HELP,
     get_current_datetime,
+    get_generic_error,
 )
 
 logger = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ class Application(BaseApplication):
                 "delete saved": "state_delete_saved",
                 "skip": MainMenuApplication.START_STATE,
             },
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_submit_optout(self):
@@ -136,7 +136,7 @@ class Application(BaseApplication):
                 Choice("skip", self._("Skip")),
             ],
             next=_next,
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
         )
 
     async def state_delete_saved(self):
@@ -187,7 +187,7 @@ class Application(BaseApplication):
             choices=[
                 Choice("see", "See personal data"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "see": ChangePreferencesApplication.START_STATE,
             },

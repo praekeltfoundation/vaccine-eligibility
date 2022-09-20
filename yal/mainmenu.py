@@ -15,7 +15,7 @@ from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
-from yal.utils import BACK_TO_MAIN, GENERIC_ERROR, GET_HELP, get_current_datetime
+from yal.utils import BACK_TO_MAIN, GET_HELP, get_current_datetime, get_generic_error
 
 logger = logging.getLogger(__name__)
 
@@ -377,7 +377,7 @@ class Application(BaseApplication):
         return CustomChoiceState(
             self,
             question=question,
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             choices=choices,
             next=next_,
             helper_metadata=helper_metadata,
@@ -486,7 +486,7 @@ class Application(BaseApplication):
                 Choice("yes", "Yes", additional_keywords="👍🏾"),
                 Choice("no", "No", additional_keywords="👎🏾"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "yes": "state_prompt_info_useful",
                 "no": "state_prompt_not_found_comment",
@@ -546,7 +546,7 @@ class Application(BaseApplication):
                 Choice("yes", "Yes", additional_keywords="👍🏾"),
                 Choice("no", "No", additional_keywords="👎🏾"),
             ],
-            error=self._(GENERIC_ERROR),
+            error=self._(get_generic_error()),
             next={
                 "yes": "state_submit_feedback",
                 "no": "state_prompt_feedback_comment",
