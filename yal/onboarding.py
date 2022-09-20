@@ -321,7 +321,7 @@ class Application(BaseApplication):
     async def state_validate_full_address(self):
         value = self.user.answers["state_full_address"]
 
-        if value == "skip":
+        if value.lower().strip() == "skip":
             return await self.go_to_state("state_gender")
 
         try:
@@ -369,6 +369,9 @@ class Application(BaseApplication):
         )
 
     async def state_street_name(self):
+        if self.user.answers["state_suburb"].lower().strip() == "skip":
+            return await self.go_to_state("state_gender")
+
         await self.update_last_onboarding_time()
         return FreeText(
             self,
@@ -392,6 +395,9 @@ class Application(BaseApplication):
         )
 
     async def state_street_number(self):
+        if self.user.answers["state_street_name"].lower().strip() == "skip":
+            return await self.go_to_state("state_gender")
+
         await self.update_last_onboarding_time()
         return FreeText(
             self,
