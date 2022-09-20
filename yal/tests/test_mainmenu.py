@@ -1258,11 +1258,9 @@ async def test_state_prompt_not_found_comment(tester: AppTester, turn_mock):
         "Ok got it. Thank you for the feedback, I'm working on it already👍🏾."
     )
 
+    message_id = tester.application.inbound.message_id  # type: ignore
     label_request = turn_mock.app.requests[0]
-    assert (
-        label_request.path
-        == f"/v1/messages/{tester.application.inbound.message_id}/labels"
-    )
+    assert label_request.path == f"/v1/messages/{message_id}/labels"
     assert json.loads(label_request.body.decode("utf-8")) == {
         "labels": ["Priority Question"],
     }
@@ -1351,11 +1349,9 @@ async def test_state_prompt_feedback_comment_submit(
         "data": {"session_id": 1, "user_addr": "27820001001"},
     }
 
+    message_id = tester.application.inbound.message_id  # type: ignore
     label_request = turn_mock.app.requests[0]
-    assert (
-        label_request.path
-        == f"/v1/messages/{tester.application.inbound.message_id}/labels"
-    )
+    assert label_request.path == f"/v1/messages/{message_id}/labels"
     assert json.loads(label_request.body.decode("utf-8")) == {
         "labels": ["Priority Question"],
     }
