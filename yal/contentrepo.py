@@ -22,6 +22,7 @@ def get_contentrepo_api():
             "Content-Type": "application/json",
             "Accept": "application/json",
             "User-Agent": "yal-whatsapp-bot",
+            "Authorization": f"Token {config.CONTENTREPO_API_TOKEN}",
         },
     )
 
