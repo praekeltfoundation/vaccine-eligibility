@@ -269,7 +269,12 @@ class WhatsAppListState(ChoiceState):
             helper_metadata={
                 "button": self.button,
                 "sections": [
-                    {"rows": [{"id": c.label, "title": c.label} for c in self.choices]}
+                    {
+                        "rows": [
+                            {"id": c.label[:20], "title": c.label[:20]}
+                            for c in self.choices
+                        ]
+                    }
                 ],
             },
         )
