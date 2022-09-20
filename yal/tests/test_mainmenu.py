@@ -8,7 +8,7 @@ from sanic import Sanic, response
 
 from vaccine.models import Message
 from vaccine.testing import AppTester
-from yal import config
+from yal import config, turn
 from yal.main import Application
 from yal.utils import BACK_TO_MAIN, GET_HELP
 
@@ -84,11 +84,11 @@ async def turn_mock(sanic_client):
         return response.json({}, status=200)
 
     client = await sanic_client(app)
-    url = config.API_HOST
-    config.API_HOST = f"http://{client.host}:{client.port}"
-    config.API_TOKEN = "testtoken"
+
+    get_turn_url = turn.get_turn_url
+    turn.get_turn_url = lambda path: f"http://{client.host}:{client.port}/{path}"
     yield client
-    config.API_HOST = url
+    turn.get_turn_url = get_turn_url
 
 
 @pytest.fixture

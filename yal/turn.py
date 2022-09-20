@@ -1,5 +1,5 @@
 import logging
-from urllib.parse import urljoin
+from urllib.parse import ParseResult, urlunparse
 
 import aiohttp
 
@@ -26,12 +26,25 @@ def get_turn_api():
     )
 
 
+def get_turn_url(path: str) -> str:
+    return urlunparse(
+        ParseResult(
+            scheme="https",
+            netloc=config.API_HOST or "",
+            path=path,
+            params="",
+            query="",
+            fragment="",
+        )
+    )
+
+
 async def label_message(message_id, label):
     async with get_turn_api() as session:
         for i in range(3):
             try:
                 response = await session.post(
-                    url=urljoin(config.API_HOST, f"/v1/messages/{message_id}/labels"),
+                    url=get_turn_url(f"v1/messages/{message_id}/labels"),
                     json={"labels": [label]},
                 )
                 response.raise_for_status()
