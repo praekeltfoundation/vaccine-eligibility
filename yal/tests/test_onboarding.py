@@ -486,6 +486,61 @@ async def test_state_full_address_minor(
 
 @pytest.mark.asyncio
 @mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_full_address_skip(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_answer("age", "22")
+    tester.setup_state("state_full_address")
+
+    await tester.user_input("SKIP")
+
+    tester.assert_state("state_gender")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_suburb_skip(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_suburb")
+
+    await tester.user_input("SKIP")
+
+    tester.assert_state("state_gender")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_street_name_skip(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_street_name")
+    tester.setup_answer("state_suburb", "test suburb")
+
+    await tester.user_input("SKIP")
+
+    tester.assert_state("state_gender")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_number_name_skip(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_street_number")
+    tester.setup_answer("state_street_name", "test street name")
+
+    await tester.user_input("SKIP")
+
+    tester.assert_state("state_gender")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
 async def test_state_gender(get_current_datetime, tester: AppTester, rapidpro_mock):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_gender")
