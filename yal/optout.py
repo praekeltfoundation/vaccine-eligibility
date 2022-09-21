@@ -34,13 +34,13 @@ class Application(BaseApplication):
                 [
                     "*🙍🏾‍♀️Hi!*",
                     "",
-                    f"I just received a message from you saying {inbound}.",
+                    f"I just received a message from you saying *{inbound}*.",
                     "",
-                    "What would you like to do?",
+                    "*What would you like to do?*",
                     "",
-                    "1 - I  want to stop receiving notifications",
-                    "2 - I  want to delete all data saved about me.",
-                    "3 - No change. I still want to receive messages from B-Wise",
+                    "*1* - I  want to stop receiving notifications",
+                    "*2* - I  want to delete all data saved about me.",
+                    "*3* - No change. I still want to receive messages from B-Wise",
                 ]
             )
         )

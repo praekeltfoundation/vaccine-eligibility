@@ -91,6 +91,28 @@ async def rapidpro_mock(sanic_client):
 
 
 @pytest.mark.asyncio
+async def test_state_optout(tester: AppTester):
+    tester.setup_state("state_catch_all")
+    await tester.user_input("stop")
+    tester.assert_state("state_optout")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*🙍🏾‍♀️Hi!*",
+                "",
+                "I just received a message from you saying *stop*.",
+                "",
+                "*What would you like to do?*",
+                "",
+                "*1* - I  want to stop receiving notifications",
+                "*2* - I  want to delete all data saved about me.",
+                "*3* - No change. I still want to receive messages from B-Wise",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
 async def test_state_optout_survey_other(tester: AppTester):
     tester.setup_state("state_optout_survey")
     await tester.user_input("6")
