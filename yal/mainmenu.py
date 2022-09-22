@@ -74,7 +74,7 @@ class Application(BaseApplication):
             (
                 "*🏥 NEED HELP?*",
                 [
-                    Choice(PleaseCallMeApplication.START_STATE, "Please call me!"),
+                    Choice(PleaseCallMeApplication.START_STATE, "Talk to a counsellor"),
                     Choice(
                         ServiceFinderApplication.START_STATE,
                         "Find clinics and services",

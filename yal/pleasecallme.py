@@ -87,7 +87,7 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🆘HELP!",
-                    "*Please call me*",
+                    "*Talk to a counsellor*",
                     "-----",
                     "",
                     "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
@@ -121,7 +121,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP! / Please call me",
+                    "🆘HELP! / Talk to a counsellor",
                     "*Emergency*",
                     "-----",
                     "",
@@ -149,7 +149,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP! / Please call me",
+                    "🆘HELP! / Talk to a counsellor",
                     "*Opening hours*",
                     "-----",
                     "",
@@ -188,6 +188,21 @@ class Application(BaseApplication):
             )
         )
         await asyncio.sleep(0.5)
+        await self.worker.publish_message(
+            self.inbound.reply(
+                self._(
+                    "\n".join(
+                        [
+                            "📞 A trained loveLife counsellor will call you back.",
+                            "",
+                            "They'll be able to talk to you about any sex, relationship and "
+                            "mental health questions you may have or issues you may be facing.",
+                        ]
+                    )
+                )
+            )
+        )
+        await asyncio.sleep(0.5)
         return await self.go_to_state("state_in_hours")
 
     async def state_in_hours(self):
@@ -195,10 +210,10 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🆘HELP!",
-                    "*Please call me*",
+                    "*Talk to a counsellor*",
                     "-----",
                     "",
-                    "👩🏾 *Should we call you on the WhatsApp number you are using to "
+                    "👩🏾 *Should a counsellor call you on the WhatsApp number you are using to "
                     "chat?*",
                     "",
                     "*1* - Yes, use this number",
@@ -277,7 +292,7 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🆘HELP!",
-                    "*Please call me*",
+                    "*Talk to a counsellor*",
                     "-----",
                     "",
                     "👩🏾 *Great! I've successfully arranged for a loveLife counsellor to"
@@ -323,7 +338,7 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🆘HELP!",
-                    "*Please call me*",
+                    "*Talk to a counsellor*",
                     "-----",
                     "",
                     "👩🏾*No problem. What number should we use?*",
@@ -353,7 +368,7 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🆘HELP!",
-                    "*Please call me*",
+                    "*Talk to a counsellor*",
                     "-----",
                     "",
                     "*👩🏾Is this the right number?*",
@@ -388,7 +403,7 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🆘HELP!",
-                    "*Please call me*",
+                    "*Talk to a counsellor*",
                     "-----",
                     "",
                     "*👩🏾Would you like us to save this number for next time?*",
@@ -472,7 +487,7 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🆘HELP!",
-                    "*Please call me*",
+                    "*Talk to a counsellor*",
                     "-----",
                     "",
                     "👩🏾 *Want me to try again?*",
@@ -510,7 +525,7 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🆘HELP!",
-                    "*Please call me*",
+                    "*Talk to a counsellor*",
                     "-----",
                     "",
                     "👩🏾 *Which number should we use?*",
@@ -556,7 +571,7 @@ class Application(BaseApplication):
                 "\n".join(
                     [
                         "🆘HELP!",
-                        "*Please call me*",
+                        "*Talk to a counsellor*",
                         "-----",
                         "",
                         "*👩🏾Is this the right number?*",
@@ -590,7 +605,7 @@ class Application(BaseApplication):
                 "\n".join(
                     [
                         "🆘HELP!",
-                        "*Please call me*",
+                        "*Talk to a counsellor*",
                         "-----",
                         "",
                         "*👩🏾 Whoops! I don't have another number saved for you.*",
@@ -624,7 +639,7 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🆘HELP!",
-                    "*Please call me*",
+                    "*Talk to a counsellor*",
                     "-----",
                     "",
                     "👩🏾 *Are you sure you no longer need help?*",
@@ -670,7 +685,7 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🆘HELP!",
-                    "*Please call me*",
+                    "*Talk to a counsellor*",
                     "-----",
                     "",
                     "👩🏾*I'm glad you got the help you needed.*",
@@ -709,7 +724,7 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🆘HELP!",
-                    "*Please call me*",
+                    "*Talk to a counsellor*",
                     "-----",
                     "",
                     "👩🏾 *Thank you for that feedback, we'll work on it.*",
@@ -753,7 +768,7 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🆘HELP!",
-                    "*Please call me*",
+                    "*Talk to a counsellor*",
                     "-----",
                     "",
                     "👩🏾 *No problem. I hope you're no longer in trouble.*",

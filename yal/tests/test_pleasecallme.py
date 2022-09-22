@@ -123,7 +123,7 @@ async def test_start_out_of_hours_sunday_after(get_current_datetime, tester: App
         "\n".join(
             [
                 "🆘HELP!",
-                "*Please call me*",
+                "*Talk to a counsellor*",
                 "-----",
                 "",
                 "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
@@ -156,7 +156,7 @@ async def test_start_out_of_hours_sunday_before(
         "\n".join(
             [
                 "🆘HELP!",
-                "*Please call me*",
+                "*Talk to a counsellor*",
                 "-----",
                 "",
                 "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
@@ -189,7 +189,7 @@ async def test_start_out_of_hours_weekday_before(
         "\n".join(
             [
                 "🆘HELP!",
-                "*Please call me*",
+                "*Talk to a counsellor*",
                 "-----",
                 "",
                 "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
@@ -222,7 +222,7 @@ async def test_start_out_of_hours_weekday_after(
         "\n".join(
             [
                 "🆘HELP!",
-                "*Please call me*",
+                "*Talk to a counsellor*",
                 "-----",
                 "",
                 "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
@@ -247,11 +247,19 @@ async def test_start_in_hours(get_current_datetime, tester: AppTester):
     tester.setup_state("state_please_call_start")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
-    [greeting_msg] = tester.fake_worker.outbound_messages
+    [greeting_msg, explanation_msg] = tester.fake_worker.outbound_messages
     assert greeting_msg.content == "\n".join(
         [
             "👩🏾 *Say no more—I'm on it!*",
             "☝🏾 Hold tight just a sec...",
+        ]
+    )
+    assert explanation_msg.content == "\n".join(
+        [
+            "📞 A trained loveLife counsellor will call you back.",
+            "",
+            "They'll be able to talk to you about any sex, relationship and "
+            "mental health questions you may have or issues you may be facing.",
         ]
     )
 
@@ -280,11 +288,19 @@ async def test_state_open_hours_chose_to_call_when_open(tester: AppTester):
     await tester.user_input("2")
     tester.assert_state("state_in_hours")
 
-    [greeting_msg] = tester.fake_worker.outbound_messages
+    [greeting_msg, explanation_msg] = tester.fake_worker.outbound_messages
     assert greeting_msg.content == "\n".join(
         [
             "👩🏾 *Say no more—I'm on it!*",
             "☝🏾 Hold tight just a sec...",
+        ]
+    )
+    assert explanation_msg.content == "\n".join(
+        [
+            "📞 A trained loveLife counsellor will call you back.",
+            "",
+            "They'll be able to talk to you about any sex, relationship and "
+            "mental health questions you may have or issues you may be facing.",
         ]
     )
 
@@ -599,7 +615,7 @@ async def test_state_retry_callback_choose_number_saved_and_exists(
         "\n".join(
             [
                 "🆘HELP!",
-                "*Please call me*",
+                "*Talk to a counsellor*",
                 "-----",
                 "",
                 "*👩🏾Is this the right number?*",
@@ -632,7 +648,7 @@ async def test_state_retry_callback_choose_number_saved_no_number_found(
         "\n".join(
             [
                 "🆘HELP!",
-                "*Please call me*",
+                "*Talk to a counsellor*",
                 "-----",
                 "",
                 "*👩🏾 Whoops! I don't have another number saved for you.*",
