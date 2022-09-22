@@ -236,7 +236,21 @@ class FreeText:
         return self.app.send_message(self.question, helper_metadata=helper_metadata)
 
 
-class WhatsAppButtonState(ChoiceState):
+class BaseWhatsAppChoiceState(ChoiceState):
+    """
+    Base class for all whatsapp choice states.
+
+    Takes into account that buttons and list options will be truncated at 20 characters
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for choice in self.choices:
+            if len(choice.label) > 20:
+                choice.additional_keywords.append(choice.label[:20])
+
+
+class WhatsAppButtonState(BaseWhatsAppChoiceState):
     async def display(self, message: Message):
         helper_metadata: Dict[str, Any] = {
             "buttons": [choice.label for choice in self.choices]
@@ -258,7 +272,7 @@ class WhatsAppButtonState(ChoiceState):
         return self.app.send_message(self.error, helper_metadata=helper_metadata)
 
 
-class WhatsAppListState(ChoiceState):
+class WhatsAppListState(BaseWhatsAppChoiceState):
     def __init__(self, *args, button: str, **kwargs):
         super().__init__(*args, **kwargs)
         self.button = button
@@ -316,7 +330,7 @@ class SectionedChoiceState(ChoiceState):
         return "\n".join(lines)
 
 
-class CustomChoiceState(ChoiceState):
+class CustomChoiceState(BaseWhatsAppChoiceState):
     def __init__(self, *args, button: str = None, **kwargs):
         super().__init__(*args, **kwargs)
         self.button = button
@@ -330,7 +344,12 @@ class CustomChoiceState(ChoiceState):
             else:
                 helper_metadata["button"] = self.button
                 helper_metadata["sections"] = [
-                    {"rows": [{"id": c.label, "title": c.label} for c in self.buttons]}
+                    {
+                        "rows": [
+                            {"id": c.label[:20], "title": c.label[:20]}
+                            for c in self.buttons
+                        ]
+                    }
                 ]
         return helper_metadata
 
