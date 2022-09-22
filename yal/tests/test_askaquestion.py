@@ -329,7 +329,7 @@ async def test_state_display_results_back(tester: AppTester, aaq_mock):
 async def test_state_display_content_question_answered(
     tester: AppTester, rapidpro_mock, aaq_mock
 ):
-    tester.user.metadata["inbound_id"] = "inbound-id"
+    tester.user.metadata["inbound_secret_key"] = "inbound-id"
     tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.setup_state("state_display_content")
@@ -364,7 +364,7 @@ async def test_state_display_content_question_answered(
 async def test_state_display_content_question_not_answered(
     tester: AppTester, rapidpro_mock, aaq_mock
 ):
-    tester.user.metadata["inbound_id"] = "inbound-id"
+    tester.user.metadata["inbound_secret_key"] = "inbound-id"
     tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.setup_state("state_display_content")
