@@ -61,6 +61,7 @@ async def inbound_check(user, message_id, question):
         "prev_page_url": response_data.get("prev_page_url"),
         "inbound_id": response_data["inbound_id"],
         "feedback_secret_key": response_data["feedback_secret_key"],
+        "inbound_secret_key": response_data["inbound_secret_key"],
     }
 
 
