@@ -195,8 +195,9 @@ class Application(BaseApplication):
                         [
                             "📞 A trained loveLife counsellor will call you back.",
                             "",
-                            "They'll be able to talk to you about any sex, relationship and "
-                            "mental health questions you may have or issues you may be facing.",
+                            "They'll be able to talk to you about any sex, relationship"
+                            " and mental health questions you may have or issues you"
+                            " may be facing.",
                         ]
                     )
                 )
@@ -213,8 +214,8 @@ class Application(BaseApplication):
                     "*Talk to a counsellor*",
                     "-----",
                     "",
-                    "👩🏾 *Should a counsellor call you on the WhatsApp number you are using to "
-                    "chat?*",
+                    "👩🏾 *Should a counsellor call you on the WhatsApp number you are"
+                    " using to chat?*",
                     "",
                     "*1* - Yes, use this number",
                     "*2* - Call me on another number",
