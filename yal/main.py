@@ -16,7 +16,7 @@ from yal.usertest_feedback import Application as FeedbackApplication
 logger = logging.getLogger(__name__)
 
 GREETING_KEYWORDS = {"hi", "hello", "menu", "0"}
-HELP_KEYWORDS = {"#", "help", "please call me"}
+HELP_KEYWORDS = {"#", "help", "please call me", "talk to a counsellor"}
 OPTOUT_KEYWORDS = {"stop"}
 ONBOARDING_REMINDER_KEYWORDS = {
     "continue",
