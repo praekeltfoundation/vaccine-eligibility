@@ -2,7 +2,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, TState
 from yal import config
 from yal.change_preferences import Application
 
@@ -41,16 +41,14 @@ def get_rapidpro_contact(urn):
 async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
-    app.requests = []
-    app.errors = 0
-    app.errormax = 0
+    tstate = TState()
 
     @app.route("/api/v2/contacts.json", methods=["GET"])
     def get_contact(request):
-        app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
                 return response.json({}, status=500)
 
         urn = request.args.get("urn")
@@ -66,13 +64,14 @@ async def rapidpro_mock(sanic_client):
 
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({}, status=200)
 
     client = await sanic_client(app)
     url = config.RAPIDPRO_URL
     config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
     config.RAPIDPRO_TOKEN = "testtoken"
+    client.tstate = tstate
     yield client
     config.RAPIDPRO_URL = url
 
@@ -122,7 +121,7 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
         )
     )
 
-    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
@@ -149,7 +148,7 @@ async def test_state_update_relationship_status(tester: AppTester, rapidpro_mock
         )
     )
 
-    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
@@ -161,7 +160,7 @@ async def test_state_update_relationship_status_submit(
     tester.assert_num_messages(1)
     tester.assert_state("state_change_info_prompt")
 
-    assert [r.path for r in rapidpro_mock.app.requests] == [
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
         "/api/v2/contacts.json",
         "/api/v2/contacts.json",
     ]
@@ -186,7 +185,7 @@ async def test_state_update_location_submit(tester: AppTester, rapidpro_mock):
     tester.assert_num_messages(1)
     tester.assert_state("state_change_info_prompt")
 
-    assert [r.path for r in rapidpro_mock.app.requests] == [
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
         "/api/v2/contacts.json",
         "/api/v2/contacts.json",
     ]

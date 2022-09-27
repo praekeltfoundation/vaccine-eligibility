@@ -6,7 +6,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, TState
 from yal import config
 from yal.main import Application
 
@@ -28,11 +28,11 @@ def get_rapidpro_contact(urn):
 async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
-    app.requests = []
+    tstate = TState()
 
     @app.route("/api/v2/contacts.json", methods=["GET"])
     def get_contact(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
 
         urn = request.args.get("urn")
         contacts = [get_rapidpro_contact(urn)]
@@ -47,7 +47,7 @@ async def rapidpro_mock(sanic_client):
 
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({}, status=200)
 
     client = await sanic_client(app)
@@ -55,6 +55,7 @@ async def rapidpro_mock(sanic_client):
     config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
     config.RAPIDPRO_TOKEN = "testtoken"
     config.AWS_MEDIA_URL = "http://aws.com"
+    client.tstate = tstate
     yield client
     config.RAPIDPRO_URL = url
 
@@ -77,8 +78,8 @@ async def test_state_dob_full_valid(
     tester.assert_answer("state_dob_day", "1")
     tester.assert_answer("age", "15")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -107,8 +108,8 @@ async def test_state_dob_full_valid_bday(
     tester.assert_answer("state_dob_day", "19")
     tester.assert_answer("age", "15")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -150,8 +151,8 @@ async def test_state_dob_full_invalid(
     tester.assert_no_answer("state_dob_day")
     tester.assert_no_answer("age")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -175,8 +176,8 @@ async def test_state_dob_year_valid(
 
     tester.assert_answer("state_dob_year", "2007")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -200,8 +201,8 @@ async def test_state_dob_year_invalid(
 
     tester.assert_no_answer("state_dob_year")
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -226,8 +227,8 @@ async def test_state_dob_month_valid(
 
     tester.assert_answer("state_dob_month", "2")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -252,8 +253,8 @@ async def test_state_dob_month_invalid(
 
     tester.assert_no_answer("state_dob_month")
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -280,8 +281,8 @@ async def test_state_dob_day_valid(
 
     tester.assert_answer("state_dob_day", "2")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -308,8 +309,8 @@ async def test_state_dob_day_invalid(
 
     tester.assert_no_answer("state_dob_day")
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -336,8 +337,8 @@ async def test_state_dob_day_invalid_date(
 
     tester.assert_no_answer("state_dob_day")
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -380,8 +381,8 @@ async def test_state_check_birthday(
     )
     assert msg.helper_metadata.get("image") == "http://aws.com/original_images/hbd.png"
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -405,8 +406,8 @@ async def test_state_relationship_status_valid(
 
     tester.assert_answer("state_relationship_status", "complicated")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -428,8 +429,8 @@ async def test_state_full_address_invalid(
 
     tester.assert_state("state_suburb")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -451,8 +452,8 @@ async def test_state_full_address_valid(
 
     tester.assert_state("state_gender")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -474,8 +475,8 @@ async def test_state_full_address_minor(
 
     tester.assert_state("state_gender")
 
-    assert len(rapidpro_mock.app.requests) == 3
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -575,8 +576,8 @@ async def test_state_gender(get_current_datetime, tester: AppTester, rapidpro_mo
         )
     )
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -600,8 +601,8 @@ async def test_state_gender_valid(
 
     tester.assert_answer("state_gender", "boy_man")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",
@@ -628,8 +629,8 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_onboarding_complete")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "opted_out": "FALSE",
@@ -660,8 +661,8 @@ async def test_onboarding_reminder_yes_response(tester: AppTester, rapidpro_mock
 
     tester.assert_state("state_dob_full")
     tester.assert_num_messages(1)
-    assert len(rapidpro_mock.app.requests) == 3
-    request = rapidpro_mock.app.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "onboarding_reminder_sent": "",
@@ -686,8 +687,8 @@ async def test_onboarding_reminder_no_thanks_response_actioned(
 
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"onboarding_reminder_sent": "", "onboarding_reminder_type": ""},
     }
@@ -716,8 +717,8 @@ async def test_onboarding_reminder_later_response_actioned(
 
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "onboarding_reminder_sent": "",
