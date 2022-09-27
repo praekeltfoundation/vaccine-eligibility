@@ -231,7 +231,7 @@ async def test_state_display_results_choose_an_answer(
 
     await tester.user_input("FAQ #1 Title")
 
-    tester.assert_state("state_display_content")
+    tester.assert_state("state_get_content_feedback")
 
     assert len(rapidpro_mock.app.requests) == 1
     request = rapidpro_mock.app.requests[0]
@@ -326,14 +326,12 @@ async def test_state_display_results_back(tester: AppTester, aaq_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_display_content_question_answered(
+async def test_state_get_content_feedback_question_answered(
     tester: AppTester, rapidpro_mock, aaq_mock
 ):
     tester.user.metadata["inbound_id"] = "inbound-id"
     tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
-    tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
-    tester.setup_state("state_display_content")
-    tester.setup_answer("state_display_results", "FAQ #1 Title")
+    tester.setup_state("state_get_content_feedback")
 
     await tester.user_input("Yes")
 

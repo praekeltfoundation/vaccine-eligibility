@@ -201,6 +201,9 @@ class Application(BaseApplication):
         await self.worker.publish_message(self.inbound.reply(question))
         await asyncio.sleep(1.5)
 
+        return await self.go_to_state("state_get_content_feedback")
+
+    async def state_get_content_feedback(self):
         question = self._(
             "\n".join(
                 [
@@ -235,7 +238,7 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
-        feedback_answer = self.user.answers.get("state_display_content", None)
+        feedback_answer = self.user.answers.get("state_get_content_feedback", None)
 
         inbound_id = self.user.metadata["inbound_id"]
         feedback_secret_key = self.user.metadata["feedback_secret_key"]
