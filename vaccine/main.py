@@ -23,13 +23,13 @@ app.update_config(config)
 setup_metrics_middleware(app)
 
 
-@app.listener("before_server_start")
+@app.before_server_start
 async def setup_worker(app, loop):
     app.worker = Worker()
     await app.worker.setup()
 
 
-@app.listener("after_server_stop")
+@app.after_server_stop
 async def shutdown_worker(app, loop):
     await app.worker.teardown()
 
