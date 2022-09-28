@@ -54,8 +54,12 @@ async def evds_mock():
         server.tstate = tstate
         yield server
         s_config.EVDS_URL = m_config.EVDS_URL = config.EVDS_URL = url
-        s_config.EVDS_USERNAME = m_config.EVDS_USERNAME = config.EVDS_USERNAME = username
-        s_config.EVDS_PASSWORD = m_config.EVDS_PASSWORD = config.EVDS_PASSWORD = password
+        s_config.EVDS_USERNAME = (
+            m_config.EVDS_USERNAME
+        ) = config.EVDS_USERNAME = username
+        s_config.EVDS_PASSWORD = (
+            m_config.EVDS_PASSWORD
+        ) = config.EVDS_PASSWORD = password
 
 
 @pytest.fixture
