@@ -937,7 +937,9 @@ async def test_state_education_level_submit(rapidpro_mock, eventstore_mock):
         "education_level": "less_grade_7",
     }
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/flow_starts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/flow_starts.json"
+    ]
     request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "flow": config.RAPIDPRO_BASELINE_SURVEY_COMPLETE_FLOW,

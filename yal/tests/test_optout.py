@@ -208,7 +208,9 @@ async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
     # Two API calls:
     # Get profile to get old details, update profile
     assert len(rapidpro_mock.tstate.requests) == 2
-    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"] * 2
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/contacts.json"
+    ] * 2
 
     post_request = rapidpro_mock.tstate.requests[1]
     assert json.loads(post_request.body.decode("utf-8")) == {

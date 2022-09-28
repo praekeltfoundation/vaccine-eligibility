@@ -984,7 +984,9 @@ async def test_state_likelihood_of_following_schedule_valid(
     await tester.user_input("1")
     tester.assert_state("state_eat_fruits")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/flow_starts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/flow_starts.json"
+    ]
     request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "flow": config.RAPIDPRO_MIDLINE_SURVEY_COMPLETE_FLOW,

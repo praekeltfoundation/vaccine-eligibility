@@ -494,7 +494,9 @@ async def test_state_privacy_policy(rapidpro_mock):
         ]
     )
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/flow_starts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/flow_starts.json"
+    ]
     assert [r.json for r in rapidpro_mock.tstate.requests] == [
         {"flow": "flow-uuid", "urns": ["tel:27820001003"]}
     ]
@@ -1570,7 +1572,9 @@ async def test_state_tracing(eventstore_mock):
 
     assert u.state.name == "state_start"
 
-    assert [r.path for r in eventstore_mock.tstate.requests] == ["/api/v3/covid19triage/"]
+    assert [r.path for r in eventstore_mock.tstate.requests] == [
+        "/api/v3/covid19triage/"
+    ]
 
     app = Application(get_user({"state_exposure": "yes"}))
     [reply] = await app.process_message(get_message("yes"))
