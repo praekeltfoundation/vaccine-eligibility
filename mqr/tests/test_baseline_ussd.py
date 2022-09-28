@@ -6,6 +6,7 @@ from sanic import Sanic, response
 from mqr import config
 from mqr.baseline_ussd import Application
 from vaccine.models import Message, StateData, User
+from vaccine.testing import TState
 
 
 def get_rapidpro_contact(
@@ -33,16 +34,14 @@ def get_rapidpro_contact(
 async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
-    app.requests = []
-    app.errors = 0
-    app.errormax = 0
+    tstate = TState()
 
     @app.route("/api/v2/contacts.json", methods=["GET"])
     def get_contact(request):
-        app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
                 return response.json({}, status=500)
 
         contacts = []
@@ -66,13 +65,14 @@ async def rapidpro_mock(sanic_client):
 
     @app.route("/api/v2/flow_starts.json", methods=["POST"])
     def start_flow(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({}, status=200)
 
     client = await sanic_client(app)
     url = config.RAPIDPRO_URL
     config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
     config.RAPIDPRO_TOKEN = "testtoken"
+    client.tstate = tstate
     yield client
     config.RAPIDPRO_URL = url
 
@@ -81,38 +81,37 @@ async def rapidpro_mock(sanic_client):
 async def eventstore_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_eventstore")
-    app.requests = []
-    app.errormax = 0
-    app.errors = 0
-    app.not_found_errormax = 0
-    app.not_found_errors = 0
+    tstate = TState()
+    tstate.not_found_errormax = 0
+    tstate.not_found_errors = 0
 
     @app.route("/api/v1/mqrbaselinesurvey/", methods=["POST"])
     def valid_baseline_survey(request):
-        app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
                 return response.json({}, status=500)
         return response.json({})
 
     @app.route("/api/v1/mqrbaselinesurvey/27820001003/", methods=["GET"])
     def get_baseline_survey_not_found(request):
-        app.requests.append(request)
-        if app.not_found_errormax:
-            if app.not_found_errors < app.not_found_errormax:
-                app.not_found_errors += 1
+        tstate.requests.append(request)
+        if tstate.not_found_errormax:
+            if tstate.not_found_errors < tstate.not_found_errormax:
+                tstate.not_found_errors += 1
                 return response.json({}, status=500)
         return response.json({"detail": "Not found."}, status=404)
 
     @app.route("/api/v1/mqrbaselinesurvey/27820001004/", methods=["GET"])
     def get_baseline_survey_found(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({"msisdn": "27820001004"})
 
     client = await sanic_client(app)
     url = config.EVENTSTORE_API_URL
     config.EVENTSTORE_API_URL = f"http://{client.host}:{client.port}"
+    client.tstate = tstate
     yield client
     config.EVENTSTORE_API_URL = url
 
@@ -142,8 +141,8 @@ async def test_state_survey_start(rapidpro_mock, eventstore_mock):
         ]
     )
 
-    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
-    assert [r.path for r in eventstore_mock.app.requests] == [
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in eventstore_mock.tstate.requests] == [
         "/api/v1/mqrbaselinesurvey/27820001003/"
     ]
 
@@ -173,7 +172,7 @@ async def test_state_survey_start_midline(rapidpro_mock):
         ]
     )
 
-    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
@@ -199,7 +198,7 @@ async def test_state_survey_start_not_mqr_contact(rapidpro_mock):
         ]
     )
 
-    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
@@ -225,12 +224,12 @@ async def test_state_survey_start_not_found(rapidpro_mock):
         ]
     )
 
-    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
 async def test_state_start_temporary_errors(rapidpro_mock):
-    rapidpro_mock.app.errormax = 3
+    rapidpro_mock.tstate.errormax = 3
     u = User(addr="27820001001", state=StateData())
     app = Application(u)
     msg = Message(
@@ -247,12 +246,12 @@ async def test_state_start_temporary_errors(rapidpro_mock):
         "Sorry, something went wrong. We have been notified. Please try again later"
     )
 
-    assert len(rapidpro_mock.app.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 3
 
 
 @pytest.mark.asyncio
 async def test_state_check_existing_result_temporary_errors(eventstore_mock):
-    eventstore_mock.app.not_found_errormax = 3
+    eventstore_mock.tstate.not_found_errormax = 3
     u = User(addr="27820001003", state=StateData(name="state_check_existing_result"))
     app = Application(u)
     msg = Message(
@@ -269,7 +268,7 @@ async def test_state_check_existing_result_temporary_errors(eventstore_mock):
         "Sorry, something went wrong. We have been notified. Please try again later"
     )
 
-    assert len(eventstore_mock.app.requests) == 3
+    assert len(eventstore_mock.tstate.requests) == 3
 
 
 @pytest.mark.asyncio
@@ -295,7 +294,7 @@ async def test_state_check_existing_result_found(eventstore_mock):
     )
     assert u.state.name == "state_start"
 
-    assert [r.path for r in eventstore_mock.app.requests] == [
+    assert [r.path for r in eventstore_mock.tstate.requests] == [
         "/api/v1/mqrbaselinesurvey/27820001004/"
     ]
 
@@ -916,11 +915,11 @@ async def test_state_education_level_submit(rapidpro_mock, eventstore_mock):
         ]
     )
 
-    assert [r.path for r in eventstore_mock.app.requests] == [
+    assert [r.path for r in eventstore_mock.tstate.requests] == [
         "/api/v1/mqrbaselinesurvey/"
     ]
 
-    request = eventstore_mock.app.requests[0]
+    request = eventstore_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "msisdn": "27820001003",
         "breastfeed": "yes",
@@ -938,8 +937,8 @@ async def test_state_education_level_submit(rapidpro_mock, eventstore_mock):
         "education_level": "less_grade_7",
     }
 
-    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/flow_starts.json"]
-    request = rapidpro_mock.app.requests[0]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/flow_starts.json"]
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "flow": config.RAPIDPRO_BASELINE_SURVEY_COMPLETE_FLOW,
         "urns": ["whatsapp:27820001003"],
