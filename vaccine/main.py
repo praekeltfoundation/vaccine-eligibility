@@ -25,19 +25,19 @@ setup_metrics_middleware(app)
 
 @app.before_server_start
 async def setup_worker(app, loop):
-    app.worker = Worker()
-    await app.worker.setup()
+    app.ctx.worker = Worker()
+    await app.ctx.worker.setup()
 
 
 @app.after_server_stop
 async def shutdown_worker(app, loop):
-    await app.worker.teardown()
+    await app.ctx.worker.teardown()
 
 
 @app.route("/")
 async def health(request: Request) -> HTTPResponse:
     result: dict = {"status": "ok", "amqp": {}, "redis": {}}
-    worker: Worker = app.worker  # type: ignore
+    worker: Worker = app.ctx.worker  # type: ignore
 
     if worker.connection.connection is None:  # pragma: no cover
         result["amqp"]["connection"] = False
