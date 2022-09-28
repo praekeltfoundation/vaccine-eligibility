@@ -80,7 +80,7 @@ async def turn_mock(sanic_client):
     app = Sanic("mock_turn")
     tstate = TState()
 
-    @app.route("/v1/messages/<message_id:string>/labels", methods=["POST"])
+    @app.route("/v1/messages/<message_id:str>/labels", methods=["POST"])
     def label_message(request, message_id):
         tstate.requests.append(request)
         return response.json({}, status=200)
