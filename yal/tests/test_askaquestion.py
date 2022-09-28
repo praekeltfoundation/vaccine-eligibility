@@ -346,7 +346,7 @@ async def test_state_get_content_feedback_question_answered(
     assert len(aaq_mock.app.requests) == 1
     request = aaq_mock.app.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
-        "feedback": {"feedback_type": "positive"},
+        "feedback": {"feedback_type": "positive", "faq_id": "-1"},
         "feedback_secret_key": "feedback-secret-key",
         "inbound_id": "inbound-id",
     }
@@ -381,7 +381,7 @@ async def test_state_display_content_question_not_answered(
     assert len(aaq_mock.app.requests) == 1
     request = aaq_mock.app.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
-        "feedback": {"feedback_type": "negative"},
+        "feedback": {"feedback_type": "negative", "faq_id": "-1"},
         "feedback_secret_key": "feedback-secret-key",
         "inbound_id": "inbound-id",
     }

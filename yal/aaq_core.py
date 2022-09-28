@@ -94,11 +94,11 @@ async def get_page(url):
     }
 
 
-async def add_feedback(secret_key, inbound_id, feedback_type):
+async def add_feedback(secret_key, inbound_id, feedback_type, faq_id):
     data = {
         "feedback_secret_key": secret_key,
         "inbound_id": inbound_id,
-        "feedback": {"feedback_type": feedback_type},
+        "feedback": {"feedback_type": feedback_type, "faq_id": faq_id},
     }
 
     async with get_aaq_api() as session:
