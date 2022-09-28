@@ -5,7 +5,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, TState
 from yal import config
 from yal.askaquestion import Application as AaqApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
@@ -88,16 +88,14 @@ def get_rapidpro_contact(urn):
 async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
-    app.requests = []
-    app.errors = 0
-    app.errormax = 0
+    tstate = TState()
 
     @app.route("/api/v2/contacts.json", methods=["GET"])
     def get_contact(request):
-        app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
                 return response.json({}, status=500)
 
         urn = request.args.get("urn")
@@ -113,13 +111,14 @@ async def rapidpro_mock(sanic_client):
 
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({}, status=200)
 
     client = await sanic_client(app)
     url = config.RAPIDPRO_URL
     config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
     config.RAPIDPRO_TOKEN = "testtoken"
+    client.tstate = tstate
     yield client
     config.RAPIDPRO_URL = url
 
@@ -128,11 +127,11 @@ async def rapidpro_mock(sanic_client):
 async def contentrepo_api_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("contentrepo_api_mock")
-    app.requests = []
+    tstate = TState()
 
     @app.route("/api/v2/pages", methods=["GET"])
     def get_main_menu(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             {
                 "count": 1,
@@ -142,7 +141,7 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/suggestedcontent", methods=["GET"])
     def get_suggested_content(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             {
                 "count": 1,
@@ -153,6 +152,7 @@ async def contentrepo_api_mock(sanic_client):
     client = await sanic_client(app)
     url = config.CONTENTREPO_API_URL
     config.CONTENTREPO_API_URL = f"http://{client.host}:{client.port}"
+    client.tstate = tstate
     yield client
     config.CONTENTREPO_API_URL = url
 
@@ -164,8 +164,8 @@ async def test_reset_keyword(tester: AppTester, rapidpro_mock, contentrepo_api_m
     tester.assert_state("state_mainmenu")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.app.requests) == 2
-    assert len(contentrepo_api_mock.app.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(contentrepo_api_mock.tstate.requests) == 3
 
 
 @pytest.mark.asyncio
@@ -203,7 +203,7 @@ async def test_state_start_to_catch_all(tester: AppTester, rapidpro_mock):
         )
     )
 
-    assert len(rapidpro_mock.app.requests) == 1
+    assert len(rapidpro_mock.tstate.requests) == 1
 
 
 @pytest.mark.asyncio
@@ -214,8 +214,8 @@ async def test_state_start_to_mainmenu(
     tester.assert_state("state_mainmenu")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.app.requests) == 2
-    assert len(contentrepo_api_mock.app.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(contentrepo_api_mock.tstate.requests) == 3
 
     tester.assert_metadata("province", "FS")
     tester.assert_metadata("suburb", "cape town")
@@ -231,7 +231,7 @@ async def test_onboarding_reminder_response_to_reminder_handler(
     tester.assert_state("state_stop_onboarding_reminders")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.app.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 2
 
 
 @pytest.mark.asyncio
@@ -247,4 +247,4 @@ async def test_aaq_timeout_response_to_handler(tester: AppTester, rapidpro_mock)
     tester.assert_num_messages(1)
     tester.assert_message("TODO: Handle question not answered")
 
-    assert len(rapidpro_mock.app.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 3

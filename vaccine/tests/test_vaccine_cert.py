@@ -15,11 +15,9 @@ def tester():
 async def whatsapp_mock(sanic_client, tester):
     Sanic.test_mode = True
     app = Sanic("mock_whatsapp")
-    app.requests = []
 
     @app.route("/v1/media/<media_id>", methods=["GET"])
     def valid_registration(request, media_id):
-        app.requests.append(request)
         return response.file(f"vaccine/data/{media_id}")
 
     client = await sanic_client(app)

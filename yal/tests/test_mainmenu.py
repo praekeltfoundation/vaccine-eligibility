@@ -8,7 +8,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, TState
 from yal import config, turn
 from yal.main import Application
 from yal.utils import BACK_TO_MAIN, GET_HELP
@@ -58,17 +58,18 @@ def build_message_detail(
 async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
-    app.requests = []
+    tstate = TState()
 
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({}, status=200)
 
     client = await sanic_client(app)
     url = config.RAPIDPRO_URL
     config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
     config.RAPIDPRO_TOKEN = "testtoken"
+    client.tstate = tstate
     yield client
     config.RAPIDPRO_URL = url
 
@@ -77,17 +78,18 @@ async def rapidpro_mock(sanic_client):
 async def turn_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_turn")
-    app.requests = []
+    tstate = TState()
 
-    @app.route("/v1/messages/<message_id:string>/labels", methods=["POST"])
+    @app.route("/v1/messages/<message_id:str>/labels", methods=["POST"])
     def label_message(request, message_id):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({}, status=200)
 
     client = await sanic_client(app)
 
     get_turn_url = turn.get_turn_url
     turn.get_turn_url = lambda path: f"http://{client.host}:{client.port}/{path}"
+    client.tstate = tstate
     yield client
     turn.get_turn_url = get_turn_url
 
@@ -96,16 +98,14 @@ async def turn_mock(sanic_client):
 async def contentrepo_api_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("contentrepo_api_mock")
-    app.requests = []
-    app.errors = 0
-    app.errormax = 0
+    tstate = TState()
 
     @app.route("/api/v2/pages", methods=["GET"])
     def get_main_menu(request):
-        app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
                 return response.json({}, status=500)
 
         tag = request.args.get("tag")
@@ -138,7 +138,7 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/suggestedcontent", methods=["GET"])
     def get_suggested_content(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         pages = []
         pages.append({"id": 444, "title": "Suggested Content 1"})
         pages.append({"id": 555, "title": "Suggested Content 2"})
@@ -152,7 +152,7 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/pages/111", methods=["GET"])
     def get_page_detail_111(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             build_message_detail(
                 111,
@@ -163,7 +163,7 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/pages/1111", methods=["GET"])
     def get_page_detail_1111(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             build_message_detail(
                 111,
@@ -174,7 +174,7 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/pages/1112", methods=["GET"])
     def get_page_detail_1112(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             build_message_detail(
                 1112,
@@ -186,7 +186,7 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/pages/222", methods=["GET"])
     def get_page_detail_222(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             build_message_detail(
                 222,
@@ -198,7 +198,7 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/pages/333", methods=["GET"])
     def get_page_detail_333(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             build_message_detail(
                 333,
@@ -210,7 +210,7 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/pages/444", methods=["GET"])
     def get_page_detail_444(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             build_message_detail(
                 444,
@@ -221,7 +221,7 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/pages/1231", methods=["GET"])
     def get_page_detail_1231(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             build_message_detail(
                 444,
@@ -235,7 +235,7 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/pages/1232", methods=["GET"])
     def get_page_detail_1232(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             build_message_detail(
                 444,
@@ -248,7 +248,7 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/pages/1234", methods=["GET"])
     def get_page_detail_1234(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             build_message_detail(
                 1234,
@@ -260,7 +260,7 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/pages/1235", methods=["GET"])
     def get_page_detail_1235(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             build_message_detail(
                 1235,
@@ -272,7 +272,7 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/pages/1236", methods=["GET"])
     def get_page_detail_1236(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             build_message_detail(
                 1236,
@@ -284,20 +284,21 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/images/<image_id:int>", methods=["GET"])
     def get_image(request, image_id):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             {"meta": {"download_url": f"http://aws.test/test{image_id}.jpg"}}
         )
 
     @app.route("/api/v2/custom/ratings/", methods=["POST"])
     def add_page_rating(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({}, status=201)
 
     client = await sanic_client(app)
     url = config.CONTENTREPO_API_URL
     config.CONTENTREPO_API_URL = f"http://{client.host}:{client.port}"
     config.CONTENTREPO_API_TOKEN = "testtoken"
+    client.tstate = tstate
     yield client
     config.CONTENTREPO_API_URL = url
 
@@ -344,15 +345,15 @@ async def test_state_mainmenu_start(
         )
     )
 
-    assert [r.path for r in contentrepo_api_mock.app.requests] == [
+    assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
         "/suggestedcontent/",
     ]
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "2022-06-19T17:30:00",
@@ -407,14 +408,14 @@ async def test_state_mainmenu_start_suggested_populated(
         )
     )
 
-    assert [r.path for r in contentrepo_api_mock.app.requests] == [
+    assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "2022-06-19T17:30:00",
@@ -433,14 +434,14 @@ async def test_state_mainmenu_static(
     tester.assert_num_messages(1)
     tester.assert_state("state_servicefinder_start")
 
-    assert [r.path for r in contentrepo_api_mock.app.requests] == [
+    assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
         "/suggestedcontent/",
     ]
 
-    assert len(rapidpro_mock.app.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 2
 
 
 @pytest.mark.asyncio
@@ -454,14 +455,14 @@ async def test_state_mainmenu_aaq(
     tester.assert_state("state_start")
     tester.assert_message("Coming soon...")
 
-    assert [r.path for r in contentrepo_api_mock.app.requests] == [
+    assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
         "/suggestedcontent/",
     ]
 
-    assert len(rapidpro_mock.app.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 2
 
 
 @pytest.mark.asyncio
@@ -490,7 +491,7 @@ async def test_state_mainmenu_contentrepo(
     tester.assert_num_messages(1)
     tester.assert_message(question)
 
-    assert [r.path for r in contentrepo_api_mock.app.requests] == [
+    assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
@@ -500,8 +501,8 @@ async def test_state_mainmenu_contentrepo(
 
     tester.assert_metadata("topics_viewed", ["222"])
 
-    assert len(rapidpro_mock.app.requests) == 3
-    request = rapidpro_mock.app.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "",
@@ -562,7 +563,7 @@ async def test_state_mainmenu_contentrepo_children(
     tester.assert_num_messages(1)
     tester.assert_message(question)
 
-    assert [r.path for r in contentrepo_api_mock.app.requests] == [
+    assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
@@ -573,7 +574,7 @@ async def test_state_mainmenu_contentrepo_children(
         "/api/v2/pages/444",
     ]
 
-    detail_request = contentrepo_api_mock.app.requests[-1]
+    detail_request = contentrepo_api_mock.tstate.requests[-1]
     parsed_url = urlparse(detail_request.url)
     params = parse_qs(parsed_url.query)
 
@@ -581,9 +582,9 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["data__session_id"][0] == "1"
     assert params["data__user_addr"][0] == "27820001001"
 
-    assert len(rapidpro_mock.app.requests) == 5
+    assert len(rapidpro_mock.tstate.requests) == 5
 
-    update_request = rapidpro_mock.app.requests[-1]
+    update_request = rapidpro_mock.tstate.requests[-1]
     assert update_request.json["fields"] == {
         "last_main_time": "2022-06-19T17:30:00",
         "suggested_text": "*3* - Suggested Content 1\n*4* - Suggested Content 2",
@@ -1300,7 +1301,7 @@ async def test_state_prompt_not_found_comment(tester: AppTester, turn_mock):
     )
 
     message_id = tester.application.inbound.message_id  # type: ignore
-    label_request = turn_mock.app.requests[0]
+    label_request = turn_mock.tstate.requests[0]
     assert label_request.path == f"/v1/messages/{message_id}/labels"
     assert json.loads(label_request.body.decode("utf-8")) == {
         "labels": ["Priority Question"],
@@ -1348,7 +1349,7 @@ async def test_state_prompt_info_useful_submit(tester: AppTester, contentrepo_ap
 
     await tester.user_input("1")
 
-    post_request = contentrepo_api_mock.app.requests[0]
+    post_request = contentrepo_api_mock.tstate.requests[0]
     assert post_request.path == "/api/v2/custom/ratings/"
     assert json.loads(post_request.body.decode("utf-8")) == {
         "page": "111",
@@ -1380,7 +1381,7 @@ async def test_state_prompt_feedback_comment_submit(
         "Ok got it. Thank you for the feedback, I'm working on it already👍🏾."
     )
 
-    post_request = contentrepo_api_mock.app.requests[0]
+    post_request = contentrepo_api_mock.tstate.requests[0]
     assert post_request.path == "/api/v2/custom/ratings/"
     assert post_request.headers["authorization"] == "Token testtoken"
     assert json.loads(post_request.body.decode("utf-8")) == {
@@ -1391,7 +1392,7 @@ async def test_state_prompt_feedback_comment_submit(
     }
 
     message_id = tester.application.inbound.message_id  # type: ignore
-    label_request = turn_mock.app.requests[0]
+    label_request = turn_mock.tstate.requests[0]
     assert label_request.path == f"/v1/messages/{message_id}/labels"
     assert json.loads(label_request.body.decode("utf-8")) == {
         "labels": ["Priority Question"],

@@ -12,6 +12,7 @@ from aio_pika import Queue, connect_robust
 from sanic import Sanic, response
 
 from vaccine.models import Answer, Event, Message, StateData, User
+from vaccine.testing import TState
 from vaccine.worker import AnswerWorker, Worker, config, logger
 
 
@@ -227,17 +228,17 @@ async def test_worker_valid_event(worker: Worker):
 async def flow_results_mock_server(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_whatsapp")
-    app.future = Future()
-    app.requests = []
+    tstate = TState()
+    tstate.future = Future()
 
     @app.route("flow-results/packages/invalid/responses", methods=["POST"])
     async def invalid(request):
-        app.future.set_result(request)
+        tstate.future.set_result(request)
         return response.json({}, status=500)
 
     @app.route("flow-results/packages/usererror/responses", methods=["POST"])
     async def user_error(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         for a in request.json["data"]["attributes"]["responses"]:
             if a[5] is None:
                 return response.json({}, status=400)
@@ -245,7 +246,7 @@ async def flow_results_mock_server(sanic_client):
 
     @app.route("flow-results/packages/duplicate/responses", methods=["POST"])
     async def duplicate(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             {
                 "data": {
@@ -259,10 +260,12 @@ async def flow_results_mock_server(sanic_client):
 
     @app.route("flow-results/packages/<flow_id:uuid>/responses", methods=["POST"])
     async def messages(request, flow_id):
-        app.future.set_result(request)
+        tstate.future.set_result(request)
         return response.json({})
 
-    return await sanic_client(app)
+    client = await sanic_client(app)
+    client.tstate = tstate
+    return client
 
 
 @pytest.fixture
@@ -308,7 +311,7 @@ async def test_answer_worker_push_results(answer_worker, flow_results_mock_serve
         .encode(),
     )
 
-    request = await flow_results_mock_server.app.future
+    request = await flow_results_mock_server.tstate.future
     assert request.json["data"]["attributes"]["responses"] == [
         [
             "2021-02-03T04:05:06+00:00",
@@ -351,7 +354,7 @@ async def test_answer_worker_push_results_server_down(
         .encode(),
     )
 
-    await flow_results_mock_server.app.future
+    await flow_results_mock_server.tstate.future
     # wait for worker to log error
     await sleep(0.1)
     assert "Error sending results to flow results server" in log_stream.getvalue()
@@ -405,7 +408,7 @@ async def test_answer_worker_push_results_user_error(
 
     # wait for worker to log error
     for _ in range(10):
-        if len(flow_results_mock_server.app.requests) == 3:
+        if len(flow_results_mock_server.tstate.requests) == 3:
             break
         await sleep(0.1)
     assert "Error sending results to flow results server" in log_stream.getvalue()
@@ -442,7 +445,7 @@ async def test_answer_worker_push_results_duplicate(
 
     # wait for worker to log error
     for _ in range(10):
-        if len(flow_results_mock_server.app.requests) == 2:
+        if len(flow_results_mock_server.tstate.requests) == 2:
             break
         await sleep(0.1)
     assert log_stream.getvalue() == ""

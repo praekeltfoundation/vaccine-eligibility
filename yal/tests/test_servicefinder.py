@@ -7,7 +7,7 @@ from unittest import mock
 import pytest
 from sanic import Sanic, response
 
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, TState
 from yal import config
 from yal.main import Application
 from yal.utils import BACK_TO_MAIN, GET_HELP
@@ -68,16 +68,16 @@ FACILITIES: List[Dict] = [
 async def servicefinder_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_servicefinder")
-    app.requests = []
+    tstate = TState()
 
     @app.route("/api/categories", methods=["GET"])
     def callback_get(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(CATEGORIES)
 
     @app.route("/api/locations", methods=["GET"])
     def callback_post(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         if request.args.get("category") == "62dd86d24d7d919468144ed5":
             return response.json([])
         return response.json(FACILITIES)
@@ -85,6 +85,7 @@ async def servicefinder_mock(sanic_client):
     client = await sanic_client(app)
     url = config.SERVICEFINDER_URL
     config.SERVICEFINDER_URL = f"http://{client.host}:{client.port}"
+    client.tstate = tstate
     yield client
     config.SERVICEFINDER_URL = url
 
@@ -93,19 +94,17 @@ async def servicefinder_mock(sanic_client):
 async def google_api_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_google_api")
-    app.requests = []
-    app.api_errormax = 0
-    app.api_errors = 0
-    app.status = "OK"
+    tstate = TState()
+    tstate.status = "OK"
 
     @app.route("/maps/api/place/autocomplete/json", methods=["GET"])
     def valid_city(request):
-        app.requests.append(request)
-        if app.api_errormax:
-            if app.api_errors < app.api_errormax:
-                app.api_errors += 1
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
                 return response.json({}, status=500)
-        if app.status == "OK":
+        if tstate.status == "OK":
             data = {
                 "status": "OK",
                 "predictions": [
@@ -116,17 +115,17 @@ async def google_api_mock(sanic_client):
                 ],
             }
         else:
-            data = {"status": app.status}
+            data = {"status": tstate.status}
         return response.json(data, status=200)
 
     @app.route("/maps/api/place/details/json", methods=["GET"])
     def details_lookup(request):
-        app.requests.append(request)
-        if app.api_errormax:
-            if app.api_errors < app.api_errormax:
-                app.api_errors += 1
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
                 return response.json({}, status=500)
-        if app.status == "OK":
+        if tstate.status == "OK":
             data = {
                 "status": "OK",
                 "result": {
@@ -134,13 +133,14 @@ async def google_api_mock(sanic_client):
                 },
             }
         else:
-            data = {"status": app.status}
+            data = {"status": tstate.status}
         return response.json(data, status=200)
 
     client = await sanic_client(app)
     config.GOOGLE_PLACES_KEY = "TEST-KEY"
     url = config.GOOGLE_PLACES_URL
     config.GOOGLE_PLACES_URL = f"http://{client.host}:{client.port}"
+    client.tstate = tstate
     yield client
     config.GOOGLE_PLACES_URL = url
 
@@ -229,7 +229,7 @@ async def test_state_servicefinder_start_existing_address(
         )
     )
 
-    assert [r.path for r in google_api_mock.app.requests] == [
+    assert [r.path for r in google_api_mock.tstate.requests] == [
         "/maps/api/place/autocomplete/json"
     ]
 
@@ -279,8 +279,8 @@ async def test_state_confirm_existing_address_yes(
 
     tester.assert_message(question)
 
-    assert [r.path for r in servicefinder_mock.app.requests] == ["/api/categories"]
-    assert [r.path for r in google_api_mock.app.requests] == [
+    assert [r.path for r in servicefinder_mock.tstate.requests] == ["/api/categories"]
+    assert [r.path for r in google_api_mock.tstate.requests] == [
         "/maps/api/place/details/json"
     ]
 
@@ -376,7 +376,7 @@ async def test_state_category(tester: AppTester, servicefinder_mock):
 
     tester.assert_message(question)
 
-    assert [r.path for r in servicefinder_mock.app.requests] == ["/api/locations"]
+    assert [r.path for r in servicefinder_mock.tstate.requests] == ["/api/locations"]
 
 
 @pytest.mark.asyncio
@@ -406,7 +406,7 @@ async def test_state_category_no_facilities(tester: AppTester, servicefinder_moc
 
     tester.assert_message(question)
 
-    assert [r.path for r in servicefinder_mock.app.requests] == ["/api/locations"]
+    assert [r.path for r in servicefinder_mock.tstate.requests] == ["/api/locations"]
 
     tester.assert_metadata("parent_category", "root")
     tester.assert_metadata("servicefinder_breadcrumb", "*Get help near you*")

@@ -6,7 +6,7 @@ from sanic import Sanic, response
 from vaccine import real411_config as config
 from vaccine.models import Message
 from vaccine.real411 import Application
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, TState
 
 
 @pytest.fixture
@@ -18,7 +18,7 @@ def tester():
 async def real411_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("real411_mock")
-    app.requests = []
+    tstate = TState()
 
     @app.route("/complaint-type", methods=["GET"])
     def complaint_type(request):
@@ -68,12 +68,12 @@ async def real411_mock(sanic_client):
 
     @app.route("/file_upload", methods=["PUT"])
     def file_upload(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.text("")
 
     @app.route("/complaint", methods=["POST"])
     def submit(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         file_count = len(request.json["file_names"])
         return response.json(
             {
@@ -92,7 +92,7 @@ async def real411_mock(sanic_client):
 
     @app.route("/complaint/finalize", methods=["POST"])
     def finalise(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json(
             {"success": True, "message": "Complaint finalised", "errors": None}
         )
@@ -103,6 +103,7 @@ async def real411_mock(sanic_client):
     token = config.REAL411_TOKEN
     config.REAL411_URL = app.config.SERVER_NAME
     config.REAL411_TOKEN = "testtoken"
+    client.tstate = tstate
     yield client
     config.REAL411_URL = url
     config.REAL411_TOKEN = token
@@ -112,11 +113,11 @@ async def real411_mock(sanic_client):
 async def whatsapp_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("whatsapp_mock")
-    app.requests = []
+    tstate = TState()
 
     @app.route("/v1/media/<media_id>", methods=["GET"])
     def get_media(request, media_id):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.raw(b"testfile")
 
     client = await sanic_client(app)
@@ -124,6 +125,7 @@ async def whatsapp_mock(sanic_client):
     token = config.WHATSAPP_TOKEN
     config.WHATSAPP_URL = f"http://{client.host}:{client.port}"
     config.WHATSAPP_TOKEN = "testtoken"
+    client.tstate = tstate
     yield client
     config.WHATSAPP_URL = url
     config.WHATSAPP_TOKEN = token
@@ -133,16 +135,17 @@ async def whatsapp_mock(sanic_client):
 async def healthcheck_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("healthcheck_mock")
-    app.requests = []
+    tstate = TState()
 
     @app.route("/v2/real411/complaint/", methods=["POST"])
     def store_complaint_ref(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({})
 
     client = await sanic_client(app)
     url = config.HEALTHCHECK_URL
     config.HEALTHCHECK_URL = f"http://{client.host}:{client.port}"
+    client.tstate = tstate
     yield client
     config.HEALTHCHECK_URL = url
 
@@ -571,7 +574,7 @@ async def test_success(
             "number and a link to track your submission",
         ]
     )
-    [submit, uploadvid, uploadimg, finalise] = real411_mock.app.requests
+    [submit, uploadvid, uploadimg, finalise] = real411_mock.tstate.requests
     assert submit.json == {
         "agree": True,
         "name": "first name surname",
@@ -592,7 +595,7 @@ async def test_success(
     assert uploadimg.headers["content-type"] == "image/jpeg"
     assert finalise.json == {"ref": "WDM88J4P"}
 
-    [complaint] = healthcheck_mock.app.requests
+    [complaint] = healthcheck_mock.tstate.requests
     assert complaint.json == {"complaint_ref": "WDM88J4P", "msisdn": "27820001001"}
 
 
@@ -612,7 +615,7 @@ async def test_success_no_media(
     await tester.user_input("test description")  # description
     await tester.user_input("SKIP")  # media
     await tester.user_input("I agree")  # opt_in
-    [submit, upload, finalise] = real411_mock.app.requests
+    [submit, upload, finalise] = real411_mock.tstate.requests
     assert submit.json == {
         "agree": True,
         "name": "first name surname",
@@ -628,7 +631,7 @@ async def test_success_no_media(
     assert upload.headers["content-type"] == "image/png"
     assert finalise.json == {"ref": "WDM88J4P"}
 
-    [complaint] = healthcheck_mock.app.requests
+    [complaint] = healthcheck_mock.tstate.requests
     assert complaint.json == {"complaint_ref": "WDM88J4P", "msisdn": "27820001001"}
 
 

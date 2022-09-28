@@ -10,7 +10,7 @@ import pytest
 from sanic import Sanic, response
 
 # from vaccine.models import Message
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, TState
 from yal import config
 from yal.main import Application
 
@@ -54,16 +54,14 @@ def get_rapidpro_contact(urn):
 async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
-    app.requests = []
-    app.errors = 0
-    app.errormax = 0
+    tstate = TState()
 
     @app.route("/api/v2/contacts.json", methods=["GET"])
     def get_contact(request):
-        app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
                 return response.json({}, status=500)
 
         urn = request.args.get("urn")
@@ -79,13 +77,14 @@ async def rapidpro_mock(sanic_client):
 
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({}, status=200)
 
     client = await sanic_client(app)
     url = config.RAPIDPRO_URL
     config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
     config.RAPIDPRO_TOKEN = "testtoken"
+    client.tstate = tstate
     yield client
     config.RAPIDPRO_URL = url
 
@@ -179,11 +178,11 @@ async def test_state_optout_stop_notifications(
     await tester.user_input("1")
     tester.assert_state("state_optout_survey")
 
-    assert len(rapidpro_mock.app.requests) == 1
+    assert len(rapidpro_mock.tstate.requests) == 1
 
-    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
 
-    post_request = rapidpro_mock.app.requests[0]
+    post_request = rapidpro_mock.tstate.requests[0]
     assert json.loads(post_request.body.decode("utf-8")) == {
         "fields": {
             "onboarding_completed": "",
@@ -208,10 +207,12 @@ async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
 
     # Two API calls:
     # Get profile to get old details, update profile
-    assert len(rapidpro_mock.app.requests) == 2
-    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/contacts.json"] * 2
+    assert len(rapidpro_mock.tstate.requests) == 2
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/contacts.json"
+    ] * 2
 
-    post_request = rapidpro_mock.app.requests[1]
+    post_request = rapidpro_mock.tstate.requests[1]
     assert json.loads(post_request.body.decode("utf-8")) == {
         "fields": {
             "dob_year": "",

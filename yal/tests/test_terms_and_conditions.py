@@ -3,7 +3,7 @@ import json
 import pytest
 from sanic import Sanic, response
 
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, TState
 from yal import config
 from yal.main import Application
 
@@ -17,17 +17,18 @@ def tester():
 async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
-    app.requests = []
+    tstate = TState()
 
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({}, status=200)
 
     client = await sanic_client(app)
     url = config.RAPIDPRO_URL
     config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
     config.RAPIDPRO_TOKEN = "testtoken"
+    client.tstate = tstate
     yield client
     config.RAPIDPRO_URL = url
 
@@ -88,8 +89,8 @@ async def test_submit_terms_and_conditions(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_dob_full")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"terms_accepted": "True"},
     }
@@ -132,8 +133,8 @@ async def test_state_decline_confirm_accept(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_dob_full")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"terms_accepted": "True"},
     }
