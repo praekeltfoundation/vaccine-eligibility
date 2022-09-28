@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, CustomChoiceState
+from vaccine.states import Choice, CustomChoiceState, WhatsAppButtonState
 from vaccine.utils import get_display_choices
 from yal import contentrepo
 from yal.pleasecallme import Application as PleaseCallMeApplication
@@ -144,16 +144,12 @@ class Application(BaseApplication):
 
         self.save_metadata("quiz_sequence", metadata["quiz_sequence"] + 1)
 
-        buttons = [Choice("next_question", "Next question")]
-
-        return CustomChoiceState(
+        return WhatsAppButtonState(
             self,
             question=page_details["body"],
-            choices=buttons,
-            next="state_quiz_question",
+            choices=[
+                Choice("next_question", "Next question"),
+            ],
             error=self._(get_generic_error()),
-            helper_metadata=helper_metadata,
-            button="Next",
-            buttons=buttons,
+            next="state_quiz_question",
         )
-        return await self.go_to_state("state_quiz_question")
