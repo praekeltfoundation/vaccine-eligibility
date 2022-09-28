@@ -3,11 +3,11 @@ from sanic import Sanic, response
 
 from vaccine.healthcheck_ussd import Application, config
 from vaccine.models import Message, StateData, User
-from vaccine.testing import TState
+from vaccine.testing import TState, run_sanic
 
 
 @pytest.fixture
-async def eventstore_mock(sanic_client):
+async def eventstore_mock():
     Sanic.test_mode = True
     app = Sanic("mock_eventstore")
     tstate = TState()
@@ -57,16 +57,16 @@ async def eventstore_mock(sanic_client):
                 return response.json({}, status=500)
         return response.json({})
 
-    client = await sanic_client(app)
-    url = config.EVENTSTORE_API_URL
-    config.EVENTSTORE_API_URL = f"http://{client.host}:{client.port}"
-    client.tstate = tstate
-    yield client
-    config.EVENTSTORE_API_URL = url
+    async with run_sanic(app) as server:
+        url = config.EVENTSTORE_API_URL
+        config.EVENTSTORE_API_URL = f"http://{server.host}:{server.port}"
+        server.tstate = tstate
+        yield server
+        config.EVENTSTORE_API_URL = url
 
 
 @pytest.fixture
-async def google_api_mock(sanic_client):
+async def google_api_mock():
     Sanic.test_mode = True
     app = Sanic("mock_google_api")
     tstate = TState()
@@ -113,17 +113,17 @@ async def google_api_mock(sanic_client):
             data = {"status": tstate.status}
         return response.json(data, status=200)
 
-    client = await sanic_client(app)
-    config.GOOGLE_PLACES_KEY = "TEST-KEY"
-    url = config.GOOGLE_PLACES_URL
-    config.GOOGLE_PLACES_URL = f"http://{client.host}:{client.port}"
-    client.tstate = tstate
-    yield client
-    config.GOOGLE_PLACES_URL = url
+    async with run_sanic(app) as server:
+        config.GOOGLE_PLACES_KEY = "TEST-KEY"
+        url = config.GOOGLE_PLACES_URL
+        config.GOOGLE_PLACES_URL = f"http://{server.host}:{server.port}"
+        server.tstate = tstate
+        yield server
+        config.GOOGLE_PLACES_URL = url
 
 
 @pytest.fixture
-async def rapidpro_mock(sanic_client):
+async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
     tstate = TState()
@@ -137,14 +137,14 @@ async def rapidpro_mock(sanic_client):
                 return response.json({}, status=500)
         return response.json({}, status=200)
 
-    client = await sanic_client(app)
-    url = config.RAPIDPRO_URL
-    config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
-    config.RAPIDPRO_TOKEN = "testtoken"
-    config.RAPIDPRO_PRIVACY_POLICY_SMS_FLOW = "flow-uuid"
-    client.tstate = tstate
-    yield client
-    config.RAPIDPRO_URL = url
+    async with run_sanic(app) as server:
+        url = config.RAPIDPRO_URL
+        config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
+        config.RAPIDPRO_TOKEN = "testtoken"
+        config.RAPIDPRO_PRIVACY_POLICY_SMS_FLOW = "flow-uuid"
+        server.tstate = tstate
+        yield server
+        config.RAPIDPRO_URL = url
 
 
 @pytest.mark.asyncio

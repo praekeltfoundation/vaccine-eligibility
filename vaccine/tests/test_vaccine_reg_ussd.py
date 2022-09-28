@@ -6,7 +6,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message, StateData, User
-from vaccine.testing import AppTester, TState
+from vaccine.testing import AppTester, TState, run_sanic
 from vaccine.vaccine_reg_ussd import Application, config
 
 
@@ -16,7 +16,7 @@ def tester():
 
 
 @pytest.fixture
-async def evds_mock(sanic_client):
+async def evds_mock():
     Sanic.test_mode = True
     app = Sanic("mock_turn")
     tstate = TState()
@@ -35,22 +35,22 @@ async def evds_mock(sanic_client):
         with gzip.open("vaccine/data/suburbs.json.gz") as f:
             return response.raw(f.read(), content_type="application/json")
 
-    client = await sanic_client(app)
-    url = config.EVDS_URL
-    username = config.EVDS_USERNAME
-    password = config.EVDS_PASSWORD
-    config.EVDS_URL = f"http://{client.host}:{client.port}"
-    config.EVDS_USERNAME = "test"
-    config.EVDS_PASSWORD = "test"
-    client.tstate = tstate
-    yield client
-    config.EVDS_URL = url
-    config.EVDS_USERNAME = username
-    config.EVDS_PASSWORD = password
+    async with run_sanic(app) as server:
+        url = config.EVDS_URL
+        username = config.EVDS_USERNAME
+        password = config.EVDS_PASSWORD
+        config.EVDS_URL = f"http://{server.host}:{server.port}"
+        config.EVDS_USERNAME = "test"
+        config.EVDS_PASSWORD = "test"
+        server.tstate = tstate
+        yield server
+        config.EVDS_URL = url
+        config.EVDS_USERNAME = username
+        config.EVDS_PASSWORD = password
 
 
 @pytest.fixture
-async def eventstore_mock(sanic_client):
+async def eventstore_mock():
     Sanic.test_mode = True
     app = Sanic("mock_eventstore")
     tstate = TState()
@@ -60,12 +60,12 @@ async def eventstore_mock(sanic_client):
         tstate.requests.append(request)
         return response.json({})
 
-    client = await sanic_client(app)
-    url = config.VACREG_EVENTSTORE_URL
-    config.VACREG_EVENTSTORE_URL = f"http://{client.host}:{client.port}"
-    client.tstate = tstate
-    yield client
-    config.VACREG_EVENTSTORE_URL = url
+    async with run_sanic(app) as server:
+        url = config.VACREG_EVENTSTORE_URL
+        config.VACREG_EVENTSTORE_URL = f"http://{server.host}:{server.port}"
+        server.tstate = tstate
+        yield server
+        config.VACREG_EVENTSTORE_URL = url
 
 
 @pytest.mark.asyncio

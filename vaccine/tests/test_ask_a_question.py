@@ -4,7 +4,7 @@ from sanic import Sanic, response
 from vaccine import ask_a_question_config as config
 from vaccine.ask_a_question import Application
 from vaccine.models import Message
-from vaccine.testing import AppTester, TState
+from vaccine.testing import AppTester, TState, run_sanic
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def tester():
 
 
 @pytest.fixture
-async def model_mock(sanic_client):
+async def model_mock():
     Sanic.test_mode = True
     app = Sanic("mock_model")
     tstate = TState()
@@ -41,15 +41,15 @@ async def model_mock(sanic_client):
                 return response.json({}, status=500)
         return response.json({})
 
-    client = await sanic_client(app)
-    url = config.MODEL_API_URL
-    token = config.MODEL_API_TOKEN
-    config.MODEL_API_URL = f"http://{client.host}:{client.port}"
-    config.MODEL_API_TOKEN = "testtoken"
-    client.tstate = tstate
-    yield client
-    config.MODEL_API_URL = url
-    config.MODEL_API_TOKEN = token
+    async with run_sanic(app) as server:
+        url = config.MODEL_API_URL
+        token = config.MODEL_API_TOKEN
+        config.MODEL_API_URL = f"http://{server.host}:{server.port}"
+        config.MODEL_API_TOKEN = "testtoken"
+        server.tstate = tstate
+        yield server
+        config.MODEL_API_URL = url
+        config.MODEL_API_TOKEN = token
 
 
 @pytest.mark.asyncio
