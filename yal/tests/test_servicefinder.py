@@ -7,7 +7,7 @@ from unittest import mock
 import pytest
 from sanic import Sanic, response
 
-from vaccine.testing import AppTester, TState
+from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.main import Application
 from yal.utils import BACK_TO_MAIN, GET_HELP
@@ -65,7 +65,7 @@ FACILITIES: List[Dict] = [
 
 
 @pytest.fixture
-async def servicefinder_mock(sanic_client):
+async def servicefinder_mock():
     Sanic.test_mode = True
     app = Sanic("mock_servicefinder")
     tstate = TState()
@@ -82,16 +82,16 @@ async def servicefinder_mock(sanic_client):
             return response.json([])
         return response.json(FACILITIES)
 
-    client = await sanic_client(app)
-    url = config.SERVICEFINDER_URL
-    config.SERVICEFINDER_URL = f"http://{client.host}:{client.port}"
-    client.tstate = tstate
-    yield client
-    config.SERVICEFINDER_URL = url
+    async with run_sanic(app) as server:
+        url = config.SERVICEFINDER_URL
+        config.SERVICEFINDER_URL = f"http://{server.host}:{server.port}"
+        server.tstate = tstate
+        yield server
+        config.SERVICEFINDER_URL = url
 
 
 @pytest.fixture
-async def google_api_mock(sanic_client):
+async def google_api_mock():
     Sanic.test_mode = True
     app = Sanic("mock_google_api")
     tstate = TState()
@@ -136,13 +136,13 @@ async def google_api_mock(sanic_client):
             data = {"status": tstate.status}
         return response.json(data, status=200)
 
-    client = await sanic_client(app)
-    config.GOOGLE_PLACES_KEY = "TEST-KEY"
-    url = config.GOOGLE_PLACES_URL
-    config.GOOGLE_PLACES_URL = f"http://{client.host}:{client.port}"
-    client.tstate = tstate
-    yield client
-    config.GOOGLE_PLACES_URL = url
+    async with run_sanic(app) as server:
+        config.GOOGLE_PLACES_KEY = "TEST-KEY"
+        url = config.GOOGLE_PLACES_URL
+        config.GOOGLE_PLACES_URL = f"http://{server.host}:{server.port}"
+        server.tstate = tstate
+        yield server
+        config.GOOGLE_PLACES_URL = url
 
 
 @pytest.mark.asyncio

@@ -2,7 +2,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, run_sanic
 from yal import config
 from yal.main import Application
 from yal.utils import BACK_TO_MAIN, GET_HELP
@@ -14,7 +14,7 @@ def tester():
 
 
 @pytest.fixture
-async def contentrepo_api_mock(sanic_client):
+async def contentrepo_api_mock():
     Sanic.test_mode = True
     app = Sanic("contentrepo_api_mock")
 
@@ -78,11 +78,11 @@ async def contentrepo_api_mock(sanic_client):
             }
         )
 
-    client = await sanic_client(app)
-    url = config.CONTENTREPO_API_URL
-    config.CONTENTREPO_API_URL = f"http://{client.host}:{client.port}"
-    yield client
-    config.CONTENTREPO_API_URL = url
+    async with run_sanic(app) as server:
+        url = config.CONTENTREPO_API_URL
+        config.CONTENTREPO_API_URL = f"http://{server.host}:{server.port}"
+        yield server
+        config.CONTENTREPO_API_URL = url
 
 
 @pytest.mark.asyncio

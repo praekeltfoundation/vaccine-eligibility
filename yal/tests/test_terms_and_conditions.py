@@ -3,7 +3,7 @@ import json
 import pytest
 from sanic import Sanic, response
 
-from vaccine.testing import AppTester, TState
+from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.main import Application
 
@@ -14,7 +14,7 @@ def tester():
 
 
 @pytest.fixture
-async def rapidpro_mock(sanic_client):
+async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
     tstate = TState()
@@ -24,13 +24,13 @@ async def rapidpro_mock(sanic_client):
         tstate.requests.append(request)
         return response.json({}, status=200)
 
-    client = await sanic_client(app)
-    url = config.RAPIDPRO_URL
-    config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
-    config.RAPIDPRO_TOKEN = "testtoken"
-    client.tstate = tstate
-    yield client
-    config.RAPIDPRO_URL = url
+    async with run_sanic(app) as server:
+        url = config.RAPIDPRO_URL
+        config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
+        config.RAPIDPRO_TOKEN = "testtoken"
+        server.tstate = tstate
+        yield server
+        config.RAPIDPRO_URL = url
 
 
 @pytest.mark.asyncio
