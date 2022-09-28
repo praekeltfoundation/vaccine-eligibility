@@ -6,7 +6,7 @@ from sanic import Sanic, response
 from mqr import config
 from mqr.midline_ussd import Application
 from vaccine.models import Message
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, TState
 
 
 @pytest.fixture
@@ -18,19 +18,18 @@ def tester():
 async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
-    app.requests = []
-    app.errors = 0
-    app.errormax = 0
+    tstate = TState()
 
     @app.route("/api/v2/flow_starts.json", methods=["POST"])
     def start_flow(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({}, status=200)
 
     client = await sanic_client(app)
     url = config.RAPIDPRO_URL
     config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
     config.RAPIDPRO_TOKEN = "testtoken"
+    client.tstate = tstate
     yield client
     config.RAPIDPRO_URL = url
 
@@ -985,8 +984,10 @@ async def test_state_likelihood_of_following_schedule_valid(
     await tester.user_input("1")
     tester.assert_state("state_eat_fruits")
 
-    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/flow_starts.json"]
-    request = rapidpro_mock.app.requests[0]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/flow_starts.json"
+    ]
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "flow": config.RAPIDPRO_MIDLINE_SURVEY_COMPLETE_FLOW,
         "urns": ["whatsapp:27820001001"],

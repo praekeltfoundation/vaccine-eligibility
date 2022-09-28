@@ -6,7 +6,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, TState
 from yal import config
 from yal.main import Application
 from yal.utils import BACK_TO_MAIN
@@ -57,29 +57,30 @@ def get_aaq_response(answers, next=None, prev=None):
 async def aaq_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_aaq")
-    app.requests = []
+    tstate = TState()
 
     @app.route("/inbound/check", methods=["POST"])
     def inbound_check(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         body = get_aaq_response(MODEL_ANSWERS_PAGE_1, next="/inbound/92567/1")
         return response.json(body, status=200)
 
     @app.route("/inbound/92567/1", methods=["GET"])
     def inbound_check_page_2(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         body = get_aaq_response(MODEL_ANSWERS_PAGE_2, prev="/inbound/92567/0")
         return response.json(body, status=200)
 
     @app.route("/inbound/feedback", methods=["PUT"])
     def add_feedback(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({}, status=200)
 
     client = await sanic_client(app)
     url = config.AAQ_URL
     config.AAQ_URL = f"http://{client.host}:{client.port}"
     config.AAQ_TOKEN = "testtoken"
+    client.tstate = tstate
     yield client
     config.AAQ_URL = url
 
@@ -88,11 +89,11 @@ async def aaq_mock(sanic_client):
 async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
-    app.requests = []
+    tstate = TState()
 
     @app.route("/api/v2/contacts.json", methods=["GET"])
     def get_contact(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
 
         urn = request.args.get("urn")
         contacts = [get_rapidpro_contact(urn)]
@@ -107,13 +108,14 @@ async def rapidpro_mock(sanic_client):
 
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({}, status=200)
 
     client = await sanic_client(app)
     url = config.RAPIDPRO_URL
     config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
     config.RAPIDPRO_TOKEN = "testtoken"
+    client.tstate = tstate
     yield client
     config.RAPIDPRO_URL = url
 
@@ -170,16 +172,16 @@ async def test_start_state_response_sets_timeout(
 
     tester.assert_state("state_display_results")
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "next_aaq_timeout_time": "2022-06-19T17:35:00",
             "aaq_timeout_type": "1",
         },
     }
-    assert len(aaq_mock.app.requests) == 1
-    request = aaq_mock.app.requests[0].json
+    assert len(aaq_mock.tstate.requests) == 1
+    request = aaq_mock.tstate.requests[0].json
     request["metadata"].pop("message_id")
     request["metadata"].pop("session_id")
     assert request == {
@@ -233,8 +235,8 @@ async def test_state_display_results_choose_an_answer(
 
     tester.assert_state("state_get_content_feedback")
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "next_aaq_timeout_time": "2022-06-19T17:35:00",
@@ -337,14 +339,14 @@ async def test_state_get_content_feedback_question_answered(
 
     tester.assert_state("state_start")
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"aaq_timeout_type": ""},
     }
 
-    assert len(aaq_mock.app.requests) == 1
-    request = aaq_mock.app.requests[0]
+    assert len(aaq_mock.tstate.requests) == 1
+    request = aaq_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "feedback": {"feedback_type": "positive", "faq_id": "-1"},
         "feedback_secret_key": "feedback-secret-key",
@@ -372,14 +374,14 @@ async def test_state_display_content_question_not_answered(
 
     tester.assert_state("state_start")
 
-    assert len(rapidpro_mock.app.requests) == 1
-    request = rapidpro_mock.app.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"aaq_timeout_type": ""},
     }
 
-    assert len(aaq_mock.app.requests) == 1
-    request = aaq_mock.app.requests[0]
+    assert len(aaq_mock.tstate.requests) == 1
+    request = aaq_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "feedback": {"feedback_type": "negative", "faq_id": "-1"},
         "feedback_secret_key": "feedback-secret-key",
@@ -399,8 +401,8 @@ async def test_state_handle_timeout_handles_type_1_yes(
     tester.setup_state("state_handle_timeout_response")
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="yes ask again")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"aaq_timeout_sent": "", "aaq_timeout_type": ""},
     }
@@ -413,8 +415,8 @@ async def test_state_handle_timeout_handles_type_1_no(tester: AppTester, rapidpr
     tester.setup_state("state_handle_timeout_response")
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="no, I'm good")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"aaq_timeout_sent": "", "aaq_timeout_type": ""},
     }
@@ -430,8 +432,8 @@ async def test_state_handle_timeout_handles_type_2_yes(
     tester.setup_state("state_handle_timeout_response")
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="yes")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"aaq_timeout_sent": "", "aaq_timeout_type": ""},
     }
@@ -451,8 +453,8 @@ async def test_state_handle_timeout_handles_type_2_no(tester: AppTester, rapidpr
     tester.setup_state("state_handle_timeout_response")
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="no")
 
-    assert len(rapidpro_mock.app.requests) == 2
-    request = rapidpro_mock.app.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"aaq_timeout_sent": "", "aaq_timeout_type": ""},
     }

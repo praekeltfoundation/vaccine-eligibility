@@ -4,7 +4,7 @@ from sanic import Sanic, response
 from vaccine import ask_a_question_config as config
 from vaccine.ask_a_question import Application
 from vaccine.models import Message
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, TState
 
 
 @pytest.fixture
@@ -16,19 +16,17 @@ def tester():
 async def model_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_model")
-    app.requests = []
-    app.errors = 0
-    app.errormax = 0
-    app.no_response = False
+    tstate = TState()
+    tstate.no_response = False
 
     @app.route("/inbound/check", methods=["POST"])
     def check(request):
-        app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
                 return response.json({}, status=500)
-        if app.no_response:
+        if tstate.no_response:
             return response.json({"top_responses": []})
         return response.file_stream(
             "vaccine/tests/aaq_model_response.json", mime_type="application/json"
@@ -36,10 +34,10 @@ async def model_mock(sanic_client):
 
     @app.route("/inbound/feedback", methods=["POST"])
     def feedback(request):
-        app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
                 return response.json({}, status=500)
         return response.json({})
 
@@ -48,6 +46,7 @@ async def model_mock(sanic_client):
     token = config.MODEL_API_TOKEN
     config.MODEL_API_URL = f"http://{client.host}:{client.port}"
     config.MODEL_API_TOKEN = "testtoken"
+    client.tstate = tstate
     yield client
     config.MODEL_API_URL = url
     config.MODEL_API_TOKEN = token
@@ -130,7 +129,7 @@ async def test_display_response_choices(tester: AppTester, model_mock):
         )
     )
     tester.assert_state("state_display_response_choices")
-    [req] = model_mock.app.requests
+    [req] = model_mock.tstate.requests
     req_data = req.json
     req_data["metadata"].pop("message_id")
     assert req_data == {
@@ -147,25 +146,25 @@ async def test_display_response_choices_reask_question(tester: AppTester, model_
 
     await tester.user_input("Does the vaccine contain covid?")
     tester.assert_state("state_display_response_choices")
-    assert len(model_mock.app.requests) == 1
+    assert len(model_mock.tstate.requests) == 1
     tester.assert_answer("state_question", "Does the vaccine contain covid?")
 
 
 @pytest.mark.asyncio
 async def test_model_api_temporary_error(tester: AppTester, model_mock):
-    model_mock.app.errormax = 1
+    model_mock.tstate.errormax = 1
     tester.setup_state("state_question")
     await tester.user_input("Is the vaccine safe?")
     tester.assert_state("state_display_response_choices")
-    assert len(model_mock.app.requests) == 2
+    assert len(model_mock.tstate.requests) == 2
 
 
 @pytest.mark.asyncio
 async def test_model_api_permanent_error(tester: AppTester, model_mock):
-    model_mock.app.errormax = 5
+    model_mock.tstate.errormax = 5
     tester.setup_state("state_question")
     await tester.user_input("Is the vaccine safe?")
-    assert len(model_mock.app.requests) == 3
+    assert len(model_mock.tstate.requests) == 3
     tester.assert_message(
         "Something went wrong, your question was not able to be processed. "
         "Please try again later"
@@ -174,7 +173,7 @@ async def test_model_api_permanent_error(tester: AppTester, model_mock):
 
 @pytest.mark.asyncio
 async def test_model_no_responses(tester: AppTester, model_mock):
-    model_mock.app.no_response = True
+    model_mock.tstate.no_response = True
     tester.setup_state("state_question")
     await tester.user_input("Is the vaccine safe?")
     tester.assert_message(
@@ -224,7 +223,7 @@ async def test_display_selected_choice(tester: AppTester, model_mock):
     )
 
     await tester.user_input("yes")
-    [r1, r2] = model_mock.app.requests
+    [r1, r2] = model_mock.tstate.requests
     assert r1.json == {
         "feedback": {"choice": "Are COVID-19 vaccines safe?"},
         "feedback_secret_key": "testsecretkey",
@@ -246,7 +245,7 @@ async def test_display_selected_choice_no_feedback(tester: AppTester, model_mock
     await tester.user_input("1")
     tester.assert_state("state_display_selected_choice")
     await tester.user_input("no")
-    [r1, r2] = model_mock.app.requests
+    [r1, r2] = model_mock.tstate.requests
     assert r1.json == {
         "feedback": {"choice": "Are COVID-19 vaccines safe?"},
         "feedback_secret_key": "testsecretkey",
@@ -288,10 +287,10 @@ async def test_display_selected_choice_temporary_error(tester: AppTester, model_
         tester.setup_answer("model_response", f.read())
 
     tester.setup_answer("state_display_response_choices", "Is the vaccine safe?")
-    model_mock.app.errormax = 1
+    model_mock.tstate.errormax = 1
     tester.setup_state("state_display_selected_choice")
     await tester.user_input("1")
-    assert len(model_mock.app.requests) == 2
+    assert len(model_mock.tstate.requests) == 2
 
 
 @pytest.mark.asyncio
@@ -300,10 +299,10 @@ async def test_display_selected_choice_permanent_error(tester: AppTester, model_
         tester.setup_answer("model_response", f.read())
 
     tester.setup_answer("state_display_response_choices", "Is the vaccine safe?")
-    model_mock.app.errormax = 5
+    model_mock.tstate.errormax = 5
     tester.setup_state("state_display_selected_choice")
     await tester.user_input("1")
-    assert len(model_mock.app.requests) == 3
+    assert len(model_mock.tstate.requests) == 3
     tester.assert_message(
         "Something went wrong, your question was not able to be processed. "
         "Please try again later"

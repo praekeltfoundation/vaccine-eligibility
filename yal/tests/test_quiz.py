@@ -17,11 +17,9 @@ def tester():
 async def contentrepo_api_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("contentrepo_api_mock")
-    app.requests = []
 
     @app.route("/api/v2/pages", methods=["GET"])
     def get_pages(request):
-        app.requests.append(request)
         tag = request.args.get("tag")
 
         pages = []
@@ -46,8 +44,6 @@ async def contentrepo_api_mock(sanic_client):
 
     @app.route("/api/v2/pages/<page_id:int>", methods=["GET"])
     def get_page_detail(request, page_id):
-        app.requests.append(request)
-
         title = "Question 1"
         body = "The body of question 1"
         tags = ["score_1"]

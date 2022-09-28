@@ -8,7 +8,7 @@ from sanic import Sanic, response
 from vaccine.data.medscheme import config as m_config
 from vaccine.data.suburbs import config as s_config
 from vaccine.models import Message
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, TState
 from vaccine.vaccine_reg_whatsapp import Application, config
 
 
@@ -21,16 +21,14 @@ def tester():
 async def evds_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_turn")
-    app.requests = []
-    app.errors = 0
-    app.errormax = 0
+    tstate = TState()
 
     @app.route("/api/private/evds-sa/person/8/record", methods=["POST"])
     def submit_record(request):
-        app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
                 return response.json({}, status=500)
         return response.json({}, status=200)
 
@@ -53,6 +51,7 @@ async def evds_mock(sanic_client):
     ) = config.EVDS_URL = f"http://{client.host}:{client.port}"
     s_config.EVDS_USERNAME = m_config.EVDS_USERNAME = config.EVDS_USERNAME = "test"
     s_config.EVDS_PASSWORD = m_config.EVDS_PASSWORD = config.EVDS_PASSWORD = "test"
+    client.tstate = tstate
     yield client
     s_config.EVDS_URL = m_config.EVDS_URL = config.EVDS_URL = url
     s_config.EVDS_USERNAME = m_config.EVDS_USERNAME = config.EVDS_USERNAME = username
@@ -63,16 +62,17 @@ async def evds_mock(sanic_client):
 async def eventstore_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_eventstore")
-    app.requests = []
+    tstate = TState()
 
     @app.route("/v2/vaccineregistration/", methods=["POST"])
     def valid_registration(request):
-        app.requests.append(request)
+        tstate.requests.append(request)
         return response.json({})
 
     client = await sanic_client(app)
     url = config.VACREG_EVENTSTORE_URL
     config.VACREG_EVENTSTORE_URL = f"http://{client.host}:{client.port}"
+    client.tstate = tstate
     yield client
     config.VACREG_EVENTSTORE_URL = url
 
@@ -985,7 +985,7 @@ async def test_state_success(evds_mock, eventstore_mock, tester: AppTester):
         session=Message.SESSION_EVENT.CLOSE,
     )
 
-    [requests] = evds_mock.app.requests
+    [requests] = evds_mock.tstate.requests
     assert requests.json == {
         "gender": "Other",
         "surname": "test surname",
@@ -1004,7 +1004,7 @@ async def test_state_success(evds_mock, eventstore_mock, tester: AppTester):
         "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
     }
 
-    [requests] = eventstore_mock.app.requests
+    [requests] = eventstore_mock.tstate.requests
     assert requests.json == {
         "msisdn": "+27820001001",
         "source": "WhatsApp 27820001002",
@@ -1060,7 +1060,7 @@ async def test_state_success_international_phonenumber(
         session=Message.SESSION_EVENT.CLOSE,
     )
 
-    [requests] = evds_mock.app.requests
+    [requests] = evds_mock.tstate.requests
     assert requests.json == {
         "gender": "Other",
         "surname": "test surname",
@@ -1079,7 +1079,7 @@ async def test_state_success_international_phonenumber(
         "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
     }
 
-    [requests] = eventstore_mock.app.requests
+    [requests] = eventstore_mock.tstate.requests
     assert requests.json == {
         "msisdn": "+32470001001",
         "source": "WhatsApp 27820001002",
@@ -1134,7 +1134,7 @@ async def test_state_success_passport(evds_mock, eventstore_mock, tester: AppTes
         session=Message.SESSION_EVENT.CLOSE,
     )
 
-    [requests] = evds_mock.app.requests
+    [requests] = evds_mock.tstate.requests
     assert requests.json == {
         "gender": "Other",
         "surname": "test surname",
@@ -1153,7 +1153,7 @@ async def test_state_success_passport(evds_mock, eventstore_mock, tester: AppTes
         "medicalAidMember": False,
         "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
     }
-    [requests] = eventstore_mock.app.requests
+    [requests] = eventstore_mock.tstate.requests
     assert requests.json == {
         "msisdn": "+27820001001",
         "source": "WhatsApp 27820001002",
@@ -1209,7 +1209,7 @@ async def test_state_success_asylum_seeker(
         session=Message.SESSION_EVENT.CLOSE,
     )
 
-    [requests] = evds_mock.app.requests
+    [requests] = evds_mock.tstate.requests
     assert requests.json == {
         "gender": "Other",
         "surname": "test surname",
@@ -1227,7 +1227,7 @@ async def test_state_success_asylum_seeker(
         "medicalAidMember": False,
         "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
     }
-    [requests] = eventstore_mock.app.requests
+    [requests] = eventstore_mock.tstate.requests
     assert requests.json == {
         "msisdn": "+27820001001",
         "source": "WhatsApp 27820001002",
@@ -1280,7 +1280,7 @@ async def test_state_success_refugee(evds_mock, eventstore_mock, tester: AppTest
         session=Message.SESSION_EVENT.CLOSE,
     )
 
-    [requests] = evds_mock.app.requests
+    [requests] = evds_mock.tstate.requests
     assert requests.json == {
         "gender": "Other",
         "surname": "test surname",
@@ -1298,7 +1298,7 @@ async def test_state_success_refugee(evds_mock, eventstore_mock, tester: AppTest
         "medicalAidMember": False,
         "sourceId": "aeb8444d-cfa4-4c52-bfaf-eed1495124b7",
     }
-    [requests] = eventstore_mock.app.requests
+    [requests] = eventstore_mock.tstate.requests
     assert requests.json == {
         "msisdn": "+27820001001",
         "source": "WhatsApp 27820001002",
@@ -1317,7 +1317,7 @@ async def test_state_success_refugee(evds_mock, eventstore_mock, tester: AppTest
 
 @pytest.mark.asyncio
 async def test_state_success_temporary_failure(evds_mock, tester: AppTester):
-    evds_mock.app.errormax = 1
+    evds_mock.tstate.errormax = 1
     tester.setup_state("state_vaccination_time")
     tester.setup_answer("state_dob_year", "1960")
     tester.setup_answer("state_dob_month", "1")
@@ -1354,7 +1354,7 @@ async def test_state_success_temporary_failure(evds_mock, tester: AppTester):
         session=Message.SESSION_EVENT.CLOSE,
     )
 
-    requests = evds_mock.app.requests
+    requests = evds_mock.tstate.requests
     assert len(requests) == 2
     assert requests[-1].json == {
         "gender": "Other",
@@ -1379,7 +1379,7 @@ async def test_state_success_temporary_failure(evds_mock, tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_error(evds_mock, tester: AppTester):
-    evds_mock.app.errormax = 3
+    evds_mock.tstate.errormax = 3
     tester.setup_state("state_vaccination_time")
     tester.setup_answer("state_dob_year", "1960")
     tester.setup_answer("state_dob_month", "1")
@@ -1417,7 +1417,7 @@ async def test_state_error(evds_mock, tester: AppTester):
         session=Message.SESSION_EVENT.CLOSE,
     )
 
-    requests = evds_mock.app.requests
+    requests = evds_mock.tstate.requests
     assert len(requests) == 3
     assert requests[-1].json == {
         "gender": "Other",

@@ -7,7 +7,7 @@ from sanic import Sanic, response
 from vaccine import hotline_callback_config as config
 from vaccine.hotline_callback import Application, get_current_datetime, in_office_hours
 from vaccine.models import Message
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, TState
 
 
 @pytest.fixture
@@ -19,24 +19,23 @@ def tester():
 async def callback_api_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_callback_api")
-    app.requests = []
-    app.errors = 0
-    app.errormax = 0
+    tstate = TState()
 
     @app.route(
         "/NDoHIncomingWhatsApp/api/CCISecure/SubmitWhatsAppChat", methods=["POST"]
     )
     def callback(request):
-        app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
                 return response.text("", status=500)
         return response.text("Received Sucessfully")
 
     client = await sanic_client(app)
     url = config.CALLBACK_API_URL
     config.CALLBACK_API_URL = f"http://{client.host}:{client.port}"
+    client.tstate = tstate
     yield client
     config.CALLBACK_API_URL = url
 
@@ -45,16 +44,14 @@ async def callback_api_mock(sanic_client):
 async def turn_api_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_turn_api")
-    app.requests = []
-    app.errors = 0
-    app.errormax = 0
+    tstate = TState()
 
     @app.route("/v1/contacts/<msisdn:int>/messages", methods=["GET"])
     def callback(request, msisdn):
-        app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
                 return response.json({}, status=500)
         return response.json(
             {
@@ -83,6 +80,7 @@ async def turn_api_mock(sanic_client):
     client = await sanic_client(app)
     url = config.TURN_URL
     config.TURN_URL = f"http://{client.host}:{client.port}"
+    client.tstate = tstate
     yield client
     config.TURN_URL = url
 
@@ -317,7 +315,7 @@ async def test_success_ooo(
             ]
         )
     )
-    [request] = callback_api_mock.app.requests
+    [request] = callback_api_mock.tstate.requests
     assert request.json == {
         "Name": "test name",
         "CLI": "+27820001003",
@@ -340,7 +338,7 @@ async def test_success_temporary_error(
     in_office_hours, tester: AppTester, callback_api_mock, turn_api_mock
 ):
     in_office_hours.return_value = False
-    callback_api_mock.app.errormax = 1
+    callback_api_mock.tstate.errormax = 1
     tester.setup_state("state_enter_number")
     tester.setup_answer("state_full_name", "test name")
     tester.setup_answer("state_select_number", "different_number")
@@ -358,7 +356,7 @@ async def test_success_temporary_error(
             ]
         )
     )
-    assert len(callback_api_mock.app.requests) == 2
+    assert len(callback_api_mock.tstate.requests) == 2
 
 
 @pytest.mark.asyncio
@@ -367,14 +365,14 @@ async def test_success_permanent_error(
     in_office_hours, tester: AppTester, callback_api_mock, turn_api_mock
 ):
     in_office_hours.return_value = False
-    callback_api_mock.app.errormax = 3
+    callback_api_mock.tstate.errormax = 3
     tester.setup_state("state_enter_number")
     tester.setup_answer("state_full_name", "test name")
     tester.setup_answer("state_select_number", "different_number")
     await tester.user_input("0820001003")
     tester.assert_state(None)
     tester.assert_message("Something went wrong. Please try again later.")
-    assert len(callback_api_mock.app.requests) == 3
+    assert len(callback_api_mock.tstate.requests) == 3
 
 
 @pytest.mark.asyncio

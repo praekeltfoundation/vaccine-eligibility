@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 from typing import Any, Callable, List, Optional, Type
 
 from aio_pika import IncomingMessage
@@ -177,3 +178,10 @@ class FakeWorker(Worker):
 
     async def process_event(self, amqp_msg: IncomingMessage):
         self.events.append(amqp_msg)
+
+
+@dataclass
+class TState:
+    requests: list = field(default_factory=list)
+    errors: int = 0
+    errormax: int = 0
