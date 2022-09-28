@@ -40,10 +40,9 @@ flake8 = "^3.8.4"
 pytest = "^6.2.2"
 pytest-cov = "^2.11.1"
 pytest-asyncio = "^0.14.0"
-pytest-sanic = "^1.9.1"
 Faker = "^8.1.0"
 locust = "^1.4.4"
-sanic-testing = "^0.7.0"
+sanic-testing = "^0.6.0"
 mypy = "^0.960"
 types-redis = "^4.2.6"
 types-python-dateutil = "^2.8.17"
@@ -57,4 +56,8 @@ profile = "black"
 multi_line_output = 3
 
 [tool.pytest.ini_options]
-addopts = "--cov=vaccine --cov=yal -W error::DeprecationWarning"
+addopts = "--cov=vaccine --cov=yal"
+filterwarnings = [
+    "error::DeprecationWarning",
+    "default::DeprecationWarning:pytest_asyncio",
+]

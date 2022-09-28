@@ -6,7 +6,7 @@ from sanic import Sanic, response
 from mqr import config
 from mqr.baseline_ussd import Application
 from vaccine.models import Message, StateData, User
-from vaccine.testing import TState
+from vaccine.testing import TState, run_sanic
 
 
 def get_rapidpro_contact(
@@ -31,7 +31,7 @@ def get_rapidpro_contact(
 
 
 @pytest.fixture
-async def rapidpro_mock(sanic_client):
+async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
     tstate = TState()
@@ -68,17 +68,17 @@ async def rapidpro_mock(sanic_client):
         tstate.requests.append(request)
         return response.json({}, status=200)
 
-    client = await sanic_client(app)
-    url = config.RAPIDPRO_URL
-    config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
-    config.RAPIDPRO_TOKEN = "testtoken"
-    client.tstate = tstate
-    yield client
-    config.RAPIDPRO_URL = url
+    async with run_sanic(app) as server:
+        url = config.RAPIDPRO_URL
+        config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
+        config.RAPIDPRO_TOKEN = "testtoken"
+        server.tstate = tstate
+        yield server
+        config.RAPIDPRO_URL = url
 
 
 @pytest.fixture
-async def eventstore_mock(sanic_client):
+async def eventstore_mock():
     Sanic.test_mode = True
     app = Sanic("mock_eventstore")
     tstate = TState()
@@ -108,12 +108,12 @@ async def eventstore_mock(sanic_client):
         tstate.requests.append(request)
         return response.json({"msisdn": "27820001004"})
 
-    client = await sanic_client(app)
-    url = config.EVENTSTORE_API_URL
-    config.EVENTSTORE_API_URL = f"http://{client.host}:{client.port}"
-    client.tstate = tstate
-    yield client
-    config.EVENTSTORE_API_URL = url
+    async with run_sanic(app) as server:
+        url = config.EVENTSTORE_API_URL
+        config.EVENTSTORE_API_URL = f"http://{server.host}:{server.port}"
+        server.tstate = tstate
+        yield server
+        config.EVENTSTORE_API_URL = url
 
 
 @pytest.mark.asyncio
