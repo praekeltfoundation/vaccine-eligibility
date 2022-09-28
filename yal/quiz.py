@@ -142,14 +142,18 @@ class Application(BaseApplication):
         if page_details.get("image_path"):
             helper_metadata["image"] = page_details["image_path"]
 
-        await self.worker.publish_message(
-            self.inbound.reply(
-                self._(page_details["body"]),
-                helper_metadata=helper_metadata,
-            )
-        )
-        await asyncio.sleep(0.5)
-
         self.save_metadata("quiz_sequence", metadata["quiz_sequence"] + 1)
 
+        buttons = [Choice("next_question", "Next question")]
+
+        return CustomChoiceState(
+            self,
+            question=page_details["body"],
+            choices=buttons,
+            next="state_quiz_question",
+            error=self._(get_generic_error()),
+            helper_metadata=helper_metadata,
+            button="Next",
+            buttons=buttons,
+        )
         return await self.go_to_state("state_quiz_question")
