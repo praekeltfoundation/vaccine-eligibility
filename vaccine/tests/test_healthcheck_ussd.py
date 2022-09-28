@@ -3,26 +3,27 @@ from sanic import Sanic, response
 
 from vaccine.healthcheck_ussd import Application, config
 from vaccine.models import Message, StateData, User
+from vaccine.testing import TState
 
 
 @pytest.fixture
 async def eventstore_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_eventstore")
-    app.requests = []
-    app.userprofile_errormax = 0
-    app.userprofile_errors = 0
-    app.start_errormax = 0
-    app.start_errors = 0
-    app.triage_errormax = 0
-    app.triage_errors = 0
+    tstate = TState()
+    tstate.userprofile_errormax = 0
+    tstate.userprofile_errors = 0
+    tstate.start_errormax = 0
+    tstate.start_errors = 0
+    tstate.triage_errormax = 0
+    tstate.triage_errors = 0
 
     @app.route("/api/v2/healthcheckuserprofile/<msisdn>/", methods=["GET"])
     def get_userprofile(request, msisdn):
-        app.requests.append(request)
-        if app.userprofile_errormax:
-            if app.userprofile_errors < app.userprofile_errormax:
-                app.userprofile_errors += 1
+        tstate.requests.append(request)
+        if tstate.userprofile_errormax:
+            if tstate.userprofile_errors < tstate.userprofile_errormax:
+                tstate.userprofile_errors += 1
                 return response.json({}, status=500)
 
         if msisdn in ["+27820001001", "+27820001004"]:
@@ -40,25 +41,26 @@ async def eventstore_mock(sanic_client):
 
     @app.route("/api/v2/covid19triagestart/", methods=["POST"])
     def valid_triagestart(request):
-        app.requests.append(request)
-        if app.start_errormax:
-            if app.start_errors < app.start_errormax:
-                app.start_errors += 1
+        tstate.requests.append(request)
+        if tstate.start_errormax:
+            if tstate.start_errors < tstate.start_errormax:
+                tstate.start_errors += 1
                 return response.json({}, status=500)
         return response.json({})
 
     @app.route("/api/v3/covid19triage/", methods=["POST"])
     def valid_triage(request):
-        app.requests.append(request)
-        if app.triage_errormax:
-            if app.triage_errors < app.triage_errormax:
-                app.triage_errors += 1
+        tstate.requests.append(request)
+        if tstate.triage_errormax:
+            if tstate.triage_errors < tstate.triage_errormax:
+                tstate.triage_errors += 1
                 return response.json({}, status=500)
         return response.json({})
 
     client = await sanic_client(app)
     url = config.EVENTSTORE_API_URL
     config.EVENTSTORE_API_URL = f"http://{client.host}:{client.port}"
+    client.tstate = tstate
     yield client
     config.EVENTSTORE_API_URL = url
 
@@ -67,19 +69,19 @@ async def eventstore_mock(sanic_client):
 async def google_api_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_google_api")
-    app.requests = []
-    app.api_errormax = 0
-    app.api_errors = 0
-    app.status = "OK"
+    tstate = TState()
+    tstate.api_errormax = 0
+    tstate.api_errors = 0
+    tstate.status = "OK"
 
     @app.route("/maps/api/place/autocomplete/json", methods=["GET"])
     def valid_city(request):
-        app.requests.append(request)
-        if app.api_errormax:
-            if app.api_errors < app.api_errormax:
-                app.api_errors += 1
+        tstate.requests.append(request)
+        if tstate.api_errormax:
+            if tstate.api_errors < tstate.api_errormax:
+                tstate.api_errors += 1
                 return response.json({}, status=500)
-        if app.status == "OK":
+        if tstate.status == "OK":
             data = {
                 "status": "OK",
                 "predictions": [
@@ -90,17 +92,17 @@ async def google_api_mock(sanic_client):
                 ],
             }
         else:
-            data = {"status": app.status}
+            data = {"status": tstate.status}
         return response.json(data, status=200)
 
     @app.route("/maps/api/place/details/json", methods=["GET"])
     def details_lookup(request):
-        app.requests.append(request)
-        if app.api_errormax:
-            if app.api_errors < app.api_errormax:
-                app.api_errors += 1
+        tstate.requests.append(request)
+        if tstate.api_errormax:
+            if tstate.api_errors < tstate.api_errormax:
+                tstate.api_errors += 1
                 return response.json({}, status=500)
-        if app.status == "OK":
+        if tstate.status == "OK":
             data = {
                 "status": "OK",
                 "result": {
@@ -108,13 +110,14 @@ async def google_api_mock(sanic_client):
                 },
             }
         else:
-            data = {"status": app.status}
+            data = {"status": tstate.status}
         return response.json(data, status=200)
 
     client = await sanic_client(app)
     config.GOOGLE_PLACES_KEY = "TEST-KEY"
     url = config.GOOGLE_PLACES_URL
     config.GOOGLE_PLACES_URL = f"http://{client.host}:{client.port}"
+    client.tstate = tstate
     yield client
     config.GOOGLE_PLACES_URL = url
 
@@ -123,16 +126,14 @@ async def google_api_mock(sanic_client):
 async def rapidpro_mock(sanic_client):
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
-    app.requests = []
-    app.errors = 0
-    app.errormax = 0
+    tstate = TState()
 
     @app.route("/api/v2/flow_starts.json", methods=["POST"])
     def start_flow(request):
-        app.requests.append(request)
-        if app.errormax:
-            if app.errors < app.errormax:
-                app.errors += 1
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
                 return response.json({}, status=500)
         return response.json({}, status=200)
 
@@ -141,6 +142,7 @@ async def rapidpro_mock(sanic_client):
     config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
     config.RAPIDPRO_TOKEN = "testtoken"
     config.RAPIDPRO_PRIVACY_POLICY_SMS_FLOW = "flow-uuid"
+    client.tstate = tstate
     yield client
     config.RAPIDPRO_URL = url
 
@@ -170,7 +172,7 @@ async def test_state_welcome_new_contact(eventstore_mock):
     )
     assert u.state.name == "state_welcome"
 
-    assert [r.path for r in eventstore_mock.app.requests] == [
+    assert [r.path for r in eventstore_mock.tstate.requests] == [
         "/api/v2/healthcheckuserprofile/+27820001003/",
         "/api/v2/covid19triagestart/",
     ]
@@ -216,7 +218,7 @@ async def test_state_welcome_returning_contact(eventstore_mock):
     )
     assert u.state.name == "state_welcome"
 
-    assert [r.path for r in eventstore_mock.app.requests] == [
+    assert [r.path for r in eventstore_mock.tstate.requests] == [
         "/api/v2/healthcheckuserprofile/+27820001004/",
         "/api/v2/covid19triagestart/",
     ]
@@ -239,8 +241,8 @@ async def test_state_welcome_returning_contact(eventstore_mock):
 
 @pytest.mark.asyncio
 async def test_state_welcome_temporary_errors(eventstore_mock):
-    eventstore_mock.app.userprofile_errormax = 1
-    eventstore_mock.app.start_errormax = 1
+    eventstore_mock.tstate.userprofile_errormax = 1
+    eventstore_mock.tstate.start_errormax = 1
     u = User(addr="27820001001", state=StateData())
     app = Application(u)
     msg = Message(
@@ -253,12 +255,12 @@ async def test_state_welcome_temporary_errors(eventstore_mock):
     )
     [reply] = await app.process_message(msg)
 
-    assert len(eventstore_mock.app.requests) == 4
+    assert len(eventstore_mock.tstate.requests) == 4
 
 
 @pytest.mark.asyncio
 async def test_state_welcome_userprofile_error(eventstore_mock):
-    eventstore_mock.app.userprofile_errormax = 3
+    eventstore_mock.tstate.userprofile_errormax = 3
     u = User(addr="27820001003", state=StateData())
     app = Application(u)
     msg = Message(
@@ -271,7 +273,7 @@ async def test_state_welcome_userprofile_error(eventstore_mock):
     )
     [reply] = await app.process_message(msg)
 
-    assert len(eventstore_mock.app.requests) == 3
+    assert len(eventstore_mock.tstate.requests) == 3
     assert u.state.name == "state_start"
     assert (
         reply.content == "Sorry, something went wrong. We have been notified. Please "
@@ -281,7 +283,7 @@ async def test_state_welcome_userprofile_error(eventstore_mock):
 
 @pytest.mark.asyncio
 async def test_state_welcome_start_error(eventstore_mock):
-    eventstore_mock.app.start_errormax = 3
+    eventstore_mock.tstate.start_errormax = 3
     u = User(addr="27820001003", state=StateData())
     app = Application(u)
     msg = Message(
@@ -294,7 +296,7 @@ async def test_state_welcome_start_error(eventstore_mock):
     )
     [reply] = await app.process_message(msg)
 
-    assert len(eventstore_mock.app.requests) == 4
+    assert len(eventstore_mock.tstate.requests) == 4
     assert u.state.name == "state_start"
     assert (
         reply.content == "Sorry, something went wrong. We have been notified. Please "
@@ -492,8 +494,8 @@ async def test_state_privacy_policy(rapidpro_mock):
         ]
     )
 
-    assert [r.path for r in rapidpro_mock.app.requests] == ["/api/v2/flow_starts.json"]
-    assert [r.json for r in rapidpro_mock.app.requests] == [
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/flow_starts.json"]
+    assert [r.json for r in rapidpro_mock.tstate.requests] == [
         {"flow": "flow-uuid", "urns": ["tel:27820001003"]}
     ]
 
@@ -717,7 +719,7 @@ async def test_state_confirm_city(google_api_mock):
         ]
     )
 
-    assert [r.path for r in google_api_mock.app.requests] == [
+    assert [r.path for r in google_api_mock.tstate.requests] == [
         "/maps/api/place/autocomplete/json"
     ]
 
@@ -739,7 +741,7 @@ async def test_state_confirm_city(google_api_mock):
 
 @pytest.mark.asyncio
 async def test_state_city_no_results(google_api_mock):
-    google_api_mock.app.status = "NO_RESULT"
+    google_api_mock.tstate.status = "NO_RESULT"
     u = User(
         addr="27820001003",
         state=StateData(name="state_city"),
@@ -762,7 +764,7 @@ async def test_state_city_no_results(google_api_mock):
 
 @pytest.mark.asyncio
 async def test_state_city_error(google_api_mock):
-    google_api_mock.app.api_errormax = 3
+    google_api_mock.tstate.api_errormax = 3
     u = User(
         addr="27820001003",
         state=StateData(name="state_city"),
@@ -787,7 +789,7 @@ async def test_state_city_error(google_api_mock):
 
 @pytest.mark.asyncio
 async def test_state_city_temporary_error(google_api_mock):
-    google_api_mock.app.api_errormax = 1
+    google_api_mock.tstate.api_errormax = 1
     u = User(
         addr="27820001003",
         state=StateData(name="state_city"),
@@ -832,7 +834,7 @@ async def test_state_place_details_lookup(google_api_mock):
     assert len(reply.content) < 160
     assert u.state.name == "state_fever"
 
-    assert [r.path for r in google_api_mock.app.requests] == [
+    assert [r.path for r in google_api_mock.tstate.requests] == [
         "/maps/api/place/details/json"
     ]
 
@@ -841,7 +843,7 @@ async def test_state_place_details_lookup(google_api_mock):
 
 @pytest.mark.asyncio
 async def test_state_place_details_lookup_invalid_response(google_api_mock):
-    google_api_mock.app.status = "ERROR"
+    google_api_mock.tstate.status = "ERROR"
     u = User(
         addr="27820001003",
         state=StateData(name="state_confirm_city"),
@@ -867,7 +869,7 @@ async def test_state_place_details_lookup_invalid_response(google_api_mock):
 
 @pytest.mark.asyncio
 async def test_state_place_details_lookup_error(google_api_mock):
-    google_api_mock.app.api_errormax = 3
+    google_api_mock.tstate.api_errormax = 3
     u = User(
         addr="27820001003",
         state=StateData(name="state_confirm_city"),
@@ -896,7 +898,7 @@ async def test_state_place_details_lookup_error(google_api_mock):
 
 @pytest.mark.asyncio
 async def test_state_place_details_lookup_temporary_error(google_api_mock):
-    google_api_mock.app.api_errormax = 1
+    google_api_mock.tstate.api_errormax = 1
     u = User(
         addr="27820001003",
         state=StateData(name="state_confirm_city"),
@@ -1568,7 +1570,7 @@ async def test_state_tracing(eventstore_mock):
 
     assert u.state.name == "state_start"
 
-    assert [r.path for r in eventstore_mock.app.requests] == ["/api/v3/covid19triage/"]
+    assert [r.path for r in eventstore_mock.tstate.requests] == ["/api/v3/covid19triage/"]
 
     app = Application(get_user({"state_exposure": "yes"}))
     [reply] = await app.process_message(get_message("yes"))
@@ -1619,7 +1621,7 @@ async def test_state_tracing(eventstore_mock):
         "healthcare practitioner for info."
     )
 
-    eventstore_mock.app.triage_errormax = 3
+    eventstore_mock.tstate.triage_errormax = 3
     app = Application(get_user())
     [reply] = await app.process_message(get_message("yes"))
     assert (
