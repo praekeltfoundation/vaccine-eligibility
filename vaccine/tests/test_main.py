@@ -1,6 +1,21 @@
+from sanic import Sanic
 from sanic_testing import TestManager
+from sentry_sdk.integrations import sanic as si_sanic
 
 from vaccine.main import app
+
+# Fix multiple additions of sentry signal handlers.
+if hasattr(si_sanic, "old_startup"):
+
+    async def conditional_sentry_startup(self):
+        if getattr(self.ctx, "sentry_startup_has_run", False):
+            await si_sanic._startup(self)
+            self.ctx.sentry_startup_has_run = True
+        else:
+            await si_sanic.old_startup(self)
+
+    Sanic._startup = conditional_sentry_startup
+
 
 TestManager(app)
 
