@@ -137,24 +137,23 @@ class Application(BaseApplication):
             if tag.startswith("score_"):
                 score += int(tag.replace("score_", ""))
         self.save_metadata("quiz_score", score)
+        self.save_metadata("quiz_answer_feedback", page_details["body"])
+        if page_details.get("image_path"):
+            self.save_metadata("quiz_feedback_image_path", page_details["image_path"])
 
         self.save_metadata("quiz_sequence", metadata["quiz_sequence"] + 1)
         return await self.go_to_state("state_quiz_answer_feedback")
 
     async def state_quiz_answer_feedback(self):
         metadata = self.user.metadata
-        page_id = metadata["selected_answer_id"]
-        error, page_details = await contentrepo.get_page_details(self.user, page_id, 1)
-        if error:
-            return await self.go_to_state("state_error")
 
         helper_metadata = {}
-        if page_details.get("image_path"):
-            helper_metadata["image"] = page_details["image_path"]
+        if metadata.get("quiz_feedback_image_path"):
+            helper_metadata["image"] = metadata["quiz_feedback_image_path"]
 
         return WhatsAppButtonState(
             self,
-            question=page_details["body"],
+            question=metadata["quiz_answer_feedback"],
             choices=[
                 Choice("next_question", "Next question"),
             ],
