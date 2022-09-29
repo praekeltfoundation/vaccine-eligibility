@@ -1,5 +1,6 @@
 import json
 
+import email_validator
 import pytest
 from sanic import Sanic, response
 
@@ -11,7 +12,10 @@ from vaccine.testing import AppTester, TState, run_sanic
 
 @pytest.fixture
 def tester():
-    return AppTester(Application)
+    evte = email_validator.TEST_ENVIRONMENT
+    email_validator.TEST_ENVIRONMENT = True
+    yield AppTester(Application)
+    email_validator.TEST_ENVIRONMENT = evte
 
 
 @pytest.fixture
@@ -84,7 +88,7 @@ async def real411_mock():
                         app.url_for("file_upload", _external=True)
                         for _ in range(file_count)
                     ],
-                    "real411_backlink": "https://example.org",
+                    "real411_backlink": "https://example.test",
                 },
                 "errors": None,
             }
@@ -403,14 +407,14 @@ async def test_email(tester: AppTester):
     tester.assert_state("state_description")
 
     tester.setup_state("state_email")
-    await tester.user_input("valid@example.org")
+    await tester.user_input("valid@example.test")
     tester.assert_state("state_description")
 
 
 @pytest.mark.asyncio
 async def test_description(tester: AppTester):
     tester.setup_state("state_email")
-    await tester.user_input("test@example.org")
+    await tester.user_input("test@example.test")
     tester.assert_state("state_description")
     tester.assert_message(
         "\n".join(
@@ -526,7 +530,7 @@ async def test_success(
     await tester.user_input("first name")  # first_name
     await tester.user_input("surname")  # surname
     await tester.user_input("confirm")  # confirm name
-    await tester.user_input("test@example.org")  # email
+    await tester.user_input("test@example.test")  # email
     await tester.user_input(
         "test video description",
         transport_metadata={
@@ -557,7 +561,7 @@ async def test_success(
                 "",
                 "Look out for messages from us in the next few days",
                 "",
-                "To track the status of your report, visit https://example.org",
+                "To track the status of your report, visit https://example.test",
                 "",
                 "Reply 0 to return to the main MENU",
             ]
@@ -583,7 +587,7 @@ async def test_success(
         'image description"}]',
         "language": 13,
         "source": 1,
-        "email": "test@example.org",
+        "email": "test@example.test",
         "file_names": [
             {"name": "vid1", "type": "video/mp4"},
             {"name": "img1", "type": "image/jpeg"},
