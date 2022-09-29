@@ -243,8 +243,10 @@ class Application(BaseApplication):
         inbound_id = self.user.metadata["inbound_id"]
         feedback_secret_key = self.user.metadata["feedback_secret_key"]
         feedback_type = "positive" if feedback_answer == "yes" else "negative"
+        # TODO: faq_id will come from the API like inbound_id and feedback_secret_key
+        faq_id = "-1"
         error = await aaq_core.add_feedback(
-            feedback_secret_key, inbound_id, feedback_type
+            feedback_secret_key, inbound_id, feedback_type, faq_id
         )
         if error:
             return await self.go_to_state("state_error")
