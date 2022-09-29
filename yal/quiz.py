@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, CustomChoiceState
+from vaccine.states import Choice, CustomChoiceState, WhatsAppButtonState
 from vaccine.utils import get_display_choices
 from yal import contentrepo
 from yal.pleasecallme import Application as PleaseCallMeApplication
@@ -30,7 +30,7 @@ class Application(BaseApplication):
                 return "state_quiz_start"
 
             self.save_metadata("selected_answer_id", choice.value)
-            return "state_quiz_answer"
+            return "state_quiz_process_answer"
 
         metadata = self.user.metadata
 
@@ -125,7 +125,7 @@ class Application(BaseApplication):
             buttons=buttons,
         )
 
-    async def state_quiz_answer(self):
+    async def state_quiz_process_answer(self):
         metadata = self.user.metadata
         page_id = metadata["selected_answer_id"]
         error, page_details = await contentrepo.get_page_details(self.user, page_id, 1)
@@ -137,19 +137,27 @@ class Application(BaseApplication):
             if tag.startswith("score_"):
                 score += int(tag.replace("score_", ""))
         self.save_metadata("quiz_score", score)
-
-        helper_metadata = {}
+        self.save_metadata("quiz_answer_feedback", page_details["body"])
         if page_details.get("image_path"):
-            helper_metadata["image"] = page_details["image_path"]
-
-        await self.worker.publish_message(
-            self.inbound.reply(
-                self._(page_details["body"]),
-                helper_metadata=helper_metadata,
-            )
-        )
-        await asyncio.sleep(0.5)
+            self.save_metadata("quiz_feedback_image_path", page_details["image_path"])
 
         self.save_metadata("quiz_sequence", metadata["quiz_sequence"] + 1)
+        return await self.go_to_state("state_quiz_answer_feedback")
 
-        return await self.go_to_state("state_quiz_question")
+    async def state_quiz_answer_feedback(self):
+        metadata = self.user.metadata
+
+        helper_metadata = {}
+        if metadata.get("quiz_feedback_image_path"):
+            helper_metadata["image"] = metadata["quiz_feedback_image_path"]
+
+        return WhatsAppButtonState(
+            self,
+            question=metadata["quiz_answer_feedback"],
+            choices=[
+                Choice("next_question", "Next question"),
+            ],
+            error=self._(get_generic_error()),
+            next="state_quiz_question",
+            helper_metadata=helper_metadata,
+        )
