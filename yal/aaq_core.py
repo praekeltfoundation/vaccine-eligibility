@@ -94,12 +94,18 @@ async def get_page(url):
     }
 
 
-async def add_feedback(secret_key, inbound_id, feedback_type, faq_id):
+async def add_feedback(secret_key, inbound_id, feedback_type, faq_id=None, page=None):
     data = {
         "feedback_secret_key": secret_key,
         "inbound_id": inbound_id,
-        "feedback": {"feedback_type": feedback_type, "faq_id": faq_id},
+        "feedback": {"feedback_type": feedback_type},
     }
+
+    if faq_id:
+        data["feedback"]["faq_id"] = faq_id
+
+    if page:
+        data["feedback"]["page_number"] = page
 
     async with get_aaq_api() as session:
         for i in range(3):

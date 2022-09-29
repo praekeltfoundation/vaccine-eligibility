@@ -163,7 +163,16 @@ class Application(BaseApplication):
     async def state_set_aaq_timeout_2(self):
         chosen_answer = self.user.answers.get("state_display_results")
 
+        inbound_id = self.user.metadata["inbound_id"]
+        feedback_secret_key = self.user.metadata["feedback_secret_key"]
+
         if chosen_answer == "more":
+            error = await aaq_core.add_feedback(
+                feedback_secret_key, inbound_id, "negative", page="1"
+            )
+            if error:
+                return await self.go_to_state("state_error")
+
             self.user.metadata["aaq_page"] = 1
             self.save_metadata("page_url", self.user.metadata["next_page_url"])
             return await self.go_to_state("state_aaq_get_page")
@@ -174,6 +183,12 @@ class Application(BaseApplication):
             return await self.go_to_state("state_aaq_get_page")
 
         if chosen_answer == "callme":
+            error = await aaq_core.add_feedback(
+                feedback_secret_key, inbound_id, "negative", page="2"
+            )
+            if error:
+                return await self.go_to_state("state_error")
+
             return await self.go_to_state(PleaseCallMeApplication.START_STATE)
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
