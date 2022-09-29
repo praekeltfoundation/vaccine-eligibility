@@ -132,7 +132,7 @@ async def test_state_quiz_start(tester: AppTester, contentrepo_api_mock):
         buttons=["Next question"],
     )
 
-    await tester.user_input("next_question")
+    await tester.user_input("next question")
 
     [result_msg] = tester.fake_worker.outbound_messages
     assert result_msg.content == "\n".join(
