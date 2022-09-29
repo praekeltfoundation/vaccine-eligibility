@@ -224,11 +224,13 @@ async def test_start_state_response_sets_timeout(
 @pytest.mark.asyncio
 @mock.patch("yal.askaquestion.get_current_datetime")
 async def test_state_display_results_choose_an_answer(
-    get_current_datetime, tester: AppTester, rapidpro_mock, aaq_mock
+    get_current_datetime, tester: AppTester, rapidpro_mock
 ):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_display_results")
     tester.user.metadata["aaq_page"] = 0
+    tester.user.metadata["inbound_id"] = "inbound-id"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
 
     await tester.user_input("FAQ #1 Title")
@@ -267,6 +269,8 @@ async def test_state_display_results_next(tester: AppTester, aaq_mock):
     tester.setup_state("state_display_results")
     tester.user.metadata["aaq_page"] = 0
     tester.user.metadata["next_page_url"] = "/inbound/92567/1"
+    tester.user.metadata["inbound_id"] = "inbound-id"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
 
     await tester.user_input("Show me more")
@@ -299,6 +303,14 @@ async def test_state_display_results_next(tester: AppTester, aaq_mock):
         )
     )
 
+    [add_feedback, next_page] = aaq_mock.tstate.requests
+
+    assert json.loads(add_feedback.body.decode("utf-8")) == {
+        "feedback": {"page_number": "1", "feedback_type": "negative"},
+        "feedback_secret_key": "feedback-secret-key",
+        "inbound_id": "inbound-id",
+    }
+
 
 @pytest.mark.asyncio
 @mock.patch("yal.pleasecallme.get_current_datetime")
@@ -308,17 +320,29 @@ async def test_state_display_results_pleasecallme(
     get_current_datetime.return_value = datetime(2022, 6, 20, 17, 30)
     tester.setup_state("state_display_results")
     tester.user.metadata["aaq_page"] = 0
+    tester.user.metadata["inbound_id"] = "inbound-id"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
 
-    await tester.user_input("Please call me")
+    await tester.user_input("5")
 
     tester.assert_state("state_in_hours")
+
+    [add_feedback] = aaq_mock.tstate.requests
+
+    assert json.loads(add_feedback.body.decode("utf-8")) == {
+        "feedback": {"page_number": "2", "feedback_type": "negative"},
+        "feedback_secret_key": "feedback-secret-key",
+        "inbound_id": "inbound-id",
+    }
 
 
 @pytest.mark.asyncio
 async def test_state_display_results_back(tester: AppTester, aaq_mock):
     tester.setup_state("state_display_results")
     tester.user.metadata["aaq_page"] = 1
+    tester.user.metadata["inbound_id"] = "inbound-id"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
     tester.user.metadata["prev_page_url"] = "/inbound/92567/1"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_2
 
