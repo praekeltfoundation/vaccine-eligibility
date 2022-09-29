@@ -152,4 +152,5 @@ class Application(BaseApplication):
             ],
             error=self._(get_generic_error()),
             next="state_quiz_question",
+            helper_metadata=helper_metadata
         )
