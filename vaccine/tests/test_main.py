@@ -14,7 +14,7 @@ if hasattr(si_sanic, "old_startup"):
         else:
             await si_sanic.old_startup(self)
 
-    Sanic._startup = conditional_sentry_startup
+    Sanic._startup = conditional_sentry_startup  # type: ignore
 
 
 TestManager(app)
