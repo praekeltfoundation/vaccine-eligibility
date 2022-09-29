@@ -19,7 +19,7 @@ aio-pika = "^6.7.1"
 sanic = "~21.6"
 prometheus-client = "^0.9.0"
 aiohttp = {extras = ["speedups"], version = "^3.7.4"}
-sentry-sdk = "^1.5.0"
+sentry-sdk = "^1.5.2"
 phonenumberslite = "^8.12.21"
 pycountry = "^20.7.3"
 aiohttp-client-cache = "^0.5.2"
@@ -60,5 +60,8 @@ addopts = "--cov=vaccine --cov=yal"
 filterwarnings = [
     "error::UserWarning:_pytest",  # For PytestUnhandledCoroutineWarning
     "error::DeprecationWarning",
+    # Various things pass a deprecated loop arg, presumably for python 3.7
     "default::DeprecationWarning:pytest_asyncio",
+    "default::DeprecationWarning:sanic.server:556",
+    "default::DeprecationWarning:sanic.server.runners:133",
 ]

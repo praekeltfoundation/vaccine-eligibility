@@ -1291,7 +1291,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "7056618101dd468f65c18d419a8e54063d7b62e5bb0fa87f10876fd3bf6389cc"
+content-hash = "11fde9052b5e5513c336d795afb25fc2cd7800d94ad39b6f3b63b6dc9c7104e9"
 
 [metadata.files]
 aio-pika = [
