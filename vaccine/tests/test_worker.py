@@ -12,7 +12,7 @@ from aio_pika import Queue, connect_robust
 from sanic import Sanic, response
 
 from vaccine.models import Answer, Event, Message, StateData, User
-from vaccine.testing import TState
+from vaccine.testing import TState, run_sanic
 from vaccine.worker import AnswerWorker, Worker, config, logger
 
 
@@ -225,7 +225,7 @@ async def test_worker_valid_event(worker: Worker):
 
 
 @pytest.fixture
-async def flow_results_mock_server(sanic_client):
+async def flow_results_mock_server():
     Sanic.test_mode = True
     app = Sanic("mock_whatsapp")
     tstate = TState()
@@ -263,9 +263,9 @@ async def flow_results_mock_server(sanic_client):
         tstate.future.set_result(request)
         return response.json({})
 
-    client = await sanic_client(app)
-    client.tstate = tstate
-    return client
+    async with run_sanic(app) as server:
+        server.tstate = tstate
+        yield server
 
 
 @pytest.fixture

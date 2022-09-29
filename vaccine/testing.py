@@ -1,7 +1,11 @@
+import socket
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from typing import Any, Callable, List, Optional, Type
 
 from aio_pika import IncomingMessage
+from sanic import Sanic
+from sanic.server import AsyncioServer
 
 from vaccine.base_application import BaseApplication
 from vaccine.models import Answer, Message, User
@@ -185,3 +189,43 @@ class TState:
     requests: list = field(default_factory=list)
     errors: int = 0
     errormax: int = 0
+
+
+def unused_port():
+    """
+    Find an unused port by temporarily binding a socket to it.
+
+    Unfortunately, Sanic.create_server() replaces port 0 with its default port
+    8080. If we want to bind to an arbitrary unused port, we need to find an
+    unused one to pass in explicitly. This potentially has a race condition in
+    it, so let's hope we don't hit that.
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
+
+
+@dataclass
+class MockServer:
+    app: Sanic
+    server: AsyncioServer
+    host: str
+    port: int
+
+
+@asynccontextmanager
+async def run_sanic(app):
+    """
+    Run a sanic app as a context manager. Best used in pytest fixtures.
+    """
+    Sanic.test_mode = True
+    port = unused_port()
+    server = await app.create_server(return_asyncio_server=True, port=port)
+    if hasattr(server, "startup"):
+        # This was introduced between 21.6 and 21.12
+        await server.startup()
+    await server.start_serving()
+    [sock] = server.server.sockets
+    host, port = sock.getsockname()
+    yield MockServer(app, server, host, port)
+    await server.close()

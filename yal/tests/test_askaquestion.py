@@ -6,7 +6,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
-from vaccine.testing import AppTester, TState
+from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.main import Application
 from yal.utils import BACK_TO_MAIN
@@ -54,7 +54,7 @@ def get_aaq_response(answers, next=None, prev=None):
 
 
 @pytest.fixture
-async def aaq_mock(sanic_client):
+async def aaq_mock():
     Sanic.test_mode = True
     app = Sanic("mock_aaq")
     tstate = TState()
@@ -76,17 +76,17 @@ async def aaq_mock(sanic_client):
         tstate.requests.append(request)
         return response.json({}, status=200)
 
-    client = await sanic_client(app)
-    url = config.AAQ_URL
-    config.AAQ_URL = f"http://{client.host}:{client.port}"
-    config.AAQ_TOKEN = "testtoken"
-    client.tstate = tstate
-    yield client
-    config.AAQ_URL = url
+    async with run_sanic(app) as server:
+        url = config.AAQ_URL
+        config.AAQ_URL = f"http://{server.host}:{server.port}"
+        config.AAQ_TOKEN = "testtoken"
+        server.tstate = tstate
+        yield server
+        config.AAQ_URL = url
 
 
 @pytest.fixture
-async def rapidpro_mock(sanic_client):
+async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
     tstate = TState()
@@ -111,13 +111,13 @@ async def rapidpro_mock(sanic_client):
         tstate.requests.append(request)
         return response.json({}, status=200)
 
-    client = await sanic_client(app)
-    url = config.RAPIDPRO_URL
-    config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
-    config.RAPIDPRO_TOKEN = "testtoken"
-    client.tstate = tstate
-    yield client
-    config.RAPIDPRO_URL = url
+    async with run_sanic(app) as server:
+        url = config.RAPIDPRO_URL
+        config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
+        config.RAPIDPRO_TOKEN = "testtoken"
+        server.tstate = tstate
+        yield server
+        config.RAPIDPRO_URL = url
 
 
 @pytest.mark.asyncio

@@ -2,7 +2,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, run_sanic
 from vaccine.vaccine_cert import Application, config
 
 
@@ -12,7 +12,7 @@ def tester():
 
 
 @pytest.fixture
-async def whatsapp_mock(sanic_client, tester):
+async def whatsapp_mock(tester):
     Sanic.test_mode = True
     app = Sanic("mock_whatsapp")
 
@@ -20,13 +20,13 @@ async def whatsapp_mock(sanic_client, tester):
     def valid_registration(request, media_id):
         return response.file(f"vaccine/data/{media_id}")
 
-    client = await sanic_client(app)
-    whatsapp_media_url = tester.application.whatsapp_media_url
-    tester.application.whatsapp_media_url = (
-        lambda media_id: f"http://{client.host}:{client.port}/v1/media/{media_id}"
-    )
-    yield client
-    tester.application.whatsapp_media_url = whatsapp_media_url
+    async with run_sanic(app) as server:
+        whatsapp_media_url = tester.application.whatsapp_media_url
+        tester.application.whatsapp_media_url = (
+            lambda media_id: f"http://{server.host}:{server.port}/v1/media/{media_id}"
+        )
+        yield server
+        tester.application.whatsapp_media_url = whatsapp_media_url
 
 
 @pytest.mark.asyncio

@@ -395,6 +395,7 @@ async def test_session_timeout_healthcheck():
     assert u.session_id != 1
 
 
+@pytest.mark.asyncio
 async def test_state_timed_out_vaccinereg():
     u = User(
         addr="27820001001", state=StateData(name="state_vaccination_time"), session_id=1
@@ -415,6 +416,7 @@ async def test_state_timed_out_vaccinereg():
     assert u.session_id != 1
 
 
+@pytest.mark.asyncio
 async def test_state_timed_out_timed_out():
     tester = AppTester(Application)
     tester.setup_state("state_timed_out_vacreg")
@@ -424,6 +426,7 @@ async def test_state_timed_out_timed_out():
     tester.assert_answer("resume_state", "state_vaccination_time")
 
 
+@pytest.mark.asyncio
 async def test_state_language():
     tester = AppTester(Application)
     tester.setup_state("state_menu")

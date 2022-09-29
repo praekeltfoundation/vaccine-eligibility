@@ -6,7 +6,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
-from vaccine.testing import AppTester, TState
+from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.main import Application
 from yal.utils import BACK_TO_MAIN
@@ -18,7 +18,7 @@ def tester():
 
 
 @pytest.fixture
-async def lovelife_mock(sanic_client):
+async def lovelife_mock():
     Sanic.test_mode = True
     app = Sanic("mock_lovelife")
     tstate = TState()
@@ -28,12 +28,12 @@ async def lovelife_mock(sanic_client):
         tstate.requests.append(request)
         return response.json({"call_ref_id": "1655818013000", "status": "Success"})
 
-    client = await sanic_client(app)
-    url = config.LOVELIFE_URL
-    config.LOVELIFE_URL = f"http://{client.host}:{client.port}"
-    client.tstate = tstate
-    yield client
-    config.LOVELIFE_URL = url
+    async with run_sanic(app) as server:
+        url = config.LOVELIFE_URL
+        config.LOVELIFE_URL = f"http://{server.host}:{server.port}"
+        server.tstate = tstate
+        yield server
+        config.LOVELIFE_URL = url
 
 
 def get_rapidpro_contact(urn):
@@ -45,7 +45,7 @@ def get_rapidpro_contact(urn):
 
 
 @pytest.fixture
-async def rapidpro_mock(sanic_client):
+async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
     tstate = TState()
@@ -70,17 +70,17 @@ async def rapidpro_mock(sanic_client):
         tstate.requests.append(request)
         return response.json({}, status=200)
 
-    client = await sanic_client(app)
-    url = config.RAPIDPRO_URL
-    config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
-    config.RAPIDPRO_TOKEN = "testtoken"
-    client.tstate = tstate
-    yield client
-    config.RAPIDPRO_URL = url
+    async with run_sanic(app) as server:
+        url = config.RAPIDPRO_URL
+        config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
+        config.RAPIDPRO_TOKEN = "testtoken"
+        server.tstate = tstate
+        yield server
+        config.RAPIDPRO_URL = url
 
 
 @pytest.fixture
-async def contentrepo_api_mock(sanic_client):
+async def contentrepo_api_mock():
     Sanic.test_mode = True
     app = Sanic("contentrepo_api_mock")
     tstate = TState()
@@ -105,12 +105,12 @@ async def contentrepo_api_mock(sanic_client):
             }
         )
 
-    client = await sanic_client(app)
-    url = config.CONTENTREPO_API_URL
-    config.CONTENTREPO_API_URL = f"http://{client.host}:{client.port}"
-    client.tstate = tstate
-    yield client
-    config.CONTENTREPO_API_URL = url
+    async with run_sanic(app) as server:
+        url = config.CONTENTREPO_API_URL
+        config.CONTENTREPO_API_URL = f"http://{server.host}:{server.port}"
+        server.tstate = tstate
+        yield server
+        config.CONTENTREPO_API_URL = url
 
 
 @pytest.mark.asyncio

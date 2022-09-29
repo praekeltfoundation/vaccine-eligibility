@@ -6,7 +6,7 @@ from sanic import Sanic, response
 from vaccine import real411_config as config
 from vaccine.models import Message
 from vaccine.real411 import Application
-from vaccine.testing import AppTester, TState
+from vaccine.testing import AppTester, TState, run_sanic
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def tester():
 
 
 @pytest.fixture
-async def real411_mock(sanic_client):
+async def real411_mock():
     Sanic.test_mode = True
     app = Sanic("real411_mock")
     tstate = TState()
@@ -97,20 +97,20 @@ async def real411_mock(sanic_client):
             {"success": True, "message": "Complaint finalised", "errors": None}
         )
 
-    client = await sanic_client(app)
-    app.config.SERVER_NAME = f"http://{client.host}:{client.port}"
-    url = config.REAL411_URL
-    token = config.REAL411_TOKEN
-    config.REAL411_URL = app.config.SERVER_NAME
-    config.REAL411_TOKEN = "testtoken"
-    client.tstate = tstate
-    yield client
-    config.REAL411_URL = url
-    config.REAL411_TOKEN = token
+    async with run_sanic(app) as server:
+        app.config.SERVER_NAME = f"http://{server.host}:{server.port}"
+        url = config.REAL411_URL
+        token = config.REAL411_TOKEN
+        config.REAL411_URL = app.config.SERVER_NAME
+        config.REAL411_TOKEN = "testtoken"
+        server.tstate = tstate
+        yield server
+        config.REAL411_URL = url
+        config.REAL411_TOKEN = token
 
 
 @pytest.fixture
-async def whatsapp_mock(sanic_client):
+async def whatsapp_mock():
     Sanic.test_mode = True
     app = Sanic("whatsapp_mock")
     tstate = TState()
@@ -120,19 +120,19 @@ async def whatsapp_mock(sanic_client):
         tstate.requests.append(request)
         return response.raw(b"testfile")
 
-    client = await sanic_client(app)
-    url = config.WHATSAPP_URL
-    token = config.WHATSAPP_TOKEN
-    config.WHATSAPP_URL = f"http://{client.host}:{client.port}"
-    config.WHATSAPP_TOKEN = "testtoken"
-    client.tstate = tstate
-    yield client
-    config.WHATSAPP_URL = url
-    config.WHATSAPP_TOKEN = token
+    async with run_sanic(app) as server:
+        url = config.WHATSAPP_URL
+        token = config.WHATSAPP_TOKEN
+        config.WHATSAPP_URL = f"http://{server.host}:{server.port}"
+        config.WHATSAPP_TOKEN = "testtoken"
+        server.tstate = tstate
+        yield server
+        config.WHATSAPP_URL = url
+        config.WHATSAPP_TOKEN = token
 
 
 @pytest.fixture
-async def healthcheck_mock(sanic_client):
+async def healthcheck_mock():
     Sanic.test_mode = True
     app = Sanic("healthcheck_mock")
     tstate = TState()
@@ -142,12 +142,12 @@ async def healthcheck_mock(sanic_client):
         tstate.requests.append(request)
         return response.json({})
 
-    client = await sanic_client(app)
-    url = config.HEALTHCHECK_URL
-    config.HEALTHCHECK_URL = f"http://{client.host}:{client.port}"
-    client.tstate = tstate
-    yield client
-    config.HEALTHCHECK_URL = url
+    async with run_sanic(app) as server:
+        url = config.HEALTHCHECK_URL
+        config.HEALTHCHECK_URL = f"http://{server.host}:{server.port}"
+        server.tstate = tstate
+        yield server
+        config.HEALTHCHECK_URL = url
 
 
 @pytest.mark.asyncio

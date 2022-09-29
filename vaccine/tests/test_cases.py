@@ -3,7 +3,7 @@ from sanic import Sanic, response
 
 from vaccine import cases
 from vaccine.models import Message
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, run_sanic
 
 
 @pytest.fixture
@@ -12,14 +12,12 @@ def tester():
 
 
 @pytest.fixture
-async def healthcheck_mock(sanic_client):
+async def healthcheck_mock():
     Sanic.test_mode = True
     app = Sanic("healthcheck_mock")
-    app.ctx.requests = []
 
     @app.route("/v2/covidcases/contactndoh", methods=["GET"])
     def contactndoh(request):
-        app.ctx.requests.append(request)
         return response.json(
             {
                 "image": {
@@ -54,11 +52,11 @@ async def healthcheck_mock(sanic_client):
             }
         )
 
-    client = await sanic_client(app)
-    url = cases.HEALTHCHECK_API_URL
-    cases.HEALTHCHECK_API_URL = f"http://{client.host}:{client.port}/"
-    yield client
-    cases.HEALTHCHECK_API_URL = url
+    async with run_sanic(app) as server:
+        url = cases.HEALTHCHECK_API_URL
+        cases.HEALTHCHECK_API_URL = f"http://{server.host}:{server.port}/"
+        yield server
+        cases.HEALTHCHECK_API_URL = url
 
 
 @pytest.mark.asyncio

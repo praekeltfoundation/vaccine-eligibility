@@ -6,7 +6,7 @@ from sanic import Sanic, response
 from mqr import config
 from mqr.midline_ussd import Application
 from vaccine.models import Message
-from vaccine.testing import AppTester, TState
+from vaccine.testing import AppTester, TState, run_sanic
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def tester():
 
 
 @pytest.fixture
-async def rapidpro_mock(sanic_client):
+async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
     tstate = TState()
@@ -25,13 +25,13 @@ async def rapidpro_mock(sanic_client):
         tstate.requests.append(request)
         return response.json({}, status=200)
 
-    client = await sanic_client(app)
-    url = config.RAPIDPRO_URL
-    config.RAPIDPRO_URL = f"http://{client.host}:{client.port}"
-    config.RAPIDPRO_TOKEN = "testtoken"
-    client.tstate = tstate
-    yield client
-    config.RAPIDPRO_URL = url
+    async with run_sanic(app) as server:
+        url = config.RAPIDPRO_URL
+        config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
+        config.RAPIDPRO_TOKEN = "testtoken"
+        server.tstate = tstate
+        yield server
+        config.RAPIDPRO_URL = url
 
 
 @pytest.mark.asyncio
@@ -358,6 +358,7 @@ async def test_state_swollen_feet_symptom_of_invalid(tester: AppTester):
     )
 
 
+@pytest.mark.asyncio
 async def test_state_dizzy_weak_symptom_of(tester: AppTester):
     tester.setup_state("state_dizzy_weak_symptom_of")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)

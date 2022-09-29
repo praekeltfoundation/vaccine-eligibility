@@ -7,7 +7,7 @@ from sanic import Sanic, response
 from vaccine import hotline_callback_config as config
 from vaccine.hotline_callback import Application, get_current_datetime, in_office_hours
 from vaccine.models import Message
-from vaccine.testing import AppTester, TState
+from vaccine.testing import AppTester, TState, run_sanic
 
 
 @pytest.fixture
@@ -16,7 +16,7 @@ def tester():
 
 
 @pytest.fixture
-async def callback_api_mock(sanic_client):
+async def callback_api_mock():
     Sanic.test_mode = True
     app = Sanic("mock_callback_api")
     tstate = TState()
@@ -32,16 +32,16 @@ async def callback_api_mock(sanic_client):
                 return response.text("", status=500)
         return response.text("Received Sucessfully")
 
-    client = await sanic_client(app)
-    url = config.CALLBACK_API_URL
-    config.CALLBACK_API_URL = f"http://{client.host}:{client.port}"
-    client.tstate = tstate
-    yield client
-    config.CALLBACK_API_URL = url
+    async with run_sanic(app) as server:
+        url = config.CALLBACK_API_URL
+        config.CALLBACK_API_URL = f"http://{server.host}:{server.port}"
+        server.tstate = tstate
+        yield server
+        config.CALLBACK_API_URL = url
 
 
 @pytest.fixture
-async def turn_api_mock(sanic_client):
+async def turn_api_mock():
     Sanic.test_mode = True
     app = Sanic("mock_turn_api")
     tstate = TState()
@@ -77,12 +77,12 @@ async def turn_api_mock(sanic_client):
             }
         )
 
-    client = await sanic_client(app)
-    url = config.TURN_URL
-    config.TURN_URL = f"http://{client.host}:{client.port}"
-    client.tstate = tstate
-    yield client
-    config.TURN_URL = url
+    async with run_sanic(app) as server:
+        url = config.TURN_URL
+        config.TURN_URL = f"http://{server.host}:{server.port}"
+        server.tstate = tstate
+        yield server
+        config.TURN_URL = url
 
 
 @pytest.mark.asyncio
