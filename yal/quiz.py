@@ -141,7 +141,6 @@ class Application(BaseApplication):
         self.save_metadata("quiz_sequence", metadata["quiz_sequence"] + 1)
         return await self.go_to_state("state_quiz_answer_feedback")
 
-
     async def state_quiz_answer_feedback(self):
         metadata = self.user.metadata
         page_id = metadata["selected_answer_id"]
@@ -161,5 +160,5 @@ class Application(BaseApplication):
             ],
             error=self._(get_generic_error()),
             next="state_quiz_question",
-            helper_metadata=helper_metadata
+            helper_metadata=helper_metadata,
         )
