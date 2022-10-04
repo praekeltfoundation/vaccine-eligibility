@@ -26,20 +26,20 @@ def get_rapidpro_contact(urn):
 
 
 MODEL_ANSWERS_PAGE_1 = {
-    "FAQ #1 Title": "This is FAQ #1's content.",
-    "FAQ #2 Title that is very long": "This is FAQ #2's content.",
-    "FAQ #3 Title": "This is FAQ #3's content.",
+    "FAQ #1 Title": {"id": "1", "body":"This is FAQ #1's content."},
+    "FAQ #2 Title that is very long": {"id": "2", "body": "This is FAQ #2's content."},
+    "FAQ #3 Title": {"id":"3", "body": "This is FAQ #3's content."},
 }
 
 MODEL_ANSWERS_PAGE_2 = {
-    "FAQ #4 Title": "This is FAQ #4's content.",
-    "FAQ #5 Title": "This is FAQ #5's content.",
-    "FAQ #6 Title": "This is FAQ #6's content.",
+    "FAQ #4 Title": {"id": "6", "body":"This is FAQ #6's content."},
+    "FAQ #5 Title": {"id": "7", "body":"This is FAQ #7's content."},
+    "FAQ #6 Title": {"id": "8", "body":"This is FAQ #8's content."},
 }
 
 
 def get_aaq_response(answers, next=None, prev=None):
-    top_responses = [[k, v] for k, v in answers.items()]
+    top_responses = [[v['id'], k, v['body']] for k, v in answers.items()]
     response = {
         "top_responses": top_responses,
         "feedback_secret_key": "abcde12345",
@@ -357,6 +357,7 @@ async def test_state_get_content_feedback_question_answered(
 ):
     tester.user.metadata["inbound_id"] = "inbound-id"
     tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["faq_id"] = "1"
     tester.setup_state("state_get_content_feedback")
 
     await tester.user_input("Yes")
@@ -372,7 +373,7 @@ async def test_state_get_content_feedback_question_answered(
     assert len(aaq_mock.tstate.requests) == 1
     request = aaq_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
-        "feedback": {"feedback_type": "positive", "faq_id": "-1"},
+        "feedback": {"feedback_type": "positive", "faq_id": "1"},
         "feedback_secret_key": "feedback-secret-key",
         "inbound_id": "inbound-id",
     }
@@ -407,7 +408,7 @@ async def test_state_display_content_question_not_answered(
     assert len(aaq_mock.tstate.requests) == 1
     request = aaq_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
-        "feedback": {"feedback_type": "negative", "faq_id": "-1"},
+        "feedback": {"feedback_type": "negative", "faq_id": "1"},
         "feedback_secret_key": "feedback-secret-key",
         "inbound_id": "inbound-id",
     }

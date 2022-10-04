@@ -52,8 +52,8 @@ async def inbound_check(user, message_id, question):
                     continue
 
     answers = {}
-    for title, body in response_data["top_responses"]:
-        answers[title] = body
+    for id, title, body in response_data["top_responses"]:
+        answers[title] = {"id": id, "body": body}
 
     return False, {
         "model_answers": answers,
@@ -82,8 +82,8 @@ async def get_page(url):
                     continue
 
     answers = {}
-    for title, body in response_data["top_responses"]:
-        answers[title] = body
+    for id, title, body in response_data["top_responses"]:
+        answers[title] = {"id": id, "body": body}
 
     return False, {
         "model_answers": answers,
