@@ -29,12 +29,14 @@ MODEL_ANSWERS_PAGE_1 = {
     "FAQ #1 Title": {"id": "1", "body":"This is FAQ #1's content."},
     "FAQ #2 Title that is very long": {"id": "2", "body": "This is FAQ #2's content."},
     "FAQ #3 Title": {"id":"3", "body": "This is FAQ #3's content."},
+    "FAQ #4 Title": {"id": "4", "body":"This is FAQ #4's content."},
+    "FAQ #5 Title": {"id": "5", "body":"This is FAQ #5's content."},
 }
 
 MODEL_ANSWERS_PAGE_2 = {
-    "FAQ #4 Title": {"id": "6", "body":"This is FAQ #6's content."},
-    "FAQ #5 Title": {"id": "7", "body":"This is FAQ #7's content."},
-    "FAQ #6 Title": {"id": "8", "body":"This is FAQ #8's content."},
+    "FAQ #6 Title": {"id": "6", "body":"This is FAQ #6's content."},
+    "FAQ #7 Title": {"id": "7", "body":"This is FAQ #7's content."},
+    "FAQ #8 Title": {"id": "8", "body":"This is FAQ #8's content."},
 }
 
 
@@ -203,7 +205,9 @@ async def test_start_state_response_sets_timeout(
                 "1. FAQ #1 Title",
                 "2. FAQ #2 Title that is very long",
                 "3. FAQ #3 Title",
-                "4. Show me more",
+                "4. FAQ #4 Title",
+                "5. FAQ #5 Title",
+                "6. Show me more",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -216,6 +220,8 @@ async def test_start_state_response_sets_timeout(
             "FAQ #1 Title",
             "FAQ #2 Title that is",
             "FAQ #3 Title",
+            "FAQ #4 Title",
+            "FAQ #5 Title",
             "Show me more",
         ],
     )
@@ -289,9 +295,9 @@ async def test_state_display_results_next(tester: AppTester, aaq_mock):
                 "*To see the answer, reply with the number of the FAQ "
                 "you're interested in:*",
                 "",
-                "1. FAQ #4 Title",
-                "2. FAQ #5 Title",
-                "3. FAQ #6 Title",
+                "1. FAQ #6 Title",
+                "2. FAQ #7 Title",
+                "3. FAQ #8 Title",
                 "4. Back to first list",
                 "5. Please call me",
                 "",
@@ -324,7 +330,7 @@ async def test_state_display_results_pleasecallme(
     tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
 
-    await tester.user_input("5")
+    await tester.user_input("7")
 
     tester.assert_state("state_in_hours")
 
