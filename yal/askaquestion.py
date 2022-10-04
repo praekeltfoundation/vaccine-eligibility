@@ -209,10 +209,16 @@ class Application(BaseApplication):
     async def state_display_content(self):
         answers = self.user.metadata["model_answers"]
         chosen_answer = self.user.answers.get("state_display_results")
-        self.save_metadata("faq_id", answers[chosen_answer]['id'])
+        self.save_metadata("faq_id", answers[chosen_answer]["id"])
 
         question = "\n".join(
-            ["🙋🏿‍♂️ QUESTIONS?", chosen_answer, "-----", "", answers[chosen_answer]['body']]
+            [
+                "🙋🏿‍♂️ QUESTIONS?",
+                chosen_answer,
+                "-----",
+                "",
+                answers[chosen_answer]["body"],
+            ]
         )
         await self.worker.publish_message(self.inbound.reply(question))
         await asyncio.sleep(1.5)

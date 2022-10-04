@@ -26,22 +26,22 @@ def get_rapidpro_contact(urn):
 
 
 MODEL_ANSWERS_PAGE_1 = {
-    "FAQ #1 Title": {"id": "1", "body":"This is FAQ #1's content."},
+    "FAQ #1 Title": {"id": "1", "body": "This is FAQ #1's content."},
     "FAQ #2 Title that is very long": {"id": "2", "body": "This is FAQ #2's content."},
-    "FAQ #3 Title": {"id":"3", "body": "This is FAQ #3's content."},
-    "FAQ #4 Title": {"id": "4", "body":"This is FAQ #4's content."},
-    "FAQ #5 Title": {"id": "5", "body":"This is FAQ #5's content."},
+    "FAQ #3 Title": {"id": "3", "body": "This is FAQ #3's content."},
+    "FAQ #4 Title": {"id": "4", "body": "This is FAQ #4's content."},
+    "FAQ #5 Title": {"id": "5", "body": "This is FAQ #5's content."},
 }
 
 MODEL_ANSWERS_PAGE_2 = {
-    "FAQ #6 Title": {"id": "6", "body":"This is FAQ #6's content."},
-    "FAQ #7 Title": {"id": "7", "body":"This is FAQ #7's content."},
-    "FAQ #8 Title": {"id": "8", "body":"This is FAQ #8's content."},
+    "FAQ #6 Title": {"id": "6", "body": "This is FAQ #6's content."},
+    "FAQ #7 Title": {"id": "7", "body": "This is FAQ #7's content."},
+    "FAQ #8 Title": {"id": "8", "body": "This is FAQ #8's content."},
 }
 
 
 def get_aaq_response(answers, next=None, prev=None):
-    top_responses = [[v['id'], k, v['body']] for k, v in answers.items()]
+    top_responses = [[v["id"], k, v["body"]] for k, v in answers.items()]
     response = {
         "top_responses": top_responses,
         "feedback_secret_key": "abcde12345",
