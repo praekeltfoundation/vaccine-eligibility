@@ -9,7 +9,7 @@ from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.main import Application
-from yal.utils import BACK_TO_MAIN
+from yal.utils import BACK_TO_MAIN, GET_HELP
 
 
 @pytest.fixture
@@ -133,12 +133,11 @@ async def test_aaq_start(mock_config, tester: AppTester, rapidpro_mock):
     tester.assert_message(
         "\n".join(
             [
-                "🙋🏿‍♂️ *QUESTIONS?*",
-                "Ask A Question",
+                "🙋🏿‍♂️ QUESTIONS? / *Ask A Question*",
                 "-----",
                 "",
-                "🙍🏾‍♀️*That's what I'm here for!*",
-                "*Just type your Q and hit send* .🙂.",
+                "[persona_emoji] *That's what I'm here for!*",
+                "*Just type your Q and hit send* 🙂",
                 "",
                 "e.g. _How do I know if I have an STI?_",
                 "",
@@ -192,13 +191,14 @@ async def test_start_state_response_sets_timeout(
     tester.assert_message(
         "\n".join(
             [
-                "🙋🏿‍♂️ QUESTIONS?",
-                "*Ask A Question*",
+                "🙋🏿‍♂️ QUESTIONS? / Ask A Question / 1st 3 matches",
                 "-----",
                 "",
-                "🙍🏾‍♀️Here are some FAQs that might answer your question." "",
-                "*To see the answer, reply with the number of the FAQ "
-                "you're interested in:*",
+                "[persona_emoji] That's a really good question! I have a few "
+                "answers that could give you the info you need.",
+                "",
+                "*What would you like to read first?* Reply with the number of the "
+                "topic you're interested in.",
                 "",
                 "1. FAQ #1 Title",
                 "2. FAQ #2 Title that is very long",
@@ -248,16 +248,21 @@ async def test_state_display_results_choose_an_answer(
 
     [msg] = tester.fake_worker.outbound_messages
     assert msg.content == "\n".join(
-        ["🙋🏿‍♂️ QUESTIONS?", "FAQ #1 Title", "-----", "", "This is FAQ #1's content."]
+        [
+            "🙋🏿‍♂️ QUESTIONS? / *FAQ #1 Title*",
+            "-----",
+            "",
+            "[persona_emoji] This is FAQ #1's content.",
+        ]
     )
 
     tester.assert_message(
         "\n".join(
             [
-                "*Did we answer your question?*",
+                "*Did I answer your question?*",
                 "",
                 "*Reply:*",
-                "*1* - Yes 👍",
+                "*1* - Yes",
                 "*2* - No, go back to list",
             ]
         )
@@ -281,19 +286,20 @@ async def test_state_display_results_next(tester: AppTester, aaq_mock):
     tester.assert_message(
         "\n".join(
             [
-                "🙋🏿‍♂️ QUESTIONS?",
-                "*Ask A Question*",
+                "🙋🏿‍♂️ QUESTIONS? / Ask A Question / 2nd 3 matches",
                 "-----",
                 "",
-                "🙍🏾‍♀️Here are some FAQs that might answer your question." "",
-                "*To see the answer, reply with the number of the FAQ "
-                "you're interested in:*",
+                "[persona_emoji] Here are some more topics that might answer your "
+                "question.",
+                "",
+                "*Which of these would you like to explore?* To see the answer, reply "
+                "with the number of the topic you're interested in.",
                 "",
                 "1. FAQ #4 Title",
                 "2. FAQ #5 Title",
                 "3. FAQ #6 Title",
                 "4. Back to first list",
-                "5. Please call me",
+                "5. Talk to a counsellor",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -319,10 +325,10 @@ async def test_state_display_results_pleasecallme(
 ):
     get_current_datetime.return_value = datetime(2022, 6, 20, 17, 30)
     tester.setup_state("state_display_results")
-    tester.user.metadata["aaq_page"] = 0
+    tester.user.metadata["aaq_page"] = 1
     tester.user.metadata["inbound_id"] = "inbound-id"
     tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
-    tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
+    tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_2
 
     await tester.user_input("5")
 
@@ -379,7 +385,7 @@ async def test_state_get_content_feedback_question_answered(
 
     tester.assert_num_messages(1)
     tester.assert_message(
-        "🙍🏾‍♀️*So glad I could help! If you have another question, "
+        "[persona_emoji] *So glad I could help! If you have another question, "
         "you know what to do!* 😉"
     )
 
@@ -390,13 +396,15 @@ async def test_state_display_content_question_not_answered(
 ):
     tester.user.metadata["inbound_id"] = "inbound-id"
     tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["faq_id"] = "1"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
+    tester.user.metadata["aaq_page"] = 0
     tester.setup_state("state_display_content")
     tester.setup_answer("state_display_results", "FAQ #1 Title")
 
     await tester.user_input("No")
 
-    tester.assert_state("state_start")
+    tester.assert_state("state_display_results")
 
     assert len(rapidpro_mock.tstate.requests) == 1
     request = rapidpro_mock.tstate.requests[0]
@@ -413,7 +421,29 @@ async def test_state_display_content_question_not_answered(
     }
 
     tester.assert_num_messages(1)
-    tester.assert_message("TODO: Handle question not answered")
+    tester.assert_message(
+        "\n".join(
+            [
+                "🙋🏿‍♂️ QUESTIONS? / Ask A Question / 1st 3 matches",
+                "-----",
+                "",
+                "[persona_emoji] That's a really good question! I have a few "
+                "answers that could give you the info you need.",
+                "",
+                "*What would you like to read first?* Reply with the number of the "
+                "topic you're interested in.",
+                "",
+                "1. FAQ #1 Title",
+                "2. FAQ #2 Title that is very long",
+                "3. FAQ #3 Title",
+                "",
+                "-----",
+                "*Or reply:*",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
+    )
 
 
 @pytest.mark.asyncio
@@ -466,7 +496,7 @@ async def test_state_handle_timeout_handles_type_2_yes(
 
     tester.assert_num_messages(1)
     tester.assert_message(
-        "🙍🏾‍♀️*So glad I could help! If you have another question, "
+        "[persona_emoji] *So glad I could help! If you have another question, "
         "you know what to do!* 😉"
     )
 
