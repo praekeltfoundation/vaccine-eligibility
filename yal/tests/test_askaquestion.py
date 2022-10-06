@@ -193,7 +193,7 @@ async def test_start_state_response_sets_timeout(
     tester.assert_message(
         "\n".join(
             [
-                "🙋🏿‍♂️ QUESTIONS? / Ask A Question / 1st 5 matches",
+                "🙋🏿‍♂️ QUESTIONS? / Ask A Question / *1st 5 matches*",
                 "-----",
                 "",
                 "[persona_emoji] That's a really good question! I have a few "
@@ -202,12 +202,14 @@ async def test_start_state_response_sets_timeout(
                 "*What would you like to read first?* Reply with the number of the "
                 "topic you're interested in.",
                 "",
-                "1. FAQ #1 Title",
-                "2. FAQ #2 Title that is very long",
-                "3. FAQ #3 Title",
-                "4. FAQ #4 Title",
-                "5. FAQ #5 Title",
-                "6. Show me more",
+                "*1*. FAQ #1 Title",
+                "*2*. FAQ #2 Title that is very long",
+                "*3*. FAQ #3 Title",
+                "*4*. FAQ #4 Title",
+                "*5*. FAQ #5 Title",
+                "",
+                "or",
+                "*6*. See more options",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -222,7 +224,7 @@ async def test_start_state_response_sets_timeout(
             "FAQ #3 Title",
             "FAQ #4 Title",
             "FAQ #5 Title",
-            "Show me more",
+            "See more options",
         ],
     )
 
@@ -284,7 +286,7 @@ async def test_state_display_results_next(tester: AppTester, aaq_mock):
     tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
 
-    await tester.user_input("Show me more")
+    await tester.user_input("See more options")
 
     tester.assert_state("state_display_results")
 
@@ -292,7 +294,7 @@ async def test_state_display_results_next(tester: AppTester, aaq_mock):
     tester.assert_message(
         "\n".join(
             [
-                "🙋🏿‍♂️ QUESTIONS? / Ask A Question / 2nd 3 matches",
+                "🙋🏿‍♂️ QUESTIONS? / Ask A Question / *2nd 3 matches*",
                 "-----",
                 "",
                 "[persona_emoji] Here are some more topics that might answer your "
@@ -301,11 +303,13 @@ async def test_state_display_results_next(tester: AppTester, aaq_mock):
                 "*Which of these would you like to explore?* To see the answer, reply "
                 "with the number of the topic you're interested in.",
                 "",
-                "1. FAQ #6 Title",
-                "2. FAQ #7 Title",
-                "3. FAQ #8 Title",
-                "4. Back to first list",
-                "5. Talk to a counsellor",
+                "*1*. FAQ #6 Title",
+                "*2*. FAQ #7 Title",
+                "*3*. FAQ #8 Title",
+                "",
+                "or",
+                "*4*. Back to first list",
+                "*5*. Talk to a counsellor",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -431,7 +435,7 @@ async def test_state_display_content_question_not_answered(
     tester.assert_message(
         "\n".join(
             [
-                "🙋🏿‍♂️ QUESTIONS? / Ask A Question / 1st 5 matches",
+                "🙋🏿‍♂️ QUESTIONS? / Ask A Question / *1st 5 matches*",
                 "-----",
                 "",
                 "[persona_emoji] That's a really good question! I have a few "
@@ -440,11 +444,11 @@ async def test_state_display_content_question_not_answered(
                 "*What would you like to read first?* Reply with the number of the "
                 "topic you're interested in.",
                 "",
-                "1. FAQ #1 Title",
-                "2. FAQ #2 Title that is very long",
-                "3. FAQ #3 Title",
-                "4. FAQ #4 Title",
-                "5. FAQ #5 Title",
+                "*1*. FAQ #1 Title",
+                "*2*. FAQ #2 Title that is very long",
+                "*3*. FAQ #3 Title",
+                "*4*. FAQ #4 Title",
+                "*5*. FAQ #5 Title",
                 "",
                 "-----",
                 "*Or reply:*",
