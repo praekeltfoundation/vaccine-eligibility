@@ -378,7 +378,7 @@ async def test_state_get_content_feedback_question_answered(
 
     await tester.user_input("Yes")
 
-    tester.assert_state("state_start")
+    tester.assert_state("state_pre_mainmenu")
 
     assert len(rapidpro_mock.tstate.requests) == 1
     request = rapidpro_mock.tstate.requests[0]
@@ -505,7 +505,7 @@ async def test_state_handle_timeout_handles_type_2_yes(
         "fields": {"aaq_timeout_sent": "", "aaq_timeout_type": ""},
     }
 
-    tester.assert_state("state_start")
+    tester.assert_state("state_pre_mainmenu")
 
     tester.assert_num_messages(1)
     tester.assert_message(

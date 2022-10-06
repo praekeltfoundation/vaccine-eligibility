@@ -309,7 +309,7 @@ class Application(BaseApplication):
                 "[persona_emoji] *So glad I could help! If you have another question, "
                 "you know what to do!* 😉"
             ),
-            next=self.START_STATE,
+            next="state_pre_mainmenu",
         )
 
     async def state_no_question_not_answered(self):
