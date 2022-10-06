@@ -63,6 +63,7 @@ class Application(BaseApplication):
                     "-----",
                     "*Or reply:*",
                     BACK_TO_MAIN,
+                    GET_HELP,
                 ]
             )
         )

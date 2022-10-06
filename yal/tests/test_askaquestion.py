@@ -146,6 +146,7 @@ async def test_aaq_start(mock_config, tester: AppTester, rapidpro_mock):
                 "-----",
                 "*Or reply:*",
                 BACK_TO_MAIN,
+                GET_HELP,
             ]
         )
     )
