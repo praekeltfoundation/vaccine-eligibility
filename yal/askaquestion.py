@@ -232,13 +232,14 @@ class Application(BaseApplication):
     async def state_display_content(self):
         answers = self.user.metadata["model_answers"]
         chosen_answer = self.user.answers.get("state_display_results")
-
+        self.save_metadata("faq_id", answers[chosen_answer]["id"])
+        content = answers[chosen_answer]["body"]
         question = "\n".join(
             [
                 f"🙋🏿‍♂️ QUESTIONS? / *{chosen_answer}*",
                 "-----",
                 "",
-                f"[persona_emoji] {answers[chosen_answer]}",
+                f"[persona_emoji] {content}",
             ]
         )
         await self.worker.publish_message(self.inbound.reply(question))
@@ -285,9 +286,8 @@ class Application(BaseApplication):
 
         inbound_id = self.user.metadata["inbound_id"]
         feedback_secret_key = self.user.metadata["feedback_secret_key"]
+        faq_id = self.user.metadata["faq_id"]
         feedback_type = "positive" if feedback_answer == "yes" else "negative"
-        # TODO: faq_id will come from the API like inbound_id and feedback_secret_key
-        faq_id = "-1"
         error = await aaq_core.add_feedback(
             feedback_secret_key, inbound_id, feedback_type, faq_id
         )
