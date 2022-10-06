@@ -52,12 +52,11 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🙋🏿‍♂️ *QUESTIONS?*",
-                    "Ask A Question",
+                    "🙋🏿‍♂️ QUESTIONS? / *Ask A Question*",
                     "-----",
                     "",
-                    "🙍🏾‍♀️*That's what I'm here for!*",
-                    "*Just type your Q and hit send* .🙂.",
+                    "[persona_emoji] *That's what I'm here for!*",
+                    "*Just type your Q and hit send* 🙂",
                     "",
                     "e.g. _How do I know if I have an STI?_",
                     "",
@@ -125,22 +124,46 @@ class Application(BaseApplication):
         for title in answers.keys():
             choices.append(Choice(title, title))
 
-        if page == 0 and self.user.metadata.get("next_page_url"):
-            choices.append(Choice("more", "Show me more"))
+        if page == 0:
+            if self.user.metadata.get("next_page_url"):
+                choices.append(Choice("more", "Show me more"))
+            question = self._(
+                "\n".join(
+                    [
+                        f"🙋🏿‍♂️ QUESTIONS? / Ask A Question / 1st {len(answers)} "
+                        "matches",
+                        "-----",
+                        "",
+                        "[persona_emoji] That's a really good question! I have a few "
+                        "answers that could give you the info you need.",
+                        "",
+                        "*What would you like to read first?* Reply with the number "
+                        "of the topic you're interested in.",
+                        "",
+                        get_display_choices(choices),
+                        "",
+                        "-----",
+                        "*Or reply:*",
+                        BACK_TO_MAIN,
+                        GET_HELP,
+                    ]
+                )
+            )
         else:
             choices.append(Choice("back", "Back to first list"))
-            choices.append(Choice("callme", "Please call me"))
-
-        question = self._(
-            "\n".join(
+            choices.append(Choice("callme", "Talk to a counsellor"))
+            question = "\n".join(
                 [
-                    "🙋🏿‍♂️ QUESTIONS?",
-                    "*Ask A Question*",
+                    f"🙋🏿‍♂️ QUESTIONS? / Ask A Question / 2nd {len(answers)} "
+                    "matches",
                     "-----",
                     "",
-                    "🙍🏾‍♀️Here are some FAQs that might answer your question." "",
-                    "*To see the answer, reply with the number of the FAQ "
-                    "you're interested in:*",
+                    "[persona_emoji] Here are some more topics that might answer "
+                    "your question.",
+                    "",
+                    "*Which of these would you like to explore?* To see the "
+                    "answer, reply with the number of the topic you're interested "
+                    "in.",
                     "",
                     get_display_choices(choices),
                     "",
@@ -150,7 +173,7 @@ class Application(BaseApplication):
                     GET_HELP,
                 ]
             )
-        )
+
         return WhatsAppListState(
             self,
             question=question,
@@ -210,14 +233,13 @@ class Application(BaseApplication):
         answers = self.user.metadata["model_answers"]
         chosen_answer = self.user.answers.get("state_display_results")
         self.save_metadata("faq_id", answers[chosen_answer]["id"])
-
+        content = answers[chosen_answer]["body"]
         question = "\n".join(
             [
-                "🙋🏿‍♂️ QUESTIONS?",
-                chosen_answer,
+                f"🙋🏿‍♂️ QUESTIONS? / *{chosen_answer}*",
                 "-----",
                 "",
-                answers[chosen_answer]["body"],
+                f"[persona_emoji] {content}",
             ]
         )
         await self.worker.publish_message(self.inbound.reply(question))
@@ -229,10 +251,10 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "*Did we answer your question?*",
+                    "*Did I answer your question?*",
                     "",
                     "*Reply:*",
-                    "*1* - Yes 👍",
+                    "*1* - Yes",
                     "*2* - No, go back to list",
                 ]
             )
@@ -275,13 +297,13 @@ class Application(BaseApplication):
         if feedback_answer == "yes":
             return await self.go_to_state("state_yes_question_answered")
 
-        return await self.go_to_state("state_no_question_not_answered")
+        return await self.go_to_state("state_display_results")
 
     async def state_yes_question_answered(self):
         return EndState(
             self,
             self._(
-                "🙍🏾‍♀️*So glad I could help! If you have another question, "
+                "[persona_emoji] *So glad I could help! If you have another question, "
                 "you know what to do!* 😉"
             ),
             next=self.START_STATE,
