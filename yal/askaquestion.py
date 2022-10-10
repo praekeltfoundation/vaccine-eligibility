@@ -63,6 +63,7 @@ class Application(BaseApplication):
                     "-----",
                     "*Or reply:*",
                     BACK_TO_MAIN,
+                    GET_HELP,
                 ]
             )
         )
@@ -125,37 +126,34 @@ class Application(BaseApplication):
             choices.append(Choice(title, title))
 
         if page == 0:
+            question_list = [
+                f"🙋🏿‍♂️ QUESTIONS? / Ask A Question / *1st {len(answers)} matches*",
+                "-----",
+                "",
+                "[persona_emoji] That's a really good question! I have a few "
+                "answers that could give you the info you need.",
+                "",
+                "*What would you like to read first?* Reply with the number "
+                "of the topic you're interested in.",
+                "",
+                get_display_choices(choices, bold_numbers=True),
+                "",
+            ]
+            # Add next page option if there is one
             if self.user.metadata.get("next_page_url"):
-                choices.append(Choice("more", "Show me more"))
-            question = self._(
-                "\n".join(
-                    [
-                        f"🙋🏿‍♂️ QUESTIONS? / Ask A Question / 1st {len(answers)} "
-                        "matches",
-                        "-----",
-                        "",
-                        "[persona_emoji] That's a really good question! I have a few "
-                        "answers that could give you the info you need.",
-                        "",
-                        "*What would you like to read first?* Reply with the number "
-                        "of the topic you're interested in.",
-                        "",
-                        get_display_choices(choices),
-                        "",
-                        "-----",
-                        "*Or reply:*",
-                        BACK_TO_MAIN,
-                        GET_HELP,
-                    ]
+                question_list.extend(
+                    ["or", f"*{len(choices)+1}*. See more options", ""]
                 )
-            )
+                choices.append(Choice("more", "See more options"))
+            # Add footer options
+            question_list.extend(["-----", "*Or reply:*", BACK_TO_MAIN, GET_HELP])
+
+            question = self._("\n".join(question_list))
         else:
-            choices.append(Choice("back", "Back to first list"))
-            choices.append(Choice("callme", "Talk to a counsellor"))
             question = "\n".join(
                 [
-                    f"🙋🏿‍♂️ QUESTIONS? / Ask A Question / 2nd {len(answers)} "
-                    "matches",
+                    f"🙋🏿‍♂️ QUESTIONS? / Ask A Question / *2nd {len(answers)} "
+                    "matches*",
                     "-----",
                     "",
                     "[persona_emoji] Here are some more topics that might answer "
@@ -165,7 +163,11 @@ class Application(BaseApplication):
                     "answer, reply with the number of the topic you're interested "
                     "in.",
                     "",
-                    get_display_choices(choices),
+                    get_display_choices(choices, bold_numbers=True),
+                    "",
+                    "or",
+                    f"*{len(choices)+1}*. Back to first list",
+                    f"*{len(choices)+2}*. Talk to a counsellor",
                     "",
                     "-----",
                     "*Or reply:*",
@@ -173,6 +175,8 @@ class Application(BaseApplication):
                     GET_HELP,
                 ]
             )
+            choices.append(Choice("back", "Back to first list"))
+            choices.append(Choice("callme", "Talk to a counsellor"))
 
         return WhatsAppListState(
             self,
@@ -306,7 +310,7 @@ class Application(BaseApplication):
                 "[persona_emoji] *So glad I could help! If you have another question, "
                 "you know what to do!* 😉"
             ),
-            next=self.START_STATE,
+            next="state_pre_mainmenu",
         )
 
     async def state_no_question_not_answered(self):
