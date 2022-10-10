@@ -12,6 +12,7 @@ from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
+from yal.utils import replace_persona_fields
 
 logger = logging.getLogger(__name__)
 
@@ -133,3 +134,10 @@ class Application(
             ),
             next=self.START_STATE,
         )
+
+    def send_message(self, content, continue_session=True, **kw):
+        """
+        Replaces any persona placeholders in content before sending
+        """
+        content=replace_persona_fields(content, self.user.metadata)
+        return super().send_message(content, continue_session, **kw)
