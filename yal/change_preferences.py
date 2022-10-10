@@ -2,7 +2,14 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, ChoiceState, FreeText, WhatsAppListState
+from vaccine.states import (
+    Choice,
+    ChoiceState,
+    FreeText,
+    WhatsAppListState,
+    WhatsAppButtonState
+)
+from vaccine.utils import get_display_choices
 from yal import rapidpro
 from yal.utils import GENDERS, PROVINCES, get_generic_error, normalise_phonenumber
 from yal.validators import day_validator, year_validator
@@ -81,11 +88,14 @@ class Application(BaseApplication):
                     "",
                     "☑️ 🌈  *Identity*",
                     gender,
+                    "",
+                    "[persona_emoji] *Bot name*",
+                    "B-wise [persona_name]"
                 ]
             )
         )
 
-        await self.worker.publish_message(self.inbound.reply(question))
+        await self.publish_message(question)
         await asyncio.sleep(0.5)
 
         return await self.go_to_state("state_change_info_prompt")
@@ -103,6 +113,7 @@ class Application(BaseApplication):
                     "2. Relationship Status",
                     "3. Location",
                     "4. Identity",
+                    "5. Bot name and emoji",
                     "-----",
                     "*Or reply:*",
                     "*0* - 🏠 Back to *Main MENU*",
@@ -121,10 +132,11 @@ class Application(BaseApplication):
                 ),
                 Choice("state_update_province", self._("Location")),
                 Choice("state_update_gender", self._("Identity")),
+                Choice("state_update_bot_name", self._("Bot name and emoji")),
             ],
             next=next_,
             error=self._(get_generic_error()),
-            error_footer=self._("\n" "Reply with the number next to the month."),
+            error_footer=self._("\n" "Reply with the number that matches your choice."),
             button="Change Preferences",
         )
 
@@ -445,3 +457,123 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         return await self.go_to_state("state_display_preferences")
+
+    async def state_update_bot_name(self):
+        question = self._(
+            "\n".join(
+                [
+                    "[persona_emoji] PERSONALISE YOUR B-WISE BOT / *Give me a name*",
+                    "-----",
+                    "",
+                    "*What would you like to call me?*",
+                    "It can be any name you like or one that reminds you of someone you trust.",
+                    "",
+                    "Just type and send me your new bot name.",
+                ]
+            )
+        )
+        return ChoiceState(
+            self,
+            question=question,
+            footer=self._("\n" "If you want to do this later, just click the \"skip\" button."),
+            next="state_update_bot_name_submit",
+            error=self._(get_generic_error()),
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_update_bot_name_submit(self):
+        choice = self.user.answers.get("state_update_bot_name")
+        if choice == "skip":
+            return await self.go_to_state("state_update_bot_emoji")
+
+        self.save_metadata("persona_name", choice)
+
+        data = {"persona_name": choice}
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        error = await rapidpro.update_profile(whatsapp_id, data)
+        if error:
+            return await self.go_to_state("state_error")
+
+        question = self._(
+            "\n".join(
+                [
+                    "Great - from now on you can call me [persona_name].",
+                    "",
+                    "_You can change this later by typing in *9* from the main *MENU*._",
+                ]
+            )
+        )
+        await self.publish_message(question)
+        await asyncio.sleep(0.5)
+
+        return await self.go_to_state("state_update_bot_emoji")
+
+    async def state_update_bot_emoji(self):
+        question = self._(
+            "\n".join(
+                [
+                    "[persona_emoji] PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
+                    "-----",
+                    "",
+                    "*Why not use an emoji to accompany my new name?*",
+                    "Send in the new emoji you'd like to use now.",
+                    "",
+                ]
+            )
+        )
+        return ChoiceState(
+            self,
+            question=question,
+            footer=self._("\n" "If you want to do this later, just click the \"skip\" button."),
+            next="state_update_bot_emoji_submit",
+            error=self._(get_generic_error()),
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_update_bot_emoji_submit(self):
+        choice = self.user.answers.get("state_update_bot_emoji")
+        if choice == "skip":
+            return await self.go_to_state("state_change_info_prompt")
+
+        self.save_metadata("persona_emoji", choice)
+
+        data = {"persona_emoji": choice}
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        error = await rapidpro.update_profile(whatsapp_id, data)
+        if error:
+            return await self.go_to_state("state_error")
+
+        choices = [
+            Choice("menu", self._("Main Menu")),
+            Choice(
+                "ask_a_question", self._("Ask a question")
+            ),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "[persona_emoji] PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
+                    "-----",
+                    "",
+                    "Wonderful! [persona_emoji]",
+                    "",
+                    "*What would you like to do now?*",
+                    "",
+                    get_display_choices(choices),
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "menu": "state_pre_mainmenu",
+                "ask_a_question": "state_aaq_start",
+            },
+        )
