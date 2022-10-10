@@ -141,3 +141,10 @@ class Application(
         """
         content=replace_persona_fields(content, self.user.metadata)
         return super().send_message(content, continue_session, **kw)
+
+    async def publish_message(self, question):
+        """
+        Replaces any persona placeholders in content before sending
+        """
+        content=replace_persona_fields(question, self.user.metadata)
+        await self.worker.publish_message(self.inbound.reply(content))

@@ -246,7 +246,7 @@ class Application(BaseApplication):
                 f"[persona_emoji] {content}",
             ]
         )
-        await self.worker.publish_message(self.inbound.reply(question))
+        await self.publish_message(question)
         await asyncio.sleep(1.5)
 
         return await self.go_to_state("state_get_content_feedback")
