@@ -65,7 +65,9 @@ def calculate_age(date_of_birth: date):
     return years
 
 
-def get_display_choices(choices) -> str:
+def get_display_choices(choices, bold_numbers=False) -> str:
+    if bold_numbers:
+        return "\n".join(f"*{i + 1}*. {c.label}" for i, c in enumerate(choices))
     return "\n".join(f"{i + 1}. {c.label}" for i, c in enumerate(choices))
 
 
