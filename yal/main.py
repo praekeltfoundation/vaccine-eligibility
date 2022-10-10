@@ -93,7 +93,11 @@ class Application(
         # to a scheduled msg
         aaq_timeout_sent = fields.get("aaq_timeout_sent")
 
+        # Cache some profile info
         for field in ("province", "suburb", "street_name", "street_number"):
+            if fields.get(field):
+                self.save_metadata(field, fields[field])
+        for field in utils.PERSONA_FIELDS:
             if fields.get(field):
                 self.save_metadata(field, fields[field])
 
