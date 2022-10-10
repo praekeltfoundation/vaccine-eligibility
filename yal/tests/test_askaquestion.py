@@ -138,7 +138,7 @@ async def test_aaq_start(mock_config, tester: AppTester, rapidpro_mock):
                 "🙋🏿‍♂️ QUESTIONS? / *Ask A Question*",
                 "-----",
                 "",
-                "[persona_emoji] *That's what I'm here for!*",
+                "🤖 *That's what I'm here for!*",
                 "*Just type your Q and hit send* 🙂",
                 "",
                 "e.g. _How do I know if I have an STI?_",
@@ -197,7 +197,7 @@ async def test_start_state_response_sets_timeout(
                 "🙋🏿‍♂️ QUESTIONS? / Ask A Question / *1st 5 matches*",
                 "-----",
                 "",
-                "[persona_emoji] That's a really good question! I have a few "
+                "🤖 That's a really good question! I have a few "
                 "answers that could give you the info you need.",
                 "",
                 "*What would you like to read first?* Reply with the number of the "
@@ -261,7 +261,7 @@ async def test_state_display_results_choose_an_answer(
             "🙋🏿‍♂️ QUESTIONS? / *FAQ #1 Title*",
             "-----",
             "",
-            "[persona_emoji] This is FAQ #1's content.",
+            "🤖 This is FAQ #1's content.",
         ]
     )
 
@@ -298,7 +298,7 @@ async def test_state_display_results_next(tester: AppTester, aaq_mock):
                 "🙋🏿‍♂️ QUESTIONS? / Ask A Question / *2nd 3 matches*",
                 "-----",
                 "",
-                "[persona_emoji] Here are some more topics that might answer your "
+                "🤖 Here are some more topics that might answer your "
                 "question.",
                 "",
                 "*Which of these would you like to explore?* To see the answer, reply "
@@ -397,7 +397,7 @@ async def test_state_get_content_feedback_question_answered(
 
     tester.assert_num_messages(1)
     tester.assert_message(
-        "[persona_emoji] *So glad I could help! If you have another question, "
+        "🤖 *So glad I could help! If you have another question, "
         "you know what to do!* 😉"
     )
 
@@ -439,7 +439,7 @@ async def test_state_display_content_question_not_answered(
                 "🙋🏿‍♂️ QUESTIONS? / Ask A Question / *1st 5 matches*",
                 "-----",
                 "",
-                "[persona_emoji] That's a really good question! I have a few "
+                "🤖 That's a really good question! I have a few "
                 "answers that could give you the info you need.",
                 "",
                 "*What would you like to read first?* Reply with the number of the "
@@ -510,7 +510,7 @@ async def test_state_handle_timeout_handles_type_2_yes(
 
     tester.assert_num_messages(1)
     tester.assert_message(
-        "[persona_emoji] *So glad I could help! If you have another question, "
+        "🤖 *So glad I could help! If you have another question, "
         "you know what to do!* 😉"
     )
 
