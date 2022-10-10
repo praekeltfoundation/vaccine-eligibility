@@ -23,6 +23,7 @@ def test_generic_error_message():
     for _ in range(10):
         assert utils.get_generic_error() in utils.GENERIC_ERRORS
 
+
 def test_replace_persona_fields():
     """
     It should replace placeholders with the value in the given dict
@@ -30,7 +31,7 @@ def test_replace_persona_fields():
     meta_dict = {
         "question": "this is the question to show other things don't get replaced",
         "persona_emoji": "🦸",
-        "persona_name": "caped crusader"
+        "persona_name": "caped crusader",
     }
     content = (
         "Hi 👋, You chose to call me [persona_name] and I look like [persona_emoji]"
@@ -41,7 +42,8 @@ def test_replace_persona_fields():
     assert replaced_content == (
         "Hi 👋, You chose to call me caped crusader and I look like 🦸"
         "Note that question doesn't get replaced. Neither does [question]"
-        )
+    )
+
 
 def test_replace_persona_fields_uses_placeholders():
     """
@@ -57,4 +59,4 @@ def test_replace_persona_fields_uses_placeholders():
     assert replaced_content == (
         "Hi 👋, You chose to call me B-wise and I look like 🤖"
         "Note that question doesn't get replaced. Neither does [question]"
-        )
+    )

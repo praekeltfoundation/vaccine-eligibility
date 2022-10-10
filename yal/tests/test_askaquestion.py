@@ -298,8 +298,7 @@ async def test_state_display_results_next(tester: AppTester, aaq_mock):
                 "🙋🏿‍♂️ QUESTIONS? / Ask A Question / *2nd 3 matches*",
                 "-----",
                 "",
-                "🤖 Here are some more topics that might answer your "
-                "question.",
+                "🤖 Here are some more topics that might answer your question.",
                 "",
                 "*Which of these would you like to explore?* To see the answer, reply "
                 "with the number of the topic you're interested in.",
