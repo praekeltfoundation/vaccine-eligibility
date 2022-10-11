@@ -4,7 +4,7 @@ from sanic import Sanic, response
 from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
-from yal.change_preferences import Application
+from yal.main import Application
 
 
 @pytest.fixture
@@ -28,6 +28,8 @@ def get_rapidpro_contact(urn):
             "suburb": "TestSuburb",
             "street_name": "test street",
             "street_number": "12",
+            "persona_emoji": "🦸",
+            "persona_name": "Caped Crusader",
         },
         "blocked": False,
         "stopped": False,
@@ -78,6 +80,8 @@ async def rapidpro_mock():
 
 @pytest.mark.asyncio
 async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["persona_emoji"] = "🦸"
+    tester.user.metadata["persona_name"] = "Caped Crusader"
     tester.setup_state("state_display_preferences")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
     tester.assert_num_messages(1)
@@ -101,6 +105,9 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
             "",
             "☑️ 🌈  *Identity*",
             "Boy/Man",
+            "",
+            "🦸 *Bot name*",
+            "B-wise Caped Crusader"
         ]
     )
 
@@ -113,6 +120,7 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
                 "2. Relationship Status",
                 "3. Location",
                 "4. Identity",
+                "5. Bot name and emoji",
                 "-----",
                 "*Or reply:*",
                 "*0* - 🏠 Back to *Main MENU*",
@@ -189,3 +197,152 @@ async def test_state_update_location_submit(tester: AppTester, rapidpro_mock):
         "/api/v2/contacts.json",
         "/api/v2/contacts.json",
     ]
+
+
+@pytest.mark.asyncio
+async def test_state_update_bot_name(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["persona_emoji"] = "🦸"
+    tester.user.metadata["persona_name"] = "Caped Crusader"
+    tester.setup_state("state_display_preferences")
+    await tester.user_input("5")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_update_bot_name")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "🦸 PERSONALISE YOUR B-WISE BOT / *Give me a name*",
+                "-----",
+                "",
+                "*What would you like to call me?*",
+                "It can be any name you like or one that reminds you of someone you trust.",
+                "",
+                "Just type and send me your new bot name.",
+                "",
+                "_If you want to do this later, just click the \"skip\" button._"
+            ]
+        )
+    )
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+
+
+@pytest.mark.asyncio
+async def test_state_update_bot_name_submit(
+    tester: AppTester, rapidpro_mock
+):
+    tester.user.metadata["persona_emoji"] = "🦸"
+    tester.user.metadata["persona_name"] = "Caped Crusader"
+    tester.setup_state("state_update_bot_name")
+    await tester.user_input("johnny")
+
+    [msg] = tester.fake_worker.outbound_messages
+    assert msg.content == "\n".join(
+        [
+            "Great - from now on you can call me johnny.",
+            "",
+            "_You can change this later by typing in *9* from the main *MENU*._",
+        ]
+    )
+    tester.assert_num_messages(1)
+    tester.assert_message(
+        "\n".join(
+            [
+                "🦸 PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
+                "-----",
+                "",
+                "*Why not use an emoji to accompany my new name?*",
+                "Send in the new emoji you'd like to use now.",
+                "",
+                "_If you want to do this later, just click the \"skip\" button._",
+            ]
+        )
+    )
+
+    tester.assert_state("state_update_bot_emoji")
+    tester.assert_metadata("persona_name", "johnny")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/contacts.json",
+    ]
+
+
+@pytest.mark.asyncio
+async def test_state_update_bot_name_skip(
+    tester: AppTester, rapidpro_mock
+):
+    tester.user.metadata["persona_emoji"] = "🦸"
+    tester.user.metadata["persona_name"] = "Caped Crusader"
+    tester.setup_state("state_update_bot_name")
+    await tester.user_input("skip")
+
+    assert len(tester.fake_worker.outbound_messages) == 0
+
+    tester.assert_num_messages(1)
+    tester.assert_message(
+        "\n".join(
+            [
+                "🦸 PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
+                "-----",
+                "",
+                "*Why not use an emoji to accompany my new name?*",
+                "Send in the new emoji you'd like to use now.",
+                "",
+                "_If you want to do this later, just click the \"skip\" button._",
+            ]
+        )
+    )
+
+    tester.assert_state("state_update_bot_emoji")
+    tester.assert_metadata("persona_name", "Caped Crusader")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+
+
+@pytest.mark.asyncio
+async def test_state_update_bot_emoji_submit(
+    tester: AppTester, rapidpro_mock
+):
+    tester.user.metadata["persona_emoji"] = "🦸"
+    tester.user.metadata["persona_name"] = "Caped Crusader"
+    tester.setup_state("state_update_bot_emoji")
+    await tester.user_input("🙋🏿‍♂️")
+
+    tester.assert_num_messages(1)
+    tester.assert_message(
+        "\n".join(
+            [
+                "🙋🏿‍♂️ PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
+                "-----",
+                "",
+                "Wonderful! 🙋🏿‍♂️",
+                "",
+                "*What would you like to do now?*",
+                "",
+                "1. Main Menu",
+                "2. Ask a question",
+            ]
+        )
+    )
+
+    tester.assert_state("state_update_bot_emoji_submit")
+    tester.assert_metadata("persona_emoji", "🙋🏿‍♂️")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/contacts.json",
+    ]
+
+
+@pytest.mark.asyncio
+async def test_state_update_bot_emoji_skip(
+    tester: AppTester, rapidpro_mock
+):
+    tester.user.metadata["persona_emoji"] = "🦸"
+    tester.user.metadata["persona_name"] = "Caped Crusader"
+    tester.setup_state("state_update_bot_emoji")
+    await tester.user_input("skip")
+
+    tester.assert_state("state_change_info_prompt")
+    tester.assert_metadata("persona_emoji", "🦸")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == []
