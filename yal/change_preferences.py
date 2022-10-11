@@ -12,7 +12,7 @@ from vaccine.states import (
 from vaccine.utils import get_display_choices
 from yal import rapidpro
 from yal.utils import GENDERS, PROVINCES, get_generic_error, normalise_phonenumber
-from yal.validators import day_validator, year_validator
+from yal.validators import age_validator
 
 logger = logging.getLogger(__name__)
 
@@ -38,9 +38,7 @@ class Application(BaseApplication):
 
             return value
 
-        dob_year = fields.get("dob_year") or "skip"
-        dob_month = fields.get("dob_month") or "skip"
-        dob_day = fields.get("dob_day") or "skip"
+        age = fields.get("age") or "skip"
         relationship_status = get_field("relationship_status").title()
         gender = get_field("gender")
 
@@ -59,16 +57,6 @@ class Application(BaseApplication):
             ]
         )
 
-        dob = []
-        if dob_day != "skip" and dob_month != "skip":
-            dob.append(dob_day)
-            dob.append(dob_month)
-        elif dob_day != "skip":
-            dob.append(dob_month)
-
-        if dob_year != "skip":
-            dob.append(dob_year)
-
         question = self._(
             "\n".join(
                 [
@@ -77,8 +65,8 @@ class Application(BaseApplication):
                     "-----",
                     "*👩🏾 No problem. Here's the info you've saved:*",
                     "",
-                    "☑️ 🎂 *Birthday*",
-                    "/".join(dob) if dob != [] else "Empty",
+                    "🍰 *Age*",
+                    age or "Empty",
                     "",
                     "☑️ 💟 *In a Relationship?*",
                     relationship_status,
@@ -109,7 +97,7 @@ class Application(BaseApplication):
                 [
                     "👩🏾 *What info would you like to change?*",
                     "",
-                    "1. Birthday",
+                    "1. Age",
                     "2. Relationship Status",
                     "3. Location",
                     "4. Identity",
@@ -126,7 +114,7 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("state_update_dob_year", self._("Birthday")),
+                Choice("state_update_age", self._("Age")),
                 Choice(
                     "state_update_relationship_status", self._("Relationship Status")
                 ),
@@ -140,102 +128,41 @@ class Application(BaseApplication):
             button="Change Preferences",
         )
 
-    async def state_update_dob_year(self):
+    async def state_update_age(self):
         return FreeText(
             self,
             question=self._(
                 "\n".join(
                     [
-                        "*CHAT SETTINGS*",
-                        "Date of birth",
+                        "ABOUT YOU / 🍰*Age*",
                         "-----",
                         "",
-                        "Which year were you born in?",
-                        "",
-                        "Reply with a number. (e.g. 2007)",
-                        "",
-                        "-----",
-                        "Rather not say?",
-                        "No stress! Just tap SKIP.",
+                        "*What is your age?*",
+                        "_Type in the number only (e.g. 24)_"
                     ]
                 )
             ),
-            next="state_update_dob_month",
-            check=year_validator(
+            next="state_update_age_submit",
+            check=age_validator(
                 self._(
-                    "⚠️  Please TYPE in only the YEAR you were born.\n" "Example _1980_"
+                    "\n".join(
+                        [
+                            "Hmm, something looks a bit off to me. Can we try again? Remember to *only use numbers*. 👍🏽",
+                            "",
+                            "For example just send in *17* if you are 17 years old."
+                        ]
+                    )
                 )
             ),
             buttons=[Choice("skip", self._("Skip"))],
         )
 
-    async def state_update_dob_month(self):
-        return ChoiceState(
-            self,
-            question=self._(
-                "*CHAT SETTINGS*\n"
-                "Your date of birth\n"
-                "-----\n"
-                "*What month where you born in?*\n"
-                "Reply with a number:"
-            ),
-            choices=[
-                Choice("1", self._("January")),
-                Choice("2", self._("February")),
-                Choice("3", self._("March")),
-                Choice("4", self._("April")),
-                Choice("5", self._("May")),
-                Choice("6", self._("June")),
-                Choice("7", self._("July")),
-                Choice("8", self._("August")),
-                Choice("9", self._("September")),
-                Choice("10", self._("October")),
-                Choice("11", self._("November")),
-                Choice("12", self._("December")),
-            ],
-            footer=self._("\n" "If you'd rather not say, just tap *SKIP*."),
-            next="state_update_dob_day",
-            error=self._(get_generic_error()),
-            error_footer=self._("\n" "Reply with the number next to the month."),
-            buttons=[Choice("skip", self._("Skip"))],
-        )
-
-    async def state_update_dob_day(self):
-        question = self._(
-            "\n".join(
-                [
-                    "*CHAT SETTINGS*",
-                    "Your date of birth",
-                    "-----",
-                    "",
-                    "*Great. And which day were you born on?*",
-                    "",
-                    "Reply with a number. (e.g. *30* - if you were born on the 30th)",
-                    "",
-                    "If you'd rather not say, just tap *SKIP*.",
-                ]
-            )
-        )
-
-        dob_year = self.user.answers["state_update_dob_year"]
-        dob_month = self.user.answers["state_update_dob_month"]
-
-        return FreeText(
-            self,
-            question=question,
-            next="state_update_dob_submit",
-            check=day_validator(dob_year, dob_month, question),
-            buttons=[Choice("skip", self._("Skip"))],
-        )
-
-    async def state_update_dob_submit(self):
+    async def state_update_age_submit(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
         data = {
-            "dob_month": self.user.answers.get("state_update_dob_month"),
-            "dob_day": self.user.answers.get("state_update_dob_day"),
-            "dob_year": self.user.answers.get("state_update_dob_year"),
+            "age": self.user.answers.get("state_update_age"),
         }
 
         error = await rapidpro.update_profile(whatsapp_id, data)

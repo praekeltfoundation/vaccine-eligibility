@@ -21,9 +21,7 @@ def get_rapidpro_contact(urn):
         "fields": {
             "relationship_status": None,
             "gender": "boy_man",
-            "dob_day": "22",
-            "dob_month": "2",
-            "dob_year": "2022",
+            "age": "22",
             "province": "FS",
             "suburb": "TestSuburb",
             "street_name": "test street",
@@ -94,8 +92,8 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
             "-----",
             "*👩🏾 No problem. Here's the info you've saved:*",
             "",
-            "☑️ 🎂 *Birthday*",
-            "22/2/2022",
+            "🍰 *Age*",
+            "22",
             "",
             "☑️ 💟 *In a Relationship?*",
             "Empty",
@@ -116,7 +114,7 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
             [
                 "👩🏾 *What info would you like to change?*",
                 "",
-                "1. Birthday",
+                "1. Age",
                 "2. Relationship Status",
                 "3. Location",
                 "4. Identity",
@@ -130,6 +128,43 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
     )
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+
+
+@pytest.mark.asyncio
+async def test_state_update_age(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_display_preferences")
+    await tester.user_input("1")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_update_age")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "ABOUT YOU / 🍰*Age*",
+                "-----",
+                "",
+                "*What is your age?*",
+                "_Type in the number only (e.g. 24)_"
+            ]
+        )
+    )
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+
+
+@pytest.mark.asyncio
+async def test_state_update_age_submit(
+    tester: AppTester, rapidpro_mock
+):
+    tester.setup_state("state_update_age")
+    await tester.user_input("32")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_change_info_prompt")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/contacts.json",
+        "/api/v2/contacts.json",
+    ]
 
 
 @pytest.mark.asyncio
