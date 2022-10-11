@@ -12,6 +12,7 @@ from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
+from yal.utils import replace_persona_fields
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +94,11 @@ class Application(
         # to a scheduled msg
         aaq_timeout_sent = fields.get("aaq_timeout_sent")
 
+        # Cache some profile info
         for field in ("province", "suburb", "street_name", "street_number"):
+            if fields.get(field):
+                self.save_metadata(field, fields[field])
+        for field in utils.PERSONA_FIELDS:
             if fields.get(field):
                 self.save_metadata(field, fields[field])
 
@@ -129,3 +134,17 @@ class Application(
             ),
             next=self.START_STATE,
         )
+
+    def send_message(self, content, continue_session=True, **kw):
+        """
+        Replaces any persona placeholders in content before sending
+        """
+        content = replace_persona_fields(content, self.user.metadata)
+        return super().send_message(content, continue_session, **kw)
+
+    async def publish_message(self, question):
+        """
+        Replaces any persona placeholders in content before sending
+        """
+        content = replace_persona_fields(question, self.user.metadata)
+        await self.worker.publish_message(self.inbound.reply(content))

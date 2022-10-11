@@ -28,6 +28,8 @@ GENDERS = {
 }
 BACK_TO_MAIN = "0. 🏠 *Back* to Main *MENU*"
 GET_HELP = "#. 🆘Get *HELP*"
+PERSONA_FIELDS = ["persona_emoji", "persona_name"]
+PERSONA_DEFAULTS = {"persona_emoji": "🤖", "persona_name": "B-wise"}
 
 
 def get_generic_error():
@@ -64,3 +66,12 @@ def normalise_phonenumber(phonenumber):
         return phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.E164)
     except (phonenumbers.phonenumberutil.NumberParseException, AssertionError):
         raise ValueError("Invalid phone number")
+
+
+def replace_persona_fields(text, metadata={}):
+    for key in PERSONA_FIELDS:
+        if key in metadata:
+            text = text.replace(f"[{key}]", metadata[key])
+        else:
+            text = text.replace(f"[{key}]", PERSONA_DEFAULTS[key])
+    return text
