@@ -469,15 +469,15 @@ class Application(BaseApplication):
                     "It can be any name you like or one that reminds you of someone you trust.",
                     "",
                     "Just type and send me your new bot name.",
+                    "",
+                    "_If you want to do this later, just click the \"skip\" button._"
                 ]
             )
         )
-        return ChoiceState(
+        return FreeText(
             self,
             question=question,
-            footer=self._("\n" "If you want to do this later, just click the \"skip\" button."),
             next="state_update_bot_name_submit",
-            error=self._(get_generic_error()),
             buttons=[Choice("skip", self._("Skip"))],
         )
 
@@ -520,15 +520,14 @@ class Application(BaseApplication):
                     "*Why not use an emoji to accompany my new name?*",
                     "Send in the new emoji you'd like to use now.",
                     "",
+                    "_If you want to do this later, just click the \"skip\" button._",
                 ]
             )
         )
-        return ChoiceState(
+        return FreeText(
             self,
             question=question,
-            footer=self._("\n" "If you want to do this later, just click the \"skip\" button."),
             next="state_update_bot_emoji_submit",
-            error=self._(get_generic_error()),
             buttons=[Choice("skip", self._("Skip"))],
         )
 
