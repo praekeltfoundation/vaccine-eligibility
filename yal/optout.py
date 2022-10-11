@@ -89,7 +89,7 @@ class Application(BaseApplication):
                 ]
             )
         )
-        self.worker.publish_message(self.inbound.reply(msg))
+        await self.worker.publish_message(self.inbound.reply(msg))
         await asyncio.sleep(0.5)
         return await self.go_to_state("state_optout_survey")
 
