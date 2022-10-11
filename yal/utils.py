@@ -67,6 +67,7 @@ def normalise_phonenumber(phonenumber):
     except (phonenumbers.phonenumberutil.NumberParseException, AssertionError):
         raise ValueError("Invalid phone number")
 
+
 def replace_persona_fields(text, metadata={}):
     for key in PERSONA_FIELDS:
         if key in metadata:
