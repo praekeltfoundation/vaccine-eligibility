@@ -350,12 +350,12 @@ async def test_state_mainmenu_start(
             "8. Sub menu 3",
             "-----",
             "🙋🏿‍♂️ *QUESTIONS?*",
-            "9. Ask a Question",
+            "9. Ask your own question",
             "-----",
             "*⚙️ CHAT SETTINGS*",
-            "10. Change Profile",
+            "10. Update your information",
             "-----",
-            "💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
+            "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or *MENU*.",
         ]
     )
     assert banner.content == "Test banner message"
@@ -415,12 +415,12 @@ async def test_state_mainmenu_start_suggested_populated(
                 "8. Sub menu 3",
                 "-----",
                 "🙋🏿‍♂️ *QUESTIONS?*",
-                "9. Ask a Question",
+                "9. Ask your own question",
                 "-----",
                 "*⚙️ CHAT SETTINGS*",
-                "10. Change Profile",
+                "10. Update your information",
                 "-----",
-                "💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
+                "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or *MENU*.",
             ]
         )
     )
