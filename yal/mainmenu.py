@@ -180,6 +180,17 @@ class Application(BaseApplication):
             )
         )
 
+        # We ignore errors here, because if there's an error they just won't get the
+        # banner, we can still carry on and not go to the error state
+        _, banner_choices = await contentrepo.get_choices_by_tag("banner")
+        banner_messages = []
+        for choice in banner_choices:
+            error, page_details = await contentrepo.get_page_details(
+                self.user, choice.value, self.inbound.message_id
+            )
+            if not error:
+                banner_messages.append(page_details["body"])
+
         return CustomChoiceState(
             self,
             question=question,
@@ -191,6 +202,7 @@ class Application(BaseApplication):
             ),
             choices=choices,
             next=next_,
+            additional_messages=banner_messages,
         )
 
     async def state_contentrepo_page(self):

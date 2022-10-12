@@ -407,7 +407,7 @@ async def test_answer_worker_push_results_user_error(
     )
 
     # wait for worker to log error
-    for _ in range(10):
+    for _ in range(50):
         if len(flow_results_mock_server.tstate.requests) == 3:
             break
         await sleep(0.1)

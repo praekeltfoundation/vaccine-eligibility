@@ -113,6 +113,9 @@ async def contentrepo_api_mock():
         if tag == "mainmenu":
             pages.append({"id": 111, "title": "Main Menu 1 💊"})
             pages.append({"id": 222, "title": "Main Menu 2 🤝"})
+        elif tag == "banner":
+            if tstate.banner:
+                pages.append({"id": 777, "title": "Banner message"})
 
         child_of = request.args.get("child_of")
         if child_of in ["111", "222", "333", "444"]:
@@ -281,6 +284,18 @@ async def contentrepo_api_mock():
             )
         )
 
+    @app.route("/api/v2/pages/777", methods=["GET"])
+    def get_page_detail_777(request):
+        tstate.requests.append(request)
+        return response.json(
+            build_message_detail(
+                777,
+                "Banner message",
+                "Test banner message",
+                ["banner"],
+            )
+        )
+
     @app.route("/api/v2/images/<image_id:int>", methods=["GET"])
     def get_image(request, image_id):
         tstate.requests.append(request)
@@ -307,48 +322,51 @@ async def contentrepo_api_mock():
 async def test_state_mainmenu_start(
     get_current_datetime, tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
+    contentrepo_api_mock.tstate.banner = True
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
-    tester.assert_num_messages(1)
-    tester.assert_message(
-        "\n".join(
-            [
-                "🏡 *MAIN MENU*",
-                "How can I help you today?",
-                "-----",
-                "Send me the number of the topic you're interested in.",
-                "",
-                "*🏥 NEED HELP?*",
-                "1. Talk to a counsellor",
-                "2. Find clinics and services",
-                "-----",
-                "*Main Menu 1 💊*",
-                "3. Sub menu 1",
-                "4. Sub menu 2",
-                "5. Sub menu 3",
-                "-----",
-                "*Main Menu 2 🤝*",
-                "6. Sub menu 1",
-                "7. Sub menu 2",
-                "8. Sub menu 3",
-                "-----",
-                "🙋🏿‍♂️ *QUESTIONS?*",
-                "9. Ask a Question",
-                "-----",
-                "*⚙️ CHAT SETTINGS*",
-                "10. Change Profile",
-                "-----",
-                "💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
-            ]
-        )
+    tester.assert_num_messages(2)
+    menu, banner = tester.application.messages
+    assert menu.content == "\n".join(
+        [
+            "🏡 *MAIN MENU*",
+            "How can I help you today?",
+            "-----",
+            "Send me the number of the topic you're interested in.",
+            "",
+            "*🏥 NEED HELP?*",
+            "1. Talk to a counsellor",
+            "2. Find clinics and services",
+            "-----",
+            "*Main Menu 1 💊*",
+            "3. Sub menu 1",
+            "4. Sub menu 2",
+            "5. Sub menu 3",
+            "-----",
+            "*Main Menu 2 🤝*",
+            "6. Sub menu 1",
+            "7. Sub menu 2",
+            "8. Sub menu 3",
+            "-----",
+            "🙋🏿‍♂️ *QUESTIONS?*",
+            "9. Ask a Question",
+            "-----",
+            "*⚙️ CHAT SETTINGS*",
+            "10. Change Profile",
+            "-----",
+            "💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
+        ]
     )
+    assert banner.content == "Test banner message"
 
     assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
         "/suggestedcontent/",
+        "/api/v2/pages",
+        "/api/v2/pages/777",
     ]
 
     assert len(rapidpro_mock.tstate.requests) == 1
@@ -411,6 +429,7 @@ async def test_state_mainmenu_start_suggested_populated(
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
+        "/api/v2/pages",
     ]
 
     assert len(rapidpro_mock.tstate.requests) == 1
@@ -438,6 +457,7 @@ async def test_state_mainmenu_static(
         "/api/v2/pages",
         "/api/v2/pages",
         "/suggestedcontent/",
+        "/api/v2/pages",
     ]
 
     assert len(rapidpro_mock.tstate.requests) == 2
@@ -459,6 +479,7 @@ async def test_state_mainmenu_aaq(
         "/api/v2/pages",
         "/api/v2/pages",
         "/suggestedcontent/",
+        "/api/v2/pages",
     ]
 
     assert len(rapidpro_mock.tstate.requests) == 2
@@ -495,6 +516,7 @@ async def test_state_mainmenu_contentrepo(
         "/api/v2/pages",
         "/api/v2/pages",
         "/suggestedcontent/",
+        "/api/v2/pages",
         "/api/v2/pages/444",
     ]
 
@@ -567,6 +589,7 @@ async def test_state_mainmenu_contentrepo_children(
         "/api/v2/pages",
         "/api/v2/pages",
         "/suggestedcontent/",
+        "/api/v2/pages",
         "/api/v2/pages/333",
         "/api/v2/pages",
         "/api/v2/pages",

@@ -56,7 +56,7 @@ profile = "black"
 multi_line_output = 3
 
 [tool.pytest.ini_options]
-addopts = "--cov=vaccine --cov=yal"
+addopts = "--cov=vaccine --cov=yal --ignore=vaccine.testing"
 filterwarnings = [
     "error::UserWarning:_pytest",  # For PytestUnhandledCoroutineWarning
     "error::DeprecationWarning",
