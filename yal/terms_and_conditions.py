@@ -5,7 +5,6 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, WhatsAppButtonState, WhatsAppListState
 from yal import contentrepo, rapidpro
 from yal.onboarding import Application as OnboardingApplication
-from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.utils import get_generic_error, normalise_phonenumber
 
 logger = logging.getLogger(__name__)
@@ -15,153 +14,59 @@ class Application(BaseApplication):
     START_STATE = "state_welcome"
 
     async def state_welcome(self):
-        await self.worker.publish_message(
-            self.inbound.reply(
-                self._(
-                    "🙋🏾‍♀️  *HOWZIT! Welcome to B-Wise by Young Africa Live!*\n"
-                    "-----\n"
-                    "\n"
-                    "*Sister Unathi, at your service!*\n"
-                    "\n"
-                    "I'm a chatbot working on behalf of B-Wise bot, here to answer "
-                    "your questions about bodies, sex, relationships and health 😌."
-                )
+        question = self._(
+            "\n".join(
+                [
+                    "👋🏾 *HOWZIT! Welcome to B-Wise!*",
+                    "",
+                    "I'm a chatbot service 🤖 here to answer questions about "
+                    "your body, sex, relationships and health 😌",
+                    "",
+                    "Most of the time you'll be talking to me, but I can also connect "
+                    "you to an actual human (loveLife counsellor) if you need help.",
+                    "",
+                    "Let's start by creating your profile (just click the button "
+                    "below) ⬇️",
+                ]
             )
         )
-        await asyncio.sleep(0.5)
-        return await self.go_to_state("state_emergency_prompt")
+        error = self._(get_generic_error())
 
-    async def state_emergency_prompt(self):
-        question = self._(
-            "🆘 *Are you in trouble?*\n"
-            "-----\n"
-            "\n"
-            "🙍🏾‍♀️ Before we continue, I just want to check - *do you need to speak "
-            "to a human now?*\n"
-            "\n"
-            "*REPLY:*\n"
-            "*1* - Yes, I need human help\n"
-            "*2* - No, I'm good"
-        )
         return WhatsAppButtonState(
             self,
             question=question,
-            choices=[
-                Choice("yes", "Yes, I need help now"),
-                Choice("no", "No, I'm good"),
-            ],
-            error=self._(get_generic_error()),
-            next={
-                "yes": PleaseCallMeApplication.START_STATE,
-                "no": "state_emergency_info",
-            },
+            choices=[Choice("create", "Create a profile")],
+            error=error,
+            next="state_terms",
         )
-
-    async def state_emergency_info(self):
-        await self.worker.publish_message(
-            self.inbound.reply(
-                self._(
-                    "Cool 😎\n"
-                    "\n"
-                    "If you ever do need urgent, human help — just say the magic "
-                    "word (*HELP*) and I'll link you to a real person."
-                )
-            )
-        )
-        await asyncio.sleep(0.5)
-        return await self.go_to_state("state_get_to_know")
-
-    async def state_get_to_know(self):
-        question = self._(
-            "*Let's get to know each other better*\n"
-            "\n"
-            "Do you mind if I ask you a few Qs? It will help me do a better job at "
-            "answering your questions. 🙃\n"
-            "\n"
-            "*Reply:*\n"
-            "*1* - OK\n"
-            "*2* - Why?"
-        )
-        return WhatsAppButtonState(
-            self,
-            question=question,
-            choices=[Choice("ok", "Ok"), Choice("why", "Why?")],
-            error=self._(get_generic_error()),
-            next={
-                "ok": "state_pre_terms",
-                "why": "state_get_to_know_why",
-            },
-        )
-
-    async def state_get_to_know_why(self):
-        question = self._(
-            "🤔 *Why the questions?*\n"
-            "\n"
-            "🙍🏾‍♀️ These questions help the B-Wise team improve your experience with "
-            "me. The more I learn from you, the better the service will be for you.\n"
-            "\n"
-            "*Don't worry, you never have to share anything you don't want to. 🙂*\n"
-            "\n"
-            "*Ready?*\n"
-            "*1* - Ok\n"
-            "*2* - No Thanks"
-        )
-        return WhatsAppButtonState(
-            self,
-            question=question,
-            choices=[Choice("ok", "Ok"), Choice("no", "No thanks")],
-            error=self._(get_generic_error()),
-            next={"ok": "state_pre_terms", "no": "state_decline_get_to_know"},
-        )
-
-    async def state_decline_get_to_know(self):
-        await self.worker.publish_message(
-            self.inbound.reply(
-                self._(
-                    "😫 *We're sad to see you go.\n"
-                    "\n"
-                    "🙍🏾‍♀️ Although we'd love to chat, we understand that you might "
-                    "not be ready. If you change your mind, just sent the word HI "
-                    "to this number and we can start again.\n"
-                    "\n"
-                    "*See you next time*👋🏾"
-                )
-            )
-        )
-        await asyncio.sleep(0.5)
-        return await self.go_to_state("state_decline_2")
-
-    async def state_pre_terms(self):
-        await self.worker.publish_message(
-            self.inbound.reply(self._("Awesome, thanks 😌  — So, first things first..."))
-        )
-        await asyncio.sleep(0.5)
-        return await self.go_to_state("state_terms")
 
     async def state_terms(self):
         question = self._(
-            "🔒 *TERMS & CONDITIONS*\n"
-            "_B-Wise by Young Africa Live: Privacy Policy_\n"
-            "-----\n"
-            "\n"
-            "*Before we chat, I need to make sure you’re 💯% cool with our Privacy "
-            "Policy.*\n"
-            "\n"
-            "It explains your rights and choices when it comes to how we use and "
-            "store your info.\n"
-            "\n"
-            "*1 - READ* Privacy Policy\n"
-            "*2 - I ACCEPT* (continue)\n"
-            "*3 - I DON'T ACCEPT*"
+            "\n".join(
+                [
+                    "🔒 TERMS & CONDITIONS / *B-Wise: Privacy Policy*",
+                    "-----",
+                    "",
+                    "*Before we chat, I need to make sure... Are you 💯% cool with "
+                    "me sending you messages?*",
+                    "",
+                    "You can read the Privacy Policy, which explains your rights and "
+                    "choices when it comes to how we use and store your info.",
+                    "",
+                    "1. Yes, cool with me",
+                    "2. No, not keen",
+                    "3. Read Privacy Policy",
+                ]
+            )
         )
         return WhatsAppListState(
             self,
             question=question,
             button="Privacy Policy",
             choices=[
+                Choice("accept", "Yes, cool with me"),
+                Choice("decline", "No, not keen"),
                 Choice("read", "Read Privacy Policy"),
-                Choice("accept", "I Accept"),
-                Choice("decline", "I Don't Accept"),
             ],
             error=self._(get_generic_error()),
             next={
@@ -183,26 +88,30 @@ class Application(BaseApplication):
 
     async def state_decline_confirm(self):
         question = self._(
-            "🔒 *TERMS & CONDITIONS*\n"
-            "_Young Africa Live: Privacy Policy_\n"
-            "-----\n"
-            "\n"
-            "⚠️ *Are you Sure?*\n"
-            "\n"
-            "Unfortunately, I can't share any info with you if you haven't accepted "
-            "the Privacy Policy 😔.\n"
-            "\n"
-            "It's important for your safety and confidentiality...\n"
-            "\n"
-            "*1. ACCEPT* Privacy Policy\n"
-            "*2. END* chat"
+            "\n".join(
+                [
+                    "🔒 TERMS & CONDITIONS / *B-Wise: Privacy Policy*",
+                    "_Young Africa Live: Privacy Policy_",
+                    "-----",
+                    "",
+                    "⚠️ *Are you Sure?*",
+                    "",
+                    "Unfortunately, I can't share any info with you if you haven't "
+                    "accepted the Privacy Policy 😔.",
+                    "",
+                    "It's important for your safety and confidentiality...",
+                    "",
+                    "*1. ACCEPT* Privacy Policy",
+                    "*2. END* chat",
+                ]
+            )
         )
         return WhatsAppButtonState(
             self,
             question=question,
             choices=[
-                Choice("end", "END chat"),
                 Choice("accept", "ACCEPT"),
+                Choice("end", "END chat"),
             ],
             error=self._(get_generic_error()),
             next={
@@ -221,8 +130,8 @@ class Application(BaseApplication):
                     "important to us too.\n"
                     "\n"
                     "If you change your mind though, we'll be here! Just send me a "
-                    "*HI* whenever you're ready to chat again. In the mean time, be "
-                    "wise, and look after yourself 😉👋🏾"
+                    "*HI* whenever you're ready to chat again. In the meantime, be "
+                    "wise and look after yourself 😉👋🏾"
                 )
             )
         )
