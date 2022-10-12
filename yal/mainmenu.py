@@ -185,12 +185,22 @@ class Application(BaseApplication):
         # banner, we can still carry on and not go to the error state
         _, banner_choices = await contentrepo.get_choices_by_tag("banner")
         banner_messages = []
+        # Get all the content pages that have the banner tag
         for choice in banner_choices:
-            error, page_details = await contentrepo.get_page_details(
-                self.user, choice.value, self.inbound.message_id
-            )
-            if not error:
-                banner_messages.append(page_details["body"])
+            # Get all the messages for this content page
+            message_id = 1
+            while message_id is not None:
+                error, page_details = await contentrepo.get_page_details(
+                    self.user, choice.value, message_id
+                )
+                if error:
+                    message_id = None
+                else:
+                    banner_messages.append(page_details["body"])
+                    if page_details.get("next_prompt"):
+                        message_id += 1
+                    else:
+                        message_id = None
 
         return CustomChoiceState(
             self,
