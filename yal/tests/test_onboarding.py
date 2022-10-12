@@ -62,6 +62,84 @@ async def rapidpro_mock():
 
 @pytest.mark.asyncio
 @mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_persona_name(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_persona_name")
+
+    await tester.user_input("Nurse Joy")
+
+    tester.assert_state("state_persona_emoji")
+    tester.assert_num_messages(1)
+
+    [msg] = tester.fake_worker.outbound_messages
+    assert msg.content == "\n".join(
+        [
+            "Great - from now on you can call me Nurse Joy.",
+            "",
+            "_You can change this later by typing in *9* from the main *MENU.*_",
+        ]
+    )
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_persona_name_skip(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_persona_name")
+
+    await tester.user_input("skip")
+
+    tester.assert_state("state_dob_full")
+    tester.assert_num_messages(1)
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_persona_emoji(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_persona_emoji")
+
+    await tester.user_input("😉")
+
+    tester.assert_state("state_dob_full")
+    tester.assert_num_messages(1)
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
 async def test_state_dob_full_valid(
     get_current_datetime, tester: AppTester, rapidpro_mock
 ):

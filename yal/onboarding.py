@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 class Application(BaseApplication):
-    START_STATE = "state_dob_full"
+    START_STATE = "state_persona_name"
     REMINDER_STATE = "state_handle_onboarding_reminder_response"
 
     async def update_last_onboarding_time(self):
@@ -35,6 +35,78 @@ class Application(BaseApplication):
         }
 
         return await rapidpro.update_profile(whatsapp_id, data)
+
+    async def state_persona_name(self):
+        await self.update_last_onboarding_time()
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "🙋🏾 PERSONALISE YOUR B-WISE BOT / *Give me a name*",
+                        "---",
+                        "",
+                        "*What would you like to call me?*",
+                        "It can be any name you like or one that reminds you of "
+                        "someone you trust.",
+                        "",
+                        "Just type and send me your new bot name.",
+                        "",
+                        '_If you want to do this later, just click the "skip" button._',
+                    ]
+                )
+            ),
+            next="state_save_persona_name",
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_save_persona_name(self):
+        persona_name = self.user.answers.get("state_persona_name")
+        if persona_name != "skip":
+            self.save_metadata("persona_name", persona_name)
+            msg = self._(
+                "\n".join(
+                    [
+                        "Great - from now on you can call me [persona_name].",
+                        "",
+                        "_You can change this later by typing in *9* from the main "
+                        "*MENU.*_",
+                    ]
+                )
+            )
+            await self.publish_message(msg)
+            await asyncio.sleep(0.5)
+            return await self.go_to_state("state_persona_emoji")
+
+        return await self.go_to_state("state_dob_full")
+
+    async def state_persona_emoji(self):
+        await self.update_last_onboarding_time()
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "🙋🏾 PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
+                        "-----",
+                        "",
+                        "Why not use an emoji to accompany my new name? Send in the "
+                        "emoji you'd like to use, now.",
+                        "",
+                        '_If you want to do this later, just click the "skip" button._',
+                    ]
+                )
+            ),
+            next="state_save_persona_emoji",
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_save_persona_emoji(self):
+        persona_emoji = self.user.answers.get("state_persona_emoji")
+        if persona_emoji != "skip":
+            self.save_metadata("persona_emoji", persona_emoji)
+
+        return await self.go_to_state("state_dob_full")
 
     async def state_dob_full(self):
         await self.update_last_onboarding_time()
@@ -468,10 +540,14 @@ class Application(BaseApplication):
     async def state_submit_onboarding(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
+        persona_name = self.user.answers.get("state_persona_name")
+        persona_emoji = self.user.answers.get("state_persona_emoji")
 
         data = {
             "opted_out": "FALSE",
             "onboarding_completed": "True",
+            "persona_name": persona_name if persona_name != "skip" else "",
+            "persona_emoji": persona_emoji if persona_emoji != "skip" else "",
             "dob_month": self.user.answers.get("state_dob_month"),
             "dob_day": self.user.answers.get("state_dob_day"),
             "dob_year": self.user.answers.get("state_dob_year"),
