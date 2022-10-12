@@ -198,7 +198,7 @@ async def test_state_start_to_catch_all(tester: AppTester, rapidpro_mock):
     tester.assert_message(
         "\n".join(
             [
-                "👩🏾 *Howzit! Welcome to B-Wise by Young Africa Live!*",
+                "🤖 *Howzit! Welcome to B-Wise.*",
                 "",
                 "If you're looking for answers to questions about bodies, sex, "
                 "relationships and health, please reply with the word *HI*.",
