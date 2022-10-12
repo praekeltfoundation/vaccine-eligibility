@@ -59,6 +59,11 @@ async def test_submit_terms_and_conditions(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_dob_full")
     tester.assert_num_messages(1)
 
+    [msg] = tester.fake_worker.outbound_messages
+    assert msg.content == (
+        "Excellent - now we can get you set up."
+    )
+
     assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
