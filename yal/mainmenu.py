@@ -101,7 +101,7 @@ class Application(BaseApplication):
         sections.append(
             (
                 "🙋🏿‍♂️ *QUESTIONS?*",
-                [Choice(AskaQuestionApplication.START_STATE, "Ask a Question")],
+                [Choice(AskaQuestionApplication.START_STATE, "Ask your own question")],
             )
         )
         sections.append(
@@ -110,7 +110,7 @@ class Application(BaseApplication):
                 [
                     Choice(
                         ChangePreferencesApplication.START_STATE,
-                        "Change Profile",
+                        "Update your information",
                     ),
                 ],
             )
@@ -175,7 +175,8 @@ class Application(BaseApplication):
                     "Send me the number of the topic you're interested in.",
                     "",
                     "\n".join(menu_lines),
-                    "💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
+                    "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or "
+                    "*MENU*.",
                 ]
             )
         )
