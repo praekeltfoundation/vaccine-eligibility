@@ -420,7 +420,8 @@ async def test_state_mainmenu_start_suggested_populated(
                 "*⚙️ CHAT SETTINGS*",
                 "10. Update your information",
                 "-----",
-                "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or *MENU*.",
+                "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or"
+                " *MENU*.",
             ]
         )
     )
