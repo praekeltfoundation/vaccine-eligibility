@@ -132,12 +132,15 @@ async def contentrepo_api_mock():
     @app.route("/api/v2/pages", methods=["GET"])
     def get_main_menu(request):
         tstate.requests.append(request)
-        return response.json(
-            {
-                "count": 1,
-                "results": [{"id": 111, "title": "Main Menu 1 💊"}],
-            }
-        )
+        tag = request.args.get("tag")
+        if tag == "mainmenu":
+            return response.json(
+                {
+                    "count": 1,
+                    "results": [{"id": 111, "title": "Main Menu 1 💊"}],
+                }
+            )
+        return response.json({"count": 0, "results": []})
 
     @app.route("/suggestedcontent", methods=["GET"])
     def get_suggested_content(request):
@@ -165,7 +168,7 @@ async def test_reset_keyword(tester: AppTester, rapidpro_mock, contentrepo_api_m
     tester.assert_num_messages(1)
 
     assert len(rapidpro_mock.tstate.requests) == 2
-    assert len(contentrepo_api_mock.tstate.requests) == 3
+    assert len(contentrepo_api_mock.tstate.requests) == 4
 
 
 @pytest.mark.asyncio
@@ -215,7 +218,7 @@ async def test_state_start_to_mainmenu(
     tester.assert_num_messages(1)
 
     assert len(rapidpro_mock.tstate.requests) == 2
-    assert len(contentrepo_api_mock.tstate.requests) == 3
+    assert len(contentrepo_api_mock.tstate.requests) == 4
 
     tester.assert_metadata("province", "FS")
     tester.assert_metadata("suburb", "cape town")

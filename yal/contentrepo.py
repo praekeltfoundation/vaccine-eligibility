@@ -1,8 +1,10 @@
 import logging
+from typing import Any, Dict, List, Tuple
 from urllib.parse import urljoin
 
 import aiohttp
 
+from vaccine.models import User
 from vaccine.states import Choice
 from vaccine.utils import HTTP_EXCEPTIONS
 from yal import config
@@ -37,7 +39,7 @@ def get_privacy_policy_url():
     )
 
 
-async def get_choices_by_tag(tag):
+async def get_choices_by_tag(tag: str) -> Tuple[bool, List[Choice]]:
     return await get_choices_by_path(f"/api/v2/pages?tag={tag}")
 
 
@@ -64,7 +66,10 @@ async def get_page_detail_by_tag(user, tag):
     return await get_page_details(user, choices[0].value, 1)
 
 
-async def get_choices_by_path(path):
+async def get_choices_by_path(path: str) -> Tuple[bool, List[Choice]]:
+    if not config.CONTENTREPO_API_URL:
+        logger.error("CONTENTREPO_API_URL not configured")
+        return False, []
     choices = []
     async with get_contentrepo_api() as session:
         for i in range(3):
@@ -87,15 +92,20 @@ async def get_choices_by_path(path):
     return False, choices
 
 
-async def get_page_details(user, page_id, message_id, suggested=False):
-    page_details = {}
+async def get_page_details(
+    user: User, page_id: str, message_id: str, suggested=False
+) -> Tuple[bool, Dict[str, Any]]:
+    if not config.CONTENTREPO_API_URL:
+        logger.error("CONTENTREPO_API_URL not configured")
+        return False, {}
+    page_details: Dict[str, Any] = {}
     async with get_contentrepo_api() as session:
         for i in range(3):
             try:
                 params = {
                     "whatsapp": "true",
                     "message": message_id,
-                    "data__session_id": user.session_id,
+                    "data__session_id": user.session_id or "",
                     "data__user_addr": user.addr,
                 }
                 if suggested:
@@ -171,7 +181,7 @@ async def get_page_details(user, page_id, message_id, suggested=False):
             except HTTP_EXCEPTIONS as e:
                 if i == 2:
                     logger.exception(e)
-                    return True, []
+                    return True, {}
                 else:
                     continue
     return False, page_details

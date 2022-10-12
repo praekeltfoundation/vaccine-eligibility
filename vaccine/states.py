@@ -331,8 +331,15 @@ class SectionedChoiceState(ChoiceState):
 
 
 class CustomChoiceState(BaseWhatsAppChoiceState):
-    def __init__(self, *args, button: str = None, **kwargs):
+    def __init__(
+        self,
+        *args,
+        button: str = None,
+        additional_messages: Optional[List[str]] = None,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
+        self.additional_messages = additional_messages or []
         self.button = button
 
     @property
@@ -354,9 +361,9 @@ class CustomChoiceState(BaseWhatsAppChoiceState):
         return helper_metadata
 
     async def display(self, message):
-        return self.app.send_message(
-            self.question, helper_metadata=self._helper_metadata
-        )
+        self.app.send_message(self.question, helper_metadata=self._helper_metadata)
+        for content in self.additional_messages:
+            self.app.send_message(content)
 
     async def display_error(self, message):
         return self.app.send_message(self.error, helper_metadata=self._helper_metadata)
