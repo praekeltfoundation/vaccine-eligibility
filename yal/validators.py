@@ -46,3 +46,17 @@ def phone_number_validator(error_text):
             raise ErrorMessage(error_text)
 
     return validator
+
+
+def age_validator(error_text):
+    async def validator(value):
+        try:
+            if value != "skip":
+                assert isinstance(value, str)
+                assert value.isdigit()
+                assert int(value) > 0
+                assert int(value) <= 100
+        except AssertionError:
+            raise ErrorMessage(error_text)
+
+    return validator
