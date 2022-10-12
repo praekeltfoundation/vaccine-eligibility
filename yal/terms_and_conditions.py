@@ -175,11 +175,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         await self.worker.publish_message(
-            self.inbound.reply(
-                self._(
-                    "Excellent - now we can get you set up."
-                )
-            )
+            self.inbound.reply(self._("Excellent - now we can get you set up."))
         )
         await asyncio.sleep(0.5)
         return await self.go_to_state(OnboardingApplication.START_STATE)
