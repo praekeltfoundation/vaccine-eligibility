@@ -142,6 +142,31 @@ async def test_state_persona_emoji(
 
 @pytest.mark.asyncio
 @mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_persona_emoji_skip(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_persona_emoji")
+
+    await tester.user_input("skip")
+
+    tester.assert_state("state_dob_full")
+    tester.assert_num_messages(1)
+
+    assert "persona_emoji" not in tester.user.metadata
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
 async def test_state_dob_full_valid(
     get_current_datetime, tester: AppTester, rapidpro_mock
 ):
@@ -703,6 +728,8 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
     tester.setup_answer("state_suburb", "SomeSuburb")
     tester.setup_answer("state_street_name", "Good street")
     tester.setup_answer("state_street_number", "12")
+    tester.setup_answer("state_persona_name", "Nurse Joy")
+    tester.setup_answer("state_persona_emoji", "⛑️")
 
     await tester.user_input("4")
 
@@ -725,6 +752,8 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
             "street_number": "12",
             "onboarding_reminder_sent": "",
             "onboarding_reminder_type": "",
+            "persona_name": "Nurse Joy",
+            "persona_emoji": "⛑️",
         },
     }
 
