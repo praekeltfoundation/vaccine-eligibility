@@ -1,5 +1,5 @@
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, WhatsAppButtonState
+from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
 from vaccine.utils import get_display_choices
 from yal import rapidpro, utils
 
@@ -49,3 +49,56 @@ class ContentFeedbackSurveyApplication(BaseApplication):
             error=self._(utils.get_generic_error()),
             next={"no": "state_no_feedback", "yes": "state_get_feedback"},
         )
+
+    async def state_no_feedback(self):
+        question = self._(
+            "\n".join(
+                [
+                    "Thanks for letting us know!",
+                    "",
+                    "Check you later 👋🏾",
+                    "",
+                    "-----",
+                    "*Or reply:*",
+                    utils.BACK_TO_MAIN,
+                    utils.GET_HELP,
+                ]
+            )
+        )
+        return EndState(self, question)
+
+    async def state_get_feedback(self):
+        question = self._(
+            "\n".join(
+                [
+                    "Please tell me what was missing or what you'd like to change.",
+                    "",
+                    "_Just type and send your feedback now._",
+                    "",
+                    "-----",
+                    "*Or reply:*",
+                    utils.BACK_TO_MAIN,
+                    utils.GET_HELP,
+                ]
+            )
+        )
+        return FreeText(self, question, next="state_confirm_feedback")
+
+    async def state_confirm_feedback(self):
+        question = self._(
+            "\n".join(
+                [
+                    "Ok got it 👍🏾",
+                    "",
+                    "Thank you for the feedback - I'm working on it already.",
+                    "",
+                    "Chat again soon 👋🏾",
+                    "",
+                    "-----",
+                    "*Or reply:*",
+                    utils.BACK_TO_MAIN,
+                    utils.GET_HELP,
+                ]
+            )
+        )
+        return EndState(self, question)

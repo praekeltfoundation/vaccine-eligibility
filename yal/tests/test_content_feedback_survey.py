@@ -57,3 +57,74 @@ async def test_start(tester: AppTester, rapidpro_mock: MockServer):
     assert rapidpro_mock.tstate
     [update_contact] = rapidpro_mock.tstate.requests
     assert update_contact.json["fields"] == {"feedback_survey_sent": ""}
+
+
+@pytest.mark.asyncio
+async def test_no_feedback(tester: AppTester):
+    """If the user doesn't have any feedback, end"""
+    tester.setup_state("state_positive_feedback")
+    await tester.user_input("No changes")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Thanks for letting us know!",
+                "",
+                "Check you later 👋🏾",
+                "",
+                "-----",
+                "*Or reply:*",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        ),
+        session=Message.SESSION_EVENT.CLOSE,
+    )
+
+
+@pytest.mark.asyncio
+async def test_get_feedback(tester: AppTester):
+    """If the user has feedback, ask them for it"""
+    tester.setup_state("state_positive_feedback")
+    await tester.user_input("Yes, I have a change")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Please tell me what was missing or what you'd like to change.",
+                "",
+                "_Just type and send your feedback now._",
+                "",
+                "-----",
+                "*Or reply:*",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
+    )
+    tester.assert_state("state_get_feedback")
+
+
+@pytest.mark.asyncio
+async def test_confirm_feedback(tester: AppTester):
+    """After the user has given their feedback, confirm"""
+    tester.setup_state("state_get_feedback")
+    await tester.user_input("test feedback")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Ok got it 👍🏾",
+                "",
+                "Thank you for the feedback - I'm working on it already.",
+                "",
+                "Chat again soon 👋🏾",
+                "",
+                "-----",
+                "*Or reply:*",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        ),
+        session=Message.SESSION_EVENT.CLOSE,
+    )
