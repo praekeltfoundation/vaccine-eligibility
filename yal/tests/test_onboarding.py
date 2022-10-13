@@ -150,7 +150,7 @@ async def test_state_persona_emoji_skip(
 
     await tester.user_input("skip")
 
-    tester.assert_state("state_dob_full")
+    tester.assert_state("state_age")
     tester.assert_num_messages(1)
 
     assert "persona_emoji" not in tester.user.metadata
