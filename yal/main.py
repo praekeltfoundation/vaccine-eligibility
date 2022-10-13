@@ -4,6 +4,7 @@ from vaccine.states import EndState
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AaqApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
+from yal.content_feedback_survey import ContentFeedbackSurveyApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
 from yal.optout import Application as OptOutApplication
@@ -27,6 +28,7 @@ ONBOARDING_REMINDER_KEYWORDS = {
 CALLBACK_CHECK_KEYWORDS = {"callback"}
 AAQ_TIMEOUT_KEYWORDS = {"yes", "no", "yes ask again", "no i m good"}
 FEEDBACK_KEYWORDS = {"feedback"}
+CONTENT_FEEDBACK_KEYWORDS = {"1", "2", "yes", "nope", "yes thanks", "nope"}
 
 
 class Application(
@@ -40,6 +42,7 @@ class Application(
     OptOutApplication,
     AaqApplication,
     FeedbackApplication,
+    ContentFeedbackSurveyApplication,
 ):
     START_STATE = "state_start"
 
@@ -93,6 +96,8 @@ class Application(
         # If one of these values is True then the user might be responding
         # to a scheduled msg
         aaq_timeout_sent = fields.get("aaq_timeout_sent")
+        feedback_survey_sent = fields.get("feedback_survey_sent")
+        feedback_type = fields.get("feedback_type")
 
         # Cache some profile info
         for field in ("province", "suburb", "street_name", "street_number"):
@@ -116,6 +121,11 @@ class Application(
 
         if aaq_timeout_sent and (inbound.lower() in AAQ_TIMEOUT_KEYWORDS):
             return await self.go_to_state(AaqApplication.TIMEOUT_RESPONSE_STATE)
+        if feedback_survey_sent:
+            if feedback_type == "content" and (inbound in CONTENT_FEEDBACK_KEYWORDS):
+                return await self.go_to_state(
+                    ContentFeedbackSurveyApplication.START_STATE
+                )
 
         return await self.go_to_state("state_catch_all")
 

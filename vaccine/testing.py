@@ -212,6 +212,7 @@ class MockServer:
     server: AsyncioServer
     host: str
     port: int
+    tstate: Optional[TState] = None
 
 
 @asynccontextmanager
