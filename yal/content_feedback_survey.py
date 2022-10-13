@@ -15,7 +15,6 @@ class ContentFeedbackSurveyApplication(BaseApplication):
         await rapidpro.update_profile(whatsapp_id, {"feedback_survey_sent": ""})
 
         keyword = utils.clean_inbound(self.inbound.content)
-        print(keyword)
         if keyword in {"1", "yes", "yes thanks"}:
             return await self.go_to_state("state_positive_feedback")
         else:
