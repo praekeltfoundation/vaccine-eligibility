@@ -2,6 +2,7 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
 from vaccine.utils import get_display_choices
 from yal import rapidpro, utils
+from yal.askaquestion import Application as AAQApplication
 
 
 class ContentFeedbackSurveyApplication(BaseApplication):
@@ -96,6 +97,57 @@ class ContentFeedbackSurveyApplication(BaseApplication):
                     "",
                     "-----",
                     "*Or reply:*",
+                    utils.BACK_TO_MAIN,
+                    utils.GET_HELP,
+                ]
+            )
+        )
+        return EndState(self, question)
+
+    async def state_negative_feedback(self):
+        choices = [
+            Choice("yes", self._("Yes, please")),
+            Choice("no", self._("Maybe later")),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "I'm sorry I couldn't find what you were looking for this time... "
+                    "maybe I can help you find it if you *ask me a question?*",
+                    "",
+                    "*Would you like to ask me a question now?*",
+                    "",
+                    get_display_choices(choices, bold_numbers=True),
+                    "",
+                    "-----",
+                    "*Or reply:*",
+                    utils.BACK_TO_MAIN,
+                    utils.GET_HELP,
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            next={
+                "yes": AAQApplication.START_STATE,
+                "no": "state_no_negative_feedback",
+            },
+            error=self._(utils.get_generic_error()),
+        )
+
+    async def state_no_negative_feedback(self):
+        question = self._(
+            "\n".join(
+                [
+                    "Cool. 👍🏾",
+                    "",
+                    'If you change your mind, just go back to "ask a question" on the '
+                    "main menu.",
+                    "",
+                    "-----",
+                    "*Reply:*",
                     utils.BACK_TO_MAIN,
                     utils.GET_HELP,
                 ]

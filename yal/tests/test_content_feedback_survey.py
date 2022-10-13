@@ -32,7 +32,8 @@ def tester():
 
 
 @pytest.mark.asyncio
-async def test_start(tester: AppTester, rapidpro_mock: MockServer):
+async def test_positive_feedback(tester: AppTester, rapidpro_mock: MockServer):
+    """If the user responds positively to the push message, ask for any feedback"""
     await tester.user_input("yes", session=Message.SESSION_EVENT.NEW)
     tester.assert_state("state_positive_feedback")
     tester.assert_message(
@@ -127,4 +128,51 @@ async def test_confirm_feedback(tester: AppTester):
             ]
         ),
         session=Message.SESSION_EVENT.CLOSE,
+    )
+
+
+@pytest.mark.asyncio
+async def test_negative_feedback(tester: AppTester, rapidpro_mock: MockServer):
+    """If the user responds negative to the push message, ask if they want AAQ"""
+    await tester.user_input("no", session=Message.SESSION_EVENT.NEW)
+    tester.assert_state("state_negative_feedback")
+    tester.assert_message(
+        "\n".join(
+            [
+                "I'm sorry I couldn't find what you were looking for this time... "
+                "maybe I can help you find it if you *ask me a question?*",
+                "",
+                "*Would you like to ask me a question now?*",
+                "",
+                "*1*. Yes, please",
+                "*2*. Maybe later",
+                "",
+                "-----",
+                "*Or reply:*",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_no_negative_feedback(tester: AppTester, rapidpro_mock: MockServer):
+    """If the user doesn't want to AAQ, confirm"""
+    tester.setup_state("state_negative_feedback")
+    await tester.user_input("Maybe later")
+    tester.assert_message(
+        "\n".join(
+            [
+                "Cool. 👍🏾",
+                "",
+                'If you change your mind, just go back to "ask a question" on the '
+                "main menu.",
+                "",
+                "-----",
+                "*Reply:*",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
     )
