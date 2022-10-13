@@ -91,7 +91,6 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🔒 TERMS & CONDITIONS / *B-Wise: Privacy Policy*",
-                    "_Young Africa Live: Privacy Policy_",
                     "-----",
                     "",
                     "⚠️ *Are you Sure?*",
@@ -149,7 +148,7 @@ class Application(BaseApplication):
                 "\n"
                 "https://bwisehealth.com/ \n"
                 "\n"
-                "You'll find loads of sex, relationships and health info there. It's "
+                "You'll find loads of info about sex, relationships and health. It's "
                 "also my other virtual office.\n"
                 "\n"
                 "Feel free to drop me a virtual _howzit_ there too!\n"
