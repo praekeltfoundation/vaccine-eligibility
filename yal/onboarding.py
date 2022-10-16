@@ -6,6 +6,7 @@ from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListSt
 from yal import rapidpro, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
+from yal.askaquestion import Application as AaqApplication
 from yal.utils import get_current_datetime, get_generic_error
 from yal.validators import age_validator
 
@@ -231,36 +232,25 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "*Lekker—We're good to go!*",
+                    "🙏🏾 OK—We're good to go!",
                     "",
-                    "✅ Age",
-                    "✅ Relationship Status",
-                    "✅ Location",
-                    "✅ Gender",
                     "-----",
                     "",
-                    "Thanks! Next time we chat, I'll be able to give you some "
-                    "personal recommendations for things to check out 😉.",
+                    "[persona_emoji]  *Do you want to go ahead and ask a question?*",
+                    "I can answer questions about sex, relationships and your health. "
+                    "Just type your Q and hit send 🙂",
                     "",
-                    "*Shall we get chatting?*",
+                    "e.g. _How do I know if I have an STI?_"
                     "",
-                    "1 - OK",
-                    "2 - Change my preferences",
+                    "-----",
+                    "",
+                    "🏠 Or head to the main menu by clicking the button below.",
                 ]
             )
         )
-        error = self._(get_generic_error())
-
-        return WhatsAppButtonState(
-            self,
-            question=question,
-            choices=[Choice("ok", "OK"), Choice("change", "Change preferences")],
-            error=error,
-            next={
-                "ok": MainMenuApplication.START_STATE,
-                "change": ChangePreferencesApplication.START_STATE,
-            },
-        )
+        buttons = [Choice("menu", "Menu"),]
+        return await self.go_to_state_with_kwargs(
+            "state_aaq_start", question=question, buttons=buttons)
 
     async def state_stop_onboarding_reminders(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
