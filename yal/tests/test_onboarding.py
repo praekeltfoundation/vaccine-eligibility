@@ -292,6 +292,26 @@ async def test_submit_onboarding(mock_config, tester: AppTester, rapidpro_mock):
 
     tester.assert_state("state_aaq_start")
     tester.assert_num_messages(1)
+    tester.assert_message(
+        "\n".join(
+            [
+                "🙏🏾 OK—We're good to go!",
+                "",
+                "-----",
+                "",
+                "🤖  *Do you want to go ahead and ask a question?*",
+                "I can answer questions about sex, relationships and your health. "
+                "Just type your Q and hit send 🙂",
+                "",
+                "e.g. _How do I know if I have an STI?_",
+                "",
+                "-----",
+                "",
+                "🏠 Or head to the main menu by clicking the button below.",
+            ]
+        ),
+        buttons=["Main menu"],
+    )
 
     assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[1]
