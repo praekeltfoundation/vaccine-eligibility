@@ -173,7 +173,7 @@ async def test_state_age(get_current_datetime, tester: AppTester, rapidpro_mock)
 
     await tester.user_input("22")
 
-    tester.assert_state("state_relationship_status")
+    tester.assert_state("state_gender")
     tester.assert_num_messages(1)
 
     tester.assert_answer("state_age", "22")
@@ -190,155 +190,6 @@ async def test_state_age(get_current_datetime, tester: AppTester, rapidpro_mock)
 
 @pytest.mark.asyncio
 @mock.patch("yal.onboarding.get_current_datetime")
-async def test_state_relationship_status_valid(
-    get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_state("state_relationship_status")
-
-    await tester.user_input("2")
-
-    tester.assert_state("state_province")
-    tester.assert_num_messages(1)
-
-    tester.assert_answer("state_relationship_status", "complicated")
-
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_onboarding_time": "2022-06-19T17:30:00",
-            "onboarding_reminder_type": "5 min",
-        },
-    }
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
-async def test_state_full_address_invalid(
-    get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_answer("age", "22")
-    tester.setup_state("state_full_address")
-
-    await tester.user_input("2 test street \n test suburb")
-
-    tester.assert_state("state_suburb")
-
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_onboarding_time": "2022-06-19T17:30:00",
-            "onboarding_reminder_type": "5 min",
-        },
-    }
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
-async def test_state_full_address_valid(
-    get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_answer("age", "22")
-    tester.setup_state("state_full_address")
-
-    await tester.user_input("2\ntest street\n test suburb")
-
-    tester.assert_state("state_gender")
-
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_onboarding_time": "2022-06-19T17:30:00",
-            "onboarding_reminder_type": "5 min",
-        },
-    }
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
-async def test_state_full_address_minor(
-    get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_answer("age", "17")
-    tester.setup_state("state_province")
-
-    await tester.user_input("2")
-
-    tester.assert_state("state_gender")
-
-    assert len(rapidpro_mock.tstate.requests) == 3
-    request = rapidpro_mock.tstate.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_onboarding_time": "2022-06-19T17:30:00",
-            "onboarding_reminder_type": "5 min",
-        },
-    }
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
-async def test_state_full_address_skip(
-    get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_answer("age", "22")
-    tester.setup_state("state_full_address")
-
-    await tester.user_input("SKIP")
-
-    tester.assert_state("state_gender")
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
-async def test_state_suburb_skip(
-    get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_state("state_suburb")
-
-    await tester.user_input("SKIP")
-
-    tester.assert_state("state_gender")
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
-async def test_state_street_name_skip(
-    get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_state("state_street_name")
-    tester.setup_answer("state_suburb", "test suburb")
-
-    await tester.user_input("SKIP")
-
-    tester.assert_state("state_gender")
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
-async def test_state_number_name_skip(
-    get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_state("state_street_number")
-    tester.setup_answer("state_street_name", "test street name")
-
-    await tester.user_input("SKIP")
-
-    tester.assert_state("state_gender")
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
 async def test_state_gender(get_current_datetime, tester: AppTester, rapidpro_mock):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_gender")
@@ -348,27 +199,19 @@ async def test_state_gender(get_current_datetime, tester: AppTester, rapidpro_mo
     tester.assert_message(
         "\n".join(
             [
-                "*ABOUT YOU*",
-                "🌈 How you identify",
-                "-----",
-                "",
-                "*You're almost done!*🙌🏾",
-                "",
-                "✅ Age",
-                "✅ Relationship Status",
-                "✅ Location",
-                "◻️ Gender",
+                "ABOUT YOU / 🌈 *Your identity*",
                 "-----",
                 "",
                 "*What's your gender?*",
                 "",
-                "Please select the option you think best describes you:",
+                "Please click the button and select the option you think best "
+                "describes you:",
                 "",
-                "*1* - Girl/Woman",
-                "*2* - Boy/Man",
+                "*1* - Female",
+                "*2* - Male",
                 "*3* - Non-binary",
-                "*4* - Something else",
-                "*5* - Skip",
+                "*4* - None of these",
+                "*5* - Rather not say",
             ]
         )
     )
@@ -384,19 +227,44 @@ async def test_state_gender(get_current_datetime, tester: AppTester, rapidpro_mo
 
 
 @pytest.mark.asyncio
+@mock.patch("yal.askaquestion.config")
 @mock.patch("yal.onboarding.get_current_datetime")
-async def test_state_gender_valid(
-    get_current_datetime, tester: AppTester, rapidpro_mock
+async def test_state_gender_from_list(
+    get_current_datetime, mock_config, tester: AppTester, rapidpro_mock
 ):
+    mock_config.AAQ_URL = "http://aaq-test.com"
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_gender")
 
     await tester.user_input("2")
 
-    tester.assert_state("state_onboarding_complete")
+    tester.assert_state("state_aaq_start")
     tester.assert_num_messages(1)
 
-    tester.assert_answer("state_gender", "boy_man")
+    tester.assert_answer("state_gender", "male")
+
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_other_gender(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_gender")
+
+    await tester.user_input("4")
+
+    tester.assert_state("state_other_gender")
+    tester.assert_num_messages(1)
 
     assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[0]
@@ -409,23 +277,41 @@ async def test_state_gender_valid(
 
 
 @pytest.mark.asyncio
-async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_gender")
+@mock.patch("yal.askaquestion.config")
+async def test_submit_onboarding(mock_config, tester: AppTester, rapidpro_mock):
+    mock_config.AAQ_URL = "http://aaq-test.com"
+    tester.setup_state("state_other_gender")
 
     tester.setup_answer("state_age", "22")
-    tester.setup_answer("state_relationship_status", "yes")
     tester.setup_answer("state_gender", "other")
-    tester.setup_answer("state_province", "FS")
-    tester.setup_answer("state_suburb", "SomeSuburb")
-    tester.setup_answer("state_street_name", "Good street")
-    tester.setup_answer("state_street_number", "12")
+    tester.setup_answer("state_other_gender", "gender fluid")
     tester.setup_answer("state_persona_name", "Nurse Joy")
     tester.setup_answer("state_persona_emoji", "⛑️")
 
-    await tester.user_input("4")
+    await tester.user_input("gender fluid")
 
-    tester.assert_state("state_onboarding_complete")
+    tester.assert_state("state_aaq_start")
     tester.assert_num_messages(1)
+    tester.assert_message(
+        "\n".join(
+            [
+                "🙏🏾 OK—We're good to go!",
+                "",
+                "-----",
+                "",
+                "🤖  *Do you want to go ahead and ask a question?*",
+                "I can answer questions about sex, relationships and your health. "
+                "Just type your Q and hit send 🙂",
+                "",
+                "e.g. _How do I know if I have an STI?_",
+                "",
+                "-----",
+                "",
+                "🏠 Or head to the main menu by clicking the button below.",
+            ]
+        ),
+        buttons=["Main menu"],
+    )
 
     assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[1]
@@ -434,23 +320,14 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
             "age": "22",
             "opted_out": "FALSE",
             "onboarding_completed": "True",
-            "relationship_status": "yes",
             "gender": "other",
-            "province": "FS",
-            "suburb": "SomeSuburb",
-            "street_name": "Good street",
-            "street_number": "12",
+            "gender_other": "gender fluid",
             "onboarding_reminder_sent": "",
             "onboarding_reminder_type": "",
             "persona_name": "Nurse Joy",
             "persona_emoji": "⛑️",
         },
     }
-
-    tester.assert_metadata("province", "FS")
-    tester.assert_metadata("suburb", "SomeSuburb")
-    tester.assert_metadata("street_name", "Good street")
-    tester.assert_metadata("street_number", "12")
 
 
 @pytest.mark.asyncio

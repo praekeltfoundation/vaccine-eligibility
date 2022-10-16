@@ -52,6 +52,16 @@ class BaseApplication:
         self.state_name = name
         return await self.get_current_state()
 
+    async def go_to_state_with_kwargs(self, name, **kw):
+        """
+        Go to another state and have it process the user message instead
+        """
+        self.state_name = name
+        if not self.state_name:
+            self.state_name = self.START_STATE
+        state_func = getattr(self, self.state_name)
+        return await state_func(**kw)
+
     @property
     def state_name(self):
         return self.user.state.name

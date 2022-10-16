@@ -21,10 +21,11 @@ GENERIC_ERRORS = (
     "again. This time, look for the number matching your choice and send that👍🏽",
 )
 GENDERS = {
-    "girl_woman": "Girl/Woman",
-    "boy_man": "Boy/Man",
+    "female": "Female",
+    "male": "Male",
     "non_binary": "Non-binary",
-    "other": "Something else",
+    "other": "None of these",
+    "skip": "Rather not say",
 }
 BACK_TO_MAIN = "0. 🏠 *Back* to Main *MENU*"
 GET_HELP = "#. 🆘Get *HELP*"

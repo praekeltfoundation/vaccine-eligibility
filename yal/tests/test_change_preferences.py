@@ -20,7 +20,7 @@ def get_rapidpro_contact(urn):
         "groups": [],
         "fields": {
             "relationship_status": None,
-            "gender": "boy_man",
+            "gender": "male",
             "age": "22",
             "province": "FS",
             "suburb": "TestSuburb",
@@ -102,7 +102,7 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
             "12 test street TestSuburb Free State",
             "",
             "☑️ 🌈  *Identity*",
-            "Boy/Man",
+            "Male",
             "",
             "🦸 *Bot name*",
             "B-wise Caped Crusader"
