@@ -1,23 +1,13 @@
 import asyncio
 import logging
-from datetime import date, datetime
-
-from dateutil.relativedelta import relativedelta
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import (
-    Choice,
-    ChoiceState,
-    FreeText,
-    WhatsAppButtonState,
-    WhatsAppListState,
-)
-from vaccine.utils import get_today
-from yal import contentrepo, rapidpro, utils
+from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
+from yal import rapidpro, utils
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.utils import get_current_datetime, get_generic_error
-from yal.validators import day_validator, year_validator
+from yal.validators import age_validator
 
 logger = logging.getLogger(__name__)
 
@@ -78,7 +68,7 @@ class Application(BaseApplication):
             await asyncio.sleep(0.5)
             return await self.go_to_state("state_persona_emoji")
 
-        return await self.go_to_state("state_dob_full")
+        return await self.go_to_state("state_age")
 
     async def state_persona_emoji(self):
         await self.update_last_onboarding_time()
@@ -106,174 +96,51 @@ class Application(BaseApplication):
         if persona_emoji != "skip":
             self.save_metadata("persona_emoji", persona_emoji)
 
-        return await self.go_to_state("state_dob_full")
+        return await self.go_to_state("state_profile_intro")
 
-    async def state_dob_full(self):
-        await self.update_last_onboarding_time()
-        return FreeText(
-            self,
-            question=self._(
+    async def state_profile_intro(self):
+        msg = (
+            self._(
                 "\n".join(
                     [
-                        "*ABOUT YOU*",
-                        "🎂 Date of Birth",
-                        "-----",
-                        "🙍🏾‍♀️ *Great! I'm just going to ask you a few quick "
-                        "questions*",
-                        "",
-                        "*What is your Date of birth?*",
-                        "Type the numbers that match when you were born e.g. "
-                        "(30/09/2007)",
+                        "*[persona_emoji] Great! I'm just going to ask you a few "
+                        "quick questions now.*",
                     ]
                 )
             ),
-            next="state_validate_full_dob",
         )
+        self.publish_message(msg)
+        await asyncio.sleep(0.5)
+        return await self.go_to_state("state_age")
 
-    async def state_validate_full_dob(self):
-        value = self.user.answers["state_dob_full"]
-
-        try:
-            dob = datetime.strptime(value, "%d/%m/%Y")
-
-            self.save_answer("state_dob_day", str(dob.day))
-            self.save_answer("state_dob_month", str(dob.month))
-            self.save_answer("state_dob_year", str(dob.year))
-
-            return await self.go_to_state("state_check_birthday")
-        except ValueError:
-            msg = self._(
-                "Umm...I'm sorry but I'm not sure what that means🤦🏾‍♀️ You can help "
-                "me by trying again. This time, we'll break it up into year, "
-                "month and day.👍🏽"
-            )
-            await self.worker.publish_message(self.inbound.reply(msg))
-            await asyncio.sleep(0.5)
-            return await self.go_to_state("state_dob_year")
-
-    async def state_dob_year(self):
+    async def state_age(self):
         await self.update_last_onboarding_time()
         return FreeText(
             self,
             question=self._(
                 "\n".join(
                     [
-                        "*ABOUT YOU*",
-                        "🎂 Date of Birth",
+                        "ABOUT YOU / 🍰*Age*",
                         "-----",
-                        "🙍🏾‍♀️ *Great! I'm just going to ask you a few quick "
-                        "questions*",
                         "",
-                        "*Which year were you born?*",
-                        "Reply with a number. (e.g.2007)",
+                        "*What is your age?*" "_Type in the number only (e.g. 24)_",
                     ]
                 )
             ),
-            next="state_dob_month",
-            check=year_validator(
+            next="state_relationship_status",
+            check=age_validator(
                 self._(
-                    "⚠️  Please TYPE in only the YEAR you were born.\n" "Example _1980_"
+                    "\n".join(
+                        [
+                            "Hmm, something looks a bit off to me. Can we try again? "
+                            "Remember to *only use numbers*. 👍🏽",
+                            "",
+                            "For example just send in *17* if you are 17 years old.",
+                        ]
+                    )
                 )
             ),
         )
-
-    async def state_dob_month(self):
-        await self.update_last_onboarding_time()
-        return ChoiceState(
-            self,
-            question=self._(
-                "\n".join(
-                    [
-                        "*ABOUT YOU*",
-                        "🎂 Date of Birth",
-                        "-----",
-                        "🙍🏾‍♀️ *Great!  And What month where you born in?*",
-                        "",
-                        "Reply with a number:",
-                    ]
-                )
-            ),
-            choices=[
-                Choice("1", self._("January")),
-                Choice("2", self._("February")),
-                Choice("3", self._("March")),
-                Choice("4", self._("April")),
-                Choice("5", self._("May")),
-                Choice("6", self._("June")),
-                Choice("7", self._("July")),
-                Choice("8", self._("August")),
-                Choice("9", self._("September")),
-                Choice("10", self._("October")),
-                Choice("11", self._("November")),
-                Choice("12", self._("December")),
-            ],
-            next="state_dob_day",
-            error=self._(get_generic_error()),
-            error_footer=self._("\n" "Reply with the number next to the month."),
-        )
-
-    async def state_dob_day(self):
-        await self.update_last_onboarding_time()
-        question = self._(
-            "\n".join(
-                [
-                    "*ABOUT YOU*",
-                    "🎂 Date of Birth",
-                    "-----",
-                    "",
-                    "🙍🏾‍♀️ *Perfect! And finally, which day were you born on?*",
-                    "",
-                    "Reply with a number from 1-31",
-                    "(e.g. 30 - if you were born on the 30th)",
-                ]
-            )
-        )
-
-        dob_year = self.user.answers["state_dob_year"]
-        dob_month = self.user.answers["state_dob_month"]
-
-        return FreeText(
-            self,
-            question=question,
-            next="state_check_birthday",
-            check=day_validator(dob_year, dob_month, question),
-        )
-
-    async def state_check_birthday(self):
-        day = self.user.answers["state_dob_day"]
-        month = self.user.answers["state_dob_month"]
-        year = self.user.answers["state_dob_year"]
-
-        today = get_today()
-        dob = date(int(year), int(month), int(day))
-        age = relativedelta(today, dob).years
-        self.save_answer("age", str(age))
-
-        if today.day == int(day) and today.month == int(month):
-            age_msg = ""
-            if year != "skip":
-                age_msg = f"{age} today? "
-
-            msg = self._(
-                "\n".join(
-                    [
-                        f"*Yoh! {age_msg}HAPPY BIRTHDAY!* 🎂 🎉 ",
-                        "",
-                        "Hope you're having a great one so far! Remember—age is "
-                        "just a number. Here's to always having  wisdom that goes"
-                        " beyond your years 😉 🥂",
-                    ]
-                )
-            )
-            await self.worker.publish_message(
-                self.inbound.reply(
-                    msg,
-                    helper_metadata={"image": contentrepo.get_image_url("hbd.png")},
-                )
-            )
-            await asyncio.sleep(1.5)
-
-        return await self.go_to_state("state_relationship_status")
 
     async def state_relationship_status(self):
         await self.update_last_onboarding_time()
@@ -281,7 +148,7 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "*Fantastic!*",
-                    "✅  Birthday",
+                    "✅  Age",
                     "◻️  *Relationship Status*",
                     "◻️  Location",
                     "◻️  Gender",
@@ -326,7 +193,7 @@ class Application(BaseApplication):
                 [
                     "Amazing!",
                     "",
-                    "✅ Birthday",
+                    "✅ Age",
                     "✅ Relationship Status",
                     "◻️ Location",
                     "◻️ Gender",
@@ -513,7 +380,7 @@ class Application(BaseApplication):
                     "",
                     "*You're almost done!*🙌🏾",
                     "",
-                    "✅ Birthday",
+                    "✅ Age",
                     "✅ Relationship Status",
                     "✅ Location",
                     "◻️ Gender",
@@ -548,9 +415,7 @@ class Application(BaseApplication):
             "onboarding_completed": "True",
             "persona_name": persona_name if persona_name != "skip" else "",
             "persona_emoji": persona_emoji if persona_emoji != "skip" else "",
-            "dob_month": self.user.answers.get("state_dob_month"),
-            "dob_day": self.user.answers.get("state_dob_day"),
-            "dob_year": self.user.answers.get("state_dob_year"),
+            "age": self.user.answers.get("state_age"),
             "relationship_status": self.user.answers.get("state_relationship_status"),
             "gender": self.user.answers.get("state_gender"),
             "province": self.user.answers.get("state_province"),
@@ -577,7 +442,7 @@ class Application(BaseApplication):
                 [
                     "*Lekker—We're good to go!*",
                     "",
-                    "✅ Birthday",
+                    "✅ Age",
                     "✅ Relationship Status",
                     "✅ Location",
                     "✅ Gender",
@@ -679,7 +544,7 @@ class Application(BaseApplication):
             error = await rapidpro.update_profile(whatsapp_id, data)
             if error:
                 return await self.go_to_state("state_error")
-            return await self.go_to_state("state_dob_full")
+            return await self.go_to_state("state_persona_name")
 
         if inbound == "no thanks" or inbound == "not interested":
             return await self.go_to_state("state_stop_onboarding_reminders")
