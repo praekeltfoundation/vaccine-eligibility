@@ -21,6 +21,9 @@ class Application(BaseApplication):
     START_STATE = "state_display_preferences"
 
     async def state_display_preferences(self):
+        async def next_(choice: Choice):
+            return choice.value
+
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
@@ -60,52 +63,30 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "*CHAT SETTINGS*",
-                    "⚙️ Change or update your info",
+                    "⚙️CHAT SETTINGS / *Update your info*",
                     "-----",
-                    "*👩🏾 No problem. Here's the info you've saved:*",
+                    "Here's the info you've saved. *What info would you like to "
+                    "change?*",
                     "",
                     "🍰 *Age*",
                     age or "Empty",
                     "",
-                    "☑️ 💟 *In a Relationship?*",
-                    relationship_status,
-                    "",
-                    "☑️ 📍 *Location*",
-                    location or "Empty",
-                    "",
-                    "☑️ 🌈  *Identity*",
+                    "🌈Gender",
                     gender,
                     "",
-                    "[persona_emoji] *Bot name*",
-                    "B-wise [persona_name]"
-                ]
-            )
-        )
-
-        await self.publish_message(question)
-        await asyncio.sleep(0.5)
-
-        return await self.go_to_state("state_change_info_prompt")
-
-    async def state_change_info_prompt(self):
-        async def next_(choice: Choice):
-            return choice.value
-
-        question = self._(
-            "\n".join(
-                [
-                    "👩🏾 *What info would you like to change?*",
+                    "🤖*Bot Name+emoji*",
+                    "[persona_emoji] [persona_name]"
                     "",
-                    "1. Age",
-                    "2. Relationship Status",
-                    "3. Location",
-                    "4. Identity",
-                    "5. Bot name and emoji",
-                    "-----",
+                    "❤️ *Relationship?*",
+                    relationship_status or "Empty",
+                    "",
+                    "📍*Location*",
+                    location or "Empty",
+                    "",
+                    "*-----*",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to *Main MENU*",
-                    "*#* - 🆘 Get *HELP*",
+                    "*0 -* 🏠 Back to Main *MENU*",
+                    "*# -* 🆘 Get *HELP*",
                 ]
             )
         )
@@ -115,12 +96,12 @@ class Application(BaseApplication):
             question=question,
             choices=[
                 Choice("state_update_age", self._("Age")),
+                Choice("state_update_gender", self._("Gender")),
+                Choice("state_update_bot_name", self._("Bot name + emoji")),
                 Choice(
-                    "state_update_relationship_status", self._("Relationship Status")
+                    "state_update_relationship_status", self._("Relationship?")
                 ),
                 Choice("state_update_province", self._("Location")),
-                Choice("state_update_gender", self._("Identity")),
-                Choice("state_update_bot_name", self._("Bot name and emoji")),
             ],
             next=next_,
             error=self._(get_generic_error()),
@@ -461,7 +442,7 @@ class Application(BaseApplication):
     async def state_update_bot_emoji_submit(self):
         choice = self.user.answers.get("state_update_bot_emoji")
         if choice == "skip":
-            return await self.go_to_state("state_change_info_prompt")
+            return await self.go_to_state("state_display_preferences")
 
         self.save_metadata("persona_emoji", choice)
 

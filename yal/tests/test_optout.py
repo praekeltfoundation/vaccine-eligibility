@@ -278,7 +278,7 @@ async def test_state_optout_delete_no_data(tester: AppTester, rapidpro_mock):
 async def test_state_optout_delete_saved_see_data(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_delete_saved")
     await tester.user_input("1")
-    tester.assert_state("state_change_info_prompt")
+    tester.assert_state("state_display_preferences")
 
 
 @pytest.mark.asyncio

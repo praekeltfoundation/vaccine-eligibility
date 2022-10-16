@@ -84,47 +84,36 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
     tester.assert_num_messages(1)
 
-    [msg] = tester.fake_worker.outbound_messages
-    assert msg.content == "\n".join(
-        [
-            "*CHAT SETTINGS*",
-            "⚙️ Change or update your info",
-            "-----",
-            "*👩🏾 No problem. Here's the info you've saved:*",
-            "",
-            "🍰 *Age*",
-            "22",
-            "",
-            "☑️ 💟 *In a Relationship?*",
-            "Empty",
-            "",
-            "☑️ 📍 *Location*",
-            "12 test street TestSuburb Free State",
-            "",
-            "☑️ 🌈  *Identity*",
-            "Male",
-            "",
-            "🦸 *Bot name*",
-            "B-wise Caped Crusader"
-        ]
-    )
-
     tester.assert_message(
         "\n".join(
             [
-                "👩🏾 *What info would you like to change?*",
-                "",
-                "1. Age",
-                "2. Relationship Status",
-                "3. Location",
-                "4. Identity",
-                "5. Bot name and emoji",
+                "⚙️CHAT SETTINGS / *Update your info*",
                 "-----",
+                "Here's the info you've saved. *What info would you like to "
+                "change?*",
+                "",
+                "🍰 *Age*",
+                "22",
+                "",
+                "🌈Gender",
+                "Male",
+                "",
+                "🤖*Bot Name+emoji*",
+                "🦸 Caped Crusader"
+                "",
+                "❤️ *Relationship?*",
+                "Empty",
+                "",
+                "📍*Location*",
+                "12 test street TestSuburb Free State",
+                "",
+                "*-----*",
                 "*Or reply:*",
-                "*0* - 🏠 Back to *Main MENU*",
-                "*#* - 🆘 Get *HELP*",
+                "*0 -* 🏠 Back to Main *MENU*",
+                "*# -* 🆘 Get *HELP*",
             ]
-        )
+        ),
+        list_items= ["Age", "Gender", "Bot name + emoji", "Relationship?", "Location"]
     )
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
@@ -159,7 +148,7 @@ async def test_state_update_age_submit(
     tester.setup_state("state_update_age")
     await tester.user_input("32")
     tester.assert_num_messages(1)
-    tester.assert_state("state_change_info_prompt")
+    tester.assert_state("state_display_preferences")
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == [
         "/api/v2/contacts.json",
@@ -170,7 +159,7 @@ async def test_state_update_age_submit(
 @pytest.mark.asyncio
 async def test_state_update_relationship_status(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_display_preferences")
-    await tester.user_input("2")
+    await tester.user_input("4")
     tester.assert_num_messages(1)
     tester.assert_state("state_update_relationship_status")
 
@@ -201,7 +190,7 @@ async def test_state_update_relationship_status_submit(
     tester.setup_state("state_update_relationship_status")
     await tester.user_input("2")
     tester.assert_num_messages(1)
-    tester.assert_state("state_change_info_prompt")
+    tester.assert_state("state_display_preferences")
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == [
         "/api/v2/contacts.json",
@@ -226,7 +215,7 @@ async def test_state_update_location_submit(tester: AppTester, rapidpro_mock):
     tester.assert_metadata("street_number", "12")
 
     tester.assert_num_messages(1)
-    tester.assert_state("state_change_info_prompt")
+    tester.assert_state("state_display_preferences")
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == [
         "/api/v2/contacts.json",
@@ -239,7 +228,7 @@ async def test_state_update_bot_name(tester: AppTester, rapidpro_mock):
     tester.user.metadata["persona_emoji"] = "🦸"
     tester.user.metadata["persona_name"] = "Caped Crusader"
     tester.setup_state("state_display_preferences")
-    await tester.user_input("5")
+    await tester.user_input("3")
     tester.assert_num_messages(1)
     tester.assert_state("state_update_bot_name")
 
@@ -377,7 +366,9 @@ async def test_state_update_bot_emoji_skip(
     tester.setup_state("state_update_bot_emoji")
     await tester.user_input("skip")
 
-    tester.assert_state("state_change_info_prompt")
+    tester.assert_state("state_display_preferences")
     tester.assert_metadata("persona_emoji", "🦸")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/contacts.json",
+    ]
