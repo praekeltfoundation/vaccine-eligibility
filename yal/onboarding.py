@@ -248,7 +248,7 @@ class Application(BaseApplication):
                 ]
             )
         )
-        buttons = [Choice("menu", "Menu"),]
+        buttons = [Choice("menu", "Main menu"),]
         return await self.go_to_state_with_kwargs(
             "state_aaq_start", question=question, buttons=buttons)
 
