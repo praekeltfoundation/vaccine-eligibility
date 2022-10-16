@@ -505,7 +505,7 @@ async def test_state_callback_response_handles_call_received(
     }
 
     tester.assert_state("state_mainmenu")
-    assert len(contentrepo_api_mock.tstate.requests) == 3
+    assert len(contentrepo_api_mock.tstate.requests) == 4
 
 
 @pytest.mark.asyncio

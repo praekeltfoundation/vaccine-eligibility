@@ -101,7 +101,7 @@ class Application(BaseApplication):
         sections.append(
             (
                 "🙋🏿‍♂️ *QUESTIONS?*",
-                [Choice(AskaQuestionApplication.START_STATE, "Ask a Question")],
+                [Choice(AskaQuestionApplication.START_STATE, "Ask your own question")],
             )
         )
         sections.append(
@@ -110,7 +110,7 @@ class Application(BaseApplication):
                 [
                     Choice(
                         ChangePreferencesApplication.START_STATE,
-                        "Change Profile",
+                        "Update your information",
                     ),
                 ],
             )
@@ -175,10 +175,32 @@ class Application(BaseApplication):
                     "Send me the number of the topic you're interested in.",
                     "",
                     "\n".join(menu_lines),
-                    "💡 TIP: Jump back to this menu at any time by replying 0 or MENU.",
+                    "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or "
+                    "*MENU*.",
                 ]
             )
         )
+
+        # We ignore errors here, because if there's an error they just won't get the
+        # banner, we can still carry on and not go to the error state
+        _, banner_choices = await contentrepo.get_choices_by_tag("banner")
+        banner_messages = []
+        # Get all the content pages that have the banner tag
+        for choice in banner_choices:
+            # Get all the messages for this content page
+            message_id = 1
+            while message_id is not None:
+                error, page_details = await contentrepo.get_page_details(
+                    self.user, choice.value, message_id
+                )
+                if error:
+                    message_id = None
+                else:
+                    banner_messages.append(page_details["body"])
+                    if page_details.get("next_prompt"):
+                        message_id += 1
+                    else:
+                        message_id = None
 
         return CustomChoiceState(
             self,
@@ -191,6 +213,7 @@ class Application(BaseApplication):
             ),
             choices=choices,
             next=next_,
+            additional_messages=banner_messages,
         )
 
     async def state_contentrepo_page(self):

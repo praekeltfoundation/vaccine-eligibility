@@ -36,46 +36,16 @@ async def rapidpro_mock():
 @pytest.mark.asyncio
 async def test_state_welcome_valid(tester: AppTester):
     tester.setup_state("state_welcome")
-    await tester.user_input("2")
-
-    tester.assert_state("state_get_to_know")
-    tester.assert_num_messages(1)
-
-
-@pytest.mark.asyncio
-async def test_state_get_to_know_valid(tester: AppTester):
-    tester.setup_state("state_get_to_know")
-    await tester.user_input("2")
-
-    tester.assert_state("state_get_to_know_why")
-    tester.assert_num_messages(1)
-    tester.assert_message(
-        "🤔 *Why the questions?*\n"
-        "\n"
-        "🙍🏾‍♀️ These questions help the B-Wise team improve your experience with "
-        "me. The more I learn from you, the better the service will be for you.\n"
-        "\n"
-        "*Don't worry, you never have to share anything you don't want to. 🙂*\n"
-        "\n"
-        "*Ready?*\n"
-        "*1* - Ok\n"
-        "*2* - No Thanks"
-    )
-
-
-@pytest.mark.asyncio
-async def test_state_get_to_know_why_valid(tester: AppTester):
-    tester.setup_state("state_get_to_know_why")
-    await tester.user_input("OK")
+    await tester.user_input("Create a profile")
 
     tester.assert_state("state_terms")
     tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio
-async def test_state_terms_valid(tester: AppTester):
+async def test_state_terms_read(tester: AppTester):
     tester.setup_state("state_terms")
-    await tester.user_input("1")
+    await tester.user_input("3")
 
     tester.assert_state("state_terms")
     tester.assert_num_messages(1)
@@ -84,10 +54,13 @@ async def test_state_terms_valid(tester: AppTester):
 @pytest.mark.asyncio
 async def test_submit_terms_and_conditions(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_terms")
-    await tester.user_input("2")
+    await tester.user_input("1")
 
-    tester.assert_state("state_dob_full")
+    tester.assert_state("state_persona_name")
     tester.assert_num_messages(1)
+
+    [msg] = tester.fake_worker.outbound_messages
+    assert msg.content == ("Excellent - now we can get you set up.")
 
     assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[0]
@@ -99,7 +72,7 @@ async def test_submit_terms_and_conditions(tester: AppTester, rapidpro_mock):
 @pytest.mark.asyncio
 async def test_state_terms_decline(tester: AppTester):
     tester.setup_state("state_terms")
-    await tester.user_input("3")
+    await tester.user_input("2")
 
     tester.assert_state("state_decline_confirm")
     tester.assert_num_messages(1)
@@ -108,7 +81,7 @@ async def test_state_terms_decline(tester: AppTester):
 @pytest.mark.asyncio
 async def test_state_decline_confirm_valid(tester: AppTester):
     tester.setup_state("state_decline_confirm")
-    await tester.user_input("1")
+    await tester.user_input("2")
 
     tester.assert_state("state_decline_2")
 
@@ -120,17 +93,17 @@ async def test_state_decline_confirm_valid(tester: AppTester):
         "important to us too.\n"
         "\n"
         "If you change your mind though, we'll be here! Just send me a "
-        "*HI* whenever you're ready to chat again. In the mean time, be "
-        "wise, and look after yourself 😉👋🏾"
+        "*HI* whenever you're ready to chat again. In the meantime, be "
+        "wise and look after yourself 😉👋🏾"
     )
 
 
 @pytest.mark.asyncio
 async def test_state_decline_confirm_accept(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_decline_confirm")
-    await tester.user_input("2")
+    await tester.user_input("1")
 
-    tester.assert_state("state_dob_full")
+    tester.assert_state("state_persona_name")
     tester.assert_num_messages(1)
 
     assert len(rapidpro_mock.tstate.requests) == 2

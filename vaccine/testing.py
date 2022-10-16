@@ -189,6 +189,7 @@ class TState:
     requests: list = field(default_factory=list)
     errors: int = 0
     errormax: int = 0
+    banner: bool = False
 
 
 def unused_port():
