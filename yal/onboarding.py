@@ -2,11 +2,8 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
+from vaccine.states import Choice, FreeText, WhatsAppListState
 from yal import rapidpro, utils
-from yal.change_preferences import Application as ChangePreferencesApplication
-from yal.mainmenu import Application as MainMenuApplication
-from yal.askaquestion import Application as AaqApplication
 from yal.utils import get_current_datetime, get_generic_error
 from yal.validators import age_validator
 
@@ -240,7 +237,7 @@ class Application(BaseApplication):
                     "I can answer questions about sex, relationships and your health. "
                     "Just type your Q and hit send 🙂",
                     "",
-                    "e.g. _How do I know if I have an STI?_"
+                    "e.g. _How do I know if I have an STI?_",
                     "",
                     "-----",
                     "",
@@ -248,9 +245,12 @@ class Application(BaseApplication):
                 ]
             )
         )
-        buttons = [Choice("menu", "Main menu"),]
+        buttons = [
+            Choice("menu", "Main menu"),
+        ]
         return await self.go_to_state_with_kwargs(
-            "state_aaq_start", question=question, buttons=buttons)
+            "state_aaq_start", question=question, buttons=buttons
+        )
 
     async def state_stop_onboarding_reminders(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
