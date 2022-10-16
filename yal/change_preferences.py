@@ -2,13 +2,7 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import (
-    Choice,
-    ChoiceState,
-    FreeText,
-    WhatsAppListState,
-    WhatsAppButtonState
-)
+from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
 from vaccine.utils import get_display_choices
 from yal import rapidpro
 from yal.utils import GENDERS, PROVINCES, get_generic_error, normalise_phonenumber
@@ -75,7 +69,7 @@ class Application(BaseApplication):
                     gender,
                     "",
                     "🤖*Bot Name+emoji*",
-                    "[persona_emoji] [persona_name]"
+                    "[persona_emoji] [persona_name]",
                     "",
                     "❤️ *Relationship?*",
                     relationship_status or "Empty",
@@ -98,9 +92,7 @@ class Application(BaseApplication):
                 Choice("state_update_age", self._("Age")),
                 Choice("state_update_gender", self._("Gender")),
                 Choice("state_update_bot_name", self._("Bot name + emoji")),
-                Choice(
-                    "state_update_relationship_status", self._("Relationship?")
-                ),
+                Choice("state_update_relationship_status", self._("Relationship?")),
                 Choice("state_update_province", self._("Location")),
             ],
             next=next_,
@@ -119,7 +111,7 @@ class Application(BaseApplication):
                         "-----",
                         "",
                         "*What is your age?*",
-                        "_Type in the number only (e.g. 24)_"
+                        "_Type in the number only (e.g. 24)_",
                     ]
                 )
             ),
@@ -128,9 +120,10 @@ class Application(BaseApplication):
                 self._(
                     "\n".join(
                         [
-                            "Hmm, something looks a bit off to me. Can we try again? Remember to *only use numbers*. 👍🏽",
+                            "Hmm, something looks a bit off to me. Can we try again? "
+                            "Remember to *only use numbers*. 👍🏽",
                             "",
-                            "For example just send in *17* if you are 17 years old."
+                            "For example just send in *17* if you are 17 years old.",
                         ]
                     )
                 )
@@ -374,11 +367,12 @@ class Application(BaseApplication):
                     "-----",
                     "",
                     "*What would you like to call me?*",
-                    "It can be any name you like or one that reminds you of someone you trust.",
+                    "It can be any name you like or one that reminds you of someone "
+                    "you trust.",
                     "",
                     "Just type and send me your new bot name.",
                     "",
-                    "_If you want to do this later, just click the \"skip\" button._"
+                    '_If you want to do this later, just click the "skip" button._',
                 ]
             )
         )
@@ -409,7 +403,8 @@ class Application(BaseApplication):
                 [
                     "Great - from now on you can call me [persona_name].",
                     "",
-                    "_You can change this later by typing in *9* from the main *MENU*._",
+                    "_You can change this later by typing in *9* from the main "
+                    "*MENU*._",
                 ]
             )
         )
@@ -428,7 +423,7 @@ class Application(BaseApplication):
                     "*Why not use an emoji to accompany my new name?*",
                     "Send in the new emoji you'd like to use now.",
                     "",
-                    "_If you want to do this later, just click the \"skip\" button._",
+                    '_If you want to do this later, just click the "skip" button._',
                 ]
             )
         )
@@ -456,9 +451,7 @@ class Application(BaseApplication):
 
         choices = [
             Choice("menu", self._("Main Menu")),
-            Choice(
-                "ask_a_question", self._("Ask a question")
-            ),
+            Choice("ask_a_question", self._("Ask a question")),
         ]
         question = self._(
             "\n".join(
