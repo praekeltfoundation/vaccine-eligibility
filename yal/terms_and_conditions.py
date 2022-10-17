@@ -17,7 +17,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "👋🏾 *HOWZIT! Welcome to B-Wise!*",
+                    "👋🏾 *Hey there! Welcome to B-Wise!*",
                     "",
                     "I'm a chatbot service 🤖 here to answer questions about "
                     "your body, sex, relationships and health 😌",

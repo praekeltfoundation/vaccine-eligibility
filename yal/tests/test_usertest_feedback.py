@@ -94,7 +94,7 @@ async def test_state_check_feedback_not_part(tester: AppTester, rapidpro_mock):
     tester.assert_message(
         "\n".join(
             [
-                "🤖 *Howzit! Welcome to B-Wise.*",
+                "🤖 *Hey there — Welcome to B-Wise!*",
                 "",
                 "If you're looking for answers to questions about bodies, sex, "
                 "relationships and health, please reply with the word *HI*.",
