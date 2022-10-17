@@ -17,8 +17,9 @@ GENERIC_ERRORS = (
     "time, please reply with the number that matches your choice.👍🏽",
     "Oops, looks like I don't have that option available.🤔Please try again - I'll get "
     "it if you use the number that matches your choice, promise.👍",
-    "Umm...I'm sorry but I'm not sure what that means🤦🏾‍♀️. You can help me by trying "
-    "again. This time, look for the number matching your choice and send that👍🏽",
+    "Umm...I'm sorry but I'm not sure what that means [persona_emoji]. You can help "
+    "me by trying again. This time, look for the number matching your choice and send "
+    "that👍🏽",
 )
 GENDERS = {
     "girl_woman": "Girl/Woman",

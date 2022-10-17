@@ -32,7 +32,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "*🙍🏾‍♀️Hi!*",
+                    "[persona_emoji] *Hi!*",
                     "",
                     f"I just received a message from you saying *{inbound}*.",
                     "",
@@ -106,7 +106,7 @@ class Application(BaseApplication):
                     "*What can we do better?*",
                     "------",
                     "",
-                    "*👩🏾 We are always trying to improve.*",
+                    "[persona_emoji] *We are always trying to improve.*",
                     "*Could you tell us why you want to stop getting these messages?*",
                     "",
                     "Your answer will help us make this service better.",
@@ -203,7 +203,7 @@ class Application(BaseApplication):
                         "*Please tell us more*",
                         "------",
                         "",
-                        "🙍🏾‍♀️ *Thanks.*" "",
+                        "[persona_emoji] *Thanks.*" "",
                         "If you could share your reason by replying with a ",
                         "few words about why you want to stop receiving messages,",
                         "I'd be so grateful 🙂.",
@@ -223,7 +223,7 @@ class Application(BaseApplication):
                             "*Goodbye* 👋🏾",
                             "-",
                             "",
-                            "🙍🏾‍♀️Thanks so much for your help.",
+                            "[persona_emoji] *Thanks so much for your help.*",
                             "",
                             "You won't get any more messages from us unless you *send "
                             "the word HI* to this number.",
