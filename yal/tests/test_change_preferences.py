@@ -172,10 +172,9 @@ async def test_state_update_age_submit(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_update_age_confirm")
     await tester.user_input("1")
     tester.assert_num_messages(1)
-    tester.assert_state("state_display_preferences")
+    tester.assert_state("state_conclude_changes")
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == [
-        "/api/v2/contacts.json",
         "/api/v2/contacts.json",
     ]
 

@@ -183,7 +183,37 @@ class Application(BaseApplication):
         error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")
-        return await self.go_to_state("state_display_preferences")
+        return await self.go_to_state("state_conclude_changes")
+
+    async def state_conclude_changes(self):
+        choices = [
+            Choice("menu", self._("Go to the menu")),
+            Choice("state_aaq_start", self._("Ask a question")),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "CHAT SETTINGS / ⚙️ *Change or update your info*",
+                    "*-----*",
+                    "",
+                    "Wonderful! [persona_emoji]",
+                    "",
+                    "*What would you like to do now?*",
+                    "",
+                    get_display_choices(choices),
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "menu": "state_pre_mainmenu",
+                "state_aaq_start": "state_aaq_start",
+            },
+        )
 
     async def state_update_relationship_status(self):
         question = self._(
