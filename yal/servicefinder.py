@@ -136,10 +136,8 @@ class Application(BaseApplication):
 
     async def state_pre_confirm_existing_address(self):
         metadata = self.user.metadata
-        await self.worker.publish_message(
-            self.inbound.reply(
-                self._("👩🏾 *Okay, I just need to confirm some details...*")
-            )
+        await self.publish_message(
+            self._("[persona_emoji] *Okay, I just need to confirm some details...*")
         )
         await asyncio.sleep(0.5)
 
@@ -149,7 +147,7 @@ class Application(BaseApplication):
                     "🏥 Find Clinics and Services",
                     "*Get help near you*",
                     "-----",
-                    "🙍🏾‍♀️ *The address I have for you right now is:*",
+                    "[persona_emoji] *The address I have for you right now is:*",
                     "",
                     f"{metadata['street_number']} {metadata['street_name']},",
                     metadata["suburb"],
@@ -160,7 +158,7 @@ class Application(BaseApplication):
                 ]
             )
         )
-        await self.worker.publish_message(self.inbound.reply(msg))
+        await self.publish_message(msg)
         await asyncio.sleep(0.5)
 
         return await self.go_to_state("state_confirm_existing_address")
@@ -173,8 +171,8 @@ class Application(BaseApplication):
                     "*Get help near you*",
                     "-----",
                     "",
-                    "🙍🏾‍♀️ *Would you like me to recommend helpful services close to "
-                    "this address?*",
+                    "[persona_emoji] *Would you like me to recommend helpful services "
+                    "close to this address?*",
                     "",
                     "1 - Yes please",
                     "2 - Use a different location",
@@ -268,12 +266,12 @@ class Application(BaseApplication):
                 "*Get help near you*",
                 "-----",
                 "",
-                "👩🏾 Perfect! That helps me narrow it down.",
+                "[persona_emoji] Perfect! That helps me narrow it down.",
                 "",
                 "*Next, please tell me what you need help with*",
             ]
         )
-        await self.worker.publish_message(self.inbound.reply(self._(msg)))
+        await self.publish_message(self._(msg))
         await asyncio.sleep(0.5)
 
         return await self.go_to_state("state_category")
@@ -318,7 +316,7 @@ class Application(BaseApplication):
                     metadata["servicefinder_breadcrumb"],
                     "-----",
                     "",
-                    "🙍🏾‍♀️ *Choose an option from the list:*",
+                    "[persona_emoji] *Choose an option from the list:*",
                     "",
                     category_text,
                     "",
@@ -377,7 +375,7 @@ class Application(BaseApplication):
         self.reset_metadata()
         question = "\n".join(
             [
-                "🙍🏾‍♀️ *Sorry, we can't find any services near you.*",
+                "[persona_emoji] *Sorry, we can't find any services near you.*",
                 "",
                 "But don't worry, here are some other options you can try:",
                 "",
@@ -401,10 +399,10 @@ class Application(BaseApplication):
                 "*Get help near you*",
                 "-----",
                 "",
-                "👩🏾*Okay, I've got you. Here are your closest options...*",
+                "[persona_emoji]*Okay, I've got you. Here are your closest options...*",
             ]
         )
-        await self.worker.publish_message(self.inbound.reply(self._(msg)))
+        await self.publish_message(self._(msg))
         await asyncio.sleep(0.5)
 
         user_location = (metadata["latitude"], metadata["longitude"])
@@ -453,18 +451,16 @@ class Application(BaseApplication):
         )
 
     async def state_pre_no_location(self):
-        await self.worker.publish_message(
-            self.inbound.reply(
-                self._("👩🏾 *Okay, I just need to confirm some details...*")
-            )
+        await self.publish_message(
+            self._("[persona_emoji] *Okay, I just need to confirm some details...*")
         )
         await asyncio.sleep(0.5)
 
         return await self.go_to_state("state_location")
 
     async def state_pre_different_location(self):
-        await self.worker.publish_message(
-            self.inbound.reply(self._("🙍🏾‍♀️ *Sure. Where would you like me to look?*"))
+        await self.publish_message(
+            self._("[persona_emoji] *Sure. Where would you like me to look?*")
         )
         await asyncio.sleep(0.5)
 
@@ -484,8 +480,8 @@ class Application(BaseApplication):
                 raise ErrorMessage(
                     "\n".join(
                         [
-                            "🙍🏾‍♀️*Hmmm, for some reason I couldn't find that "
-                            "location. Let's try again.*",
+                            "[persona_emoji]*Hmmm, for some reason I couldn't find "
+                            "that location. Let's try again.*",
                             "",
                             "*OR*",
                             "",
@@ -502,8 +498,8 @@ class Application(BaseApplication):
                     "*Get help near you*",
                     "-----",
                     "",
-                    "🙍🏾‍♀️*You can share a location by sending me a pin (📍). To do "
-                    "this:*",
+                    "[persona_emoji] *You can share a location by sending me a pin "
+                    "(📍). To do this:*",
                     "",
                     "1️⃣ Tap the *+* button on the bottom left of this screen.",
                     "2️⃣ Tap *Location*",

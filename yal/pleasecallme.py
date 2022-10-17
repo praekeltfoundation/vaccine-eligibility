@@ -90,7 +90,8 @@ class Application(BaseApplication):
                     "*Talk to a counsellor*",
                     "-----",
                     "",
-                    "*👩🏾 Eish! Our loveLife counsellors are all offline right now...*",
+                    "[persona_emoji] *Eish! Our loveLife counsellors are all offline "
+                    "right now...*",
                     "",
                     f"A loveLife counsellor will be available from {next_avail_str}",
                     "",
@@ -125,7 +126,7 @@ class Application(BaseApplication):
                     "*Emergency*",
                     "-----",
                     "",
-                    "*👩🏾 Are you in trouble?*",
+                    "[persona_emoji] *Are you in trouble?*",
                     "",
                     f"🚨If you are, please call {config.EMERGENCY_NUMBER} now!",
                     "",
@@ -153,8 +154,8 @@ class Application(BaseApplication):
                     "*Opening hours*",
                     "-----",
                     "",
-                    "🙍🏾‍♀️ *Here's when you can chat with one of our (human) loveLife "
-                    "counsellors:*",
+                    "[persona_emoji] *Here's when you can chat with one of our (human) "
+                    "loveLife counsellors:*",
                     "",
                     "🗓 *Mon-Fri:* 9 - 7pm",
                     "🗓 *Weekends:* 12 - 5pm",
@@ -182,24 +183,22 @@ class Application(BaseApplication):
         )
 
     async def state_in_hours_greeting(self):
-        await self.worker.publish_message(
-            self.inbound.reply(
-                self._("👩🏾 *Say no more—I'm on it!*\n☝🏾 Hold tight just a sec..."),
-            )
+        await self.publish_message(
+            self._(
+                "[persona_emoji] *Say no more—I'm on it!*\n☝🏾 Hold tight just a sec..."
+            ),
         )
         await asyncio.sleep(0.5)
-        await self.worker.publish_message(
-            self.inbound.reply(
-                self._(
-                    "\n".join(
-                        [
-                            "📞 A trained loveLife counsellor will call you back.",
-                            "",
-                            "They'll be able to talk to you about any sex, relationship"
-                            " and mental health questions you may have or issues you"
-                            " may be facing.",
-                        ]
-                    )
+        await self.publish_message(
+            self._(
+                "\n".join(
+                    [
+                        "📞 A trained loveLife counsellor will call you back.",
+                        "",
+                        "They'll be able to talk to you about any sex, relationship"
+                        " and mental health questions you may have or issues you"
+                        " may be facing.",
+                    ]
                 )
             )
         )
@@ -214,8 +213,8 @@ class Application(BaseApplication):
                     "*Talk to a counsellor*",
                     "-----",
                     "",
-                    "👩🏾 *Should a counsellor call you on the WhatsApp number you are"
-                    " using to chat?*",
+                    "[persona_emoji] *Should a counsellor call you on the WhatsApp "
+                    "number you are using to chat?*",
                     "",
                     "*1* - Yes, use this number",
                     "*2* - Call me on another number",
@@ -296,8 +295,8 @@ class Application(BaseApplication):
                     "*Talk to a counsellor*",
                     "-----",
                     "",
-                    "👩🏾 *Great! I've successfully arranged for a loveLife counsellor to"
-                    " call you back.* ✅",
+                    "[persona_emoji] *Great! I've successfully arranged for a loveLife "
+                    "counsellor to call you back.* ✅",
                     "",
                     "It should take around 3 minutes or so. Hang in there.",
                     "",
@@ -342,7 +341,7 @@ class Application(BaseApplication):
                     "*Talk to a counsellor*",
                     "-----",
                     "",
-                    "👩🏾*No problem. What number should we use?*",
+                    "[persona_emoji] *No problem. What number should we use?*",
                     "",
                     "Reply by sending the number.",
                     "",
@@ -372,7 +371,7 @@ class Application(BaseApplication):
                     "*Talk to a counsellor*",
                     "-----",
                     "",
-                    "*👩🏾Is this the right number?*",
+                    "[persona_emoji] *Is this the right number?*",
                     "",
                     msisdn,
                     "",
@@ -407,7 +406,8 @@ class Application(BaseApplication):
                     "*Talk to a counsellor*",
                     "-----",
                     "",
-                    "*👩🏾Would you like us to save this number for next time?*",
+                    "[persona_emoji] *Would you like us to save this number for next "
+                    "time?*",
                     "",
                     "*1* - Yes, please",
                     "*2* - No thanks",
@@ -473,13 +473,13 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    "👩🏾 *Eish! Sorry about that!*",
+                    "[persona_emoji] *Eish! Sorry about that!*",
                     "",
                     "Something must have gone wrong on our side. Apologies for that.",
                 ]
             )
         )
-        await self.worker.publish_message(self.inbound.reply(msg))
+        await self.publish_message(msg)
         await asyncio.sleep(0.5)
         return await self.go_to_state("state_ask_to_call_again")
 
@@ -491,7 +491,7 @@ class Application(BaseApplication):
                     "*Talk to a counsellor*",
                     "-----",
                     "",
-                    "👩🏾 *Want me to try again?*",
+                    "[persona_emoji] *Want me to try again?*",
                     "I can try and contact one of my colleagues at loveLife again",
                     " to call you back.",
                     "",
@@ -529,7 +529,7 @@ class Application(BaseApplication):
                     "*Talk to a counsellor*",
                     "-----",
                     "",
-                    "👩🏾 *Which number should we use?*",
+                    "[persona_emoji] *Which number should we use?*",
                     "",
                     "*1* - My Whatsapp number",
                     "*2* - The previously saved number",
@@ -575,7 +575,7 @@ class Application(BaseApplication):
                         "*Talk to a counsellor*",
                         "-----",
                         "",
-                        "*👩🏾Is this the right number?*",
+                        "[persona_emoji] *Is this the right number?*",
                         "",
                         msisdn,
                         "",
@@ -609,7 +609,8 @@ class Application(BaseApplication):
                         "*Talk to a counsellor*",
                         "-----",
                         "",
-                        "*👩🏾 Whoops! I don't have another number saved for you.*",
+                        "[persona_emoji] *Whoops! I don't have another number saved "
+                        "for you.*",
                         "*Which number should we use?*",
                         "",
                         "*1* - My Whatsapp number",
@@ -643,7 +644,7 @@ class Application(BaseApplication):
                     "*Talk to a counsellor*",
                     "-----",
                     "",
-                    "👩🏾 *Are you sure you no longer need help?*",
+                    "[persona_emoji] *Are you sure you no longer need help?*",
                     "",
                     "*1* - Yes, I got help",
                     "*2* - This way is too long",
@@ -689,7 +690,7 @@ class Application(BaseApplication):
                     "*Talk to a counsellor*",
                     "-----",
                     "",
-                    "👩🏾*I'm glad you got the help you needed.*",
+                    "[persona_emoji] *I'm glad you got the help you needed.*",
                     "",
                     "If you need help again, just reply *HELP* at anytime and ",
                     "one of our loveLife counsellors can call you back.",
@@ -728,7 +729,7 @@ class Application(BaseApplication):
                     "*Talk to a counsellor*",
                     "-----",
                     "",
-                    "👩🏾 *Thank you for that feedback, we'll work on it.*",
+                    "[persona_emoji] *Thank you for that feedback, we'll work on it.*",
                     "",
                     "If you need help again, just reply *HELP* at anytime and ",
                     "one of our loveLife counsellors can call you back.",
@@ -772,7 +773,7 @@ class Application(BaseApplication):
                     "*Talk to a counsellor*",
                     "-----",
                     "",
-                    "👩🏾 *No problem. I hope you're no longer in trouble.*",
+                    "[persona_emoji] *No problem. I hope you're no longer in trouble.*",
                     "",
                     "If you need help again, just reply *HELP* at anytime and ",
                     "one of our loveLife counsellors can call you back.",
@@ -807,7 +808,8 @@ class Application(BaseApplication):
                     "*Get in touch with B-Wise*",
                     "-----",
                     "",
-                    "🙍🏾‍♀️*Don't stress. My team at B-Wise have got your back too.* 👊🏾",
+                    "[persona_emoji] *Don't stress. My team at B-Wise have got your "
+                    "back too.* 👊🏾",
                     "",
                     "You can get in touch with one of my them via social media now.",
                     "",

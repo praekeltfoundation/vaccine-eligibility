@@ -97,7 +97,7 @@ async def test_state_optout(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "*🙍🏾‍♀️Hi!*",
+                "🤖 *Hi!*",
                 "",
                 "I just received a message from you saying *stop*.",
                 "",
