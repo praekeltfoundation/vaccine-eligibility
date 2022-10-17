@@ -125,7 +125,7 @@ class Application(
             self._(
                 "\n".join(
                     [
-                        "[persona_emoji] *Howzit! Welcome to B-Wise.*",
+                        "[persona_emoji] *Hey there — Welcome to B-Wise!*",
                         "",
                         "If you're looking for answers to questions about bodies, sex, "
                         "relationships and health, please reply with the word *HI*.",
