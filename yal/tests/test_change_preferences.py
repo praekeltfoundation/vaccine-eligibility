@@ -129,11 +129,15 @@ async def test_state_update_age(tester: AppTester, rapidpro_mock):
     tester.assert_message(
         "\n".join(
             [
-                "ABOUT YOU / 🍰*Age*",
+                "*CHAT SETTINGS / ⚙️ Change or update your info* / *Age*",
                 "-----",
                 "",
                 "*What is your age?*",
                 "_Type in the number only (e.g. 24)_",
+                "",
+                "*-----*",
+                "Rather not say?",
+                "No stress! Just tap SKIP",
             ]
         )
     )
@@ -142,9 +146,31 @@ async def test_state_update_age(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_update_age_submit(tester: AppTester, rapidpro_mock):
+async def test_state_update_age_confirm(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_update_age")
     await tester.user_input("32")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_update_age_confirm")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+
+
+@pytest.mark.asyncio
+async def test_state_update_age_confirm_not_correct(tester: AppTester, rapidpro_mock):
+    tester.setup_answer("state_update_age", "32")
+    tester.setup_state("state_update_age_confirm")
+    await tester.user_input("2")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_update_age")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+
+
+@pytest.mark.asyncio
+async def test_state_update_age_submit(tester: AppTester, rapidpro_mock):
+    tester.setup_answer("state_update_age", "32")
+    tester.setup_state("state_update_age_confirm")
+    await tester.user_input("1")
     tester.assert_num_messages(1)
     tester.assert_state("state_display_preferences")
 

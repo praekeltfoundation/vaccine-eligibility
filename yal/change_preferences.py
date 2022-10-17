@@ -107,15 +107,19 @@ class Application(BaseApplication):
             question=self._(
                 "\n".join(
                     [
-                        "ABOUT YOU / 🍰*Age*",
+                        "*CHAT SETTINGS / ⚙️ Change or update your info* / *Age*",
                         "-----",
                         "",
                         "*What is your age?*",
                         "_Type in the number only (e.g. 24)_",
+                        "",
+                        "*-----*",
+                        "Rather not say?",
+                        "No stress! Just tap SKIP",
                     ]
                 )
             ),
-            next="state_update_age_submit",
+            next="state_update_age_confirm",
             check=age_validator(
                 self._(
                     "\n".join(
@@ -131,7 +135,44 @@ class Application(BaseApplication):
             buttons=[Choice("skip", self._("Skip"))],
         )
 
+    async def state_update_age_confirm(self):
+        age = self.user.answers.get("state_update_age")
+        if age == "skip":
+            return await self.go_to_state("state_display_preferences")
+
+        choices = [
+            Choice("yes", self._("Yes")),
+            Choice("no", self._("No")),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "*CHAT SETTINGS / ⚙️ Change or update your info* / *Age*",
+                    "-----",
+                    "",
+                    f"*You've entered {age} as your age.*",
+                    "",
+                    "Is this correct?",
+                    "",
+                    get_display_choices(choices),
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "yes": "state_update_age_submit",
+                "no": "state_update_age",
+            },
+        )
+
     async def state_update_age_submit(self):
+        if self.user.answers.get("state_update_age") == "skip":
+            return await self.go_to_state("state_display_preferences")
+
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
@@ -142,7 +183,6 @@ class Application(BaseApplication):
         error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")
-
         return await self.go_to_state("state_display_preferences")
 
     async def state_update_relationship_status(self):
