@@ -158,8 +158,7 @@ async def test_state_servicefinder_start_no_address(tester: AppTester):
                 "*Get help near you*",
                 "-----",
                 "",
-                "🙍🏾‍♀️*You can share a location by sending me a pin (📍). To do "
-                "this:*",
+                "🤖 *You can share a location by sending me a pin (📍). To do this:*",
                 "",
                 "1️⃣ Tap the *+* button on the bottom left of this screen.",
                 "2️⃣ Tap *Location*",
@@ -191,13 +190,13 @@ async def test_state_servicefinder_start_existing_address(
     tester.assert_state("state_confirm_existing_address")
 
     [msg1, msg2] = tester.fake_worker.outbound_messages
-    assert msg1.content == "👩🏾 *Okay, I just need to confirm some details...*"
+    assert msg1.content == "🤖 *Okay, I just need to confirm some details...*"
     assert msg2.content == "\n".join(
         [
             "🏥 Find Clinics and Services",
             "*Get help near you*",
             "-----",
-            "🙍🏾‍♀️ *The address I have for you right now is:*",
+            "🤖 *The address I have for you right now is:*",
             "",
             "99 high level,",
             "cape town",
@@ -215,7 +214,7 @@ async def test_state_servicefinder_start_existing_address(
                 "*Get help near you*",
                 "-----",
                 "",
-                "🙍🏾‍♀️ *Would you like me to recommend helpful services close to "
+                "🤖 *Would you like me to recommend helpful services close to "
                 "this address?*",
                 "",
                 "1 - Yes please",
@@ -256,7 +255,7 @@ async def test_state_confirm_existing_address_yes(
             "*Get help near you*",
             "-----",
             "",
-            "🙍🏾‍♀️ *Choose an option from the list:*",
+            "🤖 *Choose an option from the list:*",
             "",
             "1 - Clinics & Hospitals",
             "2 - HIV Prevention",
@@ -315,7 +314,7 @@ async def test_state_category_sub(tester: AppTester, servicefinder_mock):
             "Get help near you / *HIV Prevention*",
             "-----",
             "",
-            "🙍🏾‍♀️ *Choose an option from the list:*",
+            "🤖 *Choose an option from the list:*",
             "",
             "1 - Where to get PrEP",
             "2 - Where to get PEP",
@@ -395,7 +394,7 @@ async def test_state_category_no_facilities(tester: AppTester, servicefinder_moc
 
     question = "\n".join(
         [
-            "🙍🏾‍♀️ *Sorry, we can't find any services near you.*",
+            "🤖 *Sorry, we can't find any services near you.*",
             "",
             "But don't worry, here are some other options you can try:",
             "",
