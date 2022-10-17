@@ -120,6 +120,108 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
+async def test_state_update_gender(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_display_preferences")
+    await tester.user_input("2")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_update_gender")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*CHAT SETTINGS / ⚙️ Change or update your info* / *Gender*",
+                "*-----*",
+                "",
+                "*What's your gender?*",
+                "",
+                "Please click the button and select the option you think best "
+                "describes you:",
+                "",
+                "*1* - Female",
+                "*2* - Male",
+                "*3* - Non-binary",
+                "*4* - None of these",
+                "*5* - Rather not say",
+            ]
+        ),
+        list_items=["Female", "Male", "Non-binary", "None of these", "Rather not say"],
+    )
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+
+
+@pytest.mark.asyncio
+async def test_state_update_gender_from_list(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_update_gender")
+
+    await tester.user_input("2")
+
+    tester.assert_state("state_update_gender_confirm")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_update_gender", "male")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+
+
+@pytest.mark.asyncio
+async def test_state_update_other_gender(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_update_gender")
+
+    await tester.user_input("4")
+
+    tester.assert_state("state_update_other_gender")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_update_gender", "other")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+
+
+@pytest.mark.asyncio
+async def test_state_update_gender_confirm(tester: AppTester, rapidpro_mock):
+    tester.setup_answer("state_update_gender", "other")
+    tester.setup_state("state_update_other_gender")
+
+    await tester.user_input("trans man")
+
+    tester.assert_state("state_update_gender_confirm")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_update_other_gender", "trans man")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+
+
+@pytest.mark.asyncio
+async def test_state_update_gender_confirm_not_correct(
+    tester: AppTester, rapidpro_mock
+):
+    tester.setup_state("state_update_gender_confirm")
+
+    await tester.user_input("2")
+
+    tester.assert_state("state_update_gender")
+    tester.assert_num_messages(1)
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+
+
+@pytest.mark.asyncio
+async def test_state_update_gender_submit(tester: AppTester, rapidpro_mock):
+    tester.setup_answer("state_update_gender", "other")
+    tester.setup_answer("state_other_gender", "gender fluid")
+    tester.setup_state("state_update_gender_confirm")
+    await tester.user_input("1")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_conclude_changes")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/contacts.json",
+    ]
+
+
+@pytest.mark.asyncio
 async def test_state_update_age(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_display_preferences")
     await tester.user_input("1")

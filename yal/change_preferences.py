@@ -390,21 +390,19 @@ class Application(BaseApplication):
             [f"*{i+1}* - {name}" for i, (code, name) in enumerate(GENDERS.items())]
         )
         gender_choices = [Choice(code, name) for code, name in GENDERS.items()]
-        gender_choices.append(Choice("skip", "Skip"))
 
         question = self._(
             "\n".join(
                 [
-                    "*CHAT SETTINGS*",
-                    "Choose your gender",
-                    "-----",
+                    "*CHAT SETTINGS / ⚙️ Change or update your info* / *Gender*",
+                    "*-----*",
                     "",
                     "*What's your gender?*",
                     "",
-                    "Please select the option you think best describes you:",
+                    "Please click the button and select the option you think best "
+                    "describes you:",
                     "",
                     gender_text,
-                    f"*{len(gender_choices)}* - Skip",
                 ]
             )
         )
@@ -413,21 +411,86 @@ class Application(BaseApplication):
             question=question,
             button="Gender",
             choices=gender_choices,
-            next="state_update_gender_submit",
+            next="state_update_other_gender",
             error=self._(get_generic_error()),
+        )
+
+    async def state_update_other_gender(self):
+        gender = self.user.answers.get("state_update_gender")
+        if gender == "skip":
+            return await self.go_to_state("state_display_preferences")
+        if gender != "other":
+            return await self.go_to_state("state_update_gender_confirm")
+
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "*CHAT SETTINGS / ⚙️ Change or update your info* / *Gender*",
+                        "-----",
+                        "",
+                        "[persona_emoji] No problem. I want to make double sure you "
+                        "feel included.",
+                        "",
+                        "*Go ahead and let me know what you'd prefer. Type something "
+                        "and hit send. 😌*",
+                    ]
+                )
+            ),
+            next="state_update_gender_confirm",
+        )
+
+    async def state_update_gender_confirm(self):
+        gender = self.user.answers.get("state_update_gender")
+        if gender == "skip":
+            return await self.go_to_state("state_display_preferences")
+        if gender == "other":
+            gender = self.user.answers.get("state_update_other_gender", "")
+
+        choices = [
+            Choice("yes", self._("Yes")),
+            Choice("no", self._("No")),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "*CHAT SETTINGS / ⚙️ Change or update your info* / *Gender*",
+                    "-----",
+                    "",
+                    f"*You've chosen {gender} as your gender.*",
+                    "",
+                    "Is this correct?",
+                    "",
+                    get_display_choices(choices),
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "yes": "state_update_gender_submit",
+                "no": "state_update_gender",
+            },
         )
 
     async def state_update_gender_submit(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        data = {"gender": self.user.answers.get("state_update_gender")}
+        data = {
+            "gender": self.user.answers.get("state_update_gender"),
+            "gender_other": self.user.answers.get("state_update_other_gender", ""),
+        }
 
         error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")
 
-        return await self.go_to_state("state_display_preferences")
+        return await self.go_to_state("state_conclude_changes")
 
     async def state_update_bot_name(self):
         question = self._(
