@@ -227,16 +227,18 @@ async def test_state_gender(get_current_datetime, tester: AppTester, rapidpro_mo
 
 
 @pytest.mark.asyncio
+@mock.patch("yal.askaquestion.config")
 @mock.patch("yal.onboarding.get_current_datetime")
 async def test_state_gender_from_list(
-    get_current_datetime, tester: AppTester, rapidpro_mock
+    get_current_datetime, mock_config, tester: AppTester, rapidpro_mock
 ):
+    mock_config.AAQ_URL = "http://aaq-test.com"
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_gender")
 
     await tester.user_input("2")
 
-    tester.assert_state("state_onboarding_complete")
+    tester.assert_state("state_aaq_start")
     tester.assert_num_messages(1)
 
     tester.assert_answer("state_gender", "male")
@@ -275,7 +277,9 @@ async def test_state_other_gender(
 
 
 @pytest.mark.asyncio
-async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
+@mock.patch("yal.askaquestion.config")
+async def test_submit_onboarding(mock_config, tester: AppTester, rapidpro_mock):
+    mock_config.AAQ_URL = "http://aaq-test.com"
     tester.setup_state("state_other_gender")
 
     tester.setup_answer("state_age", "22")
@@ -286,8 +290,28 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
 
     await tester.user_input("gender fluid")
 
-    tester.assert_state("state_onboarding_complete")
+    tester.assert_state("state_aaq_start")
     tester.assert_num_messages(1)
+    tester.assert_message(
+        "\n".join(
+            [
+                "🙏🏾 OK—We're good to go!",
+                "",
+                "-----",
+                "",
+                "🤖  *Do you want to go ahead and ask a question?*",
+                "I can answer questions about sex, relationships and your health. "
+                "Just type your Q and hit send 🙂",
+                "",
+                "e.g. _How do I know if I have an STI?_",
+                "",
+                "-----",
+                "",
+                "🏠 Or head to the main menu by clicking the button below.",
+            ]
+        ),
+        buttons=["Main menu"],
+    )
 
     assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[1]

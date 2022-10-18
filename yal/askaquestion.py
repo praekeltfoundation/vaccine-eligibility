@@ -42,36 +42,38 @@ class Application(BaseApplication):
     START_STATE = "state_aaq_start"
     TIMEOUT_RESPONSE_STATE = "state_handle_timeout_response"
 
-    async def state_aaq_start(self):
+    async def state_aaq_start(self, question=None, buttons=None):
 
         if not config.AAQ_URL:
             return await self.go_to_state("state_coming_soon")
 
         self.save_metadata("aaq_page", 0)
 
-        question = self._(
-            "\n".join(
-                [
-                    "🙋🏿‍♂️ QUESTIONS? / *Ask A Question*",
-                    "-----",
-                    "",
-                    "[persona_emoji] *That's what I'm here for!*",
-                    "*Just type your Q and hit send* 🙂",
-                    "",
-                    "e.g. _How do I know if I have an STI?_",
-                    "",
-                    "-----",
-                    "*Or reply:*",
-                    BACK_TO_MAIN,
-                    GET_HELP,
-                ]
+        if not question:
+            question = self._(
+                "\n".join(
+                    [
+                        "🙋🏿‍♂️ QUESTIONS? / *Ask A Question*",
+                        "-----",
+                        "",
+                        "[persona_emoji] *That's what I'm here for!*",
+                        "*Just type your Q and hit send* 🙂",
+                        "",
+                        "e.g. _How do I know if I have an STI?_",
+                        "",
+                        "-----",
+                        "*Or reply:*",
+                        BACK_TO_MAIN,
+                        GET_HELP,
+                    ]
+                )
             )
-        )
         return FreeText(
             self,
             question=question,
             next="state_set_aaq_timeout_1",
             check=nonempty_validator(question),
+            buttons=buttons,
         )
 
     async def state_coming_soon(self):

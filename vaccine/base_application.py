@@ -39,18 +39,18 @@ class BaseApplication:
         )
         self._ = self.translation.gettext
 
-    async def get_current_state(self):
+    async def get_current_state(self, **kw):
         if not self.state_name:
             self.state_name = self.START_STATE
         state_func = getattr(self, self.state_name)
-        return await state_func()
+        return await state_func(**kw)
 
-    async def go_to_state(self, name):
+    async def go_to_state(self, name, **kw):
         """
         Go to another state and have it process the user message instead
         """
         self.state_name = name
-        return await self.get_current_state()
+        return await self.get_current_state(**kw)
 
     @property
     def state_name(self):
