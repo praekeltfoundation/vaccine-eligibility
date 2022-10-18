@@ -146,7 +146,7 @@ class Application(BaseApplication):
         gender_text = "\n".join(
             [
                 f"*{i+1}* - {name}"
-                for i, (code, name) in enumerate(utils.GENDERS.items())
+                for i, (_, name) in enumerate(utils.GENDERS.items())
             ]
         )
         gender_choices = [Choice(code, name) for code, name in utils.GENDERS.items()]
