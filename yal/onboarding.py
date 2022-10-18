@@ -146,10 +146,7 @@ class Application(BaseApplication):
         await self.update_last_onboarding_time()
 
         gender_text = "\n".join(
-            [
-                f"*{i+1}* - {name}"
-                for i, (_, name) in enumerate(utils.GENDERS.items())
-            ]
+            [f"*{i+1}* - {name}" for i, (_, name) in enumerate(utils.GENDERS.items())]
         )
         gender_choices = [Choice(code, name) for code, name in utils.GENDERS.items()]
 
