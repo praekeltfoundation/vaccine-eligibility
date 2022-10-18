@@ -39,28 +39,18 @@ class BaseApplication:
         )
         self._ = self.translation.gettext
 
-    async def get_current_state(self):
-        if not self.state_name:
-            self.state_name = self.START_STATE
-        state_func = getattr(self, self.state_name)
-        return await state_func()
-
-    async def go_to_state(self, name):
-        """
-        Go to another state and have it process the user message instead
-        """
-        self.state_name = name
-        return await self.get_current_state()
-
-    async def go_to_state_with_kwargs(self, name, **kw):
-        """
-        Go to another state and have it process the user message instead
-        """
-        self.state_name = name
+    async def get_current_state(self, **kw):
         if not self.state_name:
             self.state_name = self.START_STATE
         state_func = getattr(self, self.state_name)
         return await state_func(**kw)
+
+    async def go_to_state(self, name, **kw):
+        """
+        Go to another state and have it process the user message instead
+        """
+        self.state_name = name
+        return await self.get_current_state(**kw)
 
     @property
     def state_name(self):
