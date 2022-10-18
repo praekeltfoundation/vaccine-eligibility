@@ -291,16 +291,16 @@ async def test_state_update_relationship_status(tester: AppTester, rapidpro_mock
     tester.assert_message(
         "\n".join(
             [
-                "*CHAT SETTINGS*",
-                "⚙️ Change or update your info",
+                "*CHAT SETTINGS / ⚙️ Change or update your info* / *Relationship?*",
                 "-----",
                 "",
-                "*And what about love? Seeing someone special right now?*",
+                "🤖 *Are you currently in a relationship or seeing "
+                "someone special right now?",
                 "",
-                "*1*. Yes",
-                "*2*. It's complicated",
-                "*3*. No",
-                "*4*. Skip",
+                "1. Yes, in relationship",
+                "2. It's complicated",
+                "3. Not seeing anyone",
+                "4. Skip",
             ]
         )
     )
@@ -309,16 +309,41 @@ async def test_state_update_relationship_status(tester: AppTester, rapidpro_mock
 
 
 @pytest.mark.asyncio
-async def test_state_update_relationship_status_submit(
+async def test_state_update_relationship_status_confirm(
     tester: AppTester, rapidpro_mock
 ):
     tester.setup_state("state_update_relationship_status")
     await tester.user_input("2")
     tester.assert_num_messages(1)
-    tester.assert_state("state_display_preferences")
+    tester.assert_state("state_update_relationship_status_confirm")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+
+
+@pytest.mark.asyncio
+async def test_state_update_relationship_status_confirm_not_correct(
+    tester: AppTester, rapidpro_mock
+):
+    tester.setup_answer("state_update_relationship_status", "yes")
+    tester.setup_state("state_update_relationship_status_confirm")
+    await tester.user_input("2")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_update_relationship_status")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+
+
+@pytest.mark.asyncio
+async def test_state_update_relationship_status_submit(
+    tester: AppTester, rapidpro_mock
+):
+    tester.setup_answer("state_update_relationship_status", "yes")
+    tester.setup_state("state_update_relationship_status_confirm")
+    await tester.user_input("1")
+    tester.assert_num_messages(1)
+    tester.assert_state("state_conclude_changes")
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == [
-        "/api/v2/contacts.json",
         "/api/v2/contacts.json",
     ]
 

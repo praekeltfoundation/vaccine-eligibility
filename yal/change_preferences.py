@@ -216,19 +216,22 @@ class Application(BaseApplication):
         )
 
     async def state_update_relationship_status(self):
+        choices = [
+            Choice("yes", self._("Yes, in relationship")),
+            Choice("complicated", self._("It's complicated")),
+            Choice("no", self._("Not seeing anyone")),
+            Choice("skip", self._("Skip")),
+        ]
         question = self._(
             "\n".join(
                 [
-                    "*CHAT SETTINGS*",
-                    "⚙️ Change or update your info",
+                    "*CHAT SETTINGS / ⚙️ Change or update your info* / *Relationship?*",
                     "-----",
                     "",
-                    "*And what about love? Seeing someone special right now?*",
+                    "[persona_emoji] *Are you currently in a relationship or seeing "
+                    "someone special right now?",
                     "",
-                    "*1*. Yes",
-                    "*2*. It's complicated",
-                    "*3*. No",
-                    "*4*. Skip",
+                    get_display_choices(choices),
                 ]
             )
         )
@@ -236,14 +239,43 @@ class Application(BaseApplication):
             self,
             question=question,
             button="Relationship Status",
-            choices=[
-                Choice("yes", self._("Yes")),
-                Choice("complicated", self._("It's complicated")),
-                Choice("no", self._("No")),
-                Choice("skip", self._("Skip")),
-            ],
-            next="state_update_relationship_status_submit",
+            choices=choices,
+            next="state_update_relationship_status_confirm",
             error=self._(get_generic_error()),
+        )
+
+    async def state_update_relationship_status_confirm(self):
+        rel = self.user.answers.get("state_update_relationship_status")
+        if rel == "skip":
+            return await self.go_to_state("state_display_preferences")
+
+        choices = [
+            Choice("yes", self._("Yes")),
+            Choice("no", self._("No")),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "*CHAT SETTINGS / ⚙️ Change or update your info* / *Relationship?*",
+                    "-----",
+                    "",
+                    f"*You've entered {rel} as your relationship status.*",
+                    "",
+                    "Is this correct?",
+                    "",
+                    get_display_choices(choices),
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "yes": "state_update_relationship_status_submit",
+                "no": "state_update_relationship_status",
+            },
         )
 
     async def state_update_relationship_status_submit(self):
@@ -258,7 +290,7 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
-        return await self.go_to_state("state_display_preferences")
+        return await self.go_to_state("state_conclude_changes")
 
     async def state_update_province(self):
         province_text = "\n".join(
