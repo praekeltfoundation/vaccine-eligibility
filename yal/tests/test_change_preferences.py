@@ -422,7 +422,7 @@ async def test_state_update_bot_name_submit(tester: AppTester, rapidpro_mock):
         "\n".join(
             [
                 "🦸 PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
-                "-----",
+                "*-----*",
                 "",
                 "*Why not use an emoji to accompany my new name?*",
                 "Send in the new emoji you'd like to use now.",
@@ -454,7 +454,7 @@ async def test_state_update_bot_name_skip(tester: AppTester, rapidpro_mock):
         "\n".join(
             [
                 "🦸 PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
-                "-----",
+                "*-----*",
                 "",
                 "*Why not use an emoji to accompany my new name?*",
                 "Send in the new emoji you'd like to use now.",
@@ -482,13 +482,13 @@ async def test_state_update_bot_emoji_submit(tester: AppTester, rapidpro_mock):
         "\n".join(
             [
                 "🙋🏿‍♂️ PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
-                "-----",
+                "*-----*",
                 "",
                 "Wonderful! 🙋🏿‍♂️",
                 "",
                 "*What would you like to do now?*",
                 "",
-                "1. Main Menu",
+                "1. Go to the menu",
                 "2. Ask a question",
             ]
         )

@@ -583,7 +583,7 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "[persona_emoji] PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
-                    "-----",
+                    "*-----*",
                     "",
                     "*Why not use an emoji to accompany my new name?*",
                     "Send in the new emoji you'd like to use now.",
@@ -615,14 +615,14 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         choices = [
-            Choice("menu", self._("Main Menu")),
+            Choice("menu", self._("Go to the menu")),
             Choice("ask_a_question", self._("Ask a question")),
         ]
         question = self._(
             "\n".join(
                 [
                     "[persona_emoji] PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
-                    "-----",
+                    "*-----*",
                     "",
                     "Wonderful! [persona_emoji]",
                     "",
