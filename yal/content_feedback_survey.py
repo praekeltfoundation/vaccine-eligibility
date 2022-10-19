@@ -23,20 +23,21 @@ class ContentFeedbackSurveyApplication(BaseApplication):
     async def state_positive_feedback(self):
         choices = [
             Choice("no", self._("No changes")),
-            Choice("yes", self._("Yes, I have a change!")),
+            Choice("yes", self._("Yes, I have a change")),
         ]
         question = self._(
             "\n".join(
                 [
                     "*That's great - I'm so happy I could help.* 😊",
                     "",
-                    "If there is anything or any info that you think needs to be "
-                    "changed or added, please let me know.",
+                    "If there is anything that you think needs to be changed or added "
+                    "in the info I gave you? Please let me know!",
                     "",
                     "Reply:",
                     get_display_choices(choices),
                     "",
                     "--",
+                    "",
                     utils.BACK_TO_MAIN,
                     utils.GET_HELP,
                 ]

@@ -41,14 +41,15 @@ async def test_positive_feedback(tester: AppTester, rapidpro_mock: MockServer):
             [
                 "*That's great - I'm so happy I could help.* 😊",
                 "",
-                "If there is anything or any info that you think needs to be changed "
-                "or added, please let me know.",
+                "If there is anything that you think needs to be changed or added in "
+                "the info I gave you? Please let me know!",
                 "",
                 "Reply:",
                 "1. No changes",
-                "2. Yes, I have a change!",
+                "2. Yes, I have a change",
                 "",
                 "--",
+                "",
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
