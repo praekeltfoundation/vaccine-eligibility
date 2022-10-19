@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
@@ -220,7 +220,7 @@ class Application(BaseApplication):
     async def state_contentrepo_page(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip("+")
-        timestamp = datetime.now() + timedelta(minutes=10)
+        timestamp = utils.get_current_datetime() + timedelta(minutes=10)
         # We ignore this error, as it just means they won't get the reminder
         await rapidpro.update_profile(
             whatsapp_id,
