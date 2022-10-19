@@ -97,17 +97,15 @@ class Application(BaseApplication):
         return await self.go_to_state("state_profile_intro")
 
     async def state_profile_intro(self):
-        msg = (
-            self._(
-                "\n".join(
-                    [
-                        "*[persona_emoji] Great! I'm just going to ask you a few "
-                        "quick questions now.*",
-                    ]
-                )
-            ),
+        msg = self._(
+            "\n".join(
+                [
+                    "*[persona_emoji] Great! I'm just going to ask you a few "
+                    "quick questions now.*",
+                ]
+            )
         )
-        self.publish_message(msg)
+        await self.publish_message(msg)
         await asyncio.sleep(0.5)
         return await self.go_to_state("state_age")
 
