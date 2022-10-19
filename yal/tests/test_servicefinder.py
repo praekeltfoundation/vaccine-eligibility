@@ -554,3 +554,109 @@ async def test_servicefinder_start_to_end(
 
     await tester.user_input("2")
     tester.assert_state("state_start")
+
+
+@pytest.mark.asyncio
+async def test_state_location_type_address(tester: AppTester):
+    tester.setup_state("state_location")
+    await tester.user_input("type address")
+    tester.assert_state("state_province")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+async def test_state_province(tester: AppTester):
+    tester.setup_state("state_province")
+    await tester.user_input("2")
+    tester.assert_answer("state_province", "FS")
+    tester.assert_state("state_full_address")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+async def test_state_full_address_invalid(tester: AppTester):
+    tester.setup_state("state_full_address")
+    await tester.user_input("2 test street test suburb")
+    tester.assert_state("state_validate_full_address_error")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+async def test_state_validate_full_address_error_retry(tester: AppTester):
+    tester.setup_state("state_validate_full_address_error")
+    await tester.user_input("2")
+    tester.assert_state("state_full_address")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+async def test_state_validate_full_address_error_long(tester: AppTester):
+    tester.setup_state("state_validate_full_address_error")
+    await tester.user_input("1")
+    tester.assert_state("state_suburb")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+async def test_state_suburb(tester: AppTester):
+    tester.setup_state("state_suburb")
+    await tester.user_input("test suburb")
+    tester.assert_state("state_street_name")
+    tester.assert_answer("state_suburb", "test suburb")
+
+
+@pytest.mark.asyncio
+async def test_state_street_name(
+    tester: AppTester, servicefinder_mock, google_api_mock, rapidpro_mock
+):
+    tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
+    tester.user.metadata["google_session_token"] = "123"
+
+    tester.setup_answer("state_province", "FS")
+    tester.setup_answer("state_suburb", "test suburb")
+    tester.setup_state("state_street_name")
+    await tester.user_input("test street")
+    tester.assert_state("state_category")
+
+    assert [r.path for r in google_api_mock.tstate.requests] == [
+        "/maps/api/place/autocomplete/json",
+        "/maps/api/place/details/json",
+    ]
+
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "latitude": -3.866_651,
+            "longitude": 51.195_827,
+            "location_description": "test street test suburb, FS",
+        },
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_validate_full_address_success(
+    tester: AppTester, servicefinder_mock, google_api_mock, rapidpro_mock
+):
+    tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
+    tester.user.metadata["google_session_token"] = "123"
+
+    tester.setup_answer("state_province", "FS")
+    tester.setup_state("state_full_address")
+    await tester.user_input("test suburb \n test street")
+    tester.assert_state("state_category")
+
+    assert [r.path for r in google_api_mock.tstate.requests] == [
+        "/maps/api/place/autocomplete/json",
+        "/maps/api/place/details/json",
+    ]
+
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "latitude": -3.866_651,
+            "longitude": 51.195_827,
+            "location_description": "test street test suburb, FS",
+        },
+    }

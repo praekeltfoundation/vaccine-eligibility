@@ -16,11 +16,18 @@ from vaccine.states import (
     FreeText,
     MenuState,
     WhatsAppButtonState,
+    WhatsAppListState,
 )
 from vaccine.utils import HTTP_EXCEPTIONS
 from yal import config, rapidpro
 from yal.pleasecallme import Application as PleaseCallMeApplication
-from yal.utils import BACK_TO_MAIN, GET_HELP, get_generic_error, normalise_phonenumber
+from yal.utils import (
+    BACK_TO_MAIN,
+    GET_HELP,
+    PROVINCES,
+    get_generic_error,
+    normalise_phonenumber,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -161,40 +168,6 @@ class Application(BaseApplication):
                 "new": "state_pre_different_location",
             },
         )
-
-    async def state_address_coords_lookup(self):
-        async with get_google_api() as session:
-            for i in range(3):
-                try:
-                    response = await session.get(
-                        urljoin(
-                            config.GOOGLE_PLACES_URL, "/maps/api/place/details/json"
-                        ),
-                        params={
-                            "key": config.GOOGLE_PLACES_KEY,
-                            "place_id": self.user.metadata.get("place_id"),
-                            "sessiontoken": self.user.metadata.get(
-                                "google_session_token"
-                            ),
-                            "language": "en",
-                            "fields": "geometry",
-                        },
-                    )
-                    response.raise_for_status()
-                    data = await response.json()
-
-                    location = data["result"]["geometry"]["location"]
-
-                    self.save_metadata("latitude", location["lat"])
-                    self.save_metadata("longitude", location["lng"])
-
-                    return await self.go_to_state("state_category_lookup")
-                except HTTP_EXCEPTIONS as e:
-                    if i == 2:
-                        logger.exception(e)
-                        return await self.go_to_state("state_error")
-                    else:
-                        continue
 
     async def state_category_lookup(self):
         async with get_servicefinder_api() as session:
@@ -448,6 +421,8 @@ class Application(BaseApplication):
         async def store_location_coords(content):
             if not self.inbound:
                 return
+            if content == "type address":
+                return
             loc = self.inbound.transport_metadata.get("message", {}).get("location", {})
             latitude = loc.get("latitude")
             longitude = loc.get("longitude")
@@ -500,9 +475,13 @@ class Application(BaseApplication):
             question=question,
             next="state_get_description_from_coords",
             check=store_location_coords,
+            buttons=[Choice("type address", self._("Type Address Instead"))],
         )
 
     async def state_get_description_from_coords(self):
+        if self.user.answers["state_location"] == "type address":
+            return await self.go_to_state("state_province")
+
         metadata = self.user.metadata
         latitude = metadata.get("latitude")
         longitude = metadata.get("longitude")
@@ -560,3 +539,237 @@ class Application(BaseApplication):
         await rapidpro.update_profile(whatsapp_id, data)
 
         return await self.go_to_state("state_category_lookup")
+
+    async def state_province(self):
+        province_text = "\n".join(
+            [f"{i+1} - {name}" for i, (_, name) in enumerate(PROVINCES)]
+        )
+        province_choices = [Choice(code, name) for code, name in PROVINCES]
+        province_choices.append(Choice("skip", "Skip"))
+
+        question = self._(
+            "\n".join(
+                [
+                    "NEED HELP / Find clinics and services /📍*Location*",
+                    "-----",
+                    "",
+                    "To be able to suggest youth-friendly clinics and FREE services "
+                    "near you, I need to know where you live.",
+                    "",
+                    "[persona_emoji]  *Which PROVINCE are you in?*",
+                    "Type the number or choose from the list.",
+                    "",
+                    province_text,
+                ]
+            )
+        )
+        return WhatsAppListState(
+            self,
+            question=question,
+            button="Province",
+            choices=province_choices,
+            next="state_full_address",
+            error=self._(get_generic_error()),
+        )
+
+    async def state_full_address(self):
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "NEED HELP / Find clinics and services /📍*Location*",
+                        "-----",
+                        "",
+                        "[persona_emoji] *OK. Lets see which facilities are close to "
+                        "you. What is your address?*",
+                        "",
+                        "Type the name of your neighbourhood and your street name.",
+                        "",
+                        "e.g.",
+                        "Mofolo South",
+                        "Lekoropo street",
+                        "",
+                        "-----",
+                        "🙍🏾‍♀️ Rather not say?",
+                        "No stress! Just tap SKIP.",
+                    ]
+                )
+            ),
+            next="state_validate_full_address",
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_validate_full_address(self):
+        value = self.user.answers["state_full_address"]
+
+        if value.lower().strip() == "skip":
+            return await self.go_to_state("state_gender")
+
+        try:
+            lines = value.split("\n")
+
+            assert len(lines) == 2
+
+            self.save_answer("state_suburb", lines[0].strip())
+            self.save_answer("state_street_name", lines[1].strip())
+
+            return await self.go_to_state("state_check_new_address")
+        except (AssertionError, IndexError):
+            return await self.go_to_state("state_validate_full_address_error")
+
+    async def state_validate_full_address_error(self):
+        choices = [
+            Choice("yes", "Yes"),
+            Choice("no", "No, it's ok"),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "Sorry but I'm not sure what that means [persona_emoji] Can you "
+                    "help me out by trying again. This time, we'll break it down into "
+                    "neighbourhood, street and house number.👍🏽",
+                    "",
+                    "Would this help?",
+                    "",
+                    "1 - Yes please",
+                    "2 - No, it's ok",
+                    "",
+                    "-----",
+                    "*Or reply:*",
+                    BACK_TO_MAIN,
+                    GET_HELP,
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "yes": "state_suburb",
+                "no": "state_full_address",
+            },
+        )
+
+    async def state_suburb(self):
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "NEED HELP / Find clinics and services /📍*Location*",
+                        "-----",
+                        "",
+                        "[persona_emoji] *OK. Which town, township, suburb or village "
+                        "do you live in?*",
+                        "",
+                        "Please type it for me and hit send.",
+                        "-----",
+                        "*Rather not say?*",
+                        "No stress! Just tap *SKIP*.",
+                    ]
+                )
+            ),
+            next="state_street_name",
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_street_name(self):
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "NEED HELP / Find clinics and services /📍*Location*",
+                        "-----",
+                        "",
+                        "[persona_emoji] Got it. And what about the street name and "
+                        "number?",
+                        "",
+                        "Could you type it for me and hit send?",
+                        "-----",
+                        "*Rather not say?*",
+                        "No stress! Just tap *SKIP*.",
+                    ]
+                )
+            ),
+            next="state_check_new_address",
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_check_new_address(self):
+        metadata = self.user.metadata
+        street_name = self.user.answers["state_street_name"]
+        suburb = self.user.answers["state_suburb"]
+        province = self.user.answers["state_province"]
+
+        address = f"{street_name} {suburb}, {province}"
+        async with get_google_api() as session:
+            for i in range(3):
+                try:
+                    response = await session.get(
+                        urljoin(
+                            config.GOOGLE_PLACES_URL,
+                            "/maps/api/place/autocomplete/json",
+                        ),
+                        params={
+                            "input": address,
+                            "key": config.GOOGLE_PLACES_KEY,
+                            "sessiontoken": metadata.get("google_session_token"),
+                            "language": "en",
+                            "components": "country:za",
+                        },
+                    )
+                    response.raise_for_status()
+                    data = await response.json()
+
+                    if data["status"] != "OK":
+                        return await self.go_to_state("state_error")
+
+                    first_result = data["predictions"][0]
+                    self.save_metadata("place_id", first_result["place_id"])
+                    self.save_metadata("location_description", address)
+
+                    return await self.go_to_state("state_address_coords_lookup")
+                except HTTP_EXCEPTIONS as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
+
+    async def state_address_coords_lookup(self):
+        async with get_google_api() as session:
+            for i in range(3):
+                try:
+                    response = await session.get(
+                        urljoin(
+                            config.GOOGLE_PLACES_URL, "/maps/api/place/details/json"
+                        ),
+                        params={
+                            "key": config.GOOGLE_PLACES_KEY,
+                            "place_id": self.user.metadata.get("place_id"),
+                            "sessiontoken": self.user.metadata.get(
+                                "google_session_token"
+                            ),
+                            "language": "en",
+                            "fields": "geometry",
+                        },
+                    )
+                    response.raise_for_status()
+                    data = await response.json()
+
+                    location = data["result"]["geometry"]["location"]
+
+                    self.save_metadata("latitude", location["lat"])
+                    self.save_metadata("longitude", location["lng"])
+
+                    return await self.go_to_state("state_save_location")
+                except HTTP_EXCEPTIONS as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
