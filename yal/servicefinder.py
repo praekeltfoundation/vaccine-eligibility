@@ -68,16 +68,16 @@ class Application(BaseApplication):
             "\n".join(
                 [
                     "🏥 Find Clinics and Services",
-                    "Get help near you",
+                    "*Get help near you*",
                     "-----",
                     "",
                     "Would you like me to help you find clinics and services closest "
                     "to you?",
                     "",
-                    "1 - Yes, sounds good",
+                    "*1* - Yes, sounds good",
                     "",
                     "-----",
-                    "Or reply:",
+                    "*Or reply:*",
                     BACK_TO_MAIN,
                     GET_HELP,
                 ]
@@ -144,8 +144,8 @@ class Application(BaseApplication):
                     "[persona_emoji] *Would you like me to recommend helpful services "
                     "close to this address?*",
                     "",
-                    "1 - Yes please",
-                    "2 - Use a different location",
+                    "*1* - Yes please",
+                    "*2* - Use a different location",
                     "",
                     "-----",
                     "*Or reply:*",
@@ -198,13 +198,14 @@ class Application(BaseApplication):
     async def state_pre_category_msg(self):
         msg = "\n".join(
             [
-                "🏥 Find Clinics and Services",
+                "🏥 *Find Clinics and Services*",
                 "*Get help near you*",
                 "-----",
                 "",
                 "[persona_emoji] Perfect! That helps me narrow it down.",
                 "",
-                "*Next, please tell me what you need help with*",
+                "Next, let me know the kind of help or information you're interested "
+                "in.",
             ]
         )
         await self.publish_message(self._(msg))
@@ -240,7 +241,7 @@ class Application(BaseApplication):
         categories = metadata["categories"][metadata.get("parent_category", "root")]
 
         category_text = "\n".join(
-            [f"{i+1} - {v}" for i, v in enumerate(categories.values())]
+            [f"*{i+1}* - {v}" for i, v in enumerate(categories.values())]
         )
         category_choices = [Choice(k, v) for k, v in categories.items()]
         category_choices.append(Choice("talk", "Talk to someone"))
@@ -258,7 +259,7 @@ class Application(BaseApplication):
                     "",
                     "*OR*",
                     "",
-                    f"{len(category_choices)} - Talk to somebody",
+                    f"*{len(category_choices)}* - Talk to somebody",
                     "",
                     "-----",
                     "*Or reply:*",
@@ -367,7 +368,7 @@ class Application(BaseApplication):
 
         msg = "\n".join(
             [
-                "🏥 Find Clinics and Services",
+                "🏥 *Find Clinics and Services*",
                 f"{category} near you",
                 "-----",
                 "",
@@ -475,7 +476,7 @@ class Application(BaseApplication):
             question=question,
             next="state_get_description_from_coords",
             check=store_location_coords,
-            buttons=[Choice("type address", self._("Type Address Instead"))],
+            buttons=[Choice("type address", self._("Type address instead"))],
         )
 
     async def state_get_description_from_coords(self):
