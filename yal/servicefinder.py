@@ -604,7 +604,7 @@ class Application(BaseApplication):
         value = self.user.answers["state_full_address"]
 
         if value.lower().strip() == "skip":
-            return await self.go_to_state("state_gender")
+            return await self.go_to_state("state_cannot_skip")
 
         try:
             lines = value.split("\n")
@@ -677,6 +677,10 @@ class Application(BaseApplication):
         )
 
     async def state_street_name(self):
+        value = self.user.answers["state_suburb"]
+        if value.lower().strip() == "skip":
+            return await self.go_to_state("state_cannot_skip")
+
         return FreeText(
             self,
             question=self._(
@@ -699,13 +703,48 @@ class Application(BaseApplication):
             buttons=[Choice("skip", self._("Skip"))],
         )
 
+    async def state_cannot_skip(self):
+        choices = [
+            Choice("share", "Share location"),
+            Choice("menu", "Back to Main Menu"),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "NEED HELP / Find clinics and services /📍*Location*",
+                    "-----",
+                    "",
+                    "[persona_emoji] *If you don't share you location with me, I won't "
+                    "be able to help you find clinics and services nearby.*",
+                    "",
+                    "What would you like to do?",
+                    "",
+                    "1. Share location",
+                    "2. Back to Main Menu",
+                    "-----",
+                    "*Rather not say?*",
+                    "No stress! Just tap *MENU*.",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "share": "state_full_address",
+                "menu": "state_pre_mainmenu",
+            },
+        )
+
     async def state_check_new_address(self):
         metadata = self.user.metadata
-        street_name = self.user.answers["state_street_name"]
+        street_name = self.user.answers.get("state_street_name", "")
         suburb = self.user.answers["state_suburb"]
-        province = self.user.answers["state_province"]
+        province = self.user.answers.get("state_province", "")
 
-        address = f"{street_name} {suburb}, {province}"
+        address = f"{street_name} {suburb}, {province}".strip()
         async with get_google_api() as session:
             for i in range(3):
                 try:
