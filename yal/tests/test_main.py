@@ -9,6 +9,7 @@ from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.askaquestion import Application as AaqApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
+from yal.content_feedback_survey import ContentFeedbackSurveyApplication
 from yal.main import Application
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
@@ -34,6 +35,9 @@ def test_no_state_name_clashes():
     sf_states = set(s for s in dir(ServiceFinderApplication) if s.startswith("state_"))
     aaq_states = set(s for s in dir(AaqApplication) if s.startswith("state_"))
     fb_states = set(s for s in dir(FeedbackApplication) if s.startswith("state_"))
+    c_fb_states = set(
+        s for s in dir(ContentFeedbackSurveyApplication) if s.startswith("state_")
+    )
     intersection = (
         m_states
         & mm_states
@@ -46,6 +50,7 @@ def test_no_state_name_clashes():
         & sf_states
         & aaq_states
         & fb_states
+        & c_fb_states
     ) - {
         "state_name",
         "state_error",
@@ -75,6 +80,8 @@ def get_rapidpro_contact(urn):
             "suburb": "cape town",
             "street_name": "high level",
             "street_number": "99",
+            "feedback_survey_sent": "true",
+            "feedback_type": "content",
         },
         "blocked": False,
         "stopped": False,
@@ -251,3 +258,16 @@ async def test_aaq_timeout_response_to_handler(tester: AppTester, rapidpro_mock)
     tester.assert_message("TODO: Handle question not answered")
 
     assert len(rapidpro_mock.tstate.requests) == 3
+
+
+@pytest.mark.asyncio
+async def test_content_feedback_response(tester: AppTester, rapidpro_mock):
+    """
+    If this is in response to a content feedback push message, then it should be handled
+    by the content feedback state
+    """
+    await tester.user_input("1", session=Message.SESSION_EVENT.NEW)
+    tester.assert_state("state_positive_feedback")
+    tester.assert_num_messages(1)
+
+    assert len(rapidpro_mock.tstate.requests) == 2

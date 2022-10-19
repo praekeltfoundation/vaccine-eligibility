@@ -523,7 +523,7 @@ async def test_state_mainmenu_contentrepo(
 
     tester.assert_metadata("topics_viewed", ["222"])
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 4
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
@@ -605,13 +605,17 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["data__session_id"][0] == "1"
     assert params["data__user_addr"][0] == "27820001001"
 
-    assert len(rapidpro_mock.tstate.requests) == 5
+    assert len(rapidpro_mock.tstate.requests) == 7
 
     update_request = rapidpro_mock.tstate.requests[-1]
     assert update_request.json["fields"] == {
         "last_main_time": "2022-06-19T17:30:00",
         "suggested_text": "*3* - Suggested Content 1\n*4* - Suggested Content 2",
     }
+
+    reminder_request = rapidpro_mock.tstate.requests[-2]
+    assert reminder_request.json["fields"]["feedback_type"] == "content"
+    assert "feedback_timestamp" in reminder_request.json["fields"]
 
 
 @pytest.mark.asyncio
