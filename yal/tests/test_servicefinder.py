@@ -118,6 +118,28 @@ async def google_api_mock():
             data = {"status": tstate.status}
         return response.json(data, status=200)
 
+    @app.route("/maps/api/geocode/json", methods=["GET"])
+    def desc_from_pin(request):
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
+                return response.json({}, status=500)
+        if tstate.status == "OK":
+            data = {
+                "status": "OK",
+                "results": [
+                    {
+                        "formatted_address": "277 Bedford Avenue, Brooklyn, NY 11211, "
+                        "USA",
+                        "place_id": "ChIJd8BlQ2BZwokRAFUEcm_qrcA",
+                    }
+                ],
+            }
+        else:
+            data = {"status": tstate.status}
+        return response.json(data, status=200)
+
     @app.route("/maps/api/place/details/json", methods=["GET"])
     def details_lookup(request):
         tstate.requests.append(request)
@@ -145,6 +167,26 @@ async def google_api_mock():
         config.GOOGLE_PLACES_URL = url
 
 
+@pytest.fixture
+async def rapidpro_mock():
+    Sanic.test_mode = True
+    app = Sanic("mock_rapidpro")
+    tstate = TState()
+
+    @app.route("/api/v2/contacts.json", methods=["POST"])
+    def update_contact(request):
+        tstate.requests.append(request)
+        return response.json({}, status=200)
+
+    async with run_sanic(app) as server:
+        url = config.RAPIDPRO_URL
+        config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
+        config.RAPIDPRO_TOKEN = "testtoken"
+        server.tstate = tstate
+        yield server
+        config.RAPIDPRO_URL = url
+
+
 @pytest.mark.asyncio
 async def test_state_servicefinder_start_no_address(tester: AppTester):
     tester.setup_state("state_servicefinder_start")
@@ -154,17 +196,21 @@ async def test_state_servicefinder_start_no_address(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "🏥 Find Clinics and Services",
-                "*Get help near you*",
+                "NEED HELP / Find clinics and services /📍*Location*",
                 "-----",
                 "",
-                "🤖 *You can share a location by sending me a pin (📍). To do this:*",
+                "To be able to suggest youth-friendly clinics and FREE services "
+                "near you, I need to know where you live.",
                 "",
-                "1️⃣ Tap the *+* button on the bottom left of this screen.",
-                "2️⃣ Tap *Location*",
-                "3️⃣ Select *Send Your Current Location* (or *use the search "
-                "bar* at the top of the screen to look up the address or area "
-                "you want to share).",
+                "🤖*(You can share your location by sending me a pin (📍). To do this:*",
+                "",
+                "1️⃣*Tap the + _(plus)_* button or the 📎*_(paperclip)_* button "
+                "below.",
+                "",
+                "2️⃣Next, tap *Location* then select *Send Your Current Location.*",
+                "",
+                "_You can also use the *search 🔎 at the top of the screen, to type "
+                "in the address or area* you want to share._",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -181,10 +227,9 @@ async def test_state_servicefinder_start_existing_address(
 ):
     tester.setup_state("state_servicefinder_start")
 
-    tester.user.metadata["province"] = "FS"
-    tester.user.metadata["suburb"] = "cape town"
-    tester.user.metadata["street_name"] = "high level"
-    tester.user.metadata["street_number"] = "99"
+    tester.user.metadata["location_description"] = "99 high level, cape town, FS"
+    tester.user.metadata["longitude"] = -73.9612889
+    tester.user.metadata["latitude"] = 40.714232
 
     await tester.user_input("1")
     tester.assert_state("state_confirm_existing_address")
@@ -198,8 +243,7 @@ async def test_state_servicefinder_start_existing_address(
             "-----",
             "🤖 *The address I have for you right now is:*",
             "",
-            "99 high level,",
-            "cape town",
+            "99 high level, cape town, FS",
             "-----",
             "*Or reply:*",
             BACK_TO_MAIN,
@@ -228,11 +272,7 @@ async def test_state_servicefinder_start_existing_address(
         )
     )
 
-    assert [r.path for r in google_api_mock.tstate.requests] == [
-        "/maps/api/place/autocomplete/json"
-    ]
-
-    tester.assert_metadata("place_id", "ChIJD7fiBh9u5kcRYJSMaMOCCwQ")
+    assert [r.path for r in google_api_mock.tstate.requests] == []
 
 
 @pytest.mark.asyncio
@@ -240,9 +280,6 @@ async def test_state_confirm_existing_address_yes(
     tester: AppTester, servicefinder_mock, google_api_mock
 ):
     tester.setup_state("state_confirm_existing_address")
-
-    tester.user.metadata["place_id"] = "ChIJD7fiBh9u5kcRYJSMaMOCCwQ"
-    tester.user.metadata["google_session_token"] = "123"
     tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
 
     await tester.user_input("1")
@@ -279,12 +316,7 @@ async def test_state_confirm_existing_address_yes(
     tester.assert_message(question)
 
     assert [r.path for r in servicefinder_mock.tstate.requests] == ["/api/categories"]
-    assert [r.path for r in google_api_mock.tstate.requests] == [
-        "/maps/api/place/details/json"
-    ]
-
-    tester.assert_metadata("latitude", -3.866651)
-    tester.assert_metadata("longitude", 51.195827)
+    assert [r.path for r in google_api_mock.tstate.requests] == []
 
 
 @pytest.mark.asyncio
@@ -295,6 +327,35 @@ async def test_state_confirm_existing_address_no(tester: AppTester):
     await tester.user_input("2")
 
     tester.assert_state("state_location")
+
+    [msg1] = tester.fake_worker.outbound_messages
+    assert msg1.content == "🤖 *Sure. Where would you like me to look?*"
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "🏥 Find Clinics and Services",
+                "*Get help near you*",
+                "-----",
+                "",
+                "🤖*You can change your location by sending me a pin (📍)."
+                " To do this:*",
+                "",
+                "1️⃣Tap the *+ _(plus)_* button or the 📎*_(paperclip)_* button "
+                "below.",
+                "",
+                "2️⃣Next, tap *Location* then select *Send Your Current Location.*",
+                "",
+                "_You can also use the *search 🔎 at the top of the screen, to type "
+                "in the address or area* you want to share._",
+                "",
+                "-----",
+                "*Or reply:*",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
+    )
 
 
 @pytest.mark.asyncio
@@ -427,9 +488,12 @@ async def test_state_category_talk(get_current_datetime, tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_location(tester: AppTester, servicefinder_mock):
+async def test_state_location(
+    tester: AppTester, servicefinder_mock, google_api_mock, rapidpro_mock
+):
     tester.setup_state("state_location")
     tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
+    tester.user.metadata["google_session_token"] = "123"
 
     await tester.user_input(
         "test location",
@@ -441,6 +505,24 @@ async def test_state_location(tester: AppTester, servicefinder_mock):
 
     tester.assert_metadata("latitude", 56.78)
     tester.assert_metadata("longitude", 12.34)
+    tester.assert_metadata("place_id", "ChIJd8BlQ2BZwokRAFUEcm_qrcA")
+    tester.assert_metadata(
+        "location_description", "277 Bedford Avenue, Brooklyn, NY 11211, USA"
+    )
+
+    assert [r.path for r in google_api_mock.tstate.requests] == [
+        "/maps/api/geocode/json"
+    ]
+
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "latitude": 56.78,
+            "longitude": 12.34,
+            "location_description": "277 Bedford Avenue, Brooklyn, NY 11211, USA",
+        },
+    }
 
 
 @pytest.mark.asyncio
@@ -457,10 +539,9 @@ async def test_servicefinder_start_to_end(
 ):
     tester.setup_state("state_servicefinder_start")
 
-    tester.user.metadata["province"] = "FS"
-    tester.user.metadata["suburb"] = "cape town"
-    tester.user.metadata["street_name"] = "high level"
-    tester.user.metadata["street_number"] = "99"
+    tester.user.metadata["location_description"] = "99 high level, cape town, FS"
+    tester.user.metadata["longitude"] = 12.34
+    tester.user.metadata["latitude"] = 56.78
 
     await tester.user_input("1")
     tester.assert_state("state_confirm_existing_address")
