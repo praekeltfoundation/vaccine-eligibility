@@ -183,7 +183,6 @@ async def rapidpro_mock():
         return response.json({"results": []})
 
     async with run_sanic(app) as server:
-        url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
         config.RAPIDPRO_TOKEN = "testtoken"
         server.tstate = tstate
@@ -570,7 +569,7 @@ async def test_state_location_type_address(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_province(tester: AppTester):
+async def test_state_province(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_province")
     await tester.user_input("2")
     tester.assert_answer("state_province", "FS")
@@ -587,7 +586,9 @@ async def test_state_full_address_invalid(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_validate_full_address_error_retry(tester: AppTester):
+async def test_state_validate_full_address_error_retry(
+    tester: AppTester, rapidpro_mock
+):
     tester.setup_state("state_validate_full_address_error")
     await tester.user_input("2")
     tester.assert_state("state_full_address")
@@ -595,7 +596,7 @@ async def test_state_validate_full_address_error_retry(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_validate_full_address_error_long(tester: AppTester):
+async def test_state_validate_full_address_error_long(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_validate_full_address_error")
     await tester.user_input("1")
     tester.assert_state("state_suburb")
@@ -656,7 +657,7 @@ async def test_state_suburb_skip(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_cannot_skip(tester: AppTester):
+async def test_state_cannot_skip(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_cannot_skip")
     await tester.user_input("1")
     tester.assert_state("state_full_address")
