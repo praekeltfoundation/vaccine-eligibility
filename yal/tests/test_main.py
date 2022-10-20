@@ -82,6 +82,9 @@ def get_rapidpro_contact(urn):
             "street_number": "99",
             "feedback_survey_sent": "true",
             "feedback_type": "content",
+            "latitude": -26.2031026,
+            "longitude": 28.0251783,
+            "location_description": "99 high level, cape town, FS",
         },
         "blocked": False,
         "stopped": False,
@@ -227,10 +230,9 @@ async def test_state_start_to_mainmenu(
     assert len(rapidpro_mock.tstate.requests) == 2
     assert len(contentrepo_api_mock.tstate.requests) == 4
 
-    tester.assert_metadata("province", "FS")
-    tester.assert_metadata("suburb", "cape town")
-    tester.assert_metadata("street_name", "high level")
-    tester.assert_metadata("street_number", "99")
+    tester.assert_metadata("longitude", 28.0251783)
+    tester.assert_metadata("latitude", -26.2031026)
+    tester.assert_metadata("location_description", "99 high level, cape town, FS")
 
 
 @pytest.mark.asyncio
@@ -266,7 +268,7 @@ async def test_content_feedback_response(tester: AppTester, rapidpro_mock):
     If this is in response to a content feedback push message, then it should be handled
     by the content feedback state
     """
-    await tester.user_input("1", session=Message.SESSION_EVENT.NEW)
+    await tester.user_input("1")
     tester.assert_state("state_positive_feedback")
     tester.assert_num_messages(1)
 
