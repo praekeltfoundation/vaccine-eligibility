@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from sanic import Sanic, response
 
@@ -22,12 +24,11 @@ def get_rapidpro_contact(urn):
             "relationship_status": None,
             "gender": "male",
             "age": "22",
-            "province": "FS",
-            "suburb": "TestSuburb",
-            "street_name": "test street",
-            "street_number": "12",
             "persona_emoji": "🦸",
             "persona_name": "Caped Crusader",
+            "location_description": "test street Test Suburb",
+            "latitude": -3.866_651,
+            "longitude": 51.195_827,
         },
         "blocked": False,
         "stopped": False,
@@ -76,6 +77,44 @@ async def rapidpro_mock():
         config.RAPIDPRO_URL = url
 
 
+@pytest.fixture
+async def google_api_mock():
+    Sanic.test_mode = True
+    app = Sanic("mock_google_api")
+    tstate = TState()
+    tstate.status = "OK"
+
+    @app.route("/maps/api/geocode/json", methods=["GET"])
+    def desc_from_pin(request):
+        tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
+                return response.json({}, status=500)
+        if tstate.status == "OK":
+            data = {
+                "status": "OK",
+                "results": [
+                    {
+                        "formatted_address": "277 Bedford Avenue, Brooklyn, NY 11211, "
+                        "USA",
+                        "place_id": "ChIJd8BlQ2BZwokRAFUEcm_qrcA",
+                    }
+                ],
+            }
+        else:
+            data = {"status": tstate.status}
+        return response.json(data, status=200)
+
+    async with run_sanic(app) as server:
+        config.GOOGLE_PLACES_KEY = "TEST-KEY"
+        url = config.GOOGLE_PLACES_URL
+        config.GOOGLE_PLACES_URL = f"http://{server.host}:{server.port}"
+        server.tstate = tstate
+        yield server
+        config.GOOGLE_PLACES_URL = url
+
+
 @pytest.mark.asyncio
 async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
     tester.user.metadata["persona_emoji"] = "🦸"
@@ -105,7 +144,7 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
                 "Empty",
                 "",
                 "📍*Location*",
-                "12 test street TestSuburb Free State",
+                "test street Test Suburb",
                 "",
                 "*-----*",
                 "*Or reply:*",
@@ -345,31 +384,6 @@ async def test_state_update_relationship_status_submit(
 
 
 @pytest.mark.asyncio
-async def test_state_update_location_submit(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_update_location_submit")
-
-    tester.setup_answer("state_update_province", "FS")
-    tester.setup_answer("state_update_suburb", "SomeSuburb")
-    tester.setup_answer("state_update_street_name", "Good street")
-    tester.setup_answer("state_update_street_number", "12")
-
-    await tester.user_input(session=Message.SESSION_EVENT.NEW)
-
-    tester.assert_metadata("province", "FS")
-    tester.assert_metadata("suburb", "SomeSuburb")
-    tester.assert_metadata("street_name", "Good street")
-    tester.assert_metadata("street_number", "12")
-
-    tester.assert_num_messages(1)
-    tester.assert_state("state_display_preferences")
-
-    assert [r.path for r in rapidpro_mock.tstate.requests] == [
-        "/api/v2/contacts.json",
-        "/api/v2/contacts.json",
-    ]
-
-
-@pytest.mark.asyncio
 async def test_state_update_bot_name(tester: AppTester, rapidpro_mock):
     tester.user.metadata["persona_emoji"] = "🦸"
     tester.user.metadata["persona_name"] = "Caped Crusader"
@@ -511,3 +525,95 @@ async def test_state_update_bot_emoji_skip(tester: AppTester, rapidpro_mock):
     assert [r.path for r in rapidpro_mock.tstate.requests] == [
         "/api/v2/contacts.json",
     ]
+
+
+@pytest.mark.asyncio
+async def test_state_update_location_confirm(tester: AppTester, google_api_mock):
+    tester.setup_state("state_update_location")
+
+    await tester.user_input(
+        "test location",
+        transport_metadata={
+            "message": {"location": {"longitude": 12.34, "latitude": 56.78}}
+        },
+    )
+    tester.assert_state("state_update_location_confirm")
+
+    tester.assert_metadata("latitude", 56.78)
+    tester.assert_metadata("longitude", 12.34)
+    tester.assert_metadata("place_id", "ChIJd8BlQ2BZwokRAFUEcm_qrcA")
+    tester.assert_metadata(
+        "location_description", "277 Bedford Avenue, Brooklyn, NY 11211, USA"
+    )
+
+    assert [r.path for r in google_api_mock.tstate.requests] == [
+        "/maps/api/geocode/json"
+    ]
+
+    tester.assert_num_messages(1)
+    tester.assert_message(
+        "\n".join(
+            [
+                "*CHAT SETTINGS / ⚙️ Change or update your info* / *Location?*",
+                "-----",
+                "",
+                "*You've entered 277 Bedford Avenue, Brooklyn, NY 11211, USA as your "
+                "location.*",
+                "",
+                "Is this correct?",
+                "",
+                "1. Yes",
+                "2. No",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_update_location_skip(
+    tester: AppTester, google_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_update_location")
+
+    await tester.user_input(
+        "skip",
+    )
+    tester.assert_state("state_display_preferences")
+
+    assert [r.path for r in google_api_mock.tstate.requests] == []
+
+
+@pytest.mark.asyncio
+async def test_state_update_location_confirm_incorrect(
+    tester: AppTester, google_api_mock
+):
+    tester.user.metadata["latitude"] = 56.78
+    tester.user.metadata["longitude"] = 12.34
+    tester.user.metadata["location_description"] = "277 Bedford Avenue, Brooklyn, NY"
+    tester.setup_state("state_update_location_confirm")
+
+    await tester.user_input("no")
+    tester.assert_state("state_update_location")
+
+
+@pytest.mark.asyncio
+async def test_state_update_location_submit(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["latitude"] = 56.78
+    tester.user.metadata["longitude"] = 12.34
+    tester.user.metadata["location_description"] = "277 Bedford Avenue, Brooklyn, NY"
+    tester.setup_state("state_update_location_confirm")
+
+    await tester.user_input("yes")
+
+    tester.assert_num_messages(1)
+    tester.assert_state("state_conclude_changes")
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "latitude": 56.78,
+            "longitude": 12.34,
+            "location_description": "277 Bedford Avenue, Brooklyn, NY",
+        },
+    }

@@ -1,14 +1,31 @@
 import asyncio
 import logging
+import secrets
+from urllib.parse import quote_plus, urljoin
+
+import aiohttp
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
-from vaccine.utils import get_display_choices
-from yal import rapidpro
-from yal.utils import GENDERS, PROVINCES, get_generic_error, normalise_phonenumber
+from vaccine.states import (
+    Choice,
+    ErrorMessage,
+    FreeText,
+    WhatsAppButtonState,
+    WhatsAppListState,
+)
+from vaccine.utils import HTTP_EXCEPTIONS, get_display_choices
+from yal import config, rapidpro
+from yal.utils import GENDERS, get_generic_error, normalise_phonenumber
 from yal.validators import age_validator
 
 logger = logging.getLogger(__name__)
+
+
+def get_google_api():
+    return aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=5),
+        headers={"Content-Type": "application/json", "User-Agent": "healthcheck-ussd"},
+    )
 
 
 class Application(BaseApplication):
@@ -39,20 +56,7 @@ class Application(BaseApplication):
         relationship_status = get_field("relationship_status").title()
         gender = get_field("gender")
 
-        province = fields.get("province")
-        suburb = fields.get("suburb")
-        street_name = fields.get("street_name")
-        street_number = fields.get("street_number")
-
-        province = dict(PROVINCES).get(province, "skip")
-
-        location = " ".join(
-            [
-                s
-                for s in [street_number, street_name, suburb, province]
-                if s and s != "skip"
-            ]
-        )
+        location = fields.get("location_description")
 
         question = self._(
             "\n".join(
@@ -93,7 +97,7 @@ class Application(BaseApplication):
                 Choice("state_update_gender", self._("Gender")),
                 Choice("state_update_bot_name", self._("Bot name + emoji")),
                 Choice("state_update_relationship_status", self._("Relationship?")),
-                Choice("state_update_province", self._("Location")),
+                Choice("state_update_location", self._("Location")),
             ],
             next=next_,
             error=self._(get_generic_error()),
@@ -292,130 +296,155 @@ class Application(BaseApplication):
 
         return await self.go_to_state("state_conclude_changes")
 
-    async def state_update_province(self):
-        province_text = "\n".join(
-            [f"{i+1} - {name}" for i, (code, name) in enumerate(PROVINCES)]
-        )
-        province_choices = [Choice(code, name) for code, name in PROVINCES]
-        province_choices.append(Choice("skip", "Skip"))
+    async def state_update_location(self):
+        async def store_location_coords(content):
+            if not self.inbound:
+                return
+            if content == "skip":
+                return
+            loc = self.inbound.transport_metadata.get("message", {}).get("location", {})
+            latitude = loc.get("latitude")
+            longitude = loc.get("longitude")
+            if isinstance(latitude, float) and isinstance(longitude, float):
+                self.save_metadata("latitude", latitude)
+                self.save_metadata("longitude", longitude)
+            else:
+                raise ErrorMessage(
+                    "\n".join(
+                        [
+                            "[persona_emoji]*Hmmm, for some reason I couldn't find "
+                            "that location. Let's try again.*",
+                            "",
+                            "*OR*",
+                            "",
+                            "*Send HELP to talk to to a human.*",
+                        ]
+                    )
+                )
 
+        question = "\n".join(
+            [
+                "*CHAT SETTINGS / ⚙️ Change or update your info* / *Location*",
+                "-----",
+                "",
+                "[persona_emoji] *You can change your location by sending me a pin "
+                "(📍). To do this:*",
+                "",
+                "1️⃣Tap the *+ _(plus)_* button or the 📎*_(paperclip)_* button "
+                "below.",
+                "",
+                "2️⃣Next, tap *Location* then select *Send Your Current Location.*",
+                "",
+                "_You can also use the *search 🔎 at the top of the screen, to type "
+                "in the address or area* you want to share._",
+                "",
+                "*-----*",
+                "Rather not say?",
+                "No stress! Just tap SKIP",
+            ]
+        )
+
+        return FreeText(
+            self,
+            question=question,
+            next="state_get_updated_description_from_coords",
+            check=store_location_coords,
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_get_updated_description_from_coords(self):
+        if self.user.answers["state_update_location"] == "skip":
+            return await self.go_to_state("state_display_preferences")
+
+        metadata = self.user.metadata
+        latitude = metadata.get("latitude")
+        longitude = metadata.get("longitude")
+
+        async with get_google_api() as session:
+            for i in range(3):
+                try:
+                    response = await session.get(
+                        urljoin(
+                            config.GOOGLE_PLACES_URL,
+                            "/maps/api/geocode/json",
+                        ),
+                        params={
+                            "latlong": quote_plus(f"{latitude},{longitude}"),
+                            "key": config.GOOGLE_PLACES_KEY,
+                            "sessiontoken": secrets.token_bytes(20).hex(),
+                            "language": "en",
+                            "components": "country:za",
+                        },
+                    )
+                    response.raise_for_status()
+                    data = await response.json()
+
+                    if data["status"] != "OK":
+                        return await self.go_to_state("state_error")
+
+                    first_result = data["results"][0]
+                    self.save_metadata("place_id", first_result["place_id"])
+                    self.save_metadata(
+                        "location_description", first_result["formatted_address"]
+                    )
+
+                    return await self.go_to_state("state_update_location_confirm")
+                except HTTP_EXCEPTIONS as e:
+                    if i == 2:
+                        logger.exception(e)
+                        return await self.go_to_state("state_error")
+                    else:
+                        continue
+
+    async def state_update_location_confirm(self):
+        location = self.user.metadata.get("location_description")
+
+        choices = [
+            Choice("yes", self._("Yes")),
+            Choice("no", self._("No")),
+        ]
         question = self._(
             "\n".join(
                 [
-                    "*ABOUT YOU*",
-                    "📍 Province",
+                    "*CHAT SETTINGS / ⚙️ Change or update your info* / *Location?*",
                     "-----",
                     "",
-                    "🙍🏾‍♀️ To be able to recommend you youth-friendly clinics and FREE "
-                    "services near you I'll need to know where you're staying "
-                    "currently. 🙂",
+                    f"*You've entered {location} as your location.*",
                     "",
-                    "*Which PROVINCE are you in?*",
-                    "You can type the number or choose from the menu.",
+                    "Is this correct?",
                     "",
-                    province_text,
-                    "-----",
-                    "👩🏾 *Rather not say?*",
-                    "No stress! Just say SKIP.",
+                    get_display_choices(choices),
                 ]
             )
         )
-        return WhatsAppListState(
+        return WhatsAppButtonState(
             self,
             question=question,
-            button="Province",
-            choices=province_choices,
-            next="state_update_suburb",
+            choices=choices,
             error=self._(get_generic_error()),
-        )
-
-    async def state_update_suburb(self):
-        return FreeText(
-            self,
-            question=self._(
-                "\n".join(
-                    [
-                        "*ABOUT YOU*",
-                        "📍 Suburb/Town/Township/Village ",
-                        "-----",
-                        "",
-                        "👩🏾 *OK. And which suburb, town, township or village was"
-                        " that?*",
-                        "Please type it for me and hit send.",
-                        "-----",
-                        "🙍🏾‍♀️ *Rather not say?*",
-                        "No stress! Just tap *SKIP*.",
-                    ]
-                )
-            ),
-            next="state_update_street_name",
-            buttons=[Choice("skip", self._("Skip"))],
-        )
-
-    async def state_update_street_name(self):
-        return FreeText(
-            self,
-            question=self._(
-                "\n".join(
-                    [
-                        "*ABOUT YOU*",
-                        "📍 Street Name",
-                        "-----",
-                        "",
-                        "👩🏾 *OK. And what about the street name?*",
-                        "Could you type it for me and hit send?",
-                        "-----",
-                        "🙍🏾‍♀️ *Rather not say?*",
-                        "No stress! Just tap *SKIP*.",
-                    ]
-                )
-            ),
-            next="state_update_street_number",
-            buttons=[Choice("skip", self._("Skip"))],
-        )
-
-    async def state_update_street_number(self):
-        return FreeText(
-            self,
-            question=self._(
-                "\n".join(
-                    [
-                        "*ABOUT YOU*",
-                        "📍Street Number",
-                        "-----",
-                        "",
-                        "👩🏾  *And which number was that?*",
-                        "Please type the street number for me and hit send.",
-                        "-----",
-                        "🙍🏾‍♀️ *Rather not say?*",
-                        "No stress! Just tap *SKIP*.",
-                    ]
-                )
-            ),
-            next="state_update_location_submit",
-            buttons=[Choice("skip", self._("Skip"))],
+            next={
+                "yes": "state_update_location_submit",
+                "no": "state_update_location",
+            },
         )
 
     async def state_update_location_submit(self):
+        metadata = self.user.metadata
+        latitude = metadata.get("latitude")
+        longitude = metadata.get("longitude")
+        location_description = metadata.get("location_description")
+
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
-
         data = {
-            "province": self.user.answers.get("state_update_province"),
-            "suburb": self.user.answers.get("state_update_suburb"),
-            "street_name": self.user.answers.get("state_update_street_name"),
-            "street_number": self.user.answers.get("state_update_street_number"),
+            "location_description": location_description,
+            "latitude": latitude,
+            "longitude": longitude,
         }
 
-        for field in ("province", "suburb", "street_name", "street_number"):
-            if data.get(field):
-                self.save_metadata(field, data[field])
+        await rapidpro.update_profile(whatsapp_id, data)
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
-        if error:
-            return await self.go_to_state("state_error")
-
-        return await self.go_to_state("state_display_preferences")
+        return await self.go_to_state("state_conclude_changes")
 
     async def state_update_gender(self):
         gender_text = "\n".join(
