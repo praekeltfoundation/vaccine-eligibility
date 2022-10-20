@@ -56,10 +56,10 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         choices = [
-            Choice("helpful", "It was helpful"),
-            Choice("learnt new", "Learnt something new"),
-            Choice("enjoyed comments", "I enjoy the comments"),
-            Choice("other", "Other"),
+            Choice("helpful", self._("It was helpful")),
+            Choice("learnt new", self._("Learnt something new")),
+            Choice("enjoyed comments", self._("I enjoy the comments")),
+            Choice("other", self._("Other")),
         ]
 
         question = self._(
@@ -126,8 +126,8 @@ class Application(BaseApplication):
 
     async def state_fb_hot_topic_helpful(self):
         choices = [
-            Choice("counsellor", self._("1. Talk to a counsellor")),
-            Choice("question", self._("2. Ask a question")),
+            Choice("counsellor", self._("Talk to a counsellor")),
+            Choice("question", self._("Ask a question")),
         ]
 
         question = self._(
@@ -155,15 +155,15 @@ class Application(BaseApplication):
             choices=choices,
             error=self._(get_generic_error()),
             next={
-                "counsellor": AskaQuestionApplication.START_STATE,
+                "counsellor": PleaseCallMeApplication.START_STATE,
                 "question": AskaQuestionApplication.START_STATE,
             },
         )
 
     async def state_fb_hot_topic_enjoyed_comments(self):
         choices = [
-            Choice("counsellor", "1. Talk to a counsellor"),
-            Choice("question", "2. Ask a question"),
+            Choice("counsellor", self._("Talk to a counsellor")),
+            Choice("question", self._("Ask a question")),
         ]
 
         question = self._(
@@ -221,8 +221,8 @@ class Application(BaseApplication):
 
     async def state_fb_hot_topic_thanks_for_feedback(self):
         choices = [
-            Choice("counsellor", "1. Talk to a counsellor"),
-            Choice("question", "2. Ask a question"),
+            Choice("counsellor", self._("Talk to a counsellor")),
+            Choice("question", self._("Ask a question")),
         ]
 
         question = self._(
