@@ -47,7 +47,7 @@ def get_current_datetime():
 
 
 def clean_inbound(content):
-    return re.sub(r"\W+", " ", content or "").strip().lower()
+    return re.sub(r"[^\w#]+", " ", content or "").strip().lower()
 
 
 def get_bot_age():

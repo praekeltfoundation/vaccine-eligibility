@@ -85,8 +85,24 @@ async def contentrepo_api_mock():
         config.CONTENTREPO_API_URL = url
 
 
+@pytest.fixture
+async def rapidpro_mock():
+    Sanic.test_mode = True
+    app = Sanic("mock_rapidpro")
+
+    @app.route("/api/v2/contacts.json", methods=["GET"])
+    def get_contact(request):
+        return response.json({"results": []})
+
+    async with run_sanic(app) as server:
+        url = config.RAPIDPRO_URL
+        config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
+        yield server
+        config.RAPIDPRO_URL = url
+
+
 @pytest.mark.asyncio
-async def test_state_quiz_start(tester: AppTester, contentrepo_api_mock):
+async def test_state_quiz_start(tester: AppTester, contentrepo_api_mock, rapidpro_mock):
     tester.setup_state("state_quiz_start")
 
     tester.user.metadata["quiz_tag"] = "first_quiz"

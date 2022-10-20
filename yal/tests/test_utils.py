@@ -60,3 +60,12 @@ def test_replace_persona_fields_uses_placeholders():
         "Hi 👋, You chose to call me B-wise and I look like 🤖"
         "Note that question doesn't get replaced. Neither does [question]"
     )
+
+
+def test_clean_inbound():
+    """
+    Should remove all non-word or `#` characters, and excess whitespace
+    """
+    assert utils.clean_inbound("#") == "#"
+    assert utils.clean_inbound("  test    whitespace ") == "test whitespace"
+    assert utils.clean_inbound("test%&^*special)(*chars") == "test special chars"

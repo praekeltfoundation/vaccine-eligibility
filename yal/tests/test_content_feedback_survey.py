@@ -34,7 +34,7 @@ def tester():
 @pytest.mark.asyncio
 async def test_positive_feedback(tester: AppTester, rapidpro_mock: MockServer):
     """If the user responds positively to the push message, ask for any feedback"""
-    await tester.user_input("yes", session=Message.SESSION_EVENT.NEW)
+    await tester.user_input("yes")
     tester.assert_state("state_positive_feedback")
     tester.assert_message(
         "\n".join(
@@ -135,7 +135,7 @@ async def test_confirm_feedback(tester: AppTester):
 @pytest.mark.asyncio
 async def test_negative_feedback(tester: AppTester, rapidpro_mock: MockServer):
     """If the user responds negative to the push message, ask if they want AAQ"""
-    await tester.user_input("no", session=Message.SESSION_EVENT.NEW)
+    await tester.user_input("nope")
     tester.assert_state("state_negative_feedback")
     tester.assert_message(
         "\n".join(

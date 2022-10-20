@@ -68,6 +68,10 @@ async def rapidpro_mock():
     app = Sanic("mock_rapidpro")
     tstate = TState()
 
+    @app.route("/api/v2/contacts.json", methods=["GET"])
+    def get_contact(request):
+        return response.json({"results": []}, status=200)
+
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
         tstate.requests.append(request)
@@ -1575,7 +1579,7 @@ async def test_state_prompt_not_found_comment(tester: AppTester, turn_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_prompt_info_useful(tester: AppTester):
+async def test_state_prompt_info_useful(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_prompt_info_found")
     await tester.user_input("1")
 
@@ -1609,7 +1613,9 @@ async def test_state_prompt_info_useful_emoticon(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_prompt_info_useful_submit(tester: AppTester, contentrepo_api_mock):
+async def test_state_prompt_info_useful_submit(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
     tester.setup_state("state_prompt_info_useful")
     tester.user.metadata["selected_page_id"] = "111"
 
@@ -1626,7 +1632,7 @@ async def test_state_prompt_info_useful_submit(tester: AppTester, contentrepo_ap
 
 
 @pytest.mark.asyncio
-async def test_state_prompt_feedback_comment(tester: AppTester):
+async def test_state_prompt_feedback_comment(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_prompt_info_useful")
     await tester.user_input("2")
 

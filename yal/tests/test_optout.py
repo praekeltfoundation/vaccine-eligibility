@@ -119,14 +119,14 @@ async def test_state_optout_survey_other(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_optout_survey_message_volume(tester: AppTester):
+async def test_state_optout_survey_message_volume(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_optout_survey")
     await tester.user_input("1")
     tester.assert_state(None)
 
 
 @pytest.mark.asyncio
-async def test_state_optout_survey_user_friendliness(tester: AppTester):
+async def test_state_optout_survey_user_friendliness(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_optout_survey")
     await tester.user_input("2")
     tester.assert_state(None)
@@ -178,11 +178,13 @@ async def test_state_optout_stop_notifications(
     await tester.user_input("1")
     tester.assert_state("state_optout_survey")
 
-    assert len(rapidpro_mock.tstate.requests) == 1
+    assert len(rapidpro_mock.tstate.requests) == 2
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/contacts.json"
+    ] * 2
 
-    post_request = rapidpro_mock.tstate.requests[0]
+    post_request = rapidpro_mock.tstate.requests[1]
     assert json.loads(post_request.body.decode("utf-8")) == {
         "fields": {
             "onboarding_completed": "",
@@ -207,12 +209,12 @@ async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
 
     # Two API calls:
     # Get profile to get old details, update profile
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
     assert [r.path for r in rapidpro_mock.tstate.requests] == [
         "/api/v2/contacts.json"
-    ] * 2
+    ] * 3
 
-    post_request = rapidpro_mock.tstate.requests[1]
+    post_request = rapidpro_mock.tstate.requests[2]
     assert json.loads(post_request.body.decode("utf-8")) == {
         "fields": {
             "dob_year": "",
