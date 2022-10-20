@@ -6,6 +6,7 @@ from sanic import Sanic, response
 
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
+from yal.utils import BACK_TO_MAIN, GET_HELP
 from yal.wa_fb_crossover_feedback import Application
 
 
@@ -77,7 +78,7 @@ async def test_state_saw_recent_facebook(tester: AppTester, rapidpro_mock):
     await tester.user_input("Yes, I did")
     tester.assert_state("state_saw_recent_facebook")
     tester.assert_message(
-        """I thought it was so interesting 💡
+        f"""I thought it was so interesting 💡
 
 What did you think?
 
@@ -90,8 +91,8 @@ _Click on the button below and choose an option_
 
 --
 
-0. 🏠 *Back* to Main *MENU*
-#. 🆘Get *HELP*"""
+{BACK_TO_MAIN}
+{GET_HELP}"""
     )
     assert len(rapidpro_mock.tstate.requests) == 1
     assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
@@ -136,14 +137,14 @@ async def test_state_fb_hot_topic_other(tester: AppTester, rapidpro_mock):
     assert tester.application.answer_events[0].response == "other"
     tester.assert_state("state_fb_hot_topic_other")
     tester.assert_message(
-        """I'd love to hear what you think of the topic. Please share your thoughts!
+        f"""I'd love to hear what you think of the topic. Please share your thoughts!
 
 _Just type and send your reply_
 
 --
 *Or reply*
-0. 🏠 *Back* to Main *MENU*
-#. 🆘Get *HELP*"""
+{BACK_TO_MAIN}
+{GET_HELP}"""
     )
 
 
