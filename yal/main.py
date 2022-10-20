@@ -109,7 +109,7 @@ class Application(
         aaq_timeout_sent = fields.get("aaq_timeout_sent")
 
         # Cache some profile info
-        for field in ("province", "suburb", "street_name", "street_number"):
+        for field in ("latitude", "longitude", "location_description"):
             if fields.get(field):
                 self.save_metadata(field, fields[field])
         for field in utils.PERSONA_FIELDS:
