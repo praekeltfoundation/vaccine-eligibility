@@ -17,7 +17,7 @@ from yal.utils import replace_persona_fields
 
 logger = logging.getLogger(__name__)
 
-GREETING_KEYWORDS = {"hi", "hello", "menu", "0"}
+GREETING_KEYWORDS = {"hi", "hello", "menu", "0", "main menu"}
 HELP_KEYWORDS = {"#", "help", "please call me", "talk to a counsellor"}
 OPTOUT_KEYWORDS = {"stop"}
 ONBOARDING_REMINDER_KEYWORDS = {
