@@ -72,6 +72,10 @@ class Application(BaseApplication):
     async def state_mainmenu(self):
         self.save_metadata("current_menu_level", 0)
 
+        error, submenu_choices = await contentrepo.get_choices_by_tag("help_submenu")
+        if error:
+            return await self.go_to_state("state_error")
+
         sections = [
             (
                 "*🏥 NEED HELP?*",
@@ -81,7 +85,7 @@ class Application(BaseApplication):
                         ServiceFinderApplication.START_STATE,
                         "Find clinics and services",
                     ),
-                ],
+                ] + submenu_choices,
             )
         ]
 
