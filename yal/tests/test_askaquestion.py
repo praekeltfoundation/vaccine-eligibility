@@ -380,8 +380,8 @@ async def test_state_get_content_feedback_question_answered(
 
     tester.assert_state("state_pre_mainmenu")
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"aaq_timeout_type": ""},
     }
@@ -499,8 +499,8 @@ async def test_state_handle_timeout_handles_type_2_yes(
     tester.setup_state("state_handle_timeout_response")
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="yes")
 
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"aaq_timeout_sent": "", "aaq_timeout_type": ""},
     }

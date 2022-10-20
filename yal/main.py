@@ -28,7 +28,7 @@ ONBOARDING_REMINDER_KEYWORDS = {
 CALLBACK_CHECK_KEYWORDS = {"callback"}
 AAQ_TIMEOUT_KEYWORDS = {"yes", "no", "yes ask again", "no i m good"}
 FEEDBACK_KEYWORDS = {"feedback"}
-CONTENT_FEEDBACK_KEYWORDS = {"1", "2", "yes", "nope", "yes thanks", "nope"}
+CONTENT_FEEDBACK_KEYWORDS = {"1", "2", "yes", "nope", "yes thanks"}
 
 
 class Application(
@@ -81,6 +81,17 @@ class Application(
                 self.user.session_id = None
                 self.state_name = OnboardingApplication.REMINDER_STATE
 
+        if keyword in CONTENT_FEEDBACK_KEYWORDS:
+            msisdn = utils.normalise_phonenumber(message.from_addr)
+            whatsapp_id = msisdn.lstrip(" + ")
+            error, fields = await rapidpro.get_profile(whatsapp_id)
+            if error:
+                return await self.go_to_state("state_error")
+            feedback_survey_sent = fields.get("feedback_survey_sent")
+            feedback_type = fields.get("feedback_type")
+            if feedback_survey_sent and feedback_type == "content":
+                self.state_name = ContentFeedbackSurveyApplication.START_STATE
+
         return await super().process_message(message)
 
     async def state_start(self):
@@ -96,8 +107,6 @@ class Application(
         # If one of these values is True then the user might be responding
         # to a scheduled msg
         aaq_timeout_sent = fields.get("aaq_timeout_sent")
-        feedback_survey_sent = fields.get("feedback_survey_sent")
-        feedback_type = fields.get("feedback_type")
 
         # Cache some profile info
         for field in ("province", "suburb", "street_name", "street_number"):
@@ -121,11 +130,6 @@ class Application(
 
         if aaq_timeout_sent and (inbound.lower() in AAQ_TIMEOUT_KEYWORDS):
             return await self.go_to_state(AaqApplication.TIMEOUT_RESPONSE_STATE)
-        if feedback_survey_sent:
-            if feedback_type == "content" and (inbound in CONTENT_FEEDBACK_KEYWORDS):
-                return await self.go_to_state(
-                    ContentFeedbackSurveyApplication.START_STATE
-                )
 
         return await self.go_to_state("state_catch_all")
 

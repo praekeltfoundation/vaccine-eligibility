@@ -145,8 +145,24 @@ async def google_api_mock():
         config.GOOGLE_PLACES_URL = url
 
 
+@pytest.fixture
+async def rapidpro_mock():
+    Sanic.test_mode = True
+    app = Sanic("mock_rapidpro")
+
+    @app.route("/api/v2/contacts.json", methods=["GET"])
+    def get_contact(request):
+        return response.json({"results": []})
+
+    async with run_sanic(app) as server:
+        url = config.RAPIDPRO_URL
+        config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
+        yield server
+        config.RAPIDPRO_URL = url
+
+
 @pytest.mark.asyncio
-async def test_state_servicefinder_start_no_address(tester: AppTester):
+async def test_state_servicefinder_start_no_address(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_servicefinder_start")
     await tester.user_input("1")
     tester.assert_state("state_location")
@@ -177,7 +193,7 @@ async def test_state_servicefinder_start_no_address(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_servicefinder_start_existing_address(
-    tester: AppTester, google_api_mock
+    tester: AppTester, google_api_mock, rapidpro_mock
 ):
     tester.setup_state("state_servicefinder_start")
 
@@ -237,7 +253,7 @@ async def test_state_servicefinder_start_existing_address(
 
 @pytest.mark.asyncio
 async def test_state_confirm_existing_address_yes(
-    tester: AppTester, servicefinder_mock, google_api_mock
+    tester: AppTester, servicefinder_mock, google_api_mock, rapidpro_mock
 ):
     tester.setup_state("state_confirm_existing_address")
 
@@ -288,7 +304,7 @@ async def test_state_confirm_existing_address_yes(
 
 
 @pytest.mark.asyncio
-async def test_state_confirm_existing_address_no(tester: AppTester):
+async def test_state_confirm_existing_address_no(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_confirm_existing_address")
     tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
 
@@ -298,7 +314,7 @@ async def test_state_confirm_existing_address_no(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_category_sub(tester: AppTester, servicefinder_mock):
+async def test_state_category_sub(tester: AppTester, servicefinder_mock, rapidpro_mock):
     tester.setup_state("state_category")
 
     tester.user.metadata["categories"] = get_processed_categories()
@@ -334,7 +350,7 @@ async def test_state_category_sub(tester: AppTester, servicefinder_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_category(tester: AppTester, servicefinder_mock):
+async def test_state_category(tester: AppTester, servicefinder_mock, rapidpro_mock):
     tester.setup_state("state_category")
 
     tester.user.metadata["categories"] = get_processed_categories()
@@ -379,7 +395,9 @@ async def test_state_category(tester: AppTester, servicefinder_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_category_no_facilities(tester: AppTester, servicefinder_mock):
+async def test_state_category_no_facilities(
+    tester: AppTester, servicefinder_mock, rapidpro_mock
+):
     tester.setup_state("state_category")
 
     tester.user.metadata["categories"] = get_processed_categories()
@@ -453,7 +471,7 @@ async def test_state_location_invalid(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_servicefinder_start_to_end(
-    tester: AppTester, google_api_mock, servicefinder_mock
+    tester: AppTester, google_api_mock, servicefinder_mock, rapidpro_mock
 ):
     tester.setup_state("state_servicefinder_start")
 

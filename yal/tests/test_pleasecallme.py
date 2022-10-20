@@ -270,7 +270,7 @@ async def test_start_in_hours(get_current_datetime, tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_out_of_hours_to_emergency(tester: AppTester):
+async def test_state_out_of_hours_to_emergency(tester: AppTester, rapidpro_mock):
     tester.user.metadata["next_available"] = "2022-06-20T17:30:00"
     tester.setup_state("state_out_of_hours")
     await tester.user_input("1")
@@ -278,7 +278,7 @@ async def test_state_out_of_hours_to_emergency(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_out_of_hours_to_open_hours(tester: AppTester):
+async def test_state_out_of_hours_to_open_hours(tester: AppTester, rapidpro_mock):
     tester.user.metadata["next_available"] = "2022-06-20T17:30:00"
     tester.setup_state("state_out_of_hours")
     await tester.user_input("2")
@@ -286,7 +286,9 @@ async def test_state_out_of_hours_to_open_hours(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_open_hours_chose_to_call_when_open(tester: AppTester):
+async def test_state_open_hours_chose_to_call_when_open(
+    tester: AppTester, rapidpro_mock
+):
     tester.setup_state("state_open_hours")
     await tester.user_input("2")
     tester.assert_state("state_in_hours")
@@ -323,8 +325,8 @@ async def test_callback_check_scheduled_if_out_of_hours(
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_check_time": "2022-06-20T11:00:00"},
     }
@@ -346,15 +348,15 @@ async def test_state_in_hours(
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_check_time": "2022-06-19T19:30:00"},
     }
 
 
 @pytest.mark.asyncio
-async def test_state_callback_confirmation(tester: AppTester):
+async def test_state_callback_confirmation(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_callback_confirmation")
     await tester.user_input("1")
 
@@ -362,7 +364,7 @@ async def test_state_callback_confirmation(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_callback_confirmation_need_help(tester: AppTester):
+async def test_state_callback_confirmation_need_help(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_callback_confirmation")
     await tester.user_input("2")
 
@@ -378,7 +380,7 @@ async def test_state_callback_confirmation_opening_hours(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_in_hours_specify(tester: AppTester):
+async def test_state_in_hours_specify(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_in_hours")
     await tester.user_input("2")
     tester.assert_state("state_specify_msisdn")
@@ -419,7 +421,9 @@ async def test_state_specify_msisdn_country_code_plus(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_confirm_specified_msisdn_incorrect(tester: AppTester):
+async def test_state_confirm_specified_msisdn_incorrect(
+    tester: AppTester, rapidpro_mock
+):
     tester.setup_state("state_confirm_specified_msisdn")
     tester.setup_answer("state_specify_msisdn", "0831231234")
     await tester.user_input("2")
@@ -427,7 +431,7 @@ async def test_state_confirm_specified_msisdn_incorrect(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_confirm_specified_msisdn(tester: AppTester):
+async def test_state_confirm_specified_msisdn(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_confirm_specified_msisdn")
     tester.setup_answer("state_specify_msisdn", "0831231234")
     await tester.user_input("1")
@@ -451,8 +455,8 @@ async def test_state_ask_to_save_emergency_number(
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_check_time": "2022-06-19T19:30:00"},
     }
@@ -475,12 +479,12 @@ async def test_state_save_emergency_contact(
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"emergency_contact": "+27831231234"},
     }
-    request = rapidpro_mock.tstate.requests[1]
+    request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_check_time": "2022-06-19T19:30:00"},
     }
