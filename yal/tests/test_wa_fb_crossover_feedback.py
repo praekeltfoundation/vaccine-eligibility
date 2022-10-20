@@ -5,7 +5,6 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.testing import AppTester, TState, run_sanic
-from vaccine.models import Message
 from yal import config
 from yal.wa_fb_crossover_feedback import Application
 

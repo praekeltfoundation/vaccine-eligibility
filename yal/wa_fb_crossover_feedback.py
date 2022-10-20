@@ -1,12 +1,7 @@
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import (
-    Choice,
-    FreeText,
-    WhatsAppButtonState,
-    WhatsAppListState,
-)
+from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
 from vaccine.utils import get_display_choices
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AskaQuestionApplication
