@@ -8,6 +8,7 @@ from vaccine.states import (
     EndState,
     FreeText,
     WhatsAppButtonState,
+    WhatsAppListState,
 )
 from vaccine.utils import get_display_choices
 from yal import contentrepo, rapidpro, turn, utils
@@ -89,6 +90,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         parent_topic_links = {}
+        relationship_topic_links = []
         for choice in choices:
             error, sub_choices = await contentrepo.get_choices_by_parent(choice.value)
             if error:
@@ -96,6 +98,9 @@ class Application(BaseApplication):
 
             for sub_choice in sub_choices:
                 parent_topic_links[sub_choice.value] = choice.value
+
+                if "relationship" in choice.label.lower():
+                    relationship_topic_links.append(sub_choice.value)
 
             sections.append((f"*{choice.label}*", sub_choices))
 
@@ -142,6 +147,8 @@ class Application(BaseApplication):
 
                 self.save_metadata("selected_page_id", choice.value)
                 self.save_metadata("current_message_id", 1)
+                if choice.value in relationship_topic_links:
+                    return "state_check_relationship_status_set"
                 return "state_contentrepo_page"
 
         choices = []
@@ -216,6 +223,66 @@ class Application(BaseApplication):
             next=next_,
             additional_messages=banner_messages,
         )
+
+    async def state_check_relationship_status_set(self):
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip("+")
+        error, fields = await rapidpro.get_profile(whatsapp_id)
+        if error:
+            return await self.go_to_state("state_error")
+
+        rel_status = fields.get("relationship_status")
+        if rel_status == "" or rel_status == "skip":
+            return await self.go_to_state("state_relationship_status")
+        return await self.go_to_state("state_contentrepo_page")
+
+    async def state_relationship_status(self):
+        # TODO: pull section title
+        question = self._(
+            "\n".join(
+                [
+                    "*SEX & RELATIONSHIPS*",
+                    "-----",
+                    "",
+                    "Before we get into relationship talk, I just wanted to find "
+                    "out...",
+                    "",
+                    "[persona_emoji] *Are you currently in a relationship or seeing "
+                    "someone special right now?*",
+                    "",
+                    "1. Yes, in a relationship",
+                    "2. It's complicated",
+                    "3. Not seeing anyone",
+                    "4. Skip",
+                ]
+            )
+        )
+        return WhatsAppListState(
+            self,
+            question=question,
+            button="Relationship Status",
+            choices=[
+                Choice("yes", self._("In a relationship")),
+                Choice("complicated", self._("It's complicated")),
+                Choice("no", self._("Not seeing anyone")),
+                Choice("skip", self._("Skip")),
+            ],
+            next="state_relationship_status_submit",
+            error=self._(get_generic_error()),
+        )
+
+    async def state_relationship_status_submit(self):
+        rel_status = self.user.answers.get("state_relationship_status")
+        if rel_status != "skip":
+            msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+            whatsapp_id = msisdn.lstrip(" + ")
+            data = {
+                "relationship_status": rel_status,
+            }
+
+            await rapidpro.update_profile(whatsapp_id, data)
+
+        return await self.go_to_state("state_contentrepo_page")
 
     async def state_contentrepo_page(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
