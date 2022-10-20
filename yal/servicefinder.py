@@ -348,15 +348,15 @@ class Application(BaseApplication):
             numbers = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
             lng, lat = facility["location"]["coordinates"]
             distance = geopy.distance.geodesic(user_location, (lat, lng)).km
-            details = [
-                f"{numbers[i]} *{facility['name']}*",
-                f"📍 {facility['fullAddress']}",
-                f"📞 {facility['telephoneNumber']}",
-                f"🦶 {round(distance)} km",
-                f"https://www.google.com/maps/place/{lat},{lng}",
-                "----",
-                "",
-            ]
+            details = []
+            details.append(f"{numbers[i]} *{facility['name']}*")
+            details.append(f"📍 {facility['fullAddress']}")
+            if facility["telephoneNumber"]:
+                details.append(f"📞 {facility['telephoneNumber']}")
+            details.append(f"🦶 {round(distance)} km")
+            details.append(f"https://www.google.com/maps/place/{lat},{lng}")
+            details.append("----")
+            details.append("")
             return "\n".join(details)
 
         services = "\n".join(
