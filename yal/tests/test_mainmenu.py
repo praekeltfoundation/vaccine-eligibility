@@ -68,10 +68,6 @@ async def rapidpro_mock():
     app = Sanic("mock_rapidpro")
     tstate = TState()
 
-    @app.route("/api/v2/contacts.json", methods=["GET"])
-    def get_contact(request):
-        return response.json({"results": []}, status=200)
-
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
         tstate.requests.append(request)
@@ -502,7 +498,7 @@ async def test_state_mainmenu_static(
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
 
 
 @pytest.mark.asyncio
@@ -848,7 +844,7 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["data__session_id"][0] == "1"
     assert params["data__user_addr"][0] == "27820001001"
 
-    assert len(rapidpro_mock.tstate.requests) == 7
+    assert len(rapidpro_mock.tstate.requests) == 8
 
     update_request = rapidpro_mock.tstate.requests[-1]
     assert update_request.json["fields"] == {
