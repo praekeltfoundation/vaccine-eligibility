@@ -5,6 +5,7 @@ from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListSt
 from vaccine.utils import get_display_choices
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AskaQuestionApplication
+from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.utils import get_generic_error
 
 logger = logging.getLogger(__name__)
@@ -191,7 +192,7 @@ class Application(BaseApplication):
             choices=choices,
             error=self._(get_generic_error()),
             next={
-                "counsellor": "",
+                "counsellor": PleaseCallMeApplication.START_STATE,
                 "question": AskaQuestionApplication.START_STATE,
             },
         )
@@ -250,7 +251,7 @@ class Application(BaseApplication):
             choices=choices,
             error=self._(get_generic_error()),
             next={
-                "counsellor": "",
+                "counsellor": PleaseCallMeApplication.START_STATE,
                 "question": AskaQuestionApplication.START_STATE,
             },
         )
