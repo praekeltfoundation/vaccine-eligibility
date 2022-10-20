@@ -19,6 +19,14 @@ def tester():
     return AppTester(Application)
 
 
+def get_rapidpro_contact(urn):
+    return {
+        "fields": {
+            "relationship_status": "Yes" if ("27820001001" in urn) else "",
+        },
+    }
+
+
 def build_message_detail(
     id,
     title,
@@ -60,14 +68,23 @@ async def rapidpro_mock():
     app = Sanic("mock_rapidpro")
     tstate = TState()
 
-    @app.route("/api/v2/contacts.json", methods=["GET"])
-    def get_contact(request):
-        return response.json({"results": []}, status=200)
-
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
         tstate.requests.append(request)
         return response.json({}, status=200)
+
+    @app.route("/api/v2/contacts.json", methods=["GET"])
+    def get_contact(request):
+        tstate.requests.append(request)
+        urn = request.args.get("urn")
+        contacts = [get_rapidpro_contact(urn)]
+        return response.json(
+            {
+                "results": contacts,
+                "next": None,
+            },
+            status=200,
+        )
 
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
@@ -116,15 +133,19 @@ async def contentrepo_api_mock():
         pages = []
         if tag == "mainmenu":
             pages.append({"id": 111, "title": "Main Menu 1 💊"})
-            pages.append({"id": 222, "title": "Main Menu 2 🤝"})
+            pages.append({"id": 222, "title": "Main Menu 2 Relationships 🤝"})
         elif tag == "banner":
             if tstate.banner:
                 pages.append({"id": 777, "title": "Banner message"})
 
         child_of = request.args.get("child_of")
-        if child_of in ["111", "222", "333", "444"]:
+        if child_of in ["111", "333", "444"]:
             pages.append({"id": 333, "title": "Sub menu 1"})
             pages.append({"id": 444, "title": "Sub menu 2"})
+            pages.append({"id": 1231, "title": "Sub menu 3"})
+        if child_of in ["222", "888"]:
+            pages.append({"id": 888, "title": "Sub menu 1"})
+            pages.append({"id": 999, "title": "Sub menu 2"})
             pages.append({"id": 1231, "title": "Sub menu 3"})
 
         if child_of in ["1111"]:
@@ -222,6 +243,18 @@ async def contentrepo_api_mock():
                 444,
                 "Sub menu 2",
                 "Sub menu test content 2",
+            )
+        )
+
+    @app.route("/api/v2/pages/888", methods=["GET"])
+    def get_page_detail_888(request):
+        tstate.requests.append(request)
+        return response.json(
+            build_message_detail(
+                888,
+                "Sub menu 1",
+                "Sub menu test content 2",
+                has_children=True,
             )
         )
 
@@ -348,7 +381,7 @@ async def test_state_mainmenu_start(
             "4. Sub menu 2",
             "5. Sub menu 3",
             "-----",
-            "*Main Menu 2 🤝*",
+            "*Main Menu 2 Relationships 🤝*",
             "6. Sub menu 1",
             "7. Sub menu 2",
             "8. Sub menu 3",
@@ -413,7 +446,7 @@ async def test_state_mainmenu_start_suggested_populated(
                 "4. Sub menu 2",
                 "5. Sub menu 3",
                 "-----",
-                "*Main Menu 2 🤝*",
+                "*Main Menu 2 Relationships 🤝*",
                 "6. Sub menu 1",
                 "7. Sub menu 2",
                 "8. Sub menu 3",
@@ -465,7 +498,7 @@ async def test_state_mainmenu_static(
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
 
 
 @pytest.mark.asyncio
@@ -525,7 +558,7 @@ async def test_state_mainmenu_contentrepo(
         "/api/v2/pages/444",
     ]
 
-    tester.assert_metadata("topics_viewed", ["222"])
+    tester.assert_metadata("topics_viewed", ["111"])
 
     assert len(rapidpro_mock.tstate.requests) == 4
     request = rapidpro_mock.tstate.requests[1]
@@ -533,6 +566,208 @@ async def test_state_mainmenu_contentrepo(
         "fields": {
             "last_mainmenu_time": "",
             "suggested_text": "",
+        },
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_mainmenu_contentrepo_relationship_content_rel_set(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_pre_mainmenu")
+    await tester.user_input("6")
+
+    question = "\n".join(
+        [
+            "Sub menu 1",
+            "-----",
+            "",
+            "Sub menu test content 2",
+            "",
+            "1. Sub menu 1",
+            "2. Sub menu 2",
+            "3. Sub menu 3",
+            "",
+            "-----",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
+    )
+
+    tester.assert_num_messages(1)
+    tester.assert_message(question)
+    tester.assert_state("state_display_page")
+
+    assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
+        "/api/v2/pages",
+        "/api/v2/pages",
+        "/api/v2/pages",
+        "/suggestedcontent/",
+        "/api/v2/pages",
+        "/api/v2/pages/888",
+        "/api/v2/pages",
+    ]
+
+    tester.assert_metadata("topics_viewed", ["222"])
+
+    assert len(rapidpro_mock.tstate.requests) == 5
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_mainmenu_time": "",
+            "suggested_text": "",
+        },
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_mainmenu_contentrepo_relationship_status(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    tester.setup_user_address("27820002002")
+    tester.setup_state("state_pre_mainmenu")
+    await tester.user_input("6")
+
+    question = "\n".join(
+        [
+            "*Main Menu 2 Relationships 🤝*",
+            "-----",
+            "",
+            "Before we get into relationship talk, I just wanted to find out...",
+            "",
+            "🤖 *Are you currently in a relationship or seeing someone special right "
+            "now?*",
+            "",
+            "1. Yes, in a relationship",
+            "2. It's complicated",
+            "3. Not seeing anyone",
+            "4. Skip",
+        ]
+    )
+
+    tester.assert_num_messages(1)
+    tester.assert_message(question)
+    tester.assert_state("state_relationship_status")
+
+    assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
+        "/api/v2/pages",
+        "/api/v2/pages",
+        "/api/v2/pages",
+        "/suggestedcontent/",
+        "/api/v2/pages",
+    ]
+
+    tester.assert_metadata("topics_viewed", ["222"])
+
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_mainmenu_time": "",
+            "suggested_text": "",
+        },
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_mainmenu_contentrepo_relationship_skip(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    tester.user.metadata["selected_page_id"] = "888"
+    tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["related_pages"] = None
+    tester.user.metadata["suggested_content"] = {}
+    tester.user.metadata["current_menu_level"] = 3
+    tester.user.metadata["parent_title"] = "Previous thing"
+    tester.user.metadata["relationship_section_title"] = "Section title"
+
+    tester.setup_user_address("27820002002")
+    tester.setup_state("state_relationship_status")
+    await tester.user_input("skip")
+
+    question = "\n".join(
+        [
+            "Sub menu 1",
+            "-----",
+            "",
+            "Sub menu test content 2",
+            "",
+            "1. Sub menu 1",
+            "2. Sub menu 2",
+            "3. Sub menu 3",
+            "",
+            "-----",
+            "*Or reply:*",
+            "4. ⬅️ Parent Title",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
+    )
+
+    tester.assert_num_messages(1)
+    tester.assert_message(question)
+    tester.assert_state("state_display_page")
+
+    assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
+        "/api/v2/pages/888",
+        "/suggestedcontent/",
+        "/api/v2/pages",
+    ]
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+
+
+@pytest.mark.asyncio
+async def test_state_mainmenu_contentrepo_relationship_submit(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    tester.user.metadata["selected_page_id"] = "888"
+    tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["related_pages"] = None
+    tester.user.metadata["suggested_content"] = {}
+    tester.user.metadata["current_menu_level"] = 3
+    tester.user.metadata["parent_title"] = "Previous thing"
+    tester.user.metadata["relationship_section_title"] = "Section title"
+
+    tester.setup_user_address("27820002002")
+    tester.setup_state("state_relationship_status")
+    await tester.user_input("In a relationship")
+
+    question = "\n".join(
+        [
+            "Sub menu 1",
+            "-----",
+            "",
+            "Sub menu test content 2",
+            "",
+            "1. Sub menu 1",
+            "2. Sub menu 2",
+            "3. Sub menu 3",
+            "",
+            "-----",
+            "*Or reply:*",
+            "4. ⬅️ Parent Title",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
+    )
+
+    tester.assert_num_messages(1)
+    tester.assert_message(question)
+    tester.assert_state("state_display_page")
+
+    assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
+        "/api/v2/pages/888",
+        "/suggestedcontent/",
+        "/api/v2/pages",
+    ]
+
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "relationship_status": "yes",
         },
     }
 
@@ -609,7 +844,7 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["data__session_id"][0] == "1"
     assert params["data__user_addr"][0] == "27820001001"
 
-    assert len(rapidpro_mock.tstate.requests) == 7
+    assert len(rapidpro_mock.tstate.requests) == 8
 
     update_request = rapidpro_mock.tstate.requests[-1]
     assert update_request.json["fields"] == {
