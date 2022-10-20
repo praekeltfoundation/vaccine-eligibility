@@ -2,10 +2,11 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, ChoiceState, FreeText, WhatsAppListState
+from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
+from vaccine.utils import get_display_choices
 from yal import rapidpro
 from yal.utils import GENDERS, PROVINCES, get_generic_error, normalise_phonenumber
-from yal.validators import day_validator, year_validator
+from yal.validators import age_validator
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +15,9 @@ class Application(BaseApplication):
     START_STATE = "state_display_preferences"
 
     async def state_display_preferences(self):
+        async def next_(choice: Choice):
+            return choice.value
+
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
@@ -31,9 +35,7 @@ class Application(BaseApplication):
 
             return value
 
-        dob_year = fields.get("dob_year") or "skip"
-        dob_month = fields.get("dob_month") or "skip"
-        dob_day = fields.get("dob_day") or "skip"
+        age = fields.get("age") or "skip"
         relationship_status = get_field("relationship_status").title()
         gender = get_field("gender")
 
@@ -52,61 +54,33 @@ class Application(BaseApplication):
             ]
         )
 
-        dob = []
-        if dob_day != "skip" and dob_month != "skip":
-            dob.append(dob_day)
-            dob.append(dob_month)
-        elif dob_day != "skip":
-            dob.append(dob_month)
-
-        if dob_year != "skip":
-            dob.append(dob_year)
-
         question = self._(
             "\n".join(
                 [
-                    "*CHAT SETTINGS*",
-                    "⚙️ Change or update your info",
+                    "⚙️CHAT SETTINGS / *Update your info*",
                     "-----",
-                    "*👩🏾 No problem. Here's the info you've saved:*",
+                    "Here's the info you've saved. *What info would you like to "
+                    "change?*",
                     "",
-                    "☑️ 🎂 *Birthday*",
-                    "/".join(dob) if dob != [] else "Empty",
+                    "🍰 *Age*",
+                    age or "Empty",
                     "",
-                    "☑️ 💟 *In a Relationship?*",
-                    relationship_status,
+                    "🌈Gender",
+                    gender,
                     "",
-                    "☑️ 📍 *Location*",
+                    "🤖*Bot Name+emoji*",
+                    "[persona_emoji] [persona_name]",
+                    "",
+                    "❤️ *Relationship?*",
+                    relationship_status or "Empty",
+                    "",
+                    "📍*Location*",
                     location or "Empty",
                     "",
-                    "☑️ 🌈  *Identity*",
-                    gender,
-                ]
-            )
-        )
-
-        await self.worker.publish_message(self.inbound.reply(question))
-        await asyncio.sleep(0.5)
-
-        return await self.go_to_state("state_change_info_prompt")
-
-    async def state_change_info_prompt(self):
-        async def next_(choice: Choice):
-            return choice.value
-
-        question = self._(
-            "\n".join(
-                [
-                    "👩🏾 *What info would you like to change?*",
-                    "",
-                    "1. Birthday",
-                    "2. Relationship Status",
-                    "3. Location",
-                    "4. Identity",
-                    "-----",
+                    "*-----*",
                     "*Or reply:*",
-                    "*0* - 🏠 Back to *Main MENU*",
-                    "*#* - 🆘 Get *HELP*",
+                    "*0 -* 🏠 Back to Main *MENU*",
+                    "*# -* 🆘 Get *HELP*",
                 ]
             )
         )
@@ -115,137 +89,149 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("state_update_dob_year", self._("Birthday")),
-                Choice(
-                    "state_update_relationship_status", self._("Relationship Status")
-                ),
+                Choice("state_update_age", self._("Age")),
+                Choice("state_update_gender", self._("Gender")),
+                Choice("state_update_bot_name", self._("Bot name + emoji")),
+                Choice("state_update_relationship_status", self._("Relationship?")),
                 Choice("state_update_province", self._("Location")),
-                Choice("state_update_gender", self._("Identity")),
             ],
             next=next_,
             error=self._(get_generic_error()),
-            error_footer=self._("\n" "Reply with the number next to the month."),
+            error_footer=self._("\n" "Reply with the number that matches your choice."),
             button="Change Preferences",
         )
 
-    async def state_update_dob_year(self):
+    async def state_update_age(self):
         return FreeText(
             self,
             question=self._(
                 "\n".join(
                     [
-                        "*CHAT SETTINGS*",
-                        "Date of birth",
+                        "*CHAT SETTINGS / ⚙️ Change or update your info* / *Age*",
                         "-----",
                         "",
-                        "Which year were you born in?",
+                        "*What is your age?*",
+                        "_Type in the number only (e.g. 24)_",
                         "",
-                        "Reply with a number. (e.g. 2007)",
-                        "",
-                        "-----",
+                        "*-----*",
                         "Rather not say?",
-                        "No stress! Just tap SKIP.",
+                        "No stress! Just tap SKIP",
                     ]
                 )
             ),
-            next="state_update_dob_month",
-            check=year_validator(
+            next="state_update_age_confirm",
+            check=age_validator(
                 self._(
-                    "⚠️  Please TYPE in only the YEAR you were born.\n" "Example _1980_"
+                    "\n".join(
+                        [
+                            "Hmm, something looks a bit off to me. Can we try again? "
+                            "Remember to *only use numbers*. 👍🏽",
+                            "",
+                            "For example just send in *17* if you are 17 years old.",
+                        ]
+                    )
                 )
             ),
             buttons=[Choice("skip", self._("Skip"))],
         )
 
-    async def state_update_dob_month(self):
-        return ChoiceState(
-            self,
-            question=self._(
-                "*CHAT SETTINGS*\n"
-                "Your date of birth\n"
-                "-----\n"
-                "*What month where you born in?*\n"
-                "Reply with a number:"
-            ),
-            choices=[
-                Choice("1", self._("January")),
-                Choice("2", self._("February")),
-                Choice("3", self._("March")),
-                Choice("4", self._("April")),
-                Choice("5", self._("May")),
-                Choice("6", self._("June")),
-                Choice("7", self._("July")),
-                Choice("8", self._("August")),
-                Choice("9", self._("September")),
-                Choice("10", self._("October")),
-                Choice("11", self._("November")),
-                Choice("12", self._("December")),
-            ],
-            footer=self._("\n" "If you'd rather not say, just tap *SKIP*."),
-            next="state_update_dob_day",
-            error=self._(get_generic_error()),
-            error_footer=self._("\n" "Reply with the number next to the month."),
-            buttons=[Choice("skip", self._("Skip"))],
-        )
+    async def state_update_age_confirm(self):
+        age = self.user.answers.get("state_update_age")
+        if age == "skip":
+            return await self.go_to_state("state_display_preferences")
 
-    async def state_update_dob_day(self):
+        choices = [
+            Choice("yes", self._("Yes")),
+            Choice("no", self._("No")),
+        ]
         question = self._(
             "\n".join(
                 [
-                    "*CHAT SETTINGS*",
-                    "Your date of birth",
+                    "*CHAT SETTINGS / ⚙️ Change or update your info* / *Age*",
                     "-----",
                     "",
-                    "*Great. And which day were you born on?*",
+                    f"*You've entered {age} as your age.*",
                     "",
-                    "Reply with a number. (e.g. *30* - if you were born on the 30th)",
+                    "Is this correct?",
                     "",
-                    "If you'd rather not say, just tap *SKIP*.",
+                    get_display_choices(choices),
                 ]
             )
         )
-
-        dob_year = self.user.answers["state_update_dob_year"]
-        dob_month = self.user.answers["state_update_dob_month"]
-
-        return FreeText(
+        return WhatsAppButtonState(
             self,
             question=question,
-            next="state_update_dob_submit",
-            check=day_validator(dob_year, dob_month, question),
-            buttons=[Choice("skip", self._("Skip"))],
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "yes": "state_update_age_submit",
+                "no": "state_update_age",
+            },
         )
 
-    async def state_update_dob_submit(self):
+    async def state_update_age_submit(self):
+        if self.user.answers.get("state_update_age") == "skip":
+            return await self.go_to_state("state_display_preferences")
+
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
         data = {
-            "dob_month": self.user.answers.get("state_update_dob_month"),
-            "dob_day": self.user.answers.get("state_update_dob_day"),
-            "dob_year": self.user.answers.get("state_update_dob_year"),
+            "age": self.user.answers.get("state_update_age"),
         }
 
         error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")
+        return await self.go_to_state("state_conclude_changes")
 
-        return await self.go_to_state("state_display_preferences")
-
-    async def state_update_relationship_status(self):
+    async def state_conclude_changes(self):
+        choices = [
+            Choice("menu", self._("Go to the menu")),
+            Choice("state_aaq_start", self._("Ask a question")),
+        ]
         question = self._(
             "\n".join(
                 [
-                    "*CHAT SETTINGS*",
-                    "⚙️ Change or update your info",
+                    "CHAT SETTINGS / ⚙️ *Change or update your info*",
+                    "*-----*",
+                    "",
+                    "Wonderful! [persona_emoji]",
+                    "",
+                    "*What would you like to do now?*",
+                    "",
+                    get_display_choices(choices),
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "menu": "state_pre_mainmenu",
+                "state_aaq_start": "state_aaq_start",
+            },
+        )
+
+    async def state_update_relationship_status(self):
+        choices = [
+            Choice("yes", self._("Yes, in relationship")),
+            Choice("complicated", self._("It's complicated")),
+            Choice("no", self._("Not seeing anyone")),
+            Choice("skip", self._("Skip")),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "*CHAT SETTINGS / ⚙️ Change or update your info* / *Relationship?*",
                     "-----",
                     "",
-                    "*And what about love? Seeing someone special right now?*",
+                    "[persona_emoji] *Are you currently in a relationship or seeing "
+                    "someone special right now?",
                     "",
-                    "*1*. Yes",
-                    "*2*. It's complicated",
-                    "*3*. No",
-                    "*4*. Skip",
+                    get_display_choices(choices),
                 ]
             )
         )
@@ -253,14 +239,43 @@ class Application(BaseApplication):
             self,
             question=question,
             button="Relationship Status",
-            choices=[
-                Choice("yes", self._("Yes")),
-                Choice("complicated", self._("It's complicated")),
-                Choice("no", self._("No")),
-                Choice("skip", self._("Skip")),
-            ],
-            next="state_update_relationship_status_submit",
+            choices=choices,
+            next="state_update_relationship_status_confirm",
             error=self._(get_generic_error()),
+        )
+
+    async def state_update_relationship_status_confirm(self):
+        rel = self.user.answers.get("state_update_relationship_status")
+        if rel == "skip":
+            return await self.go_to_state("state_display_preferences")
+
+        choices = [
+            Choice("yes", self._("Yes")),
+            Choice("no", self._("No")),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "*CHAT SETTINGS / ⚙️ Change or update your info* / *Relationship?*",
+                    "-----",
+                    "",
+                    f"*You've entered {rel} as your relationship status.*",
+                    "",
+                    "Is this correct?",
+                    "",
+                    get_display_choices(choices),
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "yes": "state_update_relationship_status_submit",
+                "no": "state_update_relationship_status",
+            },
         )
 
     async def state_update_relationship_status_submit(self):
@@ -275,7 +290,7 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
-        return await self.go_to_state("state_display_preferences")
+        return await self.go_to_state("state_conclude_changes")
 
     async def state_update_province(self):
         province_text = "\n".join(
@@ -407,21 +422,19 @@ class Application(BaseApplication):
             [f"*{i+1}* - {name}" for i, (code, name) in enumerate(GENDERS.items())]
         )
         gender_choices = [Choice(code, name) for code, name in GENDERS.items()]
-        gender_choices.append(Choice("skip", "Skip"))
 
         question = self._(
             "\n".join(
                 [
-                    "*CHAT SETTINGS*",
-                    "Choose your gender",
-                    "-----",
+                    "*CHAT SETTINGS / ⚙️ Change or update your info* / *Gender*",
+                    "*-----*",
                     "",
                     "*What's your gender?*",
                     "",
-                    "Please select the option you think best describes you:",
+                    "Please click the button and select the option you think best "
+                    "describes you:",
                     "",
                     gender_text,
-                    f"*{len(gender_choices)}* - Skip",
                 ]
             )
         )
@@ -430,18 +443,202 @@ class Application(BaseApplication):
             question=question,
             button="Gender",
             choices=gender_choices,
-            next="state_update_gender_submit",
+            next="state_update_other_gender",
             error=self._(get_generic_error()),
+        )
+
+    async def state_update_other_gender(self):
+        gender = self.user.answers.get("state_update_gender")
+        if gender == "skip":
+            return await self.go_to_state("state_display_preferences")
+        if gender != "other":
+            return await self.go_to_state("state_update_gender_confirm")
+
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "*CHAT SETTINGS / ⚙️ Change or update your info* / *Gender*",
+                        "-----",
+                        "",
+                        "[persona_emoji] No problem. I want to make double sure you "
+                        "feel included.",
+                        "",
+                        "*Go ahead and let me know what you'd prefer. Type something "
+                        "and hit send. 😌*",
+                    ]
+                )
+            ),
+            next="state_update_gender_confirm",
+        )
+
+    async def state_update_gender_confirm(self):
+        gender = self.user.answers.get("state_update_gender")
+        if gender == "skip":
+            return await self.go_to_state("state_display_preferences")
+        if gender == "other":
+            gender = self.user.answers.get("state_update_other_gender", "")
+
+        choices = [
+            Choice("yes", self._("Yes")),
+            Choice("no", self._("No")),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "*CHAT SETTINGS / ⚙️ Change or update your info* / *Gender*",
+                    "-----",
+                    "",
+                    f"*You've chosen {gender} as your gender.*",
+                    "",
+                    "Is this correct?",
+                    "",
+                    get_display_choices(choices),
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "yes": "state_update_gender_submit",
+                "no": "state_update_gender",
+            },
         )
 
     async def state_update_gender_submit(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        data = {"gender": self.user.answers.get("state_update_gender")}
+        data = {
+            "gender": self.user.answers.get("state_update_gender"),
+            "gender_other": self.user.answers.get("state_update_other_gender", ""),
+        }
 
         error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")
 
-        return await self.go_to_state("state_display_preferences")
+        return await self.go_to_state("state_conclude_changes")
+
+    async def state_update_bot_name(self):
+        question = self._(
+            "\n".join(
+                [
+                    "[persona_emoji] PERSONALISE YOUR B-WISE BOT / *Give me a name*",
+                    "-----",
+                    "",
+                    "*What would you like to call me?*",
+                    "It can be any name you like or one that reminds you of someone "
+                    "you trust.",
+                    "",
+                    "Just type and send me your new bot name.",
+                    "",
+                    '_If you want to do this later, just click the "skip" button._',
+                ]
+            )
+        )
+        return FreeText(
+            self,
+            question=question,
+            next="state_update_bot_name_submit",
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_update_bot_name_submit(self):
+        choice = self.user.answers.get("state_update_bot_name")
+        if choice == "skip":
+            return await self.go_to_state("state_update_bot_emoji")
+
+        self.save_metadata("persona_name", choice)
+
+        data = {"persona_name": choice}
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        error = await rapidpro.update_profile(whatsapp_id, data)
+        if error:
+            return await self.go_to_state("state_error")
+
+        question = self._(
+            "\n".join(
+                [
+                    "Great - from now on you can call me [persona_name].",
+                    "",
+                    "_You can change this later by typing in *9* from the main "
+                    "*MENU*._",
+                ]
+            )
+        )
+        await self.publish_message(question)
+        await asyncio.sleep(0.5)
+
+        return await self.go_to_state("state_update_bot_emoji")
+
+    async def state_update_bot_emoji(self):
+        question = self._(
+            "\n".join(
+                [
+                    "[persona_emoji] PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
+                    "*-----*",
+                    "",
+                    "*Why not use an emoji to accompany my new name?*",
+                    "Send in the new emoji you'd like to use now.",
+                    "",
+                    '_If you want to do this later, just click the "skip" button._',
+                ]
+            )
+        )
+        return FreeText(
+            self,
+            question=question,
+            next="state_update_bot_emoji_submit",
+            buttons=[Choice("skip", self._("Skip"))],
+        )
+
+    async def state_update_bot_emoji_submit(self):
+        choice = self.user.answers.get("state_update_bot_emoji")
+        if choice == "skip":
+            return await self.go_to_state("state_display_preferences")
+
+        self.save_metadata("persona_emoji", choice)
+
+        data = {"persona_emoji": choice}
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        error = await rapidpro.update_profile(whatsapp_id, data)
+        if error:
+            return await self.go_to_state("state_error")
+
+        choices = [
+            Choice("menu", self._("Go to the menu")),
+            Choice("ask_a_question", self._("Ask a question")),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "[persona_emoji] PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
+                    "*-----*",
+                    "",
+                    "Wonderful! [persona_emoji]",
+                    "",
+                    "*What would you like to do now?*",
+                    "",
+                    get_display_choices(choices),
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "menu": "state_pre_mainmenu",
+                "ask_a_question": "state_aaq_start",
+            },
+        )

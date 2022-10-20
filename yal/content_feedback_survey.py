@@ -13,12 +13,35 @@ class ContentFeedbackSurveyApplication(BaseApplication):
         whatsapp_id = msisdn.lstrip("+")
         # Reset this, so that we only get the survey once after a push
         await rapidpro.update_profile(whatsapp_id, {"feedback_survey_sent": ""})
+        return await self.go_to_state("state_process_content_feedback_trigger")
 
-        keyword = utils.clean_inbound(self.inbound.content)
-        if keyword in {"1", "yes", "yes thanks"}:
-            return await self.go_to_state("state_positive_feedback")
-        else:
-            return await self.go_to_state("state_negative_feedback")
+    async def state_process_content_feedback_trigger(self):
+        # Mirror the message here, for response and error handling
+        choices = [
+            Choice("yes", self._("Yes, thanks!"), additional_keywords=["yes"]),
+            Choice("no", self._("Nope")),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "[persona_emoji] Was the info you just read what you were looking "
+                    "for?",
+                    "",
+                    get_display_choices(choices),
+                    "",
+                    "-----",
+                    utils.BACK_TO_MAIN,
+                    utils.GET_HELP,
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=utils.get_generic_error(),
+            next={"yes": "state_positive_feedback", "no": "state_negative_feedback"},
+        )
 
     async def state_positive_feedback(self):
         choices = [

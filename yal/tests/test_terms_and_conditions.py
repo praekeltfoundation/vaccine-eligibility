@@ -19,6 +19,10 @@ async def rapidpro_mock():
     app = Sanic("mock_rapidpro")
     tstate = TState()
 
+    @app.route("/api/v2/contacts.json", methods=["GET"])
+    def get_contact(request):
+        return response.json({"results": []})
+
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
         tstate.requests.append(request)
@@ -70,7 +74,7 @@ async def test_submit_terms_and_conditions(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_terms_decline(tester: AppTester):
+async def test_state_terms_decline(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_terms")
     await tester.user_input("2")
 
@@ -79,7 +83,7 @@ async def test_state_terms_decline(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_decline_confirm_valid(tester: AppTester):
+async def test_state_decline_confirm_valid(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_decline_confirm")
     await tester.user_input("2")
 
