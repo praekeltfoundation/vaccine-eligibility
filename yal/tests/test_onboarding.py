@@ -329,6 +329,10 @@ async def test_submit_onboarding(mock_config, tester: AppTester, rapidpro_mock):
         },
     }
 
+    # Ensure that the main menu button works
+    await tester.user_input("Main menu")
+    tester.assert_state("state_welcome")
+
 
 @pytest.mark.asyncio
 async def test_onboarding_reminder_yes_response(tester: AppTester, rapidpro_mock):
