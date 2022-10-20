@@ -268,7 +268,7 @@ async def test_content_feedback_response(tester: AppTester, rapidpro_mock):
     If this is in response to a content feedback push message, then it should be handled
     by the content feedback state
     """
-    await tester.user_input("1", session=Message.SESSION_EVENT.NEW)
+    await tester.user_input("1")
     tester.assert_state("state_positive_feedback")
     tester.assert_num_messages(1)
 

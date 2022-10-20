@@ -161,7 +161,7 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
 @pytest.mark.asyncio
 async def test_state_update_gender(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_display_preferences")
-    await tester.user_input("2")
+    await tester.user_input("gender")
     tester.assert_num_messages(1)
     tester.assert_state("state_update_gender")
 
@@ -193,7 +193,7 @@ async def test_state_update_gender(tester: AppTester, rapidpro_mock):
 async def test_state_update_gender_from_list(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_update_gender")
 
-    await tester.user_input("2")
+    await tester.user_input("male")
 
     tester.assert_state("state_update_gender_confirm")
     tester.assert_num_messages(1)
@@ -238,7 +238,7 @@ async def test_state_update_gender_confirm_not_correct(
 ):
     tester.setup_state("state_update_gender_confirm")
 
-    await tester.user_input("2")
+    await tester.user_input("no")
 
     tester.assert_state("state_update_gender")
     tester.assert_num_messages(1)
@@ -255,15 +255,13 @@ async def test_state_update_gender_submit(tester: AppTester, rapidpro_mock):
     tester.assert_num_messages(1)
     tester.assert_state("state_conclude_changes")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == [
-        "/api/v2/contacts.json",
-    ]
+    assert rapidpro_mock.tstate.requests[-1].path == "/api/v2/contacts.json"
 
 
 @pytest.mark.asyncio
 async def test_state_update_age(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_display_preferences")
-    await tester.user_input("1")
+    await tester.user_input("age")
     tester.assert_num_messages(1)
     tester.assert_state("state_update_age")
 
@@ -300,7 +298,7 @@ async def test_state_update_age_confirm(tester: AppTester, rapidpro_mock):
 async def test_state_update_age_confirm_not_correct(tester: AppTester, rapidpro_mock):
     tester.setup_answer("state_update_age", "32")
     tester.setup_state("state_update_age_confirm")
-    await tester.user_input("2")
+    await tester.user_input("no")
     tester.assert_num_messages(1)
     tester.assert_state("state_update_age")
 
@@ -315,9 +313,7 @@ async def test_state_update_age_submit(tester: AppTester, rapidpro_mock):
     tester.assert_num_messages(1)
     tester.assert_state("state_conclude_changes")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == [
-        "/api/v2/contacts.json",
-    ]
+    assert rapidpro_mock.tstate.requests[-1].path == "/api/v2/contacts.json"
 
 
 @pytest.mark.asyncio
@@ -352,7 +348,7 @@ async def test_state_update_relationship_status_confirm(
     tester: AppTester, rapidpro_mock
 ):
     tester.setup_state("state_update_relationship_status")
-    await tester.user_input("2")
+    await tester.user_input("it's complicated")
     tester.assert_num_messages(1)
     tester.assert_state("state_update_relationship_status_confirm")
 
@@ -365,7 +361,7 @@ async def test_state_update_relationship_status_confirm_not_correct(
 ):
     tester.setup_answer("state_update_relationship_status", "yes")
     tester.setup_state("state_update_relationship_status_confirm")
-    await tester.user_input("2")
+    await tester.user_input("no")
     tester.assert_num_messages(1)
     tester.assert_state("state_update_relationship_status")
 
@@ -384,7 +380,7 @@ async def test_state_update_relationship_status_submit(
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == [
         "/api/v2/contacts.json",
-    ]
+    ] * 2
 
 
 @pytest.mark.asyncio
