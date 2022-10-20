@@ -20,10 +20,8 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    (
-                        "[persona_emoji] Did you see the last"
-                        "HOT TOPIC on our Facebook channel?🔥"
-                    ),
+                    "[persona_emoji] Did you see the last "
+                    "HOT TOPIC on our Facebook channel?🔥",
                     "",
                     get_display_choices(choices),
                     "",
@@ -106,15 +104,11 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    (
-                        "You should check it out! 👀There's always"
-                        "an interesting conversation to get involved in."
-                    ),
+                    "*You should check it out! 👀There's always* "
+                    "*an interesting conversation to get involved in.*",
                     "",
-                    (
-                        "You can check out the latest Hot Topic on Facebook, now!"
-                        "Just click the link below, and get involved."
-                    ),
+                    "You can check out the latest Hot Topic on Facebook, now! "
+                    "Just click the link below, and *get involved.*",
                     "",
                     "FB Link: https://www.facebook.com/BWiseHealth/",
                     "--",
@@ -134,11 +128,9 @@ class Application(BaseApplication):
                 [
                     "I'm so happy to hear that.",
                     "",
-                    (
-                        "👉🏾 Remember, if you're looking for advice or"
-                        "someone to talk to, just request a call back from our"
-                        "loveLife counsellors at any time."
-                    ),
+                    "👉🏾 Remember, if you're looking for advice or"
+                    "someone to talk to, just request a call back from our"
+                    "loveLife counsellors at any time.",
                     "",
                     "--",
                     "",
@@ -154,16 +146,12 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    (
-                        "That's also ok. 👌🏾 You choose how much"
-                        "you want to get involved - no pressure."
-                    ),
+                    "That's also ok. 👌🏾 You choose how much"
+                    "you want to get involved - no pressure.",
                     "",
-                    (
-                        "👉🏾 Remember, if you're looking for advice or"
-                        "someone to talk to, just request a call back from our"
-                        "loveLife counsellors at any time."
-                    ),
+                    "👉🏾 Remember, if you're looking for advice or"
+                    "someone to talk to, just request a call back from our"
+                    "loveLife counsellors at any time.",
                     "",
                     "--",
                     "",
@@ -179,10 +167,8 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    (
-                        "I'd love to hear what you think of the topic."
-                        "Please share your thoughts!"
-                    ),
+                    "I'd love to hear what you think of the topic. "
+                    "Please share your thoughts!",
                     "",
                     "_Just type and send your reply_",
                     "",
@@ -203,16 +189,12 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    (
-                        "Thank you so much for sharing your thoughts."
-                        "I'll make sure to keep this in mind 🤔"
-                    ),
+                    "Thank you so much for sharing your thoughts."
+                    "I'll make sure to keep this in mind 🤔",
                     "",
-                    (
-                        "👉🏾 Remember, if you're looking for advice or"
-                        "someone to talk to, just request a call back from our"
-                        "loveLife counsellors at any time."
-                    ),
+                    "👉🏾 Remember, if you're looking for advice or"
+                    "someone to talk to, just request a call back from our"
+                    "loveLife counsellors at any time.",
                     "",
                     "--",
                     "",
