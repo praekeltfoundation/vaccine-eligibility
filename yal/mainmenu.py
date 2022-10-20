@@ -85,7 +85,8 @@ class Application(BaseApplication):
                         ServiceFinderApplication.START_STATE,
                         "Find clinics and services",
                     ),
-                ] + submenu_choices,
+                ]
+                + submenu_choices,
             )
         ]
 
