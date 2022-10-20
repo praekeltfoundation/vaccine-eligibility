@@ -353,6 +353,7 @@ class Application(BaseApplication):
                 f"📍 {facility['fullAddress']}",
                 f"📞 {facility['telephoneNumber']}",
                 f"🦶 {round(distance)} km",
+                f"https://www.google.com/maps/place/{lat},{lng}",
                 "----",
                 "",
             ]
