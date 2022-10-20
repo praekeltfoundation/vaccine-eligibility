@@ -1,9 +1,15 @@
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
+from vaccine.states import (
+    Choice,
+    FreeText,
+    WhatsAppButtonState,
+    WhatsAppListState,
+)
 from vaccine.utils import get_display_choices
 from yal import rapidpro, utils
+from yal.askaquestion import Application as AskaQuestionApplication
 from yal.utils import get_generic_error
 
 logger = logging.getLogger(__name__)
@@ -47,16 +53,17 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
             "engaged_on_facebook": True,
+            "last_mainmenu_time": str(utils.get_current_datetime()),
         }
         error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")
 
         choices = [
-            Choice(1, "1 - It was helpful"),
-            Choice(2, "2 - Learnt something new"),
-            Choice(3, "3 - I enjoy the comments"),
-            Choice(4, "4 - Other"),
+            Choice("helpful", "It was helpful"),
+            Choice("learnt new", "Learnt something new"),
+            Choice("enjoyed comments", "I enjoy the comments"),
+            Choice("other", "Other"),
         ]
 
         question = self._(
@@ -86,7 +93,7 @@ class Application(BaseApplication):
                 "helpful": "state_fb_hot_topic_helpful",
                 "learnt new": "state_fb_hot_topic_helpful",
                 "enjoyed comments": "state_fb_hot_topic_enjoyed_comments",
-                "other": "",
+                "other": "state_fb_hot_topic_other",
             },
             error=self._(get_generic_error()),
         )
@@ -120,51 +127,82 @@ class Application(BaseApplication):
         )
 
         await self.worker.publish_message(self.inbound.reply(msg))
-        return await self.go_to_state("state_suggested_content")
 
     async def state_fb_hot_topic_helpful(self):
-        msg = self._(
+        choices = [
+            Choice("counsellor", self._("1. Talk to a counsellor")),
+            Choice("question", self._("2. Ask a question")),
+        ]
+
+        question = self._(
             "\n".join(
                 [
                     "I'm so happy to hear that.",
                     "",
-                    "👉🏾 Remember, if you're looking for advice or"
-                    "someone to talk to, just request a call back from our"
-                    "loveLife counsellors at any time.",
+                    "👉🏾 Remember, if you're looking for advice or "
+                    "someone to talk to, just request a call back from our "
+                    "*loveLife counsellors* at any time.",
+                    "",
+                    "*What would you like to do now?*",
+                    get_display_choices(choices),
                     "",
                     "--",
-                    "",
+                    "*Or reply*",
                     utils.BACK_TO_MAIN,
                     utils.GET_HELP,
                 ]
             )
         )
-        await self.worker.publish_message(self.inbound.reply(msg))
-        return await self.go_to_state("state_suggested_content")
+        WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "counsellor": AskaQuestionApplication.START_STATE,
+                "question": AskaQuestionApplication.START_STATE,
+            },
+        )
 
     async def state_fb_hot_topic_enjoyed_comments(self):
-        msg = self._(
+        choices = [
+            Choice("counsellor", "1. Talk to a counsellor"),
+            Choice("question", "2. Ask a question"),
+        ]
+
+        question = self._(
             "\n".join(
                 [
-                    "That's also ok. 👌🏾 You choose how much"
+                    "That's also ok. 👌🏾 You choose how much "
                     "you want to get involved - no pressure.",
                     "",
-                    "👉🏾 Remember, if you're looking for advice or"
-                    "someone to talk to, just request a call back from our"
-                    "loveLife counsellors at any time.",
+                    "👉🏾 Remember, if you're looking for advice or "
+                    "someone to talk to, just request a call back from our "
+                    "*loveLife counsellors* at any time.",
+                    "",
+                    "*What would you like to do now?*",
+                    get_display_choices(choices),
                     "",
                     "--",
-                    "",
+                    "*Or reply*",
                     utils.BACK_TO_MAIN,
                     utils.GET_HELP,
                 ]
             )
         )
-        await self.worker.publish_message(self.inbound.reply(msg))
-        return await self.go_to_state("state_suggested_content")
+        WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "counsellor": "",
+                "question": AskaQuestionApplication.START_STATE,
+            },
+        )
 
     async def state_fb_hot_topic_other(self):
-        msg = self._(
+        question = self._(
             "\n".join(
                 [
                     "I'd love to hear what you think of the topic. "
@@ -173,7 +211,7 @@ class Application(BaseApplication):
                     "_Just type and send your reply_",
                     "",
                     "--",
-                    "",
+                    "*Or reply*",
                     utils.BACK_TO_MAIN,
                     utils.GET_HELP,
                 ]
@@ -181,37 +219,43 @@ class Application(BaseApplication):
         )
         return FreeText(
             app=self,
-            question=msg,
+            question=question,
             next="state_fb_hot_topic_thanks_for_feedback",
         )
 
     async def state_fb_hot_topic_thanks_for_feedback(self):
-        msg = self._(
+        choices = [
+            Choice("counsellor", "1. Talk to a counsellor"),
+            Choice("question", "2. Ask a question"),
+        ]
+
+        question = self._(
             "\n".join(
                 [
-                    "Thank you so much for sharing your thoughts."
+                    "Thank you so much for sharing your thoughts. "
                     "I'll make sure to keep this in mind 🤔",
                     "",
-                    "👉🏾 Remember, if you're looking for advice or"
-                    "someone to talk to, just request a call back from our"
-                    "loveLife counsellors at any time.",
+                    "👉🏾 Remember, if you're looking for advice or "
+                    "someone to talk to, just request a call back from our "
+                    "*loveLife counsellors* at any time.",
+                    "",
+                    "*What would you like to do now?*",
+                    get_display_choices(choices),
                     "",
                     "--",
-                    "",
+                    "*Or reply*",
                     utils.BACK_TO_MAIN,
                     utils.GET_HELP,
                 ]
             )
         )
-        await self.worker.publish_message(self.inbound.reply(msg))
-        return await self.go_to_state("state_suggested_content")
-
-    async def state_suggested_content(self):
-        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
-        data = {"last_mainmenu_time": str(utils.get_current_datetime())}
-
-        error = await rapidpro.update_profile(whatsapp_id, data)
-        if error:
-            return await self.go_to_state("state_error")
-        return
+        WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "counsellor": "",
+                "question": AskaQuestionApplication.START_STATE,
+            },
+        )
