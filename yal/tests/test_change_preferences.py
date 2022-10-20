@@ -608,8 +608,8 @@ async def test_state_update_location_submit(tester: AppTester, rapidpro_mock):
     tester.assert_num_messages(1)
     tester.assert_state("state_conclude_changes")
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "latitude": 56.78,
