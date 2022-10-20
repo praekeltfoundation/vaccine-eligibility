@@ -90,7 +90,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         parent_topic_links = {}
-        relationship_topic_links = []
+        relationship_topic_links = {}
         for choice in choices:
             error, sub_choices = await contentrepo.get_choices_by_parent(choice.value)
             if error:
@@ -100,7 +100,7 @@ class Application(BaseApplication):
                 parent_topic_links[sub_choice.value] = choice.value
 
                 if "relationship" in choice.label.lower():
-                    relationship_topic_links.append(sub_choice.value)
+                    relationship_topic_links[sub_choice.value] = choice.label
 
             sections.append((f"*{choice.label}*", sub_choices))
 
@@ -148,6 +148,10 @@ class Application(BaseApplication):
                 self.save_metadata("selected_page_id", choice.value)
                 self.save_metadata("current_message_id", 1)
                 if choice.value in relationship_topic_links:
+                    self.save_metadata(
+                        "relationship_section_title",
+                        relationship_topic_links[choice.value],
+                    )
                     return "state_check_relationship_status_set"
                 return "state_contentrepo_page"
 
@@ -237,11 +241,11 @@ class Application(BaseApplication):
         return await self.go_to_state("state_contentrepo_page")
 
     async def state_relationship_status(self):
-        # TODO: pull section title
+        rel_section_title = self.user.metadata["relationship_section_title"]
         question = self._(
             "\n".join(
                 [
-                    "*SEX & RELATIONSHIPS*",
+                    f"*{rel_section_title}*",
                     "-----",
                     "",
                     "Before we get into relationship talk, I just wanted to find "

@@ -631,7 +631,7 @@ async def test_state_mainmenu_contentrepo_relationship_status(
 
     question = "\n".join(
         [
-            "*SEX & RELATIONSHIPS*",
+            "*Main Menu 2 Relationships 🤝*",
             "-----",
             "",
             "Before we get into relationship talk, I just wanted to find out...",
@@ -680,6 +680,7 @@ async def test_state_mainmenu_contentrepo_relationship_skip(
     tester.user.metadata["suggested_content"] = {}
     tester.user.metadata["current_menu_level"] = 3
     tester.user.metadata["parent_title"] = "Previous thing"
+    tester.user.metadata["relationship_section_title"] = "Section title"
 
     tester.setup_user_address("27820002002")
     tester.setup_state("state_relationship_status")
@@ -727,6 +728,7 @@ async def test_state_mainmenu_contentrepo_relationship_submit(
     tester.user.metadata["suggested_content"] = {}
     tester.user.metadata["current_menu_level"] = 3
     tester.user.metadata["parent_title"] = "Previous thing"
+    tester.user.metadata["relationship_section_title"] = "Section title"
 
     tester.setup_user_address("27820002002")
     tester.setup_state("state_relationship_status")
