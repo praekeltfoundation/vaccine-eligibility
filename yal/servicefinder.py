@@ -423,7 +423,7 @@ class Application(BaseApplication):
         async def store_location_coords(content):
             if not self.inbound:
                 return
-            if content == "type address":
+            if content.lower() in ["type address", "type address instead"]:
                 return
             loc = self.inbound.transport_metadata.get("message", {}).get("location", {})
             latitude = loc.get("latitude")
@@ -481,7 +481,10 @@ class Application(BaseApplication):
         )
 
     async def state_get_description_from_coords(self):
-        if self.user.answers["state_location"] == "type address":
+        if self.user.answers["state_location"].lower() in [
+            "type address",
+            "type address instead",
+        ]:
             return await self.go_to_state("state_province")
 
         metadata = self.user.metadata
