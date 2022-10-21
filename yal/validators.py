@@ -51,7 +51,7 @@ def phone_number_validator(error_text):
 def age_validator(error_text):
     async def validator(value):
         try:
-            if value != "skip":
+            if value.lower() != "skip":
                 assert isinstance(value, str)
                 assert value.isdigit()
                 assert int(value) > 0
