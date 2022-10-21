@@ -3,10 +3,10 @@ import logging
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
+    EndState,
     FreeText,
     WhatsAppButtonState,
     WhatsAppListState,
-    EndState,
 )
 from vaccine.utils import get_display_choices
 from yal import rapidpro, utils
