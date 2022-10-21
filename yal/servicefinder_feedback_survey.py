@@ -461,7 +461,6 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
         )
 
     async def state_get_appointment_tips(self):
-        metadata = self.user.metadata
         self.save_metadata("selected_page_id", self.APPOINTMENT_TIPS_CONTENT_ID)
         self.save_metadata("current_menu_level", self.APPOINTMENT_TIPS_MENU_LEVEL)
         self.save_metadata("current_message_id", 1)
