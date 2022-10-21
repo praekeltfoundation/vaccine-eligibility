@@ -219,6 +219,18 @@ class Application(BaseApplication):
                     else:
                         message_id = None
 
+        if len(banner_messages) > 0:
+            msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+            whatsapp_id = msisdn.lstrip("+")
+            timestamp = get_current_datetime() + timedelta(hours=2)
+            # We ignore this error, as it just means they won't get the reminder
+            await rapidpro.update_profile(
+                whatsapp_id,
+                {
+                    "feedback_timestamp": timestamp.isoformat(),
+                    "feedback_type": "facebook_banner",
+                },
+            )
         return CustomChoiceState(
             self,
             question=question,

@@ -65,6 +65,11 @@ def tester():
 
 
 def get_rapidpro_contact(urn):
+    feedback_type = ""
+    if "27820001002" in urn:
+        feedback_type = "content"
+    if "27820001003" in urn:
+        feedback_type = "facebook_banner"
     return {
         "uuid": "b733e997-b0b4-4d4d-a3ad-0546e1644aa9",
         "name": "",
@@ -81,7 +86,7 @@ def get_rapidpro_contact(urn):
             "street_name": "high level",
             "street_number": "99",
             "feedback_survey_sent": "true",
-            "feedback_type": "content",
+            "feedback_type": feedback_type,
             "latitude": -26.2031026,
             "longitude": 28.0251783,
             "location_description": "99 high level, cape town, FS",
@@ -268,8 +273,23 @@ async def test_content_feedback_response(tester: AppTester, rapidpro_mock):
     If this is in response to a content feedback push message, then it should be handled
     by the content feedback state
     """
+    tester.setup_user_address("27820001002")
     await tester.user_input("1")
     tester.assert_state("state_positive_feedback")
     tester.assert_num_messages(1)
 
     assert len(rapidpro_mock.tstate.requests) == 2
+
+
+@pytest.mark.asyncio
+async def test_facebook_crossover_feedback_response(tester: AppTester, rapidpro_mock):
+    """
+    If this is in response to a fb feedback push message, then it should be handled
+    by the fb feedback state
+    """
+    tester.setup_user_address("27820001003")
+    await tester.user_input("yes, I did")
+    tester.assert_state("state_saw_recent_facebook")
+    tester.assert_num_messages(1)
+
+    assert len(rapidpro_mock.tstate.requests) == 3
