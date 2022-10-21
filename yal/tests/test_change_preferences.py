@@ -575,9 +575,7 @@ async def test_state_update_location_skip(
 ):
     tester.setup_state("state_update_location")
 
-    await tester.user_input(
-        "skip",
-    )
+    await tester.user_input("Skip")
     tester.assert_state("state_display_preferences")
 
     assert [r.path for r in google_api_mock.tstate.requests] == []

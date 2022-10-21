@@ -62,6 +62,26 @@ def test_replace_persona_fields_uses_placeholders():
     )
 
 
+def test_replace_persona_fields_uses_placeholders_if_skip():
+    """
+    It should use the placeholders if the user's value is "skip"
+    """
+    meta_dict = {
+        "persona_emoji": "Skip",
+        "persona_name": "skip",
+    }
+    content = (
+        "Hi 👋, You chose to call me [persona_name] and I look like [persona_emoji]"
+        "Note that question doesn't get replaced. Neither does [question]"
+    )
+
+    replaced_content = utils.replace_persona_fields(content, meta_dict)
+    assert replaced_content == (
+        "Hi 👋, You chose to call me B-wise and I look like 🤖"
+        "Note that question doesn't get replaced. Neither does [question]"
+    )
+
+
 def test_clean_inbound():
     """
     Should remove all non-word or `#` characters, and excess whitespace

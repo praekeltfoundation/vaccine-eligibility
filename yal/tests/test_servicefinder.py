@@ -564,7 +564,7 @@ async def test_servicefinder_start_to_end(
 @pytest.mark.asyncio
 async def test_state_location_type_address(tester: AppTester):
     tester.setup_state("state_location")
-    await tester.user_input("type address")
+    await tester.user_input("Type address")
     tester.assert_state("state_province")
     tester.assert_num_messages(1)
 

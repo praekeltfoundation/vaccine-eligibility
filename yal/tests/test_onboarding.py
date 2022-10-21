@@ -190,6 +190,29 @@ async def test_state_age(get_current_datetime, tester: AppTester, rapidpro_mock)
 
 @pytest.mark.asyncio
 @mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_age_skip(get_current_datetime, tester: AppTester, rapidpro_mock):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_age")
+
+    await tester.user_input("Skip")
+
+    tester.assert_state("state_gender")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_age", "Skip")
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
 async def test_state_gender(get_current_datetime, tester: AppTester, rapidpro_mock):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_gender")

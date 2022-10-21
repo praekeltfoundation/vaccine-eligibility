@@ -300,7 +300,7 @@ class Application(BaseApplication):
         async def store_location_coords(content):
             if not self.inbound:
                 return
-            if content == "skip":
+            if content.lower() == "skip":
                 return
             loc = self.inbound.transport_metadata.get("message", {}).get("location", {})
             latitude = loc.get("latitude")
@@ -353,7 +353,7 @@ class Application(BaseApplication):
         )
 
     async def state_get_updated_description_from_coords(self):
-        if self.user.answers["state_update_location"] == "skip":
+        if self.user.answers["state_update_location"].lower() == "skip":
             return await self.go_to_state("state_display_preferences")
 
         metadata = self.user.metadata
