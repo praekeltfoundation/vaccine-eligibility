@@ -18,7 +18,16 @@ logger = logging.getLogger(__name__)
 
 
 class Application(BaseApplication):
-    START_STATE = "state_wa_fb_crossover_feedback"
+    START_STATE = "state_crossover_feedback_survey_start"
+
+    async def state_crossover_feedback_survey_start(self):
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip("+")
+        # Reset this, so that we only get the survey once after a push
+        await rapidpro.update_profile(
+            whatsapp_id, {"crossover_feedback_survey_sent": ""}
+        )
+        return await self.go_to_state("state_wa_fb_crossover_feedback")
 
     async def state_wa_fb_crossover_feedback(self):
         choices = [
