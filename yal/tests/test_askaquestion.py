@@ -268,11 +268,12 @@ async def test_state_display_results_choose_an_answer(
     tester.assert_message(
         "\n".join(
             [
-                "*Did I answer your question?*",
+                "🤖 *Did I answer your question?*",
                 "",
                 "*Reply:*",
-                "*1* - Yes",
-                "*2* - No, go back to list",
+                "*1*. Yes",
+                "*2*. No, go back to list",
+                "*3*. Nope...",
             ]
         )
     )
@@ -378,7 +379,7 @@ async def test_state_get_content_feedback_question_answered(
 
     await tester.user_input("Yes")
 
-    tester.assert_state("state_pre_mainmenu")
+    tester.assert_state("state_yes_question_answered")
 
     assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[1]
@@ -395,10 +396,23 @@ async def test_state_get_content_feedback_question_answered(
     }
 
     tester.assert_num_messages(1)
-    tester.assert_message(
-        "🤖 *So glad I could help! If you have another question, "
-        "you know what to do!* 😉"
+    message = "\n".join(
+        [
+            "*That's great - I'm so happy I could help.* 😊 ",
+            "",
+            "Is there anything that you would change about my answer?",
+            "",
+            "*Reply:*",
+            "1. No changes",
+            "2. Yes, I have a change",
+            "",
+            "-----",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
     )
+    tester.assert_message(message)
 
 
 @pytest.mark.asyncio
@@ -413,50 +427,75 @@ async def test_state_display_content_question_not_answered(
     tester.setup_state("state_display_content")
     tester.setup_answer("state_display_results", "FAQ #1 Title")
 
-    await tester.user_input("No")
+    await tester.user_input("Nope...")
+
+    tester.assert_state("state_no_question_not_answered")
+
+    message = "\n".join(
+        [
+            "*I'm sorry I couldn't find what you were looking for this time.* ",
+            "",
+            "Please tell me what you're looking for again. "
+            "I'll try make sure I have the right information "
+            "for you next time.",
+            "",
+            "_Just type and send your question again, now._" "",
+            "-----",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
+    )
+
+    tester.assert_message(message)
+
+
+@pytest.mark.asyncio
+async def test_state_no_question_not_answered(
+    tester: AppTester, rapidpro_mock, aaq_mock
+):
+    tester.setup_state("state_no_question_not_answered")
+
+    await tester.user_input("how do I get someone to love me")
+
+    tester.assert_state("state_no_question_not_answered_thank_you")
+
+    message = "\n".join(
+        [
+            "Ok got it. I'll start working on this right away 👍🏾",
+            "",
+            "Thank you for the feedback, you're helping this service improve.",
+            "",
+            "What would you like to do now?",
+            "",
+            "1. Find a clinic",
+            "2. Talk to a counsellor",
+            "",
+            "-----",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
+    )
+
+    tester.assert_message(message)
+
+
+@pytest.mark.asyncio
+async def test_state_display_content_question_back_to_list(
+    tester: AppTester, rapidpro_mock, aaq_mock
+):
+    tester.user.metadata["inbound_id"] = "inbound-id"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["faq_id"] = "1"
+    tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
+    tester.user.metadata["aaq_page"] = 0
+    tester.setup_state("state_display_content")
+    tester.setup_answer("state_display_results", "FAQ #1 Title")
+
+    await tester.user_input("No, go back to list")
 
     tester.assert_state("state_display_results")
-
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"aaq_timeout_type": ""},
-    }
-
-    assert len(aaq_mock.tstate.requests) == 1
-    request = aaq_mock.tstate.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "feedback": {"feedback_type": "negative", "faq_id": "1"},
-        "feedback_secret_key": "feedback-secret-key",
-        "inbound_id": "inbound-id",
-    }
-
-    tester.assert_num_messages(1)
-    tester.assert_message(
-        "\n".join(
-            [
-                "🙋🏿‍♂️ QUESTIONS? / Ask A Question / *1st 5 matches*",
-                "-----",
-                "",
-                "🤖 That's a really good question! I have a few "
-                "answers that could give you the info you need.",
-                "",
-                "*What would you like to read first?* Reply with the number of the "
-                "topic you're interested in.",
-                "",
-                "*1*. FAQ #1 Title",
-                "*2*. FAQ #2 Title that is very long",
-                "*3*. FAQ #3 Title",
-                "*4*. FAQ #4 Title",
-                "*5*. FAQ #5 Title",
-                "",
-                "-----",
-                "*Or reply:*",
-                BACK_TO_MAIN,
-                GET_HELP,
-            ]
-        )
-    )
 
 
 @pytest.mark.asyncio
@@ -505,13 +544,26 @@ async def test_state_handle_timeout_handles_type_2_yes(
         "fields": {"aaq_timeout_sent": "", "aaq_timeout_type": ""},
     }
 
-    tester.assert_state("state_pre_mainmenu")
+    tester.assert_state("state_yes_question_answered")
 
     tester.assert_num_messages(1)
-    tester.assert_message(
-        "🤖 *So glad I could help! If you have another question, "
-        "you know what to do!* 😉"
+    message = "\n".join(
+        [
+            "*That's great - I'm so happy I could help.* 😊 ",
+            "",
+            "Is there anything that you would change about my answer?",
+            "",
+            "*Reply:*",
+            "1. No changes",
+            "2. Yes, I have a change",
+            "",
+            "-----",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
     )
+    tester.assert_message(message)
 
 
 @pytest.mark.asyncio
@@ -526,7 +578,108 @@ async def test_state_handle_timeout_handles_type_2_no(tester: AppTester, rapidpr
         "fields": {"aaq_timeout_sent": "", "aaq_timeout_type": ""},
     }
 
-    tester.assert_state("state_start")
+    tester.assert_state("state_no_question_not_answered")
 
     tester.assert_num_messages(1)
-    tester.assert_message("TODO: Handle question not answered")
+    message = "\n".join(
+        [
+            "*I'm sorry I couldn't find what you were looking for this time.* ",
+            "",
+            "Please tell me what you're looking for again. "
+            "I'll try make sure I have the right information "
+            "for you next time.",
+            "",
+            "_Just type and send your question again, now._" "",
+            "-----",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
+    )
+    tester.assert_message(message)
+
+
+@pytest.mark.asyncio
+async def test_state_yes_question_answered_no_changes(tester: AppTester, rapidpro_mock):
+    tester.setup_user_address("27820001002")
+    tester.setup_state("state_yes_question_answered")
+
+    await tester.user_input("No changes")
+
+    tester.assert_state("state_yes_question_answered_no_changes")
+
+    tester.assert_num_messages(1)
+    message = "\n".join(
+        [
+            "Thank you so much for your feedback.",
+            "",
+            "🤖 *If you have another question, " "you know what to do!* 😉 ",
+            "",
+            "*What would you like to do now?*",
+            "",
+            "1. Ask another question",
+            "2. Talk to a counsellor",
+            "",
+            "-----",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
+    )
+    tester.assert_message(message)
+
+
+@pytest.mark.asyncio
+async def test_state_yes_question_answered_changes(tester: AppTester, rapidpro_mock):
+    tester.setup_user_address("27820001002")
+    tester.setup_state("state_yes_question_answered")
+
+    await tester.user_input("Yes, I have a change")
+
+    tester.assert_state("state_yes_question_answered_changes")
+
+    tester.assert_num_messages(1)
+    message = "\n".join(
+        [
+            "Please tell me what was missing or "
+            "what you would have changed in my answer.",
+            "",
+            "_Just type and send it now._",
+            "",
+            "-----",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
+    )
+    tester.assert_message(message)
+
+
+@pytest.mark.asyncio
+async def test_state_save_aaq_priority_feedback(tester: AppTester, rapidpro_mock):
+    tester.setup_user_address("27820001002")
+    tester.setup_state("state_yes_question_answered_changes")
+
+    await tester.user_input("Please change stuff")
+
+    tester.assert_state("state_no_question_not_answered_thank_you")
+
+    tester.assert_num_messages(1)
+    message = "\n".join(
+        [
+            "Ok got it. I'll start working on this right away 👍🏾",
+            "",
+            "Thank you for the feedback, you're helping this service improve.",
+            "",
+            "What would you like to do now?",
+            "",
+            "1. Find a clinic",
+            "2. Talk to a counsellor",
+            "",
+            "-----",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
+    )
+    tester.assert_message(message)

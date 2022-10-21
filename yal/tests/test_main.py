@@ -19,6 +19,7 @@ from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
+from yal.utils import BACK_TO_MAIN, GET_HELP
 
 
 def test_no_state_name_clashes():
@@ -256,8 +257,24 @@ async def test_callback_check_response_to_handler(tester: AppTester):
 @pytest.mark.asyncio
 async def test_aaq_timeout_response_to_handler(tester: AppTester, rapidpro_mock):
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="no")
+    tester.assert_state("state_no_question_not_answered")
     tester.assert_num_messages(1)
-    tester.assert_message("TODO: Handle question not answered")
+    message = "\n".join(
+        [
+            "*I'm sorry I couldn't find what you were looking for this time.* ",
+            "",
+            "Please tell me what you're looking for again. "
+            "I'll try make sure I have the right information "
+            "for you next time.",
+            "",
+            "_Just type and send your question again, now._" "",
+            "-----",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
+    )
+    tester.assert_message(message)
 
     assert len(rapidpro_mock.tstate.requests) == 3
 

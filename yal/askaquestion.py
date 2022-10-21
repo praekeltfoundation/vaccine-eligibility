@@ -16,6 +16,7 @@ from vaccine.utils import get_display_choices
 from vaccine.validators import nonempty_validator
 from yal import aaq_core, config, rapidpro
 from yal.pleasecallme import Application as PleaseCallMeApplication
+from yal.servicefinder import Application as ServiceFinderApplication
 from yal.utils import (
     BACK_TO_MAIN,
     GET_HELP,
@@ -254,26 +255,31 @@ class Application(BaseApplication):
         return await self.go_to_state("state_get_content_feedback")
 
     async def state_get_content_feedback(self):
+        choices = [
+            Choice("yes", self._("Yes")),
+            Choice("back to list", self._("No, go back to list")),
+            Choice("no", self._("Nope...")),
+        ]
         question = self._(
             "\n".join(
                 [
-                    "*Did I answer your question?*",
+                    "[persona_emoji] *Did I answer your question?*",
                     "",
                     "*Reply:*",
-                    "*1* - Yes",
-                    "*2* - No, go back to list",
+                    get_display_choices(choices, bold_numbers=True),
                 ]
             )
         )
         return WhatsAppButtonState(
             self,
             question=question,
-            choices=[
-                Choice("yes", "Yes"),
-                Choice("no", "No"),
-            ],
+            choices=choices,
             error=self._(get_generic_error()),
-            next="state_is_question_answered",
+            next={
+                "yes": "state_is_question_answered",
+                "back to list": "state_display_results",
+                "no": "state_no_question_not_answered",
+            },
         )
 
     async def state_is_question_answered(self):
@@ -306,20 +312,153 @@ class Application(BaseApplication):
         return await self.go_to_state("state_display_results")
 
     async def state_yes_question_answered(self):
-        return EndState(
+        choices = [
+            Choice("no", self._("No changes")),
+            Choice("yes", self._("Yes, I have a change")),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "*That's great - I'm so happy I could help.* 😊 ",
+                    "",
+                    "Is there anything that you would change about my answer?",
+                    "",
+                    "*Reply:*",
+                    get_display_choices(choices),
+                    "",
+                    "-----",
+                    "*Or reply:*",
+                    BACK_TO_MAIN,
+                    GET_HELP,
+                ]
+            )
+        )
+
+        return WhatsAppButtonState(
             self,
-            self._(
-                "[persona_emoji] *So glad I could help! If you have another question, "
-                "you know what to do!* 😉"
-            ),
-            next="state_pre_mainmenu",
+            question=question,
+            choices=choices,
+            next={
+                "no": "state_yes_question_answered_no_changes",
+                "yes": "state_yes_question_answered_changes",
+            },
+            error=self._(get_generic_error()),
+        )
+
+    async def state_yes_question_answered_no_changes(self):
+        choices = [
+            Choice("aaq", self._("Ask another question")),
+            Choice("counsellor", self._("Talk to a counsellor")),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "Thank you so much for your feedback.",
+                    "",
+                    "[persona_emoji] *If you have another question, "
+                    "you know what to do!* 😉 ",
+                    "",
+                    "*What would you like to do now?*",
+                    "",
+                    get_display_choices(choices),
+                    "",
+                    "-----",
+                    "*Or reply:*",
+                    BACK_TO_MAIN,
+                    GET_HELP,
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            next={
+                "aaq": self.START_STATE,
+                "counsellor": PleaseCallMeApplication.START_STATE,
+            },
+            error=self._(get_generic_error()),
+        )
+
+    async def state_yes_question_answered_changes(self):
+
+        question = self._(
+            "\n".join(
+                [
+                    "Please tell me what was missing or "
+                    "what you would have changed in my answer.",
+                    "",
+                    "_Just type and send it now._",
+                    "",
+                    "-----",
+                    "*Or reply:*",
+                    BACK_TO_MAIN,
+                    GET_HELP,
+                ]
+            )
+        )
+        return FreeText(
+            self,
+            question=question,
+            next="state_no_question_not_answered_thank_you",
         )
 
     async def state_no_question_not_answered(self):
-        return EndState(
+        question = self._(
+            "\n".join(
+                [
+                    "*I'm sorry I couldn't find what you were looking for this time.* ",
+                    "",
+                    "Please tell me what you're looking for again. "
+                    "I'll try make sure I have the right information "
+                    "for you next time.",
+                    "",
+                    "_Just type and send your question again, now._" "",
+                    "-----",
+                    "*Or reply:*",
+                    BACK_TO_MAIN,
+                    GET_HELP,
+                ]
+            )
+        )
+        return FreeText(
             self,
-            self._("TODO: Handle question not answered"),
-            next=self.START_STATE,
+            question=question,
+            next="state_no_question_not_answered_thank_you",
+        )
+
+    async def state_no_question_not_answered_thank_you(self):
+        choices = [
+            Choice("clinic", self._("Find a clinic")),
+            Choice("counsellor", self._("Talk to a counsellor")),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "Ok got it. I'll start working on this right away 👍🏾",
+                    "",
+                    "Thank you for the feedback, you're helping this service improve.",
+                    "",
+                    "What would you like to do now?",
+                    "",
+                    get_display_choices(choices),
+                    "",
+                    "-----",
+                    "*Or reply:*",
+                    BACK_TO_MAIN,
+                    GET_HELP,
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "clinic": ServiceFinderApplication.START_STATE,
+                "counsellor": PleaseCallMeApplication.START_STATE,
+            },
         )
 
     async def state_handle_timeout_response(self):
