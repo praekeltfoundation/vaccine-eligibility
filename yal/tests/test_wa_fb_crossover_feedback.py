@@ -111,7 +111,7 @@ async def test_state_fb_hot_topic_helpful(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_saw_recent_facebook")
     await tester.user_input("It was helpful")
     assert tester.application.answer_events[0].response == "helpful"
-    tester.assert_state(None)
+    tester.assert_state("state_fb_hot_topic_helpful")
 
 
 @pytest.mark.asyncio
@@ -119,7 +119,7 @@ async def test_state_fb_hot_topic_helpful_learnt_new(tester: AppTester, rapidpro
     tester.setup_state("state_saw_recent_facebook")
     await tester.user_input("Learnt something new")
     assert tester.application.answer_events[0].response == "learnt new"
-    tester.assert_state(None)
+    tester.assert_state("state_fb_hot_topic_helpful")
 
 
 @pytest.mark.asyncio
@@ -127,7 +127,7 @@ async def test_state_fb_hot_topic_enjoyed_comments(tester: AppTester, rapidpro_m
     tester.setup_state("state_saw_recent_facebook")
     await tester.user_input("I enjoy the comments")
     assert tester.application.answer_events[0].response == "enjoyed comments"
-    tester.assert_state(None)
+    tester.assert_state("state_fb_hot_topic_enjoyed_comments")
 
 
 @pytest.mark.asyncio
@@ -152,4 +152,4 @@ _Just type and send your reply_
 async def test_state_fb_hot_topic_thanks_for_feedback(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_fb_hot_topic_other")
     await tester.user_input("The article was boring")
-    tester.assert_state(None)
+    tester.assert_state("state_fb_hot_topic_thanks_for_feedback")

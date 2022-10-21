@@ -1,7 +1,13 @@
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
+from vaccine.states import (
+    Choice,
+    FreeText,
+    WhatsAppButtonState,
+    WhatsAppListState,
+    EndState,
+)
 from vaccine.utils import get_display_choices
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AskaQuestionApplication
@@ -122,7 +128,10 @@ class Application(BaseApplication):
             )
         )
 
-        await self.worker.publish_message(self.inbound.reply(msg))
+        return EndState(
+            self,
+            text=msg,
+        )
 
     async def state_fb_hot_topic_helpful(self):
         choices = [
@@ -149,7 +158,7 @@ class Application(BaseApplication):
                 ]
             )
         )
-        WhatsAppButtonState(
+        return WhatsAppButtonState(
             self,
             question=question,
             choices=choices,
@@ -186,7 +195,7 @@ class Application(BaseApplication):
                 ]
             )
         )
-        WhatsAppButtonState(
+        return WhatsAppButtonState(
             self,
             question=question,
             choices=choices,
@@ -245,7 +254,7 @@ class Application(BaseApplication):
                 ]
             )
         )
-        WhatsAppButtonState(
+        return WhatsAppButtonState(
             self,
             question=question,
             choices=choices,
