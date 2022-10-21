@@ -19,6 +19,7 @@ from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
+from yal.utils import BACK_TO_MAIN, GET_HELP
 
 
 def test_no_state_name_clashes():
@@ -97,6 +98,69 @@ def get_rapidpro_contact(urn):
         "modified_on": "2015-11-11T08:30:25.525936+00:00",
         "urns": [urn],
     }
+
+
+MODEL_ANSWERS_PAGE_1 = {
+    "FAQ #1 Title": {"id": "1", "body": "This is FAQ #1's content."},
+    "FAQ #2 Title that is very long": {"id": "2", "body": "This is FAQ #2's content."},
+    "FAQ #3 Title": {"id": "3", "body": "This is FAQ #3's content."},
+    "FAQ #4 Title": {"id": "4", "body": "This is FAQ #4's content."},
+    "FAQ #5 Title": {"id": "5", "body": "This is FAQ #5's content."},
+}
+
+
+MODEL_ANSWERS_PAGE_2 = {
+    "FAQ #6 Title": {"id": "6", "body": "This is FAQ #6's content."},
+    "FAQ #7 Title": {"id": "7", "body": "This is FAQ #7's content."},
+    "FAQ #8 Title": {"id": "8", "body": "This is FAQ #8's content."},
+}
+
+
+def get_aaq_response(answers, next=None, prev=None):
+    top_responses = [[v["id"], k, v["body"]] for k, v in answers.items()]
+    response = {
+        "top_responses": top_responses,
+        "feedback_secret_key": "abcde12345",
+        "inbound_secret_key": "secret_123",
+        "inbound_id": 28,
+    }
+    if next:
+        response["next_page_url"] = f"{next}?inbound_secret_key=secret_123"
+    if prev:
+        response["prev_page_url"] = f"{prev}?inbound_secret_key=secret_123"
+    return response
+
+
+@pytest.fixture
+async def aaq_mock():
+    Sanic.test_mode = True
+    app = Sanic("mock_aaq")
+    tstate = TState()
+
+    @app.route("/inbound/check", methods=["POST"])
+    def inbound_check(request):
+        tstate.requests.append(request)
+        body = get_aaq_response(MODEL_ANSWERS_PAGE_1, next="/inbound/92567/1")
+        return response.json(body, status=200)
+
+    @app.route("/inbound/92567/1", methods=["GET"])
+    def inbound_check_page_2(request):
+        tstate.requests.append(request)
+        body = get_aaq_response(MODEL_ANSWERS_PAGE_2, prev="/inbound/92567/0")
+        return response.json(body, status=200)
+
+    @app.route("/inbound/feedback", methods=["PUT"])
+    def add_feedback(request):
+        tstate.requests.append(request)
+        return response.json({}, status=200)
+
+    async with run_sanic(app) as server:
+        url = config.AAQ_URL
+        config.AAQ_URL = f"http://{server.host}:{server.port}"
+        config.AAQ_TOKEN = "testtoken"
+        server.tstate = tstate
+        yield server
+        config.AAQ_URL = url
 
 
 @pytest.fixture
@@ -259,12 +323,35 @@ async def test_callback_check_response_to_handler(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_aaq_timeout_response_to_handler(tester: AppTester, rapidpro_mock):
+async def test_aaq_timeout_response_to_handler(
+    tester: AppTester, rapidpro_mock, aaq_mock
+):
+    tester.user.metadata["inbound_id"] = "inbound-id"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["faq_id"] = "1"
+    tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
+    tester.user.metadata["aaq_page"] = 0
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="no")
+    tester.assert_state("state_no_question_not_answered")
     tester.assert_num_messages(1)
-    tester.assert_message("TODO: Handle question not answered")
+    message = "\n".join(
+        [
+            "*I'm sorry I couldn't find what you were looking for this time.* ",
+            "",
+            "Please tell me what you're looking for again. "
+            "I'll try make sure I have the right information "
+            "for you next time.",
+            "",
+            "_Just type and send your question again, now._" "",
+            "-----",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
+    )
+    tester.assert_message(message)
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 4
 
 
 @pytest.mark.asyncio
