@@ -508,6 +508,7 @@ class Application(BaseApplication):
                     data = await response.json()
 
                     if data["status"] != "OK":
+                        logger.error(f"Received non-OK status from geocode API: {data}")
                         return await self.go_to_state("state_error")
 
                     first_result = data["results"][0]
@@ -767,6 +768,7 @@ class Application(BaseApplication):
                     data = await response.json()
 
                     if data["status"] != "OK":
+                        logger.error(f"Received non-OK response from autocomplete API: {data}")
                         return await self.go_to_state("state_error")
 
                     first_result = data["predictions"][0]
