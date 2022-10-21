@@ -7,10 +7,12 @@ import aiohttp
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
-from vaccine.utils import HTTP_EXCEPTIONS
+from vaccine.utils import HTTP_EXCEPTIONS, get_display_choices
 from yal import config, rapidpro
+from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.utils import (
     BACK_TO_MAIN,
+    GET_HELP,
     get_current_datetime,
     get_generic_error,
     normalise_phonenumber,
@@ -463,9 +465,173 @@ class Application(BaseApplication):
             ],
             error=self._(get_generic_error()),
             next={
-                "yes": "state_pre_mainmenu",
+                "yes": "state_collect_call_feedback",
                 "missed": "state_ask_to_call_again",
                 "no": "state_no_callback_received",
+            },
+        )
+
+    async def state_collect_call_feedback(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "last_mainmenu_time": get_current_datetime().isoformat(),
+        }
+        error = await rapidpro.update_profile(whatsapp_id, data)
+        if error:
+            return await self.go_to_state("state_error")
+
+        question = self._(
+            "\n".join(
+                [
+                    "I'm glad you got a chance to talk to someone.",
+                    "",
+                    "Did you find the call helpful?",
+                    "",
+                    "*1* - Yes, very helpful",
+                    "*2* - No, not really",
+                    "-----",
+                    "*Or reply:*",
+                    BACK_TO_MAIN,
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("yes", "Yes, very helpful"),
+                Choice("no", "No, not really"),
+            ],
+            error=self._(get_generic_error()),
+            next={
+                "yes": "state_call_helpful",
+                "no": "state_call_not_helpful_feedback",
+            },
+        )
+
+    async def state_call_helpful(self):
+        choices = [
+            Choice("question", self._("Ask a question")),
+            Choice("update", self._("Update your info")),
+            Choice("counsellor", self._("Talk to a counsellor")),
+        ]
+
+        question = self._(
+            "\n".join(
+                [
+                    "I'm so happy to hear that.",
+                    "",
+                    "Remember, if you need help from a loveLife counsellor, just "
+                    "request a call back any time.",
+                    "",
+                    "*What would you like to do now?*",
+                    get_display_choices(choices),
+                    "",
+                    "--",
+                    "*Or reply*",
+                    BACK_TO_MAIN,
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "question": "state_aaq_start",
+                "update": ChangePreferencesApplication.START_STATE,
+                "counsellor": self.START_STATE,
+            },
+        )
+
+    async def state_call_not_helpful_feedback(self):
+        question = self._(
+            "\n".join(
+                [
+                    "I'm sorry to hear that your call was not very helpful 👎🏾",
+                    "",
+                    "Please tell me about your experience. What went wrong?",
+                    "",
+                    "_Just type and send your answer_",
+                    "",
+                    "-----",
+                    "*Or reply*",
+                    BACK_TO_MAIN,
+                ]
+            )
+        )
+        return FreeText(
+            self,
+            question=question,
+            next="state_call_not_helpful_try_again",
+        )
+
+    async def state_call_not_helpful_try_again(self):
+        choices = [
+            Choice("yes", self._("Yes, It might help")),
+            Choice("no", self._("No, thanks")),
+        ]
+
+        question = self._(
+            "\n".join(
+                [
+                    "Thank you so much for sharing your feedback with me, I'll see "
+                    "what I can do about it.",
+                    "",
+                    "*Would you like to try speaking to a loveLife counsellor again "
+                    "about this?*",
+                    "",
+                    get_display_choices(choices),
+                    "",
+                    "--",
+                    "*Or reply*",
+                    BACK_TO_MAIN,
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "yes": self.START_STATE,
+                "no": "state_call_not_helpful_try_again_declined",
+            },
+        )
+
+    async def state_call_not_helpful_try_again_declined(self):
+        choices = [
+            Choice("question", self._("Ask a question")),
+            Choice("update", self._("Update your info")),
+        ]
+
+        question = self._(
+            "\n".join(
+                [
+                    "No problem.",
+                    "",
+                    "*What would you like to do now?*",
+                    "",
+                    get_display_choices(choices),
+                    "",
+                    "--",
+                    "*Or reply*",
+                    BACK_TO_MAIN,
+                    GET_HELP,
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "question": "state_aaq_start",
+                "update": ChangePreferencesApplication.START_STATE,
             },
         )
 
