@@ -137,6 +137,8 @@ async def contentrepo_api_mock():
         elif tag == "banner":
             if tstate.banner:
                 pages.append({"id": 777, "title": "Banner message"})
+        elif tag == "help_submenu":
+            pages.append({"id": 1111, "title": "Help content"})
 
         child_of = request.args.get("child_of")
         if child_of in ["111", "333", "444"]:
@@ -375,22 +377,23 @@ async def test_state_mainmenu_start(
             "*🏥 NEED HELP?*",
             "1. Talk to a counsellor",
             "2. Find clinics and services",
+            "3. Help content",
             "-----",
             "*Main Menu 1 💊*",
-            "3. Sub menu 1",
-            "4. Sub menu 2",
-            "5. Sub menu 3",
+            "4. Sub menu 1",
+            "5. Sub menu 2",
+            "6. Sub menu 3",
             "-----",
             "*Main Menu 2 Relationships 🤝*",
-            "6. Sub menu 1",
-            "7. Sub menu 2",
-            "8. Sub menu 3",
+            "7. Sub menu 1",
+            "8. Sub menu 2",
+            "9. Sub menu 3",
             "-----",
             "🙋🏿‍♂️ *QUESTIONS?*",
-            "9. Ask your own question",
+            "10. Ask your own question",
             "-----",
             "*⚙️ CHAT SETTINGS*",
-            "10. Update your information",
+            "11. Update your information",
             "-----",
             "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or *MENU*.",
         ]
@@ -398,6 +401,7 @@ async def test_state_mainmenu_start(
     assert banner.content == "Test banner message"
 
     assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
+        "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
@@ -411,7 +415,7 @@ async def test_state_mainmenu_start(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "2022-06-19T17:30:00",
-            "suggested_text": "*11* - Suggested Content 1\n*12* - Suggested Content 2",
+            "suggested_text": "*12* - Suggested Content 1\n*13* - Suggested Content 2",
         },
     }
 
@@ -440,22 +444,23 @@ async def test_state_mainmenu_start_suggested_populated(
                 "*🏥 NEED HELP?*",
                 "1. Talk to a counsellor",
                 "2. Find clinics and services",
+                "3. Help content",
                 "-----",
                 "*Main Menu 1 💊*",
-                "3. Sub menu 1",
-                "4. Sub menu 2",
-                "5. Sub menu 3",
+                "4. Sub menu 1",
+                "5. Sub menu 2",
+                "6. Sub menu 3",
                 "-----",
                 "*Main Menu 2 Relationships 🤝*",
-                "6. Sub menu 1",
-                "7. Sub menu 2",
-                "8. Sub menu 3",
+                "7. Sub menu 1",
+                "8. Sub menu 2",
+                "9. Sub menu 3",
                 "-----",
                 "🙋🏿‍♂️ *QUESTIONS?*",
-                "9. Ask your own question",
+                "10. Ask your own question",
                 "-----",
                 "*⚙️ CHAT SETTINGS*",
-                "10. Update your information",
+                "11. Update your information",
                 "-----",
                 "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or"
                 " *MENU*.",
@@ -468,6 +473,7 @@ async def test_state_mainmenu_start_suggested_populated(
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
+        "/api/v2/pages",
     ]
 
     assert len(rapidpro_mock.tstate.requests) == 1
@@ -475,7 +481,7 @@ async def test_state_mainmenu_start_suggested_populated(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "2022-06-19T17:30:00",
-            "suggested_text": "*11* - Suggested Content 1\n*12* - Suggested Content 2",
+            "suggested_text": "*12* - Suggested Content 1\n*13* - Suggested Content 2",
         },
     }
 
@@ -494,6 +500,7 @@ async def test_state_mainmenu_static(
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
+        "/api/v2/pages",
         "/suggestedcontent/",
         "/api/v2/pages",
     ]
@@ -506,13 +513,14 @@ async def test_state_mainmenu_aaq(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
     tester.setup_state("state_pre_mainmenu")
-    await tester.user_input("9")
+    await tester.user_input("10")
 
     tester.assert_num_messages(1)
     tester.assert_state("state_start")
     tester.assert_message("Coming soon...")
 
     assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
+        "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
@@ -528,7 +536,7 @@ async def test_state_mainmenu_contentrepo(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
     tester.setup_state("state_pre_mainmenu")
-    await tester.user_input("4")
+    await tester.user_input("5")
 
     question = "\n".join(
         [
@@ -553,6 +561,7 @@ async def test_state_mainmenu_contentrepo(
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
+        "/api/v2/pages",
         "/suggestedcontent/",
         "/api/v2/pages",
         "/api/v2/pages/444",
@@ -571,11 +580,57 @@ async def test_state_mainmenu_contentrepo(
 
 
 @pytest.mark.asyncio
+async def test_state_mainmenu_contentrepo_help_content(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_pre_mainmenu")
+    await tester.user_input("3")
+
+    question = "\n".join(
+        [
+            "Main Menu 1 💊",
+            "-----",
+            "",
+            "Message test content 1",
+            "",
+            "1. Pls give us feedback",
+            "",
+            "-----",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
+        ]
+    )
+
+    tester.assert_num_messages(1)
+    tester.assert_message(question)
+
+    assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
+        "/api/v2/pages",
+        "/api/v2/pages",
+        "/api/v2/pages",
+        "/api/v2/pages",
+        "/suggestedcontent/",
+        "/api/v2/pages",
+        "/api/v2/pages/1111",
+    ]
+
+    assert len(rapidpro_mock.tstate.requests) == 4
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_mainmenu_time": "",
+            "suggested_text": "",
+        },
+    }
+
+
+@pytest.mark.asyncio
 async def test_state_mainmenu_contentrepo_relationship_content_rel_set(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
     tester.setup_state("state_pre_mainmenu")
-    await tester.user_input("6")
+    await tester.user_input("7")
 
     question = "\n".join(
         [
@@ -603,6 +658,7 @@ async def test_state_mainmenu_contentrepo_relationship_content_rel_set(
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
+        "/api/v2/pages",
         "/suggestedcontent/",
         "/api/v2/pages",
         "/api/v2/pages/888",
@@ -627,7 +683,7 @@ async def test_state_mainmenu_contentrepo_relationship_status(
 ):
     tester.setup_user_address("27820002002")
     tester.setup_state("state_pre_mainmenu")
-    await tester.user_input("6")
+    await tester.user_input("7")
 
     question = "\n".join(
         [
@@ -651,6 +707,7 @@ async def test_state_mainmenu_contentrepo_relationship_status(
     tester.assert_state("state_relationship_status")
 
     assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
+        "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
@@ -779,7 +836,7 @@ async def test_state_mainmenu_contentrepo_children(
 ):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_pre_mainmenu")
-    await tester.user_input("3")
+    await tester.user_input("4")
 
     question = "\n".join(
         [
@@ -828,6 +885,7 @@ async def test_state_mainmenu_contentrepo_children(
         "/api/v2/pages",
         "/api/v2/pages",
         "/api/v2/pages",
+        "/api/v2/pages",
         "/suggestedcontent/",
         "/api/v2/pages",
         "/api/v2/pages/333",
@@ -862,7 +920,7 @@ async def test_state_submenu_image(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
     tester.setup_state("state_pre_mainmenu")
-    await tester.user_input("5")
+    await tester.user_input("6")
 
     question = "\n".join(
         [
@@ -890,7 +948,7 @@ async def test_state_detail_image(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
     tester.setup_state("state_pre_mainmenu")
-    await tester.user_input("5")
+    await tester.user_input("6")
     await tester.user_input("1")
 
     question = "\n".join(

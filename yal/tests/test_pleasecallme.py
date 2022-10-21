@@ -504,12 +504,12 @@ async def test_state_callback_response_handles_call_received(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "2022-06-19T17:30:00",
-            "suggested_text": "*6* - Suggested Content 1",
+            "suggested_text": "*7* - Suggested Content 1",
         },
     }
 
     tester.assert_state("state_mainmenu")
-    assert len(contentrepo_api_mock.tstate.requests) == 4
+    assert len(contentrepo_api_mock.tstate.requests) == 5
 
 
 @pytest.mark.asyncio
