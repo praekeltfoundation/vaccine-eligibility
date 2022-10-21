@@ -119,7 +119,8 @@ class Application(BaseApplication):
                         "ABOUT YOU / 🍰*Age*",
                         "-----",
                         "",
-                        "*What is your age?*" "_Type in the number only (e.g. 24)_",
+                        "*What is your age?*",
+                        "_Type in the number only (e.g. 24)_",
                     ]
                 )
             ),
