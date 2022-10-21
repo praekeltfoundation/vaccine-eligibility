@@ -768,7 +768,9 @@ class Application(BaseApplication):
                     data = await response.json()
 
                     if data["status"] != "OK":
-                        logger.error(f"Received non-OK response from autocomplete API: {data}")
+                        logger.error(
+                            f"Received non-OK response from autocomplete API: {data}"
+                        )
                         return await self.go_to_state("state_error")
 
                     first_result = data["predictions"][0]
