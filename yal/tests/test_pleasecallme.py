@@ -491,7 +491,7 @@ async def test_state_save_emergency_contact(
 
 
 @pytest.mark.asyncio
-@mock.patch("yal.mainmenu.get_current_datetime")
+@mock.patch("yal.pleasecallme.get_current_datetime")
 async def test_state_callback_response_handles_call_received(
     get_current_datetime, tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
@@ -504,12 +504,10 @@ async def test_state_callback_response_handles_call_received(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "2022-06-19T17:30:00",
-            "suggested_text": "*7* - Suggested Content 1",
         },
     }
 
-    tester.assert_state("state_mainmenu")
-    assert len(contentrepo_api_mock.tstate.requests) == 5
+    tester.assert_state("state_collect_call_feedback")
 
 
 @pytest.mark.asyncio
@@ -841,3 +839,79 @@ async def test_state_contact_bwise_website(tester: AppTester):
     #     "image": "https://contenrepo/media/original_images/"
     #               "Screenshot 2022-06-06 at 15.02.53.png"
     # }
+
+
+@pytest.mark.asyncio
+async def state_collect_call_feedback_helpful(tester: AppTester):
+    tester.setup_state("state_collect_call_feedback")
+    await tester.user_input("Yes, very helpful")
+    tester.assert_state("state_call_helpful")
+
+
+@pytest.mark.asyncio
+async def state_collect_call_helpful_aaq(tester: AppTester):
+    tester.setup_state("state_call_helpful")
+    await tester.user_input("Ask a question")
+    tester.assert_state("state_aaq_start")
+
+
+@pytest.mark.asyncio
+async def state_collect_call_helpful_update_info(tester: AppTester):
+    tester.setup_state("state_call_helpful")
+    await tester.user_input("Update your info")
+    tester.assert_state("state_display_preferences")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def state_collect_call_helpful_goto_counsellor(
+    get_current_datetime, tester: AppTester
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_call_helpful")
+    await tester.user_input("Talk to a counsellor")
+    tester.assert_state("state_out_of_hours")
+
+
+@pytest.mark.asyncio
+async def state_collect_call_feedback_not_helpful(tester: AppTester):
+    tester.setup_state("state_collect_call_feedback")
+    await tester.user_input("No, not really")
+    tester.assert_state("state_call_not_helpful_feedback")
+
+
+@pytest.mark.asyncio
+async def state_call_not_helpful_feedback(tester: AppTester):
+    tester.setup_state("state_call_not_helpful_feedback")
+    await tester.user_input("Some detailed feedback")
+    tester.assert_state("state_call_not_helpful_try_again")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def state_call_not_helpful_try_again(get_current_datetime, tester: AppTester):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_call_not_helpful_try_again")
+    await tester.user_input("Yes, It might help")
+    tester.assert_state("state_out_of_hours")
+
+
+@pytest.mark.asyncio
+async def state_call_not_helpful_try_again_declined(tester: AppTester):
+    tester.setup_state("state_call_not_helpful_try_again")
+    await tester.user_input("No, thanks")
+    tester.assert_state("state_call_not_helpful_try_again_declined")
+
+
+@pytest.mark.asyncio
+async def state_call_not_helpful_try_again_declined_to_aaq(tester: AppTester):
+    tester.setup_state("state_call_not_helpful_try_again_declined")
+    await tester.user_input("Ask a question")
+    tester.assert_state("state_aaq_start")
+
+
+@pytest.mark.asyncio
+async def state_call_not_helpful_try_again_declined_to_update(tester: AppTester):
+    tester.setup_state("state_call_not_helpful_try_again_declined")
+    await tester.user_input("Update your info")
+    tester.assert_state("state_display_preferences")
