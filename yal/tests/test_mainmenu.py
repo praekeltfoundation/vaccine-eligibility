@@ -410,12 +410,19 @@ async def test_state_mainmenu_start(
         "/api/v2/pages/777",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 1
+    assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "2022-06-19T17:30:00",
             "suggested_text": "*12* - Suggested Content 1\n*13* - Suggested Content 2",
+        },
+    }
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "feedback_timestamp": "2022-06-19T19:30:00",
+            "feedback_type": "facebook_banner",
         },
     }
 
