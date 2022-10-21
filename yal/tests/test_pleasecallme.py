@@ -372,7 +372,9 @@ async def test_state_callback_confirmation_need_help(tester: AppTester, rapidpro
 
 
 @pytest.mark.asyncio
-async def test_state_callback_confirmation_opening_hours(tester: AppTester):
+async def test_state_callback_confirmation_opening_hours(
+    tester: AppTester, rapidpro_mock
+):
     tester.setup_state("state_callback_confirmation")
     await tester.user_input("3")
 

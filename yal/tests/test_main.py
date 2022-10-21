@@ -17,6 +17,7 @@ from yal.optout import Application as OptoutApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
+from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
 
@@ -38,6 +39,9 @@ def test_no_state_name_clashes():
     c_fb_states = set(
         s for s in dir(ContentFeedbackSurveyApplication) if s.startswith("state_")
     )
+    sf_s_states = set(
+        s for s in dir(ServiceFinderFeedbackSurveyApplication) if s.startswith("state_")
+    )
     intersection = (
         m_states
         & mm_states
@@ -51,6 +55,7 @@ def test_no_state_name_clashes():
         & aaq_states
         & fb_states
         & c_fb_states
+        & sf_s_states
     ) - {
         "state_name",
         "state_error",
@@ -66,10 +71,16 @@ def tester():
 
 def get_rapidpro_contact(urn):
     feedback_type = ""
+    feedback_timestamp = None
     if "27820001002" in urn:
         feedback_type = "content"
     if "27820001003" in urn:
         feedback_type = "facebook_banner"
+    if "27820001004" in urn:
+        feedback_type = "servicefinder"
+    if "27820001005" in urn:
+        feedback_type = "servicefinder_2"
+        feedback_timestamp = "2022-03-04T05:06:07"
     return {
         "uuid": "b733e997-b0b4-4d4d-a3ad-0546e1644aa9",
         "name": "",
@@ -87,6 +98,7 @@ def get_rapidpro_contact(urn):
             "street_number": "99",
             "feedback_survey_sent": "true",
             "feedback_type": feedback_type,
+            "feedback_timestamp": feedback_timestamp,
             "latitude": -26.2031026,
             "longitude": 28.0251783,
             "location_description": "99 high level, cape town, FS",
@@ -293,3 +305,31 @@ async def test_facebook_crossover_feedback_response(tester: AppTester, rapidpro_
     tester.assert_num_messages(1)
 
     assert len(rapidpro_mock.tstate.requests) == 3
+
+
+@pytest.mark.asyncio
+async def test_servicefinder_feedback_response(tester: AppTester, rapidpro_mock):
+    """
+    If this is in response to a servicefinder feedback push message, then it should be
+    handled by the servicefinder feedback application
+    """
+    tester.setup_user_address("27820001004")
+    await tester.user_input("yes, thanks")
+    tester.assert_state("state_servicefinder_positive_feedback")
+    tester.assert_num_messages(1)
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+
+
+@pytest.mark.asyncio
+async def test_servicefinder_feedback_2_response(tester: AppTester, rapidpro_mock):
+    """
+    If this is in response to the second servicefinder feedback push message, then it
+    should be handled by the servicefinder feedback application
+    """
+    tester.setup_user_address("27820001005")
+    await tester.user_input("yes, i went")
+    tester.assert_state("state_went_to_service")
+    tester.assert_num_messages(1)
+
+    assert len(rapidpro_mock.tstate.requests) == 2

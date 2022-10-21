@@ -622,8 +622,8 @@ async def test_state_mainmenu_contentrepo_help_content(
         "/api/v2/pages/1111",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 4
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 5
+    request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "",
