@@ -449,6 +449,14 @@ async def test_state_display_content_question_not_answered(
 
     tester.assert_message(message)
 
+    assert len(aaq_mock.tstate.requests) == 1
+    request = aaq_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "feedback": {"feedback_type": "negative", "faq_id": "1"},
+        "feedback_secret_key": "feedback-secret-key",
+        "inbound_id": "inbound-id",
+    }
+
 
 @pytest.mark.asyncio
 async def test_state_no_question_not_answered(
@@ -497,6 +505,14 @@ async def test_state_display_content_question_back_to_list(
 
     tester.assert_state("state_display_results")
 
+    assert len(aaq_mock.tstate.requests) == 1
+    request = aaq_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "feedback": {"feedback_type": "negative", "faq_id": "1"},
+        "feedback_secret_key": "feedback-secret-key",
+        "inbound_id": "inbound-id",
+    }
+
 
 @pytest.mark.asyncio
 @mock.patch("yal.askaquestion.config")
@@ -532,13 +548,18 @@ async def test_state_handle_timeout_handles_type_1_no(tester: AppTester, rapidpr
 
 @pytest.mark.asyncio
 async def test_state_handle_timeout_handles_type_2_yes(
-    tester: AppTester, rapidpro_mock
+    tester: AppTester, rapidpro_mock, aaq_mock
 ):
     tester.setup_user_address("27820001002")
     tester.setup_state("state_handle_timeout_response")
+    tester.user.metadata["inbound_id"] = "inbound-id"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["faq_id"] = "1"
+    tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
+    tester.user.metadata["aaq_page"] = 0
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="yes")
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 4
     request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"aaq_timeout_sent": "", "aaq_timeout_type": ""},
@@ -565,14 +586,29 @@ async def test_state_handle_timeout_handles_type_2_yes(
     )
     tester.assert_message(message)
 
+    assert len(aaq_mock.tstate.requests) == 1
+    request = aaq_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "feedback": {"feedback_type": "positive", "faq_id": "1"},
+        "feedback_secret_key": "feedback-secret-key",
+        "inbound_id": "inbound-id",
+    }
+
 
 @pytest.mark.asyncio
-async def test_state_handle_timeout_handles_type_2_no(tester: AppTester, rapidpro_mock):
+async def test_state_handle_timeout_handles_type_2_no(
+    tester: AppTester, rapidpro_mock, aaq_mock
+):
     tester.setup_user_address("27820001002")
     tester.setup_state("state_handle_timeout_response")
+    tester.user.metadata["inbound_id"] = "inbound-id"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["faq_id"] = "1"
+    tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
+    tester.user.metadata["aaq_page"] = 0
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="no")
 
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"aaq_timeout_sent": "", "aaq_timeout_type": ""},
@@ -597,6 +633,14 @@ async def test_state_handle_timeout_handles_type_2_no(tester: AppTester, rapidpr
         ]
     )
     tester.assert_message(message)
+
+    assert len(aaq_mock.tstate.requests) == 1
+    request = aaq_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "feedback": {"feedback_type": "negative", "faq_id": "1"},
+        "feedback_secret_key": "feedback-secret-key",
+        "inbound_id": "inbound-id",
+    }
 
 
 @pytest.mark.asyncio
@@ -630,7 +674,7 @@ async def test_state_yes_question_answered_no_changes(tester: AppTester, rapidpr
 
 
 @pytest.mark.asyncio
-async def test_state_yes_question_answered_changes(tester: AppTester, rapidpro_mock):
+async def test_state_yes_question_answered_changes(tester: AppTester, aaq_mock):
     tester.setup_user_address("27820001002")
     tester.setup_state("state_yes_question_answered")
 
@@ -656,7 +700,9 @@ async def test_state_yes_question_answered_changes(tester: AppTester, rapidpro_m
 
 
 @pytest.mark.asyncio
-async def test_state_save_aaq_priority_feedback(tester: AppTester, rapidpro_mock):
+async def test_state_yes_question_answered_changes_given(
+    tester: AppTester, rapidpro_mock
+):
     tester.setup_user_address("27820001002")
     tester.setup_state("state_yes_question_answered_changes")
 

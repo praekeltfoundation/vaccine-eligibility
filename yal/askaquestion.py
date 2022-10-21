@@ -275,14 +275,11 @@ class Application(BaseApplication):
             question=question,
             choices=choices,
             error=self._(get_generic_error()),
-            next={
-                "yes": "state_is_question_answered",
-                "back to list": "state_display_results",
-                "no": "state_no_question_not_answered",
-            },
+            next="state_is_question_answered",
         )
 
     async def state_is_question_answered(self):
+
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
@@ -308,6 +305,10 @@ class Application(BaseApplication):
 
         if feedback_answer == "yes":
             return await self.go_to_state("state_yes_question_answered")
+        if feedback_answer == "back to list":
+            return await self.go_to_state("state_display_results")
+        if feedback_answer == "no":
+            return await self.go_to_state("state_no_question_not_answered")
 
         return await self.go_to_state("state_display_results")
 
@@ -479,6 +480,7 @@ class Application(BaseApplication):
 
         timeout_type_sent = fields.get("aaq_timeout_type")
         inbound = clean_inbound(self.inbound.content)
+        self.save_answer("state_get_content_feedback", inbound)
 
         if timeout_type_sent == "1":
             if inbound == "yes ask again":
@@ -489,6 +491,4 @@ class Application(BaseApplication):
                 next=self.START_STATE,
             )
         if timeout_type_sent == "2":
-            if inbound == "yes":
-                return await self.go_to_state("state_yes_question_answered")
-            return await self.go_to_state("state_no_question_not_answered")
+            return await self.go_to_state("state_is_question_answered")
