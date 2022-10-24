@@ -424,7 +424,7 @@ async def test_state_update_bot_name_submit(tester: AppTester, rapidpro_mock):
         [
             "Great - from now on you can call me johnny.",
             "",
-            "_You can change this later by typing in *9* from the main *MENU*._",
+            "_You can change this later from the main *MENU*._",
         ]
     )
     tester.assert_num_messages(1)
