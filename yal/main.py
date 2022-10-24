@@ -120,6 +120,16 @@ class Application(
                     ServiceFinderFeedbackSurveyApplication.CALLBACK_2_STATE
                 )
 
+        if keyword in AAQ_TIMEOUT_KEYWORDS:
+            msisdn = utils.normalise_phonenumber(message.from_addr)
+            whatsapp_id = msisdn.lstrip(" + ")
+            error, fields = await rapidpro.get_profile(whatsapp_id)
+            if error:
+                return await self.go_to_state("state_error")
+            aaq_timeout_sent = fields.get("aaq_timeout_sent")
+            if aaq_timeout_sent:
+                return await self.go_to_state(AaqApplication.TIMEOUT_RESPONSE_STATE)
+
         return await super().process_message(message)
 
     async def state_start(self):
@@ -132,9 +142,6 @@ class Application(
 
         terms_accepted = fields.get("terms_accepted")
         onboarding_completed = fields.get("onboarding_completed")
-        # If one of these values is True then the user might be responding
-        # to a scheduled msg
-        aaq_timeout_sent = fields.get("aaq_timeout_sent")
 
         # Cache some profile info
         for field in ("latitude", "longitude", "location_description"):
@@ -155,9 +162,6 @@ class Application(
                 return await self.go_to_state(OnboardingApplication.START_STATE)
             else:
                 return await self.go_to_state(TermsApplication.START_STATE)
-
-        if aaq_timeout_sent and (inbound.lower() in AAQ_TIMEOUT_KEYWORDS):
-            return await self.go_to_state(AaqApplication.TIMEOUT_RESPONSE_STATE)
 
         return await self.go_to_state("state_catch_all")
 
