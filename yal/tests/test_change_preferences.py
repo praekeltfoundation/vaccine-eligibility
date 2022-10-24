@@ -220,6 +220,18 @@ async def test_state_update_gender_from_list(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
+async def test_state_update_gender_skip(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_update_gender")
+
+    await tester.user_input("Rather Not Say")
+
+    tester.assert_answer("state_update_gender", "skip")
+    tester.setup_state("state_display_preferences")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+
+
+@pytest.mark.asyncio
 async def test_state_update_other_gender(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_update_gender")
 

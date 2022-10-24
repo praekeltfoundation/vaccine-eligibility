@@ -503,8 +503,8 @@ class Application(BaseApplication):
         )
 
     async def state_update_gender_confirm(self):
-        gender = self.user.answers.get("state_update_gender")
-        if gender == "skip":
+        gender = self.user.answers.get("state_update_gender").lower()
+        if gender == "skip" or gender == "rather not say":
             return await self.go_to_state("state_display_preferences")
         if gender == "other":
             gender = self.user.answers.get("state_update_other_gender", "")
