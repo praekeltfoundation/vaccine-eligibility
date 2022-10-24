@@ -78,9 +78,13 @@ def get_rapidpro_contact(urn):
         feedback_type = "facebook_banner"
     if "27820001004" in urn:
         feedback_type = "servicefinder"
+    feedback_type_2 = ""
+    feedback_timestamp_2 = None
+    feedback_survey_sent_2 = ""
     if "27820001005" in urn:
-        feedback_type = "servicefinder_2"
-        feedback_timestamp = "2022-03-04T05:06:07"
+        feedback_type_2 = "servicefinder"
+        feedback_timestamp_2 = "2022-03-04T05:06:07"
+        feedback_survey_sent_2 = "true"
     return {
         "uuid": "b733e997-b0b4-4d4d-a3ad-0546e1644aa9",
         "name": "",
@@ -99,6 +103,9 @@ def get_rapidpro_contact(urn):
             "feedback_survey_sent": "true",
             "feedback_type": feedback_type,
             "feedback_timestamp": feedback_timestamp,
+            "feedback_type_2": feedback_type_2,
+            "feedback_timestamp_2": feedback_timestamp_2,
+            "feedback_survey_sent_2": feedback_survey_sent_2,
             "latitude": -26.2031026,
             "longitude": 28.0251783,
             "location_description": "99 high level, cape town, FS",
@@ -332,4 +339,4 @@ async def test_servicefinder_feedback_2_response(tester: AppTester, rapidpro_moc
     tester.assert_state("state_went_to_service")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3

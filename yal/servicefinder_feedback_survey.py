@@ -138,8 +138,8 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
         await rapidpro.update_profile(
             whatsapp_id=whatsapp_id,
             fields={
-                "feedback_timestamp": timestamp.isoformat(),
-                "feedback_type": "servicefinder_2",
+                "feedback_timestamp_2": timestamp.isoformat(),
+                "feedback_type_2": "servicefinder",
             },
         )
         return await self.go_to_state("state_servicefinder_feedback_confirmation")
@@ -179,10 +179,15 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
     async def state_servicefinder_feedback_survey_2_start(self):
         # Repeat the question here for error and selection handling
         whatsapp_id = utils.normalise_phonenumber(self.inbound.from_addr).lstrip("+")
+        # Reset this, so that we only get the survey once after a push
+        await rapidpro.update_profile(whatsapp_id, {"feedback_survey_sent_2": ""})
         error, fields = await rapidpro.get_profile(whatsapp_id)
         if error:
             return await self.go_to_state("state_error")
-        feedback_datetime = datetime.fromisoformat(fields["feedback_timestamp"])
+        feedback_datetime = (
+            datetime.fromisoformat(fields["feedback_timestamp_2"])
+            - self.CALLBACK_2_DELAY
+        )
         choices = [
             Choice("yes", self._("Yes, I went")),
             Choice("no", self._("No, I didn't go")),

@@ -25,7 +25,16 @@ async def rapidpro_mock():
     def get_contact(request):
         tstate.requests.append(request)
         return response.json(
-            {"results": [{"fields": {"feedback_timestamp": "2022-03-04T05:06:07"}}]},
+            {
+                "results": [
+                    {
+                        "fields": {
+                            "feedback_timestamp": "2022-03-04T05:06:07",
+                            "feedback_timestamp_2": "2022-03-04T05:06:07",
+                        }
+                    }
+                ]
+            },
             status=200,
         )
 
@@ -92,8 +101,8 @@ async def test_state_servicefinder_feedback_confirmation(
     assert rapidpro_mock.tstate is not None
     [request] = rapidpro_mock.tstate.requests
     assert request.json["fields"] == {
-        "feedback_timestamp": "2022-01-16T03:04:05",
-        "feedback_type": "servicefinder_2",
+        "feedback_timestamp_2": "2022-01-16T03:04:05",
+        "feedback_type_2": "servicefinder",
     }
 
 
@@ -103,7 +112,7 @@ async def test_state_went_to_service(tester: AppTester, rapidpro_mock: MockServe
     await tester.user_input("yes, i went")
     tester.assert_state("state_went_to_service")
     assert rapidpro_mock.tstate is not None
-    assert len(rapidpro_mock.tstate.requests) == 1
+    assert len(rapidpro_mock.tstate.requests) == 2
 
 
 @pytest.mark.asyncio
@@ -114,7 +123,7 @@ async def test_state_did_not_go_to_service(
     await tester.user_input("no, i didn't go")
     tester.assert_state("state_did_not_go_to_service")
     assert rapidpro_mock.tstate is not None
-    assert len(rapidpro_mock.tstate.requests) == 1
+    assert len(rapidpro_mock.tstate.requests) == 2
 
 
 @pytest.mark.asyncio
