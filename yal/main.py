@@ -116,7 +116,7 @@ class Application(
             if feedback_survey_sent and feedback_type == "servicefinder":
                 self.state_name = ServiceFinderFeedbackSurveyApplication.START_STATE
             if feedback_survey_sent and (
-                feedback_type == "ask_a_question" or feedback_type =="ask_a_question_2"
+                feedback_type == "ask_a_question" or feedback_type == "ask_a_question_2"
             ):
                 self.state_name = AaqApplication.TIMEOUT_RESPONSE_STATE
 

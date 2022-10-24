@@ -20,7 +20,9 @@ def tester():
 def get_rapidpro_contact(urn):
     return {
         "fields": {
-            "feedback_type": "ask_a_question" if ("27820001001" in urn) else "ask_a_question_2",
+            "feedback_type": "ask_a_question"
+            if ("27820001001" in urn)
+            else "ask_a_question_2",
         },
     }
 
@@ -178,8 +180,8 @@ async def test_start_state_response_sets_timeout(
     request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
-            "next_aaq_timeout_time": "2022-06-19T17:35:00",
-            "aaq_timeout_type": "1",
+            "feedback_timestamp": "2022-06-19T17:35:00",
+            "feedback_type": "ask_a_question",
         },
     }
     assert len(aaq_mock.tstate.requests) == 1
@@ -250,8 +252,8 @@ async def test_state_display_results_choose_an_answer(
     request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
-            "next_aaq_timeout_time": "2022-06-19T17:35:00",
-            "aaq_timeout_type": "2",
+            "feedback_timestamp": "2022-06-19T17:35:00",
+            "feedback_type": "ask_a_question_2",
         },
     }
 
@@ -384,7 +386,7 @@ async def test_state_get_content_feedback_question_answered(
     assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"aaq_timeout_type": ""},
+        "fields": {"feedback_type": ""},
     }
 
     assert len(aaq_mock.tstate.requests) == 1

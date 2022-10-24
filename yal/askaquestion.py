@@ -20,7 +20,6 @@ from yal.servicefinder import Application as ServiceFinderApplication
 from yal.utils import (
     BACK_TO_MAIN,
     GET_HELP,
-    clean_inbound,
     get_current_datetime,
     get_generic_error,
     normalise_phonenumber,
@@ -90,8 +89,8 @@ class Application(BaseApplication):
 
         timeout_time = get_current_datetime() + timedelta(minutes=5)
         data = {
-            "next_aaq_timeout_time": timeout_time.isoformat(),
-            "aaq_timeout_type": "1",
+            "feedback_timestamp": timeout_time.isoformat(),
+            "feedback_type": "ask_a_question",
         }
 
         error = await rapidpro.update_profile(whatsapp_id, data)
@@ -226,8 +225,8 @@ class Application(BaseApplication):
 
         timeout_time = get_current_datetime() + timedelta(minutes=5)
         data = {
-            "next_aaq_timeout_time": timeout_time.isoformat(),
-            "aaq_timeout_type": "2",
+            "feedback_timestamp": timeout_time.isoformat(),
+            "feedback_type": "ask_a_question_2",
         }
 
         error = await rapidpro.update_profile(whatsapp_id, data)
@@ -279,12 +278,11 @@ class Application(BaseApplication):
         )
 
     async def state_is_question_answered(self):
-
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
         data = {
-            "aaq_timeout_type": "",
+            "feedback_type": "",
         }
 
         error = await rapidpro.update_profile(whatsapp_id, data)
