@@ -1607,7 +1607,7 @@ async def test_state_prompt_info_found(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_prompt_info_found_no(tester: AppTester):
+async def test_state_prompt_info_found_no(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_prompt_info_found")
     await tester.user_input("no")
 

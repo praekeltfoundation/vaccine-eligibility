@@ -462,6 +462,41 @@ class Application(BaseApplication):
             },
         )
 
+    async def state_handle_list_timeout(self):
+        choices = [
+            Choice("yes", self._("Yes, ask again")),
+            Choice("no", self._("No, I'm good")),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "[persona_emoji] *Me again!*",
+                    "",
+                    "Doesn't look like you found an answer to the question you asked "
+                    "me recently...",
+                    "",
+                    "*Would you like to ask again or try a different Q?*",
+                    "",
+                    get_display_choices(choices),
+                    "",
+                    "-----",
+                    "*Or reply:*",
+                    BACK_TO_MAIN,
+                    GET_HELP,
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "yes": "state_aaq_start",
+                "no": "state_pre_mainmenu",
+            },
+        )
+
     async def state_handle_timeout_response(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
@@ -469,26 +504,16 @@ class Application(BaseApplication):
         error, fields = await rapidpro.get_profile(whatsapp_id)
         if error:
             return await self.go_to_state("state_error")
-
         data = {
-            "aaq_timeout_sent": "",
-            "aaq_timeout_type": "",
+            "feedback_survey_sent": "",
         }
         error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")
 
-        timeout_type_sent = fields.get("aaq_timeout_type")
-        inbound = clean_inbound(self.inbound.content)
-        self.save_answer("state_get_content_feedback", inbound)
+        timeout_type_sent = fields.get("feedback_type")
 
-        if timeout_type_sent == "1":
-            if inbound == "yes ask again":
-                return await self.go_to_state("state_aaq_start")
-            return EndState(
-                self,
-                self._("Ok"),
-                next=self.START_STATE,
-            )
-        if timeout_type_sent == "2":
-            return await self.go_to_state("state_is_question_answered")
+        if timeout_type_sent == "ask_a_question":
+            return await self.go_to_state("state_handle_list_timeout")
+        if timeout_type_sent == "ask_a_question_2":
+            return await self.go_to_state("state_get_content_feedback")

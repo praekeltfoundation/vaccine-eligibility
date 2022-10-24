@@ -86,6 +86,10 @@ def get_rapidpro_contact(urn):
         feedback_type_2 = "servicefinder"
         feedback_timestamp_2 = "2022-03-04T05:06:07"
         feedback_survey_sent_2 = "true"
+    if "27820001006" in urn:
+        feedback_type = "ask_a_question"
+    if "27820001007" in urn:
+        feedback_type = "ask_a_question_2"
     return {
         "uuid": "b733e997-b0b4-4d4d-a3ad-0546e1644aa9",
         "name": "",
@@ -94,8 +98,6 @@ def get_rapidpro_contact(urn):
         "fields": {
             "onboarding_completed": "27820001001" in urn,
             "onboarding_reminder_sent": "27820001001" in urn,
-            "aaq_timeout_sent": "27820001001" in urn,
-            "aaq_timeout_type": "2" if "27820001001" in urn else "",
             "terms_accepted": "27820001001" in urn,
             "province": "FS",
             "suburb": "cape town",
@@ -345,12 +347,13 @@ async def test_callback_check_response_to_handler(tester: AppTester):
 async def test_aaq_timeout_response_to_handler(
     tester: AppTester, rapidpro_mock, aaq_mock
 ):
+    tester.setup_user_address("27820001007")
     tester.user.metadata["inbound_id"] = "inbound-id"
     tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
     tester.user.metadata["faq_id"] = "1"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.user.metadata["aaq_page"] = 0
-    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="no")
+    await tester.user_input("Nope...")
     tester.assert_state("state_no_question_not_answered")
     tester.assert_num_messages(1)
     message = "\n".join(
