@@ -193,12 +193,28 @@ async def test_state_update_gender(tester: AppTester, rapidpro_mock):
 async def test_state_update_gender_from_list(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_update_gender")
 
-    await tester.user_input("male")
+    await tester.user_input("Non-Binary")
 
-    tester.assert_state("state_update_gender_confirm")
+    tester.assert_answer("state_update_gender", "non_binary")
     tester.assert_num_messages(1)
 
-    tester.assert_answer("state_update_gender", "male")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*CHAT SETTINGS / ⚙️ Change or update your info* / *Gender*",
+                "-----",
+                "",
+                "*You've chosen Non-binary as your gender.*",
+                "",
+                "Is this correct?",
+                "",
+                "1. Yes",
+                "2. No",
+            ]
+        ),
+    )
+
+    tester.assert_state("state_update_gender_confirm")
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == []
 
@@ -236,6 +252,7 @@ async def test_state_update_gender_confirm(tester: AppTester, rapidpro_mock):
 async def test_state_update_gender_confirm_not_correct(
     tester: AppTester, rapidpro_mock
 ):
+    tester.setup_answer("state_update_gender", "male")
     tester.setup_state("state_update_gender_confirm")
 
     await tester.user_input("no")

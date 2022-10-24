@@ -508,6 +508,8 @@ class Application(BaseApplication):
             return await self.go_to_state("state_display_preferences")
         if gender == "other":
             gender = self.user.answers.get("state_update_other_gender", "")
+        else:
+            gender = GENDERS[gender]
 
         choices = [
             Choice("yes", self._("Yes")),
