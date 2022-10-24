@@ -46,6 +46,7 @@ CONTENT_FEEDBACK_KEYWORDS = {
     "yes ask again",
     "no i m good",
     "nope",
+    "no go back to list"
 }
 
 
