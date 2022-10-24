@@ -28,7 +28,6 @@ ONBOARDING_REMINDER_KEYWORDS = {
     "not interested",
 }
 CALLBACK_CHECK_KEYWORDS = {"callback"}
-AAQ_TIMEOUT_KEYWORDS = {"yes", "no", "yes ask again", "no i m good"}
 FEEDBACK_KEYWORDS = {"feedback"}
 CONTENT_FEEDBACK_KEYWORDS = {
     "1",
@@ -43,6 +42,9 @@ CONTENT_FEEDBACK_KEYWORDS = {
     "i knew this before",
     "yes i went",
     "no i didn t go",
+    "no",
+    "yes ask again",
+    "no i m good",
 }
 
 
@@ -112,6 +114,10 @@ class Application(
                 self.state_name = WaFbCrossoverFeedbackApplication.START_STATE
             if feedback_survey_sent and feedback_type == "servicefinder":
                 self.state_name = ServiceFinderFeedbackSurveyApplication.START_STATE
+            if feedback_survey_sent and (
+                feedback_type == "ask_a_question" or feedback_type =="ask_a_question_2"
+            ):
+                self.state_name = AaqApplication.TIMEOUT_RESPONSE_STATE
 
             feedback_survey_sent_2 = fields.get("feedback_survey_sent_2")
             feedback_type_2 = fields.get("feedback_type_2")
@@ -119,16 +125,6 @@ class Application(
                 self.state_name = (
                     ServiceFinderFeedbackSurveyApplication.CALLBACK_2_STATE
                 )
-
-        if keyword in AAQ_TIMEOUT_KEYWORDS:
-            msisdn = utils.normalise_phonenumber(message.from_addr)
-            whatsapp_id = msisdn.lstrip(" + ")
-            error, fields = await rapidpro.get_profile(whatsapp_id)
-            if error:
-                return await self.go_to_state("state_error")
-            aaq_timeout_sent = fields.get("aaq_timeout_sent")
-            if aaq_timeout_sent:
-                return await self.go_to_state(AaqApplication.TIMEOUT_RESPONSE_STATE)
 
         return await super().process_message(message)
 
