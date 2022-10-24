@@ -1,7 +1,6 @@
 import pytest
 from sanic import Sanic, response
 
-from vaccine.models import Message
 from vaccine.testing import AppTester, MockServer, TState, run_sanic
 from yal import config
 from yal.content_feedback_survey import ContentFeedbackSurveyApplication
@@ -48,7 +47,7 @@ async def test_positive_feedback(tester: AppTester, rapidpro_mock: MockServer):
                 "1. No changes",
                 "2. Yes, I have a change",
                 "",
-                "--",
+                "-----",
                 "",
                 BACK_TO_MAIN,
                 GET_HELP,
@@ -72,7 +71,11 @@ async def test_no_feedback(tester: AppTester):
             [
                 "Thanks for letting us know!",
                 "",
-                "Check you later 👋🏾",
+                "*What would you like to do now?*",
+                "",
+                "1. Talk to a counsellor",
+                "2. Ask a question",
+                "3. Update your information",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -80,7 +83,6 @@ async def test_no_feedback(tester: AppTester):
                 GET_HELP,
             ]
         ),
-        session=Message.SESSION_EVENT.CLOSE,
     )
 
 
@@ -120,7 +122,11 @@ async def test_confirm_feedback(tester: AppTester):
                 "",
                 "Thank you for the feedback - I'm working on it already.",
                 "",
-                "Chat again soon 👋🏾",
+                "*What would you like to do now?*",
+                "",
+                "1. Talk to a counsellor",
+                "2. Ask a question",
+                "3. Update your information",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -128,14 +134,13 @@ async def test_confirm_feedback(tester: AppTester):
                 GET_HELP,
             ]
         ),
-        session=Message.SESSION_EVENT.CLOSE,
     )
 
 
 @pytest.mark.asyncio
 async def test_negative_feedback(tester: AppTester, rapidpro_mock: MockServer):
     """If the user responds negative to the push message, ask if they want AAQ"""
-    await tester.user_input("nope")
+    await tester.user_input("Not really")
     tester.assert_state("state_negative_feedback")
     tester.assert_message(
         "\n".join(
@@ -167,8 +172,13 @@ async def test_no_negative_feedback(tester: AppTester, rapidpro_mock: MockServer
             [
                 "Cool. 👍🏾",
                 "",
-                'If you change your mind, just go back to "ask a question" on the '
-                "main menu.",
+                "If you change your mind, you know where to go",
+                "",
+                "*What would you like to do now?*",
+                "",
+                "1. Talk to a counsellor",
+                "2. Ask a question",
+                "3. Update your information",
                 "",
                 "-----",
                 "*Reply:*",

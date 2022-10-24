@@ -33,7 +33,7 @@ CONTENT_FEEDBACK_KEYWORDS = {
     "1",
     "2",
     "yes",
-    "nope",
+    "not really",
     "yes thanks",
     "yes i did",
     "no i didn t",
