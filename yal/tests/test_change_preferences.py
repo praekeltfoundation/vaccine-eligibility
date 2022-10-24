@@ -409,7 +409,9 @@ async def test_state_update_bot_name(tester: AppTester, rapidpro_mock):
         )
     )
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/contacts.json"
+    ] * 2
 
 
 @pytest.mark.asyncio

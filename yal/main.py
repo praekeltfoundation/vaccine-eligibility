@@ -11,6 +11,7 @@ from yal.optout import Application as OptOutApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
+from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import replace_persona_fields
@@ -32,11 +33,16 @@ FEEDBACK_KEYWORDS = {"feedback"}
 CONTENT_FEEDBACK_KEYWORDS = {
     "1",
     "2",
+    "3",
     "yes",
     "not really",
     "yes thanks",
     "yes i did",
     "no i didn t",
+    "no not helpful",
+    "i knew this before",
+    "yes i went",
+    "no i didn t go",
 }
 
 
@@ -53,6 +59,7 @@ class Application(
     FeedbackApplication,
     ContentFeedbackSurveyApplication,
     WaFbCrossoverFeedbackApplication,
+    ServiceFinderFeedbackSurveyApplication,
 ):
     START_STATE = "state_start"
 
@@ -103,6 +110,15 @@ class Application(
                 self.state_name = ContentFeedbackSurveyApplication.START_STATE
             if feedback_survey_sent and feedback_type == "facebook_banner":
                 self.state_name = WaFbCrossoverFeedbackApplication.START_STATE
+            if feedback_survey_sent and feedback_type == "servicefinder":
+                self.state_name = ServiceFinderFeedbackSurveyApplication.START_STATE
+
+            feedback_survey_sent_2 = fields.get("feedback_survey_sent_2")
+            feedback_type_2 = fields.get("feedback_type_2")
+            if feedback_survey_sent_2 and feedback_type_2 == "servicefinder":
+                self.state_name = (
+                    ServiceFinderFeedbackSurveyApplication.CALLBACK_2_STATE
+                )
 
         return await super().process_message(message)
 

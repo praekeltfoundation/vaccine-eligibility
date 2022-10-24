@@ -2,6 +2,7 @@ import asyncio
 import logging
 import secrets
 from collections import defaultdict
+from datetime import timedelta
 from urllib.parse import quote_plus, urljoin
 
 import aiohttp
@@ -19,7 +20,7 @@ from vaccine.states import (
     WhatsAppListState,
 )
 from vaccine.utils import HTTP_EXCEPTIONS
-from yal import config, rapidpro
+from yal import config, rapidpro, utils
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.utils import (
     BACK_TO_MAIN,
@@ -51,6 +52,7 @@ def get_google_api():
 
 class Application(BaseApplication):
     START_STATE = "state_servicefinder_start"
+    SURVEY_DELAY = timedelta(minutes=10)
 
     def reset_metadata(self):
         self.save_metadata("parent_category", "root")
@@ -329,6 +331,16 @@ class Application(BaseApplication):
         )
 
     async def state_display_facilities(self):
+        timestamp = utils.get_current_datetime() + self.SURVEY_DELAY
+        whatsapp_id = utils.normalise_phonenumber(self.inbound.from_addr).lstrip("+")
+        await rapidpro.update_profile(
+            whatsapp_id=whatsapp_id,
+            fields={
+                "feedback_timestamp": timestamp.isoformat(),
+                "feedback_type": "servicefinder",
+            },
+        )
+
         metadata = self.user.metadata
         msg = "\n".join(
             [
