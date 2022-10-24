@@ -1,8 +1,10 @@
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
+from vaccine.states import Choice, FreeText, WhatsAppButtonState
 from vaccine.utils import get_display_choices
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AAQApplication
+from yal.change_preferences import Application as ChangePreferencesApplication
+from yal.pleasecallme import Application as PleaseCallMeApplication
 
 
 class ContentFeedbackSurveyApplication(BaseApplication):
@@ -19,7 +21,7 @@ class ContentFeedbackSurveyApplication(BaseApplication):
         # Mirror the message here, for response and error handling
         choices = [
             Choice("yes", self._("Yes, thanks!"), additional_keywords=["yes"]),
-            Choice("no", self._("Nope")),
+            Choice("no", self._("Not really")),
         ]
         question = self._(
             "\n".join(
@@ -59,7 +61,7 @@ class ContentFeedbackSurveyApplication(BaseApplication):
                     "Reply:",
                     get_display_choices(choices),
                     "",
-                    "--",
+                    "-----",
                     "",
                     utils.BACK_TO_MAIN,
                     utils.GET_HELP,
@@ -75,12 +77,19 @@ class ContentFeedbackSurveyApplication(BaseApplication):
         )
 
     async def state_no_feedback(self):
+        choices = [
+            Choice("counsellor", self._("Talk to a counsellor")),
+            Choice("question", self._("Ask a question")),
+            Choice("update info", self._("Update your information")),
+        ]
         question = self._(
             "\n".join(
                 [
                     "Thanks for letting us know!",
                     "",
-                    "Check you later 👋🏾",
+                    "*What would you like to do now?*",
+                    "",
+                    get_display_choices(choices),
                     "",
                     "-----",
                     "*Or reply:*",
@@ -89,7 +98,17 @@ class ContentFeedbackSurveyApplication(BaseApplication):
                 ]
             )
         )
-        return EndState(self, question)
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            next={
+                "counsellor": PleaseCallMeApplication.START_STATE,
+                "question": AAQApplication.START_STATE,
+                "update info": ChangePreferencesApplication.START_STATE,
+            },
+            error=self._(utils.get_generic_error()),
+        )
 
     async def state_get_feedback(self):
         question = self._(
@@ -109,6 +128,11 @@ class ContentFeedbackSurveyApplication(BaseApplication):
         return FreeText(self, question, next="state_confirm_feedback")
 
     async def state_confirm_feedback(self):
+        choices = [
+            Choice("counsellor", self._("Talk to a counsellor")),
+            Choice("question", self._("Ask a question")),
+            Choice("update info", self._("Update your information")),
+        ]
         question = self._(
             "\n".join(
                 [
@@ -116,7 +140,9 @@ class ContentFeedbackSurveyApplication(BaseApplication):
                     "",
                     "Thank you for the feedback - I'm working on it already.",
                     "",
-                    "Chat again soon 👋🏾",
+                    "*What would you like to do now?*",
+                    "",
+                    get_display_choices(choices),
                     "",
                     "-----",
                     "*Or reply:*",
@@ -125,7 +151,17 @@ class ContentFeedbackSurveyApplication(BaseApplication):
                 ]
             )
         )
-        return EndState(self, question)
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            next={
+                "counsellor": PleaseCallMeApplication.START_STATE,
+                "question": AAQApplication.START_STATE,
+                "update info": ChangePreferencesApplication.START_STATE,
+            },
+            error=self._(utils.get_generic_error()),
+        )
 
     async def state_negative_feedback(self):
         choices = [
@@ -161,13 +197,21 @@ class ContentFeedbackSurveyApplication(BaseApplication):
         )
 
     async def state_no_negative_feedback(self):
+        choices = [
+            Choice("counsellor", self._("Talk to a counsellor")),
+            Choice("question", self._("Ask a question")),
+            Choice("update info", self._("Update your information")),
+        ]
         question = self._(
             "\n".join(
                 [
                     "Cool. 👍🏾",
                     "",
-                    'If you change your mind, just go back to "ask a question" on the '
-                    "main menu.",
+                    "If you change your mind, you know where to go",
+                    "",
+                    "*What would you like to do now?*",
+                    "",
+                    get_display_choices(choices),
                     "",
                     "-----",
                     "*Reply:*",
@@ -176,4 +220,14 @@ class ContentFeedbackSurveyApplication(BaseApplication):
                 ]
             )
         )
-        return EndState(self, question)
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            next={
+                "counsellor": PleaseCallMeApplication.START_STATE,
+                "question": AAQApplication.START_STATE,
+                "update info": ChangePreferencesApplication.START_STATE,
+            },
+            error=self._(utils.get_generic_error()),
+        )
