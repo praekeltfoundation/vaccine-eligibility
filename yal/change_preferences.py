@@ -592,16 +592,7 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
-        question = self._(
-            "\n".join(
-                [
-                    "Great - from now on you can call me [persona_name].",
-                    "",
-                    "_You can change this later by typing in *9* from the main "
-                    "*MENU*._",
-                ]
-            )
-        )
+        question = self._("Great - from now on you can call me [persona_name].")
         await self.publish_message(question)
         await asyncio.sleep(0.5)
 

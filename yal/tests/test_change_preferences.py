@@ -420,13 +420,7 @@ async def test_state_update_bot_name_submit(tester: AppTester, rapidpro_mock):
     await tester.user_input("johnny")
 
     [msg] = tester.fake_worker.outbound_messages
-    assert msg.content == "\n".join(
-        [
-            "Great - from now on you can call me johnny.",
-            "",
-            "_You can change this later by typing in *9* from the main *MENU*._",
-        ]
-    )
+    assert msg.content == "Great - from now on you can call me johnny."
     tester.assert_num_messages(1)
     tester.assert_message(
         "\n".join(
