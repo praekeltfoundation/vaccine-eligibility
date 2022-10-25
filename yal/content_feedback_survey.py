@@ -11,7 +11,7 @@ from yal.pleasecallme import Application as PleaseCallMeApplication
 
 class ContentFeedbackSurveyApplication(BaseApplication):
     START_STATE = "state_content_feedback_survey_start"
-    TRIGGER_KEYWORDS = {"1", "yes thanks", "2", "not really"}
+    CONTENT_FEEDBACK_TRIGGER_KEYWORDS = {"1", "yes thanks", "2", "not really"}
 
     async def state_content_feedback_survey_start(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
@@ -22,7 +22,7 @@ class ContentFeedbackSurveyApplication(BaseApplication):
             whatsapp_id, {"feedback_survey_sent": "", "feedback_timestamp": ""}
         )
         keyword = utils.clean_inbound(self.inbound.content)
-        if keyword in self.TRIGGER_KEYWORDS:
+        if keyword in self.CONTENT_FEEDBACK_TRIGGER_KEYWORDS:
             return await self.go_to_state("state_process_content_feedback_trigger")
         else:
             # Get it to display the message, instead of having this state try to

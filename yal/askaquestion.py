@@ -43,7 +43,7 @@ def get_aaq_api():
 class Application(BaseApplication):
     START_STATE = "state_aaq_start"
     TIMEOUT_RESPONSE_STATE = "state_handle_timeout_response"
-    TRIGGER_KEYWORDS = {
+    AAQ_FEEDBACK_TRIGGER_KEYWORDS = {
         "1",
         "yes ask again",
         "yes",
@@ -526,7 +526,7 @@ class Application(BaseApplication):
         self.save_metadata("feedback_type", timeout_type_sent)
 
         keyword = clean_inbound(self.inbound.content)
-        if keyword in self.TRIGGER_KEYWORDS:
+        if keyword in self.AAQ_FEEDBACK_TRIGGER_KEYWORDS:
             if timeout_type_sent == "ask_a_question":
                 return await self.go_to_state("state_handle_list_timeout")
             if timeout_type_sent == "ask_a_question_2":

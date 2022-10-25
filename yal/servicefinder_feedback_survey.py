@@ -43,6 +43,9 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
             # Get it to display the message, instead of having this state try to
             # match it to a keyword
             self.inbound.session_event = Message.SESSION_EVENT.NEW
+            self.save_metadata(
+                "feedback_return_state", "state_servicefinder_feedback_confirmation"
+            )
             return await self.go_to_state(
                 "state_servicefinder_feedback_unrecognised_option"
             )
@@ -93,13 +96,14 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
                 get_display_choices(choices),
             ]
         )
+        feedback_return_state = self.user.metadata.get("feedback_return_state")
         return WhatsAppButtonState(
             self,
             question=question,
             choices=choices,
             error=utils.get_generic_error(),
             next={
-                "feedback": "state_process_servicefinder_feedback_trigger",
+                "feedback": feedback_return_state,
                 "mainmenu": MainMenuApplication.START_STATE,
                 "aaq": AAQApplication.START_STATE,
             },
@@ -244,6 +248,19 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
             datetime.fromisoformat(fields["feedback_timestamp_2"])
             - self.CALLBACK_2_DELAY
         )
+
+        keyword = utils.clean_inbound(self.inbound.content)
+        if keyword not in self.SERVICEFINDER_TRIGGER_KEYWORDS:
+            # Get it to display the message, instead of having this state try to
+            # match it to a keyword
+            self.inbound.session_event = Message.SESSION_EVENT.NEW
+            self.save_metadata(
+                "feedback_return_state", "state_servicefinder_feedback_survey_2_start"
+            )
+            return await self.go_to_state(
+                "state_servicefinder_feedback_unrecognised_option"
+            )
+
         choices = [
             Choice("yes", self._("Yes, I went")),
             Choice("no", self._("No, I didn't go")),
