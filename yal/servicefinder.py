@@ -516,7 +516,6 @@ class Application(BaseApplication):
                             "key": config.GOOGLE_PLACES_KEY,
                             "sessiontoken": metadata.get("google_session_token"),
                             "language": "en",
-                            "components": "country:za",
                         },
                     )
                     response.raise_for_status()
