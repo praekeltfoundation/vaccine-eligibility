@@ -103,13 +103,14 @@ class Application(
         otherwise return None
         """
         feedback_timestamp = self.user.metadata.get("feedback_timestamp")
-        feedback_in_time = feedback_timestamp and datetime.fromisoformat(
-            feedback_timestamp
-        ) > get_current_datetime() - timedelta(minutes=1)
+        in_one_minute = get_current_datetime() + timedelta(minutes=1)
+        feedback_in_time = feedback_timestamp and (
+            datetime.fromisoformat(feedback_timestamp) < in_one_minute
+        )
         feedback_timestamp_2 = self.user.metadata.get("feedback_timestamp_2")
-        feedback_in_time_2 = feedback_timestamp_2 and datetime.fromisoformat(
-            feedback_timestamp_2
-        ) > get_current_datetime() - timedelta(minutes=1)
+        feedback_in_time_2 = feedback_timestamp_2 and (
+            datetime.fromisoformat(feedback_timestamp_2) < in_one_minute
+        )
         if feedback_in_time or feedback_in_time_2:
             msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
             whatsapp_id = msisdn.lstrip("+")

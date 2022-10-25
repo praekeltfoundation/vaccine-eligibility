@@ -17,7 +17,7 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
     CALLBACK_2_DELAY = timedelta(days=14)
     APPOINTMENT_TIPS_CONTENT_ID = 494
     APPOINTMENT_TIPS_MENU_LEVEL = 2
-    TRIGGER_KEYWORDS = {
+    SERVICEFINDER_TRIGGER_KEYWORDS = {
         "1",
         "yes thanks",
         "2",
@@ -35,7 +35,7 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
             whatsapp_id, {"feedback_survey_sent": "", "feedback_timestamp": ""}
         )
         keyword = utils.clean_inbound(self.inbound.content)
-        if keyword in self.TRIGGER_KEYWORDS:
+        if keyword in self.SERVICEFINDER_TRIGGER_KEYWORDS:
             return await self.go_to_state(
                 "state_process_servicefinder_feedback_trigger"
             )

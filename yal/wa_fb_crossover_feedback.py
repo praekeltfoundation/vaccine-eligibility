@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 class Application(BaseApplication):
     START_STATE = "state_crossover_feedback_survey_start"
-    TRIGGER_KEYWORDS = {"1", "yes i did", "2", "no i didn t"}
+    WA_FB_CROSSOVER_TRIGGER_KEYWORDS = {"1", "yes i did", "2", "no i didn t"}
 
     async def state_crossover_feedback_survey_start(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
@@ -32,7 +32,7 @@ class Application(BaseApplication):
             whatsapp_id, {"feedback_survey_sent": "", "feedback_timestamp": ""}
         )
         keyword = utils.clean_inbound(self.inbound.content)
-        if keyword in self.TRIGGER_KEYWORDS:
+        if keyword in self.WA_FB_CROSSOVER_TRIGGER_KEYWORDS:
             return await self.go_to_state("state_wa_fb_crossover_feedback")
         else:
             # Get it to display the message, instead of having this state try to

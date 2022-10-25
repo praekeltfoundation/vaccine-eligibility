@@ -44,7 +44,14 @@ class Application(BaseApplication):
     START_STATE = "state_aaq_start"
     TIMEOUT_RESPONSE_STATE = "state_handle_timeout_response"
     TRIGGER_KEYWORDS = {
-        "1", "yes ask again", "yes", "2", "no i m good", "nope", "3", "no go back to list"
+        "1",
+        "yes ask again",
+        "yes",
+        "2",
+        "no i m good",
+        "nope",
+        "3",
+        "no go back to list",
     }
 
     async def state_aaq_start(self, question=None, buttons=None):
@@ -528,9 +535,7 @@ class Application(BaseApplication):
             # Get it to display the message, instead of having this state try to
             # match it to a keyword
             self.inbound.session_event = Message.SESSION_EVENT.NEW
-            return await self.go_to_state(
-                "state_aaq_timeout_unrecognised_option"
-            )
+            return await self.go_to_state("state_aaq_timeout_unrecognised_option")
 
     async def state_aaq_timeout_unrecognised_option(self):
         choices = [

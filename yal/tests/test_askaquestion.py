@@ -9,7 +9,7 @@ from vaccine.models import Message
 from vaccine.testing import AppTester, MockServer, TState, run_sanic
 from yal import config
 from yal.main import Application
-from yal.utils import BACK_TO_MAIN, GET_HELP, get_current_datetime
+from yal.utils import BACK_TO_MAIN, GET_HELP
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ def get_rapidpro_contact(urn):
             "feedback_type": "ask_a_question"
             if ("27820001001" in urn)
             else "ask_a_question_2",
-            "feedback_sent": "TRUE"
+            "feedback_sent": "TRUE",
         },
     }
 
@@ -491,6 +491,7 @@ async def test_state_no_question_not_answered(
 
     tester.assert_message(message)
 
+
 @pytest.mark.asyncio
 async def test_timeout_invalid_keyword(tester: AppTester, rapidpro_mock: MockServer):
     """If the user responds with a keyword we don't recognise, show them the error"""
@@ -510,6 +511,7 @@ async def test_timeout_invalid_keyword_back_to_feedback(
 
     await tester.user_input("reply to last text")
     tester.assert_state("state_handle_list_timeout")
+
 
 @pytest.mark.asyncio
 async def test_state_display_content_question_back_to_list(

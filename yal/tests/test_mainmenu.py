@@ -909,7 +909,7 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["data__session_id"][0] == "1"
     assert params["data__user_addr"][0] == "27820001001"
 
-    assert len(rapidpro_mock.tstate.requests) == 8
+    assert len(rapidpro_mock.tstate.requests) == 7
 
     update_request = rapidpro_mock.tstate.requests[-1]
     assert update_request.json["fields"] == {
