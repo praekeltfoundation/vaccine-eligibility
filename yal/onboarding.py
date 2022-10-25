@@ -265,10 +265,10 @@ class Application(BaseApplication):
             question=self._(
                 "\n".join(
                     [
-                        "🙍🏾‍♀️Got it.",
+                        "Got it.",
                         "",
-                        "👩🏾 *Remember* — you can update your info at any time. Just ",
-                        "choose *UPDATE/CHANGE PERSONAL INFO* from the Main *MENU*.",
+                        "*Remember* — you can update your info at any time.",
+                        "You can change this later from the main *MENU*.",
                         "",
                         "*1* - OK, got it 👍",
                     ]
