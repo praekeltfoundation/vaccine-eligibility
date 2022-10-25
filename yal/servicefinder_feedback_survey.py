@@ -20,8 +20,10 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
     SERVICEFINDER_TRIGGER_KEYWORDS = {
         "1",
         "yes thanks",
+        "yes i went",
         "2",
         "no not helpful",
+        "no i didn t go",
         "3",
         "i knew this before",
     }
@@ -44,7 +46,7 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
             # match it to a keyword
             self.inbound.session_event = Message.SESSION_EVENT.NEW
             self.save_metadata(
-                "feedback_return_state", "state_servicefinder_feedback_confirmation"
+                "feedback_return_state", "state_process_servicefinder_feedback_trigger"
             )
             return await self.go_to_state(
                 "state_servicefinder_feedback_unrecognised_option"
