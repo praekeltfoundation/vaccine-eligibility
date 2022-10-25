@@ -69,7 +69,7 @@ async def test_state_not_saw_recent_facebook(tester: AppTester, rapidpro_mock):
         "engaged_on_facebook"
     ]
 
-    assert engaged_on_facebook is False
+    assert engaged_on_facebook == "FALSE"
 
 
 @pytest.mark.asyncio
@@ -103,7 +103,7 @@ _Click on the button below and choose an option_
         "engaged_on_facebook"
     ]
 
-    assert engaged_on_facebook is True
+    assert engaged_on_facebook == "TRUE"
 
 
 @pytest.mark.asyncio
