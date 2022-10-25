@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import pytest
 from sanic import Sanic, response
 
-from vaccine.testing import AppTester, TState, run_sanic
+from vaccine.testing import AppTester, MockServer, TState, run_sanic
 from yal import config
 from yal.utils import BACK_TO_MAIN, GET_HELP
 from yal.wa_fb_crossover_feedback import Application
@@ -53,6 +53,25 @@ async def rapidpro_mock():
         server.tstate = tstate
         yield server
         config.RAPIDPRO_URL = url
+
+
+@pytest.mark.asyncio
+async def test_invalid_keyword(tester: AppTester, rapidpro_mock: MockServer):
+    """If the user responds with a keyword we don't recognise, show them the error"""
+    await tester.user_input("menu")
+    tester.assert_state("state_wa_fb_crossover_feedback_unrecognised_option")
+
+
+@pytest.mark.asyncio
+async def test_invalid_keyword_back_to_feedback(
+    tester: AppTester, rapidpro_mock: MockServer
+):
+    """If the user responds with a keyword we don't recognise, show them the error"""
+    await tester.user_input("menu")
+    tester.assert_state("state_wa_fb_crossover_feedback_unrecognised_option")
+
+    await tester.user_input("reply to last text")
+    tester.assert_state("state_wa_fb_crossover_feedback")
 
 
 @pytest.mark.asyncio

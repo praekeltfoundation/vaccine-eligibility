@@ -1,6 +1,7 @@
 import logging
 
 from vaccine.base_application import BaseApplication
+from vaccine.models import Message
 from vaccine.states import (
     Choice,
     EndState,
@@ -11,6 +12,7 @@ from vaccine.states import (
 from vaccine.utils import get_display_choices
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AskaQuestionApplication
+from yal.mainmenu import Application as MainMenuApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.utils import get_generic_error
 
@@ -19,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 class Application(BaseApplication):
     START_STATE = "state_crossover_feedback_survey_start"
+    TRIGGER_KEYWORDS = {"1", "yes i did", "2", "no i didn t"}
 
     async def state_crossover_feedback_survey_start(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
@@ -28,7 +31,16 @@ class Application(BaseApplication):
         await rapidpro.update_profile(
             whatsapp_id, {"feedback_survey_sent": "", "feedback_timestamp": ""}
         )
-        return await self.go_to_state("state_wa_fb_crossover_feedback")
+        keyword = utils.clean_inbound(self.inbound.content)
+        if keyword in self.TRIGGER_KEYWORDS:
+            return await self.go_to_state("state_wa_fb_crossover_feedback")
+        else:
+            # Get it to display the message, instead of having this state try to
+            # match it to a keyword
+            self.inbound.session_event = Message.SESSION_EVENT.NEW
+            return await self.go_to_state(
+                "state_wa_fb_crossover_feedback_unrecognised_option"
+            )
 
     async def state_wa_fb_crossover_feedback(self):
         choices = [
@@ -57,6 +69,34 @@ class Application(BaseApplication):
             next={
                 "yes": "state_saw_recent_facebook",
                 "no": "state_not_saw_recent_facebook",
+            },
+        )
+
+    async def state_wa_fb_crossover_feedback_unrecognised_option(self):
+        choices = [
+            Choice("feedback", self._("Reply to last text")),
+            Choice("mainmenu", self._("Go to the Main Menu")),
+            Choice("aaq", self._("Ask a question")),
+        ]
+        question = "\n".join(
+            [
+                "*[persona_emoji] Hmm, looks like you've run out of time to respond to "
+                "that message.*",
+                "",
+                "*What would you like to do now? Here are some options.*",
+                "",
+                get_display_choices(choices),
+            ]
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=utils.get_generic_error(),
+            next={
+                "feedback": "state_wa_fb_crossover_feedback",
+                "mainmenu": MainMenuApplication.START_STATE,
+                "aaq": AskaQuestionApplication.START_STATE,
             },
         )
 
