@@ -184,7 +184,14 @@ async def test_state_update_gender(tester: AppTester, rapidpro_mock):
                 "*6* - Skip",
             ]
         ),
-        list_items=["Female", "Male", "Non-binary", "None of these", "Rather not say", "Skip"],
+        list_items=[
+            "Female",
+            "Male",
+            "Non-binary",
+            "None of these",
+            "Rather not say",
+            "Skip",
+        ],
     )
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
