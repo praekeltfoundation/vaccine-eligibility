@@ -559,6 +559,12 @@ class Application(BaseApplication):
         return await self.go_to_state("state_category_lookup")
 
     async def state_province(self):
+        def _next(choice: Choice):
+            if choice.value == "skip":
+                return "state_validate_full_address_error"
+            else:
+                return "state_full_address"
+
         province_text = "\n".join(
             [f"{i+1} - {name}" for i, (_, name) in enumerate(PROVINCES)]
         )
@@ -586,7 +592,7 @@ class Application(BaseApplication):
             question=question,
             button="Province",
             choices=province_choices,
-            next="state_full_address",
+            next=_next,
             error=self._(get_generic_error()),
         )
 

@@ -589,6 +589,13 @@ async def test_state_province(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
+async def test_state_province_skip(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_province")
+    await tester.user_input("10")
+    tester.assert_state("state_validate_full_address_error")
+
+
+@pytest.mark.asyncio
 async def test_state_full_address_invalid(tester: AppTester):
     tester.setup_state("state_full_address")
     await tester.user_input("2 test street test suburb")
