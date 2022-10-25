@@ -26,7 +26,7 @@ GENDERS = {
     "male": "Male",
     "non_binary": "Non-binary",
     "other": "None of these",
-    "skip": "Rather not say",
+    "rather_not_say": "Rather not say",
 }
 BACK_TO_MAIN = "0. 🏠 *Back* to Main *MENU*"
 GET_HELP = "#. 🆘Get *HELP*"

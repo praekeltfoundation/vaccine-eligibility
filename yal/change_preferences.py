@@ -451,6 +451,8 @@ class Application(BaseApplication):
             [f"*{i+1}* - {name}" for i, (code, name) in enumerate(GENDERS.items())]
         )
         gender_choices = [Choice(code, name) for code, name in GENDERS.items()]
+        gender_text = f"{gender_text}\n*{len(gender_choices) + 1}* - Skip"
+        gender_choices.append(Choice("skip", self._("Skip")))
 
         question = self._(
             "\n".join(

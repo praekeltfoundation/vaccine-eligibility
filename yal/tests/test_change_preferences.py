@@ -181,9 +181,17 @@ async def test_state_update_gender(tester: AppTester, rapidpro_mock):
                 "*3* - Non-binary",
                 "*4* - None of these",
                 "*5* - Rather not say",
+                "*6* - Skip",
             ]
         ),
-        list_items=["Female", "Male", "Non-binary", "None of these", "Rather not say"],
+        list_items=[
+            "Female",
+            "Male",
+            "Non-binary",
+            "None of these",
+            "Rather not say",
+            "Skip",
+        ],
     )
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
@@ -223,12 +231,22 @@ async def test_state_update_gender_from_list(tester: AppTester, rapidpro_mock):
 async def test_state_update_gender_skip(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_update_gender")
 
-    await tester.user_input("Rather Not Say")
+    await tester.user_input("Skip")
 
     tester.assert_answer("state_update_gender", "skip")
     tester.setup_state("state_display_preferences")
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+
+
+@pytest.mark.asyncio
+async def test_state_update_gender_rather_not_say(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_update_gender")
+
+    await tester.user_input("Rather Not Say")
+
+    tester.assert_answer("state_update_gender", "rather_not_say")
+    tester.setup_state("state_update_gender_confirm")
 
 
 @pytest.mark.asyncio
