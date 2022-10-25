@@ -13,6 +13,7 @@ from sanic import Sanic, response
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.main import Application
+from yal.utils import get_current_datetime
 
 # TODO: add number of messages assertions
 
@@ -46,6 +47,19 @@ def get_rapidpro_contact(urn):
             "suburb": "TestSuburb",
             "street_name": "test street",
             "street_number": "12",
+            "last_main_timeout": get_current_datetime().isoformat(),
+            "last_mainmenu_timeout": get_current_datetime().isoformat(),
+            "last_onboarding_time": get_current_datetime().isoformat(),
+            "callback_check_time": get_current_datetime().isoformat(),
+            "feedback_timestamp": get_current_datetime().isoformat(),
+            "feedback_timestamp_2": get_current_datetime().isoformat(),
+            "longitude": "123",
+            "latitude": "456",
+            "location_description": "Narnia",
+            "persona_name": "Aslan",
+            "persona_emoji": "🦁",
+            "gender_other": "non conforming",
+            "emergency_contact": "123-emergency",
         }
     return contact
 
@@ -103,9 +117,9 @@ async def test_state_optout(tester: AppTester):
                 "",
                 "*What would you like to do?*",
                 "",
-                "*1* - I  want to stop receiving notifications",
-                "*2* - I  want to delete all data saved about me.",
-                "*3* - No change. I still want to receive messages from B-Wise",
+                "*1.* I  want to stop receiving notifications",
+                "*2.* I  want to delete all data saved about me.",
+                "*3.* No change. I still want to receive messages from B-Wise",
             ]
         )
     )
@@ -190,6 +204,12 @@ async def test_state_optout_stop_notifications(
             "onboarding_completed": "",
             "opted_out": "TRUE",
             "opted_out_timestamp": "2022-06-19T17:30:00",
+            "last_main_timeout": "",
+            "last_mainmenu_timeout": "",
+            "last_onboarding_time": "",
+            "callback_check_time": "",
+            "feedback_timestamp": "",
+            "feedback_timestamp_2": "",
         },
     }
 
@@ -226,6 +246,19 @@ async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
             "suburb": "",
             "street_name": "",
             "street_number": "",
+            "last_main_timeout": "",
+            "last_mainmenu_timeout": "",
+            "last_onboarding_time": "",
+            "callback_check_time": "",
+            "feedback_timestamp": "",
+            "feedback_timestamp_2": "",
+            "longitude": "",
+            "latitude": "",
+            "location_description": "",
+            "persona_name": "",
+            "persona_emoji": "",
+            "gender_other": "",
+            "emergency_contact": "",
         },
     }
 

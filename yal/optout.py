@@ -25,6 +25,14 @@ logger = logging.getLogger(__name__)
 
 class Application(BaseApplication):
     START_STATE = "state_optout"
+    reminders_to_be_cleared = {
+        "last_main_timeout": "",
+        "last_mainmenu_timeout": "",
+        "last_onboarding_time": "",
+        "callback_check_time": "",
+        "feedback_timestamp": "",
+        "feedback_timestamp_2": "",
+    }
 
     async def state_optout(self):
 
@@ -38,9 +46,9 @@ class Application(BaseApplication):
                     "",
                     "*What would you like to do?*",
                     "",
-                    "*1* - I  want to stop receiving notifications",
-                    "*2* - I  want to delete all data saved about me.",
-                    "*3* - No change. I still want to receive messages from B-Wise",
+                    "*1.* I  want to stop receiving notifications",
+                    "*2.* I  want to delete all data saved about me.",
+                    "*3.* No change. I still want to receive messages from B-Wise",
                 ]
             )
         )
@@ -64,14 +72,15 @@ class Application(BaseApplication):
     async def state_submit_optout(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "onboarding_completed": "",
+            "opted_out": "TRUE",
+            "opted_out_timestamp": get_current_datetime().isoformat(),
+        } | self.reminders_to_be_cleared
 
         error = await rapidpro.update_profile(
             whatsapp_id,
-            {
-                "onboarding_completed": "",
-                "opted_out": "TRUE",
-                "opted_out_timestamp": get_current_datetime().isoformat(),
-            },
+            data,
         )
         if error:
             return await self.go_to_state("state_error")
@@ -153,7 +162,14 @@ class Application(BaseApplication):
             "suburb": "",
             "street_name": "",
             "street_number": "",
-        }
+            "longitude": "",
+            "latitude": "",
+            "location_description": "",
+            "persona_name": "",
+            "persona_emoji": "",
+            "gender_other": "",
+            "emergency_contact": "",
+        } | self.reminders_to_be_cleared
         error, fields = await rapidpro.get_profile(whatsapp_id)
         if error:
             return await self.go_to_state("state_error")
