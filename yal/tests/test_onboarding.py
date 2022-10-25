@@ -78,7 +78,7 @@ async def test_state_persona_name(
         [
             "Great - from now on you can call me Nurse Joy.",
             "",
-            "_You can change this later by typing in *9* from the main *MENU.*_",
+            "_You can change this later from the main *MENU.*_",
         ]
     )
 
