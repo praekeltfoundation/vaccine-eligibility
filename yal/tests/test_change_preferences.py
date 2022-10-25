@@ -272,7 +272,7 @@ async def test_state_update_gender_confirm_not_correct(
     tester.assert_state("state_update_gender")
     tester.assert_num_messages(1)
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
@@ -331,7 +331,7 @@ async def test_state_update_age_confirm_not_correct(tester: AppTester, rapidpro_
     tester.assert_num_messages(1)
     tester.assert_state("state_update_age")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
@@ -394,7 +394,7 @@ async def test_state_update_relationship_status_confirm_not_correct(
     tester.assert_num_messages(1)
     tester.assert_state("state_update_relationship_status")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
@@ -614,7 +614,7 @@ async def test_state_update_location_skip(
 
 @pytest.mark.asyncio
 async def test_state_update_location_confirm_incorrect(
-    tester: AppTester, google_api_mock
+    tester: AppTester, google_api_mock, rapidpro_mock
 ):
     tester.user.metadata["latitude"] = 56.78
     tester.user.metadata["longitude"] = 12.34

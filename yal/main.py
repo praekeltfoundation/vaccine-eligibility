@@ -28,7 +28,6 @@ ONBOARDING_REMINDER_KEYWORDS = {
     "not interested",
 }
 CALLBACK_CHECK_KEYWORDS = {"callback"}
-AAQ_TIMEOUT_KEYWORDS = {"yes", "no", "yes ask again", "no i m good"}
 FEEDBACK_KEYWORDS = {"feedback"}
 CONTENT_FEEDBACK_KEYWORDS = {
     "1",
@@ -43,6 +42,11 @@ CONTENT_FEEDBACK_KEYWORDS = {
     "i knew this before",
     "yes i went",
     "no i didn t go",
+    "no",
+    "yes ask again",
+    "no i m good",
+    "nope",
+    "no go back to list",
 }
 
 
@@ -112,6 +116,10 @@ class Application(
                 self.state_name = WaFbCrossoverFeedbackApplication.START_STATE
             if feedback_survey_sent and feedback_type == "servicefinder":
                 self.state_name = ServiceFinderFeedbackSurveyApplication.START_STATE
+            if feedback_survey_sent and (
+                feedback_type == "ask_a_question" or feedback_type == "ask_a_question_2"
+            ):
+                self.state_name = AaqApplication.TIMEOUT_RESPONSE_STATE
 
             feedback_survey_sent_2 = fields.get("feedback_survey_sent_2")
             feedback_type_2 = fields.get("feedback_type_2")
@@ -132,9 +140,6 @@ class Application(
 
         terms_accepted = fields.get("terms_accepted")
         onboarding_completed = fields.get("onboarding_completed")
-        # If one of these values is True then the user might be responding
-        # to a scheduled msg
-        aaq_timeout_sent = fields.get("aaq_timeout_sent")
 
         # Cache some profile info
         for field in ("latitude", "longitude", "location_description"):
@@ -155,9 +160,6 @@ class Application(
                 return await self.go_to_state(OnboardingApplication.START_STATE)
             else:
                 return await self.go_to_state(TermsApplication.START_STATE)
-
-        if aaq_timeout_sent and (inbound.lower() in AAQ_TIMEOUT_KEYWORDS):
-            return await self.go_to_state(AaqApplication.TIMEOUT_RESPONSE_STATE)
 
         return await self.go_to_state("state_catch_all")
 

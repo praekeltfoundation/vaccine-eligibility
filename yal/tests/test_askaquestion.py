@@ -20,7 +20,9 @@ def tester():
 def get_rapidpro_contact(urn):
     return {
         "fields": {
-            "aaq_timeout_type": "1" if ("27820001001" in urn) else "2",
+            "feedback_type": "ask_a_question"
+            if ("27820001001" in urn)
+            else "ask_a_question_2",
         },
     }
 
@@ -178,8 +180,8 @@ async def test_start_state_response_sets_timeout(
     request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
-            "next_aaq_timeout_time": "2022-06-19T17:35:00",
-            "aaq_timeout_type": "1",
+            "feedback_timestamp": "2022-06-19T17:35:00",
+            "feedback_type": "ask_a_question",
         },
     }
     assert len(aaq_mock.tstate.requests) == 1
@@ -250,8 +252,8 @@ async def test_state_display_results_choose_an_answer(
     request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
-            "next_aaq_timeout_time": "2022-06-19T17:35:00",
-            "aaq_timeout_type": "2",
+            "feedback_timestamp": "2022-06-19T17:35:00",
+            "feedback_type": "ask_a_question_2",
         },
     }
 
@@ -384,7 +386,7 @@ async def test_state_get_content_feedback_question_answered(
     assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"aaq_timeout_type": ""},
+        "fields": {"feedback_type": ""},
     }
 
     assert len(aaq_mock.tstate.requests) == 1
@@ -521,12 +523,12 @@ async def test_state_handle_timeout_handles_type_1_yes(
 ):
     mock_config.AAQ_URL = "http://aaq-test.com"
     tester.setup_state("state_handle_timeout_response")
-    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="yes ask again")
+    await tester.user_input("yes, ask again")
 
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[-1]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"aaq_timeout_sent": "", "aaq_timeout_type": ""},
+        "fields": {"feedback_survey_sent": ""},
     }
 
     tester.assert_state("state_aaq_start")
@@ -535,15 +537,15 @@ async def test_state_handle_timeout_handles_type_1_yes(
 @pytest.mark.asyncio
 async def test_state_handle_timeout_handles_type_1_no(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_handle_timeout_response")
-    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="no, I'm good")
+    await tester.user_input("no, I'm good")
 
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 4
+    request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"aaq_timeout_sent": "", "aaq_timeout_type": ""},
+        "fields": {"feedback_survey_sent": ""},
     }
 
-    tester.assert_state("state_start")
+    tester.assert_state("state_mainmenu")
 
 
 @pytest.mark.asyncio
@@ -557,12 +559,12 @@ async def test_state_handle_timeout_handles_type_2_yes(
     tester.user.metadata["faq_id"] = "1"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.user.metadata["aaq_page"] = 0
-    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="yes")
+    await tester.user_input(content="yes")
 
     assert len(rapidpro_mock.tstate.requests) == 4
     request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"aaq_timeout_sent": "", "aaq_timeout_type": ""},
+        "fields": {"feedback_survey_sent": ""},
     }
 
     tester.assert_state("state_yes_question_answered")
@@ -606,12 +608,12 @@ async def test_state_handle_timeout_handles_type_2_no(
     tester.user.metadata["faq_id"] = "1"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.user.metadata["aaq_page"] = 0
-    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="no")
+    await tester.user_input(content="nope...")
 
-    assert len(rapidpro_mock.tstate.requests) == 3
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 4
+    request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"aaq_timeout_sent": "", "aaq_timeout_type": ""},
+        "fields": {"feedback_survey_sent": ""},
     }
 
     tester.assert_state("state_no_question_not_answered")
