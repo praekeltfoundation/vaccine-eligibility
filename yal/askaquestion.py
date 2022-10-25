@@ -398,7 +398,7 @@ class Application(BaseApplication):
             question=question,
             choices=choices,
             next={
-                "aaq": self.START_STATE,
+                "aaq": "state_aaq_start",
                 "counsellor": PleaseCallMeApplication.START_STATE,
             },
             error=self._(get_generic_error()),
