@@ -66,7 +66,11 @@ async def aaq_mock():
     @app.route("/inbound/check", methods=["POST"])
     def inbound_check(request):
         tstate.requests.append(request)
-        body = get_aaq_response(MODEL_ANSWERS_PAGE_1, next="/inbound/92567/1")
+        data = json.loads(request.body)
+        if data["text_to_match"] == "empty":
+            body = get_aaq_response({})
+        else:
+            body = get_aaq_response(MODEL_ANSWERS_PAGE_1, next="/inbound/92567/1")
         return response.json(body, status=200)
 
     @app.route("/inbound/92567/1", methods=["GET"])
@@ -329,6 +333,53 @@ async def test_state_display_results_next(tester: AppTester, aaq_mock):
         "feedback_secret_key": "feedback-secret-key",
         "inbound_id": "inbound-id",
     }
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.askaquestion.get_current_datetime")
+async def test_state_display_results_no_answers(
+    get_current_datetime, tester: AppTester, rapidpro_mock, aaq_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_aaq_start")
+
+    await tester.user_input("empty")
+
+    tester.assert_state("state_aaq_start")
+    tester.assert_answer("state_no_answers", "empty")
+
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "feedback_timestamp": "2022-06-19T17:35:00",
+            "feedback_type": "ask_a_question",
+        },
+    }
+    assert len(aaq_mock.tstate.requests) == 1
+    request = aaq_mock.tstate.requests[0].json
+    request["metadata"].pop("message_id")
+    request["metadata"].pop("session_id")
+    assert request == {
+        "text_to_match": "empty",
+        "metadata": {"whatsapp_id": "27820001001"},
+    }
+    tester.assert_num_messages(1)
+    tester.assert_message(
+        "\n".join(
+            [
+                "🤖 *Hmm. I couldn't find an answer for that, but "
+                "maybe I misunderstood the question.*",
+                "",
+                "Do you mind trying again?",
+                "",
+                "-----",
+                "*Or reply:*",
+                GET_HELP,
+                BACK_TO_MAIN,
+            ]
+        )
+    )
 
 
 @pytest.mark.asyncio
