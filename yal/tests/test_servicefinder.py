@@ -397,7 +397,11 @@ async def test_state_category_sub(tester: AppTester, servicefinder_mock, rapidpr
 
 
 @pytest.mark.asyncio
-async def test_state_category(tester: AppTester, servicefinder_mock, rapidpro_mock):
+@mock.patch("yal.servicefinder.utils.get_current_datetime")
+async def test_state_category(
+    get_current_datetime, tester: AppTester, servicefinder_mock, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 3, 4, 5, 6, 7)
     tester.setup_state("state_category")
 
     tester.user.metadata["categories"] = get_processed_categories()
@@ -440,6 +444,12 @@ async def test_state_category(tester: AppTester, servicefinder_mock, rapidpro_mo
     tester.assert_message(question)
 
     assert [r.path for r in servicefinder_mock.tstate.requests] == ["/api/locations"]
+
+    [request] = rapidpro_mock.tstate.requests
+    assert request.json["fields"] == {
+        "feedback_timestamp": "2022-03-04T05:16:07",
+        "feedback_type": "servicefinder",
+    }
 
 
 @pytest.mark.asyncio

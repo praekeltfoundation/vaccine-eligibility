@@ -193,14 +193,42 @@ async def test_state_update_gender(tester: AppTester, rapidpro_mock):
 async def test_state_update_gender_from_list(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_update_gender")
 
-    await tester.user_input("male")
+    await tester.user_input("Non-Binary")
 
-    tester.assert_state("state_update_gender_confirm")
+    tester.assert_answer("state_update_gender", "non_binary")
     tester.assert_num_messages(1)
 
-    tester.assert_answer("state_update_gender", "male")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*CHAT SETTINGS / ⚙️ Change or update your info* / *Gender*",
+                "-----",
+                "",
+                "*You've chosen Non-binary as your gender.*",
+                "",
+                "Is this correct?",
+                "",
+                "1. Yes",
+                "2. No",
+            ]
+        ),
+    )
+
+    tester.assert_state("state_update_gender_confirm")
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == []
+
+
+@pytest.mark.asyncio
+async def test_state_update_gender_skip(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_update_gender")
+
+    await tester.user_input("Rather Not Say")
+
+    tester.assert_answer("state_update_gender", "skip")
+    tester.setup_state("state_display_preferences")
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
@@ -236,6 +264,7 @@ async def test_state_update_gender_confirm(tester: AppTester, rapidpro_mock):
 async def test_state_update_gender_confirm_not_correct(
     tester: AppTester, rapidpro_mock
 ):
+    tester.setup_answer("state_update_gender", "male")
     tester.setup_state("state_update_gender_confirm")
 
     await tester.user_input("no")
@@ -243,7 +272,7 @@ async def test_state_update_gender_confirm_not_correct(
     tester.assert_state("state_update_gender")
     tester.assert_num_messages(1)
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
@@ -302,7 +331,7 @@ async def test_state_update_age_confirm_not_correct(tester: AppTester, rapidpro_
     tester.assert_num_messages(1)
     tester.assert_state("state_update_age")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
@@ -365,7 +394,7 @@ async def test_state_update_relationship_status_confirm_not_correct(
     tester.assert_num_messages(1)
     tester.assert_state("state_update_relationship_status")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
@@ -409,7 +438,9 @@ async def test_state_update_bot_name(tester: AppTester, rapidpro_mock):
         )
     )
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/contacts.json"
+    ] * 2
 
 
 @pytest.mark.asyncio
@@ -424,7 +455,7 @@ async def test_state_update_bot_name_submit(tester: AppTester, rapidpro_mock):
         [
             "Great - from now on you can call me johnny.",
             "",
-            "_You can change this later by typing in *9* from the main *MENU*._",
+            "_You can change this later from the main *MENU*._",
         ]
     )
     tester.assert_num_messages(1)
@@ -583,7 +614,7 @@ async def test_state_update_location_skip(
 
 @pytest.mark.asyncio
 async def test_state_update_location_confirm_incorrect(
-    tester: AppTester, google_api_mock
+    tester: AppTester, google_api_mock, rapidpro_mock
 ):
     tester.user.metadata["latitude"] = 56.78
     tester.user.metadata["longitude"] = 12.34

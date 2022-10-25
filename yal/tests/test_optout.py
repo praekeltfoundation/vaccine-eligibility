@@ -140,7 +140,7 @@ async def test_state_optout_survey_user_friendliness(tester: AppTester, rapidpro
 
 
 @pytest.mark.asyncio
-async def test_state_optout_survey_irrelevant(tester: AppTester):
+async def test_state_optout_survey_irrelevant(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_optout_survey")
     await tester.user_input("3")
     tester.assert_state(None)
@@ -303,7 +303,7 @@ async def test_state_optout_delete_saved_see_data(tester: AppTester, rapidpro_mo
 
 
 @pytest.mark.asyncio
-async def test_state_optout_skip(tester: AppTester):
+async def test_state_optout_skip(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_optout")
     await tester.user_input("3")
-    tester.assert_state(None)
+    tester.assert_state("state_mainmenu")

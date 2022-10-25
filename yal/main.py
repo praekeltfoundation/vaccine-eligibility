@@ -11,6 +11,7 @@ from yal.optout import Application as OptOutApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
+from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import replace_persona_fields
@@ -27,16 +28,25 @@ ONBOARDING_REMINDER_KEYWORDS = {
     "not interested",
 }
 CALLBACK_CHECK_KEYWORDS = {"callback"}
-AAQ_TIMEOUT_KEYWORDS = {"yes", "no", "yes ask again", "no i m good"}
 FEEDBACK_KEYWORDS = {"feedback"}
 CONTENT_FEEDBACK_KEYWORDS = {
     "1",
     "2",
+    "3",
     "yes",
-    "nope",
+    "not really",
     "yes thanks",
     "yes i did",
     "no i didn t",
+    "no not helpful",
+    "i knew this before",
+    "yes i went",
+    "no i didn t go",
+    "no",
+    "yes ask again",
+    "no i m good",
+    "nope",
+    "no go back to list",
 }
 
 
@@ -53,6 +63,7 @@ class Application(
     FeedbackApplication,
     ContentFeedbackSurveyApplication,
     WaFbCrossoverFeedbackApplication,
+    ServiceFinderFeedbackSurveyApplication,
 ):
     START_STATE = "state_start"
 
@@ -103,6 +114,19 @@ class Application(
                 self.state_name = ContentFeedbackSurveyApplication.START_STATE
             if feedback_survey_sent and feedback_type == "facebook_banner":
                 self.state_name = WaFbCrossoverFeedbackApplication.START_STATE
+            if feedback_survey_sent and feedback_type == "servicefinder":
+                self.state_name = ServiceFinderFeedbackSurveyApplication.START_STATE
+            if feedback_survey_sent and (
+                feedback_type == "ask_a_question" or feedback_type == "ask_a_question_2"
+            ):
+                self.state_name = AaqApplication.TIMEOUT_RESPONSE_STATE
+
+            feedback_survey_sent_2 = fields.get("feedback_survey_sent_2")
+            feedback_type_2 = fields.get("feedback_type_2")
+            if feedback_survey_sent_2 and feedback_type_2 == "servicefinder":
+                self.state_name = (
+                    ServiceFinderFeedbackSurveyApplication.CALLBACK_2_STATE
+                )
 
         return await super().process_message(message)
 
@@ -116,9 +140,6 @@ class Application(
 
         terms_accepted = fields.get("terms_accepted")
         onboarding_completed = fields.get("onboarding_completed")
-        # If one of these values is True then the user might be responding
-        # to a scheduled msg
-        aaq_timeout_sent = fields.get("aaq_timeout_sent")
 
         # Cache some profile info
         for field in ("latitude", "longitude", "location_description"):
@@ -139,9 +160,6 @@ class Application(
                 return await self.go_to_state(OnboardingApplication.START_STATE)
             else:
                 return await self.go_to_state(TermsApplication.START_STATE)
-
-        if aaq_timeout_sent and (inbound.lower() in AAQ_TIMEOUT_KEYWORDS):
-            return await self.go_to_state(AaqApplication.TIMEOUT_RESPONSE_STATE)
 
         return await self.go_to_state("state_catch_all")
 

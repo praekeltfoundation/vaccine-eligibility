@@ -47,7 +47,7 @@ async def test_state_welcome_valid(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_terms_read(tester: AppTester):
+async def test_state_terms_read(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_terms")
     await tester.user_input("3")
 
