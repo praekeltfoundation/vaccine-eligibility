@@ -110,6 +110,28 @@ class Application(BaseApplication):
             self.save_metadata(key, value)
         return await self.go_to_state("state_display_results")
 
+    async def state_no_answers(self):
+        self.save_answer("state_no_answers", self.user.answers["state_aaq_start"])
+        question = self._(
+            "\n".join(
+                [
+                    "[persona_emoji] *Hmm. I couldn't find an answer for that, but "
+                    "maybe I misunderstood the question.*",
+                    "",
+                    "Do you mind trying again?",
+                    "",
+                    "-----",
+                    "*Or reply:*",
+                    GET_HELP,
+                    BACK_TO_MAIN,
+                ]
+            )
+        )
+        return await self.go_to_state(
+            "state_aaq_start",
+            question=question,
+        )
+
     async def state_aaq_get_page(self):
         error, response_data = await aaq_core.get_page(self.user.metadata["page_url"])
         if error:
@@ -122,6 +144,9 @@ class Application(BaseApplication):
     async def state_display_results(self):
         answers = self.user.metadata["model_answers"]
         page = self.user.metadata["aaq_page"]
+
+        if len(answers) < 1:
+            return await self.go_to_state("state_no_answers")
 
         choices = []
         for title in answers.keys():
