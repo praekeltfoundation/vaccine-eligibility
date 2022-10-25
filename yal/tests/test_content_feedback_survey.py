@@ -33,7 +33,7 @@ def tester():
 @pytest.mark.asyncio
 async def test_positive_feedback(tester: AppTester, rapidpro_mock: MockServer):
     """If the user responds positively to the push message, ask for any feedback"""
-    await tester.user_input("yes")
+    await tester.user_input("yes, thanks!")
     tester.assert_state("state_positive_feedback")
     tester.assert_message(
         "\n".join(
@@ -87,6 +87,53 @@ async def test_no_feedback(tester: AppTester):
                 GET_HELP,
             ]
         ),
+    )
+
+
+@pytest.mark.asyncio
+async def test_invalid_keyword(tester: AppTester, rapidpro_mock: MockServer):
+    """If the user responds with a keyword we don't recognise, show them the error"""
+    await tester.user_input("menu")
+    tester.assert_state("state_content_feedback_unrecognised_option")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*[persona_emoji] Hmm, looks like you've run out of time to respond to "
+                "that message.*",
+                "",
+                "*What would you like to do now? Here are some options.*",
+                "",
+                "1. Reply to last text",
+                "2. Go to the Main Menu",
+                "3. Ask a question",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_invalid_keyword_back_to_main(
+    tester: AppTester, rapidpro_mock: MockServer
+):
+    """If the user responds with a keyword we don't recognise, show them the error"""
+    await tester.user_input("menu")
+    tester.assert_state("state_content_feedback_unrecognised_option")
+
+    await tester.user_input("reply to last text")
+    tester.assert_state("state_process_content_feedback_trigger")
+    tester.assert_message(
+        "\n".join(
+            [
+                "[persona_emoji] Was the info you just read what you were looking for?",
+                "",
+                "1. Yes, thanks!",
+                "2. Not really",
+                "",
+                "-----",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
     )
 
 

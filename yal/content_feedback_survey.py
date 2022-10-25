@@ -1,14 +1,17 @@
 from vaccine.base_application import BaseApplication
+from vaccine.models import Message
 from vaccine.states import Choice, FreeText, WhatsAppButtonState
 from vaccine.utils import get_display_choices
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AAQApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
+from yal.mainmenu import Application as MainMenuApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 
 
 class ContentFeedbackSurveyApplication(BaseApplication):
     START_STATE = "state_content_feedback_survey_start"
+    TRIGGER_KEYWORDS = {"1", "yes thanks", "2", "not really"}
 
     async def state_content_feedback_survey_start(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
@@ -18,7 +21,42 @@ class ContentFeedbackSurveyApplication(BaseApplication):
         await rapidpro.update_profile(
             whatsapp_id, {"feedback_survey_sent": "", "feedback_timestamp": ""}
         )
-        return await self.go_to_state("state_process_content_feedback_trigger")
+        keyword = utils.clean_inbound(self.inbound.content)
+        if keyword in self.TRIGGER_KEYWORDS:
+            return await self.go_to_state("state_process_content_feedback_trigger")
+        else:
+            # Get it to display the message, instead of having this state try to
+            # match it to a keyword
+            self.inbound.session_event = Message.SESSION_EVENT.NEW
+            return await self.go_to_state("state_content_feedback_unrecognised_option")
+
+    async def state_content_feedback_unrecognised_option(self):
+        choices = [
+            Choice("feedback", self._("Reply to last text")),
+            Choice("mainmenu", self._("Go to the Main Menu")),
+            Choice("aaq", self._("Ask a question")),
+        ]
+        question = "\n".join(
+            [
+                "*[persona_emoji] Hmm, looks like you've run out of time to respond to "
+                "that message.*",
+                "",
+                "*What would you like to do now? Here are some options.*",
+                "",
+                get_display_choices(choices),
+            ]
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=utils.get_generic_error(),
+            next={
+                "feedback": "state_process_content_feedback_trigger",
+                "mainmenu": MainMenuApplication.START_STATE,
+                "aaq": AAQApplication.START_STATE,
+            },
+        )
 
     async def state_process_content_feedback_trigger(self):
         # Mirror the message here, for response and error handling
