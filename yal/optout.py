@@ -162,6 +162,13 @@ class Application(BaseApplication):
             "suburb": "",
             "street_name": "",
             "street_number": "",
+            "longitude": "",
+            "latitude": "",
+            "location_description": "",
+            "persona_name": "",
+            "persona_emoji": "",
+            "gender_other": "",
+            "emergency_contact": "",
         } | self.reminders_to_be_cleared
         error, fields = await rapidpro.get_profile(whatsapp_id)
         if error:

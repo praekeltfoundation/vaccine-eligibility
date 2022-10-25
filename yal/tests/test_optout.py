@@ -53,6 +53,13 @@ def get_rapidpro_contact(urn):
             "callback_check_time": get_current_datetime().isoformat(),
             "feedback_timestamp": get_current_datetime().isoformat(),
             "feedback_timestamp_2": get_current_datetime().isoformat(),
+            "longitude": "123",
+            "latitude": "456",
+            "location_description": "Narnia",
+            "persona_name": "Aslan",
+            "persona_emoji": "🦁",
+            "gender_other": "non conforming",
+            "emergency_contact": "123-emergency",
         }
     return contact
 
@@ -245,6 +252,13 @@ async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
             "callback_check_time": "",
             "feedback_timestamp": "",
             "feedback_timestamp_2": "",
+            "longitude": "",
+            "latitude": "",
+            "location_description": "",
+            "persona_name": "",
+            "persona_emoji": "",
+            "gender_other": "",
+            "emergency_contact": "",
         },
     }
 
