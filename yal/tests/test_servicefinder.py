@@ -435,6 +435,11 @@ async def test_state_category(
             "",
             "",
             "-----",
+            "Once you've chosen a facility, tap on the link to see the quickest route "
+            "from where you are to the facility from your maps or to send them an "
+            "email.",
+            "",
+            "-----",
             "*Or reply:*",
             BACK_TO_MAIN,
             GET_HELP,
