@@ -1,7 +1,9 @@
 import logging
 from datetime import datetime, timedelta
 
+from vaccine.models import Message
 from vaccine.states import EndState
+from vaccine.utils import random_id
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AaqApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
@@ -88,6 +90,18 @@ class Application(
                 self.user.session_id = None
                 self.state_name = OnboardingApplication.REMINDER_STATE
 
+        self.inbound = message
+        feedback_state = await self.get_feedback_state()
+        if feedback_state:
+            self.state_name = feedback_state
+
+        return await super().process_message(message)
+
+    async def get_feedback_state(self):
+        """
+        If the user needs to be in a feedback state, send return that state name,
+        otherwise return None
+        """
         feedback_timestamp = self.user.metadata.get("feedback_timestamp")
         feedback_in_time = feedback_timestamp and datetime.fromisoformat(
             feedback_timestamp
@@ -97,31 +111,28 @@ class Application(
             feedback_timestamp_2
         ) > get_current_datetime() - timedelta(minutes=1)
         if feedback_in_time or feedback_in_time_2:
-            whatsapp_id = utils.normalise_phonenumber(message.from_addr).lstrip("+")
+            msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+            whatsapp_id = msisdn.lstrip("+")
             error, fields = await rapidpro.get_profile(whatsapp_id)
             if error:
-                return await self.go_to_state("state_error")
+                return "state_error"
             feedback_survey_sent = fields.get("feedback_survey_sent")
             feedback_type = fields.get("feedback_type")
             if feedback_survey_sent and feedback_type == "content":
-                self.state_name = ContentFeedbackSurveyApplication.START_STATE
+                return ContentFeedbackSurveyApplication.START_STATE
             if feedback_survey_sent and feedback_type == "facebook_banner":
-                self.state_name = WaFbCrossoverFeedbackApplication.START_STATE
+                return WaFbCrossoverFeedbackApplication.START_STATE
             if feedback_survey_sent and feedback_type == "servicefinder":
-                self.state_name = ServiceFinderFeedbackSurveyApplication.START_STATE
+                return ServiceFinderFeedbackSurveyApplication.START_STATE
             if feedback_survey_sent and (
                 feedback_type == "ask_a_question" or feedback_type == "ask_a_question_2"
             ):
-                self.state_name = AaqApplication.TIMEOUT_RESPONSE_STATE
+                return AaqApplication.TIMEOUT_RESPONSE_STATE
 
             feedback_survey_sent_2 = fields.get("feedback_survey_sent_2")
             feedback_type_2 = fields.get("feedback_type_2")
             if feedback_survey_sent_2 and feedback_type_2 == "servicefinder":
-                self.state_name = (
-                    ServiceFinderFeedbackSurveyApplication.CALLBACK_2_STATE
-                )
-
-        return await super().process_message(message)
+                return ServiceFinderFeedbackSurveyApplication.CALLBACK_2_STATE
 
     async def state_start(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
@@ -144,6 +155,14 @@ class Application(
         for field in FEEDBACK_FIELDS:
             if fields.get(field):
                 self.save_metadata(field, fields[field])
+
+        feedback_state = await self.get_feedback_state()
+        if feedback_state:
+            # Treat this like a session resume
+            if not self.user.session_id:
+                self.user.session_id = random_id()
+            self.inbound.session_event = Message.SESSION_EVENT.RESUME
+            return await self.go_to_state(feedback_state)
 
         inbound = utils.clean_inbound(self.inbound.content)
 
