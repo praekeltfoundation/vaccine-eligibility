@@ -61,8 +61,8 @@ class Application(BaseApplication):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "engaged_on_facebook": True,
-            "last_mainmenu_time": str(utils.get_current_datetime()),
+            "engaged_on_facebook": "TRUE",
+            "last_mainmenu_time": utils.get_current_datetime().isoformat(),
         }
         error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
@@ -111,7 +111,7 @@ class Application(BaseApplication):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "engaged_on_facebook": False,
+            "engaged_on_facebook": "FALSE",
         }
         error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
