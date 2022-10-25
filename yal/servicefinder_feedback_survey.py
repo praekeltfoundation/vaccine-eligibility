@@ -20,7 +20,10 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip("+")
         # Reset this, so that we only get the survey once after a push
-        await rapidpro.update_profile(whatsapp_id, {"feedback_survey_sent": ""})
+        self.save_metadata("feedback_timestamp", "")
+        await rapidpro.update_profile(
+            whatsapp_id, {"feedback_survey_sent": "", "feedback_timestamp": ""}
+        )
         return await self.go_to_state("state_process_servicefinder_feedback_trigger")
 
     async def state_process_servicefinder_feedback_trigger(self):
@@ -135,6 +138,7 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
     async def state_save_servicefinder_callback_2(self):
         timestamp = utils.get_current_datetime() + self.CALLBACK_2_DELAY
         whatsapp_id = utils.normalise_phonenumber(self.inbound.from_addr).lstrip("+")
+        self.save_metadata("feedback_timestamp_2", timestamp.isoformat())
         await rapidpro.update_profile(
             whatsapp_id=whatsapp_id,
             fields={
@@ -180,7 +184,10 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
         # Repeat the question here for error and selection handling
         whatsapp_id = utils.normalise_phonenumber(self.inbound.from_addr).lstrip("+")
         # Reset this, so that we only get the survey once after a push
-        await rapidpro.update_profile(whatsapp_id, {"feedback_survey_sent_2": ""})
+        self.save_metadata("feedback_timestamp_2", "")
+        await rapidpro.update_profile(
+            whatsapp_id, {"feedback_survey_sent_2": "", "feedback_timestamp_2": ""}
+        )
         error, fields = await rapidpro.get_profile(whatsapp_id)
         if error:
             return await self.go_to_state("state_error")

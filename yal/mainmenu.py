@@ -224,6 +224,7 @@ class Application(BaseApplication):
             whatsapp_id = msisdn.lstrip("+")
             timestamp = get_current_datetime() + timedelta(hours=2)
             # We ignore this error, as it just means they won't get the reminder
+            self.save_metadata("feedback_timestamp", timestamp.isoformat())
             await rapidpro.update_profile(
                 whatsapp_id,
                 {
@@ -310,6 +311,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip("+")
         timestamp = utils.get_current_datetime() + timedelta(minutes=10)
         # We ignore this error, as it just means they won't get the reminder
+        self.save_metadata("feedback_timestamp", timestamp.isoformat())
         await rapidpro.update_profile(
             whatsapp_id,
             {

@@ -24,7 +24,10 @@ class Application(BaseApplication):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip("+")
         # Reset this, so that we only get the survey once after a push
-        await rapidpro.update_profile(whatsapp_id, {"feedback_survey_sent": ""})
+        self.save_metadata("feedback_timestamp", "")
+        await rapidpro.update_profile(
+            whatsapp_id, {"feedback_survey_sent": "", "feedback_timestamp": ""}
+        )
         return await self.go_to_state("state_wa_fb_crossover_feedback")
 
     async def state_wa_fb_crossover_feedback(self):

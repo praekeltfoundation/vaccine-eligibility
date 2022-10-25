@@ -272,7 +272,7 @@ async def test_state_update_gender_confirm_not_correct(
     tester.assert_state("state_update_gender")
     tester.assert_num_messages(1)
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == []
 
 
 @pytest.mark.asyncio
@@ -331,7 +331,7 @@ async def test_state_update_age_confirm_not_correct(tester: AppTester, rapidpro_
     tester.assert_num_messages(1)
     tester.assert_state("state_update_age")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == []
 
 
 @pytest.mark.asyncio
@@ -394,7 +394,7 @@ async def test_state_update_relationship_status_confirm_not_correct(
     tester.assert_num_messages(1)
     tester.assert_state("state_update_relationship_status")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == []
 
 
 @pytest.mark.asyncio
@@ -409,7 +409,7 @@ async def test_state_update_relationship_status_submit(
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == [
         "/api/v2/contacts.json",
-    ] * 2
+    ]
 
 
 @pytest.mark.asyncio
@@ -438,9 +438,7 @@ async def test_state_update_bot_name(tester: AppTester, rapidpro_mock):
         )
     )
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == [
-        "/api/v2/contacts.json"
-    ] * 2
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
 
 
 @pytest.mark.asyncio
@@ -637,8 +635,8 @@ async def test_state_update_location_submit(tester: AppTester, rapidpro_mock):
     tester.assert_num_messages(1)
     tester.assert_state("state_conclude_changes")
 
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "latitude": 56.78,

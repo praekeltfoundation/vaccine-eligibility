@@ -383,8 +383,8 @@ async def test_state_get_content_feedback_question_answered(
 
     tester.assert_state("state_yes_question_answered")
 
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"feedback_type": ""},
     }
@@ -525,11 +525,12 @@ async def test_state_handle_timeout_handles_type_1_yes(
     tester.setup_state("state_handle_timeout_response")
     await tester.user_input("yes, ask again")
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[-1]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"feedback_survey_sent": ""},
+        "fields": {"feedback_survey_sent": "", "feedback_timestamp": ""},
     }
+    tester.assert_metadata("feedback_timestamp", "")
 
     tester.assert_state("state_aaq_start")
 
@@ -539,11 +540,12 @@ async def test_state_handle_timeout_handles_type_1_no(tester: AppTester, rapidpr
     tester.setup_state("state_handle_timeout_response")
     await tester.user_input("no, I'm good")
 
-    assert len(rapidpro_mock.tstate.requests) == 4
-    request = rapidpro_mock.tstate.requests[2]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"feedback_survey_sent": ""},
+        "fields": {"feedback_survey_sent": "", "feedback_timestamp": ""},
     }
+    tester.assert_metadata("feedback_timestamp", "")
 
     tester.assert_state("state_mainmenu")
 
@@ -561,11 +563,12 @@ async def test_state_handle_timeout_handles_type_2_yes(
     tester.user.metadata["aaq_page"] = 0
     await tester.user_input(content="yes")
 
-    assert len(rapidpro_mock.tstate.requests) == 4
-    request = rapidpro_mock.tstate.requests[2]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"feedback_survey_sent": ""},
+        "fields": {"feedback_survey_sent": "", "feedback_timestamp": ""},
     }
+    tester.assert_metadata("feedback_timestamp", "")
 
     tester.assert_state("state_yes_question_answered")
 
@@ -610,11 +613,12 @@ async def test_state_handle_timeout_handles_type_2_no(
     tester.user.metadata["aaq_page"] = 0
     await tester.user_input(content="nope...")
 
-    assert len(rapidpro_mock.tstate.requests) == 4
-    request = rapidpro_mock.tstate.requests[2]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"feedback_survey_sent": ""},
+        "fields": {"feedback_survey_sent": "", "feedback_timestamp": ""},
     }
+    tester.assert_metadata("feedback_timestamp", "")
 
     tester.assert_state("state_no_question_not_answered")
 

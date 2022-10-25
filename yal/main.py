@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timedelta
 
 from vaccine.states import EndState
 from yal import rapidpro, utils
@@ -14,7 +15,7 @@ from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
-from yal.utils import replace_persona_fields
+from yal.utils import get_current_datetime, replace_persona_fields
 from yal.wa_fb_crossover_feedback import Application as WaFbCrossoverFeedbackApplication
 
 logger = logging.getLogger(__name__)
@@ -29,24 +30,9 @@ ONBOARDING_REMINDER_KEYWORDS = {
 }
 CALLBACK_CHECK_KEYWORDS = {"callback"}
 FEEDBACK_KEYWORDS = {"feedback"}
-CONTENT_FEEDBACK_KEYWORDS = {
-    "1",
-    "2",
-    "3",
-    "yes",
-    "not really",
-    "yes thanks",
-    "yes i did",
-    "no i didn t",
-    "no not helpful",
-    "i knew this before",
-    "yes i went",
-    "no i didn t go",
-    "no",
-    "yes ask again",
-    "no i m good",
-    "nope",
-    "no go back to list",
+FEEDBACK_FIELDS = {
+    "feedback_timestamp",
+    "feedback_timestamp_2",
 }
 
 
@@ -102,9 +88,16 @@ class Application(
                 self.user.session_id = None
                 self.state_name = OnboardingApplication.REMINDER_STATE
 
-        if keyword in CONTENT_FEEDBACK_KEYWORDS:
-            msisdn = utils.normalise_phonenumber(message.from_addr)
-            whatsapp_id = msisdn.lstrip(" + ")
+        feedback_timestamp = self.user.metadata.get("feedback_timestamp")
+        feedback_in_time = feedback_timestamp and datetime.fromisoformat(
+            feedback_timestamp
+        ) > get_current_datetime() - timedelta(minutes=1)
+        feedback_timestamp_2 = self.user.metadata.get("feedback_timestamp_2")
+        feedback_in_time_2 = feedback_timestamp_2 and datetime.fromisoformat(
+            feedback_timestamp_2
+        ) > get_current_datetime() - timedelta(minutes=1)
+        if feedback_in_time or feedback_in_time_2:
+            whatsapp_id = utils.normalise_phonenumber(message.from_addr).lstrip("+")
             error, fields = await rapidpro.get_profile(whatsapp_id)
             if error:
                 return await self.go_to_state("state_error")
@@ -146,6 +139,9 @@ class Application(
             if fields.get(field):
                 self.save_metadata(field, fields[field])
         for field in utils.PERSONA_FIELDS:
+            if fields.get(field):
+                self.save_metadata(field, fields[field])
+        for field in FEEDBACK_FIELDS:
             if fields.get(field):
                 self.save_metadata(field, fields[field])
 

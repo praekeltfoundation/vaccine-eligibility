@@ -59,7 +59,11 @@ async def test_state_process_servicefinder_feedback_trigger(
     tester.assert_state("state_process_servicefinder_feedback_trigger")
     assert rapidpro_mock.tstate is not None
     [request] = rapidpro_mock.tstate.requests
-    assert request.json["fields"] == {"feedback_survey_sent": ""}
+    assert request.json["fields"] == {
+        "feedback_survey_sent": "",
+        "feedback_timestamp": "",
+    }
+    tester.assert_metadata("feedback_timestamp", "")
 
 
 @pytest.mark.asyncio

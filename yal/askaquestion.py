@@ -88,6 +88,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         timeout_time = get_current_datetime() + timedelta(minutes=5)
+        self.save_metadata("feedback_timestamp", timeout_time.isoformat())
         data = {
             "feedback_timestamp": timeout_time.isoformat(),
             "feedback_type": "ask_a_question",
@@ -224,6 +225,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         timeout_time = get_current_datetime() + timedelta(minutes=5)
+        self.save_metadata("feedback_timestamp", timeout_time.isoformat())
         data = {
             "feedback_timestamp": timeout_time.isoformat(),
             "feedback_type": "ask_a_question_2",
@@ -502,9 +504,8 @@ class Application(BaseApplication):
         error, fields = await rapidpro.get_profile(whatsapp_id)
         if error:
             return await self.go_to_state("state_error")
-        data = {
-            "feedback_survey_sent": "",
-        }
+        self.save_metadata("feedback_timestamp", "")
+        data = {"feedback_survey_sent": "", "feedback_timestamp": ""}
         error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")

@@ -266,8 +266,8 @@ async def test_state_gender_from_list(
 
     tester.assert_answer("state_gender", "male")
 
-    assert len(rapidpro_mock.tstate.requests) == 4
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_onboarding_time": "2022-06-19T17:30:00",

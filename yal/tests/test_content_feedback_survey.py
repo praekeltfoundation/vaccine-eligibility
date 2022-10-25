@@ -57,7 +57,11 @@ async def test_positive_feedback(tester: AppTester, rapidpro_mock: MockServer):
 
     assert rapidpro_mock.tstate
     [update_contact] = rapidpro_mock.tstate.requests
-    assert update_contact.json["fields"] == {"feedback_survey_sent": ""}
+    assert update_contact.json["fields"] == {
+        "feedback_survey_sent": "",
+        "feedback_timestamp": "",
+    }
+    tester.assert_metadata("feedback_timestamp", "")
 
 
 @pytest.mark.asyncio
