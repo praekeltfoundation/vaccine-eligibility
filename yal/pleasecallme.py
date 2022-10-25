@@ -597,7 +597,7 @@ class Application(BaseApplication):
             choices=choices,
             error=self._(get_generic_error()),
             next={
-                "yes": self.START_STATE,
+                "yes": "state_please_call_start",
                 "no": "state_call_not_helpful_try_again_declined",
             },
         )
