@@ -79,6 +79,7 @@ def get_rapidpro_contact(urn):
         feedback_type = "facebook_banner"
     if "27820001004" in urn:
         feedback_type = "servicefinder"
+        feedback_timestamp = get_current_datetime().isoformat()
     feedback_type_2 = ""
     feedback_timestamp_2 = None
     feedback_survey_sent_2 = ""
@@ -398,6 +399,7 @@ async def test_facebook_crossover_feedback_response(tester: AppTester, rapidpro_
     If this is in response to a fb feedback push message, then it should be handled
     by the fb feedback state
     """
+    # Test session resume
     tester.user.metadata["feedback_timestamp"] = get_current_datetime().isoformat()
     tester.setup_user_address("27820001003")
     await tester.user_input("yes, I did")
@@ -413,13 +415,13 @@ async def test_servicefinder_feedback_response(tester: AppTester, rapidpro_mock)
     If this is in response to a servicefinder feedback push message, then it should be
     handled by the servicefinder feedback application
     """
-    tester.user.metadata["feedback_timestamp"] = get_current_datetime().isoformat()
     tester.setup_user_address("27820001004")
-    await tester.user_input("yes, thanks")
+    # test new session
+    await tester.user_input("yes, thanks", session=Message.SESSION_EVENT.NEW)
     tester.assert_state("state_servicefinder_positive_feedback")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
 
 
 @pytest.mark.asyncio
