@@ -55,11 +55,34 @@ async def rapidpro_mock():
 async def test_state_process_servicefinder_feedback_trigger(
     tester: AppTester, rapidpro_mock: MockServer
 ):
-    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+    await tester.user_input("yes, thanks", session=Message.SESSION_EVENT.NEW)
     tester.assert_state("state_process_servicefinder_feedback_trigger")
     assert rapidpro_mock.tstate is not None
     [request] = rapidpro_mock.tstate.requests
-    assert request.json["fields"] == {"feedback_survey_sent": ""}
+    assert request.json["fields"] == {
+        "feedback_survey_sent": "",
+        "feedback_timestamp": "",
+    }
+    tester.assert_metadata("feedback_timestamp", "")
+
+
+@pytest.mark.asyncio
+async def test_invalid_keyword(tester: AppTester, rapidpro_mock: MockServer):
+    """If the user responds with a keyword we don't recognise, show them the error"""
+    await tester.user_input("menu")
+    tester.assert_state("state_servicefinder_feedback_unrecognised_option")
+
+
+@pytest.mark.asyncio
+async def test_invalid_keyword_back_to_feedback(
+    tester: AppTester, rapidpro_mock: MockServer
+):
+    """If the user responds with a keyword we don't recognise, show them the error"""
+    await tester.user_input("menu")
+    tester.assert_state("state_servicefinder_feedback_unrecognised_option")
+
+    await tester.user_input("reply to last text")
+    tester.assert_state("state_process_servicefinder_feedback_trigger")
 
 
 @pytest.mark.asyncio

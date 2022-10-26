@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
 
 from vaccine.base_application import BaseApplication
+from vaccine.models import Message
 from vaccine.states import Choice, FreeText, WhatsAppButtonState
 from vaccine.utils import get_display_choices
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AAQApplication
+from yal.mainmenu import Application as MainMenuApplication
 from yal.pleasecallme import Application as PCMApplication
 from yal.servicefinder import Application as SFApplication
 
@@ -15,13 +17,40 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
     CALLBACK_2_DELAY = timedelta(days=14)
     APPOINTMENT_TIPS_CONTENT_ID = 494
     APPOINTMENT_TIPS_MENU_LEVEL = 2
+    SERVICEFINDER_TRIGGER_KEYWORDS = {
+        "1",
+        "yes thanks",
+        "yes i went",
+        "2",
+        "no not helpful",
+        "no i didn t go",
+        "3",
+        "i knew this before",
+    }
 
     async def state_servicefinder_feedback_survey_start(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip("+")
         # Reset this, so that we only get the survey once after a push
-        await rapidpro.update_profile(whatsapp_id, {"feedback_survey_sent": ""})
-        return await self.go_to_state("state_process_servicefinder_feedback_trigger")
+        self.save_metadata("feedback_timestamp", "")
+        await rapidpro.update_profile(
+            whatsapp_id, {"feedback_survey_sent": "", "feedback_timestamp": ""}
+        )
+        keyword = utils.clean_inbound(self.inbound.content)
+        if keyword in self.SERVICEFINDER_TRIGGER_KEYWORDS:
+            return await self.go_to_state(
+                "state_process_servicefinder_feedback_trigger"
+            )
+        else:
+            # Get it to display the message, instead of having this state try to
+            # match it to a keyword
+            self.inbound.session_event = Message.SESSION_EVENT.NEW
+            self.save_metadata(
+                "feedback_return_state", "state_process_servicefinder_feedback_trigger"
+            )
+            return await self.go_to_state(
+                "state_servicefinder_feedback_unrecognised_option"
+            )
 
     async def state_process_servicefinder_feedback_trigger(self):
         # Mirror the message here, for response and error handling
@@ -50,6 +79,35 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
                 "yes": "state_servicefinder_positive_feedback",
                 "no": "state_servicefinder_negative_feedback",
                 "already_know": "state_servicefinder_already_know_feedback",
+            },
+        )
+
+    async def state_servicefinder_feedback_unrecognised_option(self):
+        choices = [
+            Choice("feedback", self._("Reply to last text")),
+            Choice("mainmenu", self._("Go to the Main Menu")),
+            Choice("aaq", self._("Ask a question")),
+        ]
+        question = "\n".join(
+            [
+                "*[persona_emoji] Hmm, looks like you've run out of time to respond to "
+                "that message.*",
+                "",
+                "*What would you like to do now? Here are some options.*",
+                "",
+                get_display_choices(choices),
+            ]
+        )
+        feedback_return_state = self.user.metadata.get("feedback_return_state")
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=utils.get_generic_error(),
+            next={
+                "feedback": feedback_return_state,
+                "mainmenu": MainMenuApplication.START_STATE,
+                "aaq": AAQApplication.START_STATE,
             },
         )
 
@@ -135,6 +193,7 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
     async def state_save_servicefinder_callback_2(self):
         timestamp = utils.get_current_datetime() + self.CALLBACK_2_DELAY
         whatsapp_id = utils.normalise_phonenumber(self.inbound.from_addr).lstrip("+")
+        self.save_metadata("feedback_timestamp_2", timestamp.isoformat())
         await rapidpro.update_profile(
             whatsapp_id=whatsapp_id,
             fields={
@@ -180,7 +239,10 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
         # Repeat the question here for error and selection handling
         whatsapp_id = utils.normalise_phonenumber(self.inbound.from_addr).lstrip("+")
         # Reset this, so that we only get the survey once after a push
-        await rapidpro.update_profile(whatsapp_id, {"feedback_survey_sent_2": ""})
+        self.save_metadata("feedback_timestamp_2", "")
+        await rapidpro.update_profile(
+            whatsapp_id, {"feedback_survey_sent_2": "", "feedback_timestamp_2": ""}
+        )
         error, fields = await rapidpro.get_profile(whatsapp_id)
         if error:
             return await self.go_to_state("state_error")
@@ -188,6 +250,19 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
             datetime.fromisoformat(fields["feedback_timestamp_2"])
             - self.CALLBACK_2_DELAY
         )
+
+        keyword = utils.clean_inbound(self.inbound.content)
+        if keyword not in self.SERVICEFINDER_TRIGGER_KEYWORDS:
+            # Get it to display the message, instead of having this state try to
+            # match it to a keyword
+            self.inbound.session_event = Message.SESSION_EVENT.NEW
+            self.save_metadata(
+                "feedback_return_state", "state_servicefinder_feedback_survey_2_start"
+            )
+            return await self.go_to_state(
+                "state_servicefinder_feedback_unrecognised_option"
+            )
+
         choices = [
             Choice("yes", self._("Yes, I went")),
             Choice("no", self._("No, I didn't go")),

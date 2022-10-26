@@ -512,7 +512,7 @@ async def test_state_mainmenu_static(
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 2
 
 
 @pytest.mark.asyncio
@@ -622,8 +622,8 @@ async def test_state_mainmenu_contentrepo_help_content(
         "/api/v2/pages/1111",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 5
-    request = rapidpro_mock.tstate.requests[2]
+    assert len(rapidpro_mock.tstate.requests) == 4
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "",
@@ -909,7 +909,7 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["data__session_id"][0] == "1"
     assert params["data__user_addr"][0] == "27820001001"
 
-    assert len(rapidpro_mock.tstate.requests) == 8
+    assert len(rapidpro_mock.tstate.requests) == 7
 
     update_request = rapidpro_mock.tstate.requests[-1]
     assert update_request.json["fields"] == {

@@ -20,7 +20,7 @@ from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
-from yal.utils import BACK_TO_MAIN, GET_HELP
+from yal.utils import BACK_TO_MAIN, GET_HELP, get_current_datetime
 
 
 def test_no_state_name_clashes():
@@ -353,6 +353,7 @@ async def test_aaq_timeout_response_to_handler(
     tester.user.metadata["faq_id"] = "1"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.user.metadata["aaq_page"] = 0
+    tester.user.metadata["feedback_timestamp"] = get_current_datetime().isoformat()
     await tester.user_input("Nope...")
     tester.assert_state("state_no_question_not_answered")
     tester.assert_num_messages(1)
@@ -382,6 +383,7 @@ async def test_content_feedback_response(tester: AppTester, rapidpro_mock):
     If this is in response to a content feedback push message, then it should be handled
     by the content feedback state
     """
+    tester.user.metadata["feedback_timestamp"] = get_current_datetime().isoformat()
     tester.setup_user_address("27820001002")
     await tester.user_input("1")
     tester.assert_state("state_positive_feedback")
@@ -396,6 +398,7 @@ async def test_facebook_crossover_feedback_response(tester: AppTester, rapidpro_
     If this is in response to a fb feedback push message, then it should be handled
     by the fb feedback state
     """
+    tester.user.metadata["feedback_timestamp"] = get_current_datetime().isoformat()
     tester.setup_user_address("27820001003")
     await tester.user_input("yes, I did")
     tester.assert_state("state_saw_recent_facebook")
@@ -410,6 +413,7 @@ async def test_servicefinder_feedback_response(tester: AppTester, rapidpro_mock)
     If this is in response to a servicefinder feedback push message, then it should be
     handled by the servicefinder feedback application
     """
+    tester.user.metadata["feedback_timestamp"] = get_current_datetime().isoformat()
     tester.setup_user_address("27820001004")
     await tester.user_input("yes, thanks")
     tester.assert_state("state_servicefinder_positive_feedback")
@@ -424,6 +428,7 @@ async def test_servicefinder_feedback_2_response(tester: AppTester, rapidpro_moc
     If this is in response to the second servicefinder feedback push message, then it
     should be handled by the servicefinder feedback application
     """
+    tester.user.metadata["feedback_timestamp_2"] = get_current_datetime().isoformat()
     tester.setup_user_address("27820001005")
     await tester.user_input("yes, i went")
     tester.assert_state("state_went_to_service")

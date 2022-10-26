@@ -33,7 +33,7 @@ def tester():
 @pytest.mark.asyncio
 async def test_positive_feedback(tester: AppTester, rapidpro_mock: MockServer):
     """If the user responds positively to the push message, ask for any feedback"""
-    await tester.user_input("yes")
+    await tester.user_input("yes, thanks!")
     tester.assert_state("state_positive_feedback")
     tester.assert_message(
         "\n".join(
@@ -57,7 +57,11 @@ async def test_positive_feedback(tester: AppTester, rapidpro_mock: MockServer):
 
     assert rapidpro_mock.tstate
     [update_contact] = rapidpro_mock.tstate.requests
-    assert update_contact.json["fields"] == {"feedback_survey_sent": ""}
+    assert update_contact.json["fields"] == {
+        "feedback_survey_sent": "",
+        "feedback_timestamp": "",
+    }
+    tester.assert_metadata("feedback_timestamp", "")
 
 
 @pytest.mark.asyncio
@@ -84,6 +88,25 @@ async def test_no_feedback(tester: AppTester):
             ]
         ),
     )
+
+
+@pytest.mark.asyncio
+async def test_invalid_keyword(tester: AppTester, rapidpro_mock: MockServer):
+    """If the user responds with a keyword we don't recognise, show them the error"""
+    await tester.user_input("menu")
+    tester.assert_state("state_content_feedback_unrecognised_option")
+
+
+@pytest.mark.asyncio
+async def test_invalid_keyword_back_to_feedback(
+    tester: AppTester, rapidpro_mock: MockServer
+):
+    """If the user responds with a keyword we don't recognise, show them the error"""
+    await tester.user_input("menu")
+    tester.assert_state("state_content_feedback_unrecognised_option")
+
+    await tester.user_input("reply to last text")
+    tester.assert_state("state_process_content_feedback_trigger")
 
 
 @pytest.mark.asyncio

@@ -6,7 +6,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
-from vaccine.testing import AppTester, TState, run_sanic
+from vaccine.testing import AppTester, MockServer, TState, run_sanic
 from yal import config
 from yal.main import Application
 from yal.utils import BACK_TO_MAIN, GET_HELP
@@ -23,6 +23,7 @@ def get_rapidpro_contact(urn):
             "feedback_type": "ask_a_question"
             if ("27820001001" in urn)
             else "ask_a_question_2",
+            "feedback_sent": "TRUE",
         },
     }
 
@@ -433,8 +434,8 @@ async def test_state_get_content_feedback_question_answered(
 
     tester.assert_state("state_yes_question_answered")
 
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"feedback_type": ""},
     }
@@ -542,6 +543,27 @@ async def test_state_no_question_not_answered(
 
 
 @pytest.mark.asyncio
+async def test_timeout_invalid_keyword(tester: AppTester, rapidpro_mock: MockServer):
+    """If the user responds with a keyword we don't recognise, show them the error"""
+    tester.setup_state("state_handle_timeout_response")
+    await tester.user_input("invalid")
+    tester.assert_state("state_aaq_timeout_unrecognised_option")
+
+
+@pytest.mark.asyncio
+async def test_timeout_invalid_keyword_back_to_feedback(
+    tester: AppTester, rapidpro_mock: MockServer
+):
+    """If the user responds with a keyword we don't recognise, show them the error"""
+    tester.setup_state("state_handle_timeout_response")
+    await tester.user_input("invalid")
+    tester.assert_state("state_aaq_timeout_unrecognised_option")
+
+    await tester.user_input("reply to last text")
+    tester.assert_state("state_handle_list_timeout")
+
+
+@pytest.mark.asyncio
 async def test_state_display_content_question_back_to_list(
     tester: AppTester, rapidpro_mock, aaq_mock
 ):
@@ -575,11 +597,12 @@ async def test_state_handle_timeout_handles_type_1_yes(
     tester.setup_state("state_handle_timeout_response")
     await tester.user_input("yes, ask again")
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[-1]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"feedback_survey_sent": ""},
+        "fields": {"feedback_survey_sent": "", "feedback_timestamp": ""},
     }
+    tester.assert_metadata("feedback_timestamp", "")
 
     tester.assert_state("state_aaq_start")
 
@@ -589,11 +612,12 @@ async def test_state_handle_timeout_handles_type_1_no(tester: AppTester, rapidpr
     tester.setup_state("state_handle_timeout_response")
     await tester.user_input("no, I'm good")
 
-    assert len(rapidpro_mock.tstate.requests) == 4
-    request = rapidpro_mock.tstate.requests[2]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"feedback_survey_sent": ""},
+        "fields": {"feedback_survey_sent": "", "feedback_timestamp": ""},
     }
+    tester.assert_metadata("feedback_timestamp", "")
 
     tester.assert_state("state_mainmenu")
 
@@ -611,11 +635,12 @@ async def test_state_handle_timeout_handles_type_2_yes(
     tester.user.metadata["aaq_page"] = 0
     await tester.user_input(content="yes")
 
-    assert len(rapidpro_mock.tstate.requests) == 4
-    request = rapidpro_mock.tstate.requests[2]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"feedback_survey_sent": ""},
+        "fields": {"feedback_survey_sent": "", "feedback_timestamp": ""},
     }
+    tester.assert_metadata("feedback_timestamp", "")
 
     tester.assert_state("state_yes_question_answered")
 
@@ -660,11 +685,12 @@ async def test_state_handle_timeout_handles_type_2_no(
     tester.user.metadata["aaq_page"] = 0
     await tester.user_input(content="nope...")
 
-    assert len(rapidpro_mock.tstate.requests) == 4
-    request = rapidpro_mock.tstate.requests[2]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"feedback_survey_sent": ""},
+        "fields": {"feedback_survey_sent": "", "feedback_timestamp": ""},
     }
+    tester.assert_metadata("feedback_timestamp", "")
 
     tester.assert_state("state_no_question_not_answered")
 

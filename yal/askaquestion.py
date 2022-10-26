@@ -5,6 +5,7 @@ from datetime import timedelta
 import aiohttp
 
 from vaccine.base_application import BaseApplication
+from vaccine.models import Message
 from vaccine.states import (
     Choice,
     EndState,
@@ -20,6 +21,7 @@ from yal.servicefinder import Application as ServiceFinderApplication
 from yal.utils import (
     BACK_TO_MAIN,
     GET_HELP,
+    clean_inbound,
     get_current_datetime,
     get_generic_error,
     normalise_phonenumber,
@@ -41,6 +43,16 @@ def get_aaq_api():
 class Application(BaseApplication):
     START_STATE = "state_aaq_start"
     TIMEOUT_RESPONSE_STATE = "state_handle_timeout_response"
+    AAQ_FEEDBACK_TRIGGER_KEYWORDS = {
+        "1",
+        "yes ask again",
+        "yes",
+        "2",
+        "no i m good",
+        "nope",
+        "3",
+        "no go back to list",
+    }
 
     async def state_aaq_start(self, question=None, buttons=None):
 
@@ -88,6 +100,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         timeout_time = get_current_datetime() + timedelta(minutes=5)
+        self.save_metadata("feedback_timestamp", timeout_time.isoformat())
         data = {
             "feedback_timestamp": timeout_time.isoformat(),
             "feedback_type": "ask_a_question",
@@ -248,6 +261,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         timeout_time = get_current_datetime() + timedelta(minutes=5)
+        self.save_metadata("feedback_timestamp", timeout_time.isoformat())
         data = {
             "feedback_timestamp": timeout_time.isoformat(),
             "feedback_type": "ask_a_question_2",
@@ -526,16 +540,57 @@ class Application(BaseApplication):
         error, fields = await rapidpro.get_profile(whatsapp_id)
         if error:
             return await self.go_to_state("state_error")
-        data = {
-            "feedback_survey_sent": "",
-        }
+        self.save_metadata("feedback_timestamp", "")
+        data = {"feedback_survey_sent": "", "feedback_timestamp": ""}
         error = await rapidpro.update_profile(whatsapp_id, data)
         if error:
             return await self.go_to_state("state_error")
 
         timeout_type_sent = fields.get("feedback_type")
+        self.save_metadata("feedback_type", timeout_type_sent)
 
+        keyword = clean_inbound(self.inbound.content)
+        if keyword in self.AAQ_FEEDBACK_TRIGGER_KEYWORDS:
+            if timeout_type_sent == "ask_a_question":
+                return await self.go_to_state("state_handle_list_timeout")
+            if timeout_type_sent == "ask_a_question_2":
+                return await self.go_to_state("state_get_content_feedback")
+        else:
+            # Get it to display the message, instead of having this state try to
+            # match it to a keyword
+            self.inbound.session_event = Message.SESSION_EVENT.NEW
+            return await self.go_to_state("state_aaq_timeout_unrecognised_option")
+
+    async def state_aaq_timeout_unrecognised_option(self):
+        choices = [
+            Choice("feedback", self._("Reply to last text")),
+            Choice("mainmenu", self._("Go to the Main Menu")),
+            Choice("aaq", self._("Ask a question")),
+        ]
+        question = "\n".join(
+            [
+                "*[persona_emoji] Hmm, looks like you've run out of time to respond to "
+                "that message.*",
+                "",
+                "*What would you like to do now? Here are some options.*",
+                "",
+                get_display_choices(choices),
+            ]
+        )
+        timeout_type_sent = self.user.metadata.get("feedback_type")
         if timeout_type_sent == "ask_a_question":
-            return await self.go_to_state("state_handle_list_timeout")
+            feedback_state = "state_handle_list_timeout"
         if timeout_type_sent == "ask_a_question_2":
-            return await self.go_to_state("state_get_content_feedback")
+            feedback_state = "state_get_content_feedback"
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=get_generic_error(),
+            next={
+                "feedback": feedback_state,
+                # hardcode to prevent circular import
+                "mainmenu": "state_pre_mainmenu",
+                "aaq": "state_aaq_start",
+            },
+        )

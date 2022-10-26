@@ -325,8 +325,8 @@ async def test_callback_check_scheduled_if_out_of_hours(
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_check_time": "2022-06-20T11:00:00"},
     }
@@ -348,8 +348,8 @@ async def test_state_in_hours(
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_check_time": "2022-06-19T19:30:00"},
     }
@@ -457,8 +457,8 @@ async def test_state_ask_to_save_emergency_number(
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_check_time": "2022-06-19T19:30:00"},
     }
@@ -481,12 +481,12 @@ async def test_state_save_emergency_contact(
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert len(rapidpro_mock.tstate.requests) == 3
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"emergency_contact": "+27831231234"},
     }
-    request = rapidpro_mock.tstate.requests[2]
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_check_time": "2022-06-19T19:30:00"},
     }

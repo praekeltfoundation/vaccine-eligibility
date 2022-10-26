@@ -333,6 +333,7 @@ class Application(BaseApplication):
     async def state_display_facilities(self):
         timestamp = utils.get_current_datetime() + self.SURVEY_DELAY
         whatsapp_id = utils.normalise_phonenumber(self.inbound.from_addr).lstrip("+")
+        self.save_metadata("feedback_timestamp", timestamp.isoformat())
         await rapidpro.update_profile(
             whatsapp_id=whatsapp_id,
             fields={
