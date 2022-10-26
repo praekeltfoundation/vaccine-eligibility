@@ -369,7 +369,7 @@ class Application(BaseApplication):
                             "/maps/api/geocode/json",
                         ),
                         params={
-                            "latlong": quote_plus(f"{latitude},{longitude}"),
+                            "latlng": quote_plus(f"{latitude},{longitude}"),
                             "key": config.GOOGLE_PLACES_KEY,
                             "sessiontoken": secrets.token_bytes(20).hex(),
                             "language": "en",
