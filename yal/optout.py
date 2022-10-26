@@ -32,6 +32,7 @@ class Application(BaseApplication):
         "callback_check_time": "",
         "feedback_timestamp": "",
         "feedback_timestamp_2": "",
+        "feedback_type": "",
     }
 
     async def state_optout(self):
@@ -72,11 +73,7 @@ class Application(BaseApplication):
     async def state_submit_optout(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
-        data = {
-            "onboarding_completed": "",
-            "opted_out": "TRUE",
-            "opted_out_timestamp": get_current_datetime().isoformat(),
-        } | self.reminders_to_be_cleared
+        data = self.reminders_to_be_cleared
 
         error = await rapidpro.update_profile(
             whatsapp_id,
@@ -153,6 +150,13 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         data = {
+            "onboarding_completed": "",
+            "opted_out": "TRUE",
+            "opted_out_timestamp": get_current_datetime().isoformat(),
+            "age": "",
+            "suggested_text": "",
+            "terms_accepted": "",
+            "engaged_on_facebook": "",
             "dob_month": "",
             "dob_day": "",
             "dob_year": "",
@@ -184,7 +188,7 @@ class Application(BaseApplication):
                 [
                     "✅ *We've deleted all your saved personal data including:*",
                     "",
-                    f"*- Date of Birth:* {old_details['dob']}",
+                    f"*- Age:* {old_details['age']}",
                     f"*- Relationship Status:* {old_details['relationship_status']}",
                     f"*- Location:* {old_details['location']}",
                     f"*- Gender:* {old_details['gender']}",
@@ -282,39 +286,15 @@ class Application(BaseApplication):
                 return GENDERS.get(value, "Empty")
             return value
 
-        dob_year = fields.get("dob_year")
-        dob_month = fields.get("dob_month")
-        dob_day = fields.get("dob_day")
         relationship_status = get_field("relationship_status").title()
         gender = get_field("gender")
-
-        province = fields.get("province")
-        suburb = fields.get("suburb")
-        street_name = fields.get("street_name")
-        street_number = fields.get("street_number")
-
-        dob = []
-        if dob_day and dob_month:
-            dob.append(dob_day)
-            dob.append(dob_month)
-        elif dob_day:
-            dob.append(dob_month)
-
-        if dob_year:
-            dob.append(dob_year)
-
-        location = " ".join(
-            [
-                s
-                for s in [street_number, street_name, suburb, province]
-                if s and s != "skip"
-            ]
-        )
+        location_description = get_field("location_description")
+        age = get_field("age")
 
         result = {
-            "dob": "/".join(dob) if dob != [] else "Empty",
+            "age": f"{age}",
             "relationship_status": f"{relationship_status}",
-            "location": location or "Empty",
+            "location": location_description,
             "gender": f"{gender}",
         }
         return result
