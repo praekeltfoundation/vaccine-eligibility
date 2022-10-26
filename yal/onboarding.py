@@ -57,8 +57,7 @@ class Application(BaseApplication):
                     [
                         "Great - from now on you can call me [persona_name].",
                         "",
-                        "_You can change this later by typing in *9* from the main "
-                        "*MENU.*_",
+                        "_You can change this later from the main *MENU.*_",
                     ]
                 )
             )
