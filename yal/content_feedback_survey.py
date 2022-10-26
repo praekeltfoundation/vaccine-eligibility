@@ -80,7 +80,7 @@ class ContentFeedbackSurveyApplication(BaseApplication):
         choices = [
             Choice("counsellor", self._("Talk to a counsellor")),
             Choice("question", self._("Ask a question")),
-            Choice("update info", self._("Update your information")),
+            Choice("update info", self._("Update your info")),
         ]
         question = self._(
             "\n".join(
@@ -89,7 +89,9 @@ class ContentFeedbackSurveyApplication(BaseApplication):
                     "",
                     "*What would you like to do now?*",
                     "",
-                    get_display_choices(choices),
+                    "1. Talk to a counsellor",
+                    "2. Ask a question",
+                    "3. Update your information",
                     "",
                     "-----",
                     "*Or reply:*",
@@ -131,7 +133,7 @@ class ContentFeedbackSurveyApplication(BaseApplication):
         choices = [
             Choice("counsellor", self._("Talk to a counsellor")),
             Choice("question", self._("Ask a question")),
-            Choice("update info", self._("Update your information")),
+            Choice("update info", self._("Update your info")),
         ]
         question = self._(
             "\n".join(
@@ -142,7 +144,9 @@ class ContentFeedbackSurveyApplication(BaseApplication):
                     "",
                     "*What would you like to do now?*",
                     "",
-                    get_display_choices(choices),
+                    "1. Talk to a counsellor",
+                    "2. Ask a question",
+                    "3. Update your information",
                     "",
                     "-----",
                     "*Or reply:*",
@@ -200,7 +204,7 @@ class ContentFeedbackSurveyApplication(BaseApplication):
         choices = [
             Choice("counsellor", self._("Talk to a counsellor")),
             Choice("question", self._("Ask a question")),
-            Choice("update info", self._("Update your information")),
+            Choice("update info", self._("Update your info")),
         ]
         question = self._(
             "\n".join(
@@ -211,7 +215,9 @@ class ContentFeedbackSurveyApplication(BaseApplication):
                     "",
                     "*What would you like to do now?*",
                     "",
-                    get_display_choices(choices),
+                    "1. Talk to a counsellor",
+                    "2. Ask a question",
+                    "3. Update your information",
                     "",
                     "-----",
                     "*Reply:*",
