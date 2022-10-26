@@ -93,6 +93,9 @@ class Application(
         self.inbound = message
         feedback_state = await self.get_feedback_state()
         if feedback_state:
+            if not self.user.session_id:
+                self.user.session_id = random_id()
+            self.inbound.session_event = Message.SESSION_EVENT.RESUME
             self.state_name = feedback_state
 
         return await super().process_message(message)
