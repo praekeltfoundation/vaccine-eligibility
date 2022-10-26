@@ -26,8 +26,8 @@ logger = logging.getLogger(__name__)
 class Application(BaseApplication):
     START_STATE = "state_optout"
     reminders_to_be_cleared = {
-        "last_main_timeout": "",
-        "last_mainmenu_timeout": "",
+        "last_main_time": "",
+        "last_mainmenu_time": "",
         "last_onboarding_time": "",
         "callback_check_time": "",
         "feedback_timestamp": "",
