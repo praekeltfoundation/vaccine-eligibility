@@ -3,7 +3,7 @@ import logging
 import secrets
 from collections import defaultdict
 from datetime import timedelta
-from urllib.parse import quote_plus, urljoin
+from urllib.parse import urljoin
 
 import aiohttp
 import geopy.distance
@@ -518,7 +518,7 @@ class Application(BaseApplication):
                             "/maps/api/geocode/json",
                         ),
                         params={
-                            "latlng": quote_plus(f"{latitude},{longitude}"),
+                            "latlng": f"{latitude},{longitude}",
                             "key": config.GOOGLE_PLACES_KEY,
                             "sessiontoken": metadata.get("google_session_token"),
                             "language": "en",
