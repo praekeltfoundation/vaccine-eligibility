@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import secrets
-from urllib.parse import quote_plus, urljoin
+from urllib.parse import urljoin
 
 import aiohttp
 
@@ -369,7 +369,7 @@ class Application(BaseApplication):
                             "/maps/api/geocode/json",
                         ),
                         params={
-                            "latlng": quote_plus(f"{latitude},{longitude}"),
+                            "latlng": f"{latitude},{longitude}",
                             "key": config.GOOGLE_PLACES_KEY,
                             "sessiontoken": secrets.token_bytes(20).hex(),
                             "language": "en",
