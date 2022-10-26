@@ -300,7 +300,7 @@ class Application(BaseApplication):
         async def store_location_coords(content):
             if not self.inbound:
                 return
-            if content.lower() == "skip":
+            if content and content.lower() == "skip":
                 return
             loc = self.inbound.transport_metadata.get("message", {}).get("location", {})
             latitude = loc.get("latitude")
@@ -373,7 +373,6 @@ class Application(BaseApplication):
                             "key": config.GOOGLE_PLACES_KEY,
                             "sessiontoken": secrets.token_bytes(20).hex(),
                             "language": "en",
-                            "components": "country:za",
                         },
                     )
                     response.raise_for_status()

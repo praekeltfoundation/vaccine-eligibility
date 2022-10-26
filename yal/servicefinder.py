@@ -435,7 +435,7 @@ class Application(BaseApplication):
         async def store_location_coords(content):
             if not self.inbound:
                 return
-            if content.lower() in ["type address", "type address instead"]:
+            if content and content.lower() in ["type address", "type address instead"]:
                 return
             loc = self.inbound.transport_metadata.get("message", {}).get("location", {})
             latitude = loc.get("latitude")
