@@ -589,10 +589,16 @@ async def test_state_province(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_province_skip(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_province")
-    await tester.user_input("10")
-    tester.assert_state("state_validate_full_address_error")
+async def test_state_province_skip(
+    tester: AppTester, rapidpro_mock, servicefinder_mock, google_api_mock
+):
+    tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
+    tester.user.metadata["google_session_token"] = "123"
+
+    tester.setup_answer("state_province", "skip")
+    tester.setup_state("state_full_address")
+    await tester.user_input("test suburb \n test street")
+    tester.assert_answer("state_province", "")
 
 
 @pytest.mark.asyncio
