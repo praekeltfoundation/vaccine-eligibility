@@ -368,11 +368,9 @@ class Application(BaseApplication):
                 details.append(f"📞 {facility['telephoneNumber']}")
             details.append(f"🦶 {round(distance)} km")
             details.append(f"https://www.google.com/maps/place/{lat},{lng}")
-            details.append("----")
-            details.append("")
             return "\n".join(details)
 
-        services = "\n".join(
+        services = "\n----\n\n".join(
             [format_facility(i, f) for i, f in enumerate(metadata["facilities"][:5])]
         )
 
@@ -387,9 +385,8 @@ class Application(BaseApplication):
                 "-----",
                 "",
                 services,
-                "",
                 "-----",
-                "Once you've chosen a facility, tap on the link to see the quickest "
+                "Once you've chosen a facility, *tap on the link* to see the quickest "
                 "route from where you are to the facility from your maps or to send "
                 "them an email.",
                 "",

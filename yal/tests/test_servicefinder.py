@@ -431,13 +431,10 @@ async def test_state_category(
             "📍 Pheasant St Roodepoort 1724",
             "🦶 17 km",
             "https://www.google.com/maps/place/-26.1404831,27.8677946",
-            "----",
-            "",
-            "",
             "-----",
-            "Once you've chosen a facility, tap on the link to see the quickest route "
-            "from where you are to the facility from your maps or to send them an "
-            "email.",
+            "Once you've chosen a facility, *tap on the link* to see the quickest "
+            "route from where you are to the facility from your maps or to send them "
+            "an email.",
             "",
             "-----",
             "*Or reply:*",
