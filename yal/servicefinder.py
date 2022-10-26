@@ -517,7 +517,7 @@ class Application(BaseApplication):
                             "/maps/api/geocode/json",
                         ),
                         params={
-                            "latlong": quote_plus(f"{latitude},{longitude}"),
+                            "latlng": quote_plus(f"{latitude},{longitude}"),
                             "key": config.GOOGLE_PLACES_KEY,
                             "sessiontoken": metadata.get("google_session_token"),
                             "language": "en",
