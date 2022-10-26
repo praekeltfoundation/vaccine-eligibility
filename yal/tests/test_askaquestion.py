@@ -203,8 +203,7 @@ async def test_start_state_response_sets_timeout(
                 "🙋🏿‍♂️ QUESTIONS? / Ask A Question / *1st 5 matches*",
                 "-----",
                 "",
-                "🤖 That's a really good question! I have a few "
-                "answers that could give you the info you need.",
+                "🤖 Here are some answers to your question.",
                 "",
                 "*What would you like to read first?* Reply with the number of the "
                 "topic you're interested in.",
