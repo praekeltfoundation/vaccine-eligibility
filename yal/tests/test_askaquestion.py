@@ -161,7 +161,7 @@ async def test_aaq_start_coming_soon(tester: AppTester):
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
-    tester.assert_state("state_start")
+    tester.assert_state("state_aaq_start")
     tester.assert_message("Coming soon...")
 
 

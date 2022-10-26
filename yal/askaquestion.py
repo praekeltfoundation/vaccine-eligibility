@@ -92,7 +92,7 @@ class Application(BaseApplication):
         return EndState(
             self,
             self._("Coming soon..."),
-            next=self.START_STATE,
+            next="state_aaq_start",
         )
 
     async def state_set_aaq_timeout_1(self):
@@ -387,7 +387,7 @@ class Application(BaseApplication):
             question=question,
             choices=choices,
             next={
-                "aaq": self.START_STATE,
+                "aaq": "state_aaq_start",
                 "counsellor": PleaseCallMeApplication.START_STATE,
             },
             error=self._(get_generic_error()),
@@ -567,6 +567,6 @@ class Application(BaseApplication):
                 "feedback": feedback_state,
                 # hardcode to prevent circular import
                 "mainmenu": "state_pre_mainmenu",
-                "aaq": self.START_STATE,
+                "aaq": "state_aaq_start",
             },
         )
