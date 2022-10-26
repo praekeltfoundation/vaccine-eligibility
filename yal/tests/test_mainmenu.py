@@ -523,7 +523,7 @@ async def test_state_mainmenu_aaq(
     await tester.user_input("10")
 
     tester.assert_num_messages(1)
-    tester.assert_state("state_aaq_start")
+    tester.assert_state("state_start")
     tester.assert_message("Coming soon...")
 
     assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
@@ -1198,7 +1198,7 @@ async def test_state_display_page_detail_aaq_feature(
 
     await tester.user_input("1")
 
-    tester.assert_state("state_aaq_start")
+    tester.assert_state("state_start")
 
 
 @pytest.mark.asyncio
