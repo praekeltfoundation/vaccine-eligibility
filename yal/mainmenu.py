@@ -433,8 +433,8 @@ class Application(BaseApplication):
             buttons.append(Choice("feature_pleasecallme", "Call Lovelife"))
 
         if next_prompt is None and metadata["page_type"] == "detail":
-            choices.append(Choice("feedback", "Pls give us feedback"))
-            buttons.append(Choice("feedback", "Pls give us feedback"))
+            choices.append(Choice("feedback", "Got feedback for me?"))
+            buttons.append(Choice("feedback", "Got feedback for me?"))
 
         if choices:
             parts.extend(
