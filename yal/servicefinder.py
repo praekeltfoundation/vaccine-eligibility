@@ -619,6 +619,10 @@ class Application(BaseApplication):
 
     async def state_validate_full_address(self):
         value = self.user.answers["state_full_address"]
+        if "state_province" in self.user.answers:
+            province = self.user.answers["state_province"]
+            if province.lower().strip() == "skip":
+                self.save_answer("state_province", "")
 
         if value.lower().strip() == "skip":
             return await self.go_to_state("state_cannot_skip")
