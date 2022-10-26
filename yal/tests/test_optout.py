@@ -182,11 +182,9 @@ async def test_state_optout_survey_skip(tester: AppTester):
 
 
 @pytest.mark.asyncio
-@mock.patch("yal.optout.get_current_datetime")
 async def test_state_optout_stop_notifications(
-    get_current_datetime, tester: AppTester, rapidpro_mock
+    tester: AppTester, rapidpro_mock
 ):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
 
     tester.setup_state("state_optout")
     await tester.user_input("1")
@@ -199,15 +197,13 @@ async def test_state_optout_stop_notifications(
     post_request = rapidpro_mock.tstate.requests[0]
     assert json.loads(post_request.body.decode("utf-8")) == {
         "fields": {
-            "onboarding_completed": "",
-            "opted_out": "TRUE",
-            "opted_out_timestamp": "2022-06-19T17:30:00",
             "last_main_time": "",
             "last_mainmenu_time": "",
             "last_onboarding_time": "",
             "callback_check_time": "",
             "feedback_timestamp": "",
             "feedback_timestamp_2": "",
+            "feedback_type": "",
         },
     }
 
@@ -220,7 +216,12 @@ async def test_state_tell_us_more(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
+@mock.patch("yal.optout.get_current_datetime")
+async def test_state_optout_delete_saved(
+        get_current_datetime, tester: AppTester, rapidpro_mock,
+    ):
+
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_optout")
     await tester.user_input("2")
     tester.assert_state("state_delete_saved")
@@ -235,6 +236,13 @@ async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
     post_request = rapidpro_mock.tstate.requests[1]
     assert json.loads(post_request.body.decode("utf-8")) == {
         "fields": {
+            "onboarding_completed": "",
+            "opted_out": "TRUE",
+            "opted_out_timestamp": "2022-06-19T17:30:00",
+            "age": "",
+            "suggested_text": "",
+            "terms_accepted": "",
+            "engaged_on_facebook": "",
             "dob_year": "",
             "dob_month": "",
             "dob_day": "",
@@ -250,6 +258,7 @@ async def test_state_optout_delete_saved(tester: AppTester, rapidpro_mock):
             "callback_check_time": "",
             "feedback_timestamp": "",
             "feedback_timestamp_2": "",
+            "feedback_type": "",
             "longitude": "",
             "latitude": "",
             "location_description": "",

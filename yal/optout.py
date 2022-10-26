@@ -32,6 +32,7 @@ class Application(BaseApplication):
         "callback_check_time": "",
         "feedback_timestamp": "",
         "feedback_timestamp_2": "",
+        "feedback_type": "",
     }
 
     async def state_optout(self):
@@ -72,11 +73,7 @@ class Application(BaseApplication):
     async def state_submit_optout(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
-        data = {
-            "onboarding_completed": "",
-            "opted_out": "TRUE",
-            "opted_out_timestamp": get_current_datetime().isoformat(),
-        } | self.reminders_to_be_cleared
+        data = self.reminders_to_be_cleared
 
         error = await rapidpro.update_profile(
             whatsapp_id,
@@ -153,6 +150,13 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         data = {
+            "onboarding_completed": "",
+            "opted_out": "TRUE",
+            "opted_out_timestamp": get_current_datetime().isoformat(),
+            "age": "",
+            "suggested_text": "",
+            "terms_accepted": "",
+            "engaged_on_facebook": "",
             "dob_month": "",
             "dob_day": "",
             "dob_year": "",
