@@ -92,7 +92,7 @@ class Application(BaseApplication):
         return EndState(
             self,
             self._("Coming soon..."),
-            next="state_aaq_start",
+            next=self.START_STATE,
         )
 
     async def state_set_aaq_timeout_1(self):
