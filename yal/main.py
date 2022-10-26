@@ -36,6 +36,7 @@ FEEDBACK_FIELDS = {
     "feedback_timestamp",
     "feedback_timestamp_2",
 }
+QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
 
 
 class Application(
@@ -90,6 +91,10 @@ class Application(
                 self.user.session_id = None
                 self.state_name = OnboardingApplication.REMINDER_STATE
 
+        if keyword in QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS:
+            self.user.session_id = None
+            self.state_name = "state_qa_reset_feedback_timestamp_keywords"
+
         self.inbound = message
         feedback_state = await self.get_feedback_state()
         if feedback_state:
@@ -99,6 +104,14 @@ class Application(
             self.state_name = feedback_state
 
         return await super().process_message(message)
+
+    async def state_qa_reset_feedback_timestamp_keywords(self):
+        self.save_metadata("feedback_timestamp", get_current_datetime().isoformat())
+        return EndState(
+            self,
+            text="QA: Success! You can now modify the timestamp in RapidPro to trigger "
+            "the message early",
+        )
 
     async def get_feedback_state(self):
         """

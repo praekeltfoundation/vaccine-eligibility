@@ -437,3 +437,18 @@ async def test_servicefinder_feedback_2_response(tester: AppTester, rapidpro_moc
     tester.assert_num_messages(1)
 
     assert len(rapidpro_mock.tstate.requests) == 3
+
+
+@pytest.mark.asyncio
+async def test_state_qa_reset_feedback_timestamp_keywords(
+    tester: AppTester, rapidpro_mock
+):
+    old_timestamp = get_current_datetime().isoformat()
+    tester.user.metadata["feedback_timestamp"] = old_timestamp
+    await tester.user_input("resetfeedbacktimestampobzvmp")
+    tester.assert_state(None)
+    tester.assert_message(
+        "QA: Success! You can now modify the timestamp in RapidPro to trigger "
+        "the message early"
+    )
+    assert tester.user.metadata["feedback_timestamp"] != old_timestamp
