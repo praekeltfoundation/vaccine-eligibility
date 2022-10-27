@@ -21,6 +21,7 @@ from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplica
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import BACK_TO_MAIN, GET_HELP, get_current_datetime
+from yal.wa_fb_crossover_feedback import Application as WaFbCrossoverFeedbackApplication
 
 
 def test_no_state_name_clashes():
@@ -43,6 +44,9 @@ def test_no_state_name_clashes():
     sf_s_states = set(
         s for s in dir(ServiceFinderFeedbackSurveyApplication) if s.startswith("state_")
     )
+    wa_fb_states = set(
+        s for s in dir(WaFbCrossoverFeedbackApplication) if s.startswith("state_")
+    )
     intersection = (
         m_states
         & mm_states
@@ -57,6 +61,7 @@ def test_no_state_name_clashes():
         & fb_states
         & c_fb_states
         & sf_s_states
+        & wa_fb_states
     ) - {
         "state_name",
         "state_error",
