@@ -374,7 +374,7 @@ async def test_state_mainmenu_start(
             "-----",
             "Send me the number of the topic you're interested in.",
             "",
-            "*🏥 NEED HELP?*",
+            "🏥 *NEED HELP?*",
             "1. Talk to a counsellor",
             "2. Find clinics and services",
             "3. Help content",
@@ -392,7 +392,7 @@ async def test_state_mainmenu_start(
             "🙋🏿‍♂️ *QUESTIONS?*",
             "10. Ask your own question",
             "-----",
-            "*⚙️ CHAT SETTINGS*",
+            "⚙️ *CHAT SETTINGS*",
             "11. Update your information",
             "-----",
             "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or *MENU*.",
@@ -448,7 +448,7 @@ async def test_state_mainmenu_start_suggested_populated(
                 "-----",
                 "Send me the number of the topic you're interested in.",
                 "",
-                "*🏥 NEED HELP?*",
+                "🏥 *NEED HELP?*",
                 "1. Talk to a counsellor",
                 "2. Find clinics and services",
                 "3. Help content",
@@ -466,7 +466,7 @@ async def test_state_mainmenu_start_suggested_populated(
                 "🙋🏿‍♂️ *QUESTIONS?*",
                 "10. Ask your own question",
                 "-----",
-                "*⚙️ CHAT SETTINGS*",
+                "⚙️ *CHAT SETTINGS*",
                 "11. Update your information",
                 "-----",
                 "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or"
@@ -552,8 +552,6 @@ async def test_state_mainmenu_contentrepo(
             "",
             "Sub menu test content 2",
             "",
-            "1. Got feedback for me?",
-            "",
             "-----",
             "*Or reply:*",
             BACK_TO_MAIN,
@@ -599,8 +597,6 @@ async def test_state_mainmenu_contentrepo_help_content(
             "-----",
             "",
             "Message test content 1",
-            "",
-            "1. Got feedback for me?",
             "",
             "-----",
             "*Or reply:*",
@@ -875,11 +871,9 @@ async def test_state_mainmenu_contentrepo_children(
             "",
             "Sub menu test content 2",
             "",
-            "1. Got feedback for me?",
-            "",
             "-----",
             "*Or reply:*",
-            "2. ⬅️ Parent Title",
+            "1. ⬅️ Parent Title",
             BACK_TO_MAIN,
             GET_HELP,
         ]
@@ -914,7 +908,7 @@ async def test_state_mainmenu_contentrepo_children(
     update_request = rapidpro_mock.tstate.requests[-1]
     assert update_request.json["fields"] == {
         "last_main_time": "2022-06-19T17:30:00",
-        "suggested_text": "*3* - Suggested Content 1\n*4* - Suggested Content 2",
+        "suggested_text": "*2* - Suggested Content 1\n*3* - Suggested Content 2",
     }
 
     reminder_request = rapidpro_mock.tstate.requests[-2]
@@ -1097,8 +1091,6 @@ async def test_state_display_page_detail(
                 "",
                 "body",
                 "",
-                "1. Got feedback for me?",
-                "",
                 "-----",
                 "*Or reply:*",
                 BACK_TO_MAIN,
@@ -1132,11 +1124,10 @@ async def test_state_display_page_detail_quick_replies(
                 "Message test content 1",
                 "",
                 "1. No, thanks",
-                "2. Got feedback for me?",
                 "",
                 "-----",
                 "*Or reply:*",
-                "3. ⬅️ Parent Title",
+                "2. ⬅️ Parent Title",
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
@@ -1185,11 +1176,10 @@ async def test_state_display_page_detail_aaq_feature(
                 "Message test content 1",
                 "",
                 "1. Ask a Question",
-                "2. Got feedback for me?",
                 "",
                 "-----",
                 "*Or reply:*",
-                "3. ⬅️ Parent Title",
+                "2. ⬅️ Parent Title",
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
@@ -1224,11 +1214,10 @@ async def test_state_display_page_detail_servicefinder_feature(
                 "Message test content 1",
                 "",
                 "1. Find a clinic",
-                "2. Got feedback for me?",
                 "",
                 "-----",
                 "*Or reply:*",
-                "3. ⬅️ Parent Title",
+                "2. ⬅️ Parent Title",
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
@@ -1265,11 +1254,10 @@ async def test_state_display_page_detail_pleasecallme_feature(
                 "Message test content 1",
                 "",
                 "1. Call Lovelife",
-                "2. Got feedback for me?",
                 "",
                 "-----",
                 "*Or reply:*",
-                "3. ⬅️ Parent Title",
+                "2. ⬅️ Parent Title",
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
@@ -1383,11 +1371,9 @@ async def test_state_display_page_detail_back(
                 "",
                 "body",
                 "",
-                "1. Got feedback for me?",
-                "",
                 "-----",
                 "*Or reply:*",
-                "2. ⬅️ Previous thing",
+                "1. ⬅️ Previous thing",
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
@@ -1459,7 +1445,6 @@ async def test_state_display_page_detail_related(
                 "body",
                 "",
                 "1. Related Content",
-                "2. Got feedback for me?",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -1538,7 +1523,6 @@ async def test_state_content_page_related_tags(
                 "Message test content 1",
                 "",
                 "1. Related Content",
-                "2. Got feedback for me?",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -1572,7 +1556,6 @@ async def test_state_content_page_related(
                 "Message test content 2",
                 "",
                 "1. Related Content 2",
-                "2. Got feedback for me?",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -1581,152 +1564,3 @@ async def test_state_content_page_related(
             ]
         )
     )
-
-
-@pytest.mark.asyncio
-async def test_state_prompt_info_found(tester: AppTester):
-    tester.setup_state("state_prompt_info_found")
-    await tester.user_input(session=Message.SESSION_EVENT.NEW)
-
-    tester.assert_message(
-        "\n".join(
-            [
-                "Did you find the info you were looking for?",
-                "",
-                "Reply:",
-                "1. 👍🏾 Yes",
-                "2. 👎🏾 No",
-                "",
-                "--",
-                "",
-                "0. 🏠 *Back* to Main *MENU*",
-                "#. 🆘Get *HELP*",
-            ]
-        )
-    )
-
-
-@pytest.mark.asyncio
-async def test_state_prompt_info_found_no(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_prompt_info_found")
-    await tester.user_input("no")
-
-    tester.assert_message(
-        "\n".join(
-            [
-                "Hmm, I'm sorry about that.😕",
-                "Please tell me a bit more about what info you're looking for "
-                "so that I can help you next time.",
-            ]
-        )
-    )
-
-
-@pytest.mark.asyncio
-async def test_state_prompt_not_found_comment(tester: AppTester, turn_mock):
-    tester.setup_state("state_prompt_not_found_comment")
-    await tester.user_input("I don't know")
-
-    tester.assert_message(
-        "Ok got it. Thank you for the feedback, I'm working on it already👍🏾."
-    )
-
-    message_id = tester.application.inbound.message_id  # type: ignore
-    label_request = turn_mock.tstate.requests[0]
-    assert label_request.path == f"/v1/messages/{message_id}/labels"
-    assert json.loads(label_request.body.decode("utf-8")) == {
-        "labels": ["Priority Question"],
-    }
-
-
-@pytest.mark.asyncio
-async def test_state_prompt_info_useful(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_prompt_info_found")
-    await tester.user_input("1")
-
-    tester.assert_message(
-        "\n".join(
-            [
-                "Great.😊 Was the info useful?",
-                "",
-                "Reply:",
-                "1. 👍🏾 Yes",
-                "2. 👎🏾 No",
-                "",
-                "--",
-                "",
-                "0. 🏠 *Back* to Main *MENU*",
-                "#. 🆘Get *HELP*",
-            ]
-        )
-    )
-
-
-@pytest.mark.asyncio
-async def test_state_prompt_info_useful_emoticon(tester: AppTester):
-    tester.setup_state("state_prompt_info_useful")
-    await tester.user_input("👎🏾")
-    tester.assert_state("state_prompt_feedback_comment")
-
-    tester.setup_state("state_prompt_info_useful")
-    await tester.user_input("👎")
-    tester.assert_state("state_prompt_feedback_comment")
-
-
-@pytest.mark.asyncio
-async def test_state_prompt_info_useful_submit(
-    tester: AppTester, contentrepo_api_mock, rapidpro_mock
-):
-    tester.setup_state("state_prompt_info_useful")
-    tester.user.metadata["selected_page_id"] = "111"
-
-    await tester.user_input("1")
-
-    post_request = contentrepo_api_mock.tstate.requests[0]
-    assert post_request.path == "/api/v2/custom/ratings/"
-    assert json.loads(post_request.body.decode("utf-8")) == {
-        "page": "111",
-        "helpful": True,
-        "comment": "",
-        "data": {"session_id": 1, "user_addr": "27820001001"},
-    }
-
-
-@pytest.mark.asyncio
-async def test_state_prompt_feedback_comment(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_prompt_info_useful")
-    await tester.user_input("2")
-
-    tester.assert_state("state_prompt_feedback_comment")
-
-
-@pytest.mark.asyncio
-async def test_state_prompt_feedback_comment_submit(
-    tester: AppTester, contentrepo_api_mock, turn_mock
-):
-    tester.setup_state("state_prompt_feedback_comment")
-    tester.user.metadata["selected_page_id"] = "111"
-    tester.setup_answer("state_prompt_info_useful", "no")
-
-    await tester.user_input("I don't understand")
-
-    tester.assert_message(
-        "Ok got it. Thank you for the feedback, I'm working on it already👍🏾."
-    )
-
-    post_request = contentrepo_api_mock.tstate.requests[0]
-    assert post_request.path == "/api/v2/custom/ratings/"
-    assert post_request.headers["authorization"] == "Token testtoken"
-    assert json.loads(post_request.body.decode("utf-8")) == {
-        "page": "111",
-        "helpful": False,
-        "comment": "I don't understand",
-        "data": {"session_id": 1, "user_addr": "27820001001"},
-    }
-
-    message_id = tester.application.inbound.message_id  # type: ignore
-    label_request = turn_mock.tstate.requests[0]
-    assert label_request.path == f"/v1/messages/{message_id}/labels"
-    assert json.loads(label_request.body.decode("utf-8")) == {
-        "labels": ["Priority Question"],
-    }
