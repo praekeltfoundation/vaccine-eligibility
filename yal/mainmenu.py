@@ -2,16 +2,9 @@ import logging
 from datetime import timedelta
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import (
-    Choice,
-    CustomChoiceState,
-    EndState,
-    FreeText,
-    WhatsAppButtonState,
-    WhatsAppListState,
-)
+from vaccine.states import Choice, CustomChoiceState, WhatsAppListState
 from vaccine.utils import get_display_choices
-from yal import contentrepo, rapidpro, turn, utils
+from yal import contentrepo, rapidpro, utils
 from yal.askaquestion import Application as AskaQuestionApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
@@ -78,7 +71,7 @@ class Application(BaseApplication):
 
         sections = [
             (
-                "*🏥 NEED HELP?*",
+                "🏥 *NEED HELP?*",
                 [
                     Choice(PleaseCallMeApplication.START_STATE, "Talk to a counsellor"),
                     Choice(
@@ -117,7 +110,7 @@ class Application(BaseApplication):
         )
         sections.append(
             (
-                "*⚙️ CHAT SETTINGS*",
+                "⚙️ *CHAT SETTINGS*",
                 [
                     Choice(
                         ChangePreferencesApplication.START_STATE,
@@ -371,8 +364,6 @@ class Application(BaseApplication):
                 return AskaQuestionApplication.START_STATE
             elif choice.value == "feature_pleasecallme":
                 return PleaseCallMeApplication.START_STATE
-            elif choice.value == "feedback":
-                return "state_prompt_info_found"
             elif choice.value.startswith("no"):
                 return "state_get_suggestions"
 
@@ -431,10 +422,6 @@ class Application(BaseApplication):
         if "pleasecallme" in feature_redirects:
             choices.append(Choice("feature_pleasecallme", "Call Lovelife"))
             buttons.append(Choice("feature_pleasecallme", "Call Lovelife"))
-
-        if next_prompt is None and metadata["page_type"] == "detail":
-            choices.append(Choice("feedback", "Got feedback for me?"))
-            buttons.append(Choice("feedback", "Got feedback for me?"))
 
         if choices:
             parts.extend(
@@ -592,142 +579,3 @@ class Application(BaseApplication):
         self.save_metadata("current_menu_level", menu_level - 2)
 
         return await self.go_to_state("state_contentrepo_page")
-
-    async def state_prompt_info_found(self):
-        question = self._(
-            "\n".join(
-                [
-                    "Did you find the info you were looking for?",
-                    "",
-                    "Reply:",
-                    "1. 👍🏾 Yes",
-                    "2. 👎🏾 No",
-                    "",
-                    "--",
-                    "",
-                    BACK_TO_MAIN,
-                    GET_HELP,
-                ]
-            )
-        )
-        return WhatsAppButtonState(
-            self,
-            question=question,
-            choices=[
-                Choice("yes", "Yes", additional_keywords="👍🏾"),
-                Choice("no", "No", additional_keywords="👎🏾"),
-            ],
-            error=self._(get_generic_error()),
-            next={
-                "yes": "state_prompt_info_useful",
-                "no": "state_prompt_not_found_comment",
-            },
-        )
-
-    async def state_prompt_not_found_comment(self):
-        return FreeText(
-            self,
-            question=self._(
-                "\n".join(
-                    [
-                        "Hmm, I'm sorry about that.😕",
-                        "Please tell me a bit more about what info you're looking for "
-                        "so that I can help you next time.",
-                    ]
-                )
-            ),
-            next="state_label_comment",
-        )
-
-    async def state_label_comment(self):
-        error = await turn.label_message(self.inbound.message_id, "Priority Question")
-        if error:
-            return await self.go_to_state("state_error")
-        return await self.go_to_state("state_feedback_completed")
-
-    async def state_feedback_completed(self):
-        return EndState(
-            self,
-            text=self._(
-                "Ok got it. Thank you for the feedback, I'm working on it already👍🏾."
-            ),
-        )
-
-    async def state_prompt_info_useful(self):
-        question = self._(
-            "\n".join(
-                [
-                    "Great.😊 Was the info useful?",
-                    "",
-                    "Reply:",
-                    "1. 👍🏾 Yes",
-                    "2. 👎🏾 No",
-                    "",
-                    "--",
-                    "",
-                    BACK_TO_MAIN,
-                    GET_HELP,
-                ]
-            )
-        )
-        return WhatsAppButtonState(
-            self,
-            question=question,
-            choices=[
-                Choice("yes", "Yes", additional_keywords="👍🏾"),
-                Choice("no", "No", additional_keywords="👎🏾"),
-            ],
-            error=self._(get_generic_error()),
-            next={
-                "yes": "state_submit_feedback",
-                "no": "state_prompt_feedback_comment",
-            },
-        )
-
-    async def state_prompt_feedback_comment(self):
-        return FreeText(
-            self,
-            question=self._(
-                "\n".join(
-                    [
-                        "Hmm, I'm sorry about that.😕",
-                        "Please tell me a bit more about what info you're looking for "
-                        "so that I can help you next time.",
-                    ]
-                )
-            ),
-            next="state_submit_feedback",
-        )
-
-    async def state_submit_feedback(self):
-        metadata = self.user.metadata
-        helpful = self.user.answers["state_prompt_info_useful"] == "yes"
-        comment = (
-            "" if helpful else self.user.answers.get("state_prompt_feedback_comment")
-        )
-
-        error = await contentrepo.add_page_rating(
-            self.user, metadata["selected_page_id"], helpful, comment
-        )
-        if error:
-            return await self.go_to_state("state_error")
-
-        if not helpful:
-            return await self.go_to_state("state_label_comment")
-
-        return EndState(
-            self,
-            text=self._(
-                "\n".join(
-                    [
-                        "I'm so happy I could help you learn more about you sexual "
-                        "health and pleasure. 🙌🏾😎",
-                        "",
-                        "--",
-                        "",
-                        BACK_TO_MAIN,
-                        GET_HELP,
-                    ]
-                )
-            ),
-        )
