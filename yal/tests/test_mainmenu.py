@@ -22,9 +22,9 @@ def tester():
 def get_rapidpro_contact(urn):
     rel_status = ""
     if "27820001001" in urn:
-        rel_status="Yes"
+        rel_status = "Yes"
     elif "27820002002" in urn:
-        rel_status=None
+        rel_status = None
     return {
         "fields": {
             "relationship_status": rel_status,
