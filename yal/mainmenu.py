@@ -254,7 +254,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         rel_status = fields.get("relationship_status")
-        if rel_status == "" or rel_status == "skip":
+        if not rel_status or rel_status == "" or rel_status.lower() == "skip":
             return await self.go_to_state("state_relationship_status")
         return await self.go_to_state("state_contentrepo_page")
 
