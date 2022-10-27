@@ -24,6 +24,20 @@ logger = logging.getLogger(__name__)
 
 GREETING_KEYWORDS = {"hi", "hello", "menu", "0", "main menu"}
 HELP_KEYWORDS = {"#", "help", "please call me", "talk to a counsellor"}
+TRACKING_KEYWORDS = {
+    "hie",
+    "hi",
+    "hola",
+    "heita",
+    "bwise",
+    "aweh",
+    "hey",
+    "hiya",
+    "howzit",
+    "hello",
+    "start",
+    "hisuga",
+}
 OPTOUT_KEYWORDS = {"stop"}
 ONBOARDING_REMINDER_KEYWORDS = {
     "continue",
@@ -183,9 +197,13 @@ class Application(
 
         inbound = utils.clean_inbound(self.inbound.content)
 
+        # Save keywords that are used for source tracking
+        if inbound in TRACKING_KEYWORDS:
+            self.save_answer("state_source_tracking", inbound)
+
         if inbound in OPTOUT_KEYWORDS:
             return await self.go_to_state(OptOutApplication.START_STATE)
-        if inbound in GREETING_KEYWORDS:
+        if inbound in GREETING_KEYWORDS or inbound in TRACKING_KEYWORDS:
             if terms_accepted and onboarding_completed:
                 return await self.go_to_state(MainMenuApplication.START_STATE)
             elif terms_accepted:
