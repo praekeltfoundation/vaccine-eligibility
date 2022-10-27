@@ -71,7 +71,6 @@ class Application(
     START_STATE = "state_start"
 
     async def process_message(self, message):
-        print("in process_message")
         keyword = utils.clean_inbound(message.content)
         # Restart keywords
         if keyword in GREETING_KEYWORDS:
@@ -167,7 +166,6 @@ class Application(
                 return ServiceFinderFeedbackSurveyApplication.CALLBACK_2_STATE
 
     async def state_start(self):
-        print("In start_state")
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
