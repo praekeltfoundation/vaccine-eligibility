@@ -332,6 +332,29 @@ async def test_state_start_to_mainmenu(
 
 
 @pytest.mark.asyncio
+async def test_tracked_keywords_saved(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    await tester.user_input("howzit")
+    tester.assert_state("state_mainmenu")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_source_tracking", "howzit")
+
+
+@pytest.mark.asyncio
+async def test_tracked_keywords_saved_for_new_user(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    tester.setup_user_address("27820001002")
+    await tester.user_input("heita")
+    tester.assert_state("state_welcome")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_source_tracking", "heita")
+
+
+@pytest.mark.asyncio
 async def test_onboarding_reminder_response_to_reminder_handler(
     tester: AppTester, rapidpro_mock
 ):

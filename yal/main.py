@@ -24,6 +24,20 @@ logger = logging.getLogger(__name__)
 
 GREETING_KEYWORDS = {"hi", "hello", "menu", "0", "main menu"}
 HELP_KEYWORDS = {"#", "help", "please call me", "talk to a counsellor"}
+TRACKING_KEYWORDS = {
+    "hie",
+    "hi",
+    "hola",
+    "heita",
+    "bwise",
+    "aweh",
+    "hey",
+    "hiya",
+    "howzit",
+    "hello",
+    "start",
+    "hisuga",
+}
 OPTOUT_KEYWORDS = {"stop"}
 ONBOARDING_REMINDER_KEYWORDS = {
     "continue",
@@ -57,6 +71,7 @@ class Application(
     START_STATE = "state_start"
 
     async def process_message(self, message):
+        print("in process_message")
         keyword = utils.clean_inbound(message.content)
         # Restart keywords
         if keyword in GREETING_KEYWORDS:
@@ -152,6 +167,7 @@ class Application(
                 return ServiceFinderFeedbackSurveyApplication.CALLBACK_2_STATE
 
     async def state_start(self):
+        print("In start_state")
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
@@ -183,9 +199,13 @@ class Application(
 
         inbound = utils.clean_inbound(self.inbound.content)
 
+        # Save keywords that are used for source tracking
+        if inbound in TRACKING_KEYWORDS:
+            self.save_answer("state_source_tracking", inbound)
+
         if inbound in OPTOUT_KEYWORDS:
             return await self.go_to_state(OptOutApplication.START_STATE)
-        if inbound in GREETING_KEYWORDS:
+        if inbound in GREETING_KEYWORDS or inbound in TRACKING_KEYWORDS:
             if terms_accepted and onboarding_completed:
                 return await self.go_to_state(MainMenuApplication.START_STATE)
             elif terms_accepted:
