@@ -212,21 +212,6 @@ async def contentrepo_api_mock():
             ),
         )
 
-    @app.route("/api/v2/pages/1111/?message=2", methods=["GET"])
-    def get_page_detail_1111_2(request):
-        tstate.requests.append(request)
-        return response.json(
-            build_message_detail(
-                111,
-                "Main Menu 1 💊",
-                "Message test content 2",
-                total_messages=2,
-                message=2,
-                next_message=None,
-                previous_message=1,
-            ),
-        )
-
     @app.route("/api/v2/pages/1112", methods=["GET"])
     def get_page_detail_1112(request):
         tstate.requests.append(request)
@@ -646,9 +631,13 @@ async def test_state_mainmenu_contentrepo_help_content(
         "/suggestedcontent/",
         "/api/v2/pages",
         "/api/v2/pages/1111",
+        "/api/v2/pages/1111",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 4
+    request = contentrepo_api_mock.tstate.requests[-1]
+    assert request.args["message"] == ["2"]
+
+    assert len(rapidpro_mock.tstate.requests) == 7
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
