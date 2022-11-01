@@ -336,7 +336,11 @@ class Application(BaseApplication):
             "feature_redirects", page_details.get("feature_redirects", [])
         )
 
-        menu_level = metadata["current_menu_level"] + 1
+        # do not increment menu level if traveling horizontally
+        if message_id > 1:
+            menu_level = metadata["current_menu_level"]
+        else:
+            menu_level = metadata["current_menu_level"] + 1
         self.save_metadata("current_menu_level", menu_level)
 
         if page_details["has_children"]:

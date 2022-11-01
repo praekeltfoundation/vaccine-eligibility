@@ -42,15 +42,18 @@ def build_message_detail(
     total_messages=1,
     quick_replies=[],
     related_pages=[],
+    message=1,
+    next_message=None,
+    previous_message=None,
 ):
     return {
         "id": id,
         "title": title,
         "subtitle": None,
         "body": {
-            "message": 1,
-            "next_message": None,
-            "previous_message": None,
+            "message": message,
+            "next_message": next_message,
+            "previous_message": previous_message,
             "total_messages": total_messages,
             "text": {
                 "type": "Whatsapp_Message",
@@ -203,7 +206,25 @@ async def contentrepo_api_mock():
                 111,
                 "Main Menu 1 💊",
                 "Message test content 1",
-            )
+                total_messages=2,
+                message=1,
+                next_message=2,
+            ),
+        )
+
+    @app.route("/api/v2/pages/1111/?message=2", methods=["GET"])
+    def get_page_detail_1111_2(request):
+        tstate.requests.append(request)
+        return response.json(
+            build_message_detail(
+                111,
+                "Main Menu 1 💊",
+                "Message test content 2",
+                total_messages=2,
+                message=2,
+                next_message=None,
+                previous_message=1,
+            ),
         )
 
     @app.route("/api/v2/pages/1112", methods=["GET"])
@@ -603,6 +624,8 @@ async def test_state_mainmenu_contentrepo_help_content(
             "",
             "Message test content 1",
             "",
+            "1. Next",
+            "",
             "-----",
             "*Or reply:*",
             BACK_TO_MAIN,
@@ -612,6 +635,8 @@ async def test_state_mainmenu_contentrepo_help_content(
 
     tester.assert_num_messages(1)
     tester.assert_message(question)
+
+    await tester.user_input("1")
 
     assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
         "/api/v2/pages",
