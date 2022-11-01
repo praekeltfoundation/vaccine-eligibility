@@ -618,10 +618,12 @@ async def test_state_mainmenu_contentrepo_help_content(
         ]
     )
 
+    assert tester.user.metadata["current_menu_level"] == 1
     tester.assert_num_messages(1)
     tester.assert_message(question)
 
     await tester.user_input("1")
+    assert tester.user.metadata["current_menu_level"] == 1
 
     assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
         "/api/v2/pages",
