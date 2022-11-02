@@ -336,7 +336,8 @@ class Application(BaseApplication):
             "feature_redirects", page_details.get("feature_redirects", [])
         )
 
-        # do not increment menu level if traveling horizontally
+        # do not increment menu level when retrieving the next whatsapp message,
+        # only when going to a child page in content repo
         if message_id > 1:
             menu_level = metadata["current_menu_level"]
         else:
