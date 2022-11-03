@@ -28,7 +28,7 @@ GENDERS = {
     "other": "None of these",
     "rather_not_say": "Rather not say",
 }
-BACK_TO_MAIN = "0. 🏠 *Back* to Main *MENU*"
+BACK_TO_MAIN = "0. 🏠 Back to Main *MENU*"
 GET_HELP = "#. 🆘Get *HELP*"
 PERSONA_FIELDS = ["persona_emoji", "persona_name"]
 PERSONA_DEFAULTS = {"persona_emoji": "🤖", "persona_name": "B-wise"}

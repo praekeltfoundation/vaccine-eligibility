@@ -220,7 +220,7 @@ async def test_start_state_response_sets_timeout(
                 "",
                 "-----",
                 "*Or reply:*",
-                "0. 🏠 *Back* to Main *MENU*",
+                "0. 🏠 Back to Main *MENU*",
                 "#. 🆘Get *HELP*",
             ]
         ),
@@ -320,7 +320,7 @@ async def test_state_display_results_next(tester: AppTester, aaq_mock):
                 "",
                 "-----",
                 "*Or reply:*",
-                "0. 🏠 *Back* to Main *MENU*",
+                "0. 🏠 Back to Main *MENU*",
                 "#. 🆘Get *HELP*",
             ]
         )
