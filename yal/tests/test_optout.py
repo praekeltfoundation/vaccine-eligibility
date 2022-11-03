@@ -280,7 +280,7 @@ async def test_state_optout_delete_saved(
                 "*------*",
                 "*Reply:*",
                 "*1* - to see your personal data",
-                "0. 🏠 *Back* to Main *MENU*",
+                "0. 🏠 Back to Main *MENU*",
                 "#. 🆘Get *HELP*",
             ]
         )
@@ -307,7 +307,7 @@ async def test_state_optout_delete_no_data(tester: AppTester, rapidpro_mock):
                 "*------*",
                 "*Reply:*",
                 "*1* - to see your personal data",
-                "0. 🏠 *Back* to Main *MENU*",
+                "0. 🏠 Back to Main *MENU*",
                 "#. 🆘Get *HELP*",
             ]
         )
