@@ -3,7 +3,7 @@ import logging
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, FreeText, WhatsAppListState
-from yal import rapidpro, utils
+from yal import rapidpro, utils, config
 from yal.utils import get_current_datetime, get_generic_error
 from yal.validators import age_validator
 
@@ -109,6 +109,13 @@ class Application(BaseApplication):
         return await self.go_to_state("state_age")
 
     async def state_age(self):
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        if (
+            config.SEGMENTATION_SURVEY_ACTIVE
+            or msisdn in config.SEGMENTATION_SURVEY_ALLOWED
+        ):
+            self.go_to_state("state_start_survey")
+
         await self.update_last_onboarding_time()
         return FreeText(
             self,

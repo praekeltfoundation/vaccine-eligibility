@@ -16,6 +16,7 @@ from yal.onboarding import Application as OnboardingApplication
 from yal.optout import Application as OptoutApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
+from yal.segmentation_survey import Application as SegmentSurveyApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
@@ -44,6 +45,7 @@ def test_no_state_name_clashes():
     sf_s_states = set(
         s for s in dir(ServiceFinderFeedbackSurveyApplication) if s.startswith("state_")
     )
+    ss_states = set(s for s in dir(SegmentSurveyApplication) if s.startswith("state_"))
     wa_fb_states = set(
         s for s in dir(WaFbCrossoverFeedbackApplication) if s.startswith("state_")
     )
@@ -61,6 +63,7 @@ def test_no_state_name_clashes():
         & fb_states
         & c_fb_states
         & sf_s_states
+        & ss_states
         & wa_fb_states
     ) - {
         "state_name",
