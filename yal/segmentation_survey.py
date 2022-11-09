@@ -152,7 +152,7 @@ class Application(BaseApplication):
 
     async def state_trigger_airtime_flow(self):
         # TODO: start the airtime flow in rapidpro
-        self.go_to_state("state_prompt_next_action")
+        return await self.go_to_state("state_prompt_next_action")
 
     async def state_prompt_next_action(self):
         def _next(choice: Choice):

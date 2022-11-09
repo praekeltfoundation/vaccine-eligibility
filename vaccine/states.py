@@ -348,7 +348,7 @@ class CustomChoiceState(BaseWhatsAppChoiceState):
         if self.buttons:
             if len(self.buttons) <= 3:
                 helper_metadata["buttons"] = [choice.label for choice in self.buttons]
-            else:
+            elif len(self.buttons) <= 10:
                 helper_metadata["button"] = self.button
                 helper_metadata["sections"] = [
                     {
