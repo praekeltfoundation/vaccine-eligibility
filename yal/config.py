@@ -23,4 +23,4 @@ AAQ_TOKEN = environ.get("AAQ_TOKEN")
 SEGMENTATION_SURVEY_ACTIVE = environ.get(
     "SEGMENTATION_SURVEY_ACTIVE", "False"
 ).lower() in ("true", "1", "t", "on")
-SEGMENTATION_SURVEY_ALLOWED = environ.get("SEGMENTATION_SURVEY_ALLOWED", "").split()
+SEGMENTATION_SURVEY_ALLOWED = environ.get("SEGMENTATION_SURVEY_ALLOWED", "").split(",")

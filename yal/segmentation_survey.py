@@ -193,6 +193,7 @@ class Application(BaseApplication):
         )
 
     async def state_no_airtime(self):
+        # TODO: label question for helpdesk ??
         return EndState(
             self,
             text=self._(
