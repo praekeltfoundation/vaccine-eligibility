@@ -114,7 +114,7 @@ class Application(BaseApplication):
             config.SEGMENTATION_SURVEY_ACTIVE
             or msisdn in config.SEGMENTATION_SURVEY_ALLOWED
         ):
-            self.go_to_state("state_start_survey")
+            return await self.go_to_state("state_start_survey")
 
         await self.update_last_onboarding_time()
         return FreeText(
