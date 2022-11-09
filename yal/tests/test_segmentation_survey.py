@@ -23,7 +23,8 @@ async def test_survey_start(tester: AppTester):
                 "Section 1",
                 "1/2",
                 "",
-                "*How much does everyone in your house make altogether, before paying for regular monthly items?*",
+                "*How much does everyone in your house make altogether, before paying "
+                "for regular monthly items?*",
                 "",
                 "1. No income",
                 "2. R1 - R400",
@@ -94,7 +95,8 @@ async def test_survey_next_section(tester: AppTester):
                 "",
                 "*_Do you think this is True or False?_ ",
                 "",
-                "*People can reduce the risk of getting STIs by using condoms every time they have sexual intercourse.**",
+                "*People can reduce the risk of getting STIs by using condoms every "
+                "time they have sexual intercourse.**",
                 "",
                 "1. True",
                 "2. False",
