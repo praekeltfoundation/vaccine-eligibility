@@ -1,14 +1,14 @@
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
-    EndState,
-    WhatsAppButtonState,
-    MenuState,
     CustomChoiceState,
+    EndState,
+    MenuState,
+    WhatsAppButtonState,
 )
 from vaccine.utils import get_display_choices
-from yal.utils import get_generic_error, GET_HELP, BACK_TO_MAIN
 from yal.data.seqmentation_survey_questions import SURVEY_QUESTIONS
+from yal.utils import BACK_TO_MAIN, GET_HELP, get_generic_error
 
 
 class Application(BaseApplication):

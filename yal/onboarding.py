@@ -3,7 +3,7 @@ import logging
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, FreeText, WhatsAppListState
-from yal import rapidpro, utils, config
+from yal import config, rapidpro, utils
 from yal.utils import get_current_datetime, get_generic_error
 from yal.validators import age_validator
 
