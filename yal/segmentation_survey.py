@@ -23,6 +23,7 @@ class Application(BaseApplication):
                 "",
             ]
         )
+        # TODO: Add buttons
         return MenuState(
             self,
             question=self._(question),
@@ -39,9 +40,9 @@ class Application(BaseApplication):
         section = str(metadata.get("segment_section", "1"))
 
         if section not in SURVEY_QUESTIONS:
-            self.save_metadata("segment_section", None)
-            self.save_metadata("segment_question", None)
-            self.save_metadata("segment_question_nr", None)
+            self.delete_metadata("segment_section")
+            self.delete_metadata("segment_question")
+            self.delete_metadata("segment_question_nr")
             return await self.go_to_state("state_survey_done")
 
         current_question = metadata.get("segment_question")
@@ -130,8 +131,8 @@ class Application(BaseApplication):
             self.save_metadata("segment_question_nr", question_number + 1)
         else:
             self.save_metadata("segment_section", section + 1)
-            self.save_metadata("segment_question", None)
             self.save_metadata("segment_question_nr", 1)
+            self.delete_metadata("segment_question")
 
         return await self.go_to_state("state_survey_question")
 

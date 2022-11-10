@@ -107,6 +107,13 @@ class BaseApplication:
         """
         self.user.metadata[name] = value
 
+    def delete_metadata(self, name: str):
+        """
+        Deletes metadata on the user
+        """
+        if name in self.user.metadata:
+            del self.user.metadata[name]
+
     def send_message(self, content, continue_session=True, **kw):
         """
         Sends a reply to the user
