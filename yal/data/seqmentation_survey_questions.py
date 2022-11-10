@@ -28,6 +28,16 @@ SURVEY_QUESTIONS = {
                     "In a serious relationship",
                     "In a relationship, but not a serious one",
                 ],
+                "next": "state_s1_6_detail_monthly_sex_partners",
+            },
+            "state_s1_6_detail_monthly_sex_partners": {
+                "text": "\n".join(
+                    [
+                        "*Ok. You can tell me how many sexual partners you had here.*",
+                        "",
+                        "_Just type and send_",
+                    ]
+                ),
                 "next": None,
             },
         },
@@ -36,9 +46,14 @@ SURVEY_QUESTIONS = {
         "start": "state_s2_1_knowledge_1",
         "questions": {
             "state_s2_1_knowledge_1": {
-                "text": "_Do you think this is True or False?_ \n\n*People can reduce "
-                "the risk of getting STIs by using condoms every time they have "
-                "sexual intercourse.*",
+                "text": "\n".join(
+                    [
+                        "Do you think this is True or False?_",
+                        "",
+                        "*People can reduce the risk of getting STIs by using condoms "
+                        "every time they have sexual intercourse.*",
+                    ]
+                ),
                 "options": ["True", "False"],
                 "next": "state_s2_2_knowledge_2",
             },

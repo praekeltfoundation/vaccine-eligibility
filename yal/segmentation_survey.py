@@ -3,6 +3,7 @@ from vaccine.states import (
     Choice,
     CustomChoiceState,
     EndState,
+    FreeText,
     MenuState,
     WhatsAppButtonState,
 )
@@ -55,14 +56,6 @@ class Application(BaseApplication):
 
         question = SURVEY_QUESTIONS[section]["questions"][current_question]
 
-        # TODO: Handle freetext question types
-
-        choices = []
-
-        for option in question["options"]:
-            stub = option.replace(" ", "-").lower()
-            choices.append(Choice(stub, option))
-
         parts = [
             "*BWise / Survey*",
             "-----",
@@ -71,36 +64,66 @@ class Application(BaseApplication):
             "",
             f"*{question['text']}*",
             "",
-            get_display_choices(choices),
-            "",
-            "-----",
-            "*Or reply:*",
-            BACK_TO_MAIN,
-            GET_HELP,
         ]
-        question = self._("\n".join(parts))
-        # TODO: Update this
-        error_text = "Temp"
 
-        return CustomChoiceState(
-            self,
-            question=question,
-            error=error_text,
-            choices=choices,
-            next="state_survey_process_answer",
-            button="See my options",
-            buttons=choices,
+        if question.get("options"):
+            choices = []
+            for option in question["options"]:
+                stub = option.replace(" ", "-").lower()
+                choices.append(Choice(stub, option))
+
+            parts.extend(
+                [
+                    get_display_choices(choices),
+                    "",
+                ]
+            )
+
+        parts.extend(
+            [
+                "-----",
+                "*Or reply:*",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
         )
+        question_text = self._("\n".join(parts))
+
+        if question.get("options"):
+            # TODO: Update this
+            error_text = "Temp"
+
+            return CustomChoiceState(
+                self,
+                question=question_text,
+                error=error_text,
+                choices=choices,
+                next="state_survey_process_answer",
+                button="See my options",
+                buttons=choices,
+            )
+        else:
+            return FreeText(
+                self,
+                question=question_text,
+                next="state_survey_process_answer",
+            )
 
     async def state_survey_process_answer(self):
+        print(">>> state_survey_process_answer")
         metadata = self.user.metadata
         answers = self.user.answers
 
+        print(answers)
+
         section = metadata.get("segment_section", 1)
         current_question = metadata.get("segment_question")
-        answer = answers.get(current_question)
+        answer = answers.get("state_survey_question")
         question_number = metadata.get("segment_question_nr", 1)
 
+        print("current")
+        print(current_question)
+        print(answer)
         self.save_answer(current_question, answer)
 
         question = SURVEY_QUESTIONS[str(section)]["questions"][current_question]

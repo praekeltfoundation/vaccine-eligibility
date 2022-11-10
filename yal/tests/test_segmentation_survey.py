@@ -1,5 +1,6 @@
 import pytest
 
+from vaccine.models import Message
 from vaccine.testing import AppTester
 from yal.main import Application
 
@@ -21,7 +22,7 @@ async def test_survey_start(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "1/2",
+                "1/3",
                 "",
                 "*How much does everyone in your house make altogether, before paying "
                 "for regular monthly items?*",
@@ -59,7 +60,7 @@ async def test_survey_next_question(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "2/2",
+                "2/3",
                 "",
                 "*What is your present relationship status?*",
                 "",
@@ -77,9 +78,44 @@ async def test_survey_next_question(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_survey_next_section(tester: AppTester):
+async def test_survey_freetext_question(tester: AppTester):
     tester.user.metadata["segment_section"] = 1
-    tester.user.metadata["segment_question"] = "state_relationship_status"
+    tester.user.metadata["segment_question"] = "state_s1_6_detail_monthly_sex_partners"
+
+    tester.setup_state("state_survey_question")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*BWise / Survey*",
+                "-----",
+                "Section 1",
+                "1/3",
+                "",
+                "**Ok. You can tell me how many sexual partners you had here.*",
+                "",
+                "_Just type and send_*",
+                "",
+                "-----",
+                "*Or reply:*",
+                "0. 🏠 Back to Main *MENU*",
+                "#. 🆘Get *HELP*",
+            ]
+        )
+    )
+
+    await tester.user_input("11")
+
+    tester.assert_state("state_survey_question")
+
+    tester.assert_answer("state_s1_6_detail_monthly_sex_partners", "11")
+
+
+@pytest.mark.asyncio
+async def test_survey_next_section(tester: AppTester):
+    tester.user.metadata["segment_section"] = 2
+    tester.user.metadata["segment_question"] = "state_s2_2_knowledge_2"
 
     tester.setup_state("state_survey_question")
     await tester.user_input("1")
@@ -90,16 +126,19 @@ async def test_survey_next_section(tester: AppTester):
             [
                 "*BWise / Survey*",
                 "-----",
-                "Section 2",
+                "Section 3",
                 "1/2",
                 "",
-                "*_Do you think this is True or False?_ ",
+                "*_The following statements may apply more or less to you. To what "
+                "extent do you think each statement applies to you personally?_ ",
                 "",
-                "*People can reduce the risk of getting STIs by using condoms every "
-                "time they have sexual intercourse.**",
+                "*I’m my own boss.**",
                 "",
-                "1. True",
-                "2. False",
+                "1. Does not apply at all",
+                "2. Applies somewhat",
+                "3. Applies",
+                "4. Applies a lot",
+                "5. Applies completely",
                 "",
                 "-----",
                 "*Or reply:*",
