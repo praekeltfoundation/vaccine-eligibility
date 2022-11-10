@@ -22,7 +22,7 @@ async def test_survey_start(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "1/3",
+                "1/4",
                 "",
                 "*How much does everyone in your house make altogether, before paying "
                 "for regular monthly items?*",
@@ -52,7 +52,7 @@ async def test_survey_start(tester: AppTester):
 @pytest.mark.asyncio
 async def test_survey_next_question(tester: AppTester):
     tester.setup_state("state_survey_question")
-    await tester.user_input("1")
+    await tester.user_input("2")
     tester.assert_state("state_survey_question")
     tester.assert_message(
         "\n".join(
@@ -60,13 +60,41 @@ async def test_survey_next_question(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "2/3",
+                "2/4",
                 "",
                 "*What is your present relationship status?*",
                 "",
                 "1. Not currently dating",
                 "2. In a serious relationship",
                 "3. In a relationship, but not a serious one",
+                "",
+                "-----",
+                "*Or reply:*",
+                "0. 🏠 Back to Main *MENU*",
+                "#. 🆘Get *HELP*",
+            ]
+        )
+    )
+    tester.assert_answer("state_s1_4_income", "R1-R400")
+
+
+@pytest.mark.asyncio
+async def test_survey_next_question_branch(tester: AppTester):
+    tester.user.metadata["segment_question"] = "state_s1_6_monthly_sex_partners"
+    tester.setup_state("state_survey_question")
+    await tester.user_input("3")
+    tester.assert_state("state_survey_question")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*BWise / Survey*",
+                "-----",
+                "Section 1",
+                "2/4",
+                "",
+                "**Ok. You can tell me how many sexual partners you had here.*",
+                "",
+                "_Just type and send_*",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -91,7 +119,7 @@ async def test_survey_freetext_question(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "1/3",
+                "1/4",
                 "",
                 "**Ok. You can tell me how many sexual partners you had here.*",
                 "",

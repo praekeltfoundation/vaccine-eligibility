@@ -70,7 +70,10 @@ class Application(BaseApplication):
         if question.get("options"):
             choices = []
             for option in question["options"]:
-                stub = option.replace(" ", "-").lower()
+                if isinstance(option, tuple):
+                    stub, option = option
+                else:
+                    stub = option.replace(" ", "_").lower()
                 choices.append(Choice(stub, option))
 
             parts.extend(
@@ -125,9 +128,16 @@ class Application(BaseApplication):
 
         # TODO: handle message that don't require a response
 
+        next = None
+
         if question["next"]:
-            # TODO: handle next as a dict to branch off
-            self.save_metadata("segment_question", question["next"])
+            if type(question["next"]) == dict:
+                next = question["next"][answer]
+            else:
+                next = question["next"]
+
+        if next:
+            self.save_metadata("segment_question", next)
             self.save_metadata("segment_question_nr", question_number + 1)
         else:
             self.save_metadata("segment_section", section + 1)
