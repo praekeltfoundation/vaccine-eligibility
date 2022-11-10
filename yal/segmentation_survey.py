@@ -137,7 +137,6 @@ class Application(BaseApplication):
                 next = question["next"]
 
         if next:
-            # TODO: handle next as a dict to branch off
             self.save_metadata("segment_question", next)
             self.save_metadata("segment_question_nr", question_number + 1)
         else:
