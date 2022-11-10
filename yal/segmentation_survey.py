@@ -110,20 +110,14 @@ class Application(BaseApplication):
             )
 
     async def state_survey_process_answer(self):
-        print(">>> state_survey_process_answer")
         metadata = self.user.metadata
         answers = self.user.answers
-
-        print(answers)
 
         section = metadata.get("segment_section", 1)
         current_question = metadata.get("segment_question")
         answer = answers.get("state_survey_question")
         question_number = metadata.get("segment_question_nr", 1)
 
-        print("current")
-        print(current_question)
-        print(answer)
         self.save_answer(current_question, answer)
 
         question = SURVEY_QUESTIONS[str(section)]["questions"][current_question]
