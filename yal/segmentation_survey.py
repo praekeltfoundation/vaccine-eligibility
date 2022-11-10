@@ -70,7 +70,10 @@ class Application(BaseApplication):
         if question.get("options"):
             choices = []
             for option in question["options"]:
-                stub = option.replace(" ", "-").lower()
+                if isinstance(option, tuple):
+                    stub, option = option
+                else:
+                    stub = option.replace(" ", "_").lower()
                 choices.append(Choice(stub, option))
 
             parts.extend(

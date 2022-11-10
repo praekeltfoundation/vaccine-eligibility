@@ -52,7 +52,7 @@ async def test_survey_start(tester: AppTester):
 @pytest.mark.asyncio
 async def test_survey_next_question(tester: AppTester):
     tester.setup_state("state_survey_question")
-    await tester.user_input("1")
+    await tester.user_input("2")
     tester.assert_state("state_survey_question")
     tester.assert_message(
         "\n".join(
@@ -75,6 +75,7 @@ async def test_survey_next_question(tester: AppTester):
             ]
         )
     )
+    tester.assert_answer("state_s1_4_income", "R1-R400")
 
 
 @pytest.mark.asyncio
