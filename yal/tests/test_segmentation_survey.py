@@ -157,3 +157,8 @@ async def test_survey_end(tester: AppTester):
     tester.setup_state("state_survey_question")
     await tester.user_input("1")
     tester.assert_state("state_survey_done")
+
+    # Make sure metadata was cleaned up and survey can be repeated
+    tester.setup_state("state_start_survey")
+    await tester.user_input("1")
+    tester.assert_state("state_survey_question")
