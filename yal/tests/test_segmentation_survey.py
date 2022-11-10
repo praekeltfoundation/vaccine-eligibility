@@ -22,7 +22,7 @@ async def test_survey_start(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "1/3",
+                "1/4",
                 "",
                 "*How much does everyone in your house make altogether, before paying "
                 "for regular monthly items?*",
@@ -60,7 +60,7 @@ async def test_survey_next_question(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "2/3",
+                "2/4",
                 "",
                 "*What is your present relationship status?*",
                 "",
@@ -79,6 +79,33 @@ async def test_survey_next_question(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_survey_next_question_branch(tester: AppTester):
+    tester.user.metadata["segment_question"] = "state_s1_6_monthly_sex_partners"
+    tester.setup_state("state_survey_question")
+    await tester.user_input("3")
+    tester.assert_state("state_survey_question")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*BWise / Survey*",
+                "-----",
+                "Section 1",
+                "2/4",
+                "",
+                "**Ok. You can tell me how many sexual partners you had here.*",
+                "",
+                "_Just type and send_*",
+                "",
+                "-----",
+                "*Or reply:*",
+                "0. 🏠 Back to Main *MENU*",
+                "#. 🆘Get *HELP*",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
 async def test_survey_freetext_question(tester: AppTester):
     tester.user.metadata["segment_section"] = 1
     tester.user.metadata["segment_question"] = "state_s1_6_detail_monthly_sex_partners"
@@ -92,7 +119,7 @@ async def test_survey_freetext_question(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "1/3",
+                "1/4",
                 "",
                 "**Ok. You can tell me how many sexual partners you had here.*",
                 "",

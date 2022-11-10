@@ -28,7 +28,22 @@ SURVEY_QUESTIONS = {
                     ("serious", "In a serious relationship"),
                     ("not_serious", "In a relationship, but not a serious one"),
                 ],
-                "next": "state_s1_6_detail_monthly_sex_partners",
+                "next": "state_s1_6_monthly_sex_partners",
+            },
+            "state_s1_6_monthly_sex_partners": {
+                "text": "*How many sexual partners did you have over the last month?*",
+                "options": [
+                    ("1-2", "One - two"),
+                    ("2-3", "Two - three"),
+                    ("other", "Other"),
+                    ("skip", "Skip"),
+                ],
+                "next": {
+                    "1-2": None,
+                    "2-3": None,
+                    "other": "state_s1_6_detail_monthly_sex_partners",
+                    "skip": None,
+                },
             },
             "state_s1_6_detail_monthly_sex_partners": {
                 "text": "\n".join(
