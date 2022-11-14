@@ -160,7 +160,24 @@ class Application(BaseApplication):
 
         question = SURVEY_QUESTIONS[str(section)]["questions"][current_question]
 
-        # TODO: handle message that don't require a response
+        if question.get("send_after"):
+            msg = self._(
+                "\n".join(
+                    [
+                        "*BWise / Survey*",
+                        "-----",
+                        "",
+                        question["send_after"],
+                        "",
+                        "-----",
+                        "*Or reply:*",
+                        BACK_TO_MAIN,
+                        GET_HELP,
+                    ]
+                )
+            )
+            await self.publish_message(msg)
+            await asyncio.sleep(0.5)
 
         next = None
 

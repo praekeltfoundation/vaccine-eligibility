@@ -256,6 +256,23 @@ async def test_survey_next_section(tester: AppTester):
         )
     )
 
+    [msg] = tester.fake_worker.outbound_messages
+    assert msg.content == "\n".join(
+        [
+            "*BWise / Survey*",
+            "-----",
+            "",
+            "😎 *CONGRATS. YOU'RE HALFWAY THERE!*",
+            "",
+            "Section 2 complete, keep going. *Let's move onto section 3!*👍🏾",
+            "",
+            "-----",
+            "*Or reply:*",
+            "0. 🏠 Back to Main *MENU*",
+            "#. 🆘Get *HELP*",
+        ]
+    )
+
 
 @pytest.mark.asyncio
 async def test_survey_end(tester: AppTester):
