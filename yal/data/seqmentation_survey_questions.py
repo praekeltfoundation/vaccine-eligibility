@@ -78,6 +78,14 @@ SURVEY_QUESTIONS = {
                 "partner who is not infected and has no other partners.*",
                 "options": ["True", "False"],
                 "next": None,
+                "send_after": "\n".join(
+                    [
+                        "😎 *CONGRATS. YOU'RE HALFWAY THERE!*",
+                        "",
+                        "Section 2 complete, keep going. *Let's move onto section 3!* "
+                        "👍🏾",
+                    ]
+                ),
             },
         },
     },
