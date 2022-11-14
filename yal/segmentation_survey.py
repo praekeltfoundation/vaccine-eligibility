@@ -1,10 +1,11 @@
+import asyncio
+
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
     CustomChoiceState,
     EndState,
     FreeText,
-    MenuState,
     WhatsAppButtonState,
 )
 from vaccine.utils import get_display_choices
@@ -14,25 +15,58 @@ from yal.utils import BACK_TO_MAIN, GET_HELP, get_generic_error
 
 class Application(BaseApplication):
     START_STATE = "state_start_survey"
+    DECLINE_STATE = "state_survey_decline"
 
-    async def state_start_survey(self):
+    async def state_survey_decline(self):
+        def _next(choice: Choice):
+            return choice.value
+
+        choices = [
+            Choice("state_aaq_start", self._("Ask a question")),
+            Choice("state_pre_mainmenu", self._("Go to Main Menu")),
+        ]
         question = "\n".join(
             [
-                "Do you have a moment to help BWise  us with some research?",
-                "*We'll give you a little something to say thanks - R30 airtime 😉💸*",
+                "*No problem and no pressure!* 😎",
                 "",
+                "What would you like to do next?",
+                "",
+                "1. Ask a question",
+                "2. Go to Main Menu",
+                "-----",
+                "*Or reply:*",
+                BACK_TO_MAIN,
             ]
         )
-        # TODO: Add buttons
-        return MenuState(
+        return CustomChoiceState(
             self,
             question=self._(question),
             error=self._(get_generic_error()),
-            choices=[
-                Choice("state_survey_question", self._("Hell yeah!")),
-                Choice("state_gender", self._("Not interested")),
-            ],
+            choices=choices,
+            next=_next,
+            button="See my options",
+            buttons=choices,
         )
+
+    async def state_start_survey(self):
+        msg = self._(
+            "\n".join(
+                [
+                    "*Awesome, let's get straight into it.*",
+                    "",
+                    "There are 4 sections to the survey. Each section should take "
+                    "around *5-10 min* to complete.",
+                    "",
+                    "-----",
+                    "*Or reply:*",
+                    BACK_TO_MAIN,
+                ]
+            )
+        )
+        await self.publish_message(msg)
+        await asyncio.sleep(0.5)
+
+        return await self.go_to_state("state_survey_question")
 
     async def state_survey_question(self):
         metadata = self.user.metadata
