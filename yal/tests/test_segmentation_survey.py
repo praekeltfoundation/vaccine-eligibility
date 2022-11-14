@@ -264,7 +264,7 @@ async def test_survey_next_section(tester: AppTester):
             "",
             "😎 *CONGRATS. YOU'RE HALFWAY THERE!*",
             "",
-            "Section 2 complete, keep going. *Let's move onto section 3!*👍🏾",
+            "Section 2 complete, keep going. *Let's move onto section 3!* 👍🏾",
             "",
             "-----",
             "*Or reply:*",
