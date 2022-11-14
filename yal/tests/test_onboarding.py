@@ -212,18 +212,6 @@ async def test_state_age_skip(get_current_datetime, tester: AppTester, rapidpro_
 
 
 @pytest.mark.asyncio
-@mock.patch("yal.onboarding.config")
-async def test_state_age_redirect_segmentation_survey(mock_config, tester: AppTester):
-    mock_config.SEGMENTATION_SURVEY_ACTIVE = True
-
-    tester.setup_state("state_age")
-
-    await tester.user_input(session=Message.SESSION_EVENT.NEW)
-
-    tester.assert_state("state_start_survey")
-
-
-@pytest.mark.asyncio
 @mock.patch("yal.onboarding.get_current_datetime")
 async def test_state_gender(get_current_datetime, tester: AppTester, rapidpro_mock):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)

@@ -52,6 +52,8 @@ FEEDBACK_FIELDS = {
     "feedback_timestamp_2",
 }
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
+SEGMENT_SURVEY_ACCEPT = {"hell yeah"}
+SEGMENT_SURVEY_DECLINE = {"no rather not"}
 
 
 class Application(
@@ -106,6 +108,22 @@ class Application(
             if onboarding_reminder_sent:
                 self.user.session_id = None
                 self.state_name = OnboardingApplication.REMINDER_STATE
+
+        if keyword in SEGMENT_SURVEY_ACCEPT or keyword in SEGMENT_SURVEY_DECLINE:
+            msisdn = utils.normalise_phonenumber(message.from_addr)
+            whatsapp_id = msisdn.lstrip(" + ")
+            error, fields = await rapidpro.get_profile(whatsapp_id)
+
+            segment_survey_sent = str(
+                fields.get("segment_survey_sent", "False")
+            ).lower()
+            if segment_survey_sent == "true":
+                self.user.session_id = None
+
+                if keyword in SEGMENT_SURVEY_ACCEPT:
+                    self.state_name = SegmentSurveyApplication.START_STATE
+                else:
+                    self.state_name = SegmentSurveyApplication.DECLINE_STATE
 
         if keyword in QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS:
             self.user.session_id = None

@@ -1,7 +1,9 @@
 import pytest
+from sanic import Sanic, response
 
 from vaccine.models import Message
-from vaccine.testing import AppTester
+from vaccine.testing import AppTester, TState, run_sanic
+from yal import config
 from yal.main import Application
 
 
@@ -10,11 +12,60 @@ def tester():
     return AppTester(Application)
 
 
+def get_rapidpro_contact(urn):
+    return {
+        "fields": {
+            "segment_survey_sent": "True" if urn == "27820001001" else "False",
+        },
+    }
+
+
+@pytest.fixture
+async def rapidpro_mock():
+    Sanic.test_mode = True
+    app = Sanic("mock_rapidpro")
+    tstate = TState()
+
+    @app.route("/api/v2/contacts.json", methods=["GET"])
+    def get_contact(request):
+        tstate.requests.append(request)
+        urn = request.args.get("urn").split(":")[1]
+        contacts = [get_rapidpro_contact(urn)]
+        return response.json(
+            {
+                "results": contacts,
+                "next": None,
+            },
+            status=200,
+        )
+
+    async with run_sanic(app) as server:
+        url = config.RAPIDPRO_URL
+        config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
+        config.RAPIDPRO_TOKEN = "testtoken"
+        server.tstate = tstate
+        yield server
+        config.RAPIDPRO_URL = url
+
+
 @pytest.mark.asyncio
-async def test_survey_start(tester: AppTester):
-    tester.setup_state("state_start_survey")
-    await tester.user_input("1")
+async def test_survey_start(tester: AppTester, rapidpro_mock):
+    await tester.user_input("Hell Yeah!")
     tester.assert_state("state_survey_question")
+
+    [msg] = tester.fake_worker.outbound_messages
+    assert msg.content == "\n".join(
+        [
+            "*Awesome, let's get straight into it.*",
+            "",
+            "There are 4 sections to the survey. Each section should take around *5-10 "
+            "min* to complete.",
+            "",
+            "-----",
+            "*Or reply:*",
+            "0. 🏠 Back to Main *MENU*",
+        ]
+    )
 
     tester.assert_message(
         "\n".join(
@@ -44,6 +95,35 @@ async def test_survey_start(tester: AppTester):
                 "*Or reply:*",
                 "0. 🏠 Back to Main *MENU*",
                 "#. 🆘Get *HELP*",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_survey_start_not_invited(tester: AppTester, rapidpro_mock):
+    tester.setup_user_address("27820002002")
+    await tester.user_input("Hell Yeah!")
+    tester.assert_state("state_start")
+
+
+@pytest.mark.asyncio
+async def test_survey_start_decline(tester: AppTester, rapidpro_mock):
+    await tester.user_input("No, rather not")
+    tester.assert_state("state_survey_decline")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*No problem and no pressure!* 😎",
+                "",
+                "What would you like to do next?",
+                "",
+                "1. Ask a question",
+                "2. Go to Main Menu",
+                "-----",
+                "*Or reply:*",
+                "0. 🏠 Back to Main *MENU*",
             ]
         )
     )
