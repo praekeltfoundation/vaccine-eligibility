@@ -1,9 +1,11 @@
+import json
+
 import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
-from yal import config
+from yal import config, turn
 from yal.main import Application
 
 
@@ -46,6 +48,25 @@ async def rapidpro_mock():
         server.tstate = tstate
         yield server
         config.RAPIDPRO_URL = url
+
+
+@pytest.fixture
+async def turn_mock():
+    Sanic.test_mode = True
+    app = Sanic("mock_turn")
+    tstate = TState()
+
+    @app.route("/v1/messages/<message_id:str>/labels", methods=["POST"])
+    def label_message(request, message_id):
+        tstate.requests.append(request)
+        return response.json({}, status=200)
+
+    async with run_sanic(app) as server:
+        get_turn_url = turn.get_turn_url
+        turn.get_turn_url = lambda path: f"http://{server.host}:{server.port}/{path}"
+        server.tstate = tstate
+        yield server
+        turn.get_turn_url = get_turn_url
 
 
 @pytest.mark.asyncio
@@ -287,3 +308,31 @@ async def test_survey_end(tester: AppTester):
     tester.setup_state("state_start_survey")
     await tester.user_input("1")
     tester.assert_state("state_survey_question")
+
+
+@pytest.mark.asyncio
+async def test_state_no_airtime(tester: AppTester, turn_mock):
+    tester.setup_state("state_prompt_next_action")
+    await tester.user_input("3")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*BWise / Survey*",
+                "-----",
+                "",
+                "Thank you for letting us know. We'll look into it and get "
+                "back to you.",
+                "-----",
+                "*Or reply:*",
+                "0. 🏠 Back to Main *MENU*",
+                "#. 🆘Get *HELP*",
+            ]
+        )
+    )
+
+    assert len(turn_mock.tstate.requests) == 1
+    request = turn_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "labels": ["Airtime Not Received"]
+    }

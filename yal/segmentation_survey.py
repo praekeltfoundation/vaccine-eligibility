@@ -9,6 +9,7 @@ from vaccine.states import (
     WhatsAppButtonState,
 )
 from vaccine.utils import get_display_choices
+from yal import turn
 from yal.data.seqmentation_survey_questions import SURVEY_QUESTIONS
 from yal.utils import BACK_TO_MAIN, GET_HELP, get_generic_error
 
@@ -272,7 +273,12 @@ class Application(BaseApplication):
         )
 
     async def state_no_airtime(self):
-        # TODO: label question for helpdesk ??
+        error = await turn.label_message(
+            self.inbound.message_id, "Airtime Not Received"
+        )
+        if error:
+            return await self.go_to_state("state_error")
+
         return EndState(
             self,
             text=self._(
