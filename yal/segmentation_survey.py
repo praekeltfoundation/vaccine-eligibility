@@ -92,14 +92,12 @@ class Application(BaseApplication):
 
         question = SURVEY_QUESTIONS[section]["questions"][current_question]
 
-        parts = [
-            "*BWise / Survey*",
+        parts = []
+        footer = [
             "-----",
-            f"Section {section}",
-            f"{question_number}/{total_questions}",
-            "",
-            f"*{question['text']}*",
-            "",
+            "*Or reply:*",
+            BACK_TO_MAIN,
+            GET_HELP,
         ]
 
         if question.get("options"):
@@ -118,20 +116,26 @@ class Application(BaseApplication):
                 ]
             )
 
-        parts.extend(
+        error_parts = [get_generic_error(), ""] + parts + footer
+        error_text = self._(
+            "\n".join([part for part in error_parts if part is not None])
+        )
+        parts = (
             [
+                "*BWise / Survey*",
                 "-----",
-                "*Or reply:*",
-                BACK_TO_MAIN,
-                GET_HELP,
+                f"Section {section}",
+                f"{question_number}/{total_questions}",
+                "",
+                f"*{question['text']}*",
+                "",
             ]
+            + parts
+            + footer
         )
         question_text = self._("\n".join(parts))
 
         if question.get("options"):
-            # TODO: Update this
-            error_text = "Temp"
-
             return CustomChoiceState(
                 self,
                 question=question_text,
