@@ -88,8 +88,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP!",
-                    "*Talk to a counsellor*",
+                    "NEED HELP? / *Talk to a counsellor*",
                     "-----",
                     "",
                     "[persona_emoji] *Eish! Our loveLife counsellors are all offline "
@@ -124,8 +123,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP! / Talk to a counsellor",
-                    "*Emergency*",
+                    "NEED HELP? / Talk to a counsellor / *Emergency*",
                     "-----",
                     "",
                     "[persona_emoji] *Are you in trouble?*",
@@ -152,8 +150,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP! / Talk to a counsellor",
-                    "*Opening hours*",
+                    "NEED HELP? / Talk to a counsellor / *Opening hours*",
                     "-----",
                     "",
                     "[persona_emoji] *Here's when you can chat with one of our (human) "
@@ -211,8 +208,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP!",
-                    "*Talk to a counsellor*",
+                    "NEED HELP? / *Talk to a counsellor*",
                     "-----",
                     "",
                     "[persona_emoji] *Should a counsellor call you on the WhatsApp "
@@ -293,8 +289,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP!",
-                    "*Talk to a counsellor*",
+                    "NEED HELP? / *Talk to a counsellor*",
                     "-----",
                     "",
                     "[persona_emoji] *Great! I've successfully arranged for a loveLife "
@@ -339,8 +334,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP!",
-                    "*Talk to a counsellor*",
+                    "NEED HELP? / *Talk to a counsellor*",
                     "-----",
                     "",
                     "[persona_emoji] *No problem. What number should we use?*",
@@ -369,8 +363,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP!",
-                    "*Talk to a counsellor*",
+                    "NEED HELP? / *Talk to a counsellor*",
                     "-----",
                     "",
                     "[persona_emoji] *Is this the right number?*",
@@ -404,8 +397,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP!",
-                    "*Talk to a counsellor*",
+                    "NEED HELP? / *Talk to a counsellor*",
                     "-----",
                     "",
                     "[persona_emoji] *Would you like us to save this number for next "
@@ -657,8 +649,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP!",
-                    "*Talk to a counsellor*",
+                    "NEED HELP? / *Talk to a counsellor*",
                     "-----",
                     "",
                     "[persona_emoji] *Want me to try again?*",
@@ -695,8 +686,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP!",
-                    "*Talk to a counsellor*",
+                    "NEED HELP? / *Talk to a counsellor*",
                     "-----",
                     "",
                     "[persona_emoji] *Which number should we use?*",
@@ -741,8 +731,7 @@ class Application(BaseApplication):
             question = self._(
                 "\n".join(
                     [
-                        "🆘HELP!",
-                        "*Talk to a counsellor*",
+                        "NEED HELP? / *Talk to a counsellor*",
                         "-----",
                         "",
                         "[persona_emoji] *Is this the right number?*",
@@ -775,8 +764,7 @@ class Application(BaseApplication):
             question = self._(
                 "\n".join(
                     [
-                        "🆘HELP!",
-                        "*Talk to a counsellor*",
+                        "NEED HELP? / *Talk to a counsellor*",
                         "-----",
                         "",
                         "[persona_emoji] *Whoops! I don't have another number saved "
@@ -810,8 +798,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP!",
-                    "*Talk to a counsellor*",
+                    "NEED HELP? / *Talk to a counsellor*",
                     "-----",
                     "",
                     "[persona_emoji] *Are you sure you no longer need help?*",
@@ -856,8 +843,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP!",
-                    "*Talk to a counsellor*",
+                    "NEED HELP? / *Talk to a counsellor*",
                     "-----",
                     "",
                     "[persona_emoji] *I'm glad you got the help you needed.*",
@@ -895,8 +881,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP!",
-                    "*Talk to a counsellor*",
+                    "NEED HELP? / *Talk to a counsellor*",
                     "-----",
                     "",
                     "[persona_emoji] *Thank you for that feedback, we'll work on it.*",
@@ -939,8 +924,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP!",
-                    "*Talk to a counsellor*",
+                    "NEED HELP? / *Talk to a counsellor*",
                     "-----",
                     "",
                     "[persona_emoji] *No problem. I hope you're no longer in trouble.*",
@@ -974,8 +958,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🆘HELP!",
-                    "*Get in touch with B-Wise*",
+                    "NEED HELP? / *Talk to a counsellor*",
                     "-----",
                     "",
                     "[persona_emoji] *Don't stress. My team at B-Wise have got your "
