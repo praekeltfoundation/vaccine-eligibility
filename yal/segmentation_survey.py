@@ -139,12 +139,14 @@ class Application(BaseApplication):
                 next="state_survey_process_answer",
                 button="See my options",
                 buttons=choices,
+                override_answer_name=current_question,
             )
         else:
             return FreeText(
                 self,
                 question=question_text,
                 next="state_survey_process_answer",
+                override_answer_name=current_question,
             )
 
     async def state_survey_process_answer(self):
@@ -153,10 +155,8 @@ class Application(BaseApplication):
 
         section = metadata.get("segment_section", 1)
         current_question = metadata.get("segment_question")
-        answer = answers.get("state_survey_question")
+        answer = answers.get(current_question)
         question_number = metadata.get("segment_question_nr", 1)
-
-        self.save_answer(current_question, answer)
 
         question = SURVEY_QUESTIONS[str(section)]["questions"][current_question]
 
