@@ -73,6 +73,7 @@ class ChoiceState:
         error_header: Optional[str] = None,
         buttons: Optional[List[Choice]] = None,
         helper_metadata: Optional[dict] = None,
+        override_answer_name: Optional[str] = None,
     ):
         self.app = app
         self.question = question
@@ -86,6 +87,7 @@ class ChoiceState:
         self.error_header = error_header
         self.buttons = buttons
         self.helper_metadata = helper_metadata
+        self.override_answer_name = override_answer_name
 
     def _normalise_text(self, text: Optional[str]) -> str:
         text = (text or "").strip().lower()
@@ -129,7 +131,9 @@ class ChoiceState:
         if choice is None:
             return await self.display_error(message)
         else:
-            self.app.save_answer(self.app.state_name, choice.value)
+            self.app.save_answer(
+                self.override_answer_name or self.app.state_name, choice.value
+            )
             self.app.state_name = await self._get_next(choice)
             state = await self.app.get_current_state()
             return await state.display(message)
@@ -184,6 +188,7 @@ class MenuState(ChoiceState):
         self.error_header = error_header
         self.buttons = None
         self.helper_metadata = None
+        self.override_answer_name = None
 
     async def _next(self, choice: Choice):
         return choice.value
@@ -208,12 +213,14 @@ class FreeText:
             None,
         ] = None,
         buttons: Optional[List[Choice]] = None,
+        override_answer_name: Optional[str] = None,
     ):
         self.app = app
         self.question = question
         self.next = next
         self.check = check
         self.buttons = buttons
+        self.override_answer_name = override_answer_name
 
     async def process_message(self, message: Message):
         if self.check is not None:
@@ -224,7 +231,9 @@ class FreeText:
                     await validator(message.content)
                 except ErrorMessage as e:
                     return self.app.send_message(e.message)
-        self.app.save_answer(self.app.state_name, message.content or "")
+        self.app.save_answer(
+            self.override_answer_name or self.app.state_name, message.content or ""
+        )
         self.app.state_name = self.next
         state = await self.app.get_current_state()
         return await state.display(message)
