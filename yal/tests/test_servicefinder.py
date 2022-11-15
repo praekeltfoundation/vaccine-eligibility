@@ -198,7 +198,7 @@ async def test_state_servicefinder_start_no_address(tester: AppTester, rapidpro_
     tester.assert_message(
         "\n".join(
             [
-                "NEED HELP / Find clinics and services /📍*Location*",
+                "NEED HELP? / Find clinics and services / *Location*",
                 "-----",
                 "",
                 "To be able to suggest youth-friendly clinics and FREE services "
@@ -240,8 +240,7 @@ async def test_state_servicefinder_start_existing_address(
     assert msg1.content == "🤖 *Okay, I just need to confirm some details...*"
     assert msg2.content == "\n".join(
         [
-            "🏥 Find Clinics and Services",
-            "*Get help near you*",
+            "NEED HELP? / Find clinics and services / *Get help near you*",
             "-----",
             "🤖 *The address I have for you right now is:*",
             "",
@@ -256,8 +255,7 @@ async def test_state_servicefinder_start_existing_address(
     tester.assert_message(
         "\n".join(
             [
-                "🏥 Find Clinics and Services",
-                "*Get help near you*",
+                "NEED HELP? / Find clinics and services / *Get help near you*",
                 "-----",
                 "",
                 "🤖 *Would you like me to recommend helpful services close to "
@@ -290,8 +288,7 @@ async def test_state_confirm_existing_address_yes(
 
     question = "\n".join(
         [
-            "🏥 Find Clinics and Services",
-            "*Get help near you*",
+            "NEED HELP? / Find clinics and services / *Get help near you*",
             "-----",
             "",
             "🤖 *Choose an option from the list:*",
@@ -336,8 +333,7 @@ async def test_state_confirm_existing_address_no(tester: AppTester, rapidpro_moc
     tester.assert_message(
         "\n".join(
             [
-                "🏥 Find Clinics and Services",
-                "*Get help near you*",
+                "NEED HELP? / Find clinics and services / *Get help near you*",
                 "-----",
                 "",
                 "🤖*You can change your location by sending me a pin (📍)."
@@ -373,7 +369,7 @@ async def test_state_category_sub(tester: AppTester, servicefinder_mock, rapidpr
     tester.assert_state("state_category")
     question = "\n".join(
         [
-            "🏥 Find Clinics and Services",
+            "NEED HELP? / Find clinics and services / "
             "Get help near you / *HIV Prevention*",
             "-----",
             "",
@@ -416,8 +412,7 @@ async def test_state_category(
 
     question = "\n".join(
         [
-            "🏥 *Find Clinics and Services*",
-            "Where to get PEP near you",
+            "NEED HELP? / Find clinics and services / *Where to get PEP near you*",
             "-----",
             "",
             "1️⃣ *South West Gauteng TVET College - Technisa Campus*",

@@ -69,8 +69,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🏥 Find Clinics and Services",
-                    "*Get help near you*",
+                    "NEED HELP? / *Find clinics and services*",
                     "-----",
                     "",
                     "Would you like me to help you find clinics and services closest "
@@ -117,8 +116,7 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    "🏥 Find Clinics and Services",
-                    "*Get help near you*",
+                    "NEED HELP? / Find clinics and services / *Get help near you*",
                     "-----",
                     "[persona_emoji] *The address I have for you right now is:*",
                     "",
@@ -139,8 +137,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🏥 Find Clinics and Services",
-                    "*Get help near you*",
+                    "NEED HELP? / Find clinics and services / *Get help near you*",
                     "-----",
                     "",
                     "[persona_emoji] *Would you like me to recommend helpful services "
@@ -200,8 +197,7 @@ class Application(BaseApplication):
     async def state_pre_category_msg(self):
         msg = "\n".join(
             [
-                "🏥 *Find Clinics and Services*",
-                "*Get help near you*",
+                "NEED HELP? / Find clinics and services / *Get help near you*",
                 "-----",
                 "",
                 "[persona_emoji] Perfect! That helps me narrow it down.",
@@ -251,8 +247,8 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🏥 Find Clinics and Services",
-                    metadata["servicefinder_breadcrumb"],
+                    "NEED HELP? / Find clinics and services / "
+                    f"{metadata['servicefinder_breadcrumb']}",
                     "-----",
                     "",
                     "[persona_emoji] *Choose an option from the list:*",
@@ -345,8 +341,7 @@ class Application(BaseApplication):
         metadata = self.user.metadata
         msg = "\n".join(
             [
-                "🏥 Find Clinics and Services",
-                "*Get help near you*",
+                "NEED HELP? / Find clinics and services / *Get help near you*",
                 "-----",
                 "",
                 "[persona_emoji]*Okay, I've got you. Here are your closest options...*",
@@ -380,8 +375,7 @@ class Application(BaseApplication):
 
         msg = "\n".join(
             [
-                "🏥 *Find Clinics and Services*",
-                f"{category} near you",
+                f"NEED HELP? / Find clinics and services / *{category} near you*",
                 "-----",
                 "",
                 services,
@@ -411,8 +405,7 @@ class Application(BaseApplication):
 
         question = "\n".join(
             [
-                "🏥 Find Clinics and Services",
-                "*Get help near you*",
+                "NEED HELP? / Find clinics and services / *Get help near you*",
                 "-----",
                 "",
                 "[persona_emoji]*You can change your location by sending me a pin (📍)."
@@ -463,7 +456,7 @@ class Application(BaseApplication):
         if not question:
             question = "\n".join(
                 [
-                    "NEED HELP / Find clinics and services /📍*Location*",
+                    "NEED HELP? / Find clinics and services / *Location*",
                     "-----",
                     "",
                     "To be able to suggest youth-friendly clinics and FREE services "
@@ -570,7 +563,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "NEED HELP / Find clinics and services /📍*Location*",
+                    "NEED HELP? / Find clinics and services / *Location*",
                     "-----",
                     "",
                     "To be able to suggest youth-friendly clinics and FREE services "
@@ -598,7 +591,7 @@ class Application(BaseApplication):
             question=self._(
                 "\n".join(
                     [
-                        "NEED HELP / Find clinics and services /📍*Location*",
+                        "NEED HELP? / Find clinics and services / *Location*",
                         "-----",
                         "",
                         "[persona_emoji] *OK. Lets see which facilities are close to "
@@ -683,7 +676,7 @@ class Application(BaseApplication):
             question=self._(
                 "\n".join(
                     [
-                        "NEED HELP / Find clinics and services /📍*Location*",
+                        "NEED HELP? / Find clinics and services / *Location*",
                         "-----",
                         "",
                         "[persona_emoji] *OK. Which town, township, suburb or village "
@@ -710,7 +703,7 @@ class Application(BaseApplication):
             question=self._(
                 "\n".join(
                     [
-                        "NEED HELP / Find clinics and services /📍*Location*",
+                        "NEED HELP? / Find clinics and services / *Location*",
                         "-----",
                         "",
                         "[persona_emoji] Got it. And what about the street name and "
@@ -735,7 +728,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "NEED HELP / Find clinics and services /📍*Location*",
+                    "NEED HELP? / Find clinics and services / *Location*",
                     "-----",
                     "",
                     "[persona_emoji] *If you don't share you location with me, I won't "
