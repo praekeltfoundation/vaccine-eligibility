@@ -9,6 +9,7 @@ from vaccine.states import (
     WhatsAppButtonState,
 )
 from vaccine.utils import get_display_choices
+from yal import config, rapidpro, utils
 from yal.data.seqmentation_survey_questions import SURVEY_QUESTIONS
 from yal.utils import BACK_TO_MAIN, GET_HELP, get_generic_error
 
@@ -230,7 +231,12 @@ class Application(BaseApplication):
         )
 
     async def state_trigger_airtime_flow(self):
-        # TODO: start the airtime flow in rapidpro
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        error = await rapidpro.start_flow(whatsapp_id, config.SEGMENT_AIRTIME_FLOW_UUID)
+        if error:
+            return await self.go_to_state("state_error")
+
         return await self.go_to_state("state_prompt_next_action")
 
     async def state_prompt_next_action(self):
