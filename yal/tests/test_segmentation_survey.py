@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from sanic import Sanic, response
 
@@ -39,8 +41,14 @@ async def rapidpro_mock():
             status=200,
         )
 
+    @app.route("/api/v2/flow_starts.json", methods=["POST"])
+    def start_flow(request):
+        tstate.requests.append(request)
+        return response.json({}, status=200)
+
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
+        config.SEGMENT_AIRTIME_FLOW_UUID = "segment-airtime-flow-uuid"
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
         config.RAPIDPRO_TOKEN = "testtoken"
         server.tstate = tstate
@@ -287,3 +295,17 @@ async def test_survey_end(tester: AppTester):
     tester.setup_state("state_start_survey")
     await tester.user_input("1")
     tester.assert_state("state_survey_question")
+
+
+@pytest.mark.asyncio
+async def test_state_survey_done(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_survey_done")
+    await tester.user_input("Get Airtime")
+    tester.assert_state("state_prompt_next_action")
+
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "flow": "segment-airtime-flow-uuid",
+        "urns": ["whatsapp:27820001001"],
+    }
