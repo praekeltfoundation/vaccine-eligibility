@@ -158,8 +158,6 @@ class Application(BaseApplication):
         answer = answers.get(current_question)
         question_number = metadata.get("segment_question_nr", 1)
 
-        self.save_answer(current_question, answer)
-
         question = SURVEY_QUESTIONS[str(section)]["questions"][current_question]
 
         if question.get("send_after"):
