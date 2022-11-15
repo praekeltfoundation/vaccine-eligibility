@@ -125,8 +125,7 @@ async def test_start_out_of_hours_sunday_after(get_current_datetime, tester: App
     tester.assert_message(
         "\n".join(
             [
-                "🆘HELP!",
-                "*Talk to a counsellor*",
+                "NEED HELP? / *Talk to a counsellor*",
                 "-----",
                 "",
                 "🤖 *Eish! Our loveLife counsellors are all offline right now...*",
@@ -158,8 +157,7 @@ async def test_start_out_of_hours_sunday_before(
     tester.assert_message(
         "\n".join(
             [
-                "🆘HELP!",
-                "*Talk to a counsellor*",
+                "NEED HELP? / *Talk to a counsellor*",
                 "-----",
                 "",
                 "🤖 *Eish! Our loveLife counsellors are all offline right now...*",
@@ -191,8 +189,7 @@ async def test_start_out_of_hours_weekday_before(
     tester.assert_message(
         "\n".join(
             [
-                "🆘HELP!",
-                "*Talk to a counsellor*",
+                "NEED HELP? / *Talk to a counsellor*",
                 "-----",
                 "",
                 "🤖 *Eish! Our loveLife counsellors are all offline right now...*",
@@ -224,8 +221,7 @@ async def test_start_out_of_hours_weekday_after(
     tester.assert_message(
         "\n".join(
             [
-                "🆘HELP!",
-                "*Talk to a counsellor*",
+                "NEED HELP? / *Talk to a counsellor*",
                 "-----",
                 "",
                 "🤖 *Eish! Our loveLife counsellors are all offline right now...*",
@@ -621,8 +617,7 @@ async def test_state_retry_callback_choose_number_saved_and_exists(
     tester.assert_message(
         "\n".join(
             [
-                "🆘HELP!",
-                "*Talk to a counsellor*",
+                "NEED HELP? / *Talk to a counsellor*",
                 "-----",
                 "",
                 "🤖 *Is this the right number?*",
@@ -654,8 +649,7 @@ async def test_state_retry_callback_choose_number_saved_no_number_found(
     tester.assert_message(
         "\n".join(
             [
-                "🆘HELP!",
-                "*Talk to a counsellor*",
+                "NEED HELP? / *Talk to a counsellor*",
                 "-----",
                 "",
                 "🤖 *Whoops! I don't have another number saved for you.*",
