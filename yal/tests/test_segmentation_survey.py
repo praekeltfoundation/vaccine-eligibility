@@ -1,4 +1,5 @@
 import json
+import random
 
 import pytest
 from sanic import Sanic, response
@@ -164,6 +165,43 @@ async def test_survey_next_question(tester: AppTester):
         )
     )
     tester.assert_answer("state_s1_4_income", "R1-R400")
+
+
+@pytest.mark.asyncio
+async def test_survey_invalid_answer(tester: AppTester):
+    random.seed(0)
+
+    tester.setup_state("state_survey_question")
+    await tester.user_input("A")
+    tester.assert_state("state_survey_question")
+    tester.assert_message(
+        "\n".join(
+            [
+                "Oops, looks like I don't have that option available.🤔Please try "
+                "again - I'll get it if you use the number that matches your choice, "
+                "promise.👍",
+                "",
+                "1. No income",
+                "2. R1 - R400",
+                "3. R401 - R800",
+                "4. R801 - R1 600",
+                "5. R1 601 - R3 200",
+                "6. R3 201 - R6 400",
+                "7. R6 401 - R12 800",
+                "8. R12 801 - R25 600",
+                "9. R25 601 - R51 200",
+                "10. R51 201 - R102 400",
+                "11. R102 401 - R204 800",
+                "12. R204 801 or more",
+                "",
+                "-----",
+                "*Or reply:*",
+                "0. 🏠 Back to Main *MENU*",
+                "#. 🆘Get *HELP*",
+            ]
+        )
+    )
+    tester.assert_no_answer("state_s1_4_income")
 
 
 @pytest.mark.asyncio
