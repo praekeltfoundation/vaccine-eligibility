@@ -114,16 +114,18 @@ class Application(
             whatsapp_id = msisdn.lstrip(" + ")
             error, fields = await rapidpro.get_profile(whatsapp_id)
 
-            segment_survey_sent = str(
-                fields.get("segment_survey_sent", "False")
+            segment_survey_complete = str(
+                fields.get("segment_survey_complete", "False")
             ).lower()
-            if segment_survey_sent == "true":
+            if segment_survey_complete == "pending":
                 self.user.session_id = None
-
                 if keyword in SEGMENT_SURVEY_ACCEPT:
                     self.state_name = SegmentSurveyApplication.START_STATE
                 else:
                     self.state_name = SegmentSurveyApplication.DECLINE_STATE
+            elif segment_survey_complete == "true":
+                self.user.session_id = None
+                self.state_name = SegmentSurveyApplication.COMPLETED_STATE
 
         if keyword in QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS:
             self.user.session_id = None
