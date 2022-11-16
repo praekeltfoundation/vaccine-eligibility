@@ -270,33 +270,33 @@ class Application(BaseApplication):
             Choice("state_pre_mainmenu", self._("Go to Main Menu")),
             Choice("state_no_airtime", self._("I didn't receive airtime")),
         ]
+        header = "\n".join(["*BWise / Survey*", "-----", ""])
         question = "\n".join(
             [
-                "*BWise / Survey*",
-                "-----",
-                "",
                 "We've just sent you your airtime. Please check your airtime balance "
                 "now.",
                 "",
-                "What would you like to do next?",
+                "*What would you like to do next?*",
                 "",
-                "1. Ask a question",
-                "2. Go to Main Menu",
-                "3. I didn't receive airtime",
+            ]
+        )
+        footer = "\n".join(
+            [
+                "",
                 "-----",
                 "*Or reply:*",
                 "*0* - 🏠Back to Main *MENU*",
                 "*#* - 🆘Get *HELP*",
             ]
         )
-        return CustomChoiceState(
+        return ChoiceState(
             self,
+            header=header,
             question=self._(question),
+            footer=footer,
             error=self._(get_generic_error()),
             choices=choices,
             next=_next,
-            button="See my options",
-            buttons=choices,
         )
 
     async def state_no_airtime(self):

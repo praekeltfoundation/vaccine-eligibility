@@ -369,6 +369,29 @@ async def test_state_survey_done(tester: AppTester, rapidpro_mock):
     await tester.user_input("Get Airtime")
     tester.assert_state("state_prompt_next_action")
 
+    tester.assert_message(
+        "\n".join(
+            [
+                "*BWise / Survey*",
+                "-----",
+                "",
+                "We've just sent you your airtime. Please check your airtime balance "
+                "now.",
+                "",
+                "*What would you like to do next?*",
+                "",
+                "1. Ask a question",
+                "2. Go to Main Menu",
+                "3. I didn't receive airtime",
+                "",
+                "-----",
+                "*Or reply:*",
+                "*0* - 🏠Back to Main *MENU*",
+                "*#* - 🆘Get *HELP*",
+            ]
+        )
+    )
+
     assert len(rapidpro_mock.tstate.requests) == 1
     request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
