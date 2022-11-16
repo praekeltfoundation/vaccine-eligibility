@@ -123,15 +123,6 @@ class Application(BaseApplication):
 
         question = SURVEY_QUESTIONS[section]["questions"][current_question]
 
-        if question.get("options"):
-            choices = []
-            for option in question["options"]:
-                if isinstance(option, tuple):
-                    stub, option = option
-                else:
-                    stub = option.replace(" ", "_").lower()
-                choices.append(Choice(stub, option))
-
         header = "\n".join(
             [
                 "*BWise / Survey*",
@@ -152,6 +143,14 @@ class Application(BaseApplication):
         )
 
         if question.get("options"):
+            choices = []
+            for option in question["options"]:
+                if isinstance(option, tuple):
+                    stub, option = option
+                else:
+                    stub = option.replace(" ", "_").lower()
+                choices.append(Choice(stub, option))
+
             return ChoiceState(
                 self,
                 question=question["text"] + "\n",
