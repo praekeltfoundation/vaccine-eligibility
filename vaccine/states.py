@@ -214,6 +214,8 @@ class FreeText:
         ] = None,
         buttons: Optional[List[Choice]] = None,
         override_answer_name: Optional[str] = None,
+        footer: Optional[str] = None,
+        header: Optional[str] = None,
     ):
         self.app = app
         self.question = question
@@ -221,6 +223,8 @@ class FreeText:
         self.check = check
         self.buttons = buttons
         self.override_answer_name = override_answer_name
+        self.footer = footer
+        self.header = header
 
     async def process_message(self, message: Message):
         if self.check is not None:
@@ -242,7 +246,12 @@ class FreeText:
         helper_metadata: Dict[str, Any] = {}
         if self.buttons:
             helper_metadata["buttons"] = [choice.label for choice in self.buttons]
-        return self.app.send_message(self.question, helper_metadata=helper_metadata)
+        text = self.question
+        if self.footer is not None:
+            text = f"{text}\n{self.footer}"
+        if self.header is not None:
+            text = f"{self.header}\n{text}"
+        return self.app.send_message(text, helper_metadata=helper_metadata)
 
 
 class BaseWhatsAppChoiceState(ChoiceState):

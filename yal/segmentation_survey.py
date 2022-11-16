@@ -3,12 +3,12 @@ import asyncio
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
+    ChoiceState,
     CustomChoiceState,
     EndState,
     FreeText,
     WhatsAppButtonState,
 )
-from vaccine.utils import get_display_choices
 from yal import config, rapidpro, utils
 from yal.data.seqmentation_survey_questions import SURVEY_QUESTIONS
 from yal.utils import BACK_TO_MAIN, GET_HELP, get_generic_error
@@ -123,14 +123,6 @@ class Application(BaseApplication):
 
         question = SURVEY_QUESTIONS[section]["questions"][current_question]
 
-        parts = []
-        footer = [
-            "-----",
-            "*Or reply:*",
-            BACK_TO_MAIN,
-            GET_HELP,
-        ]
-
         if question.get("options"):
             choices = []
             for option in question["options"]:
@@ -140,47 +132,43 @@ class Application(BaseApplication):
                     stub = option.replace(" ", "_").lower()
                 choices.append(Choice(stub, option))
 
-            parts.extend(
-                [
-                    get_display_choices(choices),
-                    "",
-                ]
-            )
-
-        error_parts = [get_generic_error(), ""] + parts + footer
-        error_text = self._(
-            "\n".join([part for part in error_parts if part is not None])
-        )
-        parts = (
+        header = "\n".join(
             [
                 "*BWise / Survey*",
                 "-----",
                 f"Section {section}",
                 f"{question_number}/{total_questions}",
                 "",
-                f"*{question['text']}*",
-                "",
             ]
-            + parts
-            + footer
         )
-        question_text = self._("\n".join(parts))
+        footer = "\n".join(
+            [
+                "",
+                "-----",
+                "*Or reply:*",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
 
         if question.get("options"):
-            return CustomChoiceState(
+            return ChoiceState(
                 self,
-                question=question_text,
-                error=error_text,
+                question=question["text"] + "\n",
+                header=header,
+                footer=footer,
+                error=get_generic_error() + "\n",
+                error_footer=footer,
                 choices=choices,
                 next="state_survey_process_answer",
-                button="See my options",
-                buttons=choices,
                 override_answer_name=current_question,
             )
         else:
             return FreeText(
                 self,
-                question=question_text,
+                question=question["text"],
+                header=header,
+                footer=footer,
                 next="state_survey_process_answer",
                 override_answer_name=current_question,
             )
