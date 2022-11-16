@@ -17,6 +17,37 @@ from yal.utils import BACK_TO_MAIN, GET_HELP, get_generic_error
 class Application(BaseApplication):
     START_STATE = "state_start_survey"
     DECLINE_STATE = "state_survey_decline"
+    COMPLETED_STATE = "state_survey_already_completed"
+
+    async def state_survey_already_completed(self):
+        def _next(choice: Choice):
+            return choice.value
+
+        choices = [
+            Choice("state_aaq_start", self._("Ask a question")),
+            Choice("state_pre_mainmenu", self._("Go to Main Menu")),
+        ]
+        question = "\n".join(
+            [
+                "Hmm, 🤔 looks like you've already completed this survey.",
+                "",
+                "Thanks for your input, we really appreciate it.",
+                "",
+                "What would you like to do next?",
+                "",
+                "1. Ask a question",
+                "2. Go to Main Menu",
+            ]
+        )
+        return CustomChoiceState(
+            self,
+            question=self._(question),
+            error=self._(get_generic_error()),
+            choices=choices,
+            next=_next,
+            button="See my options",
+            buttons=choices,
+        )
 
     async def state_survey_decline(self):
         def _next(choice: Choice):

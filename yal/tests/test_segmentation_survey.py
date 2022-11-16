@@ -16,9 +16,15 @@ def tester():
 
 
 def get_rapidpro_contact(urn):
+    complete = ""
+    if urn == "27820001001":
+        complete = "PENDING"
+    elif urn == "27820001003":
+        complete = "TRUE"
+
     return {
         "fields": {
-            "segment_survey_sent": "True" if urn == "27820001001" else "False",
+            "segment_survey_complete": complete,
         },
     }
 
@@ -133,6 +139,28 @@ async def test_survey_start_decline(tester: AppTester, rapidpro_mock):
                 "-----",
                 "*Or reply:*",
                 "0. 🏠 Back to Main *MENU*",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_survey_start_already_completed(tester: AppTester, rapidpro_mock):
+    tester.setup_user_address("27820001003")
+    await tester.user_input("Hell Yeah!")
+    tester.assert_state("state_survey_already_completed")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Hmm, 🤔 looks like you've already completed this survey.",
+                "",
+                "Thanks for your input, we really appreciate it.",
+                "",
+                "What would you like to do next?",
+                "",
+                "1. Ask a question",
+                "2. Go to Main Menu",
             ]
         )
     )
