@@ -77,7 +77,7 @@ class Application(
     async def process_message(self, message):
         keyword = utils.clean_inbound(message.content)
         # Restart keywords
-        if keyword in GREETING_KEYWORDS:
+        if keyword in GREETING_KEYWORDS or keyword in TRACKING_KEYWORDS:
             self.user.session_id = None
             self.state_name = self.START_STATE
 
