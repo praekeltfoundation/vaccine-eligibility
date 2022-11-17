@@ -3,8 +3,8 @@ SURVEY_QUESTIONS = {
         "start": "state_s1_4_income",
         "questions": {
             "state_s1_4_income": {
-                "text": "How much does everyone in your house make altogether, before "
-                "paying for regular monthly items?",
+                "text": "*How much does everyone in your house make altogether, before "
+                "paying for regular monthly items?*",
                 "options": [
                     ("no_income", "No income"),
                     ("R1-R400", "R1 - R400"),
@@ -22,7 +22,7 @@ SURVEY_QUESTIONS = {
                 "next": "state_relationship_status",
             },
             "state_relationship_status": {
-                "text": "What is your present relationship status?",
+                "text": "*What is your present relationship status?*",
                 "options": [
                     ("no", "Not currently dating"),
                     ("serious", "In a serious relationship"),

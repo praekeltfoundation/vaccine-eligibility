@@ -3,12 +3,12 @@ import asyncio
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
+    ChoiceState,
     CustomChoiceState,
     EndState,
     FreeText,
     WhatsAppButtonState,
 )
-from vaccine.utils import get_display_choices
 from yal import config, rapidpro, utils
 from yal.data.seqmentation_survey_questions import SURVEY_QUESTIONS
 from yal.utils import BACK_TO_MAIN, GET_HELP, get_generic_error
@@ -123,13 +123,24 @@ class Application(BaseApplication):
 
         question = SURVEY_QUESTIONS[section]["questions"][current_question]
 
-        parts = []
-        footer = [
-            "-----",
-            "*Or reply:*",
-            BACK_TO_MAIN,
-            GET_HELP,
-        ]
+        header = "\n".join(
+            [
+                "*BWise / Survey*",
+                "-----",
+                f"Section {section}",
+                f"{question_number}/{total_questions}",
+                "",
+            ]
+        )
+        footer = "\n".join(
+            [
+                "",
+                "-----",
+                "*Or reply:*",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
 
         if question.get("options"):
             choices = []
@@ -140,47 +151,23 @@ class Application(BaseApplication):
                     stub = option.replace(" ", "_").lower()
                 choices.append(Choice(stub, option))
 
-            parts.extend(
-                [
-                    get_display_choices(choices),
-                    "",
-                ]
-            )
-
-        error_parts = [get_generic_error(), ""] + parts + footer
-        error_text = self._(
-            "\n".join([part for part in error_parts if part is not None])
-        )
-        parts = (
-            [
-                "*BWise / Survey*",
-                "-----",
-                f"Section {section}",
-                f"{question_number}/{total_questions}",
-                "",
-                f"*{question['text']}*",
-                "",
-            ]
-            + parts
-            + footer
-        )
-        question_text = self._("\n".join(parts))
-
-        if question.get("options"):
-            return CustomChoiceState(
+            return ChoiceState(
                 self,
-                question=question_text,
-                error=error_text,
+                question=question["text"] + "\n",
+                header=header,
+                footer=footer,
+                error=get_generic_error() + "\n",
+                error_footer=footer,
                 choices=choices,
                 next="state_survey_process_answer",
-                button="See my options",
-                buttons=choices,
                 override_answer_name=current_question,
             )
         else:
             return FreeText(
                 self,
-                question=question_text,
+                question=question["text"],
+                header=header,
+                footer=footer,
                 next="state_survey_process_answer",
                 override_answer_name=current_question,
             )
@@ -283,33 +270,33 @@ class Application(BaseApplication):
             Choice("state_pre_mainmenu", self._("Go to Main Menu")),
             Choice("state_no_airtime", self._("I didn't receive airtime")),
         ]
+        header = "\n".join(["*BWise / Survey*", "-----", ""])
         question = "\n".join(
             [
-                "*BWise / Survey*",
-                "-----",
-                "",
                 "We've just sent you your airtime. Please check your airtime balance "
                 "now.",
                 "",
-                "What would you like to do next?",
+                "*What would you like to do next?*",
                 "",
-                "1. Ask a question",
-                "2. Go to Main Menu",
-                "3. I didn't receive airtime",
+            ]
+        )
+        footer = "\n".join(
+            [
+                "",
                 "-----",
                 "*Or reply:*",
                 "*0* - 🏠Back to Main *MENU*",
                 "*#* - 🆘Get *HELP*",
             ]
         )
-        return CustomChoiceState(
+        return ChoiceState(
             self,
+            header=header,
             question=self._(question),
+            footer=footer,
             error=self._(get_generic_error()),
             choices=choices,
             next=_next,
-            button="See my options",
-            buttons=choices,
         )
 
     async def state_no_airtime(self):

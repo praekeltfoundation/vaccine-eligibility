@@ -246,9 +246,9 @@ async def test_survey_next_question_branch(tester: AppTester):
                 "Section 1",
                 "2/4",
                 "",
-                "**Ok. You can tell me how many sexual partners you had here.*",
+                "*Ok. You can tell me how many sexual partners you had here.*",
                 "",
-                "_Just type and send_*",
+                "_Just type and send_",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -275,9 +275,9 @@ async def test_survey_freetext_question(tester: AppTester):
                 "Section 1",
                 "1/4",
                 "",
-                "**Ok. You can tell me how many sexual partners you had here.*",
+                "*Ok. You can tell me how many sexual partners you had here.*",
                 "",
-                "_Just type and send_*",
+                "_Just type and send_",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -311,10 +311,10 @@ async def test_survey_next_section(tester: AppTester):
                 "Section 3",
                 "1/2",
                 "",
-                "*_The following statements may apply more or less to you. To what "
+                "_The following statements may apply more or less to you. To what "
                 "extent do you think each statement applies to you personally?_ ",
                 "",
-                "*I’m my own boss.**",
+                "*I’m my own boss.*",
                 "",
                 "1. Does not apply at all",
                 "2. Applies somewhat",
@@ -368,6 +368,29 @@ async def test_state_survey_done(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_survey_done")
     await tester.user_input("Get Airtime")
     tester.assert_state("state_prompt_next_action")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*BWise / Survey*",
+                "-----",
+                "",
+                "We've just sent you your airtime. Please check your airtime balance "
+                "now.",
+                "",
+                "*What would you like to do next?*",
+                "",
+                "1. Ask a question",
+                "2. Go to Main Menu",
+                "3. I didn't receive airtime",
+                "",
+                "-----",
+                "*Or reply:*",
+                "*0* - 🏠Back to Main *MENU*",
+                "*#* - 🆘Get *HELP*",
+            ]
+        )
+    )
 
     assert len(rapidpro_mock.tstate.requests) == 1
     request = rapidpro_mock.tstate.requests[0]
