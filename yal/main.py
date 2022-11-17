@@ -54,6 +54,7 @@ FEEDBACK_FIELDS = {
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
 SEGMENT_SURVEY_ACCEPT = {"hell yeah"}
 SEGMENT_SURVEY_DECLINE = {"no rather not"}
+EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
 
 
 class Application(
@@ -77,6 +78,12 @@ class Application(
     async def process_message(self, message):
         keyword = utils.clean_inbound(message.content)
         # Restart keywords
+        if utils.check_keyword(keyword, EMERGENCY_KEYWORDS):
+            # Emergency keywords are checked
+            # first so that false positives are overwritten later on
+            self.user.session_id = None
+            self.state_name = PleaseCallMeApplication.START_STATE
+
         if keyword in GREETING_KEYWORDS or keyword in TRACKING_KEYWORDS:
             self.user.session_id = None
             self.state_name = self.START_STATE

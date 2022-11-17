@@ -282,6 +282,52 @@ async def test_reset_keyword(tester: AppTester, rapidpro_mock, contentrepo_api_m
 
 @pytest.mark.asyncio
 @mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_emergency_keywords_existing_session(
+    get_current_datetime, tester: AppTester
+):
+    get_current_datetime.return_value = datetime(2022, 6, 21, 13, 30)
+
+    tester.setup_state("state_catch_all")
+    await tester.user_input(session=Message.SESSION_EVENT.RESUME, content="depressed")
+    tester.assert_state("state_in_hours")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_emergency_keywords_new_session(get_current_datetime, tester: AppTester):
+    get_current_datetime.return_value = datetime(2022, 6, 21, 13, 30)
+
+    tester.setup_state("state_catch_all")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="I want to die")
+    tester.assert_state("state_in_hours")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_emergency_keywords_typo(get_current_datetime, tester: AppTester):
+    get_current_datetime.return_value = datetime(2022, 6, 21, 13, 30)
+
+    tester.setup_state("state_catch_all")
+    await tester.user_input(content="edpressed")
+    tester.assert_state("state_in_hours")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_emergency_keywords_phrase_match(get_current_datetime, tester: AppTester):
+    get_current_datetime.return_value = datetime(2022, 6, 21, 13, 30)
+
+    tester.setup_state("state_catch_all")
+    await tester.user_input(content="I am depressed")
+    tester.assert_state("state_in_hours")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
 async def test_help_keyword(get_current_datetime, tester: AppTester):
     get_current_datetime.return_value = datetime(2022, 6, 21, 13, 30)
 
