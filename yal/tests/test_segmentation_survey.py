@@ -88,7 +88,7 @@ async def test_survey_start(tester: AppTester, rapidpro_mock):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "1/4",
+                "1/7",
                 "",
                 "*How much does everyone in your house make altogether, before paying "
                 "for regular monthly items?*",
@@ -177,7 +177,7 @@ async def test_survey_next_question(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "2/4",
+                "2/7",
                 "",
                 "*What is your present relationship status?*",
                 "",
@@ -244,7 +244,7 @@ async def test_survey_next_question_branch(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "2/4",
+                "2/7",
                 "",
                 "*Ok. You can tell me how many sexual partners you had here.*",
                 "",
@@ -273,7 +273,7 @@ async def test_survey_freetext_question(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "1/4",
+                "1/7",
                 "",
                 "*Ok. You can tell me how many sexual partners you had here.*",
                 "",
@@ -292,6 +292,24 @@ async def test_survey_freetext_question(tester: AppTester):
     tester.assert_state("state_survey_question")
 
     tester.assert_answer("state_s1_6_detail_monthly_sex_partners", "11")
+
+
+@pytest.mark.asyncio
+async def test_survey_info_message(tester: AppTester):
+    tester.user.metadata["segment_section"] = 1
+    tester.user.metadata["segment_question"] = "state_s1_8_sti_tested"
+
+    tester.setup_state("state_survey_question")
+    await tester.user_input("no")
+    tester.assert_state("state_survey_question")
+
+    [msg] = tester.fake_worker.outbound_messages
+    assert msg.content == (
+        "Please note, because you've selected NO, we're skipping some questions as "
+        "they don't apply to you."
+    )
+
+    tester.assert_metadata("segment_question", "state_s2_1_knowledge_1")
 
 
 @pytest.mark.asyncio
@@ -333,17 +351,9 @@ async def test_survey_next_section(tester: AppTester):
     [msg] = tester.fake_worker.outbound_messages
     assert msg.content == "\n".join(
         [
-            "*BWise / Survey*",
-            "-----",
-            "",
             "😎 *CONGRATS. YOU'RE HALFWAY THERE!*",
             "",
             "Section 2 complete, keep going. *Let's move onto section 3!* 👍🏾",
-            "",
-            "-----",
-            "*Or reply:*",
-            "0. 🏠 Back to Main *MENU*",
-            "#. 🆘Get *HELP*",
         ]
     )
 
