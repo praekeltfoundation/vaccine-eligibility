@@ -88,23 +88,16 @@ async def test_survey_start(tester: AppTester, rapidpro_mock):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "1/7",
+                "1/28",
                 "",
-                "*How much does everyone in your house make altogether, before paying "
-                "for regular monthly items?*",
+                "*What gender do you identity with?*",
                 "",
-                "1. No income",
-                "2. R1 - R400",
-                "3. R401 - R800",
-                "4. R801 - R1 600",
-                "5. R1 601 - R3 200",
-                "6. R3 201 - R6 400",
-                "7. R6 401 - R12 800",
-                "8. R12 801 - R25 600",
-                "9. R25 601 - R51 200",
-                "10. R51 201 - R102 400",
-                "11. R102 401 - R204 800",
-                "12. R204 801 or more",
+                "1. Female",
+                "2. Male",
+                "3. Non-binary",
+                "4. Transgender",
+                "5. Self-describe",
+                "6. Prefer not to disclose",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -177,13 +170,12 @@ async def test_survey_next_question(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "2/7",
+                "2/28",
                 "",
-                "*What is your present relationship status?*",
+                "*Do you sometimes, or have you previously had sex with men?*",
                 "",
-                "1. Not currently dating",
-                "2. In a serious relationship",
-                "3. In a relationship, but not a serious one",
+                "1. Yes",
+                "2. No",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -192,7 +184,7 @@ async def test_survey_next_question(tester: AppTester):
             ]
         )
     )
-    tester.assert_answer("state_s1_4_income", "R1-R400")
+    tester.assert_answer("state_s1_1_gender", "male")
 
 
 @pytest.mark.asyncio
@@ -209,18 +201,12 @@ async def test_survey_invalid_answer(tester: AppTester):
                 "again - I'll get it if you use the number that matches your choice, "
                 "promise.👍",
                 "",
-                "1. No income",
-                "2. R1 - R400",
-                "3. R401 - R800",
-                "4. R801 - R1 600",
-                "5. R1 601 - R3 200",
-                "6. R3 201 - R6 400",
-                "7. R6 401 - R12 800",
-                "8. R12 801 - R25 600",
-                "9. R25 601 - R51 200",
-                "10. R51 201 - R102 400",
-                "11. R102 401 - R204 800",
-                "12. R204 801 or more",
+                "1. Female",
+                "2. Male",
+                "3. Non-binary",
+                "4. Transgender",
+                "5. Self-describe",
+                "6. Prefer not to disclose",
                 "",
                 "-----",
                 "*Or reply:*",
@@ -244,7 +230,7 @@ async def test_survey_next_question_branch(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "2/7",
+                "2/28",
                 "",
                 "*Ok. You can tell me how many sexual partners you had here.*",
                 "",
@@ -273,7 +259,7 @@ async def test_survey_freetext_question(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "1/7",
+                "1/28",
                 "",
                 "*Ok. You can tell me how many sexual partners you had here.*",
                 "",
@@ -309,7 +295,7 @@ async def test_survey_info_message(tester: AppTester):
         "they don't apply to you."
     )
 
-    tester.assert_metadata("segment_question", "state_s2_1_knowledge_1")
+    tester.assert_metadata("segment_question", "state_s1_12_5_partners_stis")
 
 
 @pytest.mark.asyncio
