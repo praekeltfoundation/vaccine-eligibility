@@ -122,6 +122,12 @@ class Application(BaseApplication):
         total_questions = len(SURVEY_QUESTIONS[section]["questions"])
 
         question = SURVEY_QUESTIONS[section]["questions"][current_question]
+        question_type = question.get("type", "choice")
+
+        if question_type == "info":
+            await self.publish_message(question["text"])
+            await asyncio.sleep(0.5)
+            return await self.go_to_state("state_survey_process_answer")
 
         header = "\n".join(
             [
@@ -142,7 +148,7 @@ class Application(BaseApplication):
             ]
         )
 
-        if question.get("options"):
+        if question_type == "choice":
             choices = []
             for option in question["options"]:
                 if isinstance(option, tuple):
@@ -182,25 +188,6 @@ class Application(BaseApplication):
         question_number = metadata.get("segment_question_nr", 1)
 
         question = SURVEY_QUESTIONS[str(section)]["questions"][current_question]
-
-        if question.get("send_after"):
-            msg = self._(
-                "\n".join(
-                    [
-                        "*BWise / Survey*",
-                        "-----",
-                        "",
-                        question["send_after"],
-                        "",
-                        "-----",
-                        "*Or reply:*",
-                        BACK_TO_MAIN,
-                        GET_HELP,
-                    ]
-                )
-            )
-            await self.publish_message(msg)
-            await asyncio.sleep(0.5)
 
         next = None
 

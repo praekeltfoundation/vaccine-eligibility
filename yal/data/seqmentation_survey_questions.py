@@ -46,6 +46,7 @@ SURVEY_QUESTIONS = {
                 },
             },
             "state_s1_6_detail_monthly_sex_partners": {
+                "type": "freetext",
                 "text": "\n".join(
                     [
                         "*Ok. You can tell me how many sexual partners you had here.*",
@@ -53,6 +54,25 @@ SURVEY_QUESTIONS = {
                         "_Just type and send_",
                     ]
                 ),
+                "next": "state_s1_8_sti_tested",
+            },
+            "state_s1_8_sti_tested": {
+                "text": "*Have you ever been tested for STIs and HIV?*",
+                "options": [("yes", "Yes"), ("no", "No")],
+                "next": {
+                    "yes": "state_s1_9_detail_sti_tested",
+                    "no": "state_sti_tested_skip_msg",
+                },
+            },
+            "state_s1_9_detail_sti_tested": {
+                "text": "*What STIs have you been tested for?*",
+                "options": ["Reply with STI", "Skip"],
+                "next": None,
+            },
+            "state_sti_tested_skip_msg": {
+                "type": "info",
+                "text": "Please note, because you've selected NO, we're skipping some "
+                "questions as they don't apply to you.",
                 "next": None,
             },
         },
@@ -63,7 +83,7 @@ SURVEY_QUESTIONS = {
             "state_s2_1_knowledge_1": {
                 "text": "\n".join(
                     [
-                        "Do you think this is True or False?_",
+                        "_Do you think this is True or False?_",
                         "",
                         "*People can reduce the risk of getting STIs by using condoms "
                         "every time they have sexual intercourse.*",
@@ -77,8 +97,11 @@ SURVEY_QUESTIONS = {
                 "the risk of getting STIs by limiting sexual intercourse to one "
                 "partner who is not infected and has no other partners.*",
                 "options": ["True", "False"],
-                "next": None,
-                "send_after": "\n".join(
+                "next": "state_s2_progress_complete",
+            },
+            "state_s2_progress_complete": {
+                "type": "info",
+                "text": "\n".join(
                     [
                         "😎 *CONGRATS. YOU'RE HALFWAY THERE!*",
                         "",
@@ -86,6 +109,7 @@ SURVEY_QUESTIONS = {
                         "👍🏾",
                     ]
                 ),
+                "next": None,
             },
         },
     },
