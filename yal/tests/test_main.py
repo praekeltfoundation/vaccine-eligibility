@@ -2,8 +2,8 @@ from datetime import datetime
 from unittest import mock
 
 import pytest
-from sanic import Sanic, response
 from openpyxl import load_workbook
+from sanic import Sanic, response
 
 from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
@@ -115,13 +115,15 @@ def test_all_states_added_to_docs():
         | wa_fb_states
     )
 
-    wb = load_workbook(filename=f"yal/tests/states_dictionary.xlsx")
+    wb = load_workbook(filename="yal/tests/states_dictionary.xlsx")
     ws = wb.worksheets[0]
     documented_states = set(row[0].value for row in ws.iter_rows(min_row=2, max_col=1))
 
     difference = existing_states.difference(documented_states)
 
-    assert len(difference) == 0, f"{len(difference)} states are not documented. List: {difference}"
+    assert (
+        len(difference) == 0
+    ), f"{len(difference)} states are not documented. List: {difference}"
 
 
 @pytest.fixture
