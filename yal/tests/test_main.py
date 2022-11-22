@@ -3,6 +3,7 @@ from unittest import mock
 
 import pytest
 from sanic import Sanic, response
+from openpyxl import load_workbook
 
 from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
@@ -71,6 +72,56 @@ def test_no_state_name_clashes():
     }
 
     assert len(intersection) == 0, f"Common states to both apps: {intersection}"
+
+
+def test_all_states_added_to_docs():
+    m_states = set(s for s in dir(Application) if s.startswith("state_"))
+    mm_states = set(s for s in dir(MainMenuApplication) if s.startswith("state_"))
+    on_states = set(s for s in dir(OnboardingApplication) if s.startswith("state_"))
+    oo_states = set(s for s in dir(OptoutApplication) if s.startswith("state_"))
+    te_states = set(s for s in dir(TermsApplication) if s.startswith("state_"))
+    cp_states = set(
+        s for s in dir(ChangePreferencesApplication) if s.startswith("state_")
+    )
+    q_states = set(s for s in dir(QuizApplication) if s.startswith("state_"))
+    pc_states = set(s for s in dir(PleaseCallMeApplication) if s.startswith("state_"))
+    sf_states = set(s for s in dir(ServiceFinderApplication) if s.startswith("state_"))
+    aaq_states = set(s for s in dir(AaqApplication) if s.startswith("state_"))
+    fb_states = set(s for s in dir(FeedbackApplication) if s.startswith("state_"))
+    c_fb_states = set(
+        s for s in dir(ContentFeedbackSurveyApplication) if s.startswith("state_")
+    )
+    sf_s_states = set(
+        s for s in dir(ServiceFinderFeedbackSurveyApplication) if s.startswith("state_")
+    )
+    wa_fb_states = set(
+        s for s in dir(WaFbCrossoverFeedbackApplication) if s.startswith("state_")
+    )
+
+    existing_states = (
+        m_states
+        | mm_states
+        | on_states
+        | oo_states
+        | te_states
+        | cp_states
+        | q_states
+        | pc_states
+        | sf_states
+        | aaq_states
+        | fb_states
+        | c_fb_states
+        | sf_s_states
+        | wa_fb_states
+    )
+
+    wb = load_workbook(filename=f"yal/tests/states_dictionary.xlsx")
+    ws = wb.worksheets[0]
+    documented_states = set(row[0].value for row in ws.iter_rows(min_row=2, max_col=1))
+
+    difference = existing_states.difference(documented_states)
+
+    assert len(difference) == 0, f"{len(difference)} states are not documented. List: {difference}"
 
 
 @pytest.fixture
