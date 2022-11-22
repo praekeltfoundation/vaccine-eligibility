@@ -119,10 +119,10 @@ class Application(BaseApplication):
 
         question_number = metadata.get("segment_question_nr", 1)
 
-        # TODO: exclude info messages
-        total_questions = len(SURVEY_QUESTIONS[section]["questions"])
+        questions = SURVEY_QUESTIONS[section]["questions"]
+        total_questions = sum(1 for q in questions.values() if q.get("type") != "info")
 
-        question = SURVEY_QUESTIONS[section]["questions"][current_question]
+        question = questions[current_question]
         question_type = question.get("type", "choice")
 
         if question_type == "info":
