@@ -301,7 +301,7 @@ async def test_survey_info_message(tester: AppTester):
 @pytest.mark.asyncio
 async def test_survey_next_section(tester: AppTester):
     tester.user.metadata["segment_section"] = 2
-    tester.user.metadata["segment_question"] = "state_s2_2_knowledge_2"
+    tester.user.metadata["segment_question"] = "state_s2_12_contraceptive_2_detail"
 
     tester.setup_state("state_survey_question")
     await tester.user_input("1")

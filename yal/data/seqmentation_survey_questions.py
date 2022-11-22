@@ -265,9 +265,9 @@ SURVEY_QUESTIONS = {
         },
     },
     "2": {
-        "start": "state_s2_1_knowledge_1",
+        "start": "state_s2_1_knowledge_1_condoms",
         "questions": {
-            "state_s2_1_knowledge_1": {
+            "state_s2_1_knowledge_1_condoms": {
                 "text": "\n".join(
                     [
                         "_Do you think this is True or False?_",
@@ -277,13 +277,168 @@ SURVEY_QUESTIONS = {
                     ]
                 ),
                 "options": ["True", "False"],
-                "next": "state_s2_2_knowledge_2",
+                "next": "state_s2_2_knowledge_2_exclusivity",
             },
-            "state_s2_2_knowledge_2": {
-                "text": "_Do you think this is True or False?_ \n\n*People can reduce "
-                "the risk of getting STIs by limiting sexual intercourse to one "
-                "partner who is not infected and has no other partners.*",
+            "state_s2_2_knowledge_2_exclusivity": {
+                "text": "\n".join(
+                    [
+                        "_Do you think this is True or False?_",
+                        "",
+                        "*People can reduce the risk of getting STIs by limiting "
+                        "sexual intercourse to one partner who is not infected and "
+                        "has no other partners.*",
+                    ]
+                ),
                 "options": ["True", "False"],
+                "next": "state_s2_3_knowledge_3_condoms_exclusivity",
+            },
+            "state_s2_3_knowledge_3_condoms_exclusivity": {
+                "text": "\n".join(
+                    [
+                        "_Do you think this is True or False?_",
+                        "",
+                        "*People can reduce the risk of getting STIs by using condoms "
+                        "every time they have sexual intercourse and by limiting "
+                        "sexual intercourse to one partner who is not infected and "
+                        "has no other partners.*",
+                    ]
+                ),
+                "options": ["True", "False"],
+                "next": "state_s2_4_competence_1_consent",
+            },
+            "state_s2_4_competence_1_consent": {
+                "text": "If Teddy goes out to a restaurant and starts a conversation "
+                "with someone he is sexually attracted to, *what is most important "
+                "way that Teddy can decide if the person he is talking to wants to "
+                "have sex with him?*",
+                "options": [
+                    ("look", "By the way they are looking at him"),
+                    ("clothes", "By what they are wearing"),
+                    ("carry_condoms", "If they carry condoms"),
+                    ("previous_sex", "If Teddy has had sex with them before"),
+                    ("verbal_consent", "If they verbally consent to have sex"),
+                    ("dont_know", "I don't know"),
+                ],
+                "next": "state_s2_5_competence_2_right_to_sex",
+            },
+            "state_s2_5_competence_2_right_to_sex": {
+                "text": "\n".join(
+                    [
+                        "Robert and Samantha have been dating for 5 years and love "
+                        "each other very much. Every year on Robert's birthday, "
+                        "Samantha promises him sex for his birthday. This year, "
+                        "Samantha tells Robert that she is too tired for sex.",
+                        "",
+                        "To what extent do you agree with this statement: *Robert has "
+                        "the right to force Samantha to have sex.*",
+                    ]
+                ),
+                "options": [
+                    ("strongly_agree", "Strongly agree"),
+                    ("agree", "Agree"),
+                    ("not_sure", "Not sure"),
+                    ("disagree", "Disagree"),
+                    ("strongly_disagree", "Strongly disagree"),
+                ],
+                "next": "state_s2_6_competence_3_insist_condoms",
+            },
+            "state_s2_6_competence_3_insist_condoms": {
+                "text": "\n".join(
+                    [
+                        "How much do you agree with the following statement:",
+                        "",
+                        "*If sexually active, I am able to insist on condom use when "
+                        "I have sex.*",
+                    ]
+                ),
+                "options": [
+                    ("strongly_agree", "Strongly agree"),
+                    ("agree", "Agree"),
+                    ("not_sure", "Not sure"),
+                    ("disagree", "Disagree"),
+                    ("strongly_disagree", "Strongly disagree"),
+                    ("not_active", "I am not sexually active"),
+                ],
+                "next": "state_s2_7_competence_4_saying_no",
+            },
+            "state_s2_7_competence_4_saying_no": {
+                "text": "*If you are in a relationship, which statement describes you "
+                "best?*",
+                "options": [
+                    (
+                        "comfortable",
+                        "I feel comfortable telling my partner no if they want to "
+                        "have sex, but I do not want to",
+                    ),
+                    (
+                        "difficult",
+                        "I find it difficult to tell my partner 'no' if they want to "
+                        "have sex but I do not want to",
+                    ),
+                    ("not_sure", "I am not sure"),
+                    ("not_in_relationship", "Not in a relationship"),
+                ],
+                "next": "state_s2_8_enjoyment_1_needs_important",
+            },
+            "state_s2_8_enjoyment_1_needs_important": {
+                "text": "*My sexual needs or desires are important.*",
+                "options": [
+                    ("not", "Not at all true"),
+                    ("little", "A little true"),
+                    ("moderately", "Moderately true"),
+                    ("very", "Very true"),
+                    ("extremely", "Extremely true"),
+                ],
+                "next": "state_s2_9_enjoyment_2_own_pleasure",
+            },
+            "state_s2_9_enjoyment_2_own_pleasure": {
+                "text": "*I think it would be important to focus on my own pleasure "
+                "as well as my partner's during sexual experiences.*",
+                "options": [
+                    ("not", "Not at all true"),
+                    ("little", "A little true"),
+                    ("moderately", "Moderately true"),
+                    ("very", "Very true"),
+                    ("extremely", "Extremely true"),
+                ],
+                "next": "state_s2_10_enjoyment_3_expect_enjoy",
+            },
+            "state_s2_10_enjoyment_3_expect_enjoy": {
+                "text": "*I expect to enjoy sex*",
+                "options": ["TODO"],
+                "next": "TODO",
+            },
+            "state_s2_11_contraceptive_1_use": {
+                "text": "*During the last time you had sex, did you or your partner "
+                "do something or use any method to avoid or delay getting pregnant?*",
+                "options": [
+                    ("yes", "Yes"),
+                    ("no", "No"),
+                    ("dont_remember", "Don’t remember"),
+                    ("havent_had_sex", "I haven't had sex"),
+                ],
+                "next": "state_s2_12_contraceptive_2_detail",
+            },
+            "state_s2_12_contraceptive_2_detail": {
+                "text": "*What has been the main method that you or your partner "
+                "have used to delay or avoid getting pregnant?*",
+                "options": [
+                    ("none", "None"),
+                    ("pill", "Pill"),
+                    ("iud", "Intra uterine device (IUD)"),
+                    ("male_condom", "Male condom"),
+                    ("female_condom", "Female condom"),
+                    ("inject", "Injectables"),
+                    ("implant", "Implants"),
+                    ("diaphragm", "Diaphragm"),
+                    ("foam_jelly", "Foam/jelly"),
+                    ("lactational", "Lactational amenorrhea method"),
+                    ("cyclebeads", "Standard days method / cyclebeads"),
+                    ("female_sterilisation", "Female sterilisation"),
+                    ("male_sterilisation", "Male sterilisation"),
+                    ("breastfeeding", "Exclusive breastfeeding"),
+                    ("havent_had_sex", "I haven't had sex"),
+                ],
                 "next": "state_s2_progress_complete",
             },
             "state_s2_progress_complete": {
