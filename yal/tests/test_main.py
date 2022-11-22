@@ -1,8 +1,8 @@
 from datetime import datetime
 from unittest import mock
 
+import pytablereader as ptr
 import pytest
-from openpyxl import load_workbook
 from sanic import Sanic, response
 
 from vaccine.models import Message
@@ -115,9 +115,11 @@ def test_all_states_added_to_docs():
         | wa_fb_states
     )
 
-    wb = load_workbook(filename="yal/tests/states_dictionary.xlsx")
-    ws = wb.worksheets[0]
-    documented_states = set(row[0].value for row in ws.iter_rows(min_row=2, max_col=1))
+    loader = ptr.MarkdownTableFileLoader("yal/tests/states_dictionary.md")
+    for data in loader.load():
+        documented_states = set(
+            row["state_name"] for row in data.as_dict()[data.table_name]
+        )
 
     difference = existing_states.difference(documented_states)
 
