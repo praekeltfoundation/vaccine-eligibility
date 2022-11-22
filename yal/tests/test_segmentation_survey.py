@@ -313,10 +313,10 @@ async def test_survey_next_section(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 3",
-                "1/2",
+                "1/31",
                 "",
                 "_The following statements may apply more or less to you. To what "
-                "extent do you think each statement applies to you personally?_ ",
+                "extent do you think each statement applies to you personally?_",
                 "",
                 "*I’m my own boss.*",
                 "",
@@ -347,7 +347,7 @@ async def test_survey_next_section(tester: AppTester):
 @pytest.mark.asyncio
 async def test_survey_end(tester: AppTester):
     tester.user.metadata["segment_section"] = 3
-    tester.user.metadata["segment_question"] = "state_s3_2_loc_2_work"
+    tester.user.metadata["segment_question"] = "state_s3_30_gen_att_4_parenting"
 
     tester.setup_state("state_survey_question")
     await tester.user_input("1")

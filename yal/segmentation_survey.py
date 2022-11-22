@@ -119,6 +119,7 @@ class Application(BaseApplication):
 
         question_number = metadata.get("segment_question_nr", 1)
 
+        # TODO: exclude info messages
         total_questions = len(SURVEY_QUESTIONS[section]["questions"])
 
         question = SURVEY_QUESTIONS[section]["questions"][current_question]
