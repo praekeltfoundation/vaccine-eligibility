@@ -911,4 +911,95 @@ SURVEY_QUESTIONS = {
             },
         },
     },
+    "4": {
+        "start": "state_s4_start",
+        "questions": {
+            "state_s4_start": {
+                "type": "info",
+                "text": "\n".join(
+                    [
+                        "*BWise / Survey*",
+                        "*-----*",
+                        "",
+                        "Over the last two weeks, how often have you been bothered by "
+                        "the following problems?",
+                    ]
+                ),
+                "next": "state_s4_1_depression_1_anxious",
+            },
+            "state_s4_1_depression_1_anxious": {
+                "text": "*Feeling nervous, anxious or on edge*",
+                "options": [
+                    "Not at all",
+                    "Several days",
+                    "More than half the days",
+                    "Nearly every day",
+                ],
+                "next": "state_s4_2_depression_2_worrying",
+            },
+            "state_s4_2_depression_2_worrying": {
+                "text": "*Not being able to stop or control worrying*",
+                "options": [
+                    "Not at all",
+                    "Several days",
+                    "More than half the days",
+                    "Nearly every day",
+                ],
+                "next": "state_s4_3_depression_3_hopeless",
+            },
+            "state_s4_4_depression_4_interest": {
+                "text": "*Little interest or pleasure in doing things*",
+                "options": [
+                    "Not at all",
+                    "Several days",
+                    "More than half the days",
+                    "Nearly every day",
+                ],
+                "next": "state_s4_5_connectedness",
+            },
+            "state_s4_5_connectedness": {
+                "text": "*Do you have someone to talk to when you have a worry or "
+                "problem?*",
+                "options": [
+                    "Never",
+                    "Some of the time",
+                    "Most of the time",
+                    "All the time",
+                ],
+                "next": "state_s4_6_self_concept_1_myself",
+            },
+            "state_s4_6_self_concept_1_myself": {
+                "text": "\n".join(
+                    [
+                        "_How do you feel about this statement?_",
+                        "",
+                        "*I feel good about myself*",
+                    ]
+                ),
+                "options": [
+                    "Never",
+                    "Some of the time",
+                    "Most of the time",
+                    "All the time",
+                ],
+                "next": "state_s4_7_self_concept_2_body",
+            },
+            "state_s4_7_self_concept_2_body": {
+                "text": "\n".join(
+                    [
+                        "_How do you feel about this statement?_",
+                        "",
+                        "*I feel good about my body*",
+                    ]
+                ),
+                "options": [
+                    "Never",
+                    "Some of the time",
+                    "Most of the time",
+                    "All the time",
+                ],
+                "next": None,
+            },
+        },
+    },
 }

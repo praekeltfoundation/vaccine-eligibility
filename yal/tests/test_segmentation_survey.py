@@ -88,7 +88,7 @@ async def test_survey_start(tester: AppTester, rapidpro_mock):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "1/28",
+                "1/26",
                 "",
                 "*What gender do you identity with?*",
                 "",
@@ -170,7 +170,7 @@ async def test_survey_next_question(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "2/28",
+                "2/26",
                 "",
                 "*Do you sometimes, or have you previously had sex with men?*",
                 "",
@@ -230,7 +230,7 @@ async def test_survey_next_question_branch(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "2/28",
+                "2/26",
                 "",
                 "*Ok. You can tell me how many sexual partners you had here.*",
                 "",
@@ -259,7 +259,7 @@ async def test_survey_freetext_question(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "1/28",
+                "1/26",
                 "",
                 "*Ok. You can tell me how many sexual partners you had here.*",
                 "",
@@ -313,7 +313,7 @@ async def test_survey_next_section(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 3",
-                "1/31",
+                "1/30",
                 "",
                 "_The following statements may apply more or less to you. To what "
                 "extent do you think each statement applies to you personally?_",
@@ -346,8 +346,8 @@ async def test_survey_next_section(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_survey_end(tester: AppTester):
-    tester.user.metadata["segment_section"] = 3
-    tester.user.metadata["segment_question"] = "state_s3_30_gen_att_4_parenting"
+    tester.user.metadata["segment_section"] = 4
+    tester.user.metadata["segment_question"] = "state_s4_7_self_concept_2_body"
 
     tester.setup_state("state_survey_question")
     await tester.user_input("1")
