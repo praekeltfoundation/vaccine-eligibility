@@ -26,7 +26,7 @@ from yal.utils import BACK_TO_MAIN, GET_HELP, get_current_datetime
 from yal.wa_fb_crossover_feedback import Application as WaFbCrossoverFeedbackApplication
 
 
-def test_no_state_name_clashes():
+def get_state_sets():
     m_states = set(s for s in dir(Application) if s.startswith("state_"))
     mm_states = set(s for s in dir(MainMenuApplication) if s.startswith("state_"))
     on_states = set(s for s in dir(OnboardingApplication) if s.startswith("state_"))
@@ -50,23 +50,14 @@ def test_no_state_name_clashes():
     wa_fb_states = set(
         s for s in dir(WaFbCrossoverFeedbackApplication) if s.startswith("state_")
     )
-    intersection = (
-        m_states
-        & mm_states
-        & on_states
-        & oo_states
-        & te_states
-        & cp_states
-        & q_states
-        & pc_states
-        & sf_states
-        & aaq_states
-        & fb_states
-        & c_fb_states
-        & sf_s_states
-        & ss_states
-        & wa_fb_states
-    ) - {
+
+    return [m_states, mm_states, on_states, oo_states, te_states, cp_states, q_states,
+    pc_states, sf_states, aaq_states, fb_states, c_fb_states, sf_s_states, ss_states, wa_fb_states]
+
+
+def test_no_state_name_clashes():
+    state_sets = get_state_sets()
+    intersection = set.intersection(*state_sets) - {
         "state_name",
         "state_error",
     }
@@ -75,45 +66,8 @@ def test_no_state_name_clashes():
 
 
 def test_all_states_added_to_docs():
-    m_states = set(s for s in dir(Application) if s.startswith("state_"))
-    mm_states = set(s for s in dir(MainMenuApplication) if s.startswith("state_"))
-    on_states = set(s for s in dir(OnboardingApplication) if s.startswith("state_"))
-    oo_states = set(s for s in dir(OptoutApplication) if s.startswith("state_"))
-    te_states = set(s for s in dir(TermsApplication) if s.startswith("state_"))
-    cp_states = set(
-        s for s in dir(ChangePreferencesApplication) if s.startswith("state_")
-    )
-    q_states = set(s for s in dir(QuizApplication) if s.startswith("state_"))
-    pc_states = set(s for s in dir(PleaseCallMeApplication) if s.startswith("state_"))
-    sf_states = set(s for s in dir(ServiceFinderApplication) if s.startswith("state_"))
-    aaq_states = set(s for s in dir(AaqApplication) if s.startswith("state_"))
-    fb_states = set(s for s in dir(FeedbackApplication) if s.startswith("state_"))
-    c_fb_states = set(
-        s for s in dir(ContentFeedbackSurveyApplication) if s.startswith("state_")
-    )
-    sf_s_states = set(
-        s for s in dir(ServiceFinderFeedbackSurveyApplication) if s.startswith("state_")
-    )
-    wa_fb_states = set(
-        s for s in dir(WaFbCrossoverFeedbackApplication) if s.startswith("state_")
-    )
-
-    existing_states = (
-        m_states
-        | mm_states
-        | on_states
-        | oo_states
-        | te_states
-        | cp_states
-        | q_states
-        | pc_states
-        | sf_states
-        | aaq_states
-        | fb_states
-        | c_fb_states
-        | sf_s_states
-        | wa_fb_states
-    )
+    state_sets = get_state_sets()
+    existing_states = set.union(*state_sets)
 
     loader = ptr.MarkdownTableFileLoader("yal/tests/states_dictionary.md")
     documented_states = set()
