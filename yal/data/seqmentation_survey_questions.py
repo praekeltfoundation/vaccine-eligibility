@@ -48,7 +48,7 @@ SURVEY_QUESTIONS = {
                     ("R102401-R204800", "R102 401 - R204 800"),
                     ("R204801+", "R204 801 or more"),
                 ],
-                "next": "state_relationship_status",
+                "next": "state_s1_5_relationship_status",
             },
             "state_s1_5_relationship_status": {
                 "text": "*What is your present relationship status?*",
@@ -154,7 +154,7 @@ SURVEY_QUESTIONS = {
                 "text": "*Have you ever felt you needed to cut down on your drinking "
                 "or drug use?*",
                 "options": [("yes", "Yes"), ("no", "No")],
-                "next": "state_s1_13_addition_2_criticise",
+                "next": "state_s1_14_addition_2_criticise",
             },
             "state_s1_14_addition_2_criticise": {
                 "text": "*Have people annoyed you by criticising your drinking or drug "
@@ -405,8 +405,14 @@ SURVEY_QUESTIONS = {
             },
             "state_s2_10_enjoyment_3_expect_enjoy": {
                 "text": "*I expect to enjoy sex*",
-                "options": ["TODO"],
-                "next": "TODO",
+                "options": [
+                    ("not", "Not at all true"),
+                    ("little", "A little true"),
+                    ("moderately", "Moderately true"),
+                    ("very", "Very true"),
+                    ("extremely", "Extremely true"),
+                ],
+                "next": "state_s2_11_contraceptive_1_use",
             },
             "state_s2_11_contraceptive_1_use": {
                 "text": "*During the last time you had sex, did you or your partner "
@@ -777,7 +783,7 @@ SURVEY_QUESTIONS = {
                     "Quite a bit",
                     "A lot",
                 ],
-                "next": "state_s3_28_resilience_8_pride",
+                "next": "state_s3_24_resilience_8_pride",
             },
             "state_s3_24_resilience_8_pride": {
                 "text": "\n".join(
@@ -946,6 +952,16 @@ SURVEY_QUESTIONS = {
                     "Nearly every day",
                 ],
                 "next": "state_s4_3_depression_3_hopeless",
+            },
+            "state_s4_3_depression_3_hopeless": {
+                "text": "*Feeling down, depressed or hopeless*",
+                "options": [
+                    "Not at all",
+                    "Several days",
+                    "More than half the days",
+                    "Nearly every day",
+                ],
+                "next": "state_s4_4_depression_4_interest",
             },
             "state_s4_4_depression_4_interest": {
                 "text": "*Little interest or pleasure in doing things*",

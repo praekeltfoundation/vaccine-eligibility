@@ -7,6 +7,7 @@ from sanic import Sanic, response
 from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
+from yal.data.seqmentation_survey_questions import SURVEY_QUESTIONS
 from yal.main import Application
 
 
@@ -357,6 +358,30 @@ async def test_survey_end(tester: AppTester):
     tester.setup_state("state_start_survey")
     await tester.user_input("1")
     tester.assert_state("state_survey_question")
+
+
+@pytest.mark.asyncio
+async def test_survey_start_to_end():
+    def get_next(section, current_question):
+        if not current_question:
+            return
+
+        assert (
+            current_question in SURVEY_QUESTIONS[section]["questions"]
+        ), f"Section {section} - broken link to: {current_question}"
+
+        question = SURVEY_QUESTIONS[section]["questions"][current_question]
+
+        paths = []
+        if type(question.get("next")) == dict:
+            paths = set(question["next"].values())
+        else:
+            paths.append(question.get("next"))
+
+        return all([get_next(section, path) for path in paths])
+
+    for section in SURVEY_QUESTIONS.keys():
+        get_next(section, SURVEY_QUESTIONS[section]["start"])
 
 
 @pytest.mark.asyncio
