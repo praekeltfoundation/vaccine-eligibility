@@ -1,8 +1,15 @@
+
+### Update profile flow
 | state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                       |
 |--------------------------------------------|--------------------|--------------|---------------------------|------------------------------------------------------------------------------|
 | state_display_preferences                  |        TRUE        |     Text     |            TRUE           | Displays profile fields to user. User response is which field to update                               |
 | state_update_age                           |        TRUE        |     Int      |            TRUE           | Asks user to enter their age                                                                           |
 | state_update_age_confirm                   |        TRUE        |     Text     |            TRUE           | Asks user to confirm new age choice. User response is "yes" or "no"                                    |
+
+
+### AAQ flows
+| state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                       |
+|--------------------------------------------|--------------------|--------------|---------------------------|------------------------------------------------------------------------------|
 | state_aaq_start                            |        TRUE        |     Text     |            TRUE           | Asks user to enter a question                                                                      |
 | state_coming_soon                          |        FALSE       |              |            FALSE          | End state. Informs user that aaq isn't available                                                      |
 | state_set_aaq_timeout_1                    |        FALSE       |              |            TRUE           | Sets feedback timeout for AAQ list                                                                  |
