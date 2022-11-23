@@ -49,9 +49,9 @@
 
 
 ### Content Feedback flow
-| state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                     |
-|--------------------------------------------|--------------------|--------------|---------------------------|----------------------------------------------------------------|
-| state_content_feedback_survey_start        |        FALSE       |              |            TRUE           | Resets feedback timer fields on contact profile                                       |
+| state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                             |
+|--------------------------------------------|--------------------|--------------|---------------------------|----------------------------------------------------------------------------------------|
+| state_content_feedback_survey_start        |        FALSE       |              |            TRUE           | Resets feedback timer fields on contact profile                                                               |
 | state_content_feedback_unrecognised_option |        TRUE        |     Text     |            TRUE           | Offers user options when we didn't recognise feedback response. User response is "feedback", "mainmenu" or "aaq" |
 | state_process_content_feedback_trigger     |        TRUE       |      Text     |            TRUE           | Timeout sent after user reads browsable content. Asks if the content was useful. User response is "yes" or "no" |
 | state_positive_feedback                    |        TRUE       |      Text     |            TRUE           | Asks user for any changes to content. User response is "yes" or "no"                                      |
@@ -60,3 +60,11 @@
 | state_confirm_feedback                     |        TRUE        |     Text     |            TRUE           | Offers user other features. User response is "counsellor", "question" or "update info"                    |
 | state_negative_feedback                    |        TRUE        |     Text     |            TRUE           | Offers user Ask a Question feature. User response is "yes" or "no"                                        |
 | state_no_negative_feedback                 |        TRUE        |     Text     |            TRUE           | Offers user other features. User response is "counsellor", "question" or "update info"                    |
+
+
+### Main states
+| state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                             |
+|--------------------------------------------|--------------------|--------------|---------------------------|----------------------------------------------------------------------------------------|
+| state_qa_reset_feedback_timestamp_keywords |        FALSE       |              |            FALSE          | State intended for QA purposes. Resets feedback timestamps. Triggered by an obscure keyword                   |
+| state_start                                |        FALSE       |              |            TRUE           | Session entry state. Routes user based on the message they sent in                                           |
+| state_catch_all                            |        FALSE       |              |            TRUE           | Sends user a generic welcome message if we received input we don't recognise                                 |
