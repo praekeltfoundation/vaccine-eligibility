@@ -374,7 +374,7 @@ async def test_survey_start_to_end():
 
         paths = []
         if type(question.get("next")) == dict:
-            paths = set([v for v in question["next"].values()])
+            paths = set(question["next"].values())
         else:
             paths.append(question.get("next"))
 
