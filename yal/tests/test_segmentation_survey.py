@@ -380,7 +380,7 @@ async def test_survey_start_to_end():
 
         return all([get_next(section, path) for path in paths])
 
-    for section in ["1", "2", "3", "4"]:
+    for section in SURVEY_QUESTIONS.keys():
         get_next(section, SURVEY_QUESTIONS[section]["start"])
 
 
