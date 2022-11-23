@@ -113,3 +113,13 @@
 | state_delete_saved                         |        TRUE        |     Text     |            TRUE          | Deletes profile data. User response is "see" to see the cleaned profile                                |
 | state_tell_us_more                         |        TRUE        |     Text     |            TRUE          | Asks user why they opted out. User repsonse is freeText                                                   |
 | state_farewell_optout                      |        FALSE       |              |            FALSE         | Bids the user farewell and closes the session                                                           |
+
+
+### Quiz flow
+| state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
+|--------------------------------------------|--------------------|--------------|---------------------------|---------------------------------------------------------------------------------|
+| state_quiz_start                           |        FALSE       |              |            TRUE          | Resets session info about user's progress through quiz                                                     |
+| state_quiz_question                        |        TRUE        |     Text     |            TRUE          | Sends the requested quiz question to the user. User response can be "callme", "menu", "redo" or others    |
+| state_quiz_process_answer                  |        TRUE        |     Text     |            TRUE          | Processes the user's response to the quiz question and updates their score                            |
+| state_quiz_answer_feedback                 |        TRUE        |     Text     |            TRUE          | Sends user feedback about their answer and a button to proceed to the next question                        |
+
