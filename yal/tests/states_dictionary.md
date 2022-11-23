@@ -27,7 +27,7 @@
 ### AAQ flows
 | state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                       |
 |--------------------------------------------|--------------------|--------------|---------------------------|------------------------------------------------------------------------------|
-| state_aaq_start                            |        TRUE        |     Text     |            TRUE           | Asks user to enter a question                                                                      |
+| state_aaq_start                            |        TRUE        |     Text     |            TRUE           | Asks user to enter a question. Can be called with buttons defined                                  |
 | state_coming_soon                          |        FALSE       |              |            FALSE          | End state. Informs user that aaq isn't available                                                      |
 | state_set_aaq_timeout_1                    |        FALSE       |              |            TRUE           | Sets feedback timeout for AAQ list                                                                  |
 | state_aaq_model_request                    |        FALSE       |              |            FALSE          | Sends user question to AAQ model                                                                     |
@@ -71,8 +71,8 @@
 
 
 ### Main Menu flow
-| state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                             |
-|--------------------------------------------|--------------------|--------------|---------------------------|----------------------------------------------------------------------------------------|
+| state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
+|--------------------------------------------|--------------------|--------------|---------------------------|---------------------------------------------------------------------------------|
 | state_pre_mainmenu                         |        FALSE       |              |            TRUE          | Resets suggested content value for user's session                                                         |
 | state_mainmenu                             |        TRUE        |     Text     |            TRUE          | Offers the main menu to the user. User response is the feature they want to view                         |
 | state_check_relationship_status_set        |        FALSE       |              |            FALSE         | Checks if the user has shared their relationship status with us                                         |
@@ -83,3 +83,21 @@
 | state_get_suggestions                      |        FALSE       |              |            TRUE          | Updates the suggested content in the cache                                                             |
 | state_display_suggestions                  |        TRUE        |     Text     |            TRUE          | Offers user the suggested content stored. User response is based on the content                            |
 | state_back                                 |        FALSE       |              |            TRUE          | Sends the user back to the previous page                                                                |
+
+
+### Onboarding flow
+| state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
+|--------------------------------------------|--------------------|--------------|---------------------------|---------------------------------------------------------------------------------|
+| state_persona_name                         |        TRUE        |     Text     |            TRUE          | Asks user to enter a custom name for the bot                                                              |
+| state_save_persona_name                    |        FALSE       |              |            TRUE          | Updates user profile with the new name                                                                         |
+| state_persona_emoji                        |        TRUE        |     Text     |            TRUE          | Asks user to enter an emoji to represent the bot                                                           |
+| state_save_persona_emoji                   |        FALSE       |              |            FALSE         | Updates user profile with the new emoji                                                                        |
+| state_profile_intro                        |        FALSE       |              |            FALSE         | Sends a message to thank and set expectations                                                                 |
+| state_age                                  |        TRUE        |     Int      |            TRUE          | Asks user to enter their age                                                                                  |
+| state_gender                               |        TRUE        |     Text     |            TRUE          | Asks user to enter their gender. User response is "female", "male", "non_binary", "other" or "rather_not_say" |
+| state_other_gender                         |        TRUE        |     Text     |            TRUE          | Asks user to enter their gender using free text                                                               |
+| state_submit_onboarding                    |        FALSE       |     Text     |            TRUE          | Adds onboarding choices to user profile                                                                      |
+| state_onboarding_complete                  |        FALSE       |              |            TRUE          | Redirects user to AAQ start state in case they want to ask a question                                      |
+| state_stop_onboarding_reminders            |        TRUE        |     Text     |            TRUE          | Resets fields used for onboarding reminders                                                                 |
+| state_reschedule_onboarding_reminders      |        TRUE        |     Text     |            TRUE          | Sets onboarding reminder fields so that reminder is resent later                                              |
+| state_handle_onboarding_reminder_response  |        TRUE        |     Text     |            TRUE          | Routes user to other state based on their reponse to the onboarding reminder                              |
