@@ -55,6 +55,7 @@ def get_lovelife_api():
 class Application(BaseApplication):
     START_STATE = "state_please_call_start"
     CALLBACK_RESPONSE_STATE = "state_handle_callback_check_response"
+    ARE_YOU_SURE = "state_confirm_redirect_please_call_me"
 
     async def state_please_call_start(self):
         current_datetime = get_current_datetime()
@@ -1093,4 +1094,37 @@ class Application(BaseApplication):
             next={
                 "menu": "state_pre_mainmenu",
             },
+        )
+
+    async def state_confirm_redirect_please_call_me(self):
+        async def _next(choice: Choice):
+            if choice.value == "help now":
+                return "state_please_call_start"
+            if choice.value == "mistake":
+                if (
+                    "emergency_keyword_previous_state" in self.user.metadata
+                    and self.user.metadata["emergency_keyword_previous_state"]
+                ):
+                    return self.user.metadata["emergency_keyword_previous_state"]
+
+        question = self._(
+            "\n".join(
+                [
+                    "you sure?",
+                    "",
+                    "----",
+                    "*Or reply:*",
+                    BACK_TO_MAIN,
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("help now", "please help"),
+                Choice("mistake", "go back"),
+            ],
+            error=self._(get_generic_error()),
+            next=_next,
         )

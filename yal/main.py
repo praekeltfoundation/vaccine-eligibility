@@ -78,11 +78,17 @@ class Application(
     async def process_message(self, message):
         keyword = utils.clean_inbound(message.content)
         # Restart keywords
-        if utils.check_keyword(keyword, EMERGENCY_KEYWORDS):
-            # Emergency keywords are checked
-            # first so that false positives are overwritten later on
+        if keyword in EMERGENCY_KEYWORDS:
+            # Go straight to please call me application start, phrase matches exactly
             self.user.session_id = None
             self.state_name = PleaseCallMeApplication.START_STATE
+        elif utils.check_keyword(keyword, EMERGENCY_KEYWORDS):
+            self.save_metadata("emergency_keyword_previous_state", self.state_name)
+            # Emergency keywords are checked
+            # first so that false positives are overwritten later on
+            # phrase fuzzy matches, go to check if thats what they want first
+            self.user.session_id = None
+            self.state_name = PleaseCallMeApplication.ARE_YOU_SURE
 
         if keyword in GREETING_KEYWORDS or keyword in TRACKING_KEYWORDS:
             self.user.session_id = None

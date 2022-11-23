@@ -306,24 +306,25 @@ async def test_emergency_keywords_new_session(get_current_datetime, tester: AppT
 
 @pytest.mark.asyncio
 @mock.patch("yal.pleasecallme.get_current_datetime")
-async def test_emergency_keywords_typo(get_current_datetime, tester: AppTester):
+async def test_emergency_keywords_go_back(get_current_datetime, tester: AppTester):
     get_current_datetime.return_value = datetime(2022, 6, 21, 13, 30)
 
     tester.setup_state("state_catch_all")
     await tester.user_input(content="edpressed")
-    tester.assert_state("state_in_hours")
+    tester.assert_state("state_confirm_redirect_please_call_me")
     tester.assert_num_messages(1)
+    await tester.user_input("go back")
+    tester.assert_state("state_start")
 
 
 @pytest.mark.asyncio
 @mock.patch("yal.pleasecallme.get_current_datetime")
-async def test_emergency_keywords_phrase_match(get_current_datetime, tester: AppTester):
+async def test_emergency_keywords_need_help(get_current_datetime, tester: AppTester):
     get_current_datetime.return_value = datetime(2022, 6, 21, 13, 30)
 
-    tester.setup_state("state_catch_all")
-    await tester.user_input(content="I am depressed")
+    tester.setup_state("state_confirm_redirect_please_call_me")
+    await tester.user_input("please help")
     tester.assert_state("state_in_hours")
-    tester.assert_num_messages(1)
 
 
 @pytest.mark.asyncio

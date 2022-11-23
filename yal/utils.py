@@ -92,12 +92,11 @@ def get_keywords(name):
 
 
 def check_keyword(keyword, keyword_list):
-    if process.extract(
-        keyword,
-        keyword_list,
-        scorer=fuzz.ratio,
-        score_cutoff=75,
-    ):
-        return True
-    else:
-        return False
+    return bool(
+        process.extract(
+            keyword,
+            keyword_list,
+            scorer=fuzz.ratio,
+            score_cutoff=76,
+        )
+    )
