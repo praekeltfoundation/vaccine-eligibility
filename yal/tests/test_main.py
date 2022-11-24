@@ -51,8 +51,23 @@ def get_state_sets():
         s for s in dir(WaFbCrossoverFeedbackApplication) if s.startswith("state_")
     )
 
-    return [m_states, mm_states, on_states, oo_states, te_states, cp_states, q_states,
-    pc_states, sf_states, aaq_states, fb_states, c_fb_states, sf_s_states, ss_states, wa_fb_states]
+    return [
+        m_states,
+        mm_states,
+        on_states,
+        oo_states,
+        te_states,
+        cp_states,
+        q_states,
+        pc_states,
+        sf_states,
+        aaq_states,
+        fb_states,
+        c_fb_states,
+        sf_s_states,
+        ss_states,
+        wa_fb_states,
+    ]
 
 
 def test_no_state_name_clashes():
