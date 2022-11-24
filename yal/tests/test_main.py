@@ -67,7 +67,7 @@ def test_no_state_name_clashes():
 
 def test_all_states_added_to_docs():
     state_sets = get_state_sets()
-    existing_states = set.union(*state_sets)
+    existing_states = set.union(*state_sets) - {"state_name"}
 
     loader = ptr.MarkdownTableFileLoader("yal/tests/states_dictionary.md")
     documented_states = set()
