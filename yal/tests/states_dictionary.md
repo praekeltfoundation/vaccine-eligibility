@@ -216,3 +216,36 @@
 | state_cannot_skip                          |        TRUE        |     Text     |            TRUE          | Informs the user that the previous state is required for the feature. User response is "share" or "menu" |
 | state_check_new_address                    |        FALSE       |              |            TRUE          | Calls Google Places API to place_id for entered address |
 | state_address_coords_lookup                |        FALSE       |              |            TRUE          | Calls Google Places API to get coordinates for entered address |
+
+
+### Service finder feedback survey flow
+| state_name                                   | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
+|----------------------------------------------|--------------------|--------------|---------------------------|---------------------------------------------------------------------------------|
+| state_servicefinder_feedback_survey_start        |        FALSE       |              |            TRUE          | Resets scheduled message fields so it is only sent once            |
+| state_process_servicefinder_feedback_trigger     |        TRUE        |     Text     |            TRUE          | Asks the user if the feature was useful. User response is "yes", "no" or "already_know"             |
+| state_servicefinder_feedback_unrecognised_option |        TRUE        |     Text     |            TRUE          | Handles feedback timeout. Asks the user what to do. User response is "feedback", "mainmenu" or "aaq" |
+| state_servicefinder_positive_feedback            |        TRUE        |     Text     |            TRUE          | Asks user for  suggestions. User response is free text             |
+| state_servicefinder_negative_feedback            |        TRUE        |     Text     |            TRUE          | Asks user for suggestions. User response is free text             |
+| state_servicefinder_already_know_feedback        |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "aaq" or "pleasecallme"             |
+| state_save_servicefinder_callback_2              |        FALSE       |              |            TRUE          | Schedules the second feedback message             |
+| state_servicefinder_feedback_confirmation        |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "aaq" or "pleasecallme"           |
+| state_servicefinder_feedback_survey_2_start      |        TRUE        |     Text     |            TRUE          | Asks if user went to the clinic. User response is "yes" or "no"             |
+| state_went_to_service                            |        TRUE        |     Text     |            TRUE          | Asks if user's visit to clinic was helpful. User response is "helped", "no_help_needed" or "no_help" |
+| state_did_not_go_to_service                      |        TRUE        |     Text     |            TRUE          | Asks why the user didn't go. User response is "changed_mind", "will_go", "elsewhere" or "other" |
+| state_service_helped                             |        TRUE        |     Text     |            TRUE          | Asks if user has enough info. User response is "yes", "no" or "not_sure"             |
+| state_service_no_help_needed                     |        TRUE        |     Text     |            TRUE          | Asks user to rate the clinic service. User response is "good", "ok" or "bad"             |
+| state_service_no_help                            |        TRUE        |     Text     |            TRUE          | Asks user why they didn't get helped. User response is "queue", "other_help" or "other"             |
+| state_have_information_needed                    |        TRUE        |     Text     |            TRUE          | Asks if user has enough info. User response is "yes", "no" or "not_sure"             |
+| state_service_finder_survey_complete             |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "aaq" or "pleasecallme"             |
+| state_service_finder_offer_aaq                   |        TRUE        |     Text     |            TRUE          | Asks if user wants to use AAQ feature. User response is "yes" or "no"             |
+| state_get_appointment_tips                       |        FALSE       |              |            TRUE          | Routes user to the content page for appointment tips             |
+| state_offer_appointment_tips                     |        TRUE        |     Text     |            TRUE          | Asks if user wants tips for their next appointment. User response is "yes" or "no"             |
+| state_offer_appointment_tips_bad_experience      |        TRUE        |     Text     |            TRUE          | Asks if user wants tips for their next appointment. User response is "yes" or "no"             |
+| state_offer_clinic_finder                        |        TRUE        |     Text     |            TRUE          | Asks if user wants to find another clinic. User response is "yes" or "no"             |
+| state_got_other_help                             |        TRUE        |     Text     |            TRUE          | Asks if user has enough info. User response is "yes", "no" or "not_sure"             |
+| state_other_reason_for_no_service                |        TRUE        |     Text     |            TRUE          | Asks for 'other' reason the user didn't go. User response is free text             |
+| state_service_finder_survey_complete_2           |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "aaq" or "pleasecallme"             |
+| state_offer_aaq                                  |        TRUE        |     Text     |            TRUE          | Asks if user wants to use AAQ feature. User response is "yes" or "no"             |
+| state_service_finder_survey_complete_3           |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "aaq",  "pleasecallme" or "servicefinder"             |
+| state_service_finder_survey_complete_4           |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "aaq" or  "pleasecallme"             |
+| state_service_finder_survey_complete_5           |        TRUE        |     Text     |            TRUE          | Asks if user wants to use AAQ feature. User response is "yes" or "no"             |
