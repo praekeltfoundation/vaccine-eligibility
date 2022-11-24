@@ -171,3 +171,17 @@
 | state_facebook_page                        |        TRUE        |     Text     |            TRUE          | Sends user link to Facebook. User response is "menu" |
 | state_twitter_page                         |        TRUE        |     Text     |            TRUE          | Sends user link to Twitter. User response is "menu" |
 | state_website                              |        TRUE        |     Text     |            TRUE          | Sends user link to website. User response is "menu" |
+
+
+### Segmentation survey flow
+| state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
+|--------------------------------------------|--------------------|--------------|---------------------------|---------------------------------------------------------------------------------|
+| state_survey_already_completed             |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "state_aaq_state" or "state_pre_mainmenu"             |
+| state_survey_decline                       |        TRUE        |     Text     |            TRUE          | User declined survey. Offers user other features. User response is "state_aaq_state" or "state_pre_mainmenu" |
+| state_start_survey                         |        FALSE       |              |            TRUE          | Sets user expectations |
+| state_survey_question                      |        TRUE        |     Text     |            TRUE          | Sends the user a survey question. User response is based on content |
+| state_survey_process_answer                |        FALSE       |              |            TRUE          | Caches user answer and progresses the survey |
+| state_survey_done                          |        TRUE        |     Text     |            TRUE          | Thanks user and directs them to claim their airtime. User response is "get_airtime" |
+| state_trigger_airtime_flow                 |        FALSE       |              |            TRUE          | Starts the user on the airtime flow in RapidPro |
+| state_prompt_next_action                   |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "state_aaq_start", "state_pre_mainmenu" or "state_no_airtime" |
+| state_no_airtime                           |        FALSE       |              |            TRUE          | Thanks user and closes session |
