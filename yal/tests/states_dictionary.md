@@ -134,3 +134,40 @@
 | state_decline_1                            |        FALSE       |              |            TRUE          | Informs user that ther online safety is important. Routes to state_decline_2                            |
 | state_decline_2                            |        TRUE        |     Text     |            TRUE          | Informs user of how to rejoin. User response is "hi"                                                    |
 | state_submit_terms_and_conditions          |        FALSE       |              |            TRUE          | Update the user's profile and direct user to onboarding flows                                              |
+
+
+### Please call me / Talk to a counsellor flow
+| state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
+|--------------------------------------------|--------------------|--------------|---------------------------|---------------------------------------------------------------------------------|
+| state_please_call_start                    |        FALSE       |              |            TRUE          | Routes the user based on the current time                           |
+| state_out_of_hours                         |        TRUE        |     Text     |            TRUE          | Informs user that is it after hours. User response is "help now" or "opening hours"                           |
+| state_emergency                            |        TRUE        |     Text     |            TRUE          | Provides the user with an emergency number to call. User response is "see"                           |
+| state_open_hours                           |        TRUE        |     Text     |            TRUE          | Shows user opening hours. User response is "ok" or "callback in hours"                           |
+| state_in_hours_greeting                    |        FALSE       |              |            TRUE          | Explains what the callback feature is                           |
+| state_in_hours                             |        TRUE        |     Text     |            TRUE          | Asks user if current number should be used for call. User response is "yes" or "specify"        |
+| state_submit_callback                      |        FALSE       |              |            TRUE          | Calls the LoveLife API to request the callback        |
+| state_save_time_for_callback_check         |        FALSE       |              |            TRUE          | Schedules a feedback message to be sent 2hrs later        |
+| state_callback_confirmation                |        TRUE        |     Text     |            TRUE          | Informs user that call was requested. User response is "ok", "help" or "hours"        |
+| state_callme_done                          |        FALSE       |              |            TRUE          | Closes the session        |
+| state_specify_msisdn                       |        TRUE        |     Text     |            TRUE          | Asks user to enter the alternate number to use. User response is valid phone number       |
+| state_confirm_specified_msisdn             |        TRUE        |     Text     |            TRUE          | Asks user to confirm that they want to use the given msisdn. User response is "yes" or "no"      |
+| state_ask_to_save_emergency_number         |        TRUE        |     Text     |            TRUE          | Asks user if we can safe the alternate number. User response is "yes" or "no"      |
+| state_save_emergency_contact               |        FALSE       |              |            TRUE          | Saves alternate number on user profile      |
+| state_handle_callback_check_response       |        TRUE        |     Text     |            TRUE          | Feedback message asking if the call was received. User response is "yes", "missed" or "no"      |
+| state_collect_call_feedback                |        TRUE        |     Text     |            TRUE          | Asks user if the call was useful. User response is "yes" or "no"      |
+| state_call_helpful                         |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "question", "update" or "counsellor"      |
+| state_call_not_helpful_feedback            |        TRUE        |     Text     |            TRUE          | Asks user what was wrong with the call. User response is free text      |
+| state_call_not_helpful_try_again           |        TRUE        |     Text     |            TRUE          | Asks user if they would like to try another call. User response is "yes" or "no"      |
+| state_call_not_helpful_try_again_declined  |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "question" or "update"      |
+| state_no_callback_received                 |        FALSE       |              |            TRUE          | Sends user our appologies      |
+| state_ask_to_call_again                    |        TRUE        |     Text     |            TRUE          | Asks user if they would like to try another call. User response is "yes", "another way" or "no"      |
+| state_retry_callback_choose_number         |        TRUE        |     Text     |            TRUE          | Asks user what nubmer we should use for the retry. User response is "whatsapp", "previously saved" or "another" |
+| state_offer_saved_emergency_contact        |        TRUE        |     Text     |            TRUE          | Shows the user the saved number to get confirmation. User response is "yes" or "no" |
+| state_help_no_longer_needed                |        TRUE        |     Text     |            TRUE          | Asks the user to confirm they no longer need help. User response is "yes", "long" or "changed mind" |
+| state_got_help                             |        TRUE        |     Text     |            TRUE          | Directs user to the main menu. User response is "menu" |
+| state_too_long                             |        TRUE        |     Text     |            TRUE          | Offers user other contact options. User response is "another way" or "menu" |
+| state_changed_mind                         |        TRUE        |     Text     |            TRUE          | Offers user other contact options. User response is "another way" or "menu" |
+| state_contact_bwise                        |        TRUE        |     Text     |            TRUE          | Offers user other contact details. User response is "facebook", "twitter" or "website" |
+| state_facebook_page                        |        TRUE        |     Text     |            TRUE          | Sends user link to Facebook. User response is "menu" |
+| state_twitter_page                         |        TRUE        |     Text     |            TRUE          | Sends user link to Twitter. User response is "menu" |
+| state_website                              |        TRUE        |     Text     |            TRUE          | Sends user link to website. User response is "menu" |
