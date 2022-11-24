@@ -249,3 +249,17 @@
 | state_service_finder_survey_complete_3           |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "aaq",  "pleasecallme" or "servicefinder"             |
 | state_service_finder_survey_complete_4           |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "aaq" or  "pleasecallme"             |
 | state_service_finder_survey_complete_5           |        TRUE        |     Text     |            TRUE          | Asks if user wants to use AAQ feature. User response is "yes" or "no"             |
+
+
+### Facebook crossover feedback flow
+| state_name                                   | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
+|----------------------------------------------|--------------------|--------------|---------------------------|---------------------------------------------------------------------------------|
+| state_crossover_feedback_survey_start              |        FALSE       |              |            TRUE          | Resets scheduled message fields so it is only sent once            |
+| state_wa_fb_crossover_feedback                     |        TRUE        |     Text     |            TRUE          | Asks user if they have engaged on facebook. User response is "yes" or "no"            |
+| state_wa_fb_crossover_feedback_unrecognised_option |        TRUE        |     Text     |            TRUE          | Handles feedback timeout. Asks the user what to do. User response is "feedback", "mainmenu" or "aaq" |
+| state_saw_recent_facebook                          |        TRUE        |     Text     |            TRUE          | Asks use if the content on facebook was helpful. User response is "helpful", "learnt new", "enjoyed comments" or "other" |
+| state_not_saw_recent_facebook                      |        FALSE       |              |            TRUE          | Links user to facebook and closes session |
+| state_fb_hot_topic_helpful                         |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "counsellor" or  "question"            |
+| state_fb_hot_topic_enjoyed_comments                |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "counsellor" or  "question"            |
+| state_fb_hot_topic_other                           |        TRUE        |     Text     |            TRUE          | Asks the user for the thoughts on the topic. User response is free text            |
+| state_fb_hot_topic_thanks_for_feedback             |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "counsellor" or  "question"            |
