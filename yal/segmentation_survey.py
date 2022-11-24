@@ -19,39 +19,16 @@ class Application(BaseApplication):
     DECLINE_STATE = "state_survey_decline"
     COMPLETED_STATE = "state_survey_already_completed"
 
-    async def state_survey_already_completed(self):
-        def _next(choice: Choice):
-            return choice.value
-
-        choices = [
-            Choice("state_aaq_start", self._("Ask a question")),
-            Choice("state_pre_mainmenu", self._("Go to Main Menu")),
-        ]
-        question = "\n".join(
-            [
-                "Hmm, 🤔 looks like you've already completed this survey.",
-                "",
-                "Thanks for your input, we really appreciate it.",
-                "",
-                "What would you like to do next?",
-                "",
-                "1. Ask a question",
-                "2. Go to Main Menu",
-            ]
-        )
-        return CustomChoiceState(
-            self,
-            question=self._(question),
-            error=self._(get_generic_error()),
-            choices=choices,
-            next=_next,
-            button="See my options",
-            buttons=choices,
-        )
-
     async def state_survey_decline(self):
         def _next(choice: Choice):
             return choice.value
+
+        whatsapp_id = utils.normalise_phonenumber(self.user.addr).lstrip("+")
+        error = await rapidpro.update_profile(
+            whatsapp_id, {"segment_survey_complete": "decline"}, self.user.metadata
+        )
+        if error:
+            return await self.go_to_state("state_error")
 
         choices = [
             Choice("state_aaq_start", self._("Ask a question")),
@@ -81,6 +58,17 @@ class Application(BaseApplication):
         )
 
     async def state_start_survey(self):
+        keyword = utils.clean_inbound(self.inbound.content)
+        if keyword in {"2", "no rather not"}:
+            return await self.go_to_state("state_survey_decline")
+
+        whatsapp_id = utils.normalise_phonenumber(self.user.addr).lstrip("+")
+        error = await rapidpro.update_profile(
+            whatsapp_id, {"segment_survey_complete": "inprogress"}, self.user.metadata
+        )
+        if error:
+            return await self.go_to_state("state_error")
+
         msg = self._(
             "\n".join(
                 [
