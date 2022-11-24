@@ -279,7 +279,7 @@ class Application(BaseApplication):
             "callback_check_time": call_time.isoformat(),
         }
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
@@ -432,7 +432,7 @@ class Application(BaseApplication):
             "emergency_contact": self.user.answers.get("state_specify_msisdn"),
         }
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
         return await self.go_to_state("state_submit_callback")
@@ -469,7 +469,7 @@ class Application(BaseApplication):
         data = {
             "last_mainmenu_time": get_current_datetime().isoformat(),
         }
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
@@ -718,13 +718,7 @@ class Application(BaseApplication):
         )
 
     async def state_offer_saved_emergency_contact(self):
-        msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
-
-        error, fields = await rapidpro.get_profile(whatsapp_id)
-        if error:
-            return await self.go_to_state("state_error")
-        msisdn = fields.get("emergency_contact")
+        msisdn = self.user.metadata.get("emergency_contact")
         if msisdn:
             self.save_answer("state_specify_msisdn", msisdn)
 
@@ -836,7 +830,7 @@ class Application(BaseApplication):
             "callback_abandon_reason": "got help",
         }
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
@@ -875,7 +869,7 @@ class Application(BaseApplication):
             "callback_abandon_reason": "too long",
         }
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
         question = self._(
@@ -918,7 +912,7 @@ class Application(BaseApplication):
             "callback_abandon_reason": "changed mind",
         }
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
         question = self._(

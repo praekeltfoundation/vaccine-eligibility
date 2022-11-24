@@ -319,8 +319,8 @@ async def test_state_submit_completed_feedback(tester: AppTester, rapidpro_mock)
         )
     )
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "flow": "usertesting-flow-uid",
         "urns": ["whatsapp:27820001001"],

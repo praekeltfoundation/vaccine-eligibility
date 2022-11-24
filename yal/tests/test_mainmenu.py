@@ -421,15 +421,15 @@ async def test_state_mainmenu_start(
         "/api/v2/pages/777",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "2022-06-19T17:30:00",
             "suggested_text": "*12* - Suggested Content 1\n*13* - Suggested Content 2",
         },
     }
-    request = rapidpro_mock.tstate.requests[1]
+    request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "feedback_timestamp": "2022-06-19T19:30:00",
@@ -494,8 +494,8 @@ async def test_state_mainmenu_start_suggested_populated(
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "2022-06-19T17:30:00",
@@ -523,7 +523,7 @@ async def test_state_mainmenu_static(
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
 
 
 @pytest.mark.asyncio
@@ -546,7 +546,7 @@ async def test_state_mainmenu_aaq(
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
 
 
 @pytest.mark.asyncio
@@ -585,8 +585,8 @@ async def test_state_mainmenu_contentrepo(
 
     tester.assert_metadata("topics_viewed", ["111"])
 
-    assert len(rapidpro_mock.tstate.requests) == 4
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 5
+    request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "",
@@ -639,8 +639,8 @@ async def test_state_mainmenu_contentrepo_help_content(
     request = contentrepo_api_mock.tstate.requests[-1]
     assert request.args["message"] == ["2"]
 
-    assert len(rapidpro_mock.tstate.requests) == 7
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 9
+    request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "",
@@ -692,7 +692,7 @@ async def test_state_mainmenu_contentrepo_relationship_content_rel_set(
     tester.assert_metadata("topics_viewed", ["222"])
 
     assert len(rapidpro_mock.tstate.requests) == 5
-    request = rapidpro_mock.tstate.requests[1]
+    request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "",
@@ -742,7 +742,7 @@ async def test_state_mainmenu_contentrepo_relationship_status(
     tester.assert_metadata("topics_viewed", ["222"])
 
     assert len(rapidpro_mock.tstate.requests) == 3
-    request = rapidpro_mock.tstate.requests[1]
+    request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "",
@@ -796,7 +796,7 @@ async def test_state_mainmenu_contentrepo_relationship_skip(
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
 
 
 @pytest.mark.asyncio
@@ -844,8 +844,8 @@ async def test_state_mainmenu_contentrepo_relationship_submit(
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 3
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 4
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "relationship_status": "yes",
@@ -924,7 +924,7 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["data__session_id"][0] == "1"
     assert params["data__user_addr"][0] == "27820001001"
 
-    assert len(rapidpro_mock.tstate.requests) == 7
+    assert len(rapidpro_mock.tstate.requests) == 9
 
     update_request = rapidpro_mock.tstate.requests[-1]
     assert update_request.json["fields"] == {

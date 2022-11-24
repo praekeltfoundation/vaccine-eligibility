@@ -7,6 +7,7 @@ from sanic import Sanic, response
 from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
+from yal.data.seqmentation_survey_questions import SURVEY_QUESTIONS
 from yal.main import Application
 
 
@@ -29,7 +30,7 @@ def get_rapidpro_contact(urn):
     }
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
@@ -88,7 +89,7 @@ async def test_survey_start(tester: AppTester, rapidpro_mock):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "1/28",
+                "1/26",
                 "",
                 "*What gender do you identity with?*",
                 "",
@@ -170,7 +171,7 @@ async def test_survey_next_question(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "2/28",
+                "2/26",
                 "",
                 "*Do you sometimes, or have you previously had sex with men?*",
                 "",
@@ -230,7 +231,7 @@ async def test_survey_next_question_branch(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "2/28",
+                "2/26",
                 "",
                 "*Ok. You can tell me how many sexual partners you had here.*",
                 "",
@@ -259,7 +260,7 @@ async def test_survey_freetext_question(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 1",
-                "1/28",
+                "1/26",
                 "",
                 "*Ok. You can tell me how many sexual partners you had here.*",
                 "",
@@ -301,7 +302,7 @@ async def test_survey_info_message(tester: AppTester):
 @pytest.mark.asyncio
 async def test_survey_next_section(tester: AppTester):
     tester.user.metadata["segment_section"] = 2
-    tester.user.metadata["segment_question"] = "state_s2_2_knowledge_2"
+    tester.user.metadata["segment_question"] = "state_s2_12_contraceptive_2_detail"
 
     tester.setup_state("state_survey_question")
     await tester.user_input("1")
@@ -313,10 +314,10 @@ async def test_survey_next_section(tester: AppTester):
                 "*BWise / Survey*",
                 "-----",
                 "Section 3",
-                "1/2",
+                "1/30",
                 "",
                 "_The following statements may apply more or less to you. To what "
-                "extent do you think each statement applies to you personally?_ ",
+                "extent do you think each statement applies to you personally?_",
                 "",
                 "*I’m my own boss.*",
                 "",
@@ -346,8 +347,8 @@ async def test_survey_next_section(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_survey_end(tester: AppTester):
-    tester.user.metadata["segment_section"] = 3
-    tester.user.metadata["segment_question"] = "state_s3_2_loc_2_work"
+    tester.user.metadata["segment_section"] = 4
+    tester.user.metadata["segment_question"] = "state_s4_7_self_concept_2_body"
 
     tester.setup_state("state_survey_question")
     await tester.user_input("1")
@@ -357,6 +358,30 @@ async def test_survey_end(tester: AppTester):
     tester.setup_state("state_start_survey")
     await tester.user_input("1")
     tester.assert_state("state_survey_question")
+
+
+@pytest.mark.asyncio
+async def test_survey_start_to_end():
+    def get_next(section, current_question):
+        if not current_question:
+            return
+
+        assert (
+            current_question in SURVEY_QUESTIONS[section]["questions"]
+        ), f"Section {section} - broken link to: {current_question}"
+
+        question = SURVEY_QUESTIONS[section]["questions"][current_question]
+
+        paths = []
+        if type(question.get("next")) == dict:
+            paths = set(question["next"].values())
+        else:
+            paths.append(question.get("next"))
+
+        return all([get_next(section, path) for path in paths])
+
+    for section in SURVEY_QUESTIONS.keys():
+        get_next(section, SURVEY_QUESTIONS[section]["start"])
 
 
 @pytest.mark.asyncio
@@ -388,8 +413,8 @@ async def test_state_survey_done(tester: AppTester, rapidpro_mock):
         )
     )
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "flow": "segment-airtime-flow-uuid",
         "urns": ["whatsapp:27820001001"],
