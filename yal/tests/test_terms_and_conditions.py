@@ -69,7 +69,7 @@ async def test_submit_terms_and_conditions(tester: AppTester, rapidpro_mock):
     assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"terms_accepted": "True"},
+        "fields": {"terms_accepted": "True", "first_time_on_main_menu": "True"},
     }
 
 
@@ -113,5 +113,5 @@ async def test_state_decline_confirm_accept(tester: AppTester, rapidpro_mock):
     assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"terms_accepted": "True"},
+        "fields": {"terms_accepted": "True", "first_time_on_main_menu": "True"},
     }
