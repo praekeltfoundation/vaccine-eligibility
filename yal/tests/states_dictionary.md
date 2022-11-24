@@ -263,3 +263,20 @@
 | state_fb_hot_topic_enjoyed_comments                |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "counsellor" or  "question"            |
 | state_fb_hot_topic_other                           |        TRUE        |     Text     |            TRUE          | Asks the user for the thoughts on the topic. User response is free text            |
 | state_fb_hot_topic_thanks_for_feedback             |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "counsellor" or  "question"            |
+
+
+### User testing feedback flow
+| state_name                                   | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
+|----------------------------------------------|--------------------|--------------|---------------------------|---------------------------------------------------------------------------------|
+| state_check_feedback                 |        FALSE       |              |            TRUE          | Checks if we are still awaiting feedback from this user            |
+| state_already_completed              |        FALSE       |              |            TRUE          | Closes the user session            |
+| state_feedback_pleasecallme          |        TRUE        |     Text     |            TRUE          | Asks user to rate the please call me feature            |
+| state_feedback_servicefinder         |        TRUE        |     Text     |            TRUE          | Asks user to rate the service finder feature            |
+| state_feedback_changepreferences     |        TRUE        |     Text     |            TRUE          | Asks user to rate the change preferences feature            |
+| state_feedback_quickreply            |        TRUE        |     Text     |            TRUE          | Asks user to rate their experience responding with quick replies            |
+| state_feedback_numberskeywords       |        TRUE        |     Text     |            TRUE          | Asks user to rate their experience responding with numbers            |
+| state_feedback_usefulinformation     |        TRUE        |     Text     |            TRUE          | Asks user to rate how useful the information was            |
+| state_feedback_lookforinformation    |        TRUE        |     Text     |            TRUE          | Asks user to rate likelihood of using the chatbot for info in future            |
+| state_feedback_willreturn            |        TRUE        |     Text     |            TRUE          | Asks user to rate likelihood of using YAL/Bwise in future            |
+| state_submit_completed_feedback      |        FALSE       |              |            TRUE          | Starts a flow in rapidpro to save the user's feedback            |
+| state_completed_feedback             |        TRUE        |     Text     |            TRUE          | Closes the user session            |
