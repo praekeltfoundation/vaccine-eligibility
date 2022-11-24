@@ -104,20 +104,6 @@ class Application(
             self.user.session_id = None
             self.state_name = "state_qa_reset_feedback_timestamp_keywords"
 
-        if keyword in SEGMENT_SURVEY_ACCEPT or keyword in SEGMENT_SURVEY_DECLINE:
-            segment_survey_complete = self.user.metadata.get(
-                "segment_survey_complete", "false"
-            ).lower()
-            if segment_survey_complete == "pending":
-                self.user.session_id = None
-                if keyword in SEGMENT_SURVEY_ACCEPT:
-                    self.state_name = SegmentSurveyApplication.START_STATE
-                else:
-                    self.state_name = SegmentSurveyApplication.DECLINE_STATE
-            elif segment_survey_complete == "true":
-                self.user.session_id = None
-                self.state_name = SegmentSurveyApplication.COMPLETED_STATE
-
         if keyword in ONBOARDING_REMINDER_KEYWORDS:
             if self.user.metadata.get("onboarding_reminder_sent"):
                 self.user.session_id = None
@@ -130,6 +116,14 @@ class Application(
                 self.user.session_id = random_id()
             message.session_event = Message.SESSION_EVENT.RESUME
             self.state_name = feedback_state
+
+        segment_survey_complete = self.user.metadata.get(
+            "segment_survey_complete", "false"
+        ).lower()
+        if segment_survey_complete == "pending":
+            if self.state_name not in dir(SegmentSurveyApplication):
+                self.user.session_id = None
+                self.state_name = SegmentSurveyApplication.START_STATE
 
         return await super().process_message(message)
 
