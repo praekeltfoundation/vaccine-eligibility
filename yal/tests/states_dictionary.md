@@ -123,3 +123,14 @@
 | state_quiz_process_answer                  |        TRUE        |     Text     |            TRUE          | Processes the user's response to the quiz question and updates their score                            |
 | state_quiz_answer_feedback                 |        TRUE        |     Text     |            TRUE          | Sends user feedback about their answer and a button to proceed to the next question                        |
 
+
+### Terms and Conditions flow
+| state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
+|--------------------------------------------|--------------------|--------------|---------------------------|---------------------------------------------------------------------------------|
+| state_welcome                              |        TRUE        |     Text     |            TRUE          | Welcomes the user and invites to create a profile. User response is "create"                           |
+| state_terms                                |        TRUE        |     Text     |            TRUE          | Asks user to accept privacy policy. User response is "accept", "decline" or "read"                   |
+| state_terms_pdf                            |        FALSE       |              |            TRUE          | Sends user terms and conditions as pdf and then routes back to state_terms                            |
+| state_decline_confirm                      |        TRUE        |     Text     |            TRUE          | Asks user to confirm their decline of the T&Cs. User response is "accept" or "end"                    |
+| state_decline_1                            |        FALSE       |              |            TRUE          | Informs user that ther online safety is important. Routes to state_decline_2                            |
+| state_decline_2                            |        TRUE        |     Text     |            TRUE          | Informs user of how to rejoin. User response is "hi"                                                    |
+| state_submit_terms_and_conditions          |        FALSE       |              |            TRUE          | Update the user's profile and direct user to onboarding flows                                              |
