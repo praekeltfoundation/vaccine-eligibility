@@ -35,15 +35,8 @@ class Application(BaseApplication):
         async def next_(choice: Choice):
             return choice.value
 
-        msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
-
-        error, fields = await rapidpro.get_profile(whatsapp_id)
-        if error:
-            return await self.go_to_state("state_error")
-
         def get_field(name):
-            value = fields.get(name) or "skip"
+            value = self.user.metadata.get(name) or "skip"
             if value == "skip":
                 return "Empty"
 
@@ -52,11 +45,11 @@ class Application(BaseApplication):
 
             return value
 
-        age = fields.get("age") or "skip"
+        age = self.user.metadata.get("age") or "skip"
         relationship_status = get_field("relationship_status").title()
         gender = get_field("gender")
 
-        location = fields.get("location_description")
+        location = self.user.metadata.get("location_description")
 
         question = self._(
             "\n".join(
@@ -184,7 +177,7 @@ class Application(BaseApplication):
             "age": self.user.answers.get("state_update_age"),
         }
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
         return await self.go_to_state("state_conclude_changes")
@@ -289,7 +282,7 @@ class Application(BaseApplication):
         status = self.user.answers.get("state_update_relationship_status")
 
         error = await rapidpro.update_profile(
-            whatsapp_id, {"relationship_status": status}
+            whatsapp_id, {"relationship_status": status}, self.user.metadata
         )
         if error:
             return await self.go_to_state("state_error")
@@ -306,8 +299,8 @@ class Application(BaseApplication):
             latitude = loc.get("latitude")
             longitude = loc.get("longitude")
             if isinstance(latitude, float) and isinstance(longitude, float):
-                self.save_metadata("latitude", latitude)
-                self.save_metadata("longitude", longitude)
+                self.save_metadata("new_latitude", latitude)
+                self.save_metadata("new_longitude", longitude)
             else:
                 raise ErrorMessage(
                     "\n".join(
@@ -384,7 +377,7 @@ class Application(BaseApplication):
                     first_result = data["results"][0]
                     self.save_metadata("place_id", first_result["place_id"])
                     self.save_metadata(
-                        "location_description", first_result["formatted_address"]
+                        "new_location_description", first_result["formatted_address"]
                     )
 
                     return await self.go_to_state("state_update_location_confirm")
@@ -396,7 +389,7 @@ class Application(BaseApplication):
                         continue
 
     async def state_update_location_confirm(self):
-        location = self.user.metadata.get("location_description")
+        location = self.user.metadata.get("new_location_description")
 
         choices = [
             Choice("yes", self._("Yes")),
@@ -429,9 +422,9 @@ class Application(BaseApplication):
 
     async def state_update_location_submit(self):
         metadata = self.user.metadata
-        latitude = metadata.get("latitude")
-        longitude = metadata.get("longitude")
-        location_description = metadata.get("location_description")
+        latitude = metadata.get("new_latitude")
+        longitude = metadata.get("new_longitude")
+        location_description = metadata.get("new_location_description")
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
@@ -441,7 +434,7 @@ class Application(BaseApplication):
             "longitude": longitude,
         }
 
-        await rapidpro.update_profile(whatsapp_id, data)
+        await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
 
         return await self.go_to_state("state_conclude_changes")
 
@@ -550,7 +543,7 @@ class Application(BaseApplication):
             "gender_other": self.user.answers.get("state_update_other_gender", ""),
         }
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
@@ -585,13 +578,11 @@ class Application(BaseApplication):
         if choice == "skip":
             return await self.go_to_state("state_update_bot_emoji")
 
-        self.save_metadata("persona_name", choice)
-
         data = {"persona_name": choice}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
@@ -635,13 +626,11 @@ class Application(BaseApplication):
         if choice == "skip":
             return await self.go_to_state("state_display_preferences")
 
-        self.save_metadata("persona_emoji", choice)
-
         data = {"persona_emoji": choice}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 

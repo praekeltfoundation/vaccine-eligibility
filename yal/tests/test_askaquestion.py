@@ -94,7 +94,7 @@ async def aaq_mock():
         config.AAQ_URL = url
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
@@ -181,8 +181,8 @@ async def test_start_state_response_sets_timeout(
 
     tester.assert_state("state_display_results")
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "feedback_timestamp": "2022-06-19T17:35:00",
@@ -252,8 +252,8 @@ async def test_state_display_results_choose_an_answer(
 
     tester.assert_state("state_get_content_feedback")
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "feedback_timestamp": "2022-06-19T17:35:00",
@@ -348,8 +348,8 @@ async def test_state_display_results_no_answers(
     tester.assert_state("state_aaq_start")
     tester.assert_answer("state_no_answers", "empty")
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "feedback_timestamp": "2022-06-19T17:35:00",
@@ -434,8 +434,8 @@ async def test_state_get_content_feedback_question_answered(
 
     tester.assert_state("state_yes_question_answered")
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"feedback_type": ""},
     }
