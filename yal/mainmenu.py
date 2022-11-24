@@ -59,12 +59,13 @@ class Application(BaseApplication):
         return suggested_choices
 
     async def get_first_time_user(self, whatsapp_id):
-        error, fields = await rapidpro.get_profile(whatsapp_id)
+        first_time_user = self.user.metadata.get("first_time_on_main_menu")
+        error = await rapidpro.update_profile(
+            whatsapp_id, {"first_time_on_main_menu": ""}, self.user.metadata
+        )
         if error:
-            return False
-        await rapidpro.update_profile(whatsapp_id, {"first_time_on_main_menu": ""})
-
-        return bool(fields.get("first_time_on_main_menu"))
+            return await self.go_to_state("state_error")
+        return bool(first_time_user)
 
     async def state_pre_mainmenu(self):
         self.save_metadata("suggested_content", {})

@@ -612,7 +612,7 @@ async def test_state_handle_timeout_handles_type_1_no(tester: AppTester, rapidpr
     tester.setup_state("state_handle_timeout_response")
     await tester.user_input("no, I'm good")
 
-    assert len(rapidpro_mock.tstate.requests) == 5
+    assert len(rapidpro_mock.tstate.requests) == 4
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"feedback_survey_sent": "", "feedback_timestamp": ""},

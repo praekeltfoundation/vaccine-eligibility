@@ -438,9 +438,9 @@ async def test_onboarding_set_first_time_menu(
 ):
     tester.setup_state("state_submit_terms_and_conditions")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
     tester.assert_state("state_persona_name")
-    request = rapidpro_mock.tstate.requests[0]
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "terms_accepted": "True",
