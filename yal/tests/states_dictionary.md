@@ -185,3 +185,34 @@
 | state_trigger_airtime_flow                 |        FALSE       |              |            TRUE          | Starts the user on the airtime flow in RapidPro |
 | state_prompt_next_action                   |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "state_aaq_start", "state_pre_mainmenu" or "state_no_airtime" |
 | state_no_airtime                           |        FALSE       |              |            TRUE          | Thanks user and closes session |
+
+
+### Service finder flow
+| state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
+|--------------------------------------------|--------------------|--------------|---------------------------|---------------------------------------------------------------------------------|
+| state_servicefinder_start                  |        TRUE        |     Text     |            TRUE          | Asks if user wants to find services. User response is "yes"             |
+| state_check_address                        |        FALSE       |              |            TRUE          | Routes user based on presense of existing address             |
+| state_pre_confirm_existing_address         |        FALSE       |              |            TRUE          | Sends conversational message             |
+| state_confirm_existing_address             |        TRUE        |     Text     |            TRUE          | Asks user to confirm if existing address is correct             |
+| state_confirm_existing_address             |        TRUE        |     Text     |            TRUE          | Asks user to confirm if existing address is correct. User response is "yes" or "new"       |
+| state_category_lookup                      |        FALSE       |              |            TRUE          | Calls service finder api to load categories       |
+| state_pre_category_msg                     |        FALSE       |              |            TRUE          | Sends conversational message       |
+| state_save_parent_category                 |        FALSE       |              |            TRUE          | Moves user down the category tree       |
+| state_category                             |        TRUE        |     Text     |            TRUE          | Shows user the loaded categories to choose from. User response is based on categories      |
+| state_service_lookup                       |        FALSE       |              |            TRUE          | Calls service finder api to find nearby services      |
+| state_no_facilities_found                  |        TRUE        |     Text     |            TRUE          | Asks user to try again. User response is "state_location" or "state_category"      |
+| state_display_facilities                   |        FALSE       |              |            TRUE          | Shows user the list of facilities and then closes the session      |
+| state_pre_different_location               |        FALSE       |              |            TRUE          | Routes user to state_location with a different message     |
+| state_location                             |        TRUE        |     ????     |            TRUE          | Asks user to share a location pin. User can also respond with "type address" instead           |
+| state_get_description_from_coords          |        FALSE       |              |            TRUE          | Calls Google Places API to get description for the location           |
+| state_save_location                        |        FALSE       |              |            TRUE          | Stores location details on user profile           |
+| state_province                             |        TRUE        |     Text     |            TRUE          | Asks user to choose a province           |
+| state_full_address                         |        TRUE        |     Text     |            TRUE          | Asks user to enter their neighbourhood and street name           |
+| state_full_address                         |        TRUE        |     Text     |            TRUE          | Asks user to enter their neighbourhood and street name           |
+| state_validate_full_address                |        TRUE        |     Text     |            TRUE          | Tries to process full address and saves answers state_suburb and state_street_name if successful |
+| state_validate_full_address_error          |        TRUE        |     Text     |            TRUE          | Explains to user that we will collect each field seperately. User response is "yes" or "no" |
+| state_suburb                               |        TRUE        |     Text     |            TRUE          | Asks user to enter their suburb |
+| state_street_name                          |        TRUE        |     Text     |            TRUE          | Asks user to enter their street name |
+| state_cannot_skip                          |        TRUE        |     Text     |            TRUE          | Informs the user that the previous state is required for the feature. User response is "share" or "menu" |
+| state_check_new_address                    |        FALSE       |              |            TRUE          | Calls Google Places API to place_id for entered address |
+| state_address_coords_lookup                |        FALSE       |              |            TRUE          | Calls Google Places API to get coordinates for entered address |
