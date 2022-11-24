@@ -62,7 +62,7 @@ def get_rapidpro_contact(urn):
     return contact
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
@@ -109,7 +109,7 @@ async def test_state_optout(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "🤖 *Hi!*",
+                "🦁 *Hi!*",
                 "",
                 "I just received a message from you saying *stop*.",
                 "",
@@ -186,11 +186,13 @@ async def test_state_optout_stop_notifications(tester: AppTester, rapidpro_mock)
     await tester.user_input("1")
     tester.assert_state("state_optout_survey")
 
-    assert len(rapidpro_mock.tstate.requests) == 1
+    assert len(rapidpro_mock.tstate.requests) == 2
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+    assert [r.path for r in rapidpro_mock.tstate.requests] == [
+        "/api/v2/contacts.json"
+    ] * 2
 
-    post_request = rapidpro_mock.tstate.requests[0]
+    post_request = rapidpro_mock.tstate.requests[1]
     assert json.loads(post_request.body.decode("utf-8")) == {
         "fields": {
             "last_main_time": "",

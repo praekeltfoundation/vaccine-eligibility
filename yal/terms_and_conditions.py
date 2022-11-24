@@ -173,7 +173,9 @@ class Application(BaseApplication):
             "first_time_on_main_menu": "True",
         }
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(
+            whatsapp_id, data, self.user.metadata
+        )
         if error:
             return await self.go_to_state("state_error")
 

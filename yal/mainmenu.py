@@ -25,7 +25,7 @@ class Application(BaseApplication):
         if suggested_text:
             data["suggested_text"] = suggested_text
 
-        return await rapidpro.update_profile(whatsapp_id, data)
+        return await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
 
     async def reset_suggested_content_details(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
@@ -34,7 +34,7 @@ class Application(BaseApplication):
             "last_mainmenu_time": "",
             "suggested_text": "",
         }
-        return await rapidpro.update_profile(whatsapp_id, data)
+        return await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
 
     async def get_suggested_choices(self, parent_topic_links={}):
         if self.user.metadata["suggested_content"] == {}:
@@ -227,13 +227,13 @@ class Application(BaseApplication):
         if len(banner_messages) > 0:
             timestamp = get_current_datetime() + timedelta(hours=2)
             # We ignore this error, as it just means they won't get the reminder
-            self.save_metadata("feedback_timestamp", timestamp.isoformat())
             await rapidpro.update_profile(
                 whatsapp_id,
                 {
                     "feedback_timestamp": timestamp.isoformat(),
                     "feedback_type": "facebook_banner",
                 },
+                self.user.metadata,
             )
             additional_messages.extend(banner_messages)
 
@@ -269,13 +269,7 @@ class Application(BaseApplication):
         )
 
     async def state_check_relationship_status_set(self):
-        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip("+")
-        error, fields = await rapidpro.get_profile(whatsapp_id)
-        if error:
-            return await self.go_to_state("state_error")
-
-        rel_status = fields.get("relationship_status")
+        rel_status = self.user.metadata.get("relationship_status")
         if not rel_status or rel_status == "" or rel_status.lower() == "skip":
             return await self.go_to_state("state_relationship_status")
         return await self.go_to_state("state_contentrepo_page")
@@ -324,7 +318,7 @@ class Application(BaseApplication):
                 "relationship_status": rel_status,
             }
 
-            await rapidpro.update_profile(whatsapp_id, data)
+            await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
 
         return await self.go_to_state("state_contentrepo_page")
 
@@ -333,13 +327,13 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip("+")
         timestamp = utils.get_current_datetime() + timedelta(minutes=10)
         # We ignore this error, as it just means they won't get the reminder
-        self.save_metadata("feedback_timestamp", timestamp.isoformat())
         await rapidpro.update_profile(
             whatsapp_id,
             {
                 "feedback_timestamp": timestamp.isoformat(),
                 "feedback_type": "content",
             },
+            self.user.metadata,
         )
 
         metadata = self.user.metadata

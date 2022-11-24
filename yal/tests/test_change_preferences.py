@@ -38,7 +38,7 @@ def get_rapidpro_contact(urn):
     }
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
@@ -224,7 +224,7 @@ async def test_state_update_gender_from_list(tester: AppTester, rapidpro_mock):
 
     tester.assert_state("state_update_gender_confirm")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
 
 
 @pytest.mark.asyncio
@@ -260,7 +260,7 @@ async def test_state_update_other_gender(tester: AppTester, rapidpro_mock):
 
     tester.assert_answer("state_update_gender", "other")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
 
 
 @pytest.mark.asyncio
@@ -275,7 +275,7 @@ async def test_state_update_gender_confirm(tester: AppTester, rapidpro_mock):
 
     tester.assert_answer("state_update_other_gender", "trans man")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
 
 
 @pytest.mark.asyncio
@@ -290,7 +290,7 @@ async def test_state_update_gender_confirm_not_correct(
     tester.assert_state("state_update_gender")
     tester.assert_num_messages(1)
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
 
 
 @pytest.mark.asyncio
@@ -338,7 +338,7 @@ async def test_state_update_age_confirm(tester: AppTester, rapidpro_mock):
     tester.assert_num_messages(1)
     tester.assert_state("state_update_age_confirm")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
 
 
 @pytest.mark.asyncio
@@ -349,7 +349,7 @@ async def test_state_update_age_confirm_not_correct(tester: AppTester, rapidpro_
     tester.assert_num_messages(1)
     tester.assert_state("state_update_age")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
 
 
 @pytest.mark.asyncio
@@ -376,7 +376,7 @@ async def test_state_update_relationship_status(tester: AppTester, rapidpro_mock
                 "*CHAT SETTINGS / ⚙️ Change or update your info* / *Relationship?*",
                 "-----",
                 "",
-                "🤖 *Are you currently in a relationship or seeing "
+                "🦸 *Are you currently in a relationship or seeing "
                 "someone special right now?",
                 "",
                 "1. Yes, in relationship",
@@ -399,7 +399,7 @@ async def test_state_update_relationship_status_confirm(
     tester.assert_num_messages(1)
     tester.assert_state("state_update_relationship_status_confirm")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
 
 
 @pytest.mark.asyncio
@@ -412,7 +412,7 @@ async def test_state_update_relationship_status_confirm_not_correct(
     tester.assert_num_messages(1)
     tester.assert_state("state_update_relationship_status")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
 
 
 @pytest.mark.asyncio
@@ -425,9 +425,7 @@ async def test_state_update_relationship_status_submit(
     tester.assert_num_messages(1)
     tester.assert_state("state_conclude_changes")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == [
-        "/api/v2/contacts.json",
-    ]
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET", "POST"]
 
 
 @pytest.mark.asyncio
@@ -492,9 +490,7 @@ async def test_state_update_bot_name_submit(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_update_bot_emoji")
     tester.assert_metadata("persona_name", "johnny")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == [
-        "/api/v2/contacts.json",
-    ]
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET", "POST"]
 
 
 @pytest.mark.asyncio
@@ -524,7 +520,7 @@ async def test_state_update_bot_name_skip(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_update_bot_emoji")
     tester.assert_metadata("persona_name", "Caped Crusader")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == []
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
 
 
 @pytest.mark.asyncio
@@ -554,9 +550,7 @@ async def test_state_update_bot_emoji_submit(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_update_bot_emoji_submit")
     tester.assert_metadata("persona_emoji", "🙋🏿‍♂️")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == [
-        "/api/v2/contacts.json",
-    ]
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET", "POST"]
 
 
 @pytest.mark.asyncio
@@ -569,9 +563,7 @@ async def test_state_update_bot_emoji_skip(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_display_preferences")
     tester.assert_metadata("persona_emoji", "🦸")
 
-    assert [r.path for r in rapidpro_mock.tstate.requests] == [
-        "/api/v2/contacts.json",
-    ]
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
 
 
 @pytest.mark.asyncio
@@ -586,11 +578,11 @@ async def test_state_update_location_confirm(tester: AppTester, google_api_mock)
     )
     tester.assert_state("state_update_location_confirm")
 
-    tester.assert_metadata("latitude", 56.78)
-    tester.assert_metadata("longitude", 12.34)
+    tester.assert_metadata("new_latitude", 56.78)
+    tester.assert_metadata("new_longitude", 12.34)
     tester.assert_metadata("place_id", "ChIJd8BlQ2BZwokRAFUEcm_qrcA")
     tester.assert_metadata(
-        "location_description", "277 Bedford Avenue, Brooklyn, NY 11211, USA"
+        "new_location_description", "277 Bedford Avenue, Brooklyn, NY 11211, USA"
     )
 
     assert [r.path for r in google_api_mock.tstate.requests] == [
@@ -643,9 +635,11 @@ async def test_state_update_location_confirm_incorrect(
 
 @pytest.mark.asyncio
 async def test_state_update_location_submit(tester: AppTester, rapidpro_mock):
-    tester.user.metadata["latitude"] = 56.78
-    tester.user.metadata["longitude"] = 12.34
-    tester.user.metadata["location_description"] = "277 Bedford Avenue, Brooklyn, NY"
+    tester.user.metadata["new_latitude"] = 56.78
+    tester.user.metadata["new_longitude"] = 12.34
+    tester.user.metadata[
+        "new_location_description"
+    ] = "277 Bedford Avenue, Brooklyn, NY"
     tester.setup_state("state_update_location_confirm")
 
     await tester.user_input("yes")
@@ -653,8 +647,8 @@ async def test_state_update_location_submit(tester: AppTester, rapidpro_mock):
     tester.assert_num_messages(1)
     tester.assert_state("state_conclude_changes")
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "latitude": 56.78,
