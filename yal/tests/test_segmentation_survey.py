@@ -16,20 +16,6 @@ def tester():
     return AppTester(Application)
 
 
-def get_rapidpro_contact(urn):
-    complete = ""
-    if urn == "27820001001":
-        complete = "PENDING"
-    elif urn == "27820001003":
-        complete = "TRUE"
-
-    return {
-        "fields": {
-            "segment_survey_complete": complete,
-        },
-    }
-
-
 @pytest.fixture(autouse=True)
 async def rapidpro_mock():
     Sanic.test_mode = True
@@ -39,15 +25,19 @@ async def rapidpro_mock():
     @app.route("/api/v2/contacts.json", methods=["GET"])
     def get_contact(request):
         tstate.requests.append(request)
-        urn = request.args.get("urn").split(":")[1]
-        contacts = [get_rapidpro_contact(urn)]
         return response.json(
             {
-                "results": contacts,
+                "results": [{"fields": tstate.contact_fields}],
                 "next": None,
             },
             status=200,
         )
+
+    @app.route("/api/v2/contacts.json", methods=["POST"])
+    def update_contact(request):
+        tstate.requests.append(request)
+        tstate.contact_fields.update(request.json["fields"])
+        return response.json({}, status=200)
 
     @app.route("/api/v2/flow_starts.json", methods=["POST"])
     def start_flow(request):
@@ -66,6 +56,7 @@ async def rapidpro_mock():
 
 @pytest.mark.asyncio
 async def test_survey_start(tester: AppTester, rapidpro_mock):
+    rapidpro_mock.tstate.contact_fields["segment_survey_complete"] = "pending"
     await tester.user_input("Hell Yeah!")
     tester.assert_state("state_survey_question")
 
@@ -108,6 +99,10 @@ async def test_survey_start(tester: AppTester, rapidpro_mock):
         )
     )
 
+    assert (
+        rapidpro_mock.tstate.contact_fields["segment_survey_complete"] == "inprogress"
+    )
+
 
 @pytest.mark.asyncio
 async def test_survey_start_not_invited(tester: AppTester, rapidpro_mock):
@@ -118,6 +113,7 @@ async def test_survey_start_not_invited(tester: AppTester, rapidpro_mock):
 
 @pytest.mark.asyncio
 async def test_survey_start_decline(tester: AppTester, rapidpro_mock):
+    rapidpro_mock.tstate.contact_fields["segment_survey_complete"] = "pending"
     await tester.user_input("No, rather not")
     tester.assert_state("state_survey_decline")
 
@@ -137,27 +133,7 @@ async def test_survey_start_decline(tester: AppTester, rapidpro_mock):
         )
     )
 
-
-@pytest.mark.asyncio
-async def test_survey_start_already_completed(tester: AppTester, rapidpro_mock):
-    tester.setup_user_address("27820001003")
-    await tester.user_input("Hell Yeah!")
-    tester.assert_state("state_survey_already_completed")
-
-    tester.assert_message(
-        "\n".join(
-            [
-                "Hmm, 🤔 looks like you've already completed this survey.",
-                "",
-                "Thanks for your input, we really appreciate it.",
-                "",
-                "What would you like to do next?",
-                "",
-                "1. Ask a question",
-                "2. Go to Main Menu",
-            ]
-        )
-    )
+    assert rapidpro_mock.tstate.contact_fields["segment_survey_complete"] == "decline"
 
 
 @pytest.mark.asyncio
