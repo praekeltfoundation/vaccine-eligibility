@@ -68,6 +68,7 @@
 | state_qa_reset_feedback_timestamp_keywords |        FALSE       |              |            FALSE          | State intended for QA purposes. Resets feedback timestamps. Triggered by an obscure keyword                   |
 | state_start                                |        FALSE       |              |            TRUE           | Session entry state. Routes user based on the message they sent in                                           |
 | state_catch_all                            |        FALSE       |              |            TRUE           | Sends user a generic welcome message if we received input we don't recognise                                 |
+| state_error                                |        FALSE       |              |            TRUE           | Closes user session                                 |
 
 
 ### Main Menu flow
