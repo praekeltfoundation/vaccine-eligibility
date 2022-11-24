@@ -106,7 +106,7 @@ def get_rapidpro_contact(urn):
         "groups": [],
         "fields": {
             "onboarding_completed": "27820001001" in urn,
-            "onboarding_reminder_sent": "27820001001" in urn,
+            "onboarding_reminder_sent": "27820001008" in urn,
             "terms_accepted": "27820001001" in urn,
             "province": "FS",
             "suburb": "cape town",
@@ -193,7 +193,7 @@ async def aaq_mock():
         config.AAQ_URL = url
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
@@ -349,7 +349,7 @@ async def test_tracked_keywords_saved(
 async def test_tracked_keywords_saved_for_new_user(
     tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
-    tester.setup_user_address("27820001002")
+    tester.setup_user_address("27820001000")
     await tester.user_input("heita")
     tester.assert_state("state_welcome")
     tester.assert_num_messages(1)
@@ -361,6 +361,7 @@ async def test_tracked_keywords_saved_for_new_user(
 async def test_onboarding_reminder_response_to_reminder_handler(
     tester: AppTester, rapidpro_mock
 ):
+    tester.setup_user_address("27820001008")
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="not interested")
     tester.assert_state("state_stop_onboarding_reminders")
     tester.assert_num_messages(1)
@@ -406,7 +407,7 @@ async def test_aaq_timeout_response_to_handler(
     )
     tester.assert_message(message)
 
-    assert len(rapidpro_mock.tstate.requests) == 4
+    assert len(rapidpro_mock.tstate.requests) == 3
 
 
 @pytest.mark.asyncio
@@ -452,7 +453,7 @@ async def test_servicefinder_feedback_response(tester: AppTester, rapidpro_mock)
     tester.assert_state("state_servicefinder_positive_feedback")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 2
 
 
 @pytest.mark.asyncio
@@ -467,7 +468,7 @@ async def test_servicefinder_feedback_2_response(tester: AppTester, rapidpro_moc
     tester.assert_state("state_went_to_service")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 2
 
 
 @pytest.mark.asyncio

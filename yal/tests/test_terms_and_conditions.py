@@ -13,7 +13,7 @@ def tester():
     return AppTester(Application)
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")

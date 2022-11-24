@@ -167,7 +167,7 @@ async def google_api_mock():
         config.GOOGLE_PLACES_URL = url
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")

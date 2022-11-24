@@ -329,13 +329,13 @@ class Application(BaseApplication):
     async def state_display_facilities(self):
         timestamp = utils.get_current_datetime() + self.SURVEY_DELAY
         whatsapp_id = utils.normalise_phonenumber(self.inbound.from_addr).lstrip("+")
-        self.save_metadata("feedback_timestamp", timestamp.isoformat())
         await rapidpro.update_profile(
             whatsapp_id=whatsapp_id,
             fields={
                 "feedback_timestamp": timestamp.isoformat(),
                 "feedback_type": "servicefinder",
             },
+            metadata=self.user.metadata,
         )
 
         metadata = self.user.metadata
@@ -549,7 +549,7 @@ class Application(BaseApplication):
             "longitude": longitude,
         }
 
-        await rapidpro.update_profile(whatsapp_id, data)
+        await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
 
         return await self.go_to_state("state_category_lookup")
 

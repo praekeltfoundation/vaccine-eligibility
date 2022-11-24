@@ -44,7 +44,7 @@ def get_rapidpro_contact(urn):
     }
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
@@ -321,8 +321,8 @@ async def test_callback_check_scheduled_if_out_of_hours(
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_check_time": "2022-06-20T11:00:00"},
     }
@@ -344,8 +344,8 @@ async def test_state_in_hours(
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_check_time": "2022-06-19T19:30:00"},
     }
@@ -453,8 +453,8 @@ async def test_state_ask_to_save_emergency_number(
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_check_time": "2022-06-19T19:30:00"},
     }
@@ -477,12 +477,12 @@ async def test_state_save_emergency_contact(
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"emergency_contact": "+27831231234"},
     }
-    request = rapidpro_mock.tstate.requests[1]
+    request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_check_time": "2022-06-19T19:30:00"},
     }
@@ -497,8 +497,8 @@ async def test_state_callback_response_handles_call_received(
     tester.setup_state("state_handle_callback_check_response")
     await tester.user_input("I got the call")
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    [request] = rapidpro_mock.tstate.requests
+    assert len(rapidpro_mock.tstate.requests) == 2
+    [_, request] = rapidpro_mock.tstate.requests
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "2022-06-19T17:30:00",
@@ -515,7 +515,7 @@ async def test_state_callback_response_handles_no_call(
     tester.setup_state("state_handle_callback_check_response")
     await tester.user_input("No call yet")
 
-    assert len(rapidpro_mock.tstate.requests) == 0
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
 
     tester.assert_num_messages(1)
     [msg] = tester.fake_worker.outbound_messages
@@ -537,7 +537,7 @@ async def test_state_callback_response_handles_missed_call(
     tester.setup_state("state_handle_callback_check_response")
     await tester.user_input("I missed the call")
 
-    assert len(rapidpro_mock.tstate.requests) == 0
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
     tester.assert_state("state_ask_to_call_again")
 
 
@@ -550,7 +550,7 @@ async def test_state_ask_to_call_again_yes(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_retry_callback_choose_number")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.tstate.requests) == 0
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
 
 
 @pytest.mark.asyncio
@@ -562,7 +562,7 @@ async def test_state_ask_to_call_again_another_way(tester: AppTester, rapidpro_m
     tester.assert_state("state_contact_bwise")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.tstate.requests) == 0
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
 
 
 @pytest.mark.asyncio
@@ -574,7 +574,7 @@ async def test_state_ask_to_call_again_no(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_help_no_longer_needed")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.tstate.requests) == 0
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET"]
 
 
 @pytest.mark.asyncio
@@ -595,8 +595,8 @@ async def test_state_retry_callback_choose_number_whatsapp(
         "SourceSystem": "Bwise by Young Africa live WhatsApp bot",
     }
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_check_time": "2022-06-19T19:30:00"},
     }
@@ -713,8 +713,8 @@ async def test_state_help_no_longer_needed_got_help(tester: AppTester, rapidpro_
     tester.assert_state("state_got_help")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_abandon_reason": "got help"},
     }
@@ -729,8 +729,8 @@ async def test_state_help_no_longer_needed_too_long(tester: AppTester, rapidpro_
     tester.assert_state("state_too_long")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_abandon_reason": "too long"},
     }
@@ -747,8 +747,8 @@ async def test_state_help_no_longer_needed_changed_mind(
     tester.assert_state("state_changed_mind")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_abandon_reason": "changed mind"},
     }
@@ -763,8 +763,8 @@ async def test_state_too_long(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_contact_bwise")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_abandon_reason": "too long"},
     }
@@ -779,8 +779,8 @@ async def test_state_changed_mind(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_contact_bwise")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"callback_abandon_reason": "changed mind"},
     }

@@ -30,7 +30,7 @@ def get_rapidpro_contact(urn):
     }
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
@@ -413,8 +413,8 @@ async def test_state_survey_done(tester: AppTester, rapidpro_mock):
         )
     )
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "flow": "segment-airtime-flow-uuid",
         "urns": ["whatsapp:27820001001"],
