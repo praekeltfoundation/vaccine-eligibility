@@ -58,14 +58,14 @@ class Application(BaseApplication):
 
         return suggested_choices
 
-    async def get_first_time_user(self, whatsapp_id):
-        first_time_user = self.user.metadata.get("first_time_on_main_menu")
+    async def get_privacy_reminder_sent(self, whatsapp_id):
+        privacy_reminder_sent = self.user.metadata.get("privacy_reminder_sent")
         error = await rapidpro.update_profile(
-            whatsapp_id, {"first_time_on_main_menu": ""}, self.user.metadata
+            whatsapp_id, {"privacy_reminder_sent": "True"}, self.user.metadata
         )
         if error:
             return await self.go_to_state("state_error")
-        return bool(first_time_user)
+        return bool(privacy_reminder_sent)
 
     async def state_pre_mainmenu(self):
         self.save_metadata("suggested_content", {})
@@ -239,8 +239,8 @@ class Application(BaseApplication):
             additional_messages.extend(banner_messages)
 
         # Check if user is a first time user to be sent a privacy policy message
-        first_time_user = await self.get_first_time_user(whatsapp_id)
-        if first_time_user:
+        privacy_reminder_sent = await self.get_privacy_reminder_sent(whatsapp_id)
+        if not privacy_reminder_sent:
             privacy_reminder_messages = [
                 "\n".join(
                     [

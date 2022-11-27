@@ -299,7 +299,7 @@ async def test_reset_keyword(tester: AppTester, rapidpro_mock, contentrepo_api_m
     tester.setup_state("state_catch_all")
     await tester.user_input("hi")
     tester.assert_state("state_mainmenu")
-    tester.assert_num_messages(1)
+    tester.assert_num_messages(2)
 
     assert len(rapidpro_mock.tstate.requests) == 3
     assert len(contentrepo_api_mock.tstate.requests) == 5
@@ -349,7 +349,7 @@ async def test_state_start_to_mainmenu(
 ):
     await tester.user_input("hi")
     tester.assert_state("state_mainmenu")
-    tester.assert_num_messages(1)
+    tester.assert_num_messages(2)
 
     assert len(rapidpro_mock.tstate.requests) == 3
     assert len(contentrepo_api_mock.tstate.requests) == 5
@@ -365,7 +365,7 @@ async def test_tracked_keywords_saved(
 ):
     await tester.user_input("howzit")
     tester.assert_state("state_mainmenu")
-    tester.assert_num_messages(1)
+    tester.assert_num_messages(2)
 
     tester.assert_answer("state_source_tracking", "howzit")
 

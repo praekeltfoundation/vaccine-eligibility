@@ -28,7 +28,7 @@ def get_rapidpro_contact(urn):
     elif "27820003003" in urn:
         return {
             "fields": {
-                "first_time_on_main_menu": "True",
+                "privacy_reminder_sent": "",
             },
         }
     return {
@@ -387,7 +387,7 @@ async def test_onboarding_set_first_time_menu_show_menu(
     request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
-            "first_time_on_main_menu": "",
+            "privacy_reminder_sent": "True",
         },
     }
     _, privacy_message = tester.application.messages
@@ -412,8 +412,8 @@ async def test_state_mainmenu_start(
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
-    tester.assert_num_messages(2)
-    menu, banner = tester.application.messages
+    tester.assert_num_messages(3)
+    menu, banner, _ = tester.application.messages
     assert menu.content == "\n".join(
         [
             "🏡 *MAIN MENU*",
@@ -486,40 +486,39 @@ async def test_state_mainmenu_start_suggested_populated(
         "555": "Suggested Content 2",
     }
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
-    tester.assert_num_messages(1)
-    tester.assert_message(
-        "\n".join(
-            [
-                "🏡 *MAIN MENU*",
-                "How can I help you today?",
-                "-----",
-                "Send me the number of the topic you're interested in.",
-                "",
-                "🏥 *NEED HELP?*",
-                "1. Talk to a counsellor",
-                "2. Find clinics and services",
-                "3. Help content",
-                "-----",
-                "*Main Menu 1 💊*",
-                "4. Sub menu 1",
-                "5. Sub menu 2",
-                "6. Sub menu 3",
-                "-----",
-                "*Main Menu 2 Relationships 🤝*",
-                "7. Sub menu 1",
-                "8. Sub menu 2",
-                "9. Sub menu 3",
-                "-----",
-                "🙋🏿‍♂️ *QUESTIONS?*",
-                "10. Ask your own question",
-                "-----",
-                "⚙️ *CHAT SETTINGS*",
-                "11. Update your information",
-                "-----",
-                "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or"
-                " *MENU*.",
-            ]
-        )
+    tester.assert_num_messages(2)
+    message, _ = tester.application.messages
+    assert message.content == "\n".join(
+        [
+            "🏡 *MAIN MENU*",
+            "How can I help you today?",
+            "-----",
+            "Send me the number of the topic you're interested in.",
+            "",
+            "🏥 *NEED HELP?*",
+            "1. Talk to a counsellor",
+            "2. Find clinics and services",
+            "3. Help content",
+            "-----",
+            "*Main Menu 1 💊*",
+            "4. Sub menu 1",
+            "5. Sub menu 2",
+            "6. Sub menu 3",
+            "-----",
+            "*Main Menu 2 Relationships 🤝*",
+            "7. Sub menu 1",
+            "8. Sub menu 2",
+            "9. Sub menu 3",
+            "-----",
+            "🙋🏿‍♂️ *QUESTIONS?*",
+            "10. Ask your own question",
+            "-----",
+            "⚙️ *CHAT SETTINGS*",
+            "11. Update your information",
+            "-----",
+            "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or"
+            " *MENU*.",
+        ]
     )
 
     assert [r.path for r in contentrepo_api_mock.tstate.requests] == [

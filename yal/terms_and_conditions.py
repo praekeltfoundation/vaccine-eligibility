@@ -168,12 +168,10 @@ class Application(BaseApplication):
     async def state_submit_terms_and_conditions(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
-        data = {
-            "terms_accepted": "True",
-            "first_time_on_main_menu": "True",
-        }
 
-        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        error = await rapidpro.update_profile(
+            whatsapp_id, {"terms_accepted": "True"}, self.user.metadata
+        )
         if error:
             return await self.go_to_state("state_error")
 

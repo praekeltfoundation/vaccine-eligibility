@@ -444,6 +444,5 @@ async def test_onboarding_set_first_time_menu(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "terms_accepted": "True",
-            "first_time_on_main_menu": "True",
         },
     }
