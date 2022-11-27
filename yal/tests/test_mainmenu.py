@@ -374,7 +374,7 @@ async def contentrepo_api_mock():
 
 
 @pytest.mark.asyncio
-async def test_onboarding_set_first_time_menu_show_menu(
+async def test_mainmenu_show_privacy_policy(
     tester: AppTester,
     rapidpro_mock,
 ):
