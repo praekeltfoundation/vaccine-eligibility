@@ -60,9 +60,10 @@ class Application(BaseApplication):
 
     async def get_privacy_reminder_sent(self, whatsapp_id):
         privacy_reminder_sent = self.user.metadata.get("privacy_reminder_sent")
-        error = await rapidpro.update_profile(
-            whatsapp_id, {"privacy_reminder_sent": "True"}, self.user.metadata
-        )
+        if not privacy_reminder_sent:
+            error = await rapidpro.update_profile(
+                whatsapp_id, {"privacy_reminder_sent": "True"}, self.user.metadata
+            )
         if error:
             return await self.go_to_state("state_error")
         return bool(privacy_reminder_sent)
