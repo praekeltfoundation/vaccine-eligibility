@@ -32,9 +32,10 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip("+")
         # Reset this, so that we only get the survey once after a push
-        self.save_metadata("feedback_timestamp", "")
         await rapidpro.update_profile(
-            whatsapp_id, {"feedback_survey_sent": "", "feedback_timestamp": ""}
+            whatsapp_id,
+            {"feedback_survey_sent": "", "feedback_timestamp": ""},
+            self.user.metadata,
         )
         keyword = utils.clean_inbound(self.inbound.content)
         if keyword in self.SERVICEFINDER_TRIGGER_KEYWORDS:
@@ -193,13 +194,13 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
     async def state_save_servicefinder_callback_2(self):
         timestamp = utils.get_current_datetime() + self.CALLBACK_2_DELAY
         whatsapp_id = utils.normalise_phonenumber(self.inbound.from_addr).lstrip("+")
-        self.save_metadata("feedback_timestamp_2", timestamp.isoformat())
         await rapidpro.update_profile(
             whatsapp_id=whatsapp_id,
             fields={
                 "feedback_timestamp_2": timestamp.isoformat(),
                 "feedback_type_2": "servicefinder",
             },
+            metadata=self.user.metadata,
         )
         return await self.go_to_state("state_servicefinder_feedback_confirmation")
 
@@ -239,16 +240,14 @@ class ServiceFinderFeedbackSurveyApplication(BaseApplication):
         # Repeat the question here for error and selection handling
         whatsapp_id = utils.normalise_phonenumber(self.inbound.from_addr).lstrip("+")
         # Reset this, so that we only get the survey once after a push
-        self.save_metadata("feedback_timestamp_2", "")
-        await rapidpro.update_profile(
-            whatsapp_id, {"feedback_survey_sent_2": "", "feedback_timestamp_2": ""}
-        )
-        error, fields = await rapidpro.get_profile(whatsapp_id)
-        if error:
-            return await self.go_to_state("state_error")
         feedback_datetime = (
-            datetime.fromisoformat(fields["feedback_timestamp_2"])
+            datetime.fromisoformat(self.user.metadata["feedback_timestamp_2"])
             - self.CALLBACK_2_DELAY
+        )
+        await rapidpro.update_profile(
+            whatsapp_id,
+            {"feedback_survey_sent_2": "", "feedback_timestamp_2": ""},
+            self.user.metadata,
         )
 
         keyword = utils.clean_inbound(self.inbound.content)

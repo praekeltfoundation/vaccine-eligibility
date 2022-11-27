@@ -190,6 +190,7 @@ class TState:
     errors: int = 0
     errormax: int = 0
     banner: bool = False
+    contact_fields: dict = field(default_factory=dict)
 
 
 def unused_port():

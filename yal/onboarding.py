@@ -22,7 +22,7 @@ class Application(BaseApplication):
             "onboarding_reminder_type": "5 min",
         }
 
-        return await rapidpro.update_profile(whatsapp_id, data)
+        return await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
 
     async def state_persona_name(self):
         await self.update_last_onboarding_time()
@@ -214,7 +214,7 @@ class Application(BaseApplication):
             "onboarding_reminder_type": "",
         }
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
@@ -255,7 +255,7 @@ class Application(BaseApplication):
             "onboarding_reminder_type": "",
         }  # Reset the fields
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
@@ -286,7 +286,7 @@ class Application(BaseApplication):
             "last_onboarding_time": get_current_datetime().isoformat(),
         }
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
@@ -317,7 +317,7 @@ class Application(BaseApplication):
                 "onboarding_reminder_sent": "",  # Reset the field
             }
 
-            error = await rapidpro.update_profile(whatsapp_id, data)
+            error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
             if error:
                 return await self.go_to_state("state_error")
             return await self.go_to_state("state_persona_name")

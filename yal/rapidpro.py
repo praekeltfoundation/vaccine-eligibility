@@ -48,7 +48,14 @@ async def get_profile(whatsapp_id):
     return False, fields
 
 
-async def update_profile(whatsapp_id, fields):
+async def update_profile(whatsapp_id, fields, metadata):
+    """
+    Updates the user's profile on RapidPro.
+
+    whatsapp_id: The user's whatsapp URN path
+    fields: Keys are fields to update, values are values to update them to
+    metadata: The user's metadata. Used to keep cached contact in sync with RapidPro
+    """
     urn = f"whatsapp:{whatsapp_id}"
     async with get_rapidpro_api() as session:
         for i in range(3):
@@ -64,6 +71,8 @@ async def update_profile(whatsapp_id, fields):
                     json=params,
                 )
                 response.raise_for_status()
+                for key, value in fields.items():
+                    metadata[key] = value
                 break
             except HTTP_EXCEPTIONS as e:
                 if i == 2:

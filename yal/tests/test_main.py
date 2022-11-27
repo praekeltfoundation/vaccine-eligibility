@@ -1,6 +1,7 @@
 from datetime import datetime
 from unittest import mock
 
+import pytablereader as ptr
 import pytest
 from sanic import Sanic, response
 
@@ -25,7 +26,7 @@ from yal.utils import BACK_TO_MAIN, GET_HELP, get_current_datetime
 from yal.wa_fb_crossover_feedback import Application as WaFbCrossoverFeedbackApplication
 
 
-def test_no_state_name_clashes():
+def get_state_sets():
     m_states = set(s for s in dir(Application) if s.startswith("state_"))
     mm_states = set(s for s in dir(MainMenuApplication) if s.startswith("state_"))
     on_states = set(s for s in dir(OnboardingApplication) if s.startswith("state_"))
@@ -49,28 +50,52 @@ def test_no_state_name_clashes():
     wa_fb_states = set(
         s for s in dir(WaFbCrossoverFeedbackApplication) if s.startswith("state_")
     )
-    intersection = (
-        m_states
-        & mm_states
-        & on_states
-        & oo_states
-        & te_states
-        & cp_states
-        & q_states
-        & pc_states
-        & sf_states
-        & aaq_states
-        & fb_states
-        & c_fb_states
-        & sf_s_states
-        & ss_states
-        & wa_fb_states
-    ) - {
+
+    return [
+        m_states,
+        mm_states,
+        on_states,
+        oo_states,
+        te_states,
+        cp_states,
+        q_states,
+        pc_states,
+        sf_states,
+        aaq_states,
+        fb_states,
+        c_fb_states,
+        sf_s_states,
+        ss_states,
+        wa_fb_states,
+    ]
+
+
+def test_no_state_name_clashes():
+    state_sets = get_state_sets()
+    intersection = set.intersection(*state_sets) - {
         "state_name",
         "state_error",
     }
 
     assert len(intersection) == 0, f"Common states to both apps: {intersection}"
+
+
+def test_all_states_added_to_docs():
+    state_sets = get_state_sets()
+    existing_states = set.union(*state_sets) - {"state_name"}
+
+    loader = ptr.MarkdownTableFileLoader("yal/tests/states_dictionary.md")
+    documented_states = set()
+    for data in loader.load():
+        documented_states = documented_states | set(
+            row["state_name"] for row in data.as_dict()[data.table_name]
+        )
+
+    difference = existing_states.difference(documented_states)
+
+    assert (
+        len(difference) == 0
+    ), f"{len(difference)} states are not documented. List: {difference}"
 
 
 @pytest.fixture
@@ -106,7 +131,7 @@ def get_rapidpro_contact(urn):
         "groups": [],
         "fields": {
             "onboarding_completed": "27820001001" in urn,
-            "onboarding_reminder_sent": "27820001001" in urn,
+            "onboarding_reminder_sent": "27820001008" in urn,
             "terms_accepted": "27820001001" in urn,
             "province": "FS",
             "suburb": "cape town",
@@ -193,7 +218,7 @@ async def aaq_mock():
         config.AAQ_URL = url
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 async def rapidpro_mock():
     Sanic.test_mode = True
     app = Sanic("mock_rapidpro")
@@ -396,7 +421,7 @@ async def test_tracked_keywords_saved(
 async def test_tracked_keywords_saved_for_new_user(
     tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
-    tester.setup_user_address("27820001002")
+    tester.setup_user_address("27820001000")
     await tester.user_input("heita")
     tester.assert_state("state_welcome")
     tester.assert_num_messages(1)
@@ -408,6 +433,7 @@ async def test_tracked_keywords_saved_for_new_user(
 async def test_onboarding_reminder_response_to_reminder_handler(
     tester: AppTester, rapidpro_mock
 ):
+    tester.setup_user_address("27820001008")
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="not interested")
     tester.assert_state("state_stop_onboarding_reminders")
     tester.assert_num_messages(1)
@@ -453,7 +479,7 @@ async def test_aaq_timeout_response_to_handler(
     )
     tester.assert_message(message)
 
-    assert len(rapidpro_mock.tstate.requests) == 4
+    assert len(rapidpro_mock.tstate.requests) == 3
 
 
 @pytest.mark.asyncio
@@ -499,7 +525,7 @@ async def test_servicefinder_feedback_response(tester: AppTester, rapidpro_mock)
     tester.assert_state("state_servicefinder_positive_feedback")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 2
 
 
 @pytest.mark.asyncio
@@ -514,7 +540,7 @@ async def test_servicefinder_feedback_2_response(tester: AppTester, rapidpro_moc
     tester.assert_state("state_went_to_service")
     tester.assert_num_messages(1)
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 2
 
 
 @pytest.mark.asyncio

@@ -19,39 +19,16 @@ class Application(BaseApplication):
     DECLINE_STATE = "state_survey_decline"
     COMPLETED_STATE = "state_survey_already_completed"
 
-    async def state_survey_already_completed(self):
-        def _next(choice: Choice):
-            return choice.value
-
-        choices = [
-            Choice("state_aaq_start", self._("Ask a question")),
-            Choice("state_pre_mainmenu", self._("Go to Main Menu")),
-        ]
-        question = "\n".join(
-            [
-                "Hmm, 🤔 looks like you've already completed this survey.",
-                "",
-                "Thanks for your input, we really appreciate it.",
-                "",
-                "What would you like to do next?",
-                "",
-                "1. Ask a question",
-                "2. Go to Main Menu",
-            ]
-        )
-        return CustomChoiceState(
-            self,
-            question=self._(question),
-            error=self._(get_generic_error()),
-            choices=choices,
-            next=_next,
-            button="See my options",
-            buttons=choices,
-        )
-
     async def state_survey_decline(self):
         def _next(choice: Choice):
             return choice.value
+
+        whatsapp_id = utils.normalise_phonenumber(self.user.addr).lstrip("+")
+        error = await rapidpro.update_profile(
+            whatsapp_id, {"segment_survey_complete": "decline"}, self.user.metadata
+        )
+        if error:
+            return await self.go_to_state("state_error")
 
         choices = [
             Choice("state_aaq_start", self._("Ask a question")),
@@ -81,6 +58,17 @@ class Application(BaseApplication):
         )
 
     async def state_start_survey(self):
+        keyword = utils.clean_inbound(self.inbound.content)
+        if keyword in {"2", "no rather not"}:
+            return await self.go_to_state("state_survey_decline")
+
+        whatsapp_id = utils.normalise_phonenumber(self.user.addr).lstrip("+")
+        error = await rapidpro.update_profile(
+            whatsapp_id, {"segment_survey_complete": "inprogress"}, self.user.metadata
+        )
+        if error:
+            return await self.go_to_state("state_error")
+
         msg = self._(
             "\n".join(
                 [
@@ -119,9 +107,16 @@ class Application(BaseApplication):
 
         question_number = metadata.get("segment_question_nr", 1)
 
-        total_questions = len(SURVEY_QUESTIONS[section]["questions"])
+        questions = SURVEY_QUESTIONS[section]["questions"]
+        total_questions = sum(1 for q in questions.values() if q.get("type") != "info")
 
-        question = SURVEY_QUESTIONS[section]["questions"][current_question]
+        question = questions[current_question]
+        question_type = question.get("type", "choice")
+
+        if question_type == "info":
+            await self.publish_message(question["text"])
+            await asyncio.sleep(0.5)
+            return await self.go_to_state("state_survey_process_answer")
 
         header = "\n".join(
             [
@@ -142,7 +137,7 @@ class Application(BaseApplication):
             ]
         )
 
-        if question.get("options"):
+        if question_type == "choice":
             choices = []
             for option in question["options"]:
                 if isinstance(option, tuple):
@@ -182,25 +177,6 @@ class Application(BaseApplication):
         question_number = metadata.get("segment_question_nr", 1)
 
         question = SURVEY_QUESTIONS[str(section)]["questions"][current_question]
-
-        if question.get("send_after"):
-            msg = self._(
-                "\n".join(
-                    [
-                        "*BWise / Survey*",
-                        "-----",
-                        "",
-                        question["send_after"],
-                        "",
-                        "-----",
-                        "*Or reply:*",
-                        BACK_TO_MAIN,
-                        GET_HELP,
-                    ]
-                )
-            )
-            await self.publish_message(msg)
-            await asyncio.sleep(0.5)
 
         next = None
 

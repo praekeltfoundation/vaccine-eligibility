@@ -8,16 +8,9 @@ class Application(BaseApplication):
     START_STATE = "state_check_feedback"
 
     async def state_check_feedback(self):
-        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
-
-        error, fields = await rapidpro.get_profile(whatsapp_id)
-        if error:
-            return await self.go_to_state("state_error")
-
-        if fields.get("usertesting_feedback_complete") == "PENDING":
+        if self.user.metadata.get("usertesting_feedback_complete") == "PENDING":
             return await self.go_to_state("state_feedback_pleasecallme")
-        elif fields.get("usertesting_feedback_complete") == "TRUE":
+        elif self.user.metadata.get("usertesting_feedback_complete") == "TRUE":
             return await self.go_to_state("state_already_completed")
         else:
             return await self.go_to_state("state_catch_all")

@@ -106,7 +106,7 @@ class Application(BaseApplication):
             "feedback_type": "ask_a_question",
         }
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
@@ -267,7 +267,7 @@ class Application(BaseApplication):
             "feedback_type": "ask_a_question_2",
         }
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
@@ -323,7 +323,7 @@ class Application(BaseApplication):
             "feedback_type": "",
         }
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
@@ -537,17 +537,12 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        error, fields = await rapidpro.get_profile(whatsapp_id)
-        if error:
-            return await self.go_to_state("state_error")
-        self.save_metadata("feedback_timestamp", "")
         data = {"feedback_survey_sent": "", "feedback_timestamp": ""}
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
-        timeout_type_sent = fields.get("feedback_type")
-        self.save_metadata("feedback_type", timeout_type_sent)
+        timeout_type_sent = self.user.metadata.get("feedback_type")
 
         keyword = clean_inbound(self.inbound.content)
         if keyword in self.AAQ_FEEDBACK_TRIGGER_KEYWORDS:

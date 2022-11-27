@@ -78,6 +78,7 @@ class Application(BaseApplication):
         error = await rapidpro.update_profile(
             whatsapp_id,
             data,
+            self.user.metadata,
         )
         if error:
             return await self.go_to_state("state_error")
@@ -174,12 +175,9 @@ class Application(BaseApplication):
             "gender_other": "",
             "emergency_contact": "",
         } | self.reminders_to_be_cleared
-        error, fields = await rapidpro.get_profile(whatsapp_id)
-        if error:
-            return await self.go_to_state("state_error")
-        old_details = self.__get_user_details(fields)
+        old_details = self.__get_user_details(self.user.metadata)
 
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 

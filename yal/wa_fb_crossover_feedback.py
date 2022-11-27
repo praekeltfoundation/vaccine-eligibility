@@ -27,9 +27,10 @@ class Application(BaseApplication):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip("+")
         # Reset this, so that we only get the survey once after a push
-        self.save_metadata("feedback_timestamp", "")
         await rapidpro.update_profile(
-            whatsapp_id, {"feedback_survey_sent": "", "feedback_timestamp": ""}
+            whatsapp_id,
+            {"feedback_survey_sent": "", "feedback_timestamp": ""},
+            self.user.metadata,
         )
         keyword = utils.clean_inbound(self.inbound.content)
         if keyword in self.WA_FB_CROSSOVER_TRIGGER_KEYWORDS:
@@ -107,7 +108,7 @@ class Application(BaseApplication):
             "engaged_on_facebook": "TRUE",
             "last_mainmenu_time": utils.get_current_datetime().isoformat(),
         }
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
@@ -156,7 +157,7 @@ class Application(BaseApplication):
         data = {
             "engaged_on_facebook": "FALSE",
         }
-        error = await rapidpro.update_profile(whatsapp_id, data)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
