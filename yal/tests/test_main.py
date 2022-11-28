@@ -338,7 +338,7 @@ async def test_emergency_keywords_go_back(get_current_datetime, tester: AppTeste
     await tester.user_input(content="edpressed")
     tester.assert_state("state_confirm_redirect_please_call_me")
     tester.assert_num_messages(1)
-    await tester.user_input("go back")
+    await tester.user_input("no")
     tester.assert_state("state_start")
 
 
@@ -360,7 +360,7 @@ async def test_emergency_keywords_need_help(get_current_datetime, tester: AppTes
         )
     )
     tester.assert_state("state_confirm_redirect_please_call_me")
-    await tester.user_input("please help")
+    await tester.user_input("yes")
     tester.assert_state("state_in_hours")
 
 
