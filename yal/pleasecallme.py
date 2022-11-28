@@ -55,7 +55,7 @@ def get_lovelife_api():
 class Application(BaseApplication):
     START_STATE = "state_please_call_start"
     CALLBACK_RESPONSE_STATE = "state_handle_callback_check_response"
-    ARE_YOU_SURE = "state_confirm_redirect_please_call_me"
+    CONFIRM_REDIRECT = "state_confirm_redirect_please_call_me"
 
     async def state_please_call_start(self):
         current_datetime = get_current_datetime()
@@ -1101,10 +1101,11 @@ class Application(BaseApplication):
                 ):
                     return self.user.metadata["emergency_keyword_previous_state"]
 
+        user_input = self.inbound.content
         question = self._(
             "\n".join(
                 [
-                    "you sure?",
+                    f'Hi, would you like to talk to someone about "{user_input}"?',
                     "",
                     "----",
                     "*Or reply:*",

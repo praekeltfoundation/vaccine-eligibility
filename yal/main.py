@@ -87,11 +87,10 @@ class Application(
             self.state_name = PleaseCallMeApplication.START_STATE
         elif utils.check_keyword(keyword, EMERGENCY_KEYWORDS):
             self.save_metadata("emergency_keyword_previous_state", self.state_name)
-            # Emergency keywords are checked
-            # first so that false positives are overwritten later on
-            # phrase fuzzy matches, go to check if thats what they want first
+            # If keyword fuzzy matches an emergency keyword,
+            # First confirm redirect with user
             self.user.session_id = None
-            self.state_name = PleaseCallMeApplication.ARE_YOU_SURE
+            self.state_name = PleaseCallMeApplication.CONFIRM_REDIRECT
 
         if keyword in GREETING_KEYWORDS or keyword in TRACKING_KEYWORDS:
             self.user.session_id = None

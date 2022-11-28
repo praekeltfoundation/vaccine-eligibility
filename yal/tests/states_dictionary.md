@@ -172,6 +172,7 @@
 | state_facebook_page                        |        TRUE        |     Text     |            TRUE          | Sends user link to Facebook. User response is "menu" |
 | state_twitter_page                         |        TRUE        |     Text     |            TRUE          | Sends user link to Twitter. User response is "menu" |
 | state_website                              |        TRUE        |     Text     |            TRUE          | Sends user link to website. User response is "menu" |
+| state_confirm_redirect_please_call_me      |        TRUE        |     Text     |            FALSE         | Confirms with a user whether they'd like to speak to a human if their response fuzzy matches an emergency keyword |
 
 
 ### Segmentation survey flow
