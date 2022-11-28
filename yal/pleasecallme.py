@@ -1091,16 +1091,6 @@ class Application(BaseApplication):
         )
 
     async def state_confirm_redirect_please_call_me(self):
-        async def _next(choice: Choice):
-            if choice.value == "help now":
-                return "state_please_call_start"
-            if choice.value == "mistake":
-                if (
-                    "emergency_keyword_previous_state" in self.user.metadata
-                    and self.user.metadata["emergency_keyword_previous_state"]
-                ):
-                    return self.user.metadata["emergency_keyword_previous_state"]
-
         user_input = self.inbound.content
         question = self._(
             "\n".join(
@@ -1117,9 +1107,12 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("help now", "please help"),
-                Choice("mistake", "go back"),
+                Choice("yes", "Yes"),
+                Choice("no", "No"),
             ],
             error=self._(get_generic_error()),
-            next=_next,
+            next={
+                "yes": "state_please_call_start",
+                "no": self.user.metadata["emergency_keyword_previous_state"],
+            },
         )
