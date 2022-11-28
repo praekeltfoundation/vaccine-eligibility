@@ -58,6 +58,16 @@ class Application(BaseApplication):
 
         return suggested_choices
 
+    async def get_privacy_reminder_sent(self, whatsapp_id):
+        privacy_reminder_sent = self.user.metadata.get("privacy_reminder_sent")
+        if not privacy_reminder_sent:
+            error = await rapidpro.update_profile(
+                whatsapp_id, {"privacy_reminder_sent": "True"}, self.user.metadata
+            )
+        if error:
+            return await self.go_to_state("state_error")
+        return bool(privacy_reminder_sent)
+
     async def state_pre_mainmenu(self):
         self.save_metadata("suggested_content", {})
         return await self.go_to_state("state_mainmenu")
@@ -191,6 +201,7 @@ class Application(BaseApplication):
             )
         )
 
+        additional_messages = []
         # We ignore errors here, because if there's an error they just won't get the
         # banner, we can still carry on and not go to the error state
         _, banner_choices = await contentrepo.get_choices_by_tag("banner")
@@ -212,9 +223,10 @@ class Application(BaseApplication):
                     else:
                         message_id = None
 
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip("+")
+
         if len(banner_messages) > 0:
-            msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-            whatsapp_id = msisdn.lstrip("+")
             timestamp = get_current_datetime() + timedelta(hours=2)
             # We ignore this error, as it just means they won't get the reminder
             await rapidpro.update_profile(
@@ -225,6 +237,25 @@ class Application(BaseApplication):
                 },
                 self.user.metadata,
             )
+            additional_messages.extend(banner_messages)
+
+        # Check if user is a first time user to be sent a privacy policy message
+        privacy_reminder_sent = await self.get_privacy_reminder_sent(whatsapp_id)
+        if not privacy_reminder_sent:
+            privacy_reminder_messages = [
+                "\n".join(
+                    [
+                        "This conversation is completely private and confidential. 🤐",
+                        "-----",
+                        "",
+                        "⚠️ If you think someone else could have access to the phone "
+                        "you're using to chat, remember to delete these messages "
+                        "at the end of our chat.",
+                    ]
+                )
+            ]
+            additional_messages.extend(privacy_reminder_messages)
+
         return CustomChoiceState(
             self,
             question=question,
@@ -236,7 +267,7 @@ class Application(BaseApplication):
             ),
             choices=choices,
             next=next_,
-            additional_messages=banner_messages,
+            additional_messages=additional_messages,
         )
 
     async def state_check_relationship_status_set(self):

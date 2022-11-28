@@ -25,6 +25,12 @@ def get_rapidpro_contact(urn):
         rel_status = "Yes"
     elif "27820002002" in urn:
         rel_status = None
+    elif "27820003003" in urn:
+        return {
+            "fields": {
+                "privacy_reminder_sent": "",
+            },
+        }
     return {
         "fields": {
             "relationship_status": rel_status,
@@ -368,6 +374,36 @@ async def contentrepo_api_mock():
 
 
 @pytest.mark.asyncio
+async def test_mainmenu_show_privacy_policy(
+    tester: AppTester,
+    rapidpro_mock,
+):
+    tester.setup_user_address("27820003003")
+    tester.setup_state("state_pre_mainmenu")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+    tester.assert_num_messages(2)
+
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[2]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "privacy_reminder_sent": "True",
+        },
+    }
+    _, privacy_message = tester.application.messages
+    assert privacy_message.content == "\n".join(
+        [
+            "This conversation is completely private and confidential. 🤐",
+            "-----",
+            "",
+            "⚠️ If you think someone else could have access to the phone "
+            "you're using to chat, remember to delete these messages "
+            "at the end of our chat.",
+        ]
+    )
+
+
+@pytest.mark.asyncio
 @mock.patch("yal.mainmenu.get_current_datetime")
 async def test_state_mainmenu_start(
     get_current_datetime, tester: AppTester, contentrepo_api_mock, rapidpro_mock
@@ -376,8 +412,8 @@ async def test_state_mainmenu_start(
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
-    tester.assert_num_messages(2)
-    menu, banner = tester.application.messages
+    tester.assert_num_messages(3)
+    menu, banner, _ = tester.application.messages
     assert menu.content == "\n".join(
         [
             "🏡 *MAIN MENU*",
@@ -421,7 +457,7 @@ async def test_state_mainmenu_start(
         "/api/v2/pages/777",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 4
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
@@ -450,40 +486,39 @@ async def test_state_mainmenu_start_suggested_populated(
         "555": "Suggested Content 2",
     }
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
-    tester.assert_num_messages(1)
-    tester.assert_message(
-        "\n".join(
-            [
-                "🏡 *MAIN MENU*",
-                "How can I help you today?",
-                "-----",
-                "Send me the number of the topic you're interested in.",
-                "",
-                "🏥 *NEED HELP?*",
-                "1. Talk to a counsellor",
-                "2. Find clinics and services",
-                "3. Help content",
-                "-----",
-                "*Main Menu 1 💊*",
-                "4. Sub menu 1",
-                "5. Sub menu 2",
-                "6. Sub menu 3",
-                "-----",
-                "*Main Menu 2 Relationships 🤝*",
-                "7. Sub menu 1",
-                "8. Sub menu 2",
-                "9. Sub menu 3",
-                "-----",
-                "🙋🏿‍♂️ *QUESTIONS?*",
-                "10. Ask your own question",
-                "-----",
-                "⚙️ *CHAT SETTINGS*",
-                "11. Update your information",
-                "-----",
-                "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or"
-                " *MENU*.",
-            ]
-        )
+    tester.assert_num_messages(2)
+    message, _ = tester.application.messages
+    assert message.content == "\n".join(
+        [
+            "🏡 *MAIN MENU*",
+            "How can I help you today?",
+            "-----",
+            "Send me the number of the topic you're interested in.",
+            "",
+            "🏥 *NEED HELP?*",
+            "1. Talk to a counsellor",
+            "2. Find clinics and services",
+            "3. Help content",
+            "-----",
+            "*Main Menu 1 💊*",
+            "4. Sub menu 1",
+            "5. Sub menu 2",
+            "6. Sub menu 3",
+            "-----",
+            "*Main Menu 2 Relationships 🤝*",
+            "7. Sub menu 1",
+            "8. Sub menu 2",
+            "9. Sub menu 3",
+            "-----",
+            "🙋🏿‍♂️ *QUESTIONS?*",
+            "10. Ask your own question",
+            "-----",
+            "⚙️ *CHAT SETTINGS*",
+            "11. Update your information",
+            "-----",
+            "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or"
+            " *MENU*.",
+        ]
     )
 
     assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
@@ -494,7 +529,7 @@ async def test_state_mainmenu_start_suggested_populated(
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
@@ -523,7 +558,7 @@ async def test_state_mainmenu_static(
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 4
 
 
 @pytest.mark.asyncio
@@ -546,7 +581,7 @@ async def test_state_mainmenu_aaq(
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 4
 
 
 @pytest.mark.asyncio
@@ -585,8 +620,8 @@ async def test_state_mainmenu_contentrepo(
 
     tester.assert_metadata("topics_viewed", ["111"])
 
-    assert len(rapidpro_mock.tstate.requests) == 5
-    request = rapidpro_mock.tstate.requests[2]
+    assert len(rapidpro_mock.tstate.requests) == 6
+    request = rapidpro_mock.tstate.requests[3]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "",
@@ -639,8 +674,8 @@ async def test_state_mainmenu_contentrepo_help_content(
     request = contentrepo_api_mock.tstate.requests[-1]
     assert request.args["message"] == ["2"]
 
-    assert len(rapidpro_mock.tstate.requests) == 9
-    request = rapidpro_mock.tstate.requests[2]
+    assert len(rapidpro_mock.tstate.requests) == 10
+    request = rapidpro_mock.tstate.requests[3]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "",
@@ -691,8 +726,8 @@ async def test_state_mainmenu_contentrepo_relationship_content_rel_set(
 
     tester.assert_metadata("topics_viewed", ["222"])
 
-    assert len(rapidpro_mock.tstate.requests) == 5
-    request = rapidpro_mock.tstate.requests[2]
+    assert len(rapidpro_mock.tstate.requests) == 6
+    request = rapidpro_mock.tstate.requests[3]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "",
@@ -741,8 +776,8 @@ async def test_state_mainmenu_contentrepo_relationship_status(
 
     tester.assert_metadata("topics_viewed", ["222"])
 
-    assert len(rapidpro_mock.tstate.requests) == 3
-    request = rapidpro_mock.tstate.requests[2]
+    assert len(rapidpro_mock.tstate.requests) == 4
+    request = rapidpro_mock.tstate.requests[3]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "last_mainmenu_time": "",
@@ -924,7 +959,7 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["data__session_id"][0] == "1"
     assert params["data__user_addr"][0] == "27820001001"
 
-    assert len(rapidpro_mock.tstate.requests) == 9
+    assert len(rapidpro_mock.tstate.requests) == 10
 
     update_request = rapidpro_mock.tstate.requests[-1]
     assert update_request.json["fields"] == {
