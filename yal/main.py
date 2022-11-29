@@ -49,6 +49,7 @@ FEEDBACK_KEYWORDS = {"feedback"}
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
 SEGMENT_SURVEY_ACCEPT = {"hell yeah"}
 SEGMENT_SURVEY_DECLINE = {"no rather not"}
+EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
 
 
 class Application(
@@ -80,6 +81,17 @@ class Application(
 
         keyword = utils.clean_inbound(message.content)
         # Restart keywords that interrupt the current flow
+        if keyword in EMERGENCY_KEYWORDS:
+            # Go straight to please call me application start, phrase matches exactly
+            self.user.session_id = None
+            self.state_name = PleaseCallMeApplication.START_STATE
+        elif utils.check_keyword(keyword, EMERGENCY_KEYWORDS):
+            self.save_metadata("emergency_keyword_previous_state", self.state_name)
+            # If keyword fuzzy matches an emergency keyword,
+            # First confirm redirect with user
+            self.user.session_id = None
+            self.state_name = PleaseCallMeApplication.CONFIRM_REDIRECT
+
         if keyword in GREETING_KEYWORDS or keyword in TRACKING_KEYWORDS:
             self.user.session_id = None
             self.state_name = self.START_STATE

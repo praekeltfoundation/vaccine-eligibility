@@ -307,6 +307,65 @@ async def test_reset_keyword(tester: AppTester, rapidpro_mock, contentrepo_api_m
 
 @pytest.mark.asyncio
 @mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_emergency_keywords_existing_session(
+    get_current_datetime, tester: AppTester
+):
+    get_current_datetime.return_value = datetime(2022, 6, 21, 13, 30)
+
+    tester.setup_state("state_catch_all")
+    await tester.user_input(session=Message.SESSION_EVENT.RESUME, content="depressed")
+    tester.assert_state("state_in_hours")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_emergency_keywords_new_session(get_current_datetime, tester: AppTester):
+    get_current_datetime.return_value = datetime(2022, 6, 21, 13, 30)
+
+    tester.setup_state("state_catch_all")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="I want to die")
+    tester.assert_state("state_in_hours")
+    tester.assert_num_messages(1)
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_emergency_keywords_go_back(get_current_datetime, tester: AppTester):
+    get_current_datetime.return_value = datetime(2022, 6, 21, 13, 30)
+
+    tester.setup_state("state_catch_all")
+    await tester.user_input(content="edpressed")
+    tester.assert_state("state_confirm_redirect_please_call_me")
+    tester.assert_num_messages(1)
+    await tester.user_input("no")
+    tester.assert_state("state_start")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_emergency_keywords_need_help(get_current_datetime, tester: AppTester):
+    get_current_datetime.return_value = datetime(2022, 6, 21, 13, 30)
+    tester.setup_state("state_catch_all")
+    await tester.user_input(content="want to die")
+    tester.assert_message(
+        "\n".join(
+            [
+                'Hi, would you like to talk to someone about "want to die"?',
+                "",
+                "----",
+                "*Or reply:*",
+                BACK_TO_MAIN,
+            ]
+        )
+    )
+    tester.assert_state("state_confirm_redirect_please_call_me")
+    await tester.user_input("yes")
+    tester.assert_state("state_in_hours")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
 async def test_help_keyword(get_current_datetime, tester: AppTester):
     get_current_datetime.return_value = datetime(2022, 6, 21, 13, 30)
 

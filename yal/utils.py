@@ -1,9 +1,11 @@
 import random
 import re
+from csv import reader
 from datetime import datetime, timedelta, timezone
 
 import phonenumbers
 import pycountry
+from rapidfuzz import fuzz, process
 
 from yal import config
 
@@ -77,3 +79,24 @@ def replace_persona_fields(text, metadata={}):
         else:
             text = text.replace(f"[{key}]", PERSONA_DEFAULTS[key])
     return text
+
+
+def get_keywords(name):
+    keywords = []
+    with open(f"yal/keywords/{name}.csv", mode="r") as keyword_file:
+        csvreader = reader(keyword_file)
+        next(csvreader)
+        for row in csvreader:
+            keywords.extend([x.lower() for x in row if x != ""])
+    return keywords
+
+
+def check_keyword(keyword, keyword_list):
+    return bool(
+        process.extract(
+            keyword,
+            keyword_list,
+            scorer=fuzz.ratio,
+            score_cutoff=76,
+        )
+    )

@@ -55,6 +55,7 @@ def get_lovelife_api():
 class Application(BaseApplication):
     START_STATE = "state_please_call_start"
     CALLBACK_RESPONSE_STATE = "state_handle_callback_check_response"
+    CONFIRM_REDIRECT = "state_confirm_redirect_please_call_me"
 
     async def state_please_call_start(self):
         current_datetime = get_current_datetime()
@@ -1086,5 +1087,32 @@ class Application(BaseApplication):
             error=self._(get_generic_error()),
             next={
                 "menu": "state_pre_mainmenu",
+            },
+        )
+
+    async def state_confirm_redirect_please_call_me(self):
+        user_input = self.inbound.content
+        question = self._(
+            "\n".join(
+                [
+                    f'Hi, would you like to talk to someone about "{user_input}"?',
+                    "",
+                    "----",
+                    "*Or reply:*",
+                    BACK_TO_MAIN,
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("yes", "Yes"),
+                Choice("no", "No"),
+            ],
+            error=self._(get_generic_error()),
+            next={
+                "yes": "state_please_call_start",
+                "no": self.user.metadata["emergency_keyword_previous_state"],
             },
         )
