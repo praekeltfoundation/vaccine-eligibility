@@ -4,6 +4,7 @@ from csv import reader
 from datetime import datetime, timedelta, timezone
 
 import phonenumbers
+import pkg_resources
 import pycountry
 from rapidfuzz import fuzz, process
 
@@ -83,7 +84,8 @@ def replace_persona_fields(text, metadata={}):
 
 def get_keywords(name):
     keywords = []
-    with open(f"yal/keywords/{name}.csv", mode="r") as keyword_file:
+    filename = pkg_resources.resource_filename("yal", f"keywords/{name}.csv")
+    with open(filename, mode="r") as keyword_file:
         csvreader = reader(keyword_file)
         next(csvreader)
         for row in csvreader:
