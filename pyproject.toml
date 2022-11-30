@@ -33,6 +33,7 @@ geopy = "2.2.0"
 emoji = "^2.1.0"
 types-emoji = "^2.0.1"
 pytablereader = {extras = ["md"], version = "^0.31.3"}
+setuptools = "^65.6.3"
 
 [tool.poetry.dev-dependencies]
 black = "^22.8.0"
