@@ -1378,6 +1378,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "types-setuptools"
+version = "65.6.0.1"
+description = "Typing stubs for setuptools"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "typing-extensions"
 version = "4.3.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -1523,7 +1531,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "6d1c6616c370ed9dee98677a3d9ecd9996a15d9e099b024b02f81ca7b7abd102"
+content-hash = "b3e81cf23ca0935cbca600bd5e05fcb060f3f3b0941b38aa839b8d0ac4bb8e7e"
 
 [metadata.files]
 aio-pika = []
@@ -1855,6 +1863,7 @@ typepy = []
 types-emoji = []
 types-python-dateutil = []
 types-redis = []
+types-setuptools = []
 typing-extensions = []
 ujson = []
 url-normalize = [
