@@ -1,4 +1,3 @@
-import json
 import random
 from datetime import datetime
 from unittest import mock
@@ -17,25 +16,6 @@ from yal.utils import BACK_TO_MAIN, GET_HELP
 @pytest.fixture
 def tester():
     return AppTester(Application)
-
-
-def get_rapidpro_contact(urn):
-    rel_status = ""
-    if "27820001001" in urn:
-        rel_status = "Yes"
-    elif "27820002002" in urn:
-        rel_status = None
-    elif "27820003003" in urn:
-        return {
-            "fields": {
-                "privacy_reminder_sent": "",
-            },
-        }
-    return {
-        "fields": {
-            "relationship_status": rel_status,
-        },
-    }
 
 
 def build_message_detail(
@@ -85,16 +65,16 @@ async def rapidpro_mock():
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
         tstate.requests.append(request)
+        print("updating contact", request.json["fields"])
+        tstate.contact_fields.update(request.json["fields"])
         return response.json({}, status=200)
 
     @app.route("/api/v2/contacts.json", methods=["GET"])
     def get_contact(request):
         tstate.requests.append(request)
-        urn = request.args.get("urn")
-        contacts = [get_rapidpro_contact(urn)]
         return response.json(
             {
-                "results": contacts,
+                "results": [{"fields": tstate.contact_fields}],
                 "next": None,
             },
             status=200,
@@ -378,18 +358,12 @@ async def test_mainmenu_show_privacy_policy(
     tester: AppTester,
     rapidpro_mock,
 ):
-    tester.setup_user_address("27820003003")
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
     tester.assert_num_messages(2)
 
     assert len(rapidpro_mock.tstate.requests) == 3
-    request = rapidpro_mock.tstate.requests[2]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "privacy_reminder_sent": "True",
-        },
-    }
+    assert rapidpro_mock.tstate.contact_fields["privacy_reminder_sent"] == "True"
     _, privacy_message = tester.application.messages
     assert privacy_message.content == "\n".join(
         [
@@ -401,6 +375,19 @@ async def test_mainmenu_show_privacy_policy(
             "at the end of our chat.",
         ]
     )
+
+
+@pytest.mark.asyncio
+async def test_mainmenu_skip_privacy_policy_if_seen(tester: AppTester, rapidpro_mock):
+    """
+    If the contact field shows that they've already seen the privacy policy, then don't
+    show it to them
+    """
+    rapidpro_mock.tstate.contact_fields["privacy_reminder_sent"] = "True"
+    tester.setup_state("state_pre_mainmenu")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+    tester.assert_num_messages(1)
+    tester.assert_state("state_mainmenu")
 
 
 @pytest.mark.asyncio
@@ -458,20 +445,19 @@ async def test_state_mainmenu_start(
     ]
 
     assert len(rapidpro_mock.tstate.requests) == 4
-    request = rapidpro_mock.tstate.requests[1]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_mainmenu_time": "2022-06-19T17:30:00",
-            "suggested_text": "*12* - Suggested Content 1\n*13* - Suggested Content 2",
-        },
-    }
-    request = rapidpro_mock.tstate.requests[2]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "feedback_timestamp": "2022-06-19T19:30:00",
-            "feedback_type": "facebook_banner",
-        },
-    }
+    assert (
+        rapidpro_mock.tstate.contact_fields["last_mainmenu_time"]
+        == "2022-06-19T17:30:00"
+    )
+    assert (
+        rapidpro_mock.tstate.contact_fields["suggested_text"]
+        == "*12* - Suggested Content 1\n*13* - Suggested Content 2"
+    )
+    assert (
+        rapidpro_mock.tstate.contact_fields["feedback_timestamp"]
+        == "2022-06-19T19:30:00"
+    )
+    assert rapidpro_mock.tstate.contact_fields["feedback_type"] == "facebook_banner"
 
 
 @pytest.mark.asyncio
@@ -530,13 +516,14 @@ async def test_state_mainmenu_start_suggested_populated(
     ]
 
     assert len(rapidpro_mock.tstate.requests) == 3
-    request = rapidpro_mock.tstate.requests[1]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_mainmenu_time": "2022-06-19T17:30:00",
-            "suggested_text": "*12* - Suggested Content 1\n*13* - Suggested Content 2",
-        },
-    }
+    assert (
+        rapidpro_mock.tstate.contact_fields["last_mainmenu_time"]
+        == "2022-06-19T17:30:00"
+    )
+    assert (
+        rapidpro_mock.tstate.contact_fields["suggested_text"]
+        == "*12* - Suggested Content 1\n*13* - Suggested Content 2"
+    )
 
 
 @pytest.mark.asyncio
@@ -621,13 +608,11 @@ async def test_state_mainmenu_contentrepo(
     tester.assert_metadata("topics_viewed", ["111"])
 
     assert len(rapidpro_mock.tstate.requests) == 6
-    request = rapidpro_mock.tstate.requests[3]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_mainmenu_time": "",
-            "suggested_text": "",
-        },
-    }
+    assert rapidpro_mock.tstate.contact_fields["last_mainmenu_time"] == ""
+    assert (
+        rapidpro_mock.tstate.contact_fields["suggested_text"]
+        == "*1* - Suggested Content 1\n*2* - Suggested Content 2"
+    )
 
 
 @pytest.mark.asyncio
@@ -675,19 +660,18 @@ async def test_state_mainmenu_contentrepo_help_content(
     assert request.args["message"] == ["2"]
 
     assert len(rapidpro_mock.tstate.requests) == 10
-    request = rapidpro_mock.tstate.requests[3]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_mainmenu_time": "",
-            "suggested_text": "",
-        },
-    }
+    assert rapidpro_mock.tstate.contact_fields["last_mainmenu_time"] == ""
+    assert (
+        rapidpro_mock.tstate.contact_fields["suggested_text"]
+        == "*2* - Suggested Content 1\n*3* - Suggested Content 2"
+    )
 
 
 @pytest.mark.asyncio
 async def test_state_mainmenu_contentrepo_relationship_content_rel_set(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
+    rapidpro_mock.tstate.contact_fields["relationship_status"] = "Yes"
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input("7")
 
@@ -727,20 +711,17 @@ async def test_state_mainmenu_contentrepo_relationship_content_rel_set(
     tester.assert_metadata("topics_viewed", ["222"])
 
     assert len(rapidpro_mock.tstate.requests) == 6
-    request = rapidpro_mock.tstate.requests[3]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_mainmenu_time": "",
-            "suggested_text": "",
-        },
-    }
+    assert rapidpro_mock.tstate.contact_fields["last_mainmenu_time"] == ""
+    assert (
+        rapidpro_mock.tstate.contact_fields["suggested_text"]
+        == "*4* - Suggested Content 1\n*5* - Suggested Content 2"
+    )
 
 
 @pytest.mark.asyncio
 async def test_state_mainmenu_contentrepo_relationship_status(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
-    tester.setup_user_address("27820002002")
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input("7")
 
@@ -777,13 +758,8 @@ async def test_state_mainmenu_contentrepo_relationship_status(
     tester.assert_metadata("topics_viewed", ["222"])
 
     assert len(rapidpro_mock.tstate.requests) == 4
-    request = rapidpro_mock.tstate.requests[3]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_mainmenu_time": "",
-            "suggested_text": "",
-        },
-    }
+    assert rapidpro_mock.tstate.contact_fields["last_mainmenu_time"] == ""
+    assert rapidpro_mock.tstate.contact_fields["suggested_text"] == ""
 
 
 @pytest.mark.asyncio
@@ -798,7 +774,6 @@ async def test_state_mainmenu_contentrepo_relationship_skip(
     tester.user.metadata["parent_title"] = "Previous thing"
     tester.user.metadata["relationship_section_title"] = "Section title"
 
-    tester.setup_user_address("27820002002")
     tester.setup_state("state_relationship_status")
     await tester.user_input("skip")
 
@@ -846,7 +821,6 @@ async def test_state_mainmenu_contentrepo_relationship_submit(
     tester.user.metadata["parent_title"] = "Previous thing"
     tester.user.metadata["relationship_section_title"] = "Section title"
 
-    tester.setup_user_address("27820002002")
     tester.setup_state("state_relationship_status")
     await tester.user_input("In a relationship")
 
@@ -880,12 +854,7 @@ async def test_state_mainmenu_contentrepo_relationship_submit(
     ]
 
     assert len(rapidpro_mock.tstate.requests) == 4
-    request = rapidpro_mock.tstate.requests[1]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "relationship_status": "yes",
-        },
-    }
+    assert rapidpro_mock.tstate.contact_fields["relationship_status"] == "yes"
 
 
 @pytest.mark.asyncio
@@ -960,22 +929,23 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["data__user_addr"][0] == "27820001001"
 
     assert len(rapidpro_mock.tstate.requests) == 10
-
-    update_request = rapidpro_mock.tstate.requests[-1]
-    assert update_request.json["fields"] == {
-        "last_main_time": "2022-06-19T17:30:00",
-        "suggested_text": "*2* - Suggested Content 1\n*3* - Suggested Content 2",
-    }
-
-    reminder_request = rapidpro_mock.tstate.requests[-2]
-    assert reminder_request.json["fields"]["feedback_type"] == "content"
-    assert "feedback_timestamp" in reminder_request.json["fields"]
+    assert rapidpro_mock.tstate.contact_fields["last_mainmenu_time"] == ""
+    assert (
+        rapidpro_mock.tstate.contact_fields["last_main_time"] == "2022-06-19T17:30:00"
+    )
+    assert (
+        rapidpro_mock.tstate.contact_fields["suggested_text"]
+        == "*2* - Suggested Content 1\n*3* - Suggested Content 2"
+    )
+    assert rapidpro_mock.tstate.contact_fields["feedback_type"] == "content"
+    assert "feedback_timestamp" in rapidpro_mock.tstate.contact_fields
 
 
 @pytest.mark.asyncio
 async def test_state_submenu_image(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
+    rapidpro_mock.tstate.contact_fields["relationship_status"] = "Yes"
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input("6")
 
@@ -1004,6 +974,7 @@ async def test_state_submenu_image(
 async def test_state_detail_image(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
+    rapidpro_mock.tstate.contact_fields["relationship_status"] = "Yes"
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input("6")
     await tester.user_input("1")
