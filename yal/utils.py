@@ -75,8 +75,9 @@ def normalise_phonenumber(phonenumber):
 
 def replace_persona_fields(text, metadata={}):
     for key in PERSONA_FIELDS:
-        if key in metadata and metadata[key].lower() != "skip":
-            text = text.replace(f"[{key}]", metadata[key])
+        value = metadata.get(key)
+        if value and value.lower() != "skip":
+            text = text.replace(f"[{key}]", value)
         else:
             text = text.replace(f"[{key}]", PERSONA_DEFAULTS[key])
     return text
