@@ -73,7 +73,10 @@ class Application(
         if error:
             return await self.go_to_state("state_error")
         for key, value in fields.items():
-            self.save_metadata(key, value)
+            if value:
+                self.save_metadata(key, value)
+            else:
+                self.delete_metadata(key)
 
         keyword = utils.clean_inbound(message.content)
         # Restart keywords that interrupt the current flow
