@@ -376,8 +376,9 @@ async def test_mainmenu_show_privacy_policy(
         ]
     )
 
+
 @pytest.mark.asyncio
-async def test_mainmenu_skip_privacy_policy_if_seen(    tester: AppTester,    rapidpro_mock):
+async def test_mainmenu_skip_privacy_policy_if_seen(tester: AppTester, rapidpro_mock):
     """
     If the contact field shows that they've already seen the privacy policy, then don't
     show it to them
@@ -759,6 +760,7 @@ async def test_state_mainmenu_contentrepo_relationship_status(
     assert len(rapidpro_mock.tstate.requests) == 4
     assert rapidpro_mock.tstate.contact_fields["last_mainmenu_time"] == ""
     assert rapidpro_mock.tstate.contact_fields["suggested_text"] == ""
+
 
 @pytest.mark.asyncio
 async def test_state_mainmenu_contentrepo_relationship_skip(
