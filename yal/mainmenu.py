@@ -64,8 +64,8 @@ class Application(BaseApplication):
             error = await rapidpro.update_profile(
                 whatsapp_id, {"privacy_reminder_sent": "True"}, self.user.metadata
             )
-        if error:
-            return await self.go_to_state("state_error")
+            if error:
+                return await self.go_to_state("state_error")
         return bool(privacy_reminder_sent)
 
     async def state_pre_mainmenu(self):
