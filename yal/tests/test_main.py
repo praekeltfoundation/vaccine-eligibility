@@ -103,58 +103,6 @@ def tester():
     return AppTester(Application)
 
 
-def get_rapidpro_contact(urn):
-    feedback_type = ""
-    feedback_timestamp = None
-    if "27820001002" in urn:
-        feedback_type = "content"
-    if "27820001003" in urn:
-        feedback_type = "facebook_banner"
-    if "27820001004" in urn:
-        feedback_type = "servicefinder"
-        feedback_timestamp = get_current_datetime().isoformat()
-    feedback_type_2 = ""
-    feedback_timestamp_2 = None
-    feedback_survey_sent_2 = ""
-    if "27820001005" in urn:
-        feedback_type_2 = "servicefinder"
-        feedback_timestamp_2 = "2022-03-04T05:06:07"
-        feedback_survey_sent_2 = "true"
-    if "27820001006" in urn:
-        feedback_type = "ask_a_question"
-    if "27820001007" in urn:
-        feedback_type = "ask_a_question_2"
-    return {
-        "uuid": "b733e997-b0b4-4d4d-a3ad-0546e1644aa9",
-        "name": "",
-        "language": "eng",
-        "groups": [],
-        "fields": {
-            "onboarding_completed": "27820001001" in urn,
-            "onboarding_reminder_sent": "27820001008" in urn,
-            "terms_accepted": "27820001001" in urn,
-            "province": "FS",
-            "suburb": "cape town",
-            "street_name": "high level",
-            "street_number": "99",
-            "feedback_survey_sent": "true",
-            "feedback_type": feedback_type,
-            "feedback_timestamp": feedback_timestamp,
-            "feedback_type_2": feedback_type_2,
-            "feedback_timestamp_2": feedback_timestamp_2,
-            "feedback_survey_sent_2": feedback_survey_sent_2,
-            "latitude": -26.2031026,
-            "longitude": 28.0251783,
-            "location_description": "99 high level, cape town, FS",
-        },
-        "blocked": False,
-        "stopped": False,
-        "created_on": "2015-11-11T08:30:24.922024+00:00",
-        "modified_on": "2015-11-11T08:30:25.525936+00:00",
-        "urns": [urn],
-    }
-
-
 MODEL_ANSWERS_PAGE_1 = {
     "FAQ #1 Title": {"id": "1", "body": "This is FAQ #1's content."},
     "FAQ #2 Title that is very long": {"id": "2", "body": "This is FAQ #2's content."},
@@ -232,12 +180,9 @@ async def rapidpro_mock():
                 tstate.errors += 1
                 return response.json({}, status=500)
 
-        urn = request.args.get("urn")
-        contacts = [get_rapidpro_contact(urn)]
-
         return response.json(
             {
-                "results": contacts,
+                "results": [{"fields": tstate.contact_fields}],
                 "next": None,
             },
             status=200,
@@ -246,6 +191,7 @@ async def rapidpro_mock():
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
         tstate.requests.append(request)
+        tstate.contact_fields.update(request.json["fields"])
         return response.json({}, status=200)
 
     async with run_sanic(app) as server:
@@ -296,6 +242,8 @@ async def contentrepo_api_mock():
 
 @pytest.mark.asyncio
 async def test_reset_keyword(tester: AppTester, rapidpro_mock, contentrepo_api_mock):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
     tester.setup_state("state_catch_all")
     await tester.user_input("hi")
     tester.assert_state("state_mainmenu")
@@ -406,6 +354,13 @@ async def test_state_start_to_catch_all(tester: AppTester, rapidpro_mock):
 async def test_state_start_to_mainmenu(
     tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["latitude"] = "-26.2031026"
+    rapidpro_mock.tstate.contact_fields["longitude"] = "28.0251783"
+    rapidpro_mock.tstate.contact_fields[
+        "location_description"
+    ] = "99 high level, cape town, FS"
     await tester.user_input("hi")
     tester.assert_state("state_mainmenu")
     tester.assert_num_messages(2)
@@ -413,15 +368,30 @@ async def test_state_start_to_mainmenu(
     assert len(rapidpro_mock.tstate.requests) == 3
     assert len(contentrepo_api_mock.tstate.requests) == 5
 
-    tester.assert_metadata("longitude", 28.0251783)
-    tester.assert_metadata("latitude", -26.2031026)
+    tester.assert_metadata("longitude", "28.0251783")
+    tester.assert_metadata("latitude", "-26.2031026")
     tester.assert_metadata("location_description", "99 high level, cape town, FS")
+
+
+@pytest.mark.asyncio
+async def test_state_start_contact_fields(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["blankfield"] = None
+    await tester.user_input("hi")
+
+    tester.assert_metadata("onboarding_completed", "TRUE")
+    assert "blankfield" not in tester.user.metadata
 
 
 @pytest.mark.asyncio
 async def test_tracked_keywords_saved(
     tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
     await tester.user_input("howzit")
     tester.assert_state("state_mainmenu")
     tester.assert_num_messages(2)
@@ -433,7 +403,6 @@ async def test_tracked_keywords_saved(
 async def test_tracked_keywords_saved_for_new_user(
     tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
-    tester.setup_user_address("27820001000")
     await tester.user_input("heita")
     tester.assert_state("state_welcome")
     tester.assert_num_messages(1)
@@ -445,7 +414,7 @@ async def test_tracked_keywords_saved_for_new_user(
 async def test_onboarding_reminder_response_to_reminder_handler(
     tester: AppTester, rapidpro_mock
 ):
-    tester.setup_user_address("27820001008")
+    rapidpro_mock.tstate.contact_fields["onboarding_reminder_sent"] = "TRUE"
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="not interested")
     tester.assert_state("state_stop_onboarding_reminders")
     tester.assert_num_messages(1)
@@ -464,13 +433,16 @@ async def test_callback_check_response_to_handler(tester: AppTester):
 async def test_aaq_timeout_response_to_handler(
     tester: AppTester, rapidpro_mock, aaq_mock
 ):
-    tester.setup_user_address("27820001007")
+    rapidpro_mock.tstate.contact_fields["feedback_survey_sent"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["feedback_type"] = "ask_a_question_2"
+    rapidpro_mock.tstate.contact_fields[
+        "feedback_timestamp"
+    ] = get_current_datetime().isoformat()
     tester.user.metadata["inbound_id"] = "inbound-id"
     tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
     tester.user.metadata["faq_id"] = "1"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.user.metadata["aaq_page"] = 0
-    tester.user.metadata["feedback_timestamp"] = get_current_datetime().isoformat()
     await tester.user_input("Nope...")
     tester.assert_state("state_no_question_not_answered")
     tester.assert_num_messages(1)
@@ -500,8 +472,11 @@ async def test_content_feedback_response(tester: AppTester, rapidpro_mock):
     If this is in response to a content feedback push message, then it should be handled
     by the content feedback state
     """
-    tester.user.metadata["feedback_timestamp"] = get_current_datetime().isoformat()
-    tester.setup_user_address("27820001002")
+    rapidpro_mock.tstate.contact_fields[
+        "feedback_timestamp"
+    ] = get_current_datetime().isoformat()
+    rapidpro_mock.tstate.contact_fields["feedback_type"] = "content"
+    rapidpro_mock.tstate.contact_fields["feedback_survey_sent"] = "TRUE"
     await tester.user_input("1")
     tester.assert_state("state_positive_feedback")
     tester.assert_num_messages(1)
@@ -516,8 +491,11 @@ async def test_facebook_crossover_feedback_response(tester: AppTester, rapidpro_
     by the fb feedback state
     """
     # Test session resume
-    tester.user.metadata["feedback_timestamp"] = get_current_datetime().isoformat()
-    tester.setup_user_address("27820001003")
+    rapidpro_mock.tstate.contact_fields[
+        "feedback_timestamp"
+    ] = get_current_datetime().isoformat()
+    rapidpro_mock.tstate.contact_fields["feedback_type"] = "facebook_banner"
+    rapidpro_mock.tstate.contact_fields["feedback_survey_sent"] = "TRUE"
     await tester.user_input("yes, I did")
     tester.assert_state("state_saw_recent_facebook")
     tester.assert_num_messages(1)
@@ -531,7 +509,11 @@ async def test_servicefinder_feedback_response(tester: AppTester, rapidpro_mock)
     If this is in response to a servicefinder feedback push message, then it should be
     handled by the servicefinder feedback application
     """
-    tester.setup_user_address("27820001004")
+    rapidpro_mock.tstate.contact_fields["feedback_type"] = "servicefinder"
+    rapidpro_mock.tstate.contact_fields[
+        "feedback_timestamp"
+    ] = get_current_datetime().isoformat()
+    rapidpro_mock.tstate.contact_fields["feedback_survey_sent"] = "TRUE"
     # test new session
     await tester.user_input("yes, thanks", session=Message.SESSION_EVENT.NEW)
     tester.assert_state("state_servicefinder_positive_feedback")
@@ -547,7 +529,9 @@ async def test_servicefinder_feedback_2_response(tester: AppTester, rapidpro_moc
     should be handled by the servicefinder feedback application
     """
     tester.user.metadata["feedback_timestamp_2"] = get_current_datetime().isoformat()
-    tester.setup_user_address("27820001005")
+    rapidpro_mock.tstate.contact_fields["feedback_type_2"] = "servicefinder"
+    rapidpro_mock.tstate.contact_fields["feedback_timestamp_2"] = "2022-03-04T05:06:07"
+    rapidpro_mock.tstate.contact_fields["feedback_survey_sent_2"] = "true"
     await tester.user_input("yes, i went")
     tester.assert_state("state_went_to_service")
     tester.assert_num_messages(1)
