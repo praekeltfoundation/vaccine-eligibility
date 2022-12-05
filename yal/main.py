@@ -35,7 +35,7 @@ TRACKING_KEYWORDS = {
     "howzit",
     "hello",
     "start",
-    "hisuga",
+    "hishuga",
 }
 OPTOUT_KEYWORDS = {"stop"}
 ONBOARDING_REMINDER_KEYWORDS = {
