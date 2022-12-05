@@ -38,6 +38,17 @@ TRACKING_KEYWORDS = {
     "start",
     "hisuga",
 }
+TRACKING_KEYWORDS_ROUND_2 = {
+    "chat2bwise",
+    "love2bwise",
+    "hi",
+    "click2bwise",
+    "want2bwise",
+    "start2bwise",
+    "join",
+    "register2bwise",
+    "connect",
+}
 OPTOUT_KEYWORDS = {"stop"}
 ONBOARDING_REMINDER_KEYWORDS = {
     "continue",
@@ -92,7 +103,11 @@ class Application(
             self.user.session_id = None
             self.state_name = PleaseCallMeApplication.CONFIRM_REDIRECT
 
-        if keyword in GREETING_KEYWORDS or keyword in TRACKING_KEYWORDS:
+        if (
+            keyword in GREETING_KEYWORDS
+            or keyword in TRACKING_KEYWORDS
+            or keyword in TRACKING_KEYWORDS_ROUND_2
+        ):
             self.user.session_id = None
             self.state_name = self.START_STATE
 
@@ -177,12 +192,16 @@ class Application(
         inbound = utils.clean_inbound(self.inbound.content)
 
         # Save keywords that are used for source tracking
-        if inbound in TRACKING_KEYWORDS:
+        if inbound in TRACKING_KEYWORDS or inbound in TRACKING_KEYWORDS_ROUND_2:
             self.save_answer("state_source_tracking", inbound)
 
         if inbound in OPTOUT_KEYWORDS:
             return await self.go_to_state(OptOutApplication.START_STATE)
-        if inbound in GREETING_KEYWORDS or inbound in TRACKING_KEYWORDS:
+        if (
+            inbound in GREETING_KEYWORDS
+            or inbound in TRACKING_KEYWORDS
+            or inbound in TRACKING_KEYWORDS_ROUND_2
+        ):
             if terms_accepted and onboarding_completed:
                 return await self.go_to_state(MainMenuApplication.START_STATE)
             elif terms_accepted:
