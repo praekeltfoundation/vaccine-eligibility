@@ -62,30 +62,6 @@ async def rapidpro_mock():
 async def test_survey_start(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_start_survey")
     await tester.user_input("OK, let's start!", session=Message.SESSION_EVENT.NEW)
-
-    [msg] = tester.fake_worker.outbound_messages
-    assert msg.content == "\n".join(
-        [
-            "*You and your sexual health*",
-            "-----",
-            "",
-            "🤦🏾‍♂️I've got a ton of answers and info about sex, "
-            "love and relationships.",
-            "",
-            "To point you in the right direction, "
-            "I want to quickly check what you already know.",
-        ]
-    )
-
-    tester.assert_message(
-        "\n".join(
-            [
-                "I'll ask a few questions. For each question "
-                "I just need you to choose the answer that feels right to you."
-            ]
-        )
-    )
-
     assert (
         rapidpro_mock.tstate.contact_fields["segment_survey_complete"] == "inprogress"
     )
@@ -96,26 +72,4 @@ async def test_survey_next_question(tester: AppTester):
     tester.setup_state("state_survey_question")
     await tester.user_input("2")
     tester.assert_state("state_survey_question")
-    tester.assert_message(
-        "\n".join(
-            [
-                "✅◼️◽️◽️◽️◽️◽️◽️◽️",
-                "-----",
-                "",
-                "*If Teddy goes out to a restaurant and starts chatting "
-                "with someone he is sexually attracted to, what is most "
-                "appropriate way Teddy can tell that person wants to "
-                "have sex with him?*",
-                "",
-                "[persona_emoji] _Reply with the *number* " "of your chosen answer:_",
-                "",
-                "*1*. By the way they are looking at him",
-                "*2*. By what they are wearing",
-                "*3*. If they carry condoms",
-                "*4*. If Teddy has had sex with them before",
-                "*5*. If they verbally consent to have sex",
-                "*6*. I don't know",
-            ]
-        )
-    )
     tester.assert_answer("state_s1_1_sex_health_lit_sti", "2")
