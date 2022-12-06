@@ -149,7 +149,7 @@ class Application(BaseApplication):
                     "ABOUT YOU / 🌈 *Your identity*",
                     "-----",
                     "",
-                    "*What's your gender?*",
+                    "*Which gender do you most identify with?*",
                     "",
                     "_Tap the button and select the option you think best fits._",
                 ]

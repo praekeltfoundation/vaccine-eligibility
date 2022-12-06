@@ -225,7 +225,7 @@ async def test_state_gender(get_current_datetime, tester: AppTester, rapidpro_mo
                 "ABOUT YOU / 🌈 *Your identity*",
                 "-----",
                 "",
-                "*What's your gender?*",
+                "*Which gender do you most identify with?*",
                 "",
                 "_Tap the button and select the option you think best fits._",
             ]
