@@ -11,6 +11,7 @@ from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
 from yal.optout import Application as OptOutApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
+from yal.pushmessages_optin import Application as PushMessageOptInApplication
 from yal.quiz import Application as QuizApplication
 from yal.segmentation_survey import Application as SegmentationSurveyApplication
 from yal.servicefinder import Application as ServiceFinderApplication
@@ -57,6 +58,7 @@ class Application(
     ChangePreferencesApplication,
     QuizApplication,
     PleaseCallMeApplication,
+    PushMessageOptInApplication,
     ServiceFinderApplication,
     OptOutApplication,
     AaqApplication,
