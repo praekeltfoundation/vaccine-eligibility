@@ -72,21 +72,35 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    "*Awesome, let's get straight into it.*",
-                    "",
-                    "There are 4 sections to the survey. Each section should take "
-                    "around *5-10 min* to complete.",
-                    "",
+                    "*You and your sexual health*",
                     "-----",
-                    "*Or reply:*",
-                    BACK_TO_MAIN,
+                    "",
+                    "🤦🏾‍♂️I've got a ton of answers and info about sex, "
+                    "love and relationships.",
+                    "",
+                    "To point you in the right direction, "
+                    "I want to quickly check what you already know.",
                 ]
             )
         )
         await self.publish_message(msg)
         await asyncio.sleep(0.5)
+        question = self._(
+            "\n".join(
+                [
+                    "I'll ask a few questions. For each question "
+                    "I just need you to choose the answer that feels right to you."
+                ]
+            )
+        )
 
-        return await self.go_to_state("state_survey_question")
+        return WhatsAppButtonState(
+            app=self,
+            question=question,
+            choices=[Choice("ok", "OK, let's start!")],
+            error=get_generic_error(),
+            next="state_survey_question",
+        )
 
     async def state_survey_question(self):
         metadata = self.user.metadata
@@ -109,6 +123,11 @@ class Application(BaseApplication):
 
         questions = SURVEY_QUESTIONS[section]["questions"]
         total_questions = sum(1 for q in questions.values() if q.get("type") != "info")
+        progress_bar = (
+            (question_number - 1) * "✅"
+            + "◼️"
+            + (total_questions - question_number) * "◽️"
+        )
 
         question = questions[current_question]
         question_type = question.get("type", "choice")
@@ -120,20 +139,9 @@ class Application(BaseApplication):
 
         header = "\n".join(
             [
-                "*BWise / Survey*",
+                f"{progress_bar}",
                 "-----",
-                f"Section {section}",
-                f"{question_number}/{total_questions}",
                 "",
-            ]
-        )
-        footer = "\n".join(
-            [
-                "",
-                "-----",
-                "*Or reply:*",
-                BACK_TO_MAIN,
-                GET_HELP,
             ]
         )
 
@@ -150,9 +158,7 @@ class Application(BaseApplication):
                 self,
                 question=question["text"] + "\n",
                 header=header,
-                footer=footer,
                 error=get_generic_error() + "\n",
-                error_footer=footer,
                 choices=choices,
                 next="state_survey_process_answer",
                 override_answer_name=current_question,
@@ -162,7 +168,6 @@ class Application(BaseApplication):
                 self,
                 question=question["text"],
                 header=header,
-                footer=footer,
                 next="state_survey_process_answer",
                 override_answer_name=current_question,
             )

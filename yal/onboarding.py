@@ -4,6 +4,7 @@ import logging
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, FreeText, WhatsAppListState
 from yal import rapidpro, utils
+from yal.segmentation_survey import Application as SegmentationSurveyApplication
 from yal.utils import get_current_datetime, get_generic_error
 from yal.validators import age_validator
 
@@ -77,7 +78,7 @@ class Application(BaseApplication):
                         "🙋🏾 PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
                         "-----",
                         "",
-                        "Why not use an emoji to accompany my new name? Send in the "
+                        "*Why not use an emoji to accompany my new name?* Send in the "
                         "emoji you'd like to use, now.",
                         "",
                         '_If you want to do this later, just click the "skip" button._',
@@ -99,8 +100,8 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    "*[persona_emoji] Great! I'm just going to ask you a few "
-                    "quick questions now.*",
+                    "[persona_emoji] Great! I'm just going to ask you a few "
+                    "quick questions now to get to know you better.",
                 ]
             )
         )
@@ -119,7 +120,7 @@ class Application(BaseApplication):
                         "-----",
                         "",
                         "*What is your age?*",
-                        "_Type in the number only (e.g. 24)_",
+                        "Type in the number only (e.g. 24)",
                     ]
                 )
             ),
@@ -140,10 +141,6 @@ class Application(BaseApplication):
 
     async def state_gender(self):
         await self.update_last_onboarding_time()
-
-        gender_text = "\n".join(
-            [f"*{i+1}* - {name}" for i, (_, name) in enumerate(utils.GENDERS.items())]
-        )
         gender_choices = [Choice(code, name) for code, name in utils.GENDERS.items()]
 
         question = self._(
@@ -154,10 +151,7 @@ class Application(BaseApplication):
                     "",
                     "*What's your gender?*",
                     "",
-                    "Please click the button and select the option you think best "
-                    "describes you:",
-                    "",
-                    gender_text,
+                    "_Tap the button and select the option you think best fits._",
                 ]
             )
         )
@@ -166,34 +160,39 @@ class Application(BaseApplication):
             question=question,
             button="Gender",
             choices=gender_choices,
-            next="state_other_gender",
+            next="state_rel_status",
             error=self._(get_generic_error()),
         )
 
-    async def state_other_gender(self):
+    async def state_rel_status(self):
         await self.update_last_onboarding_time()
-        gender = self.user.answers.get("state_gender")
-        if gender != "other":
-            return await self.go_to_state("state_submit_onboarding")
+        rel_status_choices = [
+            Choice("relationship", "Yes, seeing someone"),
+            Choice("single", "No, I'm single"),
+            Choice("complicated", "It's complicated"),
+        ]
 
-        return FreeText(
+        question = self._(
+            "\n".join(
+                [
+                    "ABOUT YOU / 👩🏾‍❤️‍💋‍👩🏽 *Relationship status*",
+                    "-----",
+                    "",
+                    "*Awesome! One last thing "
+                    "— are you seeing someone special right now?*",
+                    "",
+                    "_Tap the button and select the option that "
+                    "best describes your situation.._",
+                ]
+            )
+        )
+        return WhatsAppListState(
             self,
-            question=self._(
-                "\n".join(
-                    [
-                        "ABOUT YOU",
-                        "🌈 Preferred Identity",
-                        "-----",
-                        "",
-                        "[persona_emoji] No problem. I want to make double sure you "
-                        "feel included.",
-                        "",
-                        "*Go ahead and let me know what you'd prefer. Type something "
-                        "and hit send. 😌*",
-                    ]
-                )
-            ),
+            question=question,
+            button="Relationship status",
+            choices=rel_status_choices,
             next="state_submit_onboarding",
+            error=self._(get_generic_error()),
         )
 
     async def state_submit_onboarding(self):
@@ -209,7 +208,7 @@ class Application(BaseApplication):
             "persona_emoji": persona_emoji if persona_emoji != "skip" else "",
             "age": self.user.answers.get("state_age"),
             "gender": self.user.answers.get("state_gender"),
-            "gender_other": self.user.answers.get("state_other_gender", ""),
+            "relationship_status": self.user.answers.get("state_rel_status", ""),
             "onboarding_reminder_sent": "",
             "onboarding_reminder_type": "",
         }
@@ -221,31 +220,18 @@ class Application(BaseApplication):
         return await self.go_to_state("state_onboarding_complete")
 
     async def state_onboarding_complete(self):
-        question = self._(
+        msg = self._(
             "\n".join(
                 [
-                    "🙏🏾 OK—We're good to go!",
+                    "🙏🏾 Lekker! Your profile is all set up!",
                     "",
-                    "-----",
-                    "",
-                    "[persona_emoji]  *Do you want to go ahead and ask a question?*",
-                    "I can answer questions about sex, relationships and your health. "
-                    "Just type your Q and hit send 🙂",
-                    "",
-                    "e.g. _How do I know if I have an STI?_",
-                    "",
-                    "-----",
-                    "",
-                    "🏠 Or head to the main menu by clicking the button below.",
+                    "Let's get you started!",
                 ]
             )
         )
-        buttons = [
-            Choice("menu", "Main menu"),
-        ]
-        return await self.go_to_state(
-            "state_aaq_start", question=question, buttons=buttons
-        )
+
+        await self.publish_message(msg)
+        return await self.go_to_state(SegmentationSurveyApplication.START_STATE)
 
     async def state_stop_onboarding_reminders(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)

@@ -227,14 +227,7 @@ async def test_state_gender(get_current_datetime, tester: AppTester, rapidpro_mo
                 "",
                 "*What's your gender?*",
                 "",
-                "Please click the button and select the option you think best "
-                "describes you:",
-                "",
-                "*1* - Female",
-                "*2* - Male",
-                "*3* - Non-binary",
-                "*4* - None of these",
-                "*5* - Rather not say",
+                "_Tap the button and select the option you think best fits._",
             ]
         )
     )
@@ -261,33 +254,10 @@ async def test_state_gender_from_list(
 
     await tester.user_input("2")
 
-    tester.assert_state("state_aaq_start")
+    tester.assert_state("state_rel_status")
     tester.assert_num_messages(1)
 
     tester.assert_answer("state_gender", "male")
-
-    assert len(rapidpro_mock.tstate.requests) == 4
-    request = rapidpro_mock.tstate.requests[1]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "last_onboarding_time": "2022-06-19T17:30:00",
-            "onboarding_reminder_type": "5 min",
-        },
-    }
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.onboarding.get_current_datetime")
-async def test_state_other_gender(
-    get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_state("state_gender")
-
-    await tester.user_input("4")
-
-    tester.assert_state("state_other_gender")
-    tester.assert_num_messages(1)
 
     assert len(rapidpro_mock.tstate.requests) == 3
     request = rapidpro_mock.tstate.requests[1]
@@ -300,37 +270,31 @@ async def test_state_other_gender(
 
 
 @pytest.mark.asyncio
-@mock.patch("yal.askaquestion.config")
-async def test_submit_onboarding(mock_config, tester: AppTester, rapidpro_mock):
-    mock_config.AAQ_URL = "http://aaq-test.com"
-    tester.setup_state("state_other_gender")
-
+async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_start_survey")
     tester.setup_answer("state_age", "22")
     tester.setup_answer("state_gender", "other")
-    tester.setup_answer("state_other_gender", "gender fluid")
     tester.setup_answer("state_persona_name", "Nurse Joy")
     tester.setup_answer("state_persona_emoji", "⛑️")
+    tester.setup_answer("state_rel_status", "single")
 
-    await tester.user_input("gender fluid")
-
-    tester.assert_state("state_aaq_start")
+    await tester.user_input("OK, let's start!")
+    await tester.user_input("1")
+    await tester.user_input("2")
+    await tester.user_input("Strongly agree")
+    await tester.user_input("Strongly agree")
+    await tester.user_input("3")
+    await tester.user_input("Not at all true")
+    await tester.user_input("Not at all true")
+    await tester.user_input("Yes")
+    await tester.user_input("4")
     tester.assert_num_messages(1)
     tester.assert_message(
         "\n".join(
             [
-                "🙏🏾 OK—We're good to go!",
+                "🙏🏾 Lekker! Your profile is all set up!",
                 "",
-                "-----",
-                "",
-                "⛑️  *Do you want to go ahead and ask a question?*",
-                "I can answer questions about sex, relationships and your health. "
-                "Just type your Q and hit send 🙂",
-                "",
-                "e.g. _How do I know if I have an STI?_",
-                "",
-                "-----",
-                "",
-                "🏠 Or head to the main menu by clicking the button below.",
+                "Let's get you started!",
             ]
         ),
         buttons=["Main menu"],
@@ -344,7 +308,7 @@ async def test_submit_onboarding(mock_config, tester: AppTester, rapidpro_mock):
             "opted_out": "FALSE",
             "onboarding_completed": "True",
             "gender": "other",
-            "gender_other": "gender fluid",
+            "relationship_status": "single",
             "onboarding_reminder_sent": "",
             "onboarding_reminder_type": "",
             "persona_name": "Nurse Joy",

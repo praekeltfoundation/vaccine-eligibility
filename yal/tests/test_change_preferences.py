@@ -296,7 +296,6 @@ async def test_state_update_gender_confirm_not_correct(
 @pytest.mark.asyncio
 async def test_state_update_gender_submit(tester: AppTester, rapidpro_mock):
     tester.setup_answer("state_update_gender", "other")
-    tester.setup_answer("state_other_gender", "gender fluid")
     tester.setup_state("state_update_gender_confirm")
     await tester.user_input("1")
     tester.assert_num_messages(1)

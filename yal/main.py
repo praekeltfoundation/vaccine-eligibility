@@ -12,6 +12,7 @@ from yal.onboarding import Application as OnboardingApplication
 from yal.optout import Application as OptOutApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
+from yal.segmentation_survey import Application as SegmentationSurveyApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
@@ -63,6 +64,7 @@ class Application(
     ContentFeedbackSurveyApplication,
     WaFbCrossoverFeedbackApplication,
     ServiceFinderFeedbackSurveyApplication,
+    SegmentationSurveyApplication,
 ):
     START_STATE = "state_start"
 

@@ -95,14 +95,13 @@
 | state_save_persona_emoji                   |        FALSE       |              |            FALSE         | Updates user profile with the new emoji                                                                        |
 | state_profile_intro                        |        FALSE       |              |            FALSE         | Sends a message to thank and set expectations                                                                 |
 | state_age                                  |        TRUE        |     Int      |            TRUE          | Asks user to enter their age                                                                                  |
-| state_gender                               |        TRUE        |     Text     |            TRUE          | Asks user to enter their gender. User response is "female", "male", "non_binary", "other" or "rather_not_say" |
-| state_other_gender                         |        TRUE        |     Text     |            TRUE          | Asks user to enter their gender using free text                                                               |
+| state_gender                               |        TRUE        |     Text     |            TRUE          | Asks user to enter their gender. User response is "female", "male", "non_binary", "none of these" or "rather_not_say" |
 | state_submit_onboarding                    |        FALSE       |     Text     |            TRUE          | Adds onboarding choices to user profile                                                                      |
 | state_onboarding_complete                  |        FALSE       |              |            TRUE          | Redirects user to AAQ start state in case they want to ask a question                                      |
 | state_stop_onboarding_reminders            |        TRUE        |     Text     |            TRUE          | Resets fields used for onboarding reminders                                                                 |
 | state_reschedule_onboarding_reminders      |        TRUE        |     Text     |            TRUE          | Sets onboarding reminder fields so that reminder is resent later                                              |
 | state_handle_onboarding_reminder_response  |        TRUE        |     Text     |            TRUE          | Routes user to other state based on their reponse to the onboarding reminder                              |
-
+state_rel_status                             |        TRUE        |     Text     |            TRUE          | Asks the user for their current relationship states, user response is "relationship", "single", "complicated"
 
 ### OptOut flow
 | state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |

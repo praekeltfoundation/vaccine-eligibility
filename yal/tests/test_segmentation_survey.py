@@ -1,13 +1,9 @@
-import json
-import random
-
 import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
-from yal.data.seqmentation_survey_questions import SURVEY_QUESTIONS
 from yal.segmentation_survey import Application
 
 
@@ -64,44 +60,28 @@ async def rapidpro_mock():
 
 @pytest.mark.asyncio
 async def test_survey_start(tester: AppTester, rapidpro_mock):
-    await tester.user_input("Hell Yeah!", session=Message.SESSION_EVENT.NEW)
-    tester.assert_state("state_survey_question")
+    tester.setup_state("state_start_survey")
+    await tester.user_input("OK, let's start!", session=Message.SESSION_EVENT.NEW)
 
     [msg] = tester.fake_worker.outbound_messages
     assert msg.content == "\n".join(
         [
-            "*Awesome, let's get straight into it.*",
-            "",
-            "There are 4 sections to the survey. Each section should take around *5-10 "
-            "min* to complete.",
-            "",
+            "*You and your sexual health*",
             "-----",
-            "*Or reply:*",
-            "0. 🏠 Back to Main *MENU*",
+            "",
+            "🤦🏾‍♂️I've got a ton of answers and info about sex, "
+            "love and relationships.",
+            "",
+            "To point you in the right direction, "
+            "I want to quickly check what you already know.",
         ]
     )
 
     tester.assert_message(
         "\n".join(
             [
-                "*BWise / Survey*",
-                "-----",
-                "Section 1",
-                "1/26",
-                "",
-                "*What gender do you identity with?*",
-                "",
-                "1. Female",
-                "2. Male",
-                "3. Non-binary",
-                "4. Transgender",
-                "5. Self-describe",
-                "6. Prefer not to disclose",
-                "",
-                "-----",
-                "*Or reply:*",
-                "0. 🏠 Back to Main *MENU*",
-                "#. 🆘Get *HELP*",
+                "I'll ask a few questions. For each question "
+                "I just need you to choose the answer that feels right to you."
             ]
         )
     )
@@ -112,30 +92,6 @@ async def test_survey_start(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
-async def test_survey_start_decline(tester: AppTester, rapidpro_mock):
-    await tester.user_input("No, rather not", session=Message.SESSION_EVENT.NEW)
-    tester.assert_state("state_survey_decline")
-
-    tester.assert_message(
-        "\n".join(
-            [
-                "*No problem and no pressure!* 😎",
-                "",
-                "What would you like to do next?",
-                "",
-                "1. Ask a question",
-                "2. Go to Main Menu",
-                "-----",
-                "*Or reply:*",
-                "0. 🏠 Back to Main *MENU*",
-            ]
-        )
-    )
-
-    assert rapidpro_mock.tstate.contact_fields["segment_survey_complete"] == "decline"
-
-
-@pytest.mark.asyncio
 async def test_survey_next_question(tester: AppTester):
     tester.setup_state("state_survey_question")
     await tester.user_input("2")
@@ -143,254 +99,23 @@ async def test_survey_next_question(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "*BWise / Survey*",
+                "✅◼️◽️◽️◽️◽️◽️◽️◽️",
                 "-----",
-                "Section 1",
-                "2/26",
                 "",
-                "*Do you sometimes, or have you previously had sex with men?*",
+                "*If Teddy goes out to a restaurant and starts chatting "
+                "with someone he is sexually attracted to, what is most "
+                "appropriate way Teddy can tell that person wants to "
+                "have sex with him?*",
                 "",
-                "1. Yes",
-                "2. No",
+                "[persona_emoji] _Reply with the *number* " "of your chosen answer:_",
                 "",
-                "-----",
-                "*Or reply:*",
-                "0. 🏠 Back to Main *MENU*",
-                "#. 🆘Get *HELP*",
+                "*1*. By the way they are looking at him",
+                "*2*. By what they are wearing",
+                "*3*. If they carry condoms",
+                "*4*. If Teddy has had sex with them before",
+                "*5*. If they verbally consent to have sex",
+                "*6*. I don't know",
             ]
         )
     )
-    tester.assert_answer("state_s1_1_gender", "male")
-
-
-@pytest.mark.asyncio
-async def test_survey_invalid_answer(tester: AppTester):
-    random.seed(0)
-
-    tester.setup_state("state_survey_question")
-    await tester.user_input("A")
-    tester.assert_state("state_survey_question")
-    tester.assert_message(
-        "\n".join(
-            [
-                "Oops, looks like I don't have that option available.🤔Please try "
-                "again - I'll get it if you use the number that matches your choice, "
-                "promise.👍",
-                "",
-                "1. Female",
-                "2. Male",
-                "3. Non-binary",
-                "4. Transgender",
-                "5. Self-describe",
-                "6. Prefer not to disclose",
-                "",
-                "-----",
-                "*Or reply:*",
-                "0. 🏠 Back to Main *MENU*",
-                "#. 🆘Get *HELP*",
-            ]
-        )
-    )
-    tester.assert_no_answer("state_s1_4_income")
-
-
-@pytest.mark.asyncio
-async def test_survey_next_question_branch(tester: AppTester):
-    tester.user.metadata["segment_question"] = "state_s1_6_monthly_sex_partners"
-    tester.setup_state("state_survey_question")
-    await tester.user_input("3")
-    tester.assert_state("state_survey_question")
-    tester.assert_message(
-        "\n".join(
-            [
-                "*BWise / Survey*",
-                "-----",
-                "Section 1",
-                "2/26",
-                "",
-                "*Ok. You can tell me how many sexual partners you had here.*",
-                "",
-                "_Just type and send_",
-                "",
-                "-----",
-                "*Or reply:*",
-                "0. 🏠 Back to Main *MENU*",
-                "#. 🆘Get *HELP*",
-            ]
-        )
-    )
-
-
-@pytest.mark.asyncio
-async def test_survey_freetext_question(tester: AppTester):
-    tester.user.metadata["segment_section"] = 1
-    tester.user.metadata["segment_question"] = "state_s1_6_detail_monthly_sex_partners"
-
-    tester.setup_state("state_survey_question")
-    await tester.user_input(session=Message.SESSION_EVENT.NEW)
-
-    tester.assert_message(
-        "\n".join(
-            [
-                "*BWise / Survey*",
-                "-----",
-                "Section 1",
-                "1/26",
-                "",
-                "*Ok. You can tell me how many sexual partners you had here.*",
-                "",
-                "_Just type and send_",
-                "",
-                "-----",
-                "*Or reply:*",
-                "0. 🏠 Back to Main *MENU*",
-                "#. 🆘Get *HELP*",
-            ]
-        )
-    )
-
-    await tester.user_input("11")
-
-    tester.assert_state("state_survey_question")
-
-    tester.assert_answer("state_s1_6_detail_monthly_sex_partners", "11")
-
-
-@pytest.mark.asyncio
-async def test_survey_info_message(tester: AppTester):
-    tester.user.metadata["segment_section"] = 1
-    tester.user.metadata["segment_question"] = "state_s1_8_sti_tested"
-
-    tester.setup_state("state_survey_question")
-    await tester.user_input("no")
-    tester.assert_state("state_survey_question")
-
-    [msg] = tester.fake_worker.outbound_messages
-    assert msg.content == (
-        "Please note, because you've selected NO, we're skipping some questions as "
-        "they don't apply to you."
-    )
-
-    tester.assert_metadata("segment_question", "state_s1_12_5_partners_stis")
-
-
-@pytest.mark.asyncio
-async def test_survey_next_section(tester: AppTester):
-    tester.user.metadata["segment_section"] = 2
-    tester.user.metadata["segment_question"] = "state_s2_12_contraceptive_2_detail"
-
-    tester.setup_state("state_survey_question")
-    await tester.user_input("1")
-    tester.assert_state("state_survey_question")
-
-    tester.assert_message(
-        "\n".join(
-            [
-                "*BWise / Survey*",
-                "-----",
-                "Section 3",
-                "1/30",
-                "",
-                "_The following statements may apply more or less to you. To what "
-                "extent do you think each statement applies to you personally?_",
-                "",
-                "*I’m my own boss.*",
-                "",
-                "1. Does not apply at all",
-                "2. Applies somewhat",
-                "3. Applies",
-                "4. Applies a lot",
-                "5. Applies completely",
-                "",
-                "-----",
-                "*Or reply:*",
-                "0. 🏠 Back to Main *MENU*",
-                "#. 🆘Get *HELP*",
-            ]
-        )
-    )
-
-    [msg] = tester.fake_worker.outbound_messages
-    assert msg.content == "\n".join(
-        [
-            "😎 *CONGRATS. YOU'RE HALFWAY THERE!*",
-            "",
-            "Section 2 complete, keep going. *Let's move onto section 3!* 👍🏾",
-        ]
-    )
-
-
-@pytest.mark.asyncio
-async def test_survey_end(tester: AppTester):
-    tester.user.metadata["segment_section"] = 4
-    tester.user.metadata["segment_question"] = "state_s4_7_self_concept_2_body"
-
-    tester.setup_state("state_survey_question")
-    await tester.user_input("1")
-    tester.assert_state("state_survey_done")
-
-    # Make sure metadata was cleaned up and survey can be repeated
-    tester.setup_state("state_start_survey")
-    await tester.user_input("1")
-    tester.assert_state("state_survey_question")
-
-
-@pytest.mark.asyncio
-async def test_survey_start_to_end():
-    def get_next(section, current_question):
-        if not current_question:
-            return
-
-        assert (
-            current_question in SURVEY_QUESTIONS[section]["questions"]
-        ), f"Section {section} - broken link to: {current_question}"
-
-        question = SURVEY_QUESTIONS[section]["questions"][current_question]
-
-        paths = []
-        if type(question.get("next")) == dict:
-            paths = set(question["next"].values())
-        else:
-            paths.append(question.get("next"))
-
-        return all([get_next(section, path) for path in paths])
-
-    for section in SURVEY_QUESTIONS.keys():
-        get_next(section, SURVEY_QUESTIONS[section]["start"])
-
-
-@pytest.mark.asyncio
-async def test_state_survey_done(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_survey_done")
-    await tester.user_input("Get Airtime")
-    tester.assert_state("state_prompt_next_action")
-
-    tester.assert_message(
-        "\n".join(
-            [
-                "*BWise / Survey*",
-                "-----",
-                "",
-                "We've just sent you your airtime. Please check your airtime balance "
-                "now.",
-                "",
-                "*What would you like to do next?*",
-                "",
-                "1. Ask a question",
-                "2. Go to Main Menu",
-                "3. I didn't receive airtime",
-                "",
-                "-----",
-                "*Or reply:*",
-                "*0* - 🏠Back to Main *MENU*",
-                "*#* - 🆘Get *HELP*",
-            ]
-        )
-    )
-
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "flow": "segment-airtime-flow-uuid",
-        "urns": ["whatsapp:27820001001"],
-    }
+    tester.assert_answer("state_s1_1_sex_health_lit_sti", "2")
