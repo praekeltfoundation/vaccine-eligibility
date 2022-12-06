@@ -271,36 +271,26 @@ async def test_state_gender_from_list(
 
 @pytest.mark.asyncio
 async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_start_survey")
+    tester.setup_state("state_rel_status")
     tester.setup_answer("state_age", "22")
     tester.setup_answer("state_gender", "other")
     tester.setup_answer("state_persona_name", "Nurse Joy")
     tester.setup_answer("state_persona_emoji", "⛑️")
-    tester.setup_answer("state_rel_status", "single")
 
-    await tester.user_input("OK, let's start!")
-    await tester.user_input("1")
-    await tester.user_input("2")
-    await tester.user_input("Strongly agree")
-    await tester.user_input("Strongly agree")
-    await tester.user_input("3")
-    await tester.user_input("Not at all true")
-    await tester.user_input("Not at all true")
-    await tester.user_input("Yes")
-    await tester.user_input("4")
+    await tester.user_input("No, I'm single")
+
     tester.assert_num_messages(1)
     tester.assert_message(
         "\n".join(
             [
-                "🙏🏾 Lekker! Your profile is all set up!",
-                "",
-                "Let's get you started!",
+                "I'll ask a few questions. For each question "
+                "I just need you to choose the answer that feels right to you."
             ]
         ),
-        buttons=["Main menu"],
+        buttons=["OK, let's start!"],
     )
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 4
     request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
