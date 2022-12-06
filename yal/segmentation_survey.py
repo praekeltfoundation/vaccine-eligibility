@@ -75,7 +75,7 @@ class Application(BaseApplication):
                     "*You and your sexual health*",
                     "-----",
                     "",
-                    "🤦🏾‍♂️I've got a ton of answers and info about sex, "
+                    "[persona_emoji] I've got a tonne of answers and info about sex, "
                     "love and relationships.",
                     "",
                     "To point you in the right direction, "
