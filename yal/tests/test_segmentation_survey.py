@@ -8,12 +8,20 @@ from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.data.seqmentation_survey_questions import SURVEY_QUESTIONS
-from yal.main import Application
+from yal.segmentation_survey import Application
 
 
 @pytest.fixture
 def tester():
-    return AppTester(Application)
+    tester = AppTester(Application)
+
+    async def publish_message(content):
+        await tester.fake_worker.publish_message(
+            tester.application.inbound.reply(content)
+        )
+
+    tester.application.publish_message = publish_message
+    return tester
 
 
 @pytest.fixture(autouse=True)
@@ -56,8 +64,7 @@ async def rapidpro_mock():
 
 @pytest.mark.asyncio
 async def test_survey_start(tester: AppTester, rapidpro_mock):
-    rapidpro_mock.tstate.contact_fields["segment_survey_complete"] = "pending"
-    await tester.user_input("Hell Yeah!")
+    await tester.user_input("Hell Yeah!", session=Message.SESSION_EVENT.NEW)
     tester.assert_state("state_survey_question")
 
     [msg] = tester.fake_worker.outbound_messages
@@ -105,16 +112,8 @@ async def test_survey_start(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
-async def test_survey_start_not_invited(tester: AppTester, rapidpro_mock):
-    tester.setup_user_address("27820002002")
-    await tester.user_input("Hell Yeah!")
-    tester.assert_state("state_start")
-
-
-@pytest.mark.asyncio
 async def test_survey_start_decline(tester: AppTester, rapidpro_mock):
-    rapidpro_mock.tstate.contact_fields["segment_survey_complete"] = "pending"
-    await tester.user_input("No, rather not")
+    await tester.user_input("No, rather not", session=Message.SESSION_EVENT.NEW)
     tester.assert_state("state_survey_decline")
 
     tester.assert_message(
@@ -389,8 +388,8 @@ async def test_state_survey_done(tester: AppTester, rapidpro_mock):
         )
     )
 
-    assert len(rapidpro_mock.tstate.requests) == 2
-    request = rapidpro_mock.tstate.requests[1]
+    assert len(rapidpro_mock.tstate.requests) == 1
+    request = rapidpro_mock.tstate.requests[0]
     assert json.loads(request.body.decode("utf-8")) == {
         "flow": "segment-airtime-flow-uuid",
         "urns": ["whatsapp:27820001001"],

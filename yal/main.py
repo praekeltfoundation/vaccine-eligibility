@@ -12,7 +12,6 @@ from yal.onboarding import Application as OnboardingApplication
 from yal.optout import Application as OptOutApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
-from yal.segmentation_survey import Application as SegmentSurveyApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
@@ -36,7 +35,7 @@ TRACKING_KEYWORDS = {
     "howzit",
     "hello",
     "start",
-    "hisuga",
+    "hishuga",
 }
 TRACKING_KEYWORDS_ROUND_2 = {
     "chat2bwise",
@@ -58,8 +57,6 @@ ONBOARDING_REMINDER_KEYWORDS = {
 CALLBACK_CHECK_KEYWORDS = {"callback"}
 FEEDBACK_KEYWORDS = {"feedback"}
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
-SEGMENT_SURVEY_ACCEPT = {"hell yeah"}
-SEGMENT_SURVEY_DECLINE = {"no rather not"}
 EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
 
 
@@ -77,7 +74,6 @@ class Application(
     ContentFeedbackSurveyApplication,
     WaFbCrossoverFeedbackApplication,
     ServiceFinderFeedbackSurveyApplication,
-    SegmentSurveyApplication,
 ):
     START_STATE = "state_start"
 
@@ -88,7 +84,10 @@ class Application(
         if error:
             return await self.go_to_state("state_error")
         for key, value in fields.items():
-            self.save_metadata(key, value)
+            if value:
+                self.save_metadata(key, value)
+            else:
+                self.delete_metadata(key)
 
         keyword = utils.clean_inbound(message.content)
         # Restart keywords that interrupt the current flow
@@ -143,14 +142,6 @@ class Application(
                 self.user.session_id = random_id()
             message.session_event = Message.SESSION_EVENT.RESUME
             self.state_name = feedback_state
-
-        segment_survey_complete = self.user.metadata.get(
-            "segment_survey_complete", "false"
-        ).lower()
-        if segment_survey_complete == "pending":
-            if self.state_name not in dir(SegmentSurveyApplication):
-                self.user.session_id = None
-                self.state_name = SegmentSurveyApplication.START_STATE
 
         return await super().process_message(message)
 
