@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, FreeText, WhatsAppListState
+from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
 from yal import rapidpro, utils
 from yal.segmentation_survey import Application as SegmentationSurveyApplication
 from yal.utils import get_current_datetime, get_generic_error
@@ -231,7 +231,41 @@ class Application(BaseApplication):
         )
 
         await self.publish_message(msg)
-        return await self.go_to_state(SegmentationSurveyApplication.START_STATE)
+        return await self.go_to_state("state_sexual_literacy_assessment_start")
+
+    async def state_sexual_literacy_assessment_start(self):
+        msg = self._(
+            "\n".join(
+                [
+                    "*You and your sexual health*",
+                    "-----",
+                    "",
+                    "[persona_emoji] I've got a tonne of answers and info about sex, "
+                    "love and relationships.",
+                    "",
+                    "To point you in the right direction, "
+                    "I want to quickly check what you already know.",
+                ]
+            )
+        )
+        await self.publish_message(msg)
+        await asyncio.sleep(0.5)
+        question = self._(
+            "\n".join(
+                [
+                    "I'll ask a few questions. For each question "
+                    "I just need you to choose the answer that feels right to you."
+                ]
+            )
+        )
+
+        return WhatsAppButtonState(
+            app=self,
+            question=question,
+            choices=[Choice("ok", "OK, let's start!")],
+            error=get_generic_error(),
+            next=SegmentationSurveyApplication.START_STATE,
+        )
 
     async def state_stop_onboarding_reminders(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)

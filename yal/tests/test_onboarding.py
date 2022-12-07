@@ -290,7 +290,7 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
         buttons=["OK, let's start!"],
     )
 
-    assert len(rapidpro_mock.tstate.requests) == 4
+    assert len(rapidpro_mock.tstate.requests) == 3
     request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {

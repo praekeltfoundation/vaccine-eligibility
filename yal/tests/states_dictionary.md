@@ -102,6 +102,7 @@
 | state_reschedule_onboarding_reminders      |        TRUE        |     Text     |            TRUE          | Sets onboarding reminder fields so that reminder is resent later                                              |
 | state_handle_onboarding_reminder_response  |        TRUE        |     Text     |            TRUE          | Routes user to other state based on their reponse to the onboarding reminder                              |
 state_rel_status                             |        TRUE        |     Text     |            TRUE          | Asks the user for their current relationship states, user response is "relationship", "single", "complicated"
+state_sexual_literacy_assessment_start       |        TRUE        |     Text     |            TRUE          | User responds "ok" when they start the assessment                                                                   |
 
 ### OptOut flow
 | state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |

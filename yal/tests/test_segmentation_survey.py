@@ -6,7 +6,7 @@ from sanic import Sanic, response
 from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
-from yal.segmentation_survey import Application
+from yal.main import Application
 
 
 @pytest.fixture
@@ -62,11 +62,9 @@ async def rapidpro_mock():
 
 @pytest.mark.asyncio
 async def test_survey_start(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_start_survey")
-    await tester.user_input("OK, let's start!", session=Message.SESSION_EVENT.NEW)
-    assert (
-        rapidpro_mock.tstate.contact_fields["segment_survey_complete"] == "inprogress"
-    )
+    tester.setup_state("state_sexual_literacy_assessment_start")
+    await tester.user_input("OK, let's start!")
+    tester.assert_state("state_survey_question")
 
 
 @pytest.mark.asyncio

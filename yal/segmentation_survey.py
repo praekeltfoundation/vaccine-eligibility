@@ -4,7 +4,6 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
     ChoiceState,
-    CustomChoiceState,
     EndState,
     FreeText,
     WhatsAppButtonState,
@@ -16,92 +15,7 @@ from yal.utils import BACK_TO_MAIN, GET_HELP, get_generic_error
 
 
 class Application(BaseApplication):
-    START_STATE = "state_start_survey"
-    DECLINE_STATE = "state_survey_decline"
-    COMPLETED_STATE = "state_survey_already_completed"
-
-    async def state_survey_decline(self):
-        def _next(choice: Choice):
-            return choice.value
-
-        whatsapp_id = utils.normalise_phonenumber(self.user.addr).lstrip("+")
-        error = await rapidpro.update_profile(
-            whatsapp_id, {"segment_survey_complete": "decline"}, self.user.metadata
-        )
-        if error:
-            return await self.go_to_state("state_error")
-
-        choices = [
-            Choice("state_aaq_start", self._("Ask a question")),
-            Choice("state_pre_mainmenu", self._("Go to Main Menu")),
-        ]
-        question = "\n".join(
-            [
-                "*No problem and no pressure!* 😎",
-                "",
-                "What would you like to do next?",
-                "",
-                "1. Ask a question",
-                "2. Go to Main Menu",
-                "-----",
-                "*Or reply:*",
-                BACK_TO_MAIN,
-            ]
-        )
-        return CustomChoiceState(
-            self,
-            question=self._(question),
-            error=self._(get_generic_error()),
-            choices=choices,
-            next=_next,
-            button="See my options",
-            buttons=choices,
-        )
-
-    async def state_start_survey(self):
-        keyword = utils.clean_inbound(self.inbound.content)
-        if keyword in {"2", "no rather not"}:
-            return await self.go_to_state("state_survey_decline")
-
-        whatsapp_id = utils.normalise_phonenumber(self.user.addr).lstrip("+")
-        error = await rapidpro.update_profile(
-            whatsapp_id, {"segment_survey_complete": "inprogress"}, self.user.metadata
-        )
-        if error:
-            return await self.go_to_state("state_error")
-
-        msg = self._(
-            "\n".join(
-                [
-                    "*You and your sexual health*",
-                    "-----",
-                    "",
-                    "[persona_emoji] I've got a tonne of answers and info about sex, "
-                    "love and relationships.",
-                    "",
-                    "To point you in the right direction, "
-                    "I want to quickly check what you already know.",
-                ]
-            )
-        )
-        await self.publish_message(msg)
-        await asyncio.sleep(0.5)
-        question = self._(
-            "\n".join(
-                [
-                    "I'll ask a few questions. For each question "
-                    "I just need you to choose the answer that feels right to you."
-                ]
-            )
-        )
-
-        return WhatsAppButtonState(
-            app=self,
-            question=question,
-            choices=[Choice("ok", "OK, let's start!")],
-            error=get_generic_error(),
-            next="state_survey_question",
-        )
+    START_STATE = "state_survey_question"
 
     async def state_survey_question(self):
         metadata = self.user.metadata
