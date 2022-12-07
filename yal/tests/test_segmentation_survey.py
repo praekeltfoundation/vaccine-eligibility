@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from sanic import Sanic, response
 
@@ -73,3 +75,31 @@ async def test_survey_next_question(tester: AppTester):
     await tester.user_input("2")
     tester.assert_state("state_survey_question")
     tester.assert_answer("state_s1_1_sex_health_lit_sti", "2")
+
+
+@pytest.mark.asyncio
+async def test_list_message_type(tester: AppTester):
+    questions = {
+        "1": {
+            "start": "q1",
+            "questions": {
+                "q1": {
+                    "type": "list",
+                    "text": "Test question",
+                    "options": [
+                        "Choice 1",
+                        "Choice 2",
+                    ],
+                    "button": "Select a choice",
+                }
+            },
+        }
+    }
+    with mock.patch("yal.segmentation_survey.SURVEY_QUESTIONS", questions):
+        tester.setup_state("state_survey_question")
+        await tester.user_input(session=Message.SESSION_EVENT.NEW)
+        tester.assert_message(
+            content="\n".join(["◼️", "-----", "", "Test question"]),
+            list_items=["Choice 1", "Choice 2"],
+            button="Select a choice",
+        )

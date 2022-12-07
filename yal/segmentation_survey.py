@@ -8,6 +8,7 @@ from vaccine.states import (
     EndState,
     FreeText,
     WhatsAppButtonState,
+    WhatsAppListState,
 )
 from yal import config, rapidpro, utils
 from yal.data.seqmentation_survey_questions import SURVEY_QUESTIONS
@@ -145,21 +146,31 @@ class Application(BaseApplication):
             ]
         )
 
-        if question_type == "choice":
-            choices = []
-            for option in question["options"]:
-                if isinstance(option, tuple):
-                    stub, option = option
-                else:
-                    stub = option.replace(" ", "_").lower()
-                choices.append(Choice(stub, option))
+        choices = []
+        for option in question.get("options", []):
+            if isinstance(option, tuple):
+                stub, option = option
+            else:
+                stub = option.replace(" ", "_").lower()
+            choices.append(Choice(stub, option))
 
+        if question_type == "choice":
             return ChoiceState(
                 self,
                 question=question["text"] + "\n",
                 header=header,
                 error=get_generic_error() + "\n",
                 choices=choices,
+                next="state_survey_process_answer",
+                override_answer_name=current_question,
+            )
+        elif question_type == "list":
+            return WhatsAppListState(
+                self,
+                question=f"{header}\n{question['text']}",
+                error=get_generic_error(),
+                choices=choices,
+                button=question.get("button", "Choose option"),
                 next="state_survey_process_answer",
                 override_answer_name=current_question,
             )
