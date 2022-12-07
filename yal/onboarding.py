@@ -2,7 +2,13 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
+from vaccine.states import (
+    Choice,
+    EndState,
+    FreeText,
+    WhatsAppButtonState,
+    WhatsAppListState,
+)
 from yal import rapidpro, utils
 from yal.segmentation_survey import Application as SegmentationSurveyApplication
 from yal.utils import get_current_datetime, get_generic_error
@@ -259,6 +265,10 @@ class Application(BaseApplication):
             )
         )
 
+        self.save_metadata(
+            "assessment_end_state", "state_sexual_literacy_assessment_end"
+        )
+
         return WhatsAppButtonState(
             app=self,
             question=question,
@@ -266,6 +276,20 @@ class Application(BaseApplication):
             error=get_generic_error(),
             next=SegmentationSurveyApplication.START_STATE,
         )
+
+    async def state_sexual_literacy_assessment_end(self):
+        msg = "\n".join(
+            [
+                "🏁 🎉",
+                "",
+                "*Awesome. That's all the questions for now!*",
+                "",
+                "🤦🏾‍♂️ Thanks for being so patient and honest 😌.",
+            ]
+        )
+        return EndState(self, msg)
+
+        # TODO: Go down different path depending on assessment outcome
 
     async def state_stop_onboarding_reminders(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)

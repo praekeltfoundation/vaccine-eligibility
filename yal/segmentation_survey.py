@@ -4,14 +4,12 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
     ChoiceState,
-    EndState,
     FreeText,
     WhatsAppButtonState,
     WhatsAppListState,
 )
-from yal import config, rapidpro, utils
 from yal.data.seqmentation_survey_questions import SURVEY_QUESTIONS
-from yal.utils import BACK_TO_MAIN, GET_HELP, get_generic_error
+from yal.utils import get_generic_error
 
 
 class Application(BaseApplication):
@@ -21,12 +19,13 @@ class Application(BaseApplication):
         metadata = self.user.metadata
 
         section = str(metadata.get("segment_section", "1"))
+        print("state_survey_question", section, SURVEY_QUESTIONS.keys())
 
         if section not in SURVEY_QUESTIONS:
             self.delete_metadata("segment_section")
             self.delete_metadata("segment_question")
             self.delete_metadata("segment_question_nr")
-            return await self.go_to_state("state_survey_done")
+            return await self.go_to_state(metadata["assessment_end_state"])
 
         current_question = metadata.get("segment_question")
 
@@ -134,103 +133,3 @@ class Application(BaseApplication):
             self.delete_metadata("segment_question")
 
         return await self.go_to_state("state_survey_question")
-
-    async def state_survey_done(self):
-        question = self._(
-            "\n".join(
-                [
-                    "*BWise / Survey*",
-                    "-----",
-                    "",
-                    "🥳 *CONGRATULATIONS! YOU'RE 💯DONE!*",
-                    "",
-                    "Thank you so much for helping us out. All that's left to do now "
-                    "is for you to *grab your R30 airtime!* 📲",
-                    "",
-                    "We'll send you a message once the airtime has been sent. This "
-                    "may take a few minutes.",
-                    "",
-                    "-----",
-                    "*Or reply:*",
-                    BACK_TO_MAIN,
-                    GET_HELP,
-                ]
-            )
-        )
-        return WhatsAppButtonState(
-            self,
-            question=question,
-            choices=[
-                Choice("get_airtime", self._("Get Airtime")),
-            ],
-            error=get_generic_error(),
-            next={"get_airtime": "state_trigger_airtime_flow"},
-        )
-
-    async def state_trigger_airtime_flow(self):
-        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
-        error = await rapidpro.start_flow(whatsapp_id, config.SEGMENT_AIRTIME_FLOW_UUID)
-        if error:
-            return await self.go_to_state("state_error")
-
-        return await self.go_to_state("state_prompt_next_action")
-
-    async def state_prompt_next_action(self):
-        def _next(choice: Choice):
-            return choice.value
-
-        choices = [
-            Choice("state_aaq_start", self._("Ask a question")),
-            Choice("state_pre_mainmenu", self._("Go to Main Menu")),
-            Choice("state_no_airtime", self._("I didn't receive airtime")),
-        ]
-        header = "\n".join(["*BWise / Survey*", "-----", ""])
-        question = "\n".join(
-            [
-                "We've just sent you your airtime. Please check your airtime balance "
-                "now.",
-                "",
-                "*What would you like to do next?*",
-                "",
-            ]
-        )
-        footer = "\n".join(
-            [
-                "",
-                "-----",
-                "*Or reply:*",
-                "*0* - 🏠Back to Main *MENU*",
-                "*#* - 🆘Get *HELP*",
-            ]
-        )
-        return ChoiceState(
-            self,
-            header=header,
-            question=self._(question),
-            footer=footer,
-            error=self._(get_generic_error()),
-            choices=choices,
-            next=_next,
-        )
-
-    async def state_no_airtime(self):
-        # TODO: label question for helpdesk ??
-        return EndState(
-            self,
-            text=self._(
-                "\n".join(
-                    [
-                        "*BWise / Survey*",
-                        "-----",
-                        "",
-                        "Thank you for letting us know. We'll look into it and get "
-                        "back to you.",
-                        "-----",
-                        "*Or reply:*",
-                        BACK_TO_MAIN,
-                        GET_HELP,
-                    ]
-                )
-            ),
-        )

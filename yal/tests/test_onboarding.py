@@ -400,3 +400,34 @@ async def test_onboarding_set_first_time_menu(
             "terms_accepted": "True",
         },
     }
+
+
+@pytest.mark.asyncio
+async def test_assessment_start(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_sexual_literacy_assessment_start")
+    await tester.user_input("OK, let's start!")
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata(
+        "assessment_end_state", "state_sexual_literacy_assessment_end"
+    )
+
+
+@pytest.mark.asyncio
+async def test_assessment_complete(tester: AppTester, rapidpro_mock):
+    tester.user.metadata[
+        "assessment_end_state"
+    ] = "state_sexual_literacy_assessment_end"
+    tester.user.metadata["segment_section"] = 2
+    tester.setup_state("state_survey_question")
+    await tester.user_input()
+    tester.assert_message(
+        "\n".join(
+            [
+                "🏁 🎉",
+                "",
+                "*Awesome. That's all the questions for now!*",
+                "",
+                "🤦🏾‍♂️ Thanks for being so patient and honest 😌.",
+            ]
+        )
+    )
