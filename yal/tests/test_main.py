@@ -414,6 +414,8 @@ async def test_tracked_keywords_saved_for_new_user(
 async def test_tracked_keywords_saved_ads_round_2(
     tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "True"
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = "True"
     await tester.user_input("join")
     tester.assert_state("state_mainmenu")
     tester.assert_num_messages(2)
@@ -425,7 +427,8 @@ async def test_tracked_keywords_saved_ads_round_2(
 async def test_tracked_keywords_saved_for_new_user_ads_round_2(
     tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
-    tester.setup_user_address("27820001100")
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = ""
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = ""
     await tester.user_input("Hi")
     tester.assert_state("state_welcome")
     tester.assert_num_messages(1)
