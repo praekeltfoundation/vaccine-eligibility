@@ -282,3 +282,14 @@ state_sexual_literacy_assessment_start       |        TRUE        |     Text    
 | state_feedback_willreturn            |        TRUE        |     Text     |            TRUE          | Asks user to rate likelihood of using YAL/Bwise in future            |
 | state_submit_completed_feedback      |        FALSE       |              |            TRUE          | Starts a flow in rapidpro to save the user's feedback            |
 | state_completed_feedback             |        TRUE        |     Text     |            TRUE          | Closes the user session            |
+
+### PushMessages OptIn flow
+| state_name                                   | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
+|----------------------------------------------|--------------------|--------------|---------------------------|----------------------------------------------------------------------------------|
+| state_start_pushmessage_optin                |        TRUE        |     Text     |            TRUE          | Asks user if they would like to receive push messages, answers include yes and no |
+| state_pushmessage_optin_yes_submit           |        FALSE       |              |            TRUE          | Updates opted_in with True if user responds yes                                   |
+| state_pushmessage_optin_yes                  |        TRUE        |     Text     |            TRUE          | Sends the user confirmation that they will receive push messages |
+| state_pushmessage_optin_no_submit            |        FALSE       |              |            TRUE          | Updates opted_in with False if user responds no                                   |
+| state_pushmessage_optin_no                   |        TRUE        |     Text     |            TRUE          | Sends the user confirmation that they will not receive push messages |
+| state_pushmessage_optin_final                |        TRUE        |     Text     |            TRUE          | asks if user would like to go to main menu or aaq |
+
