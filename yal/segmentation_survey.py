@@ -174,6 +174,15 @@ class Application(BaseApplication):
                 next="state_survey_process_answer",
                 override_answer_name=current_question,
             )
+        elif question_type == "button":
+            return WhatsAppButtonState(
+                self,
+                question=f"{header}\n{question['text']}",
+                error=get_generic_error(),
+                choices=choices,
+                next="state_survey_process_answer",
+                override_answer_name=current_question,
+            )
         else:
             return FreeText(
                 self,

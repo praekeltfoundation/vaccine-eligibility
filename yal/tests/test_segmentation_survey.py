@@ -78,7 +78,11 @@ async def test_survey_next_question(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_list_message_type(tester: AppTester):
+async def test_list_question_type(tester: AppTester):
+    """
+    The list question type should ask the user the question using a whatsapp list
+    interactive message
+    """
     questions = {
         "1": {
             "start": "q1",
@@ -102,4 +106,35 @@ async def test_list_message_type(tester: AppTester):
             content="\n".join(["◼️", "-----", "", "Test question"]),
             list_items=["Choice 1", "Choice 2"],
             button="Select a choice",
+        )
+
+
+@pytest.mark.asyncio
+async def test_button_question_type(tester: AppTester):
+    """
+    The list question type should ask the user the question using a whatsapp button
+    interactive message
+    """
+    questions = {
+        "1": {
+            "start": "q1",
+            "questions": {
+                "q1": {
+                    "type": "button",
+                    "text": "Test question",
+                    "options": [
+                        "Choice 1",
+                        "Choice 2",
+                    ],
+                    "button": "Select a choice",
+                }
+            },
+        }
+    }
+    with mock.patch("yal.segmentation_survey.SURVEY_QUESTIONS", questions):
+        tester.setup_state("state_survey_question")
+        await tester.user_input(session=Message.SESSION_EVENT.NEW)
+        tester.assert_message(
+            content="\n".join(["◼️", "-----", "", "Test question"]),
+            buttons=["Choice 1", "Choice 2"],
         )
