@@ -65,7 +65,7 @@ async def test_survey_next_question(tester: AppTester):
     tester.setup_state("state_survey_question")
     await tester.user_input("2")
     tester.assert_state("state_survey_question")
-    tester.assert_answer("state_s1_1_sex_health_lit_sti", "2")
+    tester.assert_answer("state_s1_1_sex_health_lit_sti", "single_partner")
 
 
 @pytest.mark.asyncio

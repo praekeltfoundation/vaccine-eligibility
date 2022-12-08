@@ -3,7 +3,7 @@ ASSESSMENT_QUESTIONS = {
         "start": "state_s1_1_sex_health_lit_sti",
         "questions": {
             "state_s1_1_sex_health_lit_sti": {
-                "type": "freetext",
+                "type": "choice",
                 "text": "\n".join(
                     [
                         "*_People can reduce the risk of getting STIs by:_*",
@@ -11,17 +11,23 @@ ASSESSMENT_QUESTIONS = {
                         "[persona_emoji] _Reply with the *number* "
                         "of your chosen answer:_",
                         "",
-                        "*1.* using to condoms every time they "
-                        "have sexual intercourse.",
-                        "",
-                        "*2.* only having sex with one partner who "
-                        "isn't infected and who has no other partners.",
                     ]
                 ),
+                "options": [
+                    (
+                        "condoms",
+                        "using to condoms every time they have sexual intercourse.",
+                    ),
+                    (
+                        "single_partner",
+                        "only having sex with one partner who isn't infected and who "
+                        "has no other partners.",
+                    ),
+                ],
                 "next": "state_s1_2_sex_health_lit_consent",
             },
             "state_s1_2_sex_health_lit_consent": {
-                "type": "freetext",
+                "type": "choice",
                 "text": "\n".join(
                     [
                         "*If Teddy goes out to a restaurant and starts chatting "
@@ -32,18 +38,20 @@ ASSESSMENT_QUESTIONS = {
                         "[persona_emoji] _Reply with the *number* "
                         "of your chosen answer:_",
                         "",
-                        "*1*. By the way they are looking at him",
-                        "*2*. By what they are wearing",
-                        "*3*. If they carry condoms",
-                        "*4*. If Teddy has had sex with them before",
-                        "*5*. If they verbally consent to have sex",
-                        "*6*. I don't know",
                     ]
                 ),
+                "options": [
+                    ("looking", "By the way they are looking at him"),
+                    ("wearing", "By what they are wearing"),
+                    ("condoms", "If they carry condoms"),
+                    ("previous_sex", "If Teddy has had sex with them before"),
+                    ("verbal_consent", "If they verbally consent to have sex"),
+                    ("dont_know", "I don't know"),
+                ],
                 "next": "state_s1_3_sex_health_lit_right_to_sex",
             },
             "state_s1_3_sex_health_lit_right_to_sex": {
-                "type": "choice",
+                "type": "list",
                 "text": "\n".join(
                     [
                         "*Robert and Samantha have been dating for 5 years and love "
@@ -71,7 +79,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_s1_4_sex_health_lit_insist_condoms",
             },
             "state_s1_4_sex_health_lit_insist_condoms": {
-                "type": "choice",
+                "type": "list",
                 "text": "\n".join(
                     [
                         "How much do you agree or disagree with "
@@ -92,7 +100,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_s1_5_sex_health_lit_saying_no",
             },
             "state_s1_5_sex_health_lit_saying_no": {
-                "type": "freetext",
+                "type": "choice",
                 "text": "\n".join(
                     [
                         "*If you are in a relationship, which statement describes you "
@@ -101,19 +109,30 @@ ASSESSMENT_QUESTIONS = {
                         "[persona_emoji] _Reply with the *number* "
                         "of your chosen answer:_",
                         "",
-                        "*1.* I'm cool with telling bae no if they want "
-                        "to have sex but I don't.",
-                        "*2.* I find it hard to say no to bae if bae wants "
-                        "to have sex but I don't.",
-                        "*3.* I'm not sure how I feel about saying no when "
-                        "bae wants to have sex and I don't.",
-                        "*4.* I'm not in a relationship",
                     ]
                 ),
+                "options": [
+                    (
+                        "easy",
+                        "I'm cool with telling bae no if they want to have sex but I "
+                        "don't.",
+                    ),
+                    (
+                        "difficult",
+                        "I find it hard to say no to bae if bae wants to have sex but "
+                        "I don't.",
+                    ),
+                    (
+                        "not_sure",
+                        "I'm not sure how I feel about saying no when bae wants to "
+                        "have sex and I don't.",
+                    ),
+                    ("no_relationship", "I'm not in a relationship"),
+                ],
                 "next": "state_s1_6_sex_health_lit_needs_important",
             },
             "state_s1_6_sex_health_lit_needs_important": {
-                "type": "choice",
+                "type": "list",
                 "text": "\n".join(
                     [
                         "*How true does this statement sound to you?*",
@@ -134,7 +153,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_s1_7_sex_health_lit_own_pleasure",
             },
             "state_s1_7_sex_health_lit_own_pleasure": {
-                "type": "choice",
+                "type": "list",
                 "text": "\n".join(
                     [
                         "*How true does this statement sound to you?*",
@@ -154,36 +173,42 @@ ASSESSMENT_QUESTIONS = {
             "state_s1_8_sex_health_lit_contraception_1": {
                 "text": "*During the last time you had sex, did you or your partner "
                 "do something or use any method to avoid or delay getting pregnant?*",
-                "type": "choice",
+                "type": "button",
                 "options": [
                     ("yes", "Yes"),
                     ("no", "No"),
                 ],
-                "next": "state_s1_9_sex_health_lit_contraceptive_2",
+                "next": {
+                    "yes": "state_s1_9_sex_health_lit_contraceptive_2",
+                    "no": "state_s1_progress_complete",
+                },
             },
             "state_s1_9_sex_health_lit_contraceptive_2": {
-                "type": "freetext",
+                "type": "choice",
                 "text": "\n".join(
                     [
                         "*What has been the main method that you or your partner "
                         "have used to delay or avoid getting pregnant?*",
                         "",
-                        "*1.* Pill",
-                        "*2.* Intra uterine device (IUD)",
-                        "*3.* Male condom",
-                        "*4.* Female condom",
-                        "*5.* Injectables",
-                        "*6.* Implants",
-                        "*7.* Diaphragm",
-                        "*8.* Foam/jelly",
-                        "*9.* Pulling out (withdrawal method)",
-                        "*10.* Lactational amenorrhea method",
-                        "*11.* Standard days method" "*12.* cyclebeads",
-                        "*13.* Female sterilisation",
-                        "*14.* Male sterilisation",
-                        "*15.* Exclusive breastfeeding",
                     ]
                 ),
+                "options": [
+                    ("pill", "Pill"),
+                    ("iud", "Intra uterine device (IUD)"),
+                    ("male_condom", "Male condom"),
+                    ("female_condom", "Female condom"),
+                    ("injectable", "Injectables"),
+                    ("implant", "Implants"),
+                    ("diaphragm", "Diaphragm"),
+                    ("foam_jelly", "Foam/jelly"),
+                    ("withdrawal", "Pulling out (withdrawal method)"),
+                    ("lactational_amenorrhea", "Lactational amenorrhea method"),
+                    ("standard_days", "Standard days method"),
+                    ("cyclebeads", "Cyclebeads"),
+                    ("female_sterilisation", "Female sterilisation"),
+                    ("male_sterilisation", "Male sterilisation"),
+                    ("exclusive_breastfeeding", "Exclusive breastfeeding"),
+                ],
                 "next": "state_s1_progress_complete",
             },
             "state_s1_progress_complete": {
