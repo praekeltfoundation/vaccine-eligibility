@@ -19,6 +19,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a3_q1_depression",
             },
             "state_a3_q1_depression": {
+                "type": "button",
                 "text": "\n".join(
                     [
                         "Feeling nervous, anxious or on edge... 😰",
@@ -33,6 +34,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a3_q2_depression",
             },
             "state_a3_q2_depression": {
+                "type": "button",
                 "text": "\n".join(
                     [
                         "Not being able to stop or control worrying... 😩",
@@ -47,6 +49,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a3_q3_depression",
             },
             "state_a3_q3_depression": {
+                "type": "button",
                 "text": "Not being able to stop or control worrying... 😩",
                 "options": [
                     "Not at all",
@@ -57,6 +60,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a3_q4_depression",
             },
             "state_a3_q4_depression": {
+                "type": "button",
                 "text": "Not having much interest or pleasure in doing things... 😑",
                 "options": [
                     "Not at all",
@@ -67,6 +71,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a3_q5_depression",
             },
             "state_a3_q5_depression": {
+                "type": "button",
                 "text": "*Do you have someone to talk to when you have a worry or "
                 "problem?*",
                 "options": [

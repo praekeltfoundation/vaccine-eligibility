@@ -7,6 +7,7 @@ ASSESSMENT_QUESTIONS = {
         "start": "state_a6_start",
         "questions": {
             "state_a6_start": {
+                "type": "button",
                 "text": "\n".join(
                     [
                         "[persona_emoji]  *Let me know how you feel about these next "
@@ -23,6 +24,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a6_q1_body_image",
             },
             "state_a6_q1_body_image": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "*_I feel good about myself._*",
@@ -36,6 +38,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a6_q2_body_image",
             },
             "state_a6_q2_body_image": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "*_I feel good about my body._*",

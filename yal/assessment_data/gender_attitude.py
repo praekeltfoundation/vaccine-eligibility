@@ -7,6 +7,7 @@ ASSESSMENT_QUESTIONS = {
         "start": "state_a5_q1_gender_attitude",
         "questions": {
             "state_a5_q1_gender_attitude": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "*_There are times when a woman deserves to be beaten._*",
@@ -20,6 +21,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a5_q2_gender_attitude",
             },
             "state_a5_q2_gender_attitude": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "*_It's a woman's responsibility to avoid getting pregnant._*",
@@ -33,6 +35,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a5_q3_gender_attitude",
             },
             "state_a5_q3_gender_attitude": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "*_A man and a woman should decide together what type of "
@@ -47,6 +50,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a5_q4_gender_attitude",
             },
             "state_a5_q4_gender_attitude": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "*_If a guy gets women pregnant, the child is the "

@@ -7,6 +7,7 @@ ASSESSMENT_QUESTIONS = {
         "start": "state_a2_1_q1_loc_of_ctrl",
         "questions": {
             "state_a2_1_q1_loc_of_ctrl": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "_*I'm my own boss.*_ 😎",
@@ -22,6 +23,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a2_1_q2_loc_of_ctrl",
             },
             "state_a2_1_q2_loc_of_ctrl": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "_*If I work hard, I will be successful.*_ 🤓",
@@ -37,6 +39,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a2_1_q3_loc_of_ctrl",
             },
             "state_a2_1_q3_loc_of_ctrl": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "_*I CAN get relevant health advice if and "
@@ -53,6 +56,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a2_1_q4_loc_of_ctrl",
             },
             "state_a2_1_q4_loc_of_ctrl": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "_*What I do mainly depends on other people.*_ 👯",
@@ -68,6 +72,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a2_1_q5_loc_of_ctrl",
             },
             "state_a2_1_q5_loc_of_ctrl": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "_*Fate often gets in the way of my plans.*_",
@@ -99,6 +104,7 @@ ASSESSMENT_QUESTIONS = {
         "start": "state_a2_2_q5_healthcare",
         "questions": {
             "state_a2_2_q5_healthcare": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "*When I have health needs (like  contraception or "
@@ -113,6 +119,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a2_2_q6_healthcare",
             },
             "state_a2_2_q6_healthcare": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "[persona_emoji]  How good a job would you say you do "
@@ -150,6 +157,7 @@ ASSESSMENT_QUESTIONS = {
         "start": "state_a2_3_q1_self_esteem",
         "questions": {
             "state_a2_3_q1_self_esteem": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "_*I feel that I am a person who has worth — at least as much "
@@ -165,6 +173,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a2_3_q2_self_esteem",
             },
             "state_a2_3_q2_self_esteem": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "_*I feel like I have quite a few of good qualities.*_",
@@ -179,6 +188,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a2_3_q3_self_esteem",
             },
             "state_a2_3_q3_self_esteem": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "_*In general, I tend to feel like a failure.*_",
@@ -193,6 +203,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a2_3_q4_self_esteem",
             },
             "state_a2_3_q4_self_esteem": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "_*I feel like I don't have much to be proud of.*_",
@@ -207,6 +218,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a2_3_q5_self_esteem",
             },
             "state_a2_3_q5_self_esteem": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "_*I have a positive attitude toward myself.*_",
@@ -221,6 +233,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a2_3_q6_self_esteem",
             },
             "state_a2_3_q6_self_esteem": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "_*I'm generally satisfied with myself.*_",
@@ -235,6 +248,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a2_3_q7_self_esteem",
             },
             "state_a2_3_q7_self_esteem": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "_*I wish I could have more respect for myself.*_",
@@ -249,6 +263,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a2_3_q8_self_esteem",
             },
             "state_a2_3_q8_self_esteem": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "_*I definitely feel useless at times.*_",
@@ -263,6 +278,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a2_3_q9_self_esteem",
             },
             "state_a2_3_q9_self_esteem": {
+                "type": "list",
                 "text": "\n".join(
                     [
                         "_*Sometimes I think I'm no good at all.*_",
