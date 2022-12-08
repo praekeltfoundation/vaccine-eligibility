@@ -82,7 +82,7 @@ async def test_state_pushmessages_optin(tester: AppTester, rapidpro_mock):
     assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"push_message_opt_in ": "True"},
+        "fields": {"push_message_opt_in": "True"},
     }
 
 
@@ -95,5 +95,5 @@ async def test_state_pushmessages_optin_no(tester: AppTester, rapidpro_mock):
     assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"push_message_opt_in ": "False"},
+        "fields": {"push_message_opt_in": "False"},
     }
