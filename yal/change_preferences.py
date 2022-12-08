@@ -540,7 +540,6 @@ class Application(BaseApplication):
 
         data = {
             "gender": self.user.answers.get("state_update_gender"),
-            "gender_other": self.user.answers.get("state_update_other_gender", ""),
         }
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)

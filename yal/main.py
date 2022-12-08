@@ -5,12 +5,14 @@ from vaccine.states import EndState
 from vaccine.utils import random_id
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AaqApplication
+from yal.assessments import Application as SegmentationSurveyApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.content_feedback_survey import ContentFeedbackSurveyApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
 from yal.optout import Application as OptOutApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
+from yal.pushmessages_optin import Application as PushMessageOptInApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
@@ -67,6 +69,7 @@ class Application(
     ChangePreferencesApplication,
     QuizApplication,
     PleaseCallMeApplication,
+    PushMessageOptInApplication,
     ServiceFinderApplication,
     OptOutApplication,
     AaqApplication,
@@ -74,6 +77,7 @@ class Application(
     ContentFeedbackSurveyApplication,
     WaFbCrossoverFeedbackApplication,
     ServiceFinderFeedbackSurveyApplication,
+    SegmentationSurveyApplication,
 ):
     START_STATE = "state_start"
 

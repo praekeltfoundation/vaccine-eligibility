@@ -172,7 +172,6 @@ class Application(BaseApplication):
             "location_description": "",
             "persona_name": "",
             "persona_emoji": "",
-            "gender_other": "",
             "emergency_contact": "",
         } | self.reminders_to_be_cleared
         old_details = self.__get_user_details(self.user.metadata)

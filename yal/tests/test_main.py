@@ -9,6 +9,7 @@ from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.askaquestion import Application as AaqApplication
+from yal.assessments import Application as SegmentSurveyApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.content_feedback_survey import ContentFeedbackSurveyApplication
 from yal.main import Application
@@ -17,7 +18,6 @@ from yal.onboarding import Application as OnboardingApplication
 from yal.optout import Application as OptoutApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.quiz import Application as QuizApplication
-from yal.segmentation_survey import Application as SegmentSurveyApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication

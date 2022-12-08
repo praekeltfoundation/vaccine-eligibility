@@ -56,7 +56,6 @@ def get_rapidpro_contact(urn):
             "latitude": "456",
             "persona_name": "Aslan",
             "persona_emoji": "🦁",
-            "gender_other": "non conforming",
             "emergency_contact": "123-emergency",
         }
     return contact
@@ -264,7 +263,6 @@ async def test_state_optout_delete_saved(
             "location_description": "",
             "persona_name": "",
             "persona_emoji": "",
-            "gender_other": "",
             "emergency_contact": "",
         },
     }
