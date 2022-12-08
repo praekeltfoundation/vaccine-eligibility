@@ -5,6 +5,7 @@ from vaccine.states import EndState
 from vaccine.utils import random_id
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AaqApplication
+from yal.assessments import Application as SegmentationSurveyApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.content_feedback_survey import ContentFeedbackSurveyApplication
 from yal.mainmenu import Application as MainMenuApplication
@@ -13,7 +14,6 @@ from yal.optout import Application as OptOutApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.pushmessages_optin import Application as PushMessageOptInApplication
 from yal.quiz import Application as QuizApplication
-from yal.segmentation_survey import Application as SegmentationSurveyApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication

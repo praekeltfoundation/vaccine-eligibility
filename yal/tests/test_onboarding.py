@@ -417,7 +417,7 @@ async def test_assessment_complete(tester: AppTester, rapidpro_mock):
     tester.user.metadata[
         "assessment_end_state"
     ] = "state_sexual_literacy_assessment_end"
-    tester.user.metadata["segment_section"] = 2
+    tester.user.metadata["assessment_section"] = 2
     tester.setup_state("state_survey_question")
     await tester.user_input()
     tester.assert_message(

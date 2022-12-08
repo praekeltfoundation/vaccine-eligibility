@@ -1,4 +1,4 @@
-SURVEY_QUESTIONS = {
+ASSESSMENT_QUESTIONS = {
     "1": {
         "start": "state_s1_1_sex_health_lit_sti",
         "questions": {

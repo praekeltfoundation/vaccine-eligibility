@@ -61,13 +61,6 @@ async def rapidpro_mock():
 
 
 @pytest.mark.asyncio
-async def test_survey_start(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_sexual_literacy_assessment_start")
-    await tester.user_input("OK, let's start!")
-    tester.assert_state("state_survey_question")
-
-
-@pytest.mark.asyncio
 async def test_survey_next_question(tester: AppTester):
     tester.setup_state("state_survey_question")
     await tester.user_input("2")
@@ -97,7 +90,7 @@ async def test_list_question_type(tester: AppTester):
             },
         }
     }
-    with mock.patch("yal.segmentation_survey.SURVEY_QUESTIONS", questions):
+    with mock.patch("yal.assessments.ASSESSMENT_QUESTIONS", questions):
         tester.setup_state("state_survey_question")
         await tester.user_input(session=Message.SESSION_EVENT.NEW)
         tester.assert_message(
@@ -129,7 +122,7 @@ async def test_button_question_type(tester: AppTester):
             },
         }
     }
-    with mock.patch("yal.segmentation_survey.SURVEY_QUESTIONS", questions):
+    with mock.patch("yal.assessments.ASSESSMENT_QUESTIONS", questions):
         tester.setup_state("state_survey_question")
         await tester.user_input(session=Message.SESSION_EVENT.NEW)
         tester.assert_message(

@@ -8,7 +8,7 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
-from yal.data.seqmentation_survey_questions import SURVEY_QUESTIONS
+from yal.assessment_data.sexual_health_literacy import ASSESSMENT_QUESTIONS
 from yal.utils import get_generic_error
 
 
@@ -18,24 +18,23 @@ class Application(BaseApplication):
     async def state_survey_question(self):
         metadata = self.user.metadata
 
-        section = str(metadata.get("segment_section", "1"))
-        print("state_survey_question", section, SURVEY_QUESTIONS.keys())
+        section = str(metadata.get("assessment_section", "1"))
 
-        if section not in SURVEY_QUESTIONS:
-            self.delete_metadata("segment_section")
-            self.delete_metadata("segment_question")
-            self.delete_metadata("segment_question_nr")
+        if section not in ASSESSMENT_QUESTIONS:
+            self.delete_metadata("assessment_section")
+            self.delete_metadata("assessment_question")
+            self.delete_metadata("assessment_question_nr")
             return await self.go_to_state(metadata["assessment_end_state"])
 
-        current_question = metadata.get("segment_question")
+        current_question = metadata.get("assessment_question")
 
         if not current_question:
-            current_question = SURVEY_QUESTIONS[section]["start"]
-            self.save_metadata("segment_question", current_question)
+            current_question = ASSESSMENT_QUESTIONS[section]["start"]
+            self.save_metadata("assessment_question", current_question)
 
-        question_number = metadata.get("segment_question_nr", 1)
+        question_number = metadata.get("assessment_question_nr", 1)
 
-        questions = SURVEY_QUESTIONS[section]["questions"]
+        questions = ASSESSMENT_QUESTIONS[section]["questions"]
         total_questions = sum(1 for q in questions.values() if q.get("type") != "info")
         progress_bar = (
             (question_number - 1) * "✅"
@@ -109,12 +108,12 @@ class Application(BaseApplication):
         metadata = self.user.metadata
         answers = self.user.answers
 
-        section = metadata.get("segment_section", 1)
-        current_question = metadata.get("segment_question")
+        section = metadata.get("assessment_section", 1)
+        current_question = metadata.get("assessment_question")
         answer = answers.get(current_question)
-        question_number = metadata.get("segment_question_nr", 1)
+        question_number = metadata.get("assessment_question_nr", 1)
 
-        question = SURVEY_QUESTIONS[str(section)]["questions"][current_question]
+        question = ASSESSMENT_QUESTIONS[str(section)]["questions"][current_question]
 
         next = None
 
@@ -125,11 +124,11 @@ class Application(BaseApplication):
                 next = question["next"]
 
         if next:
-            self.save_metadata("segment_question", next)
-            self.save_metadata("segment_question_nr", question_number + 1)
+            self.save_metadata("assessment_question", next)
+            self.save_metadata("assessment_question_nr", question_number + 1)
         else:
-            self.save_metadata("segment_section", section + 1)
-            self.save_metadata("segment_question_nr", 1)
-            self.delete_metadata("segment_question")
+            self.save_metadata("assessment_section", section + 1)
+            self.save_metadata("assessment_question_nr", 1)
+            self.delete_metadata("assessment_question")
 
         return await self.go_to_state("state_survey_question")

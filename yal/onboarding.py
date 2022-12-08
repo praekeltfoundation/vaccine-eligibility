@@ -10,7 +10,7 @@ from vaccine.states import (
     WhatsAppListState,
 )
 from yal import rapidpro, utils
-from yal.segmentation_survey import Application as SegmentationSurveyApplication
+from yal.assessments import Application as SegmentationSurveyApplication
 from yal.utils import get_current_datetime, get_generic_error
 from yal.validators import age_validator
 
