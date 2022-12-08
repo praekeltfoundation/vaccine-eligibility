@@ -49,7 +49,7 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "opted_in": "False",
+            "push_message_opt_in": "False",
         }
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
@@ -75,7 +75,7 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "opted_in": "True",
+            "push_message_opt_in": "True",
         }
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
