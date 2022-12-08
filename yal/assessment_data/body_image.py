@@ -1,7 +1,7 @@
 # Assessment state naming convention
 # state_a[number]_[subsection]_q[question]_topic
 ASSESSMENT_QUESTIONS = {
-    "8":
+    "1":
     # A6 Body Image
     {
         "start": "state_a6_start",

@@ -304,7 +304,7 @@ ASSESSMENT_QUESTIONS = {
                         "Thanks so much — proud of you for pushing through. 💪",
                     ]
                 ),
-                "next": "state_a2_8_selfesteem_2_worth",
+                "next": None,
             },
         },
     },
