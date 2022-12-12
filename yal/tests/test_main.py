@@ -24,6 +24,7 @@ from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import BACK_TO_MAIN, GET_HELP, get_current_datetime
 from yal.wa_fb_crossover_feedback import Application as WaFbCrossoverFeedbackApplication
+from yal.tests.test_mainmenu import build_message_detail
 
 
 def get_state_sets():
@@ -221,6 +222,17 @@ async def contentrepo_api_mock():
                 }
             )
         return response.json({"count": 0, "results": []})
+
+    @app.route("/api/v2/pages/444", methods=["GET"])
+    def get_page_detail_444(request):
+        tstate.requests.append(request)
+        return response.json(
+            build_message_detail(
+                444,
+                "Main Menu / Content Page 444",
+                "Content for page 444",
+            )
+        )
 
     @app.route("/suggestedcontent", methods=["GET"])
     def get_suggested_content(request):
@@ -446,6 +458,40 @@ async def test_onboarding_reminder_response_to_reminder_handler(
     tester.assert_num_messages(1)
 
     assert len(rapidpro_mock.tstate.requests) == 2
+
+
+@pytest.mark.asyncio
+async def test_push_message_buttons_to_display_page(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["push_message_sent"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["push_related_page_id"] = "444"
+    await tester.user_input("yeah let s chat")
+    tester.assert_state("state_display_page")
+    tester.assert_num_messages(1)
+    print(tester.application.messages)
+    tester.assert_message(
+        "\n".join(
+            [
+                "Main Menu / Content Page 444",
+                "-----",
+                "",
+                "Content for page 444",
+                "",
+                "-----",
+                "*Or reply:*",
+                "0. 🏠 Back to Main *MENU*",
+                "#. 🆘Get *HELP*",
+            ]
+        )
+    )
+
+    assert len(rapidpro_mock.tstate.requests) == 4
+    assert len(contentrepo_api_mock.tstate.requests) == 2
+
 
 
 @pytest.mark.asyncio

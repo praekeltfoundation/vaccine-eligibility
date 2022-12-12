@@ -60,6 +60,14 @@ CALLBACK_CHECK_KEYWORDS = {"callback"}
 FEEDBACK_KEYWORDS = {"feedback"}
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
 EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
+PUSH_MSG_BUTTONS = {
+    "continue",
+    "start the quiz",
+    "ok let s do it",
+    "yes please",
+    "tell me more",
+    "yeah let s chat",
+}
 
 
 class Application(
@@ -139,7 +147,12 @@ class Application(
                 self.user.session_id = None
                 self.state_name = OnboardingApplication.REMINDER_STATE
 
-        # Fields that RapidPro sets after a push message
+        if keyword in PUSH_MSG_BUTTONS:
+            if self.user.metadata.get("push_message_sent"):
+                self.user.session_id = None
+                self.state_name = MainMenuApplication.PUSH_MESSAGE_RELATED_STATE
+
+        # Fields that RapidPro sets after a feedback push message
         feedback_state = await self.get_feedback_state()
         if feedback_state:
             if not self.user.session_id:
