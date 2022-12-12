@@ -20,6 +20,12 @@ ASSESSMENT_QUESTIONS = {
                     "Most of the time",
                     "All the time",
                 ],
+                "scoring": {
+                    "never": 0,
+                    "sometimes": 1,
+                    "most_of_the_time": 2,
+                    "all_the_time": 3,
+                },
                 "next": None,
             },
         },

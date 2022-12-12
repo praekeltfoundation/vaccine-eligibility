@@ -18,6 +18,11 @@ ASSESSMENT_QUESTIONS = {
                     "Kinda Agree",
                     "Do not Agree",
                 ],
+                "scoring": {
+                    "strongly_agree": 2,
+                    "kinda_agree": 1,
+                    "do_not_agree": 0,
+                },
                 "next": "state_a5_q2_gender_attitude",
             },
             "state_a5_q2_gender_attitude": {
@@ -32,6 +37,11 @@ ASSESSMENT_QUESTIONS = {
                     "Kinda Agree",
                     "Do not Agree",
                 ],
+                "scoring": {
+                    "strongly_agree": 2,
+                    "kinda_agree": 1,
+                    "do_not_agree": 0,
+                },
                 "next": "state_a5_q3_gender_attitude",
             },
             "state_a5_q3_gender_attitude": {
@@ -47,6 +57,11 @@ ASSESSMENT_QUESTIONS = {
                     "Kinda Agree",
                     "Do not Agree",
                 ],
+                "scoring": {
+                    "strongly_agree": 0,
+                    "kinda_agree": 1,
+                    "do_not_agree": 2,
+                },
                 "next": "state_a5_q4_gender_attitude",
             },
             "state_a5_q4_gender_attitude": {
@@ -62,6 +77,11 @@ ASSESSMENT_QUESTIONS = {
                     "Kinda Agree",
                     "Do not Agree",
                 ],
+                "scoring": {
+                    "strongly_agree": 0,
+                    "kinda_agree": 1,
+                    "do_not_agree": 2,
+                },
                 "next": None,
             },
         },

@@ -20,6 +20,13 @@ ASSESSMENT_QUESTIONS = {
                     "Very true",
                     "Extremely True",
                 ],
+                "scoring": {
+                    "not_at_all_true": 0,
+                    "a_little_true": 0,
+                    "kind_of_true": 0,
+                    "very_true": 3,
+                    "extremely_true": 5,
+                },
                 "next": "state_a2_1_q2_loc_of_ctrl",
             },
             "state_a2_1_q2_loc_of_ctrl": {
@@ -116,6 +123,11 @@ ASSESSMENT_QUESTIONS = {
                     "No",
                     "Sometimes",
                 ],
+                "scoring": {
+                    "yes": 4,
+                    "no": 0,
+                    "sometimes": 2.5,
+                },
                 "next": "state_a2_2_q6_healthcare",
             },
             "state_a2_2_q6_healthcare": {
@@ -133,6 +145,13 @@ ASSESSMENT_QUESTIONS = {
                     "OK",
                     "Pretty bad",
                 ],
+                "scoring": {
+                    "excellent": 4,
+                    "very_good": 3,
+                    "good": 2,
+                    "ok": 2,
+                    "pretty_bad": 0,
+                },
                 "next": "state_a2_2_q7_healthcare",
             },
             "state_a2_2_final": {
@@ -170,6 +189,12 @@ ASSESSMENT_QUESTIONS = {
                     "Disagree",
                     "Strongly disagree",
                 ],
+                "scoring": {
+                    "strongly_agree": 3,
+                    "agree": 2,
+                    "disagree": 1,
+                    "strongly_disagree": 0,
+                },
                 "next": "state_a2_3_q2_self_esteem",
             },
             "state_a2_3_q2_self_esteem": {
@@ -185,6 +210,12 @@ ASSESSMENT_QUESTIONS = {
                     "Disagree",
                     "Strongly disagree",
                 ],
+                "scoring": {
+                    "strongly_agree": 3,
+                    "agree": 2,
+                    "disagree": 1,
+                    "strongly_disagree": 0,
+                },
                 "next": "state_a2_3_q3_self_esteem",
             },
             "state_a2_3_q3_self_esteem": {
@@ -200,6 +231,12 @@ ASSESSMENT_QUESTIONS = {
                     "Disagree",
                     "Strongly disagree",
                 ],
+                "scoring": {
+                    "strongly_agree": 0,
+                    "agree": 1,
+                    "disagree": 2,
+                    "strongly_disagree": 3,
+                },
                 "next": "state_a2_3_q4_self_esteem",
             },
             "state_a2_3_q4_self_esteem": {
@@ -215,6 +252,12 @@ ASSESSMENT_QUESTIONS = {
                     "Disagree",
                     "Strongly disagree",
                 ],
+                "scoring": {
+                    "strongly_agree": 0,
+                    "agree": 1,
+                    "disagree": 2,
+                    "strongly_disagree": 3,
+                },
                 "next": "state_a2_3_q5_self_esteem",
             },
             "state_a2_3_q5_self_esteem": {
@@ -230,6 +273,12 @@ ASSESSMENT_QUESTIONS = {
                     "Disagree",
                     "Strongly disagree",
                 ],
+                "scoring": {
+                    "strongly_agree": 3,
+                    "agree": 2,
+                    "disagree": 1,
+                    "strongly_disagree": 0,
+                },
                 "next": "state_a2_3_q6_self_esteem",
             },
             "state_a2_3_q6_self_esteem": {
@@ -245,6 +294,12 @@ ASSESSMENT_QUESTIONS = {
                     "Disagree",
                     "Strongly disagree",
                 ],
+                "scoring": {
+                    "strongly_agree": 3,
+                    "agree": 2,
+                    "disagree": 1,
+                    "strongly_disagree": 0,
+                },
                 "next": "state_a2_3_q7_self_esteem",
             },
             "state_a2_3_q7_self_esteem": {
@@ -260,6 +315,12 @@ ASSESSMENT_QUESTIONS = {
                     "Disagree",
                     "Strongly disagree",
                 ],
+                "scoring": {
+                    "strongly_agree": 0,
+                    "agree": 1,
+                    "disagree": 2,
+                    "strongly_disagree": 3,
+                },
                 "next": "state_a2_3_q8_self_esteem",
             },
             "state_a2_3_q8_self_esteem": {
@@ -275,6 +336,12 @@ ASSESSMENT_QUESTIONS = {
                     "Disagree",
                     "Strongly disagree",
                 ],
+                "scoring": {
+                    "strongly_agree": 0,
+                    "agree": 1,
+                    "disagree": 2,
+                    "strongly_disagree": 3,
+                },
                 "next": "state_a2_3_q9_self_esteem",
             },
             "state_a2_3_q9_self_esteem": {
@@ -290,6 +357,12 @@ ASSESSMENT_QUESTIONS = {
                     "Disagree",
                     "Strongly disagree",
                 ],
+                "scoring": {
+                    "strongly_agree": 0,
+                    "agree": 1,
+                    "disagree": 2,
+                    "strongly_disagree": 3,
+                },
                 "next": "state_a2_3_final",
             },
             "state_a2_3_final": {

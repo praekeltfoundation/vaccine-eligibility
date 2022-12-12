@@ -28,6 +28,7 @@ ASSESSMENT_QUESTIONS = {
                         "has no other partners.",
                     ),
                 ],
+                "scoring": {"condoms": 5, "single_partner": 2},
                 "next": "state_a1_q2_sexual_health_lit",
             },
             "state_a1_q2_sexual_health_lit": {
@@ -52,6 +53,14 @@ ASSESSMENT_QUESTIONS = {
                     ("verbal_consent", "If they verbally consent to have sex"),
                     ("dont_know", "I don't know"),
                 ],
+                "scoring": {
+                    "looking": 0,
+                    "wearing": 0,
+                    "condoms": 0,
+                    "previous_sex": 0,
+                    "verbal_consent": 5,
+                    "dont_know": 0,
+                },
                 "next": "state_a1_q3_sexual_health_lit",
             },
             "state_a1_q3_sexual_health_lit": {
@@ -80,6 +89,13 @@ ASSESSMENT_QUESTIONS = {
                     ("disagree", "Disagree"),
                     ("strongly_disagree", "Strongly disagree"),
                 ],
+                "scoring": {
+                    "strongly_agree": 5,
+                    "agree": 3,
+                    "not_sure": 2,
+                    "disagree": 1,
+                    "strongly_disagree": 0,
+                },
                 "next": "state_a1_q4_sexual_health_lit",
             },
             "state_a1_q4_sexual_health_lit": {
@@ -101,6 +117,13 @@ ASSESSMENT_QUESTIONS = {
                     ("strongly_disagree", "Strongly disagree"),
                     ("not_active", "I am not sexually active"),
                 ],
+                "scoring": {
+                    "strongly_agree": 5,
+                    "agree": 3,
+                    "not_sure": 2,
+                    "disagree": 0,
+                    "strongly_disagree": 0,
+                },
                 "next": "state_a1_q5_sexual_health_lit",
             },
             "state_a1_q5_sexual_health_lit": {
@@ -133,6 +156,12 @@ ASSESSMENT_QUESTIONS = {
                     ),
                     ("no_relationship", "I'm not in a relationship"),
                 ],
+                "scoring": {
+                    "easy": 5,
+                    "difficult": 0,
+                    "not_sure": 1,
+                    "no_relationship": 0,
+                },
                 "next": "state_a1_q6_sexual_health_lit",
             },
             "state_a1_q6_sexual_health_lit": {
@@ -154,6 +183,13 @@ ASSESSMENT_QUESTIONS = {
                     ("very", "Very true"),
                     ("extremely", "Extremely true"),
                 ],
+                "scoring": {
+                    "not": 0,
+                    "little": 0,
+                    "moderately": 0,
+                    "very": 3,
+                    "extremely": 5,
+                },
                 "next": "state_a1_q7_sexual_health_lit",
             },
             "state_a1_q7_sexual_health_lit": {
@@ -173,6 +209,13 @@ ASSESSMENT_QUESTIONS = {
                     ("very", "Very true"),
                     ("extremely", "Extremely true"),
                 ],
+                "scoring": {
+                    "not": 0,
+                    "little": 0,
+                    "moderately": 0,
+                    "very": 3,
+                    "extremely": 5,
+                },
                 "next": "state_a1_q8_sexual_health_lit",
             },
             "state_a1_q8_sexual_health_lit": {
@@ -191,6 +234,13 @@ ASSESSMENT_QUESTIONS = {
                     ("very", "Very true"),
                     ("extremely", "Extremely true"),
                 ],
+                "scoring": {
+                    "not": 0,
+                    "little": 0,
+                    "moderately": 0,
+                    "very": 3,
+                    "extremely": 5,
+                },
                 "next": "state_a1_q9A_sexual_health_lit",
             },
             "state_a1_q9A_sexual_health_lit": {
@@ -203,6 +253,12 @@ ASSESSMENT_QUESTIONS = {
                     ("forgot", "Don't remember"),
                     ("virgin", "Haven't had sex"),
                 ],
+                "scoring": {
+                    "yes": 5,
+                    "no": 0,
+                    "forgot": 0,
+                    "virgin": 3,
+                },
                 "next": {
                     "yes": "state_a1_q9B_sexual_health_lit",
                     "no": "state_a1_final",
@@ -235,6 +291,23 @@ ASSESSMENT_QUESTIONS = {
                     ("male_sterilisation", "Male sterilisation"),
                     ("exclusive_breastfeeding", "Exclusive breastfeeding"),
                 ],
+                "scoring": {
+                    "pill": 5,
+                    "iud": 5,
+                    "male_condom": 3,
+                    "female_condom": 3,
+                    "injectable": 4,
+                    "implant": 4,
+                    "diaphragm": 2,
+                    "foam_jelly": 1,
+                    "withdrawal": 0,
+                    "lactational_amenorrhea": 2,
+                    "standard_days": 0,
+                    "cyclebeads": 1,
+                    "female_sterilisation": 2,
+                    "male_sterilisation": 2,
+                    "exclusive_breastfeeding": 1,
+                },
                 "next": "state_a1_final",
             },
             "state_a1_final": {

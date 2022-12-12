@@ -31,6 +31,12 @@ ASSESSMENT_QUESTIONS = {
                     "More than half the days",
                     "Nearly every day",
                 ],
+                "scoring": {
+                    "not_at_all": 0,
+                    "several_days": 1,
+                    "more_than_half_the_days": 2,
+                    "nearly_every_day": 3,
+                },
                 "next": "state_a3_q2_depression",
             },
             "state_a3_q2_depression": {
@@ -46,6 +52,12 @@ ASSESSMENT_QUESTIONS = {
                     "More than half the days",
                     "Nearly every day",
                 ],
+                "scoring": {
+                    "not_at_all": 0,
+                    "several_days": 1,
+                    "more_than_half_the_days": 2,
+                    "nearly_every_day": 3,
+                },
                 "next": "state_a3_q3_depression",
             },
             "state_a3_q3_depression": {
@@ -57,6 +69,12 @@ ASSESSMENT_QUESTIONS = {
                     "More than half the days",
                     "Nearly every day",
                 ],
+                "scoring": {
+                    "not_at_all": 0,
+                    "several_days": 1,
+                    "more_than_half_the_days": 2,
+                    "nearly_every_day": 3,
+                },
                 "next": "state_a3_q4_depression",
             },
             "state_a3_q4_depression": {
@@ -68,18 +86,12 @@ ASSESSMENT_QUESTIONS = {
                     "More than half the days",
                     "Nearly every day",
                 ],
-                "next": "state_a3_q5_depression",
-            },
-            "state_a3_q5_depression": {
-                "type": "list",
-                "text": "*Do you have someone to talk to when you have a worry or "
-                "problem?*",
-                "options": [
-                    "Never",
-                    "Some of the time",
-                    "Most of the time",
-                    "All the time",
-                ],
+                "scoring": {
+                    "not_at_all": 0,
+                    "several_days": 1,
+                    "more_than_half_the_days": 2,
+                    "nearly_every_day": 3,
+                },
                 "next": None,
             },
         },

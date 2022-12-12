@@ -35,6 +35,7 @@ ASSESSMENT_QUESTIONS = {
                     "Kinda Agree",
                     "Do not Agree",
                 ],
+                "scoring": {"strongly_agree": 0, "kinda_agree": 1, "do_not_agree": 2},
                 "next": "state_a6_q2_body_image",
             },
             "state_a6_q2_body_image": {
@@ -49,6 +50,7 @@ ASSESSMENT_QUESTIONS = {
                     "Kinda Agree",
                     "Do not Agree",
                 ],
+                "scoring": {"strongly_agree": 0, "kinda_agree": 1, "do_not_agree": 2},
                 "next": None,
             },
         },
