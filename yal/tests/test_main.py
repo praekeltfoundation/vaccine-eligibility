@@ -411,6 +411,32 @@ async def test_tracked_keywords_saved_for_new_user(
 
 
 @pytest.mark.asyncio
+async def test_tracked_keywords_saved_ads_round_2(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "True"
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = "True"
+    await tester.user_input("join")
+    tester.assert_state("state_mainmenu")
+    tester.assert_num_messages(2)
+
+    tester.assert_answer("state_source_tracking", "join")
+
+
+@pytest.mark.asyncio
+async def test_tracked_keywords_saved_for_new_user_ads_round_2(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = ""
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = ""
+    await tester.user_input("Hi")
+    tester.assert_state("state_welcome")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_source_tracking", "hi")
+
+
+@pytest.mark.asyncio
 async def test_onboarding_reminder_response_to_reminder_handler(
     tester: AppTester, rapidpro_mock
 ):

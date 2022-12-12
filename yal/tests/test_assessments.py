@@ -129,3 +129,29 @@ async def test_button_question_type(tester: AppTester):
             content="\n".join(["◼️", "-----", "", "Test question"]),
             buttons=["Choice 1", "Choice 2"],
         )
+
+
+@pytest.mark.asyncio
+async def test_scoring(tester: AppTester):
+    """
+    Scoring should add or remove from the total
+    """
+    tester.user.metadata["assessment_end_state"] = "state_catch_all"
+    questions = {
+        "1": {
+            "start": "q1",
+            "questions": {
+                "q1": {
+                    "type": "button",
+                    "text": "Test question",
+                    "options": ["Choice 1", "Choice 2"],
+                    "scoring": {"choice_1": 1, "choice_2": 2},
+                    "next": None,
+                }
+            },
+        }
+    }
+    with mock.patch("yal.assessments.ASSESSMENT_QUESTIONS", questions):
+        tester.setup_state("state_survey_question")
+        await tester.user_input("2")
+        tester.assert_metadata("assessment_score", 2)
