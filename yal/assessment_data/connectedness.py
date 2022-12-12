@@ -7,7 +7,7 @@ ASSESSMENT_QUESTIONS = {
         "start": "state_a4_q1_connectedness",
         "questions": {
             "state_a4_q1_connectedness": {
-                "type": "button",
+                "type": "list",
                 "text": "\n".join(
                     [
                         "[persona_emoji] *Do you have someone to talk to when you "

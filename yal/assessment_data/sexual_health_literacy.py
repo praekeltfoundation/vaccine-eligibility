@@ -196,7 +196,7 @@ ASSESSMENT_QUESTIONS = {
             "state_a1_q9A_sexual_health_lit": {
                 "text": "*During the last time you had sex, did you or your partner "
                 "do something or use any method to avoid or delay getting pregnant?*",
-                "type": "button",
+                "type": "list",
                 "options": [
                     ("yes", "Yes"),
                     ("no", "No"),
