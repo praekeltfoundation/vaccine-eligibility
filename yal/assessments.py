@@ -131,4 +131,11 @@ class Application(BaseApplication):
             self.save_metadata("assessment_question_nr", 1)
             self.delete_metadata("assessment_question")
 
+        if question.get("scoring"):
+            scoring = question["scoring"]
+            if scoring.get(answer):
+                score = metadata.get("assessment_score") or 0
+                score += scoring[answer]
+                self.save_metadata("assessment_score", score)
+
         return await self.go_to_state("state_survey_question")
