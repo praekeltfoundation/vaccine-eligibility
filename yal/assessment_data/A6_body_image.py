@@ -31,11 +31,11 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Strongly Agree",
-                    "Kinda Agree",
-                    "Do not Agree",
+                    "Strongly agree",
+                    "Do not agree",
+                    "Sometimes",
                 ],
-                "scoring": {"strongly_agree": 0, "kinda_agree": 1, "do_not_agree": 2},
+                "scoring": {"strongly_agree": 5, "do_not_agree": 0, "kinda_agree": 3},
                 "next": "state_a6_q2_body_image",
             },
             "state_a6_q2_body_image": {
@@ -46,11 +46,11 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Strongly Agree",
-                    "Kinda Agree",
-                    "Do not Agree",
+                    "Strongly agree",
+                    "Kinda agree",
+                    "Do not agree",
                 ],
-                "scoring": {"strongly_agree": 0, "kinda_agree": 1, "do_not_agree": 2},
+                "scoring": {"strongly_agree": 5, "do_not_agree": 0, "kinda_agree": 3},
                 "next": None,
             },
         },

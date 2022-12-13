@@ -23,8 +23,8 @@ ASSESSMENT_QUESTIONS = {
                 "scoring": {
                     "never": 0,
                     "sometimes": 1,
-                    "most_of_the_time": 2,
-                    "all_the_time": 3,
+                    "most_of_the_time": 3,
+                    "all_the_time": 5,
                 },
                 "next": None,
             },

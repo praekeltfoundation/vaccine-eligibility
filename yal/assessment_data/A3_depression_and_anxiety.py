@@ -34,8 +34,8 @@ ASSESSMENT_QUESTIONS = {
                 "scoring": {
                     "not_at_all": 0,
                     "several_days": 1,
-                    "more_than_half_the_days": 2,
-                    "nearly_every_day": 3,
+                    "more_than_half_the_days": 3,
+                    "nearly_every_day": 5,
                 },
                 "next": "state_a3_q2_depression",
             },
@@ -55,8 +55,8 @@ ASSESSMENT_QUESTIONS = {
                 "scoring": {
                     "not_at_all": 0,
                     "several_days": 1,
-                    "more_than_half_the_days": 2,
-                    "nearly_every_day": 3,
+                    "more_than_half_the_days": 3,
+                    "nearly_every_day": 5,
                 },
                 "next": "state_a3_q3_depression",
             },
@@ -72,8 +72,8 @@ ASSESSMENT_QUESTIONS = {
                 "scoring": {
                     "not_at_all": 0,
                     "several_days": 1,
-                    "more_than_half_the_days": 2,
-                    "nearly_every_day": 3,
+                    "more_than_half_the_days": 3,
+                    "nearly_every_day": 5,
                 },
                 "next": "state_a3_q4_depression",
             },
@@ -89,8 +89,8 @@ ASSESSMENT_QUESTIONS = {
                 "scoring": {
                     "not_at_all": 0,
                     "several_days": 1,
-                    "more_than_half_the_days": 2,
-                    "nearly_every_day": 3,
+                    "more_than_half_the_days": 3,
+                    "nearly_every_day": 5,
                 },
                 "next": None,
             },

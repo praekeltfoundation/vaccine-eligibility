@@ -28,7 +28,7 @@ ASSESSMENT_QUESTIONS = {
                         "has no other partners.",
                     ),
                 ],
-                "scoring": {"condoms": 5, "single_partner": 2},
+                "scoring": {"condoms": 5, "single_partner": 0},
                 "next": "state_a1_q2_sexual_health_lit",
             },
             "state_a1_q2_sexual_health_lit": {
