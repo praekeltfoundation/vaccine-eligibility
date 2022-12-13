@@ -69,6 +69,8 @@
 | state_start                                |        FALSE       |              |            TRUE           | Session entry state. Routes user based on the message they sent in                                           |
 | state_catch_all                            |        FALSE       |              |            TRUE           | Sends user a generic welcome message if we received input we don't recognise                                 |
 | state_error                                |        FALSE       |              |            TRUE           | Closes user session                                 |
+| state_sexual_health_literacy_assessment | FALSE | | Starts the sexual health literacy assessment |
+| state_assessment_end | FALSE | | End message for assessments |
 
 
 ### Main Menu flow

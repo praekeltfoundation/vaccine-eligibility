@@ -8,8 +8,14 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
-from yal.assessment_data.sexual_health_literacy import ASSESSMENT_QUESTIONS
+from yal.assessment_data.sexual_health_literacy import (
+    ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS,
+)
 from yal.utils import get_generic_error
+
+QUESTIONS = {
+    "sexual_health_literacy": SEXUAL_HEALTH_LITERACY_QUESTIONS,
+}
 
 
 class Application(BaseApplication):
@@ -20,7 +26,10 @@ class Application(BaseApplication):
 
         section = str(metadata.get("assessment_section", "1"))
 
-        if section not in ASSESSMENT_QUESTIONS:
+        assessment_name = metadata.get("assesment_name", "sexual_health_literacy")
+        questions = QUESTIONS[assessment_name]
+
+        if section not in questions:
             self.delete_metadata("assessment_section")
             self.delete_metadata("assessment_question")
             self.delete_metadata("assessment_question_nr")
@@ -29,12 +38,12 @@ class Application(BaseApplication):
         current_question = metadata.get("assessment_question")
 
         if not current_question:
-            current_question = ASSESSMENT_QUESTIONS[section]["start"]
+            current_question = questions[section]["start"]
             self.save_metadata("assessment_question", current_question)
 
         question_number = metadata.get("assessment_question_nr", 1)
 
-        questions = ASSESSMENT_QUESTIONS[section]["questions"]
+        questions = questions[section]["questions"]
         total_questions = sum(1 for q in questions.values() if q.get("type") != "info")
         progress_bar = (
             (question_number - 1) * "✅"
@@ -113,7 +122,9 @@ class Application(BaseApplication):
         answer = answers.get(current_question)
         question_number = metadata.get("assessment_question_nr", 1)
 
-        question = ASSESSMENT_QUESTIONS[str(section)]["questions"][current_question]
+        assessment_name = metadata.get("assesment_name", "sexual_health_literacy")
+        questions = QUESTIONS[assessment_name]
+        question = questions[str(section)]["questions"][current_question]
 
         next = None
 
