@@ -2,6 +2,7 @@ import random
 import re
 from csv import reader
 from datetime import datetime, timedelta, timezone
+from typing import Any, Optional
 
 import phonenumbers
 import pkg_resources
@@ -103,3 +104,17 @@ def check_keyword(keyword, keyword_list):
             score_cutoff=76,
         )
     )
+
+
+def get_by_path(obj: Optional[dict], *path: str, default_value: Any = None) -> Any:
+    """
+    Gets a nested value from a dictionary, by following the keys specified in path.
+    Returns default_value if no value can be resolved.
+    """
+    print(type(path))
+    print("get_by_path", obj, path)
+    if not path:
+        return obj
+    if not isinstance(obj, dict) or path[0] not in obj:
+        return default_value
+    return get_by_path(obj[path[0]], *(path[1:]), default_value=default_value)

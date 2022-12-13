@@ -89,3 +89,16 @@ def test_clean_inbound():
     assert utils.clean_inbound("#") == "#"
     assert utils.clean_inbound("  test    whitespace ") == "test whitespace"
     assert utils.clean_inbound("test%&^*special)(*chars") == "test special chars"
+
+
+def test_get_by_path():
+    """
+    Should return the value stored at the path
+    """
+    obj = {"foo": {"bar": {"baz": "hello world"}}}
+    assert utils.get_by_path(obj, "foo", "bar", "baz") == "hello world"
+    assert utils.get_by_path(obj, "invalid", "path") is None
+    assert utils.get_by_path({}, "invalid", "path") is None
+    assert utils.get_by_path(obj, "invalid", default_value="default") == "default"
+    assert utils.get_by_path(obj) == obj
+    assert utils.get_by_path(None, "foo", "bar", "baz") is None
