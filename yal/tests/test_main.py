@@ -578,3 +578,25 @@ async def test_state_qa_reset_feedback_timestamp_keywords(
         "the message early"
     )
     assert tester.user.metadata["feedback_timestamp"] != old_timestamp
+
+
+@pytest.mark.asyncio
+async def test_template_message_button_payload(tester: AppTester):
+    """
+    If there's a button payload that points to a valid state, then send the user to that
+    state.
+    """
+    await tester.user_input(
+        "test",
+        transport_metadata={"message": {"button": {"payload": "state_catch_all"}}},
+    )
+    tester.assert_message(
+        "\n".join(
+            [
+                "🤖 *Hey there — Welcome to B-Wise!*",
+                "",
+                "If you're looking for answers to questions about bodies, sex, "
+                "relationships and health, please reply with the word *HI*.",
+            ]
+        )
+    )

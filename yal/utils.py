@@ -111,8 +111,6 @@ def get_by_path(obj: Optional[dict], *path: str, default_value: Any = None) -> A
     Gets a nested value from a dictionary, by following the keys specified in path.
     Returns default_value if no value can be resolved.
     """
-    print(type(path))
-    print("get_by_path", obj, path)
     if not path:
         return obj
     if not isinstance(obj, dict) or path[0] not in obj:
