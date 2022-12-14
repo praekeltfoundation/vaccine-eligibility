@@ -35,10 +35,10 @@ ASSESSMENT_QUESTIONS = {
                 "type": "choice",
                 "text": "\n".join(
                     [
-                        "*If Teddy goes out to a restaurant and starts chatting "
+                        "_*If Teddy goes out to a restaurant and starts chatting "
                         "with someone he is sexually attracted to, what is most "
                         "appropriate way Teddy can tell that person wants to "
-                        "have sex with him?*",
+                        "have sex with him?*_",
                         "",
                         "[persona_emoji] _Reply with the *number* "
                         "of your chosen answer:_",
@@ -61,19 +61,26 @@ ASSESSMENT_QUESTIONS = {
                     "verbal_consent": 5,
                     "dont_know": 0,
                 },
+                "next": "state_a1_q3_sexual_health_lit_info",
+            },
+            "state_a1_q3_sexual_health_lit_info": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "_*Robert and Samantha have been dating for 5 years and love "
+                        "each other very much.*_",
+                        "",
+                        "_*Every year on Robert's birthday, "
+                        "Samantha promises him sex for his birthday. This year, "
+                        "Samantha tells Robert that she is too tired for sex.*_",
+                    ]
+                ),
                 "next": "state_a1_q3_sexual_health_lit",
             },
             "state_a1_q3_sexual_health_lit": {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Robert and Samantha have been dating for 5 years and love "
-                        "each other very much.*",
-                        "",
-                        "Every year on Robert's birthday, "
-                        "Samantha promises him sex for his birthday. This year, "
-                        "Samantha tells Robert that she is too tired for sex.",
-                        "",
                         "*_How much do you agree or disagree with this statement?_* 👇🏾",
                         "",
                         "Robert has the right to force Samantha to have sex.",
@@ -168,7 +175,7 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*How true does this statement sound to you?*",
+                        "_*How true does this statement sound to you?*_",
                         "",
                         "My sexual needs or desires are important.",
                         "",
@@ -196,7 +203,7 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*How true does this statement sound to you?*",
+                        "_*How true does this statement sound to you?*_",
                         "",
                         "I think it would be important to focus on my own "
                         "pleasure as well as my partner's during sexual experiences.",
@@ -222,7 +229,7 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*How true does this statement sound to you?*",
+                        "_*How true does this statement sound to you?*_",
                         "",
                         "I expect to enjoy sex.",
                     ]
@@ -246,7 +253,7 @@ ASSESSMENT_QUESTIONS = {
             "state_a1_q9A_sexual_health_lit": {
                 "text": "*During the last time you had sex, did you or your partner "
                 "do something or use any method to avoid or delay getting pregnant?*",
-                "type": "list",
+                "type": "choice",
                 "options": [
                     ("yes", "Yes"),
                     ("no", "No"),

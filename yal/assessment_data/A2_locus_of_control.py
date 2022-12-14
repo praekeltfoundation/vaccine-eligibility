@@ -99,6 +99,8 @@ ASSESSMENT_QUESTIONS = {
                     [
                         "[persona_emoji] Thanks, that was great! "
                         "And what about your health...?",
+                        "",
+                        "That's all for now",
                     ]
                 ),
                 "next": None,

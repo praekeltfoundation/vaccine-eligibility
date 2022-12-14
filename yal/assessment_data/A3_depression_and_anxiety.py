@@ -12,8 +12,8 @@ ASSESSMENT_QUESTIONS = {
                     [
                         "[persona_emoji] Think about the past 2 weeks...",
                         "",
-                        "*Can you tell me how often you've been bothered "
-                        "by any of the problems I'm about to mention.*",
+                        "*Over the last two weeks, how often have you been bothered "
+                        "by the following problems?*",
                     ]
                 ),
                 "next": "state_a3_q1_depression",
@@ -62,7 +62,7 @@ ASSESSMENT_QUESTIONS = {
             },
             "state_a3_q3_depression": {
                 "type": "list",
-                "text": "Not being able to stop or control worrying... 😩",
+                "text": "Feeling down, depressed or hopeless 😔",
                 "options": [
                     "Not at all",
                     "Several days",

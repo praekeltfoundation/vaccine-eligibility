@@ -29,8 +29,8 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "[persona_emoji]  How good a job would you say you do "
-                        "when it comes to taking care of your health?",
+                        "[persona_emoji]  How good a job do you feel you are doing "
+                        "in taking care of your health?",
                     ]
                 ),
                 "options": [
@@ -53,13 +53,9 @@ ASSESSMENT_QUESTIONS = {
                 "type": "info",
                 "text": "\n".join(
                     [
-                        "[persona_emoji]  Fantastic! OK, we're almost done.",
+                        "[persona_emoji]  Fantastic! That's it.",
                         "",
-                        "This last bunch of questions is to figure out how "
-                        "you feel about yourself right now.",
-                        "",
-                        "You know the dance 😉 — for each statement, I just need you "
-                        "to choose an answer that matches how you feel about it.",
+                        "I'll chat with you again tomorrow.",
                     ]
                 ),
                 "next": None,
