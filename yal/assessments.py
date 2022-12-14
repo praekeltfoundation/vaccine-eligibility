@@ -30,7 +30,7 @@ class Application(BaseApplication):
 
         section = str(metadata.get("assessment_section", "1"))
 
-        assessment_name = metadata.get("assesment_name", "sexual_health_literacy")
+        assessment_name = metadata.get("assessment_name", "sexual_health_literacy")
         questions = QUESTIONS[assessment_name]
 
         if section not in questions:
@@ -126,7 +126,7 @@ class Application(BaseApplication):
         answer = answers.get(current_question)
         question_number = metadata.get("assessment_question_nr", 1)
 
-        assessment_name = metadata.get("assesment_name", "sexual_health_literacy")
+        assessment_name = metadata.get("assessment_name", "sexual_health_literacy")
         questions = QUESTIONS[assessment_name]
         question = questions[str(section)]["questions"][current_question]
 
@@ -162,7 +162,7 @@ class Application(BaseApplication):
         reminder_time = get_current_datetime() + timedelta(hours=23)
         self.save_metadata("assessment_reminder", reminder_time.isoformat())
         assessment_name = self.user.metadata.get(
-            "assesment_name", "sexual_health_literacy"
+            "assessment_name", "sexual_health_literacy"
         )
 
         data = {
