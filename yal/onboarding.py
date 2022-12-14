@@ -272,9 +272,15 @@ class Application(BaseApplication):
         return WhatsAppButtonState(
             app=self,
             question=question,
-            choices=[Choice("ok", "OK, let's start!")],
+            choices=[
+                Choice("ok", "OK, let's start!"),
+                Choice("later", "I can't right now"),
+            ],
             error=get_generic_error(),
-            next=AssessmentApplication.START_STATE,
+            next={
+                "ok": AssessmentApplication.START_STATE,
+                "later": AssessmentApplication.LATER_STATE,
+            },
         )
 
     async def state_sexual_literacy_assessment_end(self):

@@ -287,7 +287,7 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
                 "I just need you to choose the answer that feels right to you."
             ]
         ),
-        buttons=["OK, let's start!"],
+        buttons=["OK, let's start!", "I can't right now"],
     )
 
     assert len(rapidpro_mock.tstate.requests) == 3
@@ -431,3 +431,34 @@ async def test_assessment_complete(tester: AppTester, rapidpro_mock):
             ]
         )
     )
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.assessments.get_current_datetime")
+async def test_assessment_skip(get_current_datetime, tester: AppTester, rapidpro_mock):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+
+    tester.user.metadata["persona_emoji"] = "🪱"
+    tester.setup_state("state_sexual_literacy_assessment_start")
+
+    await tester.user_input(content="I can't right now")
+    tester.assert_message(
+        "\n".join(
+            [
+                "🪱 No worries, we get it!",
+                "",
+                "I'll send you a reminder message tomorrow, so you can come back "
+                "and continue with these questions, then.",
+                "",
+                "Check you later 🤙🏾",
+            ]
+        )
+    )
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "assessment_reminder": "2022-06-20T16:30:00",
+            "assessment_name": "sexual_health_literacy",
+        },
+    }

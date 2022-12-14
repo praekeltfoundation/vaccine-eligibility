@@ -1,4 +1,5 @@
 import asyncio
+from datetime import timedelta
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
@@ -8,10 +9,12 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
+from yal import rapidpro
 from yal.assessment_data.A1_sexual_health_literacy import (
     ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS,
 )
-from yal.utils import get_generic_error
+from yal.mainmenu import Application as MainMenuApplication
+from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
 QUESTIONS = {
     "sexual_health_literacy": SEXUAL_HEALTH_LITERACY_QUESTIONS,
@@ -20,6 +23,7 @@ QUESTIONS = {
 
 class Application(BaseApplication):
     START_STATE = "state_survey_question"
+    LATER_STATE = "state_assessment_later_submit"
 
     async def state_survey_question(self):
         metadata = self.user.metadata
@@ -150,3 +154,42 @@ class Application(BaseApplication):
                 self.save_metadata("assessment_score", score)
 
         return await self.go_to_state("state_survey_question")
+
+    async def state_assessment_later_submit(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        reminder_time = get_current_datetime() + timedelta(hours=23)
+        self.save_metadata("assessment_reminder", reminder_time.isoformat())
+        assessment_name = self.user.metadata.get(
+            "assesment_name", "sexual_health_literacy"
+        )
+
+        data = {
+            "assessment_reminder": reminder_time.isoformat(),
+            "assessment_name": assessment_name,
+        }
+
+        await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        return await self.go_to_state("state_assessment_later")
+
+    async def state_assessment_later(self):
+        question = self._(
+            "\n".join(
+                [
+                    "[persona_emoji] No worries, we get it!",
+                    "",
+                    "I'll send you a reminder message tomorrow, so you can come back "
+                    "and continue with these questions, then.",
+                    "",
+                    "Check you later 🤙🏾",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[Choice("menu", "Go to main menu")],
+            error=get_generic_error(),
+            next=MainMenuApplication.START_STATE,
+        )
