@@ -10,7 +10,7 @@ from vaccine.states import (
     WhatsAppListState,
 )
 from yal import rapidpro, utils
-from yal.assessments import Application as SegmentationSurveyApplication
+from yal.assessments import Application as AssessmentApplication
 from yal.utils import get_current_datetime, get_generic_error
 from yal.validators import age_validator
 
@@ -274,7 +274,7 @@ class Application(BaseApplication):
             question=question,
             choices=[Choice("ok", "OK, let's start!")],
             error=get_generic_error(),
-            next=SegmentationSurveyApplication.START_STATE,
+            next=AssessmentApplication.START_STATE,
         )
 
     async def state_sexual_literacy_assessment_end(self):

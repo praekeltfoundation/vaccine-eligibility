@@ -6,7 +6,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
-from vaccine.testing import AppTester, TState, run_sanic
+from vaccine.testing import AppTester, MockServer, TState, run_sanic
 from yal import config
 from yal.askaquestion import Application as AaqApplication
 from yal.assessments import Application as SegmentSurveyApplication
@@ -578,3 +578,58 @@ async def test_state_qa_reset_feedback_timestamp_keywords(
         "the message early"
     )
     assert tester.user.metadata["feedback_timestamp"] != old_timestamp
+
+
+@pytest.mark.asyncio
+async def test_template_message_button_payload(tester: AppTester):
+    """
+    If there's a button payload that points to a valid state, then send the user to that
+    state.
+    """
+    await tester.user_input(
+        "test",
+        transport_metadata={"message": {"button": {"payload": "state_catch_all"}}},
+    )
+    tester.assert_message(
+        "\n".join(
+            [
+                "🤖 *Hey there — Welcome to B-Wise!*",
+                "",
+                "If you're looking for answers to questions about bodies, sex, "
+                "relationships and health, please reply with the word *HI*.",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_sexual_health_literacy_assessment(tester: AppTester):
+    """
+    If there's a button payload that indicates that the sexual health literacy
+    assessment should start, then we should start it
+    """
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_sexual_health_literacy_assessment"}
+            }
+        },
+    )
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "sexual_health_literacy")
+    tester.assert_metadata("assessment_end_state", "state_assessment_end")
+
+
+@pytest.mark.asyncio
+async def test_assessment_end(tester: AppTester, rapidpro_mock: MockServer):
+    """
+    At the end of the assessment, we should save the assessment score on the profile
+    """
+    tester.setup_state("state_assessment_end")
+    tester.user.metadata["assessment_name"] = "sexual_health_literacy"
+    tester.user.metadata["assessment_score"] = 7
+    await tester.user_input("test")
+    tester.assert_message("TODO: content for assessment end")
+    assert rapidpro_mock.tstate
+    assert rapidpro_mock.tstate.contact_fields == {"sexual_health_literacy": "7"}
