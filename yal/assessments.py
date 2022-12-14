@@ -11,10 +11,38 @@ from vaccine.states import (
 from yal.assessment_data.A1_sexual_health_literacy import (
     ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS,
 )
+from yal.assessment_data.A2_locus_of_control import (
+    ASSESSMENT_QUESTIONS as LOCUS_OF_CONTROL_QUESTIONS,
+)
+from yal.assessment_data.A3_depression_and_anxiety import (
+    ASSESSMENT_QUESTIONS as DEPRESSION_AND_ANXIETY_QUESTIONS,
+)
+from yal.assessment_data.A4_connectedness import (
+    ASSESSMENT_QUESTIONS as CONNECTEDNESS_QUESTIONS,
+)
+from yal.assessment_data.A5_gender_attitude import (
+    ASSESSMENT_QUESTIONS as GENDER_ATTITUDE,
+)
+from yal.assessment_data.A6_body_image import (
+    ASSESSMENT_QUESTIONS as BODY_IMAGE_QUESTIONS,
+)
+from yal.assessment_data.A7_self_perceived_healthcare import (
+    ASSESSMENT_QUESTIONS as SELF_PERCEIVED_HEALTHCARE_QUESTIONS,
+)
+from yal.assessment_data.A8_self_esteem import (
+    ASSESSMENT_QUESTIONS as SELF_ESTEEM_QUESTIONS,
+)
 from yal.utils import get_generic_error
 
 QUESTIONS = {
     "sexual_health_literacy": SEXUAL_HEALTH_LITERACY_QUESTIONS,
+    "locus_of_control": LOCUS_OF_CONTROL_QUESTIONS,
+    "depresssion_and_anxiety": DEPRESSION_AND_ANXIETY_QUESTIONS,
+    "connectedness": CONNECTEDNESS_QUESTIONS,
+    "gender_attitude": GENDER_ATTITUDE,
+    "body_image": BODY_IMAGE_QUESTIONS,
+    "self_perceived_healthcare": SELF_PERCEIVED_HEALTHCARE_QUESTIONS,
+    "self_esteem": SELF_ESTEEM_QUESTIONS,
 }
 
 
