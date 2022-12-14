@@ -116,7 +116,8 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_optout_survey                        |        TRUE        |     Text     |            TRUE          | Asks user why they opted out. User repsonse is chosen from a list                                         |
 | state_delete_saved                         |        TRUE        |     Text     |            TRUE          | Deletes profile data. User response is "see" to see the cleaned profile                                |
 | state_tell_us_more                         |        TRUE        |     Text     |            TRUE          | Asks user why they opted out. User repsonse is freeText                                                   |
-| state_farewell_optout                      |        FALSE       |              |            FALSE         | Bids the user farewell and closes the session                                                           |
+| state_opt_out_no_changes                   |        TRUE        |     Text     |            TRUE          | Bids the user farewell and asks if the user would like to go to aaq or main menu                                                           |
+| state_farewell_optout                      |        TRUE        |     Text     |            TRUE          | Bids the user farewell and asks if the user would like to go to aaq or main |
 
 
 ### Quiz flow

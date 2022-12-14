@@ -8,7 +8,7 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
-from yal.assessment_data.sexual_health_literacy import (
+from yal.assessment_data.A1_sexual_health_literacy import (
     ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS,
 )
 from yal.utils import get_generic_error

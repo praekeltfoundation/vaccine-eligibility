@@ -50,7 +50,7 @@ TRACKING_KEYWORDS_ROUND_2 = {
     "register2bwise",
     "connect",
 }
-OPTOUT_KEYWORDS = {"stop"}
+OPTOUT_KEYWORDS = {"stop", "opt out", "cancel", "quit"}
 ONBOARDING_REMINDER_KEYWORDS = {
     "continue",
     "remind me later",
