@@ -233,14 +233,14 @@ class Application(
     async def state_sexual_health_literacy_assessment(self):
         self.save_metadata("assessment_name", "sexual_health_literacy")
         self.save_metadata("assessment_end_state", "state_assessment_end")
-        await self.go_to_state(AssessmentApplication.START_STATE)
+        return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_assessment_end(self):
         whatsapp_id = utils.normalise_phonenumber(self.inbound.from_addr).lstrip("+")
         assessment_name = self.user.metadata["assessment_name"]
         score = self.user.metadata["assessment_score"]
         await rapidpro.update_profile(
-            whatsapp_id, {assessment_name: score}, self.user.metadata
+            whatsapp_id, {assessment_name: str(score)}, self.user.metadata
         )
 
         return EndState(self, "TODO: content for assessment end")
