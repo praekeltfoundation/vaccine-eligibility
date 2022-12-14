@@ -19,13 +19,6 @@ ASSESSMENT_QUESTIONS = {
                     "Very true",
                     "Extremely True",
                 ],
-                "scoring": {
-                    "not_at_all_true": 0,
-                    "a_little_true": 0,
-                    "kind_of_true": 0,
-                    "very_true": 3,
-                    "extremely_true": 5,
-                },
                 "next": "state_a2_1_q2_loc_of_ctrl",
             },
             "state_a2_1_q2_loc_of_ctrl": {
