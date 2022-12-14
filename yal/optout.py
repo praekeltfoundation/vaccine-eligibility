@@ -2,14 +2,10 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import (
-    Choice,
-    EndState,
-    FreeText,
-    WhatsAppButtonState,
-    WhatsAppListState,
-)
-from yal import contentrepo, rapidpro, utils
+from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
+from vaccine.utils import get_display_choices
+from yal import rapidpro, utils
+from yal.askaquestion import Application as AAQApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.utils import (
@@ -33,6 +29,7 @@ class Application(BaseApplication):
         "feedback_timestamp": "",
         "feedback_timestamp_2": "",
         "feedback_type": "",
+        "push_message_opt_in": "False",
     }
 
     async def state_optout(self):
@@ -47,9 +44,9 @@ class Application(BaseApplication):
                     "",
                     "*What would you like to do?*",
                     "",
-                    "*1.* I  want to stop receiving notifications",
-                    "*2.* I  want to delete all data saved about me.",
-                    "*3.* No change. I still want to receive messages from B-Wise",
+                    "*1.* Stop receiving notifications",
+                    "*2.* Delete all data saved about me.",
+                    "*3.* No change, thanks",
                 ]
             )
         )
@@ -65,12 +62,41 @@ class Application(BaseApplication):
             next={
                 "stop notifications": "state_submit_optout",
                 "delete saved": "state_delete_saved",
-                "skip": MainMenuApplication.START_STATE,
+                "skip": "state_opt_out_no_changes",
             },
             error=self._(get_generic_error()),
         )
 
+    async def state_opt_out_no_changes(self):
+        choices = [
+            Choice("main_menu", "Go to the menu"),
+            Choice("aaq", "Ask a question"),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "✅ *Cool - I'll keep sending you notifications.*",
+                    "",
+                    "*What would you like to do now?*",
+                    "",
+                    get_display_choices(choices),
+                ]
+            )
+        )
+
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "main_menu": MainMenuApplication.START_STATE,
+                "aaq": AAQApplication.START_STATE,
+            },
+        )
+
     async def state_submit_optout(self):
+        """Opt user out of the requested messages/campaigns"""
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = self.reminders_to_be_cleared
@@ -89,10 +115,13 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    "✅ B-Wise by Young Africa Live will stop sending you messages.",
-                    "------",
+                    "✅ *No problem, I'll stop sending you notifications.*",
                     "",
-                    "👩🏾 I'm sorry to see you go. It's been a pleasure talking to you.",
+                    "Remember, you can still use the menu to get the info you need.",
+                    "",
+                    "💡if you change your mind and want to get to pick up your messages "
+                    "where you left off, "
+                    "just go to your ⚙️ chat settings from the main menu.",
                 ]
             )
         )
@@ -109,8 +138,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "🛑 STOP MESSAGING ME",
-                    "*What can we do better?*",
+                    "🛑 STOP MESSAGING ME / *What can we do better?*",
                     "------",
                     "",
                     "[persona_emoji] *We are always trying to improve.*",
@@ -118,11 +146,10 @@ class Application(BaseApplication):
                     "",
                     "Your answer will help us make this service better.",
                     "",
-                    "1 - Getting too many messages",
-                    "2 - Find the service difficult to use",
-                    "3 - The messages are too long",
-                    "4 - The messages are boring/unoriginal/repetitive",
-                    "5 - The content is not relevant to me",
+                    "1 - Getting too many notifications",
+                    "2 - Getting notifications too often",
+                    "3 - Notifications are not useful",
+                    "4 - Don't remember asking for notifications",
                     "6 - Other",
                     "7 - Rather not say",
                 ]
@@ -133,12 +160,12 @@ class Application(BaseApplication):
             question=question,
             button="Opt Out",
             choices=[
-                Choice("message volume", self._("Too many messages")),
-                Choice("user-friendliness", self._("Difficult to use")),
+                Choice("notification_volume", self._("Too many notifications")),
+                Choice("notification_frequency", self._("I get them too often")),
                 Choice("irrelevant", self._("Content irrelevant")),
-                Choice("boring", self._("Content is boring")),
-                Choice("lengthy", self._("Messages too long")),
-                Choice("other", self._("Other")),
+                Choice("useless", self._("I don't find them useful")),
+                Choice("useless", self._("I didn't sign up for them")),
+                Choice("other", self._("Other issues")),
                 Choice("none", self._("Rather not say")),
                 Choice("skip", self._("Skip")),
             ],
@@ -174,7 +201,7 @@ class Application(BaseApplication):
             "persona_emoji": "",
             "emergency_contact": "",
         } | self.reminders_to_be_cleared
-        old_details = self.__get_user_details(self.user.metadata)
+        old_details = self._get_user_details(self.user.metadata)
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
@@ -192,7 +219,7 @@ class Application(BaseApplication):
                     "",
                     "*------*",
                     "*Reply:*",
-                    "*1* - to see your personal data",
+                    "1 - to see your personal data",
                     BACK_TO_MAIN,
                     GET_HELP,
                 ]
@@ -216,13 +243,13 @@ class Application(BaseApplication):
             question=self._(
                 "\n".join(
                     [
-                        "🛑 STOP MESSAGING ME",
-                        "*Please tell us more*",
+                        "🛑 STOP MESSAGING ME / Please tell us more*",
                         "------",
                         "",
-                        "[persona_emoji] *Thanks.*" "",
-                        "If you could share your reason by replying with a ",
-                        "few words about why you want to stop receiving messages,",
+                        "[persona_emoji] Thanks.",
+                        "",
+                        "Please share your reason by replying with a few words about "
+                        "why you want to stop receiving messages, "
                         "I'd be so grateful 🙂.",
                     ]
                 )
@@ -231,50 +258,37 @@ class Application(BaseApplication):
         )
 
     async def state_farewell_optout(self):
-        await self.worker.publish_message(
-            self.inbound.reply(
-                self._(
-                    "\n".join(
-                        [
-                            "🛑 STOP MESSAGING ME",
-                            "*Goodbye* 👋🏾",
-                            "-",
-                            "",
-                            "[persona_emoji] *Thanks so much for your help.*",
-                            "",
-                            "You won't get any more messages from us unless you *send "
-                            "the word HI* to this number.",
-                            "",
-                            "For any medical issues, please visit your nearest clinic.",
-                            "You're also welcome to visit us online, any time. 🙂👇🏾",
-                            "",
-                            "*Have a lovely day!* ☀️",
-                        ]
-                    )
-                )
+        choices = [
+            Choice("main_menu", "Go to the menu"),
+            Choice("aaq", "Ask a question"),
+        ]
+        question = self._(
+            "\n".join(
+                [
+                    "🛑 STOP MESSAGING ME",
+                    "*Goodbye* 👋🏾",
+                    "-",
+                    "",
+                    "[persona_emoji] *Thanks so much for your help.*",
+                    "",
+                    "*What would you like to do now?*",
+                    get_display_choices(choices),
+                ]
             )
         )
-        # await asyncio.sleep(0.5)
-        return EndState(
+
+        return WhatsAppButtonState(
             self,
-            text=self._(
-                "\n".join(
-                    [
-                        "Need quick answers?",
-                        "Check out B-Wise online!👆🏾",
-                        "",
-                        "https://bwisehealth.com/",
-                        "",
-                        "You'll find loads of sex, relationships",
-                        "and health info there.",
-                        "It's also my other virtual office.",
-                    ]
-                )
-            ),
-            helper_metadata={"image": contentrepo.get_image_url("bwise_header.png")},
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "main_menu": MainMenuApplication.START_STATE,
+                "aaq": AAQApplication.START_STATE,
+            },
         )
 
-    def __get_user_details(self, fields):
+    def _get_user_details(self, fields):
         def get_field(name):
             value = fields.get(name)
             if not value or value == "skip":
