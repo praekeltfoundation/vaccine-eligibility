@@ -114,9 +114,9 @@ async def test_state_optout(tester: AppTester):
                 "",
                 "*What would you like to do?*",
                 "",
-                "*1.* I  want to stop receiving notifications",
-                "*2.* I  want to delete all data saved about me.",
-                "*3.* No change. I still want to receive messages from B-Wise",
+                "*1.* Stop receiving notifications",
+                "*2.* Delete all data saved about me.",
+                "*3.* No change, thanks",
             ]
         )
     )
@@ -133,49 +133,49 @@ async def test_state_optout_survey_other(tester: AppTester):
 async def test_state_optout_survey_message_volume(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_optout_survey")
     await tester.user_input("1")
-    tester.assert_state(None)
+    tester.assert_state("state_farewell_optout")
 
 
 @pytest.mark.asyncio
 async def test_state_optout_survey_user_friendliness(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_optout_survey")
     await tester.user_input("2")
-    tester.assert_state(None)
+    tester.assert_state("state_farewell_optout")
 
 
 @pytest.mark.asyncio
 async def test_state_optout_survey_irrelevant(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_optout_survey")
     await tester.user_input("3")
-    tester.assert_state(None)
+    tester.assert_state("state_farewell_optout")
 
 
 @pytest.mark.asyncio
 async def test_state_optout_survey_boring(tester: AppTester):
     tester.setup_state("state_optout_survey")
     await tester.user_input("4")
-    tester.assert_state(None)
+    tester.assert_state("state_farewell_optout")
 
 
 @pytest.mark.asyncio
 async def test_state_optout_survey_lengthy(tester: AppTester):
     tester.setup_state("state_optout_survey")
     await tester.user_input("5")
-    tester.assert_state(None)
+    tester.assert_state("state_farewell_optout")
 
 
 @pytest.mark.asyncio
 async def test_state_optout_survey_none(tester: AppTester):
     tester.setup_state("state_optout_survey")
     await tester.user_input("7")
-    tester.assert_state(None)
+    tester.assert_state("state_farewell_optout")
 
 
 @pytest.mark.asyncio
 async def test_state_optout_survey_skip(tester: AppTester):
     tester.setup_state("state_optout_survey")
     await tester.user_input("8")
-    tester.assert_state(None)
+    tester.assert_state("state_farewell_optout")
 
 
 @pytest.mark.asyncio
@@ -201,6 +201,7 @@ async def test_state_optout_stop_notifications(tester: AppTester, rapidpro_mock)
             "feedback_timestamp": "",
             "feedback_timestamp_2": "",
             "feedback_type": "",
+            "push_message_opt_in": "False",
         },
     }
 
@@ -209,7 +210,7 @@ async def test_state_optout_stop_notifications(tester: AppTester, rapidpro_mock)
 async def test_state_tell_us_more(tester: AppTester):
     tester.setup_state("state_tell_us_more")
     await tester.user_input("I am just a test human")
-    tester.assert_state(None)
+    tester.assert_state("state_farewell_optout")
 
 
 @pytest.mark.asyncio
@@ -258,6 +259,7 @@ async def test_state_optout_delete_saved(
             "feedback_timestamp": "",
             "feedback_timestamp_2": "",
             "feedback_type": "",
+            "push_message_opt_in": "False",
             "longitude": "",
             "latitude": "",
             "location_description": "",
@@ -279,7 +281,7 @@ async def test_state_optout_delete_saved(
                 "",
                 "*------*",
                 "*Reply:*",
-                "*1* - to see your personal data",
+                "1 - to see your personal data",
                 "0. 🏠 Back to Main *MENU*",
                 "#. 🆘Get *HELP*",
             ]
@@ -306,7 +308,7 @@ async def test_state_optout_delete_no_data(tester: AppTester, rapidpro_mock):
                 "",
                 "*------*",
                 "*Reply:*",
-                "*1* - to see your personal data",
+                "1 - to see your personal data",
                 "0. 🏠 Back to Main *MENU*",
                 "#. 🆘Get *HELP*",
             ]
@@ -324,5 +326,6 @@ async def test_state_optout_delete_saved_see_data(tester: AppTester, rapidpro_mo
 @pytest.mark.asyncio
 async def test_state_optout_skip(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_optout")
+    print(tester.application.messages)
     await tester.user_input("3")
-    tester.assert_state("state_mainmenu")
+    tester.assert_state("state_opt_out_no_changes")
