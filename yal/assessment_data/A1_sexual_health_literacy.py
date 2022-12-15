@@ -64,7 +64,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a1_q3_sexual_health_lit_info",
             },
             "state_a1_q3_sexual_health_lit_info": {
-                "type": "list",
+                "type": "info",
                 "text": "\n".join(
                     [
                         "_*Robert and Samantha have been dating for 5 years and love "

@@ -304,3 +304,17 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_pushmessage_optin_no                   |        TRUE        |     Text     |            TRUE          | Sends the user confirmation that they will not receive push messages |
 | state_pushmessage_optin_final                |        TRUE        |     Text     |            TRUE          | asks if user would like to go to main menu or aaq |
 
+### Sexual health literacy assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a1_q1_sexual_health_lit | TRUE | Text | People can reduce the risk of getting STIs by |
+| state_a1_q2_sexual_health_lit | TRUE | Text | If Teddy goes out to a restaurant and starts chatting with someone he is sexually attracted to, what is most appropriate way Teddy can tell that person wants to have sex with him? |
+| state_a1_q3_sexual_health_lit | TRUE | Text | Robert has the right to force Samantha to have sex. |
+| state_a1_q4_sexual_health_lit | TRUE | Text | If sexually active, I _am_ able to insist on condoms when I have sex. |
+| state_a1_q5_sexual_health_lit | TRUE | Text | If you are in a relationship, which statement describes you best? |
+| state_a1_q6_sexual_health_lit | TRUE | Text | My sexual needs or desires are important. |
+| state_a1_q7_sexual_health_lit | TRUE | Text | I think it would be important to focus on my own pleasure as well as my partner's during sexual experiences. |
+| state_a1_q8_sexual_health_lit | TRUE | Text | I expect to enjoy sex. |
+| state_a1_q9A_sexual_health_lit | TRUE | Text | During the last time you had sex, did you or your partner do something or use any method to avoid or delay getting pregnant? |
+| state_a1_q9B_sexual_health_lit | TRUE | Text | What's been the MAIN way you or your partner have tried to delay or avoid getting pregnant? |
+|
