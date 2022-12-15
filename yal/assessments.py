@@ -40,7 +40,7 @@ from yal.utils import get_current_datetime, get_generic_error, normalise_phonenu
 QUESTIONS = {
     "sexual_health_literacy": SEXUAL_HEALTH_LITERACY_QUESTIONS,
     "locus_of_control": LOCUS_OF_CONTROL_QUESTIONS,
-    "depresssion_and_anxiety": DEPRESSION_AND_ANXIETY_QUESTIONS,
+    "depression_and_anxiety": DEPRESSION_AND_ANXIETY_QUESTIONS,
     "connectedness": CONNECTEDNESS_QUESTIONS,
     "gender_attitude": GENDER_ATTITUDE,
     "body_image": BODY_IMAGE_QUESTIONS,
