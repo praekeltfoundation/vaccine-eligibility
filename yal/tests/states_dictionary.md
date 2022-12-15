@@ -335,3 +335,8 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_a3_q2_depression | TRUE | Text | Not being able to stop or control worrying. |
 | state_a3_q3_depression | TRUE | Text | Feeling down, depressed or hopeless |
 | state_a3_q4_depression | TRUE | Text | Not having much interest or pleasure in doing things. |
+
+# A4 Connectedness
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a4_q1_connectedness | TRUE | Text | Do you have someone to talk to when you have a worry or problem? |
