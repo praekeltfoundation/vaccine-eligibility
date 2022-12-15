@@ -1,4 +1,5 @@
 from datetime import datetime
+from pkgutil import iter_modules
 from unittest import mock
 
 import pytablereader as ptr
@@ -83,6 +84,14 @@ def test_no_state_name_clashes():
 def test_all_states_added_to_docs():
     state_sets = get_state_sets()
     existing_states = set.union(*state_sets) - {"state_name"}
+
+    # States from assessments are dynamic
+    for assessment in iter_modules(["yal/assessment_data"]):
+        module = assessment.module_finder.find_module(assessment.name).load_module()
+        for section in module.ASSESSMENT_QUESTIONS.values():
+            for name, details in section["questions"].items():
+                if details.get("type", "freetext") != "freetext":
+                    existing_states.add(name)
 
     loader = ptr.MarkdownTableFileLoader("yal/tests/states_dictionary.md")
     documented_states = set()
