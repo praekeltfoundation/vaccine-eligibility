@@ -348,3 +348,9 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_a5_q2_gender_attitude | TRUE | Text | It's a woman's responsibility to avoid getting pregnant. |
 | state_a5_q3_gender_attitude | TRUE | Text | A man and a woman should decide together what type of contraceptive to use |
 | state_a5_q4_gender_attitude | TRUE | Text | If a guy gets women pregnant, the child is the responsibility of both. |
+
+## A6 Body image
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a6_q1_body_image | TRUE | Text | I feel good about myself. |
+| state_a6_q2_body_image | TRUE | Text | I feel good about my body. |
