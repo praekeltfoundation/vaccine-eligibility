@@ -235,6 +235,41 @@ class Application(
         self.save_metadata("assessment_end_state", "state_assessment_end")
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
+    async def state_locus_of_control_assessment(self):
+        self.save_metadata("assessment_name", "locus_of_control")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_depression_and_anxiety_assessment(self):
+        self.save_metadata("assessment_name", "depression_and_anxiety")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_connectedness_assessment(self):
+        self.save_metadata("assessment_name", "connectedness")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_gender_attitude_assessment(self):
+        self.save_metadata("assessment_name", "gender_attitude")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_body_image_assessment(self):
+        self.save_metadata("assessment_name", "body_image")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_self_perceived_healthcare_assessment(self):
+        self.save_metadata("assessment_name", "self_perceived_healthcare")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_self_esteem_assessment(self):
+        self.save_metadata("assessment_name", "self_esteem")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
     async def state_assessment_end(self):
         whatsapp_id = utils.normalise_phonenumber(self.inbound.from_addr).lstrip("+")
         assessment_name = self.user.metadata["assessment_name"]
