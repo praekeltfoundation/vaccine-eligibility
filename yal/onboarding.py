@@ -305,6 +305,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
             "sexual_health_lit_risk": risk,
+            "sexual_health_lit_score": score,
         }
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
