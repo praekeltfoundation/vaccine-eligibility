@@ -319,7 +319,7 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_a1_q9B_sexual_health_lit | TRUE | Text | What's been the MAIN way you or your partner have tried to delay or avoid getting pregnant? |
 |
 
-# A2 Locus of control
+### A2 Locus of control
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
 | state_a2_1_q1_loc_of_ctrl | TRUE | Text | I'm my own boss. |
@@ -328,7 +328,7 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_a2_1_q4_loc_of_ctrl | TRUE | Text | What I do mainly depends on other people. |
 | state_a2_1_q5_loc_of_ctrl | TRUE | Text | Fate often gets in the way of my plans. |
 
-# A3 Depression and anxiety
+### A3 Depression and anxiety
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
 | state_a3_q1_depression | TRUE | Text | Feeling nervous, anxious or on edge. |
@@ -336,7 +336,15 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_a3_q3_depression | TRUE | Text | Feeling down, depressed or hopeless |
 | state_a3_q4_depression | TRUE | Text | Not having much interest or pleasure in doing things. |
 
-# A4 Connectedness
+### A4 Connectedness
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
 | state_a4_q1_connectedness | TRUE | Text | Do you have someone to talk to when you have a worry or problem? |
+
+### A5 Gender attitude
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a5_q1_gender_attitude | TRUE | Text | There are times when a woman deserves to be beaten. |
+| state_a5_q2_gender_attitude | TRUE | Text | It's a woman's responsibility to avoid getting pregnant. |
+| state_a5_q3_gender_attitude | TRUE | Text | A man and a woman should decide together what type of contraceptive to use |
+| state_a5_q4_gender_attitude | TRUE | Text | If a guy gets women pregnant, the child is the responsibility of both. |
