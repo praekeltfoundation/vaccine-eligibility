@@ -100,7 +100,6 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         timeout_time = get_current_datetime() + timedelta(minutes=5)
-        self.save_metadata("feedback_timestamp", timeout_time.isoformat())
         data = {
             "feedback_timestamp": timeout_time.isoformat(),
             "feedback_type": "ask_a_question",
@@ -261,7 +260,6 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         timeout_time = get_current_datetime() + timedelta(minutes=5)
-        self.save_metadata("feedback_timestamp", timeout_time.isoformat())
         data = {
             "feedback_timestamp": timeout_time.isoformat(),
             "feedback_type": "ask_a_question_2",
