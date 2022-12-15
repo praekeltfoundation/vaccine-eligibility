@@ -13,8 +13,6 @@ from yal import rapidpro
 from yal.assessment_data.A1_sexual_health_literacy import (
     ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS,
 )
-from yal.mainmenu import Application as MainMenuApplication
-from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 from yal.assessment_data.A2_locus_of_control import (
     ASSESSMENT_QUESTIONS as LOCUS_OF_CONTROL_QUESTIONS,
 )
@@ -36,6 +34,8 @@ from yal.assessment_data.A7_self_perceived_healthcare import (
 from yal.assessment_data.A8_self_esteem import (
     ASSESSMENT_QUESTIONS as SELF_ESTEEM_QUESTIONS,
 )
+from yal.mainmenu import Application as MainMenuApplication
+from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
 QUESTIONS = {
     "sexual_health_literacy": SEXUAL_HEALTH_LITERACY_QUESTIONS,
