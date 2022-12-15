@@ -1,4 +1,5 @@
 import asyncio
+from datetime import timedelta
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
@@ -8,6 +9,7 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
+from yal import rapidpro
 from yal.assessment_data.A1_sexual_health_literacy import (
     ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS,
 )
@@ -32,12 +34,13 @@ from yal.assessment_data.A7_self_perceived_healthcare import (
 from yal.assessment_data.A8_self_esteem import (
     ASSESSMENT_QUESTIONS as SELF_ESTEEM_QUESTIONS,
 )
-from yal.utils import get_generic_error
+from yal.mainmenu import Application as MainMenuApplication
+from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
 QUESTIONS = {
     "sexual_health_literacy": SEXUAL_HEALTH_LITERACY_QUESTIONS,
     "locus_of_control": LOCUS_OF_CONTROL_QUESTIONS,
-    "depresssion_and_anxiety": DEPRESSION_AND_ANXIETY_QUESTIONS,
+    "depression_and_anxiety": DEPRESSION_AND_ANXIETY_QUESTIONS,
     "connectedness": CONNECTEDNESS_QUESTIONS,
     "gender_attitude": GENDER_ATTITUDE,
     "body_image": BODY_IMAGE_QUESTIONS,
@@ -48,13 +51,14 @@ QUESTIONS = {
 
 class Application(BaseApplication):
     START_STATE = "state_survey_question"
+    LATER_STATE = "state_assessment_later_submit"
 
     async def state_survey_question(self):
         metadata = self.user.metadata
 
         section = str(metadata.get("assessment_section", "1"))
 
-        assessment_name = metadata.get("assesment_name", "sexual_health_literacy")
+        assessment_name = metadata.get("assessment_name", "sexual_health_literacy")
         questions = QUESTIONS[assessment_name]
 
         if section not in questions:
@@ -150,7 +154,7 @@ class Application(BaseApplication):
         answer = answers.get(current_question)
         question_number = metadata.get("assessment_question_nr", 1)
 
-        assessment_name = metadata.get("assesment_name", "sexual_health_literacy")
+        assessment_name = metadata.get("assessment_name", "sexual_health_literacy")
         questions = QUESTIONS[assessment_name]
         question = questions[str(section)]["questions"][current_question]
 
@@ -178,3 +182,41 @@ class Application(BaseApplication):
                 self.save_metadata("assessment_score", score)
 
         return await self.go_to_state("state_survey_question")
+
+    async def state_assessment_later_submit(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        reminder_time = get_current_datetime() + timedelta(hours=23)
+        assessment_name = self.user.metadata.get(
+            "assessment_name", "sexual_health_literacy"
+        )
+
+        data = {
+            "assessment_reminder": reminder_time.isoformat(),
+            "assessment_name": assessment_name,
+        }
+
+        await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        return await self.go_to_state("state_assessment_later")
+
+    async def state_assessment_later(self):
+        question = self._(
+            "\n".join(
+                [
+                    "[persona_emoji] No worries, we get it!",
+                    "",
+                    "I'll send you a reminder message tomorrow, so you can come back "
+                    "and continue with these questions, then.",
+                    "",
+                    "Check you later 🤙🏾",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[Choice("menu", "Go to main menu")],
+            error=get_generic_error(),
+            next=MainMenuApplication.START_STATE,
+        )

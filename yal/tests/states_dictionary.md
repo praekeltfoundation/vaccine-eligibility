@@ -198,6 +198,9 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_trigger_airtime_flow                 |        FALSE       |              |            TRUE          | Starts the user on the airtime flow in RapidPro |
 | state_prompt_next_action                   |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "state_aaq_start", "state_pre_mainmenu" or "state_no_airtime" |
 | state_no_airtime                           |        FALSE       |              |            TRUE          | Thanks user and closes session |
+| state_assessment_later_submit              |        FALSE       |              |            TRUE          | Submits assessment_reminder and assessment_name as contact fields for a later reminder to complete assessment |
+| state_assessment_later                     |        TRUE        |     Text     |            TRUE          | Thanks user and asks the user if they'd like to go to the main menu |
+| state_sexual_health_literacy_send_risk_message |    TRUE        |     Text     |            TRUE          | Sends the user a message based on their risk score, takes in "yes" and "no" |
 
 
 ### Service finder flow
