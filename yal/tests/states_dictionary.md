@@ -327,3 +327,11 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_a2_1_q3_loc_of_ctrl | TRUE | Text | I CAN get relevant health advice if and when I want it. |
 | state_a2_1_q4_loc_of_ctrl | TRUE | Text | What I do mainly depends on other people. |
 | state_a2_1_q5_loc_of_ctrl | TRUE | Text | Fate often gets in the way of my plans. |
+
+# A3 Depression and anxiety
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a3_q1_depression | TRUE | Text | Feeling nervous, anxious or on edge. |
+| state_a3_q2_depression | TRUE | Text | Not being able to stop or control worrying. |
+| state_a3_q3_depression | TRUE | Text | Feeling down, depressed or hopeless |
+| state_a3_q4_depression | TRUE | Text | Not having much interest or pleasure in doing things. |
