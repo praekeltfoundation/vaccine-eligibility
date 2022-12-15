@@ -22,15 +22,15 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "No stress — whenever you're ready I'm here.",
-                    "",
                     "If you'd like, I can also send you notifications once a day with "
                     "relevant info that I've put together just for you.",
                     "",
                     "Would you like to get notifications?",
                     "",
-                    "💡You can turn the notifications off at any time.",
+                    get_display_choices(choices),
                     "",
+                    "_💡You can turn the notifications off at any time, just reply "
+                    '"STOP" or go to your profile._',
                 ]
             )
         )
