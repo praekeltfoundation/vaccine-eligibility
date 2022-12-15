@@ -360,3 +360,16 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | ---------- | ------------------ | --------- | ----------- |
 | state_a2_2_q5_healthcare | TRUE | Text | When I have health needs (like  contraception or flu symptoms), I go to my closest clinic. |
 | state_a2_2_q6_healthcare | TRUE | Text | How good a job do you feel you are doing in taking care of your health? |
+
+### A8 Self esteem
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a2_3_q1_self_esteem | TRUE | Text | I feel that I am a person who has worth — at least as much worth as others. |
+| state_a2_3_q2_self_esteem | TRUE | Text | I feel like I have quite a few of good qualities. |
+| state_a2_3_q3_self_esteem | TRUE | Text | In general, I tend to feel like a failure. |
+| state_a2_3_q4_self_esteem | TRUE | Text | I feel like I don't have much to be proud of. |
+| state_a2_3_q5_self_esteem | TRUE | Text | I have a positive attitude toward myself. |
+| state_a2_3_q6_self_esteem | TRUE | Text | I'm generally satisfied with myself. |
+| state_a2_3_q7_self_esteem | TRUE | Text | I wish I could have more respect for myself. |
+| state_a2_3_q8_self_esteem | TRUE | Text | I definitely feel useless at times. |
+| state_a2_3_q9_self_esteem | TRUE | Text | Sometimes I think I'm no good at all. |
