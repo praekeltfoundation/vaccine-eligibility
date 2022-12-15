@@ -349,8 +349,14 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_a5_q3_gender_attitude | TRUE | Text | A man and a woman should decide together what type of contraceptive to use |
 | state_a5_q4_gender_attitude | TRUE | Text | If a guy gets women pregnant, the child is the responsibility of both. |
 
-## A6 Body image
+### A6 Body image
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
 | state_a6_q1_body_image | TRUE | Text | I feel good about myself. |
 | state_a6_q2_body_image | TRUE | Text | I feel good about my body. |
+
+### A7 Self-perceived healthcare
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a2_2_q5_healthcare | TRUE | Text | When I have health needs (like  contraception or flu symptoms), I go to my closest clinic. |
+| state_a2_2_q6_healthcare | TRUE | Text | How good a job do you feel you are doing in taking care of your health? |
