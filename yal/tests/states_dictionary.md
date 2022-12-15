@@ -304,7 +304,7 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_pushmessage_optin_no                   |        TRUE        |     Text     |            TRUE          | Sends the user confirmation that they will not receive push messages |
 | state_pushmessage_optin_final                |        TRUE        |     Text     |            TRUE          | asks if user would like to go to main menu or aaq |
 
-### Sexual health literacy assessment
+### A1 Sexual health literacy assessment
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
 | state_a1_q1_sexual_health_lit | TRUE | Text | People can reduce the risk of getting STIs by |
@@ -318,3 +318,12 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_a1_q9A_sexual_health_lit | TRUE | Text | During the last time you had sex, did you or your partner do something or use any method to avoid or delay getting pregnant? |
 | state_a1_q9B_sexual_health_lit | TRUE | Text | What's been the MAIN way you or your partner have tried to delay or avoid getting pregnant? |
 |
+
+# A2 Locus of control
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a2_1_q1_loc_of_ctrl | TRUE | Text | I'm my own boss. |
+| state_a2_1_q2_loc_of_ctrl | TRUE | Text | If I work hard, I will be successful. |
+| state_a2_1_q3_loc_of_ctrl | TRUE | Text | I CAN get relevant health advice if and when I want it. |
+| state_a2_1_q4_loc_of_ctrl | TRUE | Text | What I do mainly depends on other people. |
+| state_a2_1_q5_loc_of_ctrl | TRUE | Text | Fate often gets in the way of my plans. |
