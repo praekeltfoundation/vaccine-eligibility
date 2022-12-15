@@ -70,6 +70,13 @@
 | state_catch_all                            |        FALSE       |              |            TRUE           | Sends user a generic welcome message if we received input we don't recognise                                 |
 | state_error                                |        FALSE       |              |            TRUE           | Closes user session                                 |
 | state_sexual_health_literacy_assessment | FALSE | | Starts the sexual health literacy assessment |
+| state_locus_of_control_assessment | FALSE | | Starts the locus of control assessment |
+| state_depression_and_anxiety_assessment | FALSE | | Starts the depression and anxiety assessment |
+| state_connectedness_assessment | FALSE | | Starts the connectedness assessment |
+| state_gender_attitude_assessment | FALSE | | Starts the gender attitude assessment |
+| state_body_image_assessment | FALSE | | Starts the body image assessment |
+| state_self_perceived_healthcare_assessment | FALSE | | Starts the self perceived healthcare assessment |
+| state_self_esteem_assessment | FALSE | | Starts the self esteem assessment |
 | state_assessment_end | FALSE | | End message for assessments |
 
 
