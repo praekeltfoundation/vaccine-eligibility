@@ -1,6 +1,5 @@
-import asyncio
-import aiohttp
 import argparse
+import asyncio
 import hmac
 import json
 from base64 import b64encode
@@ -8,6 +7,8 @@ from datetime import datetime
 from hashlib import sha256
 from urllib.parse import urljoin
 from uuid import uuid4
+
+import aiohttp
 
 
 def get_arguments() -> argparse.Namespace:
