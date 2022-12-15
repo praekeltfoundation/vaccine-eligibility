@@ -160,7 +160,6 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         reminder_time = get_current_datetime() + timedelta(hours=23)
-        self.save_metadata("assessment_reminder", reminder_time.isoformat())
         assessment_name = self.user.metadata.get(
             "assessment_name", "sexual_health_literacy"
         )
