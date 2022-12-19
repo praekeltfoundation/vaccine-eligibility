@@ -296,7 +296,7 @@ class Application(
             "high_risk": self._(
                 "\n".join(
                     [
-                        "[persona_emoji]  Esih! Sounds like it's been a rough "
+                        "[persona_emoji]  Eish! Sounds like it's been a rough "
                         "couple of weeks, eh? Sorry to hear you've been down. 😔",
                     ]
                 )
