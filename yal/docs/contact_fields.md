@@ -12,7 +12,6 @@ Fields
 |--------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | assessment_reminder                        | Set a time to remind the user to take an assessment that they haven't started                           |
 | assessment_name                            | Name of the assessment we need to remind the user to take                                               |
-| assessment_end_state                       | State that should be started when an assessment is done                                                 |
 | sexual_health_lit_risk                     | save the risk status from sexual_health_lit assessment (high_risk or low_risk)                          |
 | sexual_health_lit_score                    | save the score from sexual_health_lit assessment                                                        |
 | depression_and_anxiety_risk                | save the risk status from depression and anxiety assessment (high_risk or low_risk)                     |
