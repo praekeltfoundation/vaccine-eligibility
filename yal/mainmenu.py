@@ -609,3 +609,8 @@ class Application(BaseApplication):
         self.save_metadata("current_menu_level", menu_level - 2)
 
         return await self.go_to_state("state_contentrepo_page")
+
+    async def state_prep_push_msg_related_page(self):
+        return EndState(
+            self, "Payload received: state_prep_push_msg_related_page"
+        )
