@@ -263,7 +263,7 @@ class Application(BaseApplication):
         )
 
         self.save_metadata(
-            "assessment_end_state", "state_sexual_literacy_assessment_end"
+            "assessment_end_state", "state_sexual_health_literacy_assessment_end"
         )
 
         return WhatsAppButtonState(
@@ -280,7 +280,7 @@ class Application(BaseApplication):
             },
         )
 
-    async def state_sexual_literacy_assessment_end(self):
+    async def state_sexual_health_literacy_assessment_end(self):
         msg = "\n".join(
             [
                 "🏁 🎉",
