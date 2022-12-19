@@ -139,8 +139,35 @@ class Application(
 
         return await super().process_message(message)
 
-    async def state_testing_payload(self):
-        return EndState(self, "Payload received")
+    async def state_sexual_health_literacy_assessment(self):
+        return EndState(
+            self, "Payload received: state_sexual_health_literacy_assessment"
+        )
+
+    async def state_locus_of_control_assessment(self):
+        return EndState(self, "Payload received: state_locus_of_control_assessment")
+
+    async def state_depression_and_anxiety_assessment(self):
+        return EndState(
+            self, "Payload received: state_depression_and_anxiety_assessment"
+        )
+
+    async def state_connectedness_assessment(self):
+        return EndState(self, "Payload received: state_connectedness_assessment")
+
+    async def state_gender_attitude_assessment(self):
+        return EndState(self, "Payload received: state_gender_attitude_assessment")
+
+    async def state_body_image_assessment(self):
+        return EndState(self, "Payload received: state_body_image_assessment")
+
+    async def state_self_perceived_healthcare_assessment(self):
+        return EndState(
+            self, "Payload received: state_self_perceived_healthcare_assessment"
+        )
+
+    async def state_self_esteem_assessment(self):
+        return EndState(self, "Payload received: state_self_esteem_assessment")
 
     async def state_qa_reset_feedback_timestamp_keywords(self):
         self.save_metadata("feedback_timestamp", get_current_datetime().isoformat())
