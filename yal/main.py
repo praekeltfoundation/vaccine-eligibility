@@ -18,7 +18,11 @@ from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
-from yal.utils import get_current_datetime, replace_persona_fields
+from yal.utils import (
+    get_current_datetime,
+    normalise_phonenumber,
+    replace_persona_fields,
+)
 from yal.wa_fb_crossover_feedback import Application as WaFbCrossoverFeedbackApplication
 
 logger = logging.getLogger(__name__)
@@ -232,53 +236,334 @@ class Application(
 
     async def state_sexual_health_literacy_assessment(self):
         self.save_metadata("assessment_name", "sexual_health_literacy")
-        self.save_metadata("assessment_end_state", "state_assessment_end")
+        self.save_metadata(
+            "assessment_end_state", "state_sexual_health_literacy_assessment_end"
+        )
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_locus_of_control_assessment(self):
         self.save_metadata("assessment_name", "locus_of_control")
-        self.save_metadata("assessment_end_state", "state_assessment_end")
+        self.save_metadata(
+            "assessment_end_state", "state_locus_of_control_assessment_end"
+        )
         return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_locus_of_control_assessment_end(self):
+        return EndState(
+            self,
+            self._(
+                "/n".join(
+                    [
+                        "[persona_emoji] Thanks for answering all the questions.",
+                        "",
+                        "That's all for now.",
+                    ]
+                )
+            ),
+        )
 
     async def state_depression_and_anxiety_assessment(self):
         self.save_metadata("assessment_name", "depression_and_anxiety")
-        self.save_metadata("assessment_end_state", "state_assessment_end")
+        self.save_metadata(
+            "assessment_end_state", "state_depression_and_anxiety_assessment_end"
+        )
         return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_depression_and_anxiety_assessment_end(self):
+        score = self.user.metadata.get("assessment_score", 0)
+        if score <= 2:
+            # score of 0-2 high risk
+            risk = "high_risk"
+        else:
+            # score of 3-5 low risk
+            risk = "low_risk"
+
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "depression_and_anxiety_risk": risk,
+            "depression_and_anxiety_score": score,
+        }
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+        return await self.go_to_state(
+            "state_depression_and_anxiety_assessment_risk_message"
+        )
+
+    async def state_depression_and_anxiety_assessment_risk_message(self):
+        questions = {
+            "high_risk": self._(
+                "\n".join(
+                    [
+                        "[persona_emoji]  Esih! Sounds like it's been a rough "
+                        "couple of weeks, eh? Sorry to hear you've been down. 😔",
+                    ]
+                )
+            ),
+            "low_risk": self._(
+                "\n".join(
+                    [
+                        "[persona_emoji]  Glad you've got your head in a good "
+                        "place. It makes it easier to deal with the other "
+                        "things life throws at you.",
+                    ]
+                )
+            ),
+        }
+        risk = self.user.metadata.get("depression_and_anxiety_risk", "high_risk")
+        return EndState(
+            self,
+            questions[risk],
+        )
 
     async def state_connectedness_assessment(self):
         self.save_metadata("assessment_name", "connectedness")
-        self.save_metadata("assessment_end_state", "state_assessment_end")
+        self.save_metadata("assessment_end_state", "state_connectedness_assessment_end")
         return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_connectedness_assessment_end(self):
+        score = self.user.metadata.get("assessment_score", 0)
+        if score <= 2:
+            # score of 0-2 high risk
+            risk = "high_risk"
+        else:
+            # score of 3-5 low risk
+            risk = "low_risk"
+
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "connectedness_risk": risk,
+            "connectedness_score": score,
+        }
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+        return await self.go_to_state("state_connectedness_assessment_risk_message")
+
+    async def state_connectedness_assessment_risk_message(self):
+        questions = {
+            "high_risk": self._(
+                "\n".join(
+                    [
+                        "[persona_emoji] Aww shame. I'm sorry to hear that 😔",
+                        "",
+                        "I know it can be hard when you feel like you don't have the "
+                        "support you need.",
+                        "",
+                        "*The good thing is there are things we can do to get the "
+                        "help we need when we need it. *",
+                    ]
+                )
+            ),
+            "low_risk": self._(
+                "\n".join(
+                    [
+                        "[persona_emoji] *That's awesome! So glad you have somebody "
+                        "you can turn to when things get tough.*",
+                        "",
+                        "It's important to be able to share your feelings in an "
+                        "assertive way and be listened to, whether it's by friends, "
+                        "family or partners.",
+                    ]
+                )
+            ),
+        }
+        risk = self.user.metadata.get("connectedness_risk", "high_risk")
+        return EndState(
+            self,
+            questions[risk],
+        )
 
     async def state_gender_attitude_assessment(self):
         self.save_metadata("assessment_name", "gender_attitude")
-        self.save_metadata("assessment_end_state", "state_assessment_end")
+        self.save_metadata(
+            "assessment_end_state", "state_gender_attitude_assessment_end"
+        )
         return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_gender_attitude_assessment_end(self):
+        score = self.user.metadata.get("assessment_score", 0)
+        if score <= 8:
+            # score of 0-2 high risk
+            risk = "high_risk"
+        else:
+            # score of 3-5 low risk
+            risk = "low_risk"
+
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "gender_attitude_risk": risk,
+            "gender_attitude_score": score,
+        }
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+        return await self.go_to_state("state_gender_attitude_assessment_risk_message")
+
+    async def state_gender_attitude_assessment_risk_message(self):
+        questions = {
+            "high_risk": self._(
+                "\n".join(
+                    [
+                        "[persona_emoji] Thanks for those honest answers.",
+                        "",
+                        "*Knowing the difference between a healthy and an unhealthy "
+                        "relationship can help you understand what it means to "
+                        "have a positive relationship.*",
+                        "",
+                        "Being aware of the way relationships affect you can also "
+                        "help you make the best choice for you.",
+                        "",
+                        "I've got some solid tips on how you can do that. I'll "
+                        "share them with you soon 📲",
+                    ]
+                )
+            ),
+            "low_risk": self._(
+                "\n".join(
+                    [
+                        "[persona_emoji] Thanks for those honest answers.",
+                        "",
+                        "*Knowing the difference between a healthy and an unhealthy "
+                        "relationship can help you understand what it means to have "
+                        "a positive relationship.*",
+                        "",
+                        "From your answers, it sounds like you know the part you play "
+                        "in building and keeping a healthy relationship. "
+                        "That's awesome.",
+                        "",
+                        "*If you do have any questions though, just send me a "
+                        "message saying ASK.*",
+                        "",
+                        "I'll do my best to get you the answers, or hook you up with a "
+                        "human who knows even more.",
+                    ]
+                )
+            ),
+        }
+        risk = self.user.metadata.get("gender_attitude_risk", "high_risk")
+        return EndState(
+            self,
+            questions[risk],
+        )
 
     async def state_body_image_assessment(self):
         self.save_metadata("assessment_name", "body_image")
-        self.save_metadata("assessment_end_state", "state_assessment_end")
+        self.save_metadata("assessment_end_state", "state_body_image_assessment_end")
         return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_body_image_assessment_end(self):
+        score = self.user.metadata.get("assessment_score", 0)
+        if score <= 5:
+            # score of 0-5 high risk
+            risk = "high_risk"
+        else:
+            # score of 6-10 low risk
+            risk = "low_risk"
+
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "body_image_risk": risk,
+            "body_image_score": score,
+        }
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+        return await self.go_to_state("state_body_image_assessment_risk_message")
+
+    async def state_body_image_assessment_risk_message(self):
+        questions = {
+            "high_risk": self._(
+                "\n".join(
+                    [
+                        "[persona_emoji]  Thanks for giving your honest view.",
+                        "",
+                        "*It's easy to feel uncomfortable with your body. But if you "
+                        "focus on what you don't like, it can affect your self-esteem "
+                        "and make you feel bad about yourself all round.*",
+                        "",
+                        "You can feel good about yourself even if your body is "
+                        "not 100% perfect. (What does that even mean?!)",
+                        "",
+                        "I've got some great tips to share about how to get to like "
+                        "your body more. I'll share them with you soon 📲",
+                    ]
+                )
+            ),
+            "low_risk": self._(
+                "\n".join(
+                    [
+                        "[persona_emoji]  Thanks for giving your honest view.",
+                        "",
+                        "*Knowing the difference between a healthy and an unhealthy "
+                        "relationship can help you understand what it means to "
+                        "have a positive relationship.*",
+                        "",
+                        "From your answers, it sounds like you know the part you "
+                        "play in building and keeping a healthy relationship. "
+                        "That's awesome.",
+                        "",
+                        "*If you do have any questions though, just send me a "
+                        "message saying ASK.*",
+                        "",
+                        "I'll do my best to get you the answers, or hook you up "
+                        "with a human who knows even more.",
+                    ]
+                )
+            ),
+        }
+        risk = self.user.metadata.get("body_image_risk", "high_risk")
+        return EndState(
+            self,
+            questions[risk],
+        )
 
     async def state_self_perceived_healthcare_assessment(self):
         self.save_metadata("assessment_name", "self_perceived_healthcare")
-        self.save_metadata("assessment_end_state", "state_assessment_end")
+        self.save_metadata(
+            "assessment_end_state", "state_self_perceived_healthcare_assessment_end"
+        )
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
-    async def state_self_esteem_assessment(self):
-        self.save_metadata("assessment_name", "self_esteem")
-        self.save_metadata("assessment_end_state", "state_assessment_end")
-        return await self.go_to_state(AssessmentApplication.START_STATE)
+    async def state_self_perceived_healthcare_assessment_end(self):
+        score = self.user.metadata.get("assessment_score", 0)
+        if score <= 5:
+            # score of 0-5 high risk
+            risk = "high_risk"
+        else:
+            # score of 6-10 low risk
+            risk = "low_risk"
 
-    async def state_assessment_end(self):
-        whatsapp_id = utils.normalise_phonenumber(self.inbound.from_addr).lstrip("+")
-        assessment_name = self.user.metadata["assessment_name"]
-        score = self.user.metadata["assessment_score"]
-        await rapidpro.update_profile(
-            whatsapp_id, {assessment_name: str(score)}, self.user.metadata
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "self_perceived_healthcare_risk": risk,
+            "self_perceived_healthcare_score": score,
+        }
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+        return await self.go_to_state(
+            "state_self_perceived_healthcare_assessment_risk_message"
         )
 
-        return EndState(self, "TODO: content for assessment end")
+    async def state_self_perceived_healthcare_assessment_risk_message(self):
+        return EndState(
+            self,
+            self._(
+                "\n".join(
+                    [
+                        "[persona_emoji]  *Fantastic! That's it.*",
+                        "",
+                        "I'll chat with you again tomorrow.",
+                    ]
+                )
+            ),
+        )
 
     def send_message(self, content, continue_session=True, **kw):
         """

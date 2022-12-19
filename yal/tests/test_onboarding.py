@@ -408,7 +408,7 @@ async def test_assessment_start(tester: AppTester, rapidpro_mock):
     await tester.user_input("OK, let's start!")
     tester.assert_state("state_survey_question")
     tester.assert_metadata(
-        "assessment_end_state", "state_sexual_literacy_assessment_end"
+        "assessment_end_state", "state_sexual_health_literacy_assessment_end"
     )
 
 
@@ -419,7 +419,7 @@ async def test_assessment_complete(tester: AppTester, rapidpro_mock):
     """
     tester.user.metadata[
         "assessment_end_state"
-    ] = "state_sexual_literacy_assessment_end"
+    ] = "state_sexual_health_literacy_assessment_end"
     tester.user.metadata["assessment_section"] = 2
     tester.setup_state("state_survey_question")
     await tester.user_input("1")
@@ -475,7 +475,7 @@ async def test_assessment_skip(get_current_datetime, tester: AppTester, rapidpro
 @pytest.mark.asyncio
 async def test_assessment_high_risk(tester: AppTester, rapidpro_mock):
     tester.user.metadata["assessment_score"] = 12
-    tester.setup_state("state_sexual_literacy_assessment_end")
+    tester.setup_state("state_sexual_health_literacy_assessment_end")
     await tester.user_input("1")
     assert tester.user.metadata == {
         "assessment_score": 12,
@@ -504,7 +504,7 @@ async def test_assessment_high_risk(tester: AppTester, rapidpro_mock):
 @pytest.mark.asyncio
 async def test_assessment_low_risk(tester: AppTester, rapidpro_mock):
     tester.user.metadata["assessment_score"] = 28
-    tester.setup_state("state_sexual_literacy_assessment_end")
+    tester.setup_state("state_sexual_health_literacy_assessment_end")
     await tester.user_input("1")
     assert tester.user.metadata == {
         "assessment_score": 28,

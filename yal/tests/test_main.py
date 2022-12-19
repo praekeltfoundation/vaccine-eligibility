@@ -7,7 +7,7 @@ import pytest
 from sanic import Sanic, response
 
 from vaccine.models import Message
-from vaccine.testing import AppTester, MockServer, TState, run_sanic
+from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.askaquestion import Application as AaqApplication
 from yal.assessments import Application as SegmentSurveyApplication
@@ -627,7 +627,9 @@ async def test_sexual_health_literacy_assessment(tester: AppTester):
     )
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "sexual_health_literacy")
-    tester.assert_metadata("assessment_end_state", "state_assessment_end")
+    tester.assert_metadata(
+        "assessment_end_state", "state_sexual_health_literacy_assessment_end"
+    )
 
 
 @pytest.mark.asyncio
@@ -644,7 +646,9 @@ async def test_locus_of_control_assessment(tester: AppTester):
     )
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "locus_of_control")
-    tester.assert_metadata("assessment_end_state", "state_assessment_end")
+    tester.assert_metadata(
+        "assessment_end_state", "state_locus_of_control_assessment_end"
+    )
 
 
 @pytest.mark.asyncio
@@ -663,7 +667,9 @@ async def test_depression_and_anxiety_assessment(tester: AppTester):
     )
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "depression_and_anxiety")
-    tester.assert_metadata("assessment_end_state", "state_assessment_end")
+    tester.assert_metadata(
+        "assessment_end_state", "state_depression_and_anxiety_assessment_end"
+    )
 
 
 @pytest.mark.asyncio
@@ -680,7 +686,7 @@ async def test_connectedness_assessment(tester: AppTester):
     )
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "connectedness")
-    tester.assert_metadata("assessment_end_state", "state_assessment_end")
+    tester.assert_metadata("assessment_end_state", "state_connectedness_assessment_end")
 
 
 @pytest.mark.asyncio
@@ -697,7 +703,9 @@ async def test_gender_attitude_assessment(tester: AppTester):
     )
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "gender_attitude")
-    tester.assert_metadata("assessment_end_state", "state_assessment_end")
+    tester.assert_metadata(
+        "assessment_end_state", "state_gender_attitude_assessment_end"
+    )
 
 
 @pytest.mark.asyncio
@@ -714,7 +722,7 @@ async def test_body_image_assessment(tester: AppTester):
     )
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "body_image")
-    tester.assert_metadata("assessment_end_state", "state_assessment_end")
+    tester.assert_metadata("assessment_end_state", "state_body_image_assessment_end")
 
 
 @pytest.mark.asyncio
@@ -733,35 +741,6 @@ async def test_self_perceived_healthcare_assessment(tester: AppTester):
     )
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "self_perceived_healthcare")
-    tester.assert_metadata("assessment_end_state", "state_assessment_end")
-
-
-@pytest.mark.asyncio
-async def test_self_esteem_assessment(tester: AppTester):
-    """
-    If there's a button payload that indicates that the self_esteem
-    assessment should start, then we should start it
-    """
-    await tester.user_input(
-        "test",
-        transport_metadata={
-            "message": {"button": {"payload": "state_self_esteem_assessment"}}
-        },
+    tester.assert_metadata(
+        "assessment_end_state", "state_self_perceived_healthcare_assessment_end"
     )
-    tester.assert_state("state_survey_question")
-    tester.assert_metadata("assessment_name", "self_esteem")
-    tester.assert_metadata("assessment_end_state", "state_assessment_end")
-
-
-@pytest.mark.asyncio
-async def test_assessment_end(tester: AppTester, rapidpro_mock: MockServer):
-    """
-    At the end of the assessment, we should save the assessment score on the profile
-    """
-    tester.setup_state("state_assessment_end")
-    tester.user.metadata["assessment_name"] = "sexual_health_literacy"
-    tester.user.metadata["assessment_score"] = 7
-    await tester.user_input("test")
-    tester.assert_message("TODO: content for assessment end")
-    assert rapidpro_mock.tstate
-    assert rapidpro_mock.tstate.contact_fields == {"sexual_health_literacy": "7"}

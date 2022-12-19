@@ -77,7 +77,17 @@
 | state_body_image_assessment | FALSE | | Starts the body image assessment |
 | state_self_perceived_healthcare_assessment | FALSE | | Starts the self perceived healthcare assessment |
 | state_self_esteem_assessment | FALSE | | Starts the self esteem assessment |
-| state_assessment_end | FALSE | | End message for assessments |
+| state_gender_attitude_assessment_risk_message | FALSE | | End message for gender attitude assessments |
+| state_self_perceived_healthcare_assessment_risk_message | FALSE | | End message for self perceived healthcare assessments |
+| state_connectedness_assessment_end | FALSE | | Update connectedness_risk and connectedness_score on contact field |
+| state_depression_and_anxiety_assessment_risk_message | FALSE | | End message for depression and anxiety assessments |
+| state_body_image_assessment_end | FALSE | | Update body_image_risk and body_image_score on contact field |
+| state_depression_and_anxiety_assessment_end | FALSE | | Update depression_and_anxiety_risk and depression_and_anxiety_score on contact field |
+| state_connectedness_assessment_risk_message | FALSE | | End message for connectedness assessments |
+| state_body_image_assessment_risk_message | FALSE | | End message for body image assessments |
+| state_locus_of_control_assessment_end | FALSE | | End message for locus of control assessment |
+| state_self_perceived_healthcare_assessment_end | FALSE | | Update self_perceived_healthcare_risk and self_perceived_healthcare_score on contact field |
+| state_gender_attitude_assessment_end | FALSE | | Update gender_attitude_risk and gender_attitude_score on contact field |
 
 
 ### Main Menu flow
@@ -112,7 +122,7 @@
 | state_handle_onboarding_reminder_response  |        TRUE        |     Text     |            TRUE          | Routes user to other state based on their reponse to the onboarding reminder                              |
 state_rel_status                             |        TRUE        |     Text     |            TRUE          | Asks the user for their current relationship states, user response is "relationship", "single", "complicated"
 state_sexual_literacy_assessment_start       |        TRUE        |     Text     |            TRUE          | User responds "ok" when they start the assessment                                                                   |
-state_sexual_literacy_assessment_end         |        FALSE       |              |            FALSE         | User has completed the assessment and receives the end message
+state_sexual_health_literacy_assessment_end         |        FALSE       |              |            FALSE         | User has completed the assessment and receives the end message
 
 ### OptOut flow
 | state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
