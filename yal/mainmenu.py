@@ -2,7 +2,7 @@ import logging
 from datetime import timedelta
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, CustomChoiceState, WhatsAppListState
+from vaccine.states import Choice, CustomChoiceState, EndState, WhatsAppListState
 from vaccine.utils import get_display_choices
 from yal import contentrepo, rapidpro, utils
 from yal.askaquestion import Application as AskaQuestionApplication
@@ -611,6 +611,4 @@ class Application(BaseApplication):
         return await self.go_to_state("state_contentrepo_page")
 
     async def state_prep_push_msg_related_page(self):
-        return EndState(
-            self, "Payload received: state_prep_push_msg_related_page"
-        )
+        return EndState(self, "Payload received: state_prep_push_msg_related_page")
