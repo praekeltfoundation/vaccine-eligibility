@@ -128,7 +128,18 @@ class Application(
             message.session_event = Message.SESSION_EVENT.RESUME
             self.state_name = feedback_state
 
+        # Replies to template push messages
+        payload = utils.get_by_path(
+            message.transport_metadata, "message", "button", "payload"
+        )
+        if payload and payload.startswith("state_") and payload in dir(self):
+            self.user.session_id = None
+            self.state_name = payload
+
         return await super().process_message(message)
+
+    async def state_testing_payload(self):
+        return EndState(self, "Payload received")
 
     async def state_qa_reset_feedback_timestamp_keywords(self):
         self.save_metadata("feedback_timestamp", get_current_datetime().isoformat())
