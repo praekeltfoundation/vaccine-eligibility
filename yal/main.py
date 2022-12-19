@@ -128,7 +128,46 @@ class Application(
             message.session_event = Message.SESSION_EVENT.RESUME
             self.state_name = feedback_state
 
+        if self.user.metadata.get("is_tester") == "TRUE":
+            # Replies to template push messages
+            payload = utils.get_by_path(
+                message.transport_metadata, "message", "button", "payload"
+            )
+            if payload and payload.startswith("state_") and payload in dir(self):
+                self.user.session_id = None
+                self.state_name = payload
+
         return await super().process_message(message)
+
+    async def state_sexual_health_literacy_assessment(self):
+        return EndState(
+            self, "Payload received: state_sexual_health_literacy_assessment"
+        )
+
+    async def state_locus_of_control_assessment(self):
+        return EndState(self, "Payload received: state_locus_of_control_assessment")
+
+    async def state_depression_and_anxiety_assessment(self):
+        return EndState(
+            self, "Payload received: state_depression_and_anxiety_assessment"
+        )
+
+    async def state_connectedness_assessment(self):
+        return EndState(self, "Payload received: state_connectedness_assessment")
+
+    async def state_gender_attitude_assessment(self):
+        return EndState(self, "Payload received: state_gender_attitude_assessment")
+
+    async def state_body_image_assessment(self):
+        return EndState(self, "Payload received: state_body_image_assessment")
+
+    async def state_self_perceived_healthcare_assessment(self):
+        return EndState(
+            self, "Payload received: state_self_perceived_healthcare_assessment"
+        )
+
+    async def state_self_esteem_assessment(self):
+        return EndState(self, "Payload received: state_self_esteem_assessment")
 
     async def state_qa_reset_feedback_timestamp_keywords(self):
         self.save_metadata("feedback_timestamp", get_current_datetime().isoformat())
