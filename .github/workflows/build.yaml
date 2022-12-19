@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - release/add-assessments
 
 jobs:
   build:

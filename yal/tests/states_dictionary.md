@@ -69,6 +69,15 @@
 | state_start                                |        FALSE       |              |            TRUE           | Session entry state. Routes user based on the message they sent in                                           |
 | state_catch_all                            |        FALSE       |              |            TRUE           | Sends user a generic welcome message if we received input we don't recognise                                 |
 | state_error                                |        FALSE       |              |            TRUE           | Closes user session                                 |
+| state_sexual_health_literacy_assessment | FALSE | | Starts the sexual health literacy assessment |
+| state_locus_of_control_assessment | FALSE | | Starts the locus of control assessment |
+| state_depression_and_anxiety_assessment | FALSE | | Starts the depression and anxiety assessment |
+| state_connectedness_assessment | FALSE | | Starts the connectedness assessment |
+| state_gender_attitude_assessment | FALSE | | Starts the gender attitude assessment |
+| state_body_image_assessment | FALSE | | Starts the body image assessment |
+| state_self_perceived_healthcare_assessment | FALSE | | Starts the self perceived healthcare assessment |
+| state_self_esteem_assessment | FALSE | | Starts the self esteem assessment |
+| state_assessment_end | FALSE | | End message for assessments |
 
 
 ### Main Menu flow
@@ -114,7 +123,8 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_optout_survey                        |        TRUE        |     Text     |            TRUE          | Asks user why they opted out. User repsonse is chosen from a list                                         |
 | state_delete_saved                         |        TRUE        |     Text     |            TRUE          | Deletes profile data. User response is "see" to see the cleaned profile                                |
 | state_tell_us_more                         |        TRUE        |     Text     |            TRUE          | Asks user why they opted out. User repsonse is freeText                                                   |
-| state_farewell_optout                      |        FALSE       |              |            FALSE         | Bids the user farewell and closes the session                                                           |
+| state_opt_out_no_changes                   |        TRUE        |     Text     |            TRUE          | Bids the user farewell and asks if the user would like to go to aaq or main menu                                                           |
+| state_farewell_optout                      |        TRUE        |     Text     |            TRUE          | Bids the user farewell and asks if the user would like to go to aaq or main |
 
 
 ### Quiz flow
@@ -188,6 +198,9 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_trigger_airtime_flow                 |        FALSE       |              |            TRUE          | Starts the user on the airtime flow in RapidPro |
 | state_prompt_next_action                   |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "state_aaq_start", "state_pre_mainmenu" or "state_no_airtime" |
 | state_no_airtime                           |        FALSE       |              |            TRUE          | Thanks user and closes session |
+| state_assessment_later_submit              |        FALSE       |              |            TRUE          | Submits assessment_reminder and assessment_name as contact fields for a later reminder to complete assessment |
+| state_assessment_later                     |        TRUE        |     Text     |            TRUE          | Thanks user and asks the user if they'd like to go to the main menu |
+| state_sexual_health_literacy_send_risk_message |    TRUE        |     Text     |            TRUE          | Sends the user a message based on their risk score, takes in "yes" and "no" |
 
 
 ### Service finder flow
@@ -294,3 +307,72 @@ state_sexual_literacy_assessment_end         |        FALSE       |             
 | state_pushmessage_optin_no                   |        TRUE        |     Text     |            TRUE          | Sends the user confirmation that they will not receive push messages |
 | state_pushmessage_optin_final                |        TRUE        |     Text     |            TRUE          | asks if user would like to go to main menu or aaq |
 
+### A1 Sexual health literacy assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a1_q1_sexual_health_lit | TRUE | Text | People can reduce the risk of getting STIs by |
+| state_a1_q2_sexual_health_lit | TRUE | Text | If Teddy goes out to a restaurant and starts chatting with someone he is sexually attracted to, what is most appropriate way Teddy can tell that person wants to have sex with him? |
+| state_a1_q3_sexual_health_lit | TRUE | Text | Robert has the right to force Samantha to have sex. |
+| state_a1_q4_sexual_health_lit | TRUE | Text | If sexually active, I _am_ able to insist on condoms when I have sex. |
+| state_a1_q5_sexual_health_lit | TRUE | Text | If you are in a relationship, which statement describes you best? |
+| state_a1_q6_sexual_health_lit | TRUE | Text | My sexual needs or desires are important. |
+| state_a1_q7_sexual_health_lit | TRUE | Text | I think it would be important to focus on my own pleasure as well as my partner's during sexual experiences. |
+| state_a1_q8_sexual_health_lit | TRUE | Text | I expect to enjoy sex. |
+| state_a1_q9A_sexual_health_lit | TRUE | Text | During the last time you had sex, did you or your partner do something or use any method to avoid or delay getting pregnant? |
+| state_a1_q9B_sexual_health_lit | TRUE | Text | What's been the MAIN way you or your partner have tried to delay or avoid getting pregnant? |
+|
+
+### A2 Locus of control
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a2_1_q1_loc_of_ctrl | TRUE | Text | I'm my own boss. |
+| state_a2_1_q2_loc_of_ctrl | TRUE | Text | If I work hard, I will be successful. |
+| state_a2_1_q3_loc_of_ctrl | TRUE | Text | I CAN get relevant health advice if and when I want it. |
+| state_a2_1_q4_loc_of_ctrl | TRUE | Text | What I do mainly depends on other people. |
+| state_a2_1_q5_loc_of_ctrl | TRUE | Text | Fate often gets in the way of my plans. |
+
+### A3 Depression and anxiety
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a3_q1_depression | TRUE | Text | Feeling nervous, anxious or on edge. |
+| state_a3_q2_depression | TRUE | Text | Not being able to stop or control worrying. |
+| state_a3_q3_depression | TRUE | Text | Feeling down, depressed or hopeless |
+| state_a3_q4_depression | TRUE | Text | Not having much interest or pleasure in doing things. |
+
+### A4 Connectedness
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a4_q1_connectedness | TRUE | Text | Do you have someone to talk to when you have a worry or problem? |
+
+### A5 Gender attitude
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a5_q1_gender_attitude | TRUE | Text | There are times when a woman deserves to be beaten. |
+| state_a5_q2_gender_attitude | TRUE | Text | It's a woman's responsibility to avoid getting pregnant. |
+| state_a5_q3_gender_attitude | TRUE | Text | A man and a woman should decide together what type of contraceptive to use |
+| state_a5_q4_gender_attitude | TRUE | Text | If a guy gets women pregnant, the child is the responsibility of both. |
+
+### A6 Body image
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a6_q1_body_image | TRUE | Text | I feel good about myself. |
+| state_a6_q2_body_image | TRUE | Text | I feel good about my body. |
+
+### A7 Self-perceived healthcare
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a2_2_q5_healthcare | TRUE | Text | When I have health needs (like  contraception or flu symptoms), I go to my closest clinic. |
+| state_a2_2_q6_healthcare | TRUE | Text | How good a job do you feel you are doing in taking care of your health? |
+
+### A8 Self esteem
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_a2_3_q1_self_esteem | TRUE | Text | I feel that I am a person who has worth — at least as much worth as others. |
+| state_a2_3_q2_self_esteem | TRUE | Text | I feel like I have quite a few of good qualities. |
+| state_a2_3_q3_self_esteem | TRUE | Text | In general, I tend to feel like a failure. |
+| state_a2_3_q4_self_esteem | TRUE | Text | I feel like I don't have much to be proud of. |
+| state_a2_3_q5_self_esteem | TRUE | Text | I have a positive attitude toward myself. |
+| state_a2_3_q6_self_esteem | TRUE | Text | I'm generally satisfied with myself. |
+| state_a2_3_q7_self_esteem | TRUE | Text | I wish I could have more respect for myself. |
+| state_a2_3_q8_self_esteem | TRUE | Text | I definitely feel useless at times. |
+| state_a2_3_q9_self_esteem | TRUE | Text | Sometimes I think I'm no good at all. |

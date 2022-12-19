@@ -5,7 +5,7 @@ from vaccine.states import EndState
 from vaccine.utils import random_id
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AaqApplication
-from yal.assessments import Application as SegmentationSurveyApplication
+from yal.assessments import Application as AssessmentApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.content_feedback_survey import ContentFeedbackSurveyApplication
 from yal.mainmenu import Application as MainMenuApplication
@@ -50,7 +50,7 @@ TRACKING_KEYWORDS_ROUND_2 = {
     "register2bwise",
     "connect",
 }
-OPTOUT_KEYWORDS = {"stop"}
+OPTOUT_KEYWORDS = {"stop", "opt out", "cancel", "quit"}
 ONBOARDING_REMINDER_KEYWORDS = {
     "continue",
     "remind me later",
@@ -77,7 +77,7 @@ class Application(
     ContentFeedbackSurveyApplication,
     WaFbCrossoverFeedbackApplication,
     ServiceFinderFeedbackSurveyApplication,
-    SegmentationSurveyApplication,
+    AssessmentApplication,
 ):
     START_STATE = "state_start"
 
@@ -146,6 +146,14 @@ class Application(
                 self.user.session_id = random_id()
             message.session_event = Message.SESSION_EVENT.RESUME
             self.state_name = feedback_state
+
+        # Replies to template push messages
+        payload = utils.get_by_path(
+            message.transport_metadata, "message", "button", "payload"
+        )
+        if payload and payload.startswith("state_") and payload in dir(self):
+            self.user.session_id = None
+            self.state_name = payload
 
         return await super().process_message(message)
 
@@ -221,6 +229,56 @@ class Application(
             ),
             next=self.START_STATE,
         )
+
+    async def state_sexual_health_literacy_assessment(self):
+        self.save_metadata("assessment_name", "sexual_health_literacy")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_locus_of_control_assessment(self):
+        self.save_metadata("assessment_name", "locus_of_control")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_depression_and_anxiety_assessment(self):
+        self.save_metadata("assessment_name", "depression_and_anxiety")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_connectedness_assessment(self):
+        self.save_metadata("assessment_name", "connectedness")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_gender_attitude_assessment(self):
+        self.save_metadata("assessment_name", "gender_attitude")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_body_image_assessment(self):
+        self.save_metadata("assessment_name", "body_image")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_self_perceived_healthcare_assessment(self):
+        self.save_metadata("assessment_name", "self_perceived_healthcare")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_self_esteem_assessment(self):
+        self.save_metadata("assessment_name", "self_esteem")
+        self.save_metadata("assessment_end_state", "state_assessment_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_assessment_end(self):
+        whatsapp_id = utils.normalise_phonenumber(self.inbound.from_addr).lstrip("+")
+        assessment_name = self.user.metadata["assessment_name"]
+        score = self.user.metadata["assessment_score"]
+        await rapidpro.update_profile(
+            whatsapp_id, {assessment_name: str(score)}, self.user.metadata
+        )
+
+        return EndState(self, "TODO: content for assessment end")
 
     def send_message(self, content, continue_session=True, **kw):
         """
