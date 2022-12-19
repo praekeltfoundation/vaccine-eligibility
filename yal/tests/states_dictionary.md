@@ -88,6 +88,16 @@
 | state_locus_of_control_assessment_end | FALSE | | End message for locus of control assessment |
 | state_self_perceived_healthcare_assessment_end | FALSE | | Update self_perceived_healthcare_risk and self_perceived_healthcare_score on contact field |
 | state_gender_attitude_assessment_end | FALSE | | Update gender_attitude_risk and gender_attitude_score on contact field |
+| state_depression_and_anxiety_risk | FALSE | | Save depression and anxiety risk to flow results |
+| state_depression_and_anxiety_score | FALSE | | Save depression and anxiety score to flow results |
+| state_connectedness_risk | FALSE | | Save connectedness risk to flow results |
+| state_connectedness_score | FALSE | | Save connectedness score to flow results |
+| state_gender_attitude_risk | FALSE | | Save gender attitude risk to flow results |
+| state_gender_attitude_score | FALSE | | Save gender attitude score to flow results |
+| state_body_image_risk | FALSE | | Save body image risk to flow results |
+| state_body_image_score | FALSE | | Save body image score to flow results |
+| state_self_perceived_healthcare_risk | FALSE | | Save self perceived healthcare risk to flow results |
+| state_self_perceived_healthcare_score | FALSE | | Save self perceived healthcare score to flow results |
 
 
 ### Main Menu flow
