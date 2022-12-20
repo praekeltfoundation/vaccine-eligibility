@@ -58,9 +58,9 @@ ASSESSMENT_QUESTIONS = {
                     "Do not Agree",
                 ],
                 "scoring": {
-                    "strongly_agree": 0,
+                    "strongly_agree": 5,
                     "kinda_agree": 2,
-                    "do_not_agree": 5,
+                    "do_not_agree": 0,
                 },
                 "next": "state_a5_q4_gender_attitude",
             },
@@ -78,9 +78,9 @@ ASSESSMENT_QUESTIONS = {
                     "Do not Agree",
                 ],
                 "scoring": {
-                    "strongly_agree": 0,
+                    "strongly_agree": 5,
                     "kinda_agree": 2,
-                    "do_not_agree": 5,
+                    "do_not_agree": 0,
                 },
                 "next": None,
             },

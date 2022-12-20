@@ -483,6 +483,8 @@ async def test_assessment_high_risk(tester: AppTester, rapidpro_mock):
         "sexual_health_lit_risk": "high_risk",
         "sexual_health_lit_score": 12,
     }
+    tester.assert_answer("state_sexual_health_lit_risk", "high_risk")
+    tester.assert_answer("state_sexual_health_lit_score", "12")
     tester.assert_message(
         "\n".join(
             [
@@ -512,6 +514,8 @@ async def test_assessment_low_risk(tester: AppTester, rapidpro_mock):
         "sexual_health_lit_risk": "low_risk",
         "sexual_health_lit_score": 28,
     }
+    tester.assert_answer("state_sexual_health_lit_risk", "low_risk")
+    tester.assert_answer("state_sexual_health_lit_score", "28")
     tester.assert_message(
         "\n".join(
             [

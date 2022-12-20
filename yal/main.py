@@ -284,6 +284,8 @@ class Application(
             "depression_and_anxiety_risk": risk,
             "depression_and_anxiety_score": score,
         }
+        self.save_answer("state_depression_and_anxiety_risk", risk)
+        self.save_answer("state_depression_and_anxiety_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -337,6 +339,8 @@ class Application(
             "connectedness_risk": risk,
             "connectedness_score": score,
         }
+        self.save_answer("state_connectedness_risk", risk)
+        self.save_answer("state_connectedness_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -385,11 +389,11 @@ class Application(
 
     async def state_gender_attitude_assessment_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 8:
-            # score of 0-2 high risk
+        if score <= 10:
+            # score of 0-10 high risk
             risk = "high_risk"
         else:
-            # score of 3-5 low risk
+            # score of 11-20 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -398,6 +402,8 @@ class Application(
             "gender_attitude_risk": risk,
             "gender_attitude_score": score,
         }
+        self.save_answer("state_gender_attitude_risk", risk)
+        self.save_answer("state_gender_attitude_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -470,6 +476,8 @@ class Application(
             "body_image_risk": risk,
             "body_image_score": score,
         }
+        self.save_answer("state_body_image_risk", risk)
+        self.save_answer("state_body_image_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -544,6 +552,8 @@ class Application(
             "self_perceived_healthcare_risk": risk,
             "self_perceived_healthcare_score": score,
         }
+        self.save_answer("state_self_perceived_healthcare_risk", risk)
+        self.save_answer("state_self_perceived_healthcare_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")

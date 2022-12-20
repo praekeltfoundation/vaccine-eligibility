@@ -307,6 +307,8 @@ class Application(BaseApplication):
             "sexual_health_lit_risk": risk,
             "sexual_health_lit_score": score,
         }
+        self.save_answer("state_sexual_health_lit_risk", risk)
+        self.save_answer("state_sexual_health_lit_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
