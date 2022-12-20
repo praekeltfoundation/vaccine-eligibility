@@ -129,10 +129,11 @@
 | state_onboarding_complete                  |        FALSE       |              |            TRUE          | Redirects user to AAQ start state in case they want to ask a question                                      |
 | state_stop_onboarding_reminders            |        TRUE        |     Text     |            TRUE          | Resets fields used for onboarding reminders                                                                 |
 | state_reschedule_onboarding_reminders      |        TRUE        |     Text     |            TRUE          | Sets onboarding reminder fields so that reminder is resent later                                              |
-| state_handle_onboarding_reminder_response  |        TRUE        |     Text     |            TRUE          | Routes user to other state based on their reponse to the onboarding reminder                              |
-state_rel_status                             |        TRUE        |     Text     |            TRUE          | Asks the user for their current relationship states, user response is "relationship", "single", "complicated"
-state_sexual_literacy_assessment_start       |        TRUE        |     Text     |            TRUE          | User responds "ok" when they start the assessment                                                                   |
-state_sexual_health_literacy_assessment_end         |        FALSE       |              |            FALSE         | User has completed the assessment and receives the end message
+| state_handle_onboarding_reminder_response  |        TRUE        |     Text     |            TRUE          | Routes user to other state based on their response to the onboarding reminder                              |
+| state_rel_status                           |        TRUE        |     Text     |            TRUE          | Asks the user for their current relationship states, user response is "relationship", "single", "complicated"
+| state_sexual_literacy_assessment_start     |        FALSE       |              |            FALSE         | Explains to the user what is going to happen next                                                                   |
+| state_sexual_literacy_assessment_few_qs    |        TRUE        |     Text     |            TRUE          | User responds "ok" when they start the assessment                                                                   |
+| state_sexual_health_literacy_assessment_end|        FALSE       |              |            FALSE         | User has completed the assessment and receives the end message                                                |
 
 ### OptOut flow
 | state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
