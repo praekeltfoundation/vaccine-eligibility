@@ -50,8 +50,14 @@ QUESTIONS = {
 
 
 class Application(BaseApplication):
-    START_STATE = "state_survey_question"
+    START_STATE = "state_survey_start"
     LATER_STATE = "state_assessment_later_submit"
+
+    async def state_survey_start(self):
+        self.delete_metadata("assessment_section")
+        self.delete_metadata("assessment_question")
+        self.delete_metadata("assessment_question_nr")
+        return await self.go_to_state("state_survey_question")
 
     async def state_survey_question(self):
         metadata = self.user.metadata

@@ -61,6 +61,20 @@ async def rapidpro_mock():
 
 
 @pytest.mark.asyncio
+async def test_survey_start(tester: AppTester):
+    """
+    Should clear all assessment state for a new assessment
+    """
+    tester.setup_state("state_survey_question")
+    await tester.user_input("2")
+    assert "assessment_question_nr" in tester.user.metadata
+
+    tester.setup_state("state_survey_start")
+    await tester.user_input()
+    assert "assessment_question_nr" not in tester.user.metadata
+
+
+@pytest.mark.asyncio
 async def test_survey_next_question(tester: AppTester):
     tester.setup_state("state_survey_question")
     await tester.user_input("2")
