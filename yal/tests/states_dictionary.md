@@ -69,35 +69,35 @@
 | state_start                                |        FALSE       |              |            TRUE           | Session entry state. Routes user based on the message they sent in                                           |
 | state_catch_all                            |        FALSE       |              |            TRUE           | Sends user a generic welcome message if we received input we don't recognise                                 |
 | state_error                                |        FALSE       |              |            TRUE           | Closes user session                                 |
-| state_sexual_health_literacy_assessment | FALSE | |  TRUE  |  Starts the sexual health literacy assessment |
-| state_locus_of_control_assessment | FALSE | |  TRUE  |  Starts the locus of control assessment |
-| state_depression_and_anxiety_assessment | FALSE | |  TRUE  |  Starts the depression and anxiety assessment |
-| state_connectedness_assessment | FALSE | |  TRUE  |  Starts the connectedness assessment |
-| state_gender_attitude_assessment | FALSE | |  TRUE  |  Starts the gender attitude assessment |
-| state_body_image_assessment | FALSE | |  TRUE  |  Starts the body image assessment |
-| state_self_perceived_healthcare_assessment | FALSE | |  TRUE  |  Starts the self perceived healthcare assessment |
-| state_self_esteem_assessment | FALSE | |  TRUE  |  Starts the self esteem assessment |
-| state_gender_attitude_assessment_risk_message | FALSE | |  TRUE  |  End message for gender attitude assessments |
-| state_self_perceived_healthcare_assessment_risk_message | FALSE | |  TRUE  |  End message for self perceived healthcare assessments |
-| state_connectedness_assessment_end | FALSE | |  TRUE  |  Update connectedness_risk and connectedness_score on contact field |
-| state_depression_and_anxiety_assessment_risk_message | FALSE | |  TRUE  |  End message for depression and anxiety assessments |
-| state_body_image_assessment_end | FALSE | |  TRUE  |  Update body_image_risk and body_image_score on contact field |
-| state_depression_and_anxiety_assessment_end | FALSE | |  TRUE  |  Update depression_and_anxiety_risk and depression_and_anxiety_score on contact field |
-| state_connectedness_assessment_risk_message | FALSE | |  TRUE  |  End message for connectedness assessments |
-| state_body_image_assessment_risk_message | FALSE | |  TRUE  |  End message for body image assessments |
-| state_locus_of_control_assessment_end | FALSE | |  TRUE  |  End message for locus of control assessment |
-| state_self_perceived_healthcare_assessment_end | FALSE | |  TRUE  |  Update self_perceived_healthcare_risk and self_perceived_healthcare_score on contact field |
-| state_gender_attitude_assessment_end | FALSE | |  TRUE  |  Update gender_attitude_risk and gender_attitude_score on contact field |
-| state_depression_and_anxiety_risk | FALSE | |  TRUE  |  Save depression and anxiety risk to flow results |
-| state_depression_and_anxiety_score | FALSE | |  TRUE  |  Save depression and anxiety score to flow results |
-| state_connectedness_risk | FALSE | |  TRUE  |  Save connectedness risk to flow results |
-| state_connectedness_score | FALSE | |  TRUE  |  Save connectedness score to flow results |
-| state_gender_attitude_risk | FALSE | |  TRUE  |  Save gender attitude risk to flow results |
-| state_gender_attitude_score | FALSE | |  TRUE  |  Save gender attitude score to flow results |
-| state_body_image_risk | FALSE | |  TRUE  |  Save body image risk to flow results |
-| state_body_image_score | FALSE | |  TRUE  |  Save body image score to flow results |
-| state_self_perceived_healthcare_risk | FALSE | |  TRUE  |  Save self perceived healthcare risk to flow results |
-| state_self_perceived_healthcare_score | FALSE | |  TRUE  |  Save self perceived healthcare score to flow results |
+| state_sexual_health_literacy_assessment    |        FALSE       |              |            FALSE          |  Starts the sexual health literacy assessment |
+| state_locus_of_control_assessment | FALSE | |  FALSE |  Starts the locus of control assessment |
+| state_depression_and_anxiety_assessment | FALSE | |  FALSE |  Starts the depression and anxiety assessment |
+| state_connectedness_assessment | FALSE | |  FALSE |  Starts the connectedness assessment |
+| state_gender_attitude_assessment | FALSE | |  FALSE |  Starts the gender attitude assessment |
+| state_body_image_assessment | FALSE | |  FALSE |  Starts the body image assessment |
+| state_self_perceived_healthcare_assessment | FALSE | |  FALSE |  Starts the self perceived healthcare assessment |
+| state_self_esteem_assessment | FALSE | |  FALSE |  Starts the self esteem assessment |
+| state_gender_attitude_assessment_risk_message | FALSE | |  FALSE |  End message for gender attitude assessments |
+| state_self_perceived_healthcare_assessment_risk_message | FALSE | |  FALSE |  End message for self perceived healthcare assessments |
+| state_connectedness_assessment_end | FALSE | |  FALSE |  Update connectedness_risk and connectedness_score on contact field |
+| state_depression_and_anxiety_assessment_risk_message | FALSE | |  FALSE |  End message for depression and anxiety assessments |
+| state_body_image_assessment_end | FALSE | |  FALSE |  Update body_image_risk and body_image_score on contact field |
+| state_depression_and_anxiety_assessment_end | FALSE | |  FALSE |  Update depression_and_anxiety_risk and depression_and_anxiety_score on contact field |
+| state_connectedness_assessment_risk_message | FALSE | |  FALSE |  End message for connectedness assessments |
+| state_body_image_assessment_risk_message | FALSE | |  FALSE |  End message for body image assessments |
+| state_locus_of_control_assessment_end | FALSE | |  FALSE |  End message for locus of control assessment |
+| state_self_perceived_healthcare_assessment_end | FALSE | |  FALSE |  Update self_perceived_healthcare_risk and self_perceived_healthcare_score on contact field |
+| state_gender_attitude_assessment_end | FALSE | |  FALSE |  Update gender_attitude_risk and gender_attitude_score on contact field |
+| state_depression_and_anxiety_risk | FALSE | Text |  TRUE  |  Save depression and anxiety risk to flow results |
+| state_depression_and_anxiety_score | FALSE | Text |  TRUE  |  Save depression and anxiety score to flow results |
+| state_connectedness_risk | FALSE | Text |  TRUE  |  Save connectedness risk to flow results |
+| state_connectedness_score | FALSE | Text |  TRUE  |  Save connectedness score to flow results |
+| state_gender_attitude_risk | FALSE | Text |  TRUE  |  Save gender attitude risk to flow results |
+| state_gender_attitude_score | FALSE | Text |  TRUE  |  Save gender attitude score to flow results |
+| state_body_image_risk | FALSE | Text |  TRUE  |  Save body image risk to flow results |
+| state_body_image_score | FALSE | Text |  TRUE  |  Save body image score to flow results |
+| state_self_perceived_healthcare_risk | FALSE | Text |  TRUE  |  Save self perceived healthcare risk to flow results |
+| state_self_perceived_healthcare_score | FALSE | Text |  TRUE  |  Save self perceived healthcare score to flow results |
 
 
 ### Main Menu flow
