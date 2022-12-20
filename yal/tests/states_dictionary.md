@@ -140,9 +140,9 @@ state_sexual_health_literacy_assessment_end         |        FALSE       |      
 | state_optout                               |        TRUE        |     Text     |            TRUE          | Asks the user what they would to do. User response is "stop notifications", "delete saved" or "skip"     |
 | state_submit_optout                        |        FALSE       |              |            FALSE         | Resets fields used for reminders so any pending reminders are cancelled                                 |
 | state_stop_notifications                   |        FALSE       |              |            TRUE          | Sends user a message and then routes them to state_optout_survey                                          |
-| state_optout_survey                        |        TRUE        |     Text     |            TRUE          | Asks user why they opted out. User repsonse is chosen from a list                                         |
+| state_optout_survey                        |        TRUE        |     Text     |            TRUE          | Asks user why they opted out. User response is chosen from a list                                         |
 | state_delete_saved                         |        TRUE        |     Text     |            TRUE          | Deletes profile data. User response is "see" to see the cleaned profile                                |
-| state_tell_us_more                         |        TRUE        |     Text     |            TRUE          | Asks user why they opted out. User repsonse is freeText                                                   |
+| state_tell_us_more                         |        TRUE        |     Text     |            TRUE          | Asks user why they opted out. User response is freeText                                                   |
 | state_opt_out_no_changes                   |        TRUE        |     Text     |            TRUE          | Bids the user farewell and asks if the user would like to go to aaq or main menu                                                           |
 | state_farewell_optout                      |        TRUE        |     Text     |            TRUE          | Bids the user farewell and asks if the user would like to go to aaq or main |
 
@@ -163,7 +163,7 @@ state_sexual_health_literacy_assessment_end         |        FALSE       |      
 | state_terms                                |        TRUE        |     Text     |            TRUE          | Asks user to accept privacy policy. User response is "accept", "decline" or "read"                   |
 | state_terms_pdf                            |        FALSE       |              |            TRUE          | Sends user terms and conditions as pdf and then routes back to state_terms                            |
 | state_decline_confirm                      |        TRUE        |     Text     |            TRUE          | Asks user to confirm their decline of the T&Cs. User response is "accept" or "end"                    |
-| state_decline_1                            |        FALSE       |              |            TRUE          | Informs user that ther online safety is important. Routes to state_decline_2                            |
+| state_decline_1                            |        FALSE       |              |            TRUE          | Informs user that their online safety is important. Routes to state_decline_2                            |
 | state_decline_2                            |        TRUE        |     Text     |            TRUE          | Informs user of how to rejoin. User response is "hi"                                                    |
 | state_submit_terms_and_conditions          |        FALSE       |              |            TRUE          | Update the user's profile and direct user to onboarding flows                                              |
 
@@ -193,7 +193,7 @@ state_sexual_health_literacy_assessment_end         |        FALSE       |      
 | state_call_not_helpful_try_again_declined  |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "question" or "update"      |
 | state_no_callback_received                 |        FALSE       |              |            TRUE          | Sends user our appologies      |
 | state_ask_to_call_again                    |        TRUE        |     Text     |            TRUE          | Asks user if they would like to try another call. User response is "yes", "another way" or "no"      |
-| state_retry_callback_choose_number         |        TRUE        |     Text     |            TRUE          | Asks user what nubmer we should use for the retry. User response is "whatsapp", "previously saved" or "another" |
+| state_retry_callback_choose_number         |        TRUE        |     Text     |            TRUE          | Asks user what number we should use for the retry. User response is "whatsapp", "previously saved" or "another" |
 | state_offer_saved_emergency_contact        |        TRUE        |     Text     |            TRUE          | Shows the user the saved number to get confirmation. User response is "yes" or "no" |
 | state_help_no_longer_needed                |        TRUE        |     Text     |            TRUE          | Asks the user to confirm they no longer need help. User response is "yes", "long" or "changed mind" |
 | state_got_help                             |        TRUE        |     Text     |            TRUE          | Directs user to the main menu. User response is "menu" |
@@ -227,7 +227,7 @@ state_sexual_health_literacy_assessment_end         |        FALSE       |      
 | state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
 |--------------------------------------------|--------------------|--------------|---------------------------|---------------------------------------------------------------------------------|
 | state_servicefinder_start                  |        TRUE        |     Text     |            TRUE          | Asks if user wants to find services. User response is "yes"             |
-| state_check_address                        |        FALSE       |              |            TRUE          | Routes user based on presense of existing address             |
+| state_check_address                        |        FALSE       |              |            TRUE          | Routes user based on presence of existing address             |
 | state_pre_confirm_existing_address         |        FALSE       |              |            TRUE          | Sends conversational message             |
 | state_confirm_existing_address             |        TRUE        |     Text     |            TRUE          | Asks user to confirm if existing address is correct             |
 | state_confirm_existing_address             |        TRUE        |     Text     |            TRUE          | Asks user to confirm if existing address is correct. User response is "yes" or "new"       |
@@ -246,7 +246,7 @@ state_sexual_health_literacy_assessment_end         |        FALSE       |      
 | state_full_address                         |        TRUE        |     Text     |            TRUE          | Asks user to enter their neighbourhood and street name           |
 | state_full_address                         |        TRUE        |     Text     |            TRUE          | Asks user to enter their neighbourhood and street name           |
 | state_validate_full_address                |        TRUE        |     Text     |            TRUE          | Tries to process full address and saves answers state_suburb and state_street_name if successful |
-| state_validate_full_address_error          |        TRUE        |     Text     |            TRUE          | Explains to user that we will collect each field seperately. User response is "yes" or "no" |
+| state_validate_full_address_error          |        TRUE        |     Text     |            TRUE          | Explains to user that we will collect each field separately. User response is "yes" or "no" |
 | state_suburb                               |        TRUE        |     Text     |            TRUE          | Asks user to enter their suburb |
 | state_street_name                          |        TRUE        |     Text     |            TRUE          | Asks user to enter their street name |
 | state_cannot_skip                          |        TRUE        |     Text     |            TRUE          | Informs the user that the previous state is required for the feature. User response is "share" or "menu" |
