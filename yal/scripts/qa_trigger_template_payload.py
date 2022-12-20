@@ -33,7 +33,7 @@ def create_whatsapp_message(arguments: argparse.Namespace) -> dict:
             {
                 "from": arguments.whatsapp_id,
                 "id": uuid4().hex,
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": str(datetime.now().timestamp()),
                 "type": "button",
                 "button": {
                     "payload": arguments.payload,
