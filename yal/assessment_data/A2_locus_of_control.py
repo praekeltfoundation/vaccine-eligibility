@@ -85,7 +85,7 @@ ASSESSMENT_QUESTIONS = {
                     "Extremely True",
                 ],
                 "next": None,
-            }
+            },
         },
     },
 }
