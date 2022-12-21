@@ -253,6 +253,9 @@ class Application(BaseApplication):
         )
         await self.publish_message(msg)
         await asyncio.sleep(0.5)
+        return await self.go_to_state("state_sexual_literacy_assessment_few_qs")
+
+    async def state_sexual_literacy_assessment_few_qs(self):
         question = self._(
             "\n".join(
                 [
