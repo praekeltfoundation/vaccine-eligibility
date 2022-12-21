@@ -98,6 +98,7 @@
 | state_body_image_score | FALSE | Text |  TRUE  |  Save body image score to flow results |
 | state_self_perceived_healthcare_risk | FALSE | Text |  TRUE  |  Save self perceived healthcare risk to flow results |
 | state_self_perceived_healthcare_score | FALSE | Text |  TRUE  |  Save self perceived healthcare score to flow results |
+| state_source_tracking | TRUE | Text | TRUE | The trigger keyword that was used |
 
 
 ### Main Menu flow
