@@ -267,7 +267,7 @@ class Application(
             # score of 0-25 high risk
             risk = "high_risk"
         else:
-            # score of 25-30 low risk
+            # score of 26-30 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -331,11 +331,11 @@ class Application(
 
     async def state_depression_and_anxiety_assessment_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 2:
-            # score of 0-2 high risk
+        if score <= 10:
+            # score of 0-10 high risk
             risk = "high_risk"
         else:
-            # score of 3-5 low risk
+            # score of 11-20 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
