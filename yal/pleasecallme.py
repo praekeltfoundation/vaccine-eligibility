@@ -163,7 +163,7 @@ class Application(BaseApplication):
                     "There's usually about a *5 - 7 minutes* waiting time for a "
                     "callback.",
                     "",
-                    "*1* - Ok",
+                    "*1* - Ok, got it",
                     "*2* - Call me when you open",
                 ]
             )
@@ -172,8 +172,8 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("ok", "Ok"),
-                Choice("callback in hours", "Call me when you open"),
+                Choice("ok", "Ok, got it"),
+                Choice("callback in hours", "Call me when open"),
             ],
             error=self._(get_generic_error()),
             next={
