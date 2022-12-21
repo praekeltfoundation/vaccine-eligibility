@@ -122,7 +122,7 @@ ASSESSMENT_QUESTIONS = {
                     ("not_sure", "Not sure"),
                     ("disagree", "Disagree"),
                     ("strongly_disagree", "Strongly disagree"),
-                    ("not_active", "I am not sexually active"),
+                    ("not_active", "Not sexually active"),
                 ],
                 "scoring": {
                     "strongly_agree": 5,
