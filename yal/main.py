@@ -45,7 +45,7 @@ TRACKING_KEYWORDS = {
 }
 TRACKING_KEYWORDS_ROUND_2 = {
     "chat2bwise",
-    "love2bwise",
+    "talk2bwise",
     "hi",
     "click2bwise",
     "want2bwise",
