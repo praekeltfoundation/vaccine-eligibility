@@ -134,6 +134,8 @@
 | state_sexual_literacy_assessment_start     |        FALSE       |              |            FALSE         | Explains to the user what is going to happen next                                                                   |
 | state_sexual_literacy_assessment_few_qs    |        TRUE        |     Text     |            TRUE          | User responds "ok" when they start the assessment                                                                   |
 | state_sexual_health_literacy_assessment_end|        FALSE       |              |            FALSE         | User has completed the assessment and receives the end message                                                |
+| state_sexual_health_lit_risk | TRUE | Text | TRUE | Sexual health literacy risk |
+| state_sexual_health_lit_score | TRUE | Number | TRUE | Score from sexual health literacy assessment |
 
 ### OptOut flow
 | state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
