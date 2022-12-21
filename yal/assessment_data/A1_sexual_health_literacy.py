@@ -317,19 +317,6 @@ ASSESSMENT_QUESTIONS = {
                     "male_sterilisation": 2,
                     "exclusive_breastfeeding": 1,
                 },
-                "next": "state_a1_final",
-            },
-            "state_a1_final": {
-                "type": "info",
-                "text": "\n".join(
-                    [
-                        "🏁 🎉",
-                        "",
-                        "Awesome. That's all the questions for now!",
-                        "",
-                        "[persona_emoji] Thanks for being so patient and honest 😌.",
-                    ]
-                ),
                 "next": None,
             },
         },

@@ -47,17 +47,6 @@ ASSESSMENT_QUESTIONS = {
                     "ok": 2,
                     "pretty_bad": 1,
                 },
-                "next": "state_a2_2_q7_healthcare",
-            },
-            "state_a2_2_final": {
-                "type": "info",
-                "text": "\n".join(
-                    [
-                        "[persona_emoji]  Fantastic! That's it.",
-                        "",
-                        "I'll chat with you again tomorrow.",
-                    ]
-                ),
                 "next": None,
             },
         },
