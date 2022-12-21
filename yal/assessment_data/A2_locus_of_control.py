@@ -84,18 +84,6 @@ ASSESSMENT_QUESTIONS = {
                     "Very true",
                     "Extremely True",
                 ],
-                "next": "state_a2_1_final",
-            },
-            "state_a2_1_final": {
-                "type": "info",
-                "text": "\n".join(
-                    [
-                        "[persona_emoji] Thanks, that was great! "
-                        "And what about your health...?",
-                        "",
-                        "That's all for now",
-                    ]
-                ),
                 "next": None,
             },
         },
