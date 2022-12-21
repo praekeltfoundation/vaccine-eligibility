@@ -57,6 +57,7 @@ class Application(BaseApplication):
         self.delete_metadata("assessment_section")
         self.delete_metadata("assessment_question")
         self.delete_metadata("assessment_question_nr")
+        self.delete_metadata("assessment_score")
         return await self.go_to_state("state_survey_question")
 
     async def state_survey_question(self):
@@ -198,7 +199,7 @@ class Application(BaseApplication):
 
         data = {
             "assessment_reminder": reminder_time.isoformat(),
-            "assessment_name": assessment_name,
+            "assessment_reminder_name": assessment_name,
         }
 
         await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)

@@ -22,6 +22,7 @@ from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
+from yal.tests.test_mainmenu import build_message_detail
 from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import BACK_TO_MAIN, GET_HELP, get_current_datetime
 from yal.wa_fb_crossover_feedback import Application as WaFbCrossoverFeedbackApplication
@@ -230,6 +231,17 @@ async def contentrepo_api_mock():
                 }
             )
         return response.json({"count": 0, "results": []})
+
+    @app.route("/api/v2/pages/444", methods=["GET"])
+    def get_page_detail_444(request):
+        tstate.requests.append(request)
+        return response.json(
+            build_message_detail(
+                444,
+                "Main Menu / Content Page 444",
+                "Content for page 444",
+            )
+        )
 
     @app.route("/suggestedcontent", methods=["GET"])
     def get_suggested_content(request):
@@ -455,6 +467,45 @@ async def test_onboarding_reminder_response_to_reminder_handler(
     tester.assert_num_messages(1)
 
     assert len(rapidpro_mock.tstate.requests) == 2
+
+
+@pytest.mark.asyncio
+async def test_push_message_buttons_to_display_page(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    """
+    If there's a button payload that indicates the user should be shown a content page
+    then we should take them there
+    """
+    rapidpro_mock.tstate.contact_fields["push_related_page_id"] = "444"
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_prep_push_msg_related_page"}}
+        },
+    )
+
+    tester.assert_state("state_display_page")
+    tester.assert_num_messages(1)
+    tester.assert_message(
+        "\n".join(
+            [
+                "Main Menu / Content Page 444",
+                "-----",
+                "",
+                "Content for page 444",
+                "",
+                "-----",
+                "*Or reply:*",
+                "0. 🏠 Back to Main *MENU*",
+                "#. 🆘Get *HELP*",
+            ]
+        )
+    )
+
+    assert len(rapidpro_mock.tstate.requests) == 4
+    assert len(contentrepo_api_mock.tstate.requests) == 2
 
 
 @pytest.mark.asyncio
