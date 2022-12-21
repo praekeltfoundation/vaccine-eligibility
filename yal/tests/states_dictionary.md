@@ -212,6 +212,7 @@ state_sexual_health_literacy_assessment_end         |        FALSE       |      
 | state_survey_already_completed             |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "state_aaq_state" or "state_pre_mainmenu"             |
 | state_survey_decline                       |        TRUE        |     Text     |            TRUE          | User declined survey. Offers user other features. User response is "state_aaq_state" or "state_pre_mainmenu" |
 | state_start_survey                         |        FALSE       |              |            TRUE          | Sets user expectations |
+| state_survey_start                      |        FALSE        |     |            | |
 | state_survey_question                      |        TRUE        |     Text     |            TRUE          | Sends the user a survey question. User response is based on content |
 | state_survey_process_answer                |        FALSE       |              |            TRUE          | Caches user answer and progresses the survey |
 | state_survey_done                          |        TRUE        |     Text     |            TRUE          | Thanks user and directs them to claim their airtime. User response is "get_airtime" |
