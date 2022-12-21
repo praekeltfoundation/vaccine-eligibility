@@ -80,12 +80,12 @@
 | state_gender_attitude_assessment_risk_message | FALSE | |  FALSE |  End message for gender attitude assessments |
 | state_self_perceived_healthcare_assessment_risk_message | FALSE | |  FALSE |  End message for self perceived healthcare assessments |
 | state_connectedness_assessment_end | FALSE | |  FALSE |  Update connectedness_risk and connectedness_score on contact field |
+| state_sexual_health_literacy_assessment_end | FALSE | |  FALSE |  Update sexual_health_literacy_risk and sexual_health_literacy_score on contact field |
 | state_depression_and_anxiety_assessment_risk_message | FALSE | |  FALSE |  End message for depression and anxiety assessments |
 | state_body_image_assessment_end | FALSE | |  FALSE |  Update body_image_risk and body_image_score on contact field |
 | state_depression_and_anxiety_assessment_end | FALSE | |  FALSE |  Update depression_and_anxiety_risk and depression_and_anxiety_score on contact field |
 | state_connectedness_assessment_risk_message | FALSE | |  FALSE |  End message for connectedness assessments |
 | state_body_image_assessment_risk_message | FALSE | |  FALSE |  End message for body image assessments |
-| state_locus_of_control_assessment_end | FALSE | |  FALSE |  End message for locus of control assessment |
 | state_self_perceived_healthcare_assessment_end | FALSE | |  FALSE |  Update self_perceived_healthcare_risk and self_perceived_healthcare_score on contact field |
 | state_gender_attitude_assessment_end | FALSE | |  FALSE |  Update gender_attitude_risk and gender_attitude_score on contact field |
 | state_depression_and_anxiety_risk | FALSE | Text |  TRUE  |  Save depression and anxiety risk to flow results |
@@ -98,6 +98,8 @@
 | state_body_image_score | FALSE | Text |  TRUE  |  Save body image score to flow results |
 | state_self_perceived_healthcare_risk | FALSE | Text |  TRUE  |  Save self perceived healthcare risk to flow results |
 | state_self_perceived_healthcare_score | FALSE | Text |  TRUE  |  Save self perceived healthcare score to flow results |
+| state_sexual_health_lit_risk | TRUE | Text | TRUE | Sexual health literacy risk |
+| state_sexual_health_lit_score | TRUE | Number | TRUE | Score from sexual health literacy assessment |
 | state_source_tracking | TRUE | Text | TRUE | The trigger keyword that was used |
 
 
@@ -132,11 +134,10 @@
 | state_reschedule_onboarding_reminders      |        TRUE        |     Text     |            TRUE          | Sets onboarding reminder fields so that reminder is resent later                                              |
 | state_handle_onboarding_reminder_response  |        TRUE        |     Text     |            TRUE          | Routes user to other state based on their response to the onboarding reminder                              |
 | state_rel_status                           |        TRUE        |     Text     |            TRUE          | Asks the user for their current relationship states, user response is "relationship", "single", "complicated"
-| state_sexual_literacy_assessment_start     |        FALSE       |              |            FALSE         | Explains to the user what is going to happen next                                                                   |
-| state_sexual_literacy_assessment_few_qs    |        TRUE        |     Text     |            TRUE          | User responds "ok" when they start the assessment                                                                   |
-| state_sexual_health_literacy_assessment_end|        FALSE       |              |            FALSE         | User has completed the assessment and receives the end message                                                |
-| state_sexual_health_lit_risk | TRUE | Text | TRUE | Sexual health literacy risk |
-| state_sexual_health_lit_score | TRUE | Number | TRUE | Score from sexual health literacy assessment |
+| state_locus_of_control_assessment_start     |        FALSE       |              |            FALSE         | Explains to the user what is going to happen next                                                                   |
+| state_locus_of_control_assessment_few_qs    |        TRUE        |     Text     |            TRUE          | User responds "ok" when they start the assessment  |
+| state_locus_of_control_assessment_end |        FALSE       |              |            FALSE         | User has completed the assessment and receives the end message |
+
 
 ### OptOut flow
 | state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
