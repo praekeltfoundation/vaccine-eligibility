@@ -266,9 +266,9 @@ ASSESSMENT_QUESTIONS = {
                 },
                 "next": {
                     "yes": "state_a1_q9B_sexual_health_lit",
-                    "no": "state_a1_final",
-                    "forgot": "state_a1_final",
-                    "virgin": "state_a1_final",
+                    "no": None,
+                    "forgot": None,
+                    "virgin": None,
                 },
             },
             "state_a1_q9B_sexual_health_lit": {
