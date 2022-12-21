@@ -14,7 +14,6 @@ ASSESSMENT_QUESTIONS = {
                         "",
                         "[persona_emoji] _Reply with the *number* "
                         "of your chosen answer:_",
-                        "",
                     ]
                 ),
                 "options": [
@@ -42,7 +41,6 @@ ASSESSMENT_QUESTIONS = {
                         "",
                         "[persona_emoji] _Reply with the *number* "
                         "of your chosen answer:_",
-                        "",
                     ]
                 ),
                 "options": [
@@ -85,7 +83,7 @@ ASSESSMENT_QUESTIONS = {
                         "",
                         "Robert has the right to force Samantha to have sex.",
                         "",
-                        "_*Tap the button* below and select the option "
+                        "[persona_emoji] _*Tap the button* below and select the option "
                         "that describes how you feel._",
                     ]
                 ),
@@ -137,8 +135,8 @@ ASSESSMENT_QUESTIONS = {
                 "type": "choice",
                 "text": "\n".join(
                     [
-                        "*If you are in a relationship, which statement describes you "
-                        "best?*",
+                        "*If you are in a relationship, which of these statements "
+                        "describes you best?*",
                         "",
                         "[persona_emoji] _Reply with the *number* "
                         "of your chosen answer:_",
@@ -251,7 +249,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": "state_a1_q9A_sexual_health_lit",
             },
             "state_a1_q9A_sexual_health_lit": {
-                "text": "*During the last time you had sex, did you or your partner "
+                "text": "*The last time you had sex, did you or your partner "
                 "do something or use any method to avoid or delay getting pregnant?*",
                 "type": "choice",
                 "options": [
@@ -278,7 +276,7 @@ ASSESSMENT_QUESTIONS = {
                 "text": "\n".join(
                     [
                         "*What's been the MAIN way you or your partner "
-                        "have tried to delay or avoid getting pregnant? *",
+                        "have tried to delay or avoid getting pregnant?*",
                         "",
                         "_Reply with the *number* of one of the options below._",
                     ]

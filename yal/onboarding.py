@@ -80,8 +80,9 @@ class Application(BaseApplication):
                         "🙋🏾 PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
                         "-----",
                         "",
-                        "*Why not use an emoji to accompany my new name?* Send in the "
-                        "emoji you'd like to use, now.",
+                        "*Why not use an emoji to accompany my new name?*",
+                        "",
+                        "Send in the emoji you'd like to use, now.",
                         "",
                         '_If you want to do this later, just click the "skip" button._',
                     ]
@@ -225,7 +226,7 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    "🙏🏾 Lekker! Your profile is all set up!",
+                    "*🙏🏾 Lekker! Your profile is all set up!*",
                     "",
                     "Let's get you started!",
                 ]
@@ -246,8 +247,8 @@ class Application(BaseApplication):
                     "[persona_emoji] I've got a tonne of answers and info about sex, "
                     "love and relationships.",
                     "",
-                    "To point you in the right direction, "
-                    "I want to quickly check what you already know.",
+                    "*To point you in the right direction, "
+                    "I want to quickly check what you already know.*",
                 ]
             )
         )
@@ -290,7 +291,7 @@ class Application(BaseApplication):
                 "",
                 "*Awesome. That's all the questions for now!*",
                 "",
-                "🤦🏾‍♂️ Thanks for being so patient and honest 😌.",
+                "[persona_emoji] Thanks for being so patient and honest 😌.",
             ]
         )
 
@@ -337,7 +338,7 @@ class Application(BaseApplication):
                         "By the time we're done, we'll have you feeling more confident "
                         "when it comes to all things sex and relationships. 💪",
                         "",
-                        "🤦🏾‍♂️ What do you say? Shall we get started?",
+                        "[persona_emoji] *What do you say? Shall we get started?*",
                         "",
                         get_display_choices(choices),
                     ]
@@ -355,7 +356,7 @@ class Application(BaseApplication):
                         "",
                         "That means we can skip the basics.",
                         "",
-                        "🤦🏾‍♂️ What do you say? Shall we get started?",
+                        "[persona_emoji] *What do you say? Shall we get started?*",
                         "",
                         get_display_choices(choices),
                     ]

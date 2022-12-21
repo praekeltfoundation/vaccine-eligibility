@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
@@ -25,7 +26,7 @@ class Application(BaseApplication):
                     "If you'd like, I can also send you notifications once a day with "
                     "relevant info that I've put together just for you.",
                     "",
-                    "Would you like to get notifications?",
+                    "*Would you like to get notifications?*",
                     "",
                     get_display_choices(choices),
                     "",
@@ -63,7 +64,7 @@ class Application(BaseApplication):
                     "[persona_emoji] Not a problem!",
                     "",
                     "If you change your mind and want to turn on notifications, "
-                    "just choose the ⚙️Chat Settings option from the main menu. 😉",
+                    "just choose the ⚙️*Chat Settings* option from the *main menu*. 😉",
                 ]
             )
         )
@@ -86,7 +87,7 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    "[persona_emoji] Lekker! I've set up notifications.",
+                    "[persona_emoji] *Lekker! I've set up notifications.*",
                     "",
                     "🔔 I'll ping you once a day with info I think might ",
                     "be interesting or helpful for you — and sometimes just to "
@@ -95,6 +96,7 @@ class Application(BaseApplication):
             )
         )
         await self.publish_message(msg)
+        await asyncio.sleep(1)
         return await self.go_to_state("state_pushmessage_optin_final")
 
     async def state_pushmessage_optin_final(self):
