@@ -429,7 +429,7 @@ async def test_assessment_complete(tester: AppTester, rapidpro_mock):
                 "If you'd like, I can also send you notifications once a day with "
                 "relevant info that I've put together just for you.",
                 "",
-                "Would you like to get notifications?",
+                "*Would you like to get notifications?*",
                 "",
                 "1. Yes, please!",
                 "2. No thanks",
@@ -491,7 +491,7 @@ async def test_assessment_high_risk(tester: AppTester, rapidpro_mock):
                 "If you'd like, I can also send you notifications once a day with "
                 "relevant info that I've put together just for you.",
                 "",
-                "Would you like to get notifications?",
+                "*Would you like to get notifications?*",
                 "",
                 "1. Yes, please!",
                 "2. No thanks",
@@ -522,7 +522,7 @@ async def test_assessment_low_risk(tester: AppTester, rapidpro_mock):
                 "If you'd like, I can also send you notifications once a day with "
                 "relevant info that I've put together just for you.",
                 "",
-                "Would you like to get notifications?",
+                "*Would you like to get notifications?*",
                 "",
                 "1. Yes, please!",
                 "2. No thanks",
