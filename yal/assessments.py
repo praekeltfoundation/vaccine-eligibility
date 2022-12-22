@@ -201,7 +201,7 @@ class Application(BaseApplication):
 
         data = {
             "assessment_reminder": reminder_time.isoformat(),
-            "assessment_name": assessment_name,
+            "assessment_reminder_name": assessment_name,
         }
 
         await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
