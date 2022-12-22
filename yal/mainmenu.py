@@ -371,7 +371,9 @@ class Application(BaseApplication):
         if message_id > 1:
             menu_level = metadata.get("current_menu_level", inferred_menu_level)
         else:
-            menu_level = metadata.get("current_menu_level", (inferred_menu_level-1)) + 1
+            menu_level = (
+                metadata.get("current_menu_level", (inferred_menu_level - 1)) + 1
+            )
         self.save_metadata("current_menu_level", menu_level)
 
         if page_details["has_children"]:
@@ -624,8 +626,8 @@ class Application(BaseApplication):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         error = await rapidpro.update_profile(
-                whatsapp_id, {"push_related_page_id": ""}, self.user.metadata
-            )
+            whatsapp_id, {"push_related_page_id": ""}, self.user.metadata
+        )
         if error:
             return await self.go_to_state("state_error")
 

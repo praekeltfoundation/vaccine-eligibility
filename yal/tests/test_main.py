@@ -22,10 +22,10 @@ from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
+from yal.tests.test_mainmenu import build_message_detail
 from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import BACK_TO_MAIN, GET_HELP, get_current_datetime
 from yal.wa_fb_crossover_feedback import Application as WaFbCrossoverFeedbackApplication
-from yal.tests.test_mainmenu import build_message_detail
 
 
 def get_state_sets():
@@ -474,17 +474,15 @@ async def test_push_message_buttons_to_display_page(
     tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
     """
-    If there's a button payload that indicates the user should be shown a content page then
-    we should take them there
+    If there's a button payload that indicates the user should be shown a content page
+    then we should take them there
     """
     rapidpro_mock.tstate.contact_fields["push_related_page_id"] = "444"
 
     await tester.user_input(
         "test",
         transport_metadata={
-            "message": {
-                "button": {"payload": "state_prep_push_msg_related_page"}
-            }
+            "message": {"button": {"payload": "state_prep_push_msg_related_page"}}
         },
     )
 
