@@ -360,6 +360,9 @@ class Application(
                     [
                         "[persona_emoji]  Eish! Sounds like it's been a rough "
                         "couple of weeks, eh? Sorry to hear you've been down. 😔",
+                        "",
+                        "Let's see if we can work on changing that together, shall "
+                        "we? I'll send you some more info on that soon! 📲",
                     ]
                 )
             ),
@@ -368,7 +371,7 @@ class Application(
                     [
                         "[persona_emoji]  Glad you've got your head in a good "
                         "place. It makes it easier to deal with the other "
-                        "things life throws at you.",
+                        "things life throws at you 😌",
                     ]
                 )
             ),
@@ -618,18 +621,19 @@ class Application(
                         [
                             "[persona_emoji]  Thanks for giving your honest view.",
                             "",
-                            "*Knowing the difference between a healthy and an "
-                            "unhealthy relationship can help you understand what "
-                            "it means to have a positive relationship.*",
+                            "*It's easy to feel uncomfortable with your body. But if "
+                            "you focus on what you don't like, it can affect your "
+                            "self-esteem and make you feel bad about "
+                            "yourself all round.*",
                         ]
                     )
                 ),
                 self._(
                     "\n".join(
                         [
-                            "From your answers, it sounds like you know the part you "
-                            "play in building and keeping a healthy relationship. "
-                            "That's awesome.",
+                            "From your answers, it sounds like you've already started ",
+                            "that journey of getting to know, love and appreciate your "
+                            "body, which is awesome!"
                             "",
                             "*If you do have any questions though, just send me a "
                             "message saying ASK.*",
