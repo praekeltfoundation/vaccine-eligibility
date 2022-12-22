@@ -143,7 +143,7 @@ class Application(
                 self.user.session_id = None
                 self.state_name = OnboardingApplication.REMINDER_STATE
 
-        # Fields that RapidPro sets after a push message
+        # Fields that RapidPro sets after a feedback push message
         feedback_state = await self.get_feedback_state()
         if feedback_state:
             if not self.user.session_id:
