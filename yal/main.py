@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from vaccine.models import Message
@@ -234,13 +235,6 @@ class Application(
             next=self.START_STATE,
         )
 
-    async def state_sexual_health_literacy_assessment(self):
-        self.save_metadata("assessment_name", "sexual_health_literacy")
-        self.save_metadata(
-            "assessment_end_state", "state_sexual_health_literacy_assessment_end"
-        )
-        return await self.go_to_state(AssessmentApplication.START_STATE)
-
     async def state_locus_of_control_assessment(self):
         self.save_metadata("assessment_name", "locus_of_control")
         self.save_metadata(
@@ -248,18 +242,84 @@ class Application(
         )
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
-    async def state_locus_of_control_assessment_end(self):
-        return EndState(
-            self,
-            self._(
-                "/n".join(
+    async def state_sexual_health_literacy_assessment(self):
+        self.save_metadata("assessment_name", "sexual_health_literacy")
+        self.save_metadata(
+            "assessment_end_state", "state_sexual_health_literacy_assessment_end"
+        )
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_sexual_health_literacy_assessment_end(self):
+        msg = "\n".join(
+            [
+                "🏁 🎉",
+                "",
+                "*Awesome. That's all the questions for now!*",
+                "",
+                "[persona_emoji] Thanks for being so patient and honest 😌.",
+            ]
+        )
+
+        await self.publish_message(msg)
+        await asyncio.sleep(0.5)
+        score = self.user.metadata.get("assessment_score", 0)
+        if score <= 25:
+            # score of 0-25 high risk
+            risk = "high_risk"
+        else:
+            # score of 25-30 low risk
+            risk = "low_risk"
+
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "sexual_health_lit_risk": risk,
+            "sexual_health_lit_score": score,
+        }
+        self.save_answer("state_sexual_health_lit_risk", risk)
+        self.save_answer("state_sexual_health_lit_score", str(score))
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
+        return await self.go_to_state("state_sexual_health_literacy_send_risk_message")
+
+    async def state_sexual_health_literacy_send_risk_message(self):
+        questions = {
+            "high_risk": self._(
+                "\n".join(
                     [
-                        "[persona_emoji] Thanks for answering all the questions.",
+                        "*You and your sexual health*",
+                        "-----",
                         "",
-                        "That's all for now.",
+                        "Looking at your answers, I think I know exactly "
+                        "where to start. I've got some great info on "
+                        "the basics of sex, love and relationships.",
+                        "",
+                        "By the time we're done, we'll have you feeling more confident "
+                        "when it comes to all things sex and relationships. 💪",
                     ]
                 )
             ),
+            "low_risk": self._(
+                "\n".join(
+                    [
+                        "*You and your sexual health*",
+                        "-----",
+                        "",
+                        "Looking at your answers, it looks like you already "
+                        "know quite a lot about the birds 🦉and the bees 🐝of "
+                        "sex, love and relationships. Proud of you 🙏🏾",
+                        "",
+                        "That means we can skip the basics.",
+                    ]
+                )
+            ),
+        }
+        risk = self.user.metadata.get("sexual_health_lit_risk", "high_risk")
+        return EndState(
+            app=self,
+            question=questions[risk],
         )
 
     async def state_depression_and_anxiety_assessment(self):

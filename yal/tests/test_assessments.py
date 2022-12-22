@@ -79,7 +79,7 @@ async def test_survey_next_question(tester: AppTester):
     tester.setup_state("state_survey_question")
     await tester.user_input("2")
     tester.assert_state("state_survey_question")
-    tester.assert_answer("state_a1_q1_sexual_health_lit", "single_partner")
+    tester.assert_answer("state_a2_1_q1_loc_of_ctrl", "a_little_true")
 
 
 @pytest.mark.asyncio
@@ -89,7 +89,7 @@ async def test_list_question_type(tester: AppTester):
     interactive message
     """
     questions = {
-        "sexual_health_literacy": {
+        "locus_of_control": {
             "1": {
                 "start": "q1",
                 "questions": {
@@ -123,7 +123,7 @@ async def test_button_question_type(tester: AppTester):
     interactive message
     """
     questions = {
-        "sexual_health_literacy": {
+        "locus_of_control": {
             "1": {
                 "start": "q1",
                 "questions": {
@@ -156,7 +156,7 @@ async def test_scoring(tester: AppTester):
     """
     tester.user.metadata["assessment_end_state"] = "state_catch_all"
     questions = {
-        "sexual_health_literacy": {
+        "locus_of_control": {
             "1": {
                 "start": "q1",
                 "questions": {

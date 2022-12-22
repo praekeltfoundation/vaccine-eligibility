@@ -283,8 +283,8 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
     tester.assert_message(
         "\n".join(
             [
-                "I'll ask a few questions. For each question "
-                "I just need you to choose the answer that feels right to you."
+                "Can I start by asking how much you agree or disagree with some "
+                "statements about you, your life, and your health?",
             ]
         ),
         buttons=["OK, let's start!", "I can't right now"],
@@ -404,11 +404,11 @@ async def test_onboarding_set_first_time_menu(
 
 @pytest.mark.asyncio
 async def test_assessment_start(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_sexual_literacy_assessment_start")
+    tester.setup_state("state_locus_of_control_assessment_start")
     await tester.user_input("OK, let's start!")
     tester.assert_state("state_survey_question")
     tester.assert_metadata(
-        "assessment_end_state", "state_sexual_health_literacy_assessment_end"
+        "assessment_end_state", "state_locus_of_control_assessment_end"
     )
 
 
@@ -419,10 +419,10 @@ async def test_assessment_complete(tester: AppTester, rapidpro_mock):
     """
     tester.user.metadata[
         "assessment_end_state"
-    ] = "state_sexual_health_literacy_assessment_end"
+    ] = "state_locus_of_control_assessment_end"
     tester.user.metadata["assessment_section"] = 2
     tester.setup_state("state_survey_question")
-    await tester.user_input("1")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
     tester.assert_message(
         "\n".join(
             [
@@ -447,7 +447,7 @@ async def test_assessment_skip(get_current_datetime, tester: AppTester, rapidpro
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
 
     tester.user.metadata["persona_emoji"] = "🪱"
-    tester.setup_state("state_sexual_literacy_assessment_start")
+    tester.setup_state("state_locus_of_control_assessment_start")
 
     await tester.user_input(content="I can't right now")
     tester.assert_message(
@@ -467,68 +467,6 @@ async def test_assessment_skip(get_current_datetime, tester: AppTester, rapidpro
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "assessment_reminder": "2022-06-20T16:30:00",
-            "assessment_reminder_name": "sexual_health_literacy",
+            "assessment_reminder_name": "locus_of_control",
         },
     }
-
-
-@pytest.mark.asyncio
-async def test_assessment_high_risk(tester: AppTester, rapidpro_mock):
-    tester.user.metadata["assessment_score"] = 12
-    tester.setup_state("state_sexual_health_literacy_assessment_end")
-    await tester.user_input("1")
-    assert tester.user.metadata == {
-        "assessment_score": 12,
-        "onboarding_reminder_sent": "False",
-        "sexual_health_lit_risk": "high_risk",
-        "sexual_health_lit_score": 12,
-    }
-    tester.assert_answer("state_sexual_health_lit_risk", "high_risk")
-    tester.assert_answer("state_sexual_health_lit_score", "12")
-    tester.assert_message(
-        "\n".join(
-            [
-                "If you'd like, I can also send you notifications once a day with "
-                "relevant info that I've put together just for you.",
-                "",
-                "*Would you like to get notifications?*",
-                "",
-                "1. Yes, please!",
-                "2. No thanks",
-                "",
-                "_💡You can turn the notifications off at any time, just reply "
-                '"STOP" or go to your profile._',
-            ]
-        )
-    )
-
-
-@pytest.mark.asyncio
-async def test_assessment_low_risk(tester: AppTester, rapidpro_mock):
-    tester.user.metadata["assessment_score"] = 28
-    tester.setup_state("state_sexual_health_literacy_assessment_end")
-    await tester.user_input("1")
-    assert tester.user.metadata == {
-        "assessment_score": 28,
-        "onboarding_reminder_sent": "False",
-        "sexual_health_lit_risk": "low_risk",
-        "sexual_health_lit_score": 28,
-    }
-    tester.assert_answer("state_sexual_health_lit_risk", "low_risk")
-    tester.assert_answer("state_sexual_health_lit_score", "28")
-    tester.assert_message(
-        "\n".join(
-            [
-                "If you'd like, I can also send you notifications once a day with "
-                "relevant info that I've put together just for you.",
-                "",
-                "*Would you like to get notifications?*",
-                "",
-                "1. Yes, please!",
-                "2. No thanks",
-                "",
-                "_💡You can turn the notifications off at any time, just reply "
-                '"STOP" or go to your profile._',
-            ]
-        )
-    )
