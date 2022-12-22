@@ -621,10 +621,10 @@ class Application(
                         [
                             "[persona_emoji]  Thanks for giving your honest view.",
                             "",
-                            "I'm so happy you feel comfortable with your body! "
+                            "*I'm so happy you feel comfortable with your body! "
                             "Focusing on what you like about yourself can help boost "
                             "your self-esteem and make you feel a lot better about "
-                            "yourself all round!",
+                            "yourself all round!*",
                         ]
                     )
                 ),
