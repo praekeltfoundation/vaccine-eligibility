@@ -61,11 +61,25 @@ async def rapidpro_mock():
 
 
 @pytest.mark.asyncio
+async def test_survey_start(tester: AppTester):
+    """
+    Should clear all assessment state for a new assessment
+    """
+    tester.setup_state("state_survey_question")
+    await tester.user_input("2")
+    assert "assessment_question_nr" in tester.user.metadata
+
+    tester.setup_state("state_survey_start")
+    await tester.user_input()
+    assert "assessment_question_nr" not in tester.user.metadata
+
+
+@pytest.mark.asyncio
 async def test_survey_next_question(tester: AppTester):
     tester.setup_state("state_survey_question")
     await tester.user_input("2")
     tester.assert_state("state_survey_question")
-    tester.assert_answer("state_s1_1_sex_health_lit_sti", "single_partner")
+    tester.assert_answer("state_a1_q1_sexual_health_lit", "single_partner")
 
 
 @pytest.mark.asyncio
@@ -75,22 +89,24 @@ async def test_list_question_type(tester: AppTester):
     interactive message
     """
     questions = {
-        "1": {
-            "start": "q1",
-            "questions": {
-                "q1": {
-                    "type": "list",
-                    "text": "Test question",
-                    "options": [
-                        "Choice 1",
-                        "Choice 2",
-                    ],
-                    "button": "Select a choice",
-                }
-            },
+        "sexual_health_literacy": {
+            "1": {
+                "start": "q1",
+                "questions": {
+                    "q1": {
+                        "type": "list",
+                        "text": "Test question",
+                        "options": [
+                            "Choice 1",
+                            "Choice 2",
+                        ],
+                        "button": "Select a choice",
+                    }
+                },
+            }
         }
     }
-    with mock.patch("yal.assessments.ASSESSMENT_QUESTIONS", questions):
+    with mock.patch("yal.assessments.QUESTIONS", questions):
         tester.setup_state("state_survey_question")
         await tester.user_input(session=Message.SESSION_EVENT.NEW)
         tester.assert_message(
@@ -107,25 +123,55 @@ async def test_button_question_type(tester: AppTester):
     interactive message
     """
     questions = {
-        "1": {
-            "start": "q1",
-            "questions": {
-                "q1": {
-                    "type": "button",
-                    "text": "Test question",
-                    "options": [
-                        "Choice 1",
-                        "Choice 2",
-                    ],
-                    "button": "Select a choice",
-                }
-            },
+        "sexual_health_literacy": {
+            "1": {
+                "start": "q1",
+                "questions": {
+                    "q1": {
+                        "type": "button",
+                        "text": "Test question",
+                        "options": [
+                            "Choice 1",
+                            "Choice 2",
+                        ],
+                        "button": "Select a choice",
+                    }
+                },
+            }
         }
     }
-    with mock.patch("yal.assessments.ASSESSMENT_QUESTIONS", questions):
+    with mock.patch("yal.assessments.QUESTIONS", questions):
         tester.setup_state("state_survey_question")
         await tester.user_input(session=Message.SESSION_EVENT.NEW)
         tester.assert_message(
             content="\n".join(["◼️", "-----", "", "Test question"]),
             buttons=["Choice 1", "Choice 2"],
         )
+
+
+@pytest.mark.asyncio
+async def test_scoring(tester: AppTester):
+    """
+    Scoring should add or remove from the total
+    """
+    tester.user.metadata["assessment_end_state"] = "state_catch_all"
+    questions = {
+        "sexual_health_literacy": {
+            "1": {
+                "start": "q1",
+                "questions": {
+                    "q1": {
+                        "type": "button",
+                        "text": "Test question",
+                        "options": ["Choice 1", "Choice 2"],
+                        "scoring": {"choice_1": 1, "choice_2": 2},
+                        "next": None,
+                    }
+                },
+            }
+        }
+    }
+    with mock.patch("yal.assessments.QUESTIONS", questions):
+        tester.setup_state("state_survey_question")
+        await tester.user_input("2")
+        tester.assert_metadata("assessment_score", 2)

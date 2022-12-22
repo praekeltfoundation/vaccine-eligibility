@@ -367,11 +367,11 @@ async def test_mainmenu_show_privacy_policy(
     _, privacy_message = tester.application.messages
     assert privacy_message.content == "\n".join(
         [
-            "This conversation is completely private and confidential. 🤐",
+            "*This conversation is completely private and confidential.* 🤐",
             "-----",
             "",
             "⚠️ If you think someone else could have access to the phone "
-            "you're using to chat, remember to delete these messages "
+            "you're using to chat, remember to *delete these messages* "
             "at the end of our chat.",
         ]
     )

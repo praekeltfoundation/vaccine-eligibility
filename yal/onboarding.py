@@ -2,16 +2,12 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import (
-    Choice,
-    EndState,
-    FreeText,
-    WhatsAppButtonState,
-    WhatsAppListState,
-)
+from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
+from vaccine.utils import get_display_choices
 from yal import rapidpro, utils
-from yal.assessments import Application as SegmentationSurveyApplication
-from yal.utils import get_current_datetime, get_generic_error
+from yal.assessments import Application as AssessmentApplication
+from yal.pushmessages_optin import Application as PushmessageOptinApplication
+from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 from yal.validators import age_validator
 
 logger = logging.getLogger(__name__)
@@ -84,8 +80,9 @@ class Application(BaseApplication):
                         "🙋🏾 PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
                         "-----",
                         "",
-                        "*Why not use an emoji to accompany my new name?* Send in the "
-                        "emoji you'd like to use, now.",
+                        "*Why not use an emoji to accompany my new name?*",
+                        "",
+                        "Send in the emoji you'd like to use, now.",
                         "",
                         '_If you want to do this later, just click the "skip" button._',
                     ]
@@ -229,7 +226,7 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    "🙏🏾 Lekker! Your profile is all set up!",
+                    "*🙏🏾 Lekker! Your profile is all set up!*",
                     "",
                     "Let's get you started!",
                 ]
@@ -240,6 +237,7 @@ class Application(BaseApplication):
         return await self.go_to_state("state_sexual_literacy_assessment_start")
 
     async def state_sexual_literacy_assessment_start(self):
+        # TODO: add timeout and reminders to complete assessments
         msg = self._(
             "\n".join(
                 [
@@ -249,13 +247,16 @@ class Application(BaseApplication):
                     "[persona_emoji] I've got a tonne of answers and info about sex, "
                     "love and relationships.",
                     "",
-                    "To point you in the right direction, "
-                    "I want to quickly check what you already know.",
+                    "*To point you in the right direction, "
+                    "I want to quickly check what you already know.*",
                 ]
             )
         )
         await self.publish_message(msg)
         await asyncio.sleep(0.5)
+        return await self.go_to_state("state_sexual_literacy_assessment_few_qs")
+
+    async def state_sexual_literacy_assessment_few_qs(self):
         question = self._(
             "\n".join(
                 [
@@ -266,30 +267,110 @@ class Application(BaseApplication):
         )
 
         self.save_metadata(
-            "assessment_end_state", "state_sexual_literacy_assessment_end"
+            "assessment_end_state", "state_sexual_health_literacy_assessment_end"
         )
 
         return WhatsAppButtonState(
             app=self,
             question=question,
-            choices=[Choice("ok", "OK, let's start!")],
+            choices=[
+                Choice("ok", "OK, let's start!"),
+                Choice("later", "I can't right now"),
+            ],
             error=get_generic_error(),
-            next=SegmentationSurveyApplication.START_STATE,
+            next={
+                "ok": AssessmentApplication.START_STATE,
+                "later": AssessmentApplication.LATER_STATE,
+            },
         )
 
-    async def state_sexual_literacy_assessment_end(self):
+    async def state_sexual_health_literacy_assessment_end(self):
         msg = "\n".join(
             [
                 "🏁 🎉",
                 "",
                 "*Awesome. That's all the questions for now!*",
                 "",
-                "🤦🏾‍♂️ Thanks for being so patient and honest 😌.",
+                "[persona_emoji] Thanks for being so patient and honest 😌.",
             ]
         )
-        return EndState(self, msg)
 
-        # TODO: Go down different path depending on assessment outcome
+        await self.publish_message(msg)
+        await asyncio.sleep(0.5)
+        score = self.user.metadata.get("assessment_score", 0)
+        if score <= 25:
+            # score of 0-25 high risk
+            risk = "high_risk"
+        else:
+            # score of 25-30 low risk
+            risk = "low_risk"
+
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "sexual_health_lit_risk": risk,
+            "sexual_health_lit_score": score,
+        }
+        self.save_answer("state_sexual_health_lit_risk", risk)
+        self.save_answer("state_sexual_health_lit_score", str(score))
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
+        return await self.go_to_state("state_sexual_health_literacy_send_risk_message")
+
+    async def state_sexual_health_literacy_send_risk_message(self):
+        choices = [
+            Choice("yes", "Cool, let's do it!"),
+            Choice("no", "Not right now"),
+        ]
+        questions = {
+            "high_risk": self._(
+                "\n".join(
+                    [
+                        "*You and your sexual health*",
+                        "-----",
+                        "",
+                        "Looking at your answers, I think I know exactly "
+                        "where to start. I've got some great info on "
+                        "the basics of sex, love and relationships.",
+                        "",
+                        "By the time we're done, we'll have you feeling more confident "
+                        "when it comes to all things sex and relationships. 💪",
+                        "",
+                        "[persona_emoji] *What do you say? Shall we get started?*",
+                        "",
+                        get_display_choices(choices),
+                    ]
+                )
+            ),
+            "low_risk": self._(
+                "\n".join(
+                    [
+                        "*You and your sexual health*",
+                        "-----",
+                        "",
+                        "Looking at your answers, it looks like you already "
+                        "know quite a lot about the birds 🦉and the bees 🐝of "
+                        "sex, love and relationships. Proud of you 🙏🏾",
+                        "",
+                        "That means we can skip the basics.",
+                        "",
+                        "[persona_emoji] *What do you say? Shall we get started?*",
+                        "",
+                        get_display_choices(choices),
+                    ]
+                )
+            ),
+        }
+        risk = self.user.metadata.get("sexual_health_lit_risk", "high_risk")
+        return WhatsAppButtonState(
+            app=self,
+            question=questions[risk],
+            choices=choices,
+            error=get_generic_error(),
+            next=PushmessageOptinApplication.START_STATE,
+        )
 
     async def state_stop_onboarding_reminders(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)

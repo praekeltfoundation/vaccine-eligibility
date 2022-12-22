@@ -287,7 +287,7 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
                 "I just need you to choose the answer that feels right to you."
             ]
         ),
-        buttons=["OK, let's start!"],
+        buttons=["OK, let's start!", "I can't right now"],
     )
 
     assert len(rapidpro_mock.tstate.requests) == 3
@@ -408,26 +408,127 @@ async def test_assessment_start(tester: AppTester, rapidpro_mock):
     await tester.user_input("OK, let's start!")
     tester.assert_state("state_survey_question")
     tester.assert_metadata(
-        "assessment_end_state", "state_sexual_literacy_assessment_end"
+        "assessment_end_state", "state_sexual_health_literacy_assessment_end"
     )
 
 
 @pytest.mark.asyncio
 async def test_assessment_complete(tester: AppTester, rapidpro_mock):
+    """
+    Start pushmessage optin flow after assessment
+    """
     tester.user.metadata[
         "assessment_end_state"
-    ] = "state_sexual_literacy_assessment_end"
+    ] = "state_sexual_health_literacy_assessment_end"
     tester.user.metadata["assessment_section"] = 2
     tester.setup_state("state_survey_question")
-    await tester.user_input()
+    await tester.user_input("1")
     tester.assert_message(
         "\n".join(
             [
-                "🏁 🎉",
+                "If you'd like, I can also send you notifications once a day with "
+                "relevant info that I've put together just for you.",
                 "",
-                "*Awesome. That's all the questions for now!*",
+                "*Would you like to get notifications?*",
                 "",
-                "🤦🏾‍♂️ Thanks for being so patient and honest 😌.",
+                "1. Yes, please!",
+                "2. No thanks",
+                "",
+                "_💡You can turn the notifications off at any time, just reply "
+                '"STOP" or go to your profile._',
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.assessments.get_current_datetime")
+async def test_assessment_skip(get_current_datetime, tester: AppTester, rapidpro_mock):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+
+    tester.user.metadata["persona_emoji"] = "🪱"
+    tester.setup_state("state_sexual_literacy_assessment_start")
+
+    await tester.user_input(content="I can't right now")
+    tester.assert_message(
+        "\n".join(
+            [
+                "🪱 No worries, we get it!",
+                "",
+                "I'll send you a reminder message tomorrow, so you can come back "
+                "and continue with these questions, then.",
+                "",
+                "Check you later 🤙🏾",
+            ]
+        )
+    )
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "assessment_reminder": "2022-06-20T16:30:00",
+            "assessment_name": "sexual_health_literacy",
+        },
+    }
+
+
+@pytest.mark.asyncio
+async def test_assessment_high_risk(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["assessment_score"] = 12
+    tester.setup_state("state_sexual_health_literacy_assessment_end")
+    await tester.user_input("1")
+    assert tester.user.metadata == {
+        "assessment_score": 12,
+        "onboarding_reminder_sent": "False",
+        "sexual_health_lit_risk": "high_risk",
+        "sexual_health_lit_score": 12,
+    }
+    tester.assert_answer("state_sexual_health_lit_risk", "high_risk")
+    tester.assert_answer("state_sexual_health_lit_score", "12")
+    tester.assert_message(
+        "\n".join(
+            [
+                "If you'd like, I can also send you notifications once a day with "
+                "relevant info that I've put together just for you.",
+                "",
+                "*Would you like to get notifications?*",
+                "",
+                "1. Yes, please!",
+                "2. No thanks",
+                "",
+                "_💡You can turn the notifications off at any time, just reply "
+                '"STOP" or go to your profile._',
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_assessment_low_risk(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["assessment_score"] = 28
+    tester.setup_state("state_sexual_health_literacy_assessment_end")
+    await tester.user_input("1")
+    assert tester.user.metadata == {
+        "assessment_score": 28,
+        "onboarding_reminder_sent": "False",
+        "sexual_health_lit_risk": "low_risk",
+        "sexual_health_lit_score": 28,
+    }
+    tester.assert_answer("state_sexual_health_lit_risk", "low_risk")
+    tester.assert_answer("state_sexual_health_lit_score", "28")
+    tester.assert_message(
+        "\n".join(
+            [
+                "If you'd like, I can also send you notifications once a day with "
+                "relevant info that I've put together just for you.",
+                "",
+                "*Would you like to get notifications?*",
+                "",
+                "1. Yes, please!",
+                "2. No thanks",
+                "",
+                "_💡You can turn the notifications off at any time, just reply "
+                '"STOP" or go to your profile._',
             ]
         )
     )

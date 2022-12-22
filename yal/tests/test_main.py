@@ -1,4 +1,5 @@
 from datetime import datetime
+from pkgutil import iter_modules
 from unittest import mock
 
 import pytablereader as ptr
@@ -84,6 +85,14 @@ def test_no_state_name_clashes():
 def test_all_states_added_to_docs():
     state_sets = get_state_sets()
     existing_states = set.union(*state_sets) - {"state_name"}
+
+    # States from assessments are dynamic
+    for assessment in iter_modules(["yal/assessment_data"]):
+        module = assessment.module_finder.find_module(assessment.name).load_module()
+        for section in module.ASSESSMENT_QUESTIONS.values():
+            for name, details in section["questions"].items():
+                if details.get("type", "info") != "info":
+                    existing_states.add(name)
 
     loader = ptr.MarkdownTableFileLoader("yal/tests/states_dictionary.md")
     documented_states = set()
@@ -624,3 +633,160 @@ async def test_state_qa_reset_feedback_timestamp_keywords(
         "the message early"
     )
     assert tester.user.metadata["feedback_timestamp"] != old_timestamp
+
+
+@pytest.mark.asyncio
+async def test_template_message_button_payload(tester: AppTester):
+    """
+    If there's a button payload that points to a valid state, then send the user to that
+    state.
+    """
+    await tester.user_input(
+        "test",
+        transport_metadata={"message": {"button": {"payload": "state_catch_all"}}},
+    )
+    tester.assert_message(
+        "\n".join(
+            [
+                "🤖 *Hey there — Welcome to B-Wise!*",
+                "",
+                "If you're looking for answers to questions about bodies, sex, "
+                "relationships and health, please reply with the word *HI*.",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_sexual_health_literacy_assessment(tester: AppTester):
+    """
+    If there's a button payload that indicates that the sexual health literacy
+    assessment should start, then we should start it
+    """
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_sexual_health_literacy_assessment"}
+            }
+        },
+    )
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "sexual_health_literacy")
+    tester.assert_metadata(
+        "assessment_end_state", "state_sexual_health_literacy_assessment_end"
+    )
+
+
+@pytest.mark.asyncio
+async def test_locus_of_control_assessment(tester: AppTester):
+    """
+    If there's a button payload that indicates that the locus_of_control
+    assessment should start, then we should start it
+    """
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_locus_of_control_assessment"}}
+        },
+    )
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "locus_of_control")
+    tester.assert_metadata(
+        "assessment_end_state", "state_locus_of_control_assessment_end"
+    )
+
+
+@pytest.mark.asyncio
+async def test_depression_and_anxiety_assessment(tester: AppTester):
+    """
+    If there's a button payload that indicates that the depression_and_anxiety
+    assessment should start, then we should start it
+    """
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_depression_and_anxiety_assessment"}
+            }
+        },
+    )
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "depression_and_anxiety")
+    tester.assert_metadata(
+        "assessment_end_state", "state_depression_and_anxiety_assessment_end"
+    )
+
+
+@pytest.mark.asyncio
+async def test_connectedness_assessment(tester: AppTester):
+    """
+    If there's a button payload that indicates that the connectedness
+    assessment should start, then we should start it
+    """
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_connectedness_assessment"}}
+        },
+    )
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "connectedness")
+    tester.assert_metadata("assessment_end_state", "state_connectedness_assessment_end")
+
+
+@pytest.mark.asyncio
+async def test_gender_attitude_assessment(tester: AppTester):
+    """
+    If there's a button payload that indicates that the gender_attitude
+    assessment should start, then we should start it
+    """
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_gender_attitude_assessment"}}
+        },
+    )
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "gender_attitude")
+    tester.assert_metadata(
+        "assessment_end_state", "state_gender_attitude_assessment_end"
+    )
+
+
+@pytest.mark.asyncio
+async def test_body_image_assessment(tester: AppTester):
+    """
+    If there's a button payload that indicates that the body_image
+    assessment should start, then we should start it
+    """
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_body_image_assessment"}}
+        },
+    )
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "body_image")
+    tester.assert_metadata("assessment_end_state", "state_body_image_assessment_end")
+
+
+@pytest.mark.asyncio
+async def test_self_perceived_healthcare_assessment(tester: AppTester):
+    """
+    If there's a button payload that indicates that the self_perceived_healthcare
+    assessment should start, then we should start it
+    """
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_self_perceived_healthcare_assessment"}
+            }
+        },
+    )
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "self_perceived_healthcare")
+    tester.assert_metadata(
+        "assessment_end_state", "state_self_perceived_healthcare_assessment_end"
+    )
