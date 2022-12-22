@@ -257,8 +257,8 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "Can I start by asking how much you agree or disagree with some "
-                    "statements about you, your life, and your health?",
+                    "*Can I start by asking how much you agree or disagree with some "
+                    "statements about you, your life, and your health?*",
                 ]
             )
         )
@@ -283,11 +283,11 @@ class Application(BaseApplication):
 
     async def state_locus_of_control_assessment_end(self):
         msg = self._(
-            "/n".join(
+            "\n".join(
                 [
                     "🏁 🎉",
                     "",
-                    "Awesome. That's all the questions for now! ",
+                    "*Awesome. That's all the questions for now!*",
                     "",
                     "[persona_emoji] Thanks for being so patient and honest 😌.",
                 ]

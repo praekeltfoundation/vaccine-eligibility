@@ -283,8 +283,8 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
     tester.assert_message(
         "\n".join(
             [
-                "Can I start by asking how much you agree or disagree with some "
-                "statements about you, your life, and your health?",
+                "*Can I start by asking how much you agree or disagree with some "
+                "statements about you, your life, and your health?*",
             ]
         ),
         buttons=["OK, let's start!", "I can't right now"],

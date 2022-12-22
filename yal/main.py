@@ -267,7 +267,7 @@ class Application(
             # score of 0-25 high risk
             risk = "high_risk"
         else:
-            # score of 25-30 low risk
+            # score of 26-30 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -331,11 +331,11 @@ class Application(
 
     async def state_depression_and_anxiety_assessment_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 2:
-            # score of 0-2 high risk
+        if score <= 10:
+            # score of 0-10 high risk
             risk = "high_risk"
         else:
-            # score of 3-5 low risk
+            # score of 11-20 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -408,36 +408,61 @@ class Application(
 
     async def state_connectedness_assessment_risk_message(self):
         questions = {
-            "high_risk": self._(
-                "\n".join(
-                    [
-                        "[persona_emoji] Aww shame. I'm sorry to hear that 😔",
-                        "",
-                        "I know it can be hard when you feel like you don't have the "
-                        "support you need.",
-                        "",
-                        "*The good thing is there are things we can do to get the "
-                        "help we need when we need it. *",
-                    ]
-                )
-            ),
-            "low_risk": self._(
-                "\n".join(
-                    [
-                        "[persona_emoji] *That's awesome! So glad you have somebody "
-                        "you can turn to when things get tough.*",
-                        "",
-                        "It's important to be able to share your feelings in an "
-                        "assertive way and be listened to, whether it's by friends, "
-                        "family or partners.",
-                    ]
-                )
-            ),
+            "high_risk": [
+                self._(
+                    "\n".join(
+                        [
+                            "[persona_emoji] Aww shame. I'm sorry to hear that 😔",
+                            "",
+                            "I know it can be hard when you feel like you don't have "
+                            "the support you need.",
+                            "",
+                            "*The good thing is there are things we can do to get the "
+                            "help we need when we need it.*",
+                        ]
+                    )
+                ),
+                self._(
+                    "\n".join(
+                        [
+                            "Don't stress, though. I've got some more info that "
+                            "can help you with this.",
+                            "",
+                            "Sending it your way now now! 📲",
+                        ]
+                    )
+                ),
+            ],
+            "low_risk": [
+                self._(
+                    "\n".join(
+                        [
+                            "[persona_emoji] *That's awesome! So glad you have "
+                            "somebody you can turn to when things get tough.*",
+                            "",
+                            "It's important to be able to share your feelings in an "
+                            "assertive way and be listened to, whether it's by "
+                            "friends, family or partners.",
+                        ]
+                    )
+                ),
+                self._(
+                    "\n".join(
+                        [
+                            "Remember I'm also here to help however I can. "
+                            "😌 Keep going! You're doing a great job so far!"
+                        ]
+                    )
+                ),
+            ],
         }
         risk = self.user.metadata.get("connectedness_risk", "high_risk")
+
+        await self.publish_message(questions[risk][0])
+        await asyncio.sleep(0.5)
         return EndState(
             self,
-            questions[risk],
+            questions[risk][1],
         )
 
     async def state_gender_attitude_assessment(self):
@@ -471,49 +496,66 @@ class Application(
 
     async def state_gender_attitude_assessment_risk_message(self):
         questions = {
-            "high_risk": self._(
-                "\n".join(
-                    [
-                        "[persona_emoji] Thanks for those honest answers.",
-                        "",
-                        "*Knowing the difference between a healthy and an unhealthy "
-                        "relationship can help you understand what it means to "
-                        "have a positive relationship.*",
-                        "",
-                        "Being aware of the way relationships affect you can also "
-                        "help you make the best choice for you.",
-                        "",
-                        "I've got some solid tips on how you can do that. I'll "
-                        "share them with you soon 📲",
-                    ]
-                )
-            ),
-            "low_risk": self._(
-                "\n".join(
-                    [
-                        "[persona_emoji] Thanks for those honest answers.",
-                        "",
-                        "*Knowing the difference between a healthy and an unhealthy "
-                        "relationship can help you understand what it means to have "
-                        "a positive relationship.*",
-                        "",
-                        "From your answers, it sounds like you know the part you play "
-                        "in building and keeping a healthy relationship. "
-                        "That's awesome.",
-                        "",
-                        "*If you do have any questions though, just send me a "
-                        "message saying ASK.*",
-                        "",
-                        "I'll do my best to get you the answers, or hook you up with a "
-                        "human who knows even more.",
-                    ]
-                )
-            ),
+            "high_risk": [
+                self._(
+                    "\n".join(
+                        [
+                            "[persona_emoji] Thanks for those honest answers.",
+                            "",
+                            "*Knowing the difference between a healthy and an "
+                            "unhealthy relationship can help you understand what "
+                            "it means to have a positive relationship.*",
+                        ]
+                    )
+                ),
+                self._(
+                    "\n".join(
+                        [
+                            "Being aware of the way relationships affect you can also "
+                            "help you make the best choice for you.",
+                            "",
+                            "I've got some solid tips on how you can do that. I'll "
+                            "share them with you soon 📲",
+                        ]
+                    )
+                ),
+            ],
+            "low_risk": [
+                self._(
+                    "\n".join(
+                        [
+                            "[persona_emoji] Thanks for those honest answers.",
+                            "",
+                            "*Knowing the difference between a healthy and an "
+                            "unhealthy relationship can help you understand what "
+                            "it means to have a positive relationship.*",
+                        ]
+                    )
+                ),
+                self._(
+                    "\n".join(
+                        [
+                            "From your answers, it sounds like you know the part you "
+                            "play in building and keeping a healthy relationship. "
+                            "That's awesome.",
+                            "",
+                            "*If you do have any questions though, just send me a "
+                            "message saying ASK.*",
+                            "",
+                            "I'll do my best to get you the answers, or hook you up "
+                            "with a human who knows even more.",
+                        ]
+                    )
+                ),
+            ],
         }
         risk = self.user.metadata.get("gender_attitude_risk", "high_risk")
+
+        await self.publish_message(questions[risk][0])
+        await asyncio.sleep(0.5)
         return EndState(
             self,
-            questions[risk],
+            questions[risk][1],
         )
 
     async def state_body_image_assessment(self):
@@ -545,49 +587,67 @@ class Application(
 
     async def state_body_image_assessment_risk_message(self):
         questions = {
-            "high_risk": self._(
-                "\n".join(
-                    [
-                        "[persona_emoji]  Thanks for giving your honest view.",
-                        "",
-                        "*It's easy to feel uncomfortable with your body. But if you "
-                        "focus on what you don't like, it can affect your self-esteem "
-                        "and make you feel bad about yourself all round.*",
-                        "",
-                        "You can feel good about yourself even if your body is "
-                        "not 100% perfect. (What does that even mean?!)",
-                        "",
-                        "I've got some great tips to share about how to get to like "
-                        "your body more. I'll share them with you soon 📲",
-                    ]
-                )
-            ),
-            "low_risk": self._(
-                "\n".join(
-                    [
-                        "[persona_emoji]  Thanks for giving your honest view.",
-                        "",
-                        "*Knowing the difference between a healthy and an unhealthy "
-                        "relationship can help you understand what it means to "
-                        "have a positive relationship.*",
-                        "",
-                        "From your answers, it sounds like you know the part you "
-                        "play in building and keeping a healthy relationship. "
-                        "That's awesome.",
-                        "",
-                        "*If you do have any questions though, just send me a "
-                        "message saying ASK.*",
-                        "",
-                        "I'll do my best to get you the answers, or hook you up "
-                        "with a human who knows even more.",
-                    ]
-                )
-            ),
+            "high_risk": [
+                self._(
+                    "\n".join(
+                        [
+                            "[persona_emoji]  Thanks for giving your honest view.",
+                            "",
+                            "*It's easy to feel uncomfortable with your body. But if "
+                            "you focus on what you don't like, it can affect your "
+                            "self-esteem and make you feel bad about "
+                            "yourself all round.*",
+                        ]
+                    )
+                ),
+                self._(
+                    "\n".join(
+                        [
+                            "You can feel good about yourself even if your body is "
+                            "not 100% perfect. (What does that even mean?!)",
+                            "",
+                            "I've got some great tips to share about how to get to "
+                            "like your body more. I'll share them with you soon 📲",
+                        ]
+                    )
+                ),
+            ],
+            "low_risk": [
+                self._(
+                    "\n".join(
+                        [
+                            "[persona_emoji]  Thanks for giving your honest view.",
+                            "",
+                            "*Knowing the difference between a healthy and an "
+                            "unhealthy relationship can help you understand what "
+                            "it means to have a positive relationship.*",
+                        ]
+                    )
+                ),
+                self._(
+                    "\n".join(
+                        [
+                            "From your answers, it sounds like you know the part you "
+                            "play in building and keeping a healthy relationship. "
+                            "That's awesome.",
+                            "",
+                            "*If you do have any questions though, just send me a "
+                            "message saying ASK.*",
+                            "",
+                            "I'll do my best to get you the answers, or hook you up "
+                            "with a human who knows even more.",
+                        ]
+                    )
+                ),
+            ],
         }
         risk = self.user.metadata.get("body_image_risk", "high_risk")
+
+        await self.publish_message(questions[risk][0])
+        await asyncio.sleep(0.5)
         return EndState(
             self,
-            questions[risk],
+            questions[risk][1],
         )
 
     async def state_self_perceived_healthcare_assessment(self):
