@@ -473,15 +473,23 @@ async def test_onboarding_reminder_response_to_reminder_handler(
 async def test_push_message_buttons_to_display_page(
     tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
-
-    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "TRUE"
-    rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
-    rapidpro_mock.tstate.contact_fields["push_message_sent"] = "TRUE"
+    """
+    If there's a button payload that indicates the user should be shown a content page then
+    we should take them there
+    """
     rapidpro_mock.tstate.contact_fields["push_related_page_id"] = "444"
-    await tester.user_input("yeah let s chat")
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_prep_push_msg_related_page"}
+            }
+        },
+    )
+
     tester.assert_state("state_display_page")
     tester.assert_num_messages(1)
-    print(tester.application.messages)
     tester.assert_message(
         "\n".join(
             [
@@ -500,7 +508,6 @@ async def test_push_message_buttons_to_display_page(
 
     assert len(rapidpro_mock.tstate.requests) == 4
     assert len(contentrepo_api_mock.tstate.requests) == 2
-
 
 
 @pytest.mark.asyncio

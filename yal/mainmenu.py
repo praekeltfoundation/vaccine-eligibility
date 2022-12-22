@@ -618,14 +618,6 @@ class Application(BaseApplication):
     async def state_prep_push_msg_related_page(self):
         push_related_page_id = self.user.metadata.get("push_related_page_id", None)
 
-        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
-        error = await rapidpro.update_profile(
-                whatsapp_id, {"push_message_sent": ""}, self.user.metadata
-            )
-        if error:
-            return await self.go_to_state("state_error")
-
         if not push_related_page_id:
             return await self.go_to_state("state_error")
 
