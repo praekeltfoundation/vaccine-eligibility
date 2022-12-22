@@ -114,6 +114,7 @@
 | state_get_suggestions                      |        FALSE       |              |            TRUE          | Updates the suggested content in the cache                                                             |
 | state_display_suggestions                  |        TRUE        |     Text     |            TRUE          | Offers user the suggested content stored. User response is based on the content                            |
 | state_back                                 |        FALSE       |              |            TRUE          | Sends the user back to the previous page                                                                |
+| state_prep_push_msg_related_page           |        FALSE       |              |            FALSE         | Gets the id of the page the user's push message directed them to and sends them to state_display_page to view it |
 
 
 ### Onboarding flow
