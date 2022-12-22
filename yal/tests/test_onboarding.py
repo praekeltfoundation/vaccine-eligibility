@@ -467,7 +467,7 @@ async def test_assessment_skip(get_current_datetime, tester: AppTester, rapidpro
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "assessment_reminder": "2022-06-20T16:30:00",
-            "assessment_name": "sexual_health_literacy",
+            "assessment_reminder_name": "sexual_health_literacy",
         },
     }
 
