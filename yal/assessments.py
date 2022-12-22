@@ -57,6 +57,7 @@ class Application(BaseApplication):
         self.delete_metadata("assessment_section")
         self.delete_metadata("assessment_question")
         self.delete_metadata("assessment_question_nr")
+        self.delete_metadata("assessment_score")
         return await self.go_to_state("state_survey_question")
 
     async def state_survey_question(self):
