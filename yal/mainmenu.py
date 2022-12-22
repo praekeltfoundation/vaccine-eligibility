@@ -621,6 +621,14 @@ class Application(BaseApplication):
         if not push_related_page_id:
             return await self.go_to_state("state_error")
 
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        error = await rapidpro.update_profile(
+                whatsapp_id, {"push_related_page_id": ""}, self.user.metadata
+            )
+        if error:
+            return await self.go_to_state("state_error")
+
         self.save_metadata("selected_page_id", push_related_page_id)
         self.save_metadata("current_message_id", 1)
         self.save_metadata("is_suggested_page", False)
