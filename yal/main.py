@@ -621,10 +621,10 @@ class Application(
                         [
                             "[persona_emoji]  Thanks for giving your honest view.",
                             "",
-                            "*It's easy to feel uncomfortable with your body. But if "
-                            "you focus on what you don't like, it can affect your "
-                            "self-esteem and make you feel bad about "
-                            "yourself all round.*",
+                            "I'm so happy you feel comfortable with your body! "
+                            "Focusing on what you like about yourself can help boost "
+                            "your self-esteem and make you feel a lot better about "
+                            "yourself all round!",
                         ]
                     )
                 ),
