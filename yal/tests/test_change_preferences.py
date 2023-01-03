@@ -119,6 +119,7 @@ async def google_api_mock():
 async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
     tester.user.metadata["persona_emoji"] = "🦸"
     tester.user.metadata["persona_name"] = "Caped Crusader"
+    tester.user.metadata["push_message_opt_in"] = "False"
     tester.setup_state("state_display_preferences")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
     tester.assert_num_messages(1)
@@ -134,17 +135,20 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
                 "🍰 *Age*",
                 "22",
                 "",
-                "🌈Gender",
+                "🌈 *Gender*",
                 "Male",
                 "",
-                "🤖*Bot Name+emoji*",
+                "🤖 *Bot Name+emoji*",
                 "🦸 Caped Crusader",
                 "",
                 "❤️ *Relationship?*",
                 "Empty",
                 "",
-                "📍*Location*",
+                "📍 *Location*",
                 "test street Test Suburb",
+                "",
+                "🔔 *Notifications*",
+                "OFF",
                 "",
                 "*-----*",
                 "*Or reply:*",
@@ -152,7 +156,14 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
                 "*# -* 🆘 Get *HELP*",
             ]
         ),
-        list_items=["Age", "Gender", "Bot name + emoji", "Relationship?", "Location"],
+        list_items=[
+            "Age",
+            "Gender",
+            "Bot name + emoji",
+            "Relationship?",
+            "Location",
+            "Notifications",
+        ],
     )
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
@@ -655,3 +666,97 @@ async def test_state_update_location_submit(tester: AppTester, rapidpro_mock):
             "location_description": "277 Bedford Avenue, Brooklyn, NY",
         },
     }
+
+
+@pytest.mark.asyncio
+async def test_state_update_notifications_false(
+    tester: AppTester, google_api_mock, rapidpro_mock
+):
+    tester.user.metadata["push_message_opt_in"] = "False"
+    tester.setup_state("state_display_preferences")
+    await tester.user_input("Notifications")
+
+    tester.assert_state("state_update_notifications_turn_on")
+
+
+@pytest.mark.asyncio
+async def test_state_update_notifications_true(
+    tester: AppTester, google_api_mock, rapidpro_mock
+):
+    tester.user.metadata["push_message_opt_in"] = "True"
+    tester.setup_state("state_display_preferences")
+    await tester.user_input("Notifications")
+
+    tester.assert_state("state_update_notifications_turn_off")
+
+
+@pytest.mark.asyncio
+async def test_state_update_notifications_turn_off(
+    tester: AppTester, google_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_update_notifications_turn_off")
+    await tester.user_input("Stop daily messages")
+    tester.assert_state("state_update_notifications_final")
+    assert tester.application.user.metadata["push_message_opt_in"] == "False"
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "push_message_opt_in": "False",
+        },
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_update_notifications_turn_on(
+    tester: AppTester, google_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_update_notifications_turn_on")
+    await tester.user_input("Start daily message")
+    tester.assert_state("state_update_notifications_final")
+    assert tester.application.user.metadata["push_message_opt_in"] == "True"
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "push_message_opt_in": "True",
+        },
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_update_notifications_on_back(
+    tester: AppTester, google_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_update_notifications_turn_on")
+    await tester.user_input("Go back")
+    tester.assert_state("state_display_preferences")
+
+
+@pytest.mark.asyncio
+async def test_state_update_notifications_off_back(
+    tester: AppTester, google_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_update_notifications_turn_off")
+    await tester.user_input("Go back")
+    tester.assert_state("state_display_preferences")
+
+
+@pytest.mark.asyncio
+async def test_state_update_notifications_final_aaq(
+    tester: AppTester, google_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_update_notifications_final")
+    await tester.user_input("Ask a question")
+    tester.assert_state("state_aaq_start")
+
+
+@pytest.mark.asyncio
+async def test_state_update_notifications_final_mainmenu(
+    tester: AppTester, google_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_update_notifications_final")
+    await tester.user_input("Go to the menu")
+    tester.assert_state("state_mainmenu")

@@ -50,6 +50,11 @@ class Application(BaseApplication):
         gender = get_field("gender")
 
         location = self.user.metadata.get("location_description")
+        notifications = self.user.metadata.get("push_message_opt_in")
+        if notifications == "True":
+            notifications_change_state = "state_update_notifications_turn_off"
+        else:
+            notifications_change_state = "state_update_notifications_turn_on"
 
         question = self._(
             "\n".join(
@@ -62,17 +67,20 @@ class Application(BaseApplication):
                     "🍰 *Age*",
                     age or "Empty",
                     "",
-                    "🌈Gender",
+                    "🌈 *Gender*",
                     gender,
                     "",
-                    "🤖*Bot Name+emoji*",
+                    "🤖 *Bot Name+emoji*",
                     "[persona_emoji] [persona_name]",
                     "",
                     "❤️ *Relationship?*",
                     relationship_status or "Empty",
                     "",
-                    "📍*Location*",
+                    "📍 *Location*",
                     location or "Empty",
+                    "",
+                    "🔔 *Notifications*",
+                    "ON" if notifications == "True" else "OFF",
                     "",
                     "*-----*",
                     "*Or reply:*",
@@ -91,6 +99,7 @@ class Application(BaseApplication):
                 Choice("state_update_bot_name", self._("Bot name + emoji")),
                 Choice("state_update_relationship_status", self._("Relationship?")),
                 Choice("state_update_location", self._("Location")),
+                Choice(notifications_change_state, self._("Notifications")),
             ],
             next=next_,
             error=self._(get_generic_error()),
@@ -659,5 +668,142 @@ class Application(BaseApplication):
             next={
                 "menu": "state_pre_mainmenu",
                 "ask_a_question": "state_aaq_start",
+            },
+        )
+
+    async def state_update_notifications_turn_off(self):
+        question = self._(
+            "\n".join(
+                [
+                    "CHAT SETTINGS / ⚙️ Change or update your info / *Notifications*",
+                    "-----",
+                    "",
+                    "*You are signed up* to receive alerts from [persona_emoji] "
+                    "[persona_name]",
+                    "",
+                    'To stop receiving notifications, click the "STOP" button below.',
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("stop", "Stop daily messages"),
+                Choice("back", "Go back"),
+            ],
+            error=self._(get_generic_error()),
+            next={
+                "stop": "state_update_notifications_turn_off_submit",
+                "back": "state_display_preferences",
+            },
+        )
+
+    async def state_update_notifications_turn_off_submit(self):
+        data = {"push_message_opt_in": "False"}
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
+        question = self._(
+            "\n".join(
+                [
+                    "[persona emoji] *No problem! I won't send you daily messages.*",
+                    "",
+                    "Remember, you can still use the menu to get the info you need.",
+                    "",
+                    "You can also sign up for messages again at any time. "
+                    "Just go to your profile page.",
+                ]
+            )
+        )
+        await self.publish_message(question)
+        await asyncio.sleep(0.5)
+        return await self.go_to_state("state_update_notifications_final")
+
+    async def state_update_notifications_turn_on(self):
+        question = self._(
+            "\n".join(
+                [
+                    "CHAT SETTINGS / ⚙️ Change or update your info / *Notifications*"
+                    "-----"
+                    ""
+                    "*You are not signed up* to receive alerts from [persona_emoji] "
+                    "[persona_name]"
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("start", "Start daily message"),
+                Choice("back", "Go back"),
+            ],
+            error=self._(get_generic_error()),
+            next={
+                "start": "state_update_notifications_turn_on_submit",
+                "back": "state_display_preferences",
+            },
+        )
+
+    async def state_update_notifications_turn_on_submit(self):
+        data = {"push_message_opt_in": "True"}
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
+        question = self._(
+            "\n".join(
+                [
+                    "[persona emoji] *Lekker! I've set up notifications.*",
+                    "",
+                    "🔔 I'll ping you once a day with info I think might be interesting "
+                    "or helpful for you — and sometimes just to share something a "
+                    "bit more fun.",
+                    "",
+                    "You can also stop these messages again at any time. Just go to "
+                    'your profile page or send in the word "STOP".',
+                ]
+            )
+        )
+        await self.publish_message(question)
+        await asyncio.sleep(0.5)
+        return await self.go_to_state("state_update_notifications_final")
+
+    async def state_update_notifications_final(self):
+        choices = [
+            Choice("menu", "Go to the menu"),
+            Choice("aaq", "Ask a question"),
+        ]
+
+        question = self._(
+            "\n".join(
+                [
+                    "CHAT SETTINGS / ⚙️ *Change or update your info*",
+                    "-----",
+                    "",
+                    "Wonderful! [persona_emoji]",
+                    "",
+                    "*What would you like to do now?*",
+                    "",
+                    get_display_choices(choices),
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "menu": "state_pre_mainmenu",
+                "aaq": "state_aaq_start",
             },
         )
