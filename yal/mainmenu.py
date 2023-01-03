@@ -362,7 +362,6 @@ class Application(BaseApplication):
             "feature_redirects", page_details.get("feature_redirects", [])
         )
 
-
         # If a user loads a content repo page from somewhere other than the main menu
         # then we need to infer the menu level and the topics they've seen
         inferred_menu_level = len(page_details["title"].split("/")) - 1
