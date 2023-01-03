@@ -503,7 +503,7 @@ async def test_push_message_buttons_to_display_page(
             ]
         )
     )
-
+    tester.assert_metadata("topics_viewed", ["123"])
     assert len(rapidpro_mock.tstate.requests) == 4
     assert len(contentrepo_api_mock.tstate.requests) == 2
 
