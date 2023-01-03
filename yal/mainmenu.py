@@ -363,8 +363,11 @@ class Application(BaseApplication):
         )
 
         # If a user loads a content repo page from somewhere other than the main menu
-        # then we need to infer the menu level
+        # then we need to infer the menu level and the topics they've seen
         inferred_menu_level = len(page_details["title"].split("/")) - 1
+
+        if not metadata.get("suggested_content") and not metadata.get("topics_viewed"):
+            self.save_metadata("topics_viewed", [str(page_details["parent_id"])])
 
         # do not increment menu level when retrieving the next whatsapp message,
         # only when going to a child page in content repo
