@@ -711,7 +711,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "[persona emoji] *No problem! I won't send you daily messages.*",
+                    "[persona_emoji] *No problem! I won't send you daily messages.*",
                     "",
                     "Remember, you can still use the menu to get the info you need.",
                     "",
@@ -728,11 +728,11 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "CHAT SETTINGS / ⚙️ Change or update your info / *Notifications*"
-                    "-----"
-                    ""
+                    "CHAT SETTINGS / ⚙️ Change or update your info / *Notifications*",
+                    "-----",
+                    "",
                     "*You are not signed up* to receive alerts from [persona_emoji] "
-                    "[persona_name]"
+                    "[persona_name]",
                 ]
             )
         )
@@ -762,7 +762,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "[persona emoji] *Lekker! I've set up notifications.*",
+                    "[persona_emoji] *Lekker! I've set up notifications.*",
                     "",
                     "🔔 I'll ping you once a day with info I think might be interesting "
                     "or helpful for you — and sometimes just to share something a "
