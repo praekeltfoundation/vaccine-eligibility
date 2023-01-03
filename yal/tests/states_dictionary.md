@@ -22,7 +22,11 @@
 | state_update_bot_name_submit               |        FALSE       |              |            FALSE          | Updates user profile with new bot name                                                                         |
 | state_update_bot_emoji                     |        TRUE        |     Text     |            TRUE           | Asks user to enter an emoji to represent the bot                                                                |
 | state_update_bot_emoji_submit              |        TRUE        |     Text     |            TRUE           | Updates user profile with new bot emoji and offers other features. User response is "menu" or "ask_a_question" |
-
+| state_update_notifications_turn_off        |        TRUE        |     Text     |            TRUE           | Asks user if they would like to turn off daily messages |
+| state_update_notifications_turn_off_submit |        FALSE       |              |            FALSE          | Updates user profile to turn off daily messages |
+| state_update_notifications_turn_on         |        TRUE        |     Text     |            TRUE           | Asks user if they would like to turn on daily messages |
+| state_update_notifications_turn_on_submit  |        FALSE       |              |            FALSE          | Updates user profile to turn on daily messages |
+| state_update_notifications_final           |        TRUE        |     Text     |            TRUE           | After updating the profile, asks user what they would like to do next, go to main menu or AAQ |
 
 ### AAQ flows
 | state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                       |
