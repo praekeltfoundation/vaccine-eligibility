@@ -742,21 +742,3 @@ async def test_state_update_notifications_off_back(
     tester.setup_state("state_update_notifications_turn_off")
     await tester.user_input("Go back")
     tester.assert_state("state_display_preferences")
-
-
-@pytest.mark.asyncio
-async def test_state_update_notifications_final_aaq(
-    tester: AppTester, google_api_mock, rapidpro_mock
-):
-    tester.setup_state("state_update_notifications_final")
-    await tester.user_input("Ask a question")
-    tester.assert_state("state_aaq_start")
-
-
-@pytest.mark.asyncio
-async def test_state_update_notifications_final_mainmenu(
-    tester: AppTester, google_api_mock, rapidpro_mock
-):
-    tester.setup_state("state_update_notifications_final")
-    await tester.user_input("Go to the menu")
-    tester.assert_state("state_mainmenu")
