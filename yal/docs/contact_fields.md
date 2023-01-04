@@ -44,9 +44,9 @@ Fields
 | privacy_reminder_sent                      | Set to True once the user has seen the main menu with a privacy message                                 |
 | push_related_page_id                       | the Id of the push message's related page, the id of the page that will be sent when the user requests to read more |
 | last_onboarding_time                       | saves the last time the user interacted with the onboarding flow                                        |
-| onboarding_reminder_type                   | saves which onboarding reminder must be saved, 5min, 2h, 8h                                             |
+| onboarding_reminder_type                   | saves which onboarding reminder must be sent, 5min, 2h, 8h                                              |
 | onboarding_reminder_sent                   | the onboarding reminder has been sent, resets when the user interacts with the onboarding reminder      |
-| callback_check_time                        | saves the time the user should be sent the callback check in and find out if they were called           |
+| callback_check_time                        | saves the time the user should be sent the callback check in and find out if they were called with the please call me feature |
 | callback_abandon_reason                    | saves the reason the user abandoned the call back in response to the callback check in                  |
 | push_message_opt_in                        | saves whether the user would like daily messages, can be `True` or `False`                              |
 | onboarding_completed                       | saves that the user has completed onboarding, can be `True` or blank                                    |
