@@ -61,4 +61,4 @@ Fields
 | suburb                                     | no longer collected                                                                                     |
 | street_name                                | no longer collected                                                                                     |
 | street_number                              | no longer collected                                                                                     |
-| emergency_contact                          | save contact number on which the user can be called                                                     |
+| emergency_contact                          | save additional contact number on which the user can be called                                                     |
