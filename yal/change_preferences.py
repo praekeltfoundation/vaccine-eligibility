@@ -689,7 +689,7 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("stop", "Stop daily messages"),
+                Choice("stop", "Turn off alerts"),
                 Choice("back", "Go back"),
             ],
             error=self._(get_generic_error()),
@@ -740,7 +740,7 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("start", "Start daily message"),
+                Choice("start", "Turn on alerts"),
                 Choice("back", "Go back"),
             ],
             error=self._(get_generic_error()),
