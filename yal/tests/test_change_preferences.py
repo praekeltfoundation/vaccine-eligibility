@@ -695,7 +695,7 @@ async def test_state_update_notifications_turn_off(
     tester: AppTester, google_api_mock, rapidpro_mock
 ):
     tester.setup_state("state_update_notifications_turn_off")
-    await tester.user_input("Stop daily messages")
+    await tester.user_input("Turn off alerts")
     tester.assert_state("state_update_notifications_final")
     assert tester.application.user.metadata["push_message_opt_in"] == "False"
 
@@ -713,7 +713,7 @@ async def test_state_update_notifications_turn_on(
     tester: AppTester, google_api_mock, rapidpro_mock
 ):
     tester.setup_state("state_update_notifications_turn_on")
-    await tester.user_input("Start daily message")
+    await tester.user_input("Turn on alerts")
     tester.assert_state("state_update_notifications_final")
     assert tester.application.user.metadata["push_message_opt_in"] == "True"
 
