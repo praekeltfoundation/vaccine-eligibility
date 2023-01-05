@@ -795,3 +795,24 @@ async def test_self_perceived_healthcare_assessment(tester: AppTester):
     tester.assert_metadata(
         "assessment_end_state", "state_self_perceived_healthcare_assessment_end"
     )
+
+
+@pytest.mark.asyncio
+async def test_mainmenu_payload(tester: AppTester, rapidpro_mock, contentrepo_api_mock):
+    """
+    If there's a button payload that indicates that the user should be shown the main menu,
+    then we should send them there
+    """
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_pre_mainmenu"}
+            }
+        },
+    )
+    tester.assert_state("state_mainmenu")
+    tester.assert_num_messages(2)
+
+    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(contentrepo_api_mock.tstate.requests) == 5
