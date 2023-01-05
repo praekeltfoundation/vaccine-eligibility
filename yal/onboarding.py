@@ -377,3 +377,18 @@ class Application(BaseApplication):
 
         if inbound == "remind me later":
             return await self.go_to_state("state_reschedule_onboarding_reminders")
+
+    async def state_phase2_update_exising_user_profile(self):
+        # save the other fields that are usually collected in onboarding
+        self.save_answer("state_persona_name", self.user.metadata.get("persona_name"))
+        self.save_answer("state_persona_emoji", self.user.metadata.get("persona_emoji"))
+        self.save_answer("state_age", self.user.metadata.get("age"))
+
+        # send the user to state_gender if their gender isn't set
+        gender = self.user.metadata.get("gender")
+        if not gender or gender == "" or gender.lower() == "skip":
+            return await self.go_to_state("state_gender")
+
+        # if the user's gender is set, save it and send them to state_rel_status
+        self.save_answer("state_gender", gender)
+        return await self.go_to_state("state_rel_status")
