@@ -795,3 +795,17 @@ async def test_self_perceived_healthcare_assessment(tester: AppTester):
     tester.assert_metadata(
         "assessment_end_state", "state_self_perceived_healthcare_assessment_end"
     )
+
+
+@pytest.mark.asyncio
+async def test_state_generic_what_would_you_like_to_do(tester: AppTester):
+    tester.setup_state("state_generic_what_would_you_like_to_do")
+    await tester.user_input("Go to the menu")
+    tester.assert_state("state_mainmenu")
+
+
+@pytest.mark.asyncio
+async def test_state_assessment_go_to_generic(tester: AppTester):
+    tester.setup_state("state_self_perceived_healthcare_assessment_risk_message")
+    await tester.user_input(session=Message.session_event.NEW)
+    tester.assert_state("state_generic_what_would_you_like_to_do")

@@ -105,7 +105,7 @@
 | state_sexual_health_lit_risk | TRUE | Text | TRUE | Sexual health literacy risk |
 | state_sexual_health_lit_score | TRUE | Number | TRUE | Score from sexual health literacy assessment |
 | state_source_tracking | TRUE | Text | TRUE | The trigger keyword that was used |
-
+| state_generic_what_would_you_like_to_do | TRUE | Text | TRUE | state that asks the user what they would like to do, go to main menu, aaq or update settings |
 
 ### Main Menu flow
 | state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |

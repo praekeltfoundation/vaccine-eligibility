@@ -2,8 +2,8 @@ import asyncio
 import logging
 
 from vaccine.models import Message
-from vaccine.states import EndState
-from vaccine.utils import random_id
+from vaccine.states import Choice, EndState, WhatsAppButtonState
+from vaccine.utils import get_display_choices, random_id
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AaqApplication
 from yal.assessments import Application as AssessmentApplication
@@ -21,6 +21,7 @@ from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import (
     get_current_datetime,
+    get_generic_error,
     normalise_phonenumber,
     replace_persona_fields,
 )
@@ -317,10 +318,9 @@ class Application(
             ),
         }
         risk = self.user.metadata.get("sexual_health_lit_risk", "high_risk")
-        return EndState(
-            app=self,
-            question=questions[risk],
-        )
+        await self.publish_message(questions[risk])
+        await asyncio.sleep(0.5)
+        return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
     async def state_depression_and_anxiety_assessment(self):
         self.save_metadata("assessment_name", "depression_and_anxiety")
@@ -377,10 +377,9 @@ class Application(
             ),
         }
         risk = self.user.metadata.get("depression_and_anxiety_risk", "high_risk")
-        return EndState(
-            self,
-            questions[risk],
-        )
+        await self.publish_message(questions[risk])
+        await asyncio.sleep(0.5)
+        return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
     async def state_connectedness_assessment(self):
         self.save_metadata("assessment_name", "connectedness")
@@ -463,10 +462,9 @@ class Application(
 
         await self.publish_message(questions[risk][0])
         await asyncio.sleep(0.5)
-        return EndState(
-            self,
-            questions[risk][1],
-        )
+        await self.publish_message(questions[risk][1])
+        await asyncio.sleep(0.5)
+        return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
     async def state_gender_attitude_assessment(self):
         self.save_metadata("assessment_name", "gender_attitude")
@@ -556,10 +554,9 @@ class Application(
 
         await self.publish_message(questions[risk][0])
         await asyncio.sleep(0.5)
-        return EndState(
-            self,
-            questions[risk][1],
-        )
+        await self.publish_message(questions[risk][1])
+        await asyncio.sleep(0.5)
+        return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
     async def state_body_image_assessment(self):
         self.save_metadata("assessment_name", "body_image")
@@ -649,10 +646,9 @@ class Application(
 
         await self.publish_message(questions[risk][0])
         await asyncio.sleep(0.5)
-        return EndState(
-            self,
-            questions[risk][1],
-        )
+        await self.publish_message(questions[risk][1])
+        await asyncio.sleep(0.5)
+        return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
     async def state_self_perceived_healthcare_assessment(self):
         self.save_metadata("assessment_name", "self_perceived_healthcare")
@@ -686,17 +682,41 @@ class Application(
         )
 
     async def state_self_perceived_healthcare_assessment_risk_message(self):
-        return EndState(
+        msg = self._(
+            "\n".join(
+                [
+                    "[persona_emoji]  *Fantastic! That's it.*",
+                    "",
+                    "I'll chat with you again tomorrow.",
+                ]
+            )
+        )
+        await self.publish_message(msg)
+        await asyncio.sleep(0.5)
+        return await self.go_to_state("state_generic_what_would_you_like_to_do")
+
+    async def state_generic_what_would_you_like_to_do(self):
+        choices = [
+            Choice("menu", "Go to the menu"),
+            Choice("aaq", "Ask a question"),
+            Choice("settings", "Update settings"),
+        ]
+        question = self._(
+            "\n".join(
+                ["*OK. What would you like to do now?*", get_display_choices(choices)]
+            )
+        )
+
+        return WhatsAppButtonState(
             self,
-            self._(
-                "\n".join(
-                    [
-                        "[persona_emoji]  *Fantastic! That's it.*",
-                        "",
-                        "I'll chat with you again tomorrow.",
-                    ]
-                )
-            ),
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "menu": "state_pre_mainmenu",
+                "aaq": AaqApplication.START_STATE,
+                "settings": ChangePreferencesApplication.START_STATE,
+            },
         )
 
     def send_message(self, content, continue_session=True, **kw):
