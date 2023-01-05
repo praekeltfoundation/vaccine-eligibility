@@ -681,7 +681,8 @@ class Application(BaseApplication):
                     "*You are signed up* to receive alerts from [persona_emoji] "
                     "[persona_name]",
                     "",
-                    'To stop receiving notifications, click the "STOP" button below.',
+                    'To stop receiving notifications, tap "Turn off alerts" '
+                    "button below.",
                 ]
             )
         )
