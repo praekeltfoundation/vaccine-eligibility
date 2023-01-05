@@ -795,3 +795,63 @@ async def test_self_perceived_healthcare_assessment(tester: AppTester):
     tester.assert_metadata(
         "assessment_end_state", "state_self_perceived_healthcare_assessment_end"
     )
+
+
+@pytest.mark.asyncio
+async def test_mainmenu_payload(tester: AppTester, rapidpro_mock, contentrepo_api_mock):
+    """
+    If there's a button payload that indicates that the user should be shown the main
+    menu, then we should send them there
+    """
+    await tester.user_input(
+        "test",
+        transport_metadata={"message": {"button": {"payload": "state_pre_mainmenu"}}},
+    )
+    tester.assert_state("state_mainmenu")
+    tester.assert_num_messages(2)
+
+    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(contentrepo_api_mock.tstate.requests) == 5
+
+
+@pytest.mark.asyncio
+async def test_phase2_payload_message_directs_to_onboarding_gender(
+    tester: AppTester, rapidpro_mock
+):
+    """
+    If there's a button payload that indicates the user is responding to the phase2
+    invite, then we should send them to the onboarding state that handles that
+    """
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_phase2_update_exising_user_profile"}
+            }
+        },
+    )
+    tester.assert_state("state_gender")
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+
+
+@pytest.mark.asyncio
+async def test_phase2_payload_message_directs_to_onboarding_rel_status(
+    tester: AppTester, rapidpro_mock
+):
+    """
+    If there's a button payload that indicates the user is responding to the phase2
+    invite, then we should send them to the onboarding state that handles that
+    """
+    rapidpro_mock.tstate.contact_fields["gender"] = "male"
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_phase2_update_exising_user_profile"}
+            }
+        },
+    )
+    tester.assert_state("state_rel_status")
+
+    assert len(rapidpro_mock.tstate.requests) == 2

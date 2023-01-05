@@ -142,6 +142,7 @@
 | state_locus_of_control_assessment_start     |        FALSE       |              |            FALSE         | Explains to the user what is going to happen next                                                                   |
 | state_locus_of_control_assessment_few_qs    |        TRUE        |     Text     |            TRUE          | User responds "ok" when they start the assessment  |
 | state_locus_of_control_assessment_end |        FALSE       |              |            FALSE         | User has completed the assessment and receives the end message |
+| state_phase2_update_exising_user_profile |        FALSE       |              |            FALSE         | For phase 2 we need to send existing users back to onboarding so that they can take the assessments. This state handles the push message response and inserts them based on their profile (if their gender isn't set they go to state_gender, if it is set they go to state_rel_status) |
 
 
 ### OptOut flow
