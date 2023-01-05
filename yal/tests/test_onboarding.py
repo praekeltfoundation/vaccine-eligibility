@@ -470,3 +470,83 @@ async def test_assessment_skip(get_current_datetime, tester: AppTester, rapidpro
             "assessment_reminder_name": "locus_of_control",
         },
     }
+
+
+@pytest.mark.asyncio
+async def test_phase2_profile_update_to_submit_when_gender_set(
+    tester: AppTester, rapidpro_mock
+):
+    tester.user.metadata["age"] = "22"
+    tester.user.metadata["gender"] = "male"
+    tester.user.metadata["relationship_status"] = "single"
+    tester.user.metadata["persona_emoji"] = "🪱"
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_phase2_update_exising_user_profile"}
+            }
+        },
+    )
+
+    tester.assert_state("state_rel_status")
+    await tester.user_input(content="It's complicated")
+
+    tester.assert_state("state_locus_of_control_assessment_few_qs")
+
+    assert len(rapidpro_mock.tstate.requests) == 5
+    request = rapidpro_mock.tstate.requests[4]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "age": "22",
+            "opted_out": "FALSE",
+            "onboarding_completed": "True",
+            "gender": "male",
+            "relationship_status": "complicated",
+            "onboarding_reminder_sent": "",
+            "onboarding_reminder_type": "",
+            "persona_emoji": "🪱",
+        },
+    }
+
+
+@pytest.mark.asyncio
+async def test_phase2_profile_update_to_submit_when_no_gender(
+    tester: AppTester, rapidpro_mock
+):
+    tester.user.metadata["age"] = "22"
+    tester.user.metadata["relationship_status"] = "single"
+    tester.user.metadata["persona_name"] = "Nurse Joy"
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_phase2_update_exising_user_profile"}
+            }
+        },
+    )
+
+    tester.assert_state("state_gender")
+    await tester.user_input(content="Female")
+
+    tester.assert_state("state_rel_status")
+    await tester.user_input(content="It's complicated")
+
+    tester.assert_state("state_locus_of_control_assessment_few_qs")
+
+    assert len(rapidpro_mock.tstate.requests) == 8
+    request = rapidpro_mock.tstate.requests[7]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "age": "22",
+            "opted_out": "FALSE",
+            "onboarding_completed": "True",
+            "gender": "female",
+            "relationship_status": "complicated",
+            "onboarding_reminder_sent": "",
+            "onboarding_reminder_type": "",
+            "persona_name": "Nurse Joy",
+        },
+    }
