@@ -849,6 +849,20 @@ async def test_state_body_image_assessment_go_to_generic(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_state_generic_what_would_you_like_to_do_aaq(tester: AppTester, aaq_mock):
+    tester.setup_state("state_generic_what_would_you_like_to_do")
+    await tester.user_input("Ask a question")
+    tester.assert_state("state_aaq_start")
+
+
+@pytest.mark.asyncio
+async def test_state_generic_what_would_you_like_to_do_(tester: AppTester):
+    tester.setup_state("state_generic_what_would_you_like_to_do")
+    await tester.user_input("Update settings")
+    tester.assert_state("state_display_preferences")
+
+
+@pytest.mark.asyncio
 async def test_mainmenu_payload(tester: AppTester, rapidpro_mock, contentrepo_api_mock):
     """
     If there's a button payload that indicates that the user should be shown the main
