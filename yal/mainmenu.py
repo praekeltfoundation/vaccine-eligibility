@@ -48,7 +48,7 @@ class Application(BaseApplication):
                 topics_viewed
             )
             if error:
-                return await self.go_to_state("state_error")
+                return {}
             self.save_metadata(
                 "suggested_content", {c.value: c.label for c in suggested_choices}
             )
@@ -520,7 +520,6 @@ class Application(BaseApplication):
         self.save_metadata(
             "suggested_choices", [str(i + k) for k in range(len(suggested_choices))]
         )
-
         error = await self.update_suggested_content_details("main", suggested_text)
         if error:
             return await self.go_to_state("state_error")
@@ -638,7 +637,5 @@ class Application(BaseApplication):
         self.save_metadata("current_message_id", 1)
         self.save_metadata("is_suggested_page", False)
         self.save_metadata("suggested_content", {})
-        # Save the You & Your Health page as the default topic
-        self.save_metadata("topics_viewed", ["408"])
 
         return await self.go_to_state("state_contentrepo_page")
