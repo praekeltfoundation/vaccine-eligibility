@@ -520,6 +520,7 @@ class Application(BaseApplication):
         self.save_metadata(
             "suggested_choices", [str(i + k) for k in range(len(suggested_choices))]
         )
+
         error = await self.update_suggested_content_details("main", suggested_text)
         if error:
             return await self.go_to_state("state_error")
