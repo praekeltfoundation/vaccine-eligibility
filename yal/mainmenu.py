@@ -48,7 +48,7 @@ class Application(BaseApplication):
                 topics_viewed
             )
             if error:
-                return await self.go_to_state("state_error")
+                return {}
             self.save_metadata(
                 "suggested_content", {c.value: c.label for c in suggested_choices}
             )
