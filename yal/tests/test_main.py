@@ -798,6 +798,71 @@ async def test_self_perceived_healthcare_assessment(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_state_generic_what_would_you_like_to_do(tester: AppTester):
+    tester.setup_state("state_generic_what_would_you_like_to_do")
+    await tester.user_input("Go to the menu")
+    tester.assert_state("state_mainmenu")
+
+
+@pytest.mark.asyncio
+async def test_state_self_perceived_healthcare_assessment_go_to_generic(
+    tester: AppTester,
+):
+    tester.setup_state("state_self_perceived_healthcare_assessment_risk_message")
+    await tester.user_input(session=Message.session_event.NEW)
+    tester.assert_state("state_generic_what_would_you_like_to_do")
+
+
+@pytest.mark.asyncio
+async def test_state_sexual_health_literacy_assessment_go_to_generic(tester: AppTester):
+    tester.setup_state("state_sexual_health_literacy_send_risk_message")
+    await tester.user_input(session=Message.session_event.NEW)
+    tester.assert_state("state_generic_what_would_you_like_to_do")
+
+
+@pytest.mark.asyncio
+async def test_state_depression_and_anxiety_assessment_go_to_generic(tester: AppTester):
+    tester.setup_state("state_depression_and_anxiety_assessment_risk_message")
+    await tester.user_input(session=Message.session_event.NEW)
+    tester.assert_state("state_generic_what_would_you_like_to_do")
+
+
+@pytest.mark.asyncio
+async def test_state_connectedness_assessment_go_to_generic(tester: AppTester):
+    tester.setup_state("state_connectedness_assessment_risk_message")
+    await tester.user_input(session=Message.session_event.NEW)
+    tester.assert_state("state_generic_what_would_you_like_to_do")
+
+
+@pytest.mark.asyncio
+async def test_state_gender_attitude_assessment_go_to_generic(tester: AppTester):
+    tester.setup_state("state_gender_attitude_assessment_risk_message")
+    await tester.user_input(session=Message.session_event.NEW)
+    tester.assert_state("state_generic_what_would_you_like_to_do")
+
+
+@pytest.mark.asyncio
+async def test_state_body_image_assessment_go_to_generic(tester: AppTester):
+    tester.setup_state("state_body_image_assessment_risk_message")
+    await tester.user_input(session=Message.session_event.NEW)
+    tester.assert_state("state_generic_what_would_you_like_to_do")
+
+
+@pytest.mark.asyncio
+async def test_state_generic_what_would_you_like_to_do_aaq(tester: AppTester, aaq_mock):
+    tester.setup_state("state_generic_what_would_you_like_to_do")
+    await tester.user_input("Ask a question")
+    tester.assert_state("state_aaq_start")
+
+
+@pytest.mark.asyncio
+async def test_state_generic_what_would_you_like_to_do_(tester: AppTester):
+    tester.setup_state("state_generic_what_would_you_like_to_do")
+    await tester.user_input("Update settings")
+    tester.assert_state("state_display_preferences")
+
+
+@pytest.mark.asyncio
 async def test_mainmenu_payload(tester: AppTester, rapidpro_mock, contentrepo_api_mock):
     """
     If there's a button payload that indicates that the user should be shown the main
