@@ -638,5 +638,7 @@ class Application(BaseApplication):
         self.save_metadata("current_message_id", 1)
         self.save_metadata("is_suggested_page", False)
         self.save_metadata("suggested_content", {})
+        # Save the You & Your Health page as the default topic
+        self.save_metadata("topics_viewed", ["408"])
 
         return await self.go_to_state("state_contentrepo_page")
