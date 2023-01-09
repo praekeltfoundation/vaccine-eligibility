@@ -19,7 +19,7 @@ ASSESSMENT_QUESTIONS = {
                 "options": [
                     (
                         "condoms",
-                        "using to condoms every time they have sexual intercourse.",
+                        "using condoms every time they have sexual intercourse.",
                     ),
                     (
                         "single_partner",
