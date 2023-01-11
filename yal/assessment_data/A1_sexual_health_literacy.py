@@ -10,55 +10,37 @@ ASSESSMENT_QUESTIONS = {
                 "type": "choice",
                 "text": "\n".join(
                     [
-                        "*_People can reduce the risk of getting STIs by:_*",
-                        "",
-                        "[persona_emoji] _Reply with the *number* "
-                        "of your chosen answer:_",
+                        "Is the following statement true or false?"
+                        ""
+                        "People can reduce the risk of getting sexual STIs by using "
+                        "condoms every time they have sexual intercourse."
+                        ""
+                        "[persona_emoji] Reply with the number of your chosen answer:"
                     ]
                 ),
                 "options": [
-                    (
-                        "condoms",
-                        "using to condoms every time they have sexual intercourse.",
-                    ),
-                    (
-                        "single_partner",
-                        "only having sex with one partner who isn't infected and who "
-                        "has no other partners.",
-                    ),
+                    ("true", "True"),
+                    ("false", "False"),
                 ],
-                "scoring": {"condoms": 5, "single_partner": 0},
+                "scoring": {"true": 5, "false": 0},
                 "next": "state_a1_q2_sexual_health_lit",
             },
             "state_a1_q2_sexual_health_lit": {
                 "type": "choice",
                 "text": "\n".join(
                     [
-                        "_*If Teddy goes out to a restaurant and starts chatting "
-                        "with someone he is sexually attracted to, what is most "
-                        "appropriate way Teddy can tell that person wants to "
-                        "have sex with him?*_",
-                        "",
-                        "[persona_emoji] _Reply with the *number* "
-                        "of your chosen answer:_",
+                        "Is the following statement true or false?"
+                        ""
+                        "People can reduce the risk of getting sexual STIs by only "
+                        "having sex with one partner who isn't infected and who has no "
+                        "other partners."
                     ]
                 ),
                 "options": [
-                    ("looking", "By the way they are looking at him"),
-                    ("wearing", "By what they are wearing"),
-                    ("condoms", "If they carry condoms"),
-                    ("previous_sex", "If Teddy has had sex with them before"),
-                    ("verbal_consent", "If they verbally consent to have sex"),
-                    ("dont_know", "I don't know"),
+                    ("true", "True"),
+                    ("false", "False"),
                 ],
-                "scoring": {
-                    "looking": 0,
-                    "wearing": 0,
-                    "condoms": 0,
-                    "previous_sex": 0,
-                    "verbal_consent": 5,
-                    "dont_know": 0,
-                },
+                "scoring": {"true": 5, "false": 0},
                 "next": "state_a1_q3_sexual_health_lit_info",
             },
             "state_a1_q3_sexual_health_lit_info": {
