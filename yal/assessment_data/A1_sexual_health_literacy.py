@@ -10,12 +10,12 @@ ASSESSMENT_QUESTIONS = {
                 "type": "choice",
                 "text": "\n".join(
                     [
-                        "Is the following statement true or false?"
-                        ""
+                        "Is the following statement true or false?",
+                        "",
                         "People can reduce the risk of getting sexual STIs by using "
-                        "condoms every time they have sexual intercourse."
-                        ""
-                        "[persona_emoji] Reply with the number of your chosen answer:"
+                        "condoms every time they have sexual intercourse.",
+                        "",
+                        "[persona_emoji] Reply with the number of your chosen answer:",
                     ]
                 ),
                 "options": [
@@ -29,11 +29,11 @@ ASSESSMENT_QUESTIONS = {
                 "type": "choice",
                 "text": "\n".join(
                     [
-                        "Is the following statement true or false?"
-                        ""
+                        "Is the following statement true or false?",
+                        "",
                         "People can reduce the risk of getting sexual STIs by only "
                         "having sex with one partner who isn't infected and who has no "
-                        "other partners."
+                        "other partners.",
                     ]
                 ),
                 "options": [
