@@ -201,7 +201,7 @@ async def test_info_message(tester: AppTester):
                             "Choice 2",
                         ],
                         "button": "Select a choice",
-                    }
+                    },
                 },
             }
         }
