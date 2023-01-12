@@ -175,3 +175,41 @@ async def test_scoring(tester: AppTester):
         tester.setup_state("state_survey_question")
         await tester.user_input("2")
         tester.assert_metadata("assessment_score", 2)
+
+
+@pytest.mark.asyncio
+async def test_info_message(tester: AppTester):
+    """
+    Info messages should send the next question
+    """
+
+    questions = {
+        "locus_of_control": {
+            "1": {
+                "start": "info_start",
+                "questions": {
+                    "info_start": {
+                        "type": "info",
+                        "text": "this is just an info message",
+                        "next": "q1",
+                    },
+                    "q1": {
+                        "type": "button",
+                        "text": "Test question",
+                        "options": [
+                            "Choice 1",
+                            "Choice 2",
+                        ],
+                        "button": "Select a choice",
+                    },
+                },
+            }
+        }
+    }
+    with mock.patch("yal.assessments.QUESTIONS", questions):
+        tester.setup_state("state_survey_question")
+        await tester.user_input(session=Message.SESSION_EVENT.NEW)
+        tester.assert_message(
+            content="\n".join(["◼️", "-----", "", "Test question"]),
+            buttons=["Choice 1", "Choice 2"],
+        )

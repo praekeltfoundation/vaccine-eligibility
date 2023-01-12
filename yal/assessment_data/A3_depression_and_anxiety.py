@@ -28,13 +28,13 @@ ASSESSMENT_QUESTIONS = {
                 "options": [
                     "Not at all",
                     "Several days",
-                    "More than half the days",
+                    "Over half the days",
                     "Nearly every day",
                 ],
                 "scoring": {
                     "not_at_all": 5,
                     "several_days": 3,
-                    "more_than_half_the_days": 1,
+                    "over_half_the_days": 1,
                     "nearly_every_day": 0,
                 },
                 "next": "state_a3_q2_depression",
@@ -49,13 +49,13 @@ ASSESSMENT_QUESTIONS = {
                 "options": [
                     "Not at all",
                     "Several days",
-                    "More than half the days",
+                    "Over half the days",
                     "Nearly every day",
                 ],
                 "scoring": {
                     "not_at_all": 5,
                     "several_days": 3,
-                    "more_than_half_the_days": 1,
+                    "over_half_the_days": 1,
                     "nearly_every_day": 0,
                 },
                 "next": "state_a3_q3_depression",
@@ -66,13 +66,13 @@ ASSESSMENT_QUESTIONS = {
                 "options": [
                     "Not at all",
                     "Several days",
-                    "More than half the days",
+                    "Over half the days",
                     "Nearly every day",
                 ],
                 "scoring": {
                     "not_at_all": 5,
                     "several_days": 3,
-                    "more_than_half_the_days": 1,
+                    "over_half_the_days": 1,
                     "nearly_every_day": 0,
                 },
                 "next": "state_a3_q4_depression",
@@ -83,13 +83,13 @@ ASSESSMENT_QUESTIONS = {
                 "options": [
                     "Not at all",
                     "Several days",
-                    "More than half the days",
+                    "Over half the days",
                     "Nearly every day",
                 ],
                 "scoring": {
                     "not_at_all": 5,
                     "several_days": 3,
-                    "more_than_half_the_days": 1,
+                    "over_half_the_days": 1,
                     "nearly_every_day": 0,
                 },
                 "next": None,

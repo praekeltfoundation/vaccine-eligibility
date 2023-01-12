@@ -175,7 +175,10 @@ class Application(BaseApplication):
 
         if next:
             self.save_metadata("assessment_question", next)
-            self.save_metadata("assessment_question_nr", question_number + 1)
+            question_type = question.get("type", "choice")
+
+            if question_type != "info":
+                self.save_metadata("assessment_question_nr", question_number + 1)
         else:
             self.save_metadata("assessment_section", section + 1)
             self.save_metadata("assessment_question_nr", 1)
