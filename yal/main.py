@@ -414,23 +414,13 @@ class Application(
                 self._(
                     "\n".join(
                         [
-                            "[persona_emoji] Aww shame. I'm sorry to hear that 😔",
+                            "I'm sorry to hear that 😔",
                             "",
                             "I know it can be hard when you feel like you don't have "
                             "the support you need.",
                             "",
-                            "*The good thing is there are things we can do to get the "
-                            "help we need when we need it.*",
-                        ]
-                    )
-                ),
-                self._(
-                    "\n".join(
-                        [
-                            "Don't stress, though. I've got some more info that "
-                            "can help you with this.",
-                            "",
-                            "Sending it your way now now! 📲",
+                            "Over the next few weeks, I'll share some  important "
+                            "tips on how to get the help we need when we need it.",
                         ]
                     )
                 ),
@@ -462,7 +452,8 @@ class Application(
 
         await self.publish_message(questions[risk][0])
         await asyncio.sleep(0.5)
-        await self.publish_message(questions[risk][1])
+        if len(questions[risk]) == 2:
+            await self.publish_message(questions[risk][1])
         await asyncio.sleep(0.5)
         return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
