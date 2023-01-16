@@ -287,39 +287,45 @@ class Application(
 
     async def state_sexual_health_literacy_send_risk_message(self):
         questions = {
-            "high_risk": self._(
-                "\n".join(
-                    [
-                        "*You and your sexual health*",
-                        "-----",
-                        "",
-                        "Looking at your answers, I think I know exactly "
-                        "where to start. I've got some great info on "
-                        "the basics of sex, love and relationships.",
-                        "",
-                        "By the time we're done, we'll have you feeling more confident "
-                        "when it comes to all things sex and relationships. 💪",
-                    ]
-                )
-            ),
-            "low_risk": self._(
-                "\n".join(
-                    [
-                        "*You and your sexual health*",
-                        "-----",
-                        "",
-                        "Looking at your answers, it looks like you already "
-                        "know quite a lot about the birds 🦉and the bees 🐝of "
-                        "sex, love and relationships. Proud of you 🙏🏾",
-                        "",
-                        "That means we can skip the basics.",
-                    ]
-                )
-            ),
+            "high_risk": [
+                self._(
+                    "\n".join(
+                        [
+                            "*You and your sexual health*",
+                            "-----",
+                            "",
+                            "Looking at your answers, I think I know exactly "
+                            "where to start. I've got some great info on "
+                            "the basics of sex, love and relationships.",
+                            "",
+                            "By the time we're done, we'll have you feeling more "
+                            "confident when it comes to all things sex and "
+                            "relationships. 💪",
+                        ]
+                    )
+                ),
+            ],
+            "low_risk": [
+                self._(
+                    "\n".join(
+                        [
+                            "*You and your sexual health*",
+                            "-----",
+                            "",
+                            "Looking at your answers, it looks like you already "
+                            "know quite a lot about the birds 🦉and the bees 🐝of "
+                            "sex, love and relationships. Proud of you 🙏🏾",
+                            "",
+                            "That means we can skip the basics.",
+                        ]
+                    )
+                ),
+            ],
         }
         risk = self.user.metadata.get("sexual_health_lit_risk", "high_risk")
-        await self.publish_message(questions[risk])
-        await asyncio.sleep(0.5)
+        for message in questions[risk]:
+            await self.publish_message(message)
+            await asyncio.sleep(0.5)
         return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
     async def state_depression_and_anxiety_assessment(self):
@@ -355,30 +361,35 @@ class Application(
 
     async def state_depression_and_anxiety_assessment_risk_message(self):
         questions = {
-            "high_risk": self._(
-                "\n".join(
-                    [
-                        "[persona_emoji]  Eish! Sounds like it's been a rough "
-                        "couple of weeks, eh? Sorry to hear you've been down. 😔",
-                        "",
-                        "Let's see if we can work on changing that together, shall "
-                        "we? I'll send you some more info on that soon! 📲",
-                    ]
-                )
-            ),
-            "low_risk": self._(
-                "\n".join(
-                    [
-                        "[persona_emoji]  Glad you've got your head in a good "
-                        "place. It makes it easier to deal with the other "
-                        "things life throws at you 😌",
-                    ]
-                )
-            ),
+            "high_risk": [
+                self._(
+                    "\n".join(
+                        [
+                            "[persona_emoji]  Eish! Sounds like it's been a rough "
+                            "couple of weeks, eh? Sorry to hear you've been down. 😔",
+                            "",
+                            "Let's see if we can work on changing that together, shall "
+                            "we? I'll send you some more info on that soon! 📲",
+                        ]
+                    )
+                ),
+            ],
+            "low_risk": [
+                self._(
+                    "\n".join(
+                        [
+                            "[persona_emoji]  Glad you've got your head in a good "
+                            "place. It makes it easier to deal with the other "
+                            "things life throws at you 😌",
+                        ]
+                    )
+                ),
+            ],
         }
         risk = self.user.metadata.get("depression_and_anxiety_risk", "high_risk")
-        await self.publish_message(questions[risk])
-        await asyncio.sleep(0.5)
+        for message in questions[risk]:
+            await self.publish_message(message)
+            await asyncio.sleep(0.5)
         return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
     async def state_connectedness_assessment(self):
@@ -450,11 +461,9 @@ class Application(
         }
         risk = self.user.metadata.get("connectedness_risk", "high_risk")
 
-        await self.publish_message(questions[risk][0])
-        await asyncio.sleep(0.5)
-        if len(questions[risk]) == 2:
-            await self.publish_message(questions[risk][1])
-        await asyncio.sleep(0.5)
+        for message in questions[risk]:
+            await self.publish_message(message)
+            await asyncio.sleep(0.5)
         return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
     async def state_gender_attitude_assessment(self):
@@ -543,10 +552,9 @@ class Application(
         }
         risk = self.user.metadata.get("gender_attitude_risk", "high_risk")
 
-        await self.publish_message(questions[risk][0])
-        await asyncio.sleep(0.5)
-        await self.publish_message(questions[risk][1])
-        await asyncio.sleep(0.5)
+        for message in questions[risk]:
+            await self.publish_message(message)
+            await asyncio.sleep(0.5)
         return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
     async def state_body_image_assessment(self):
