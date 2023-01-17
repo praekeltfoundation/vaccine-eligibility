@@ -430,7 +430,7 @@ class Application(
                             "I know it can be hard when you feel like you don't have "
                             "the support you need.",
                             "",
-                            "Over the next few weeks, I'll share some  important "
+                            "Over the next few weeks, I'll share some important "
                             "tips on how to get the help we need when we need it.",
                         ]
                     )
