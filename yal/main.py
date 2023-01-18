@@ -702,7 +702,7 @@ class Application(
         ]
         question = self._(
             "\n".join(
-                ["*OK. What would you like to do now?*", get_display_choices(choices)]
+                ["*What would you like to do now?*", get_display_choices(choices)]
             )
         )
 
