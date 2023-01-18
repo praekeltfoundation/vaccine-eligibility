@@ -107,7 +107,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "What would you like to do now?",
+                    "*What would you like to do now?*",
                     get_display_choices(choices, bold_numbers=True),
                 ]
             )
