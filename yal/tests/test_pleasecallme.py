@@ -241,6 +241,16 @@ async def test_start_out_of_hours_weekday_after(
 
 @pytest.mark.asyncio
 @mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_state_out_of_hours(get_current_datetime, tester: AppTester):
+    get_current_datetime.return_value = datetime(2022, 6, 20, 20, 30)
+    tester.user.metadata["next_available"] = "2022-06-21T09:00:00"
+    tester.setup_state("state_out_of_hours")
+    await tester.user_input("I need help now!")
+    tester.assert_state("state_emergency")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.pleasecallme.get_current_datetime")
 async def test_start_in_hours(get_current_datetime, tester: AppTester):
     get_current_datetime.return_value = datetime(2022, 6, 20, 17, 30)
     tester.setup_state("state_please_call_start")
