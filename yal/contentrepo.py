@@ -124,6 +124,15 @@ async def get_page_details(
                 page_details["has_children"] = response_body["has_children"]
                 page_details["title"] = response_body["title"]
                 page_details["body"] = response_body["body"]["text"]["value"]["message"]
+                variations = {}
+                for v in response_body["body"]["text"]["value"].get(
+                    "variation_messages", []
+                ):
+                    if v["profile_field"] in variations:
+                        variations[v["profile_field"]][v["value"]] = v["message"]
+                    else:
+                        variations[v["profile_field"]] = {v["value"]: v["message"]}
+                page_details["variations"] = variations
 
                 page_details["parent_id"] = response_body["meta"]["parent"]["id"]
                 page_details["parent_title"] = response_body["meta"]["parent"]["title"]
