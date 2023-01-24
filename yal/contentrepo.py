@@ -124,7 +124,8 @@ async def get_page_details(
                 page_details["has_children"] = response_body["has_children"]
                 page_details["title"] = response_body["title"]
                 page_details["body"] = response_body["body"]["text"]["value"]["message"]
-                variations = {}
+                
+                variations: Dict[str, Any] = {}
                 for v in response_body["body"]["text"]["value"].get(
                     "variation_messages", []
                 ):
