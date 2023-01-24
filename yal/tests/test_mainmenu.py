@@ -224,6 +224,11 @@ async def contentrepo_api_mock():
                         "value": "male",
                         "message": "Message test content for males",
                     },
+                    {
+                        "profile_field": "gender",
+                        "value": "non-binary",
+                        "message": "Message test content for non-binary",
+                    },
                 ],
             )
         )
@@ -1523,6 +1528,42 @@ async def test_state_display_page_detail_variations(
                 "-----",
                 "",
                 "Message test content for females",
+                "",
+                "1. No, thanks",
+                "",
+                "-----",
+                "*Or reply:*",
+                "2. ⬅️ Parent Title",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_display_page_detail_non_bin_variations(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_contentrepo_page")
+    tester.user.metadata["selected_page_id"] = "1112"
+    tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["current_menu_level"] = 3
+    tester.user.metadata["last_topic_viewed"] = "1"
+    tester.user.metadata["parent_title"] = "Test Back"
+    tester.user.metadata["suggested_content"] = {}
+    tester.user.metadata["gender"] = "non_binary"
+
+    tester.user.session_id = 123
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Main Menu 1 💊",
+                "-----",
+                "",
+                "Message test content for non-binary",
                 "",
                 "1. No, thanks",
                 "",

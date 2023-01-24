@@ -438,8 +438,11 @@ class Application(BaseApplication):
 
         if variations:
             for field, value in variations.items():
-                if metadata.get(field) in value:
-                    body = value[metadata.get(field)]
+                field_value = metadata.get(field)
+                if field_value == "non_binary":
+                    field_value = "non-binary"
+                if field_value in value:
+                    body = value[field_value]
                     break
 
         parts = []
