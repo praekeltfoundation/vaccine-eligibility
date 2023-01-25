@@ -361,6 +361,7 @@ class Application(BaseApplication):
         self.save_metadata(
             "feature_redirects", page_details.get("feature_redirects", [])
         )
+        self.save_metadata("variations", page_details.get("variations", {}))
 
         # If a user loads a content repo page from somewhere other than the main menu
         # then we need to infer the menu level and the topics they've seen
@@ -433,6 +434,16 @@ class Application(BaseApplication):
         next_prompt = metadata.get("next_prompt")
         quiz_tag = metadata.get("quiz_tag")
         quick_replies = metadata.get("quick_replies", [])
+        variations = metadata.get("variations", {})
+
+        if variations:
+            for field, value in variations.items():
+                field_value = metadata.get(field)
+                if field_value == "non_binary":
+                    field_value = "non-binary"
+                if field_value in value:
+                    body = value[field_value]
+                    break
 
         parts = []
 
