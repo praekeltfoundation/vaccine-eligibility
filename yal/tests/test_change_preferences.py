@@ -416,7 +416,7 @@ async def test_state_update_relationship_status_confirm(
 async def test_state_update_relationship_status_confirm_not_correct(
     tester: AppTester, rapidpro_mock
 ):
-    tester.setup_answer("state_update_relationship_status", "yes")
+    tester.setup_answer("state_update_relationship_status", "relationship")
     tester.setup_state("state_update_relationship_status_confirm")
     await tester.user_input("no")
     tester.assert_num_messages(1)
@@ -429,7 +429,7 @@ async def test_state_update_relationship_status_confirm_not_correct(
 async def test_state_update_relationship_status_submit(
     tester: AppTester, rapidpro_mock
 ):
-    tester.setup_answer("state_update_relationship_status", "yes")
+    tester.setup_answer("state_update_relationship_status", "relationship")
     tester.setup_state("state_update_relationship_status_confirm")
     await tester.user_input("1")
     tester.assert_num_messages(1)

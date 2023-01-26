@@ -694,7 +694,7 @@ async def test_state_mainmenu_contentrepo_help_content(
 async def test_state_mainmenu_contentrepo_relationship_content_rel_set(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
-    rapidpro_mock.tstate.contact_fields["relationship_status"] = "Yes"
+    rapidpro_mock.tstate.contact_fields["relationship_status"] = "relationship"
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input("7")
 
@@ -877,7 +877,7 @@ async def test_state_mainmenu_contentrepo_relationship_submit(
     ]
 
     assert len(rapidpro_mock.tstate.requests) == 4
-    assert rapidpro_mock.tstate.contact_fields["relationship_status"] == "yes"
+    assert rapidpro_mock.tstate.contact_fields["relationship_status"] == "relationship"
 
 
 @pytest.mark.asyncio
@@ -968,7 +968,7 @@ async def test_state_mainmenu_contentrepo_children(
 async def test_state_submenu_image(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
-    rapidpro_mock.tstate.contact_fields["relationship_status"] = "Yes"
+    rapidpro_mock.tstate.contact_fields["relationship_status"] = "relationship"
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input("6")
 
@@ -997,7 +997,7 @@ async def test_state_submenu_image(
 async def test_state_detail_image(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
-    rapidpro_mock.tstate.contact_fields["relationship_status"] = "Yes"
+    rapidpro_mock.tstate.contact_fields["relationship_status"] = "relationship"
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input("6")
     await tester.user_input("1")

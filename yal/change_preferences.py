@@ -223,9 +223,9 @@ class Application(BaseApplication):
 
     async def state_update_relationship_status(self):
         choices = [
-            Choice("yes", self._("Yes, in relationship")),
+            Choice("relationship", self._("Yes, in relationship")),
             Choice("complicated", self._("It's complicated")),
-            Choice("no", self._("Not seeing anyone")),
+            Choice("single", self._("Not seeing anyone")),
             Choice("skip", self._("Skip")),
         ]
         question = self._(

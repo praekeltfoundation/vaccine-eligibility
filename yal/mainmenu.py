@@ -303,9 +303,9 @@ class Application(BaseApplication):
             question=question,
             button="Relationship Status",
             choices=[
-                Choice("yes", self._("In a relationship")),
+                Choice("relationship", self._("In a relationship")),
                 Choice("complicated", self._("It's complicated")),
-                Choice("no", self._("Not seeing anyone")),
+                Choice("single", self._("Not seeing anyone")),
                 Choice("skip", self._("Skip")),
             ],
             next="state_relationship_status_submit",
