@@ -47,6 +47,8 @@ def get_today():
 
 
 def get_current_datetime():
+    if config.QA_OVERRIDE_CURRENT_TIMESTAMP:
+        return datetime.fromisoformat(config.QA_OVERRIDE_CURRENT_TIMESTAMP)
     return datetime.now(tz=TZ_SAST)
 
 
