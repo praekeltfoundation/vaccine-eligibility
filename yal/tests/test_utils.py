@@ -1,7 +1,7 @@
 from datetime import datetime
 from unittest import TestCase
 
-from yal import utils
+from yal import config, utils
 
 
 def override_get_today():
@@ -102,3 +102,12 @@ def test_get_by_path():
     assert utils.get_by_path(obj, "invalid", default_value="default") == "default"
     assert utils.get_by_path(obj) == obj
     assert utils.get_by_path(None, "foo", "bar", "baz") is None
+
+
+def test_get_current_datetime_qa_override():
+    """
+    QA_OVERRIDE_CURRENT_TIMESTAMP should change the output of get_current_datetime
+    """
+    assert utils.get_current_datetime() != datetime(2022, 3, 4, 5, 6, 7)
+    config.QA_OVERRIDE_CURRENT_TIMESTAMP = "2022-03-04T05:06:07"
+    assert utils.get_current_datetime() == datetime(2022, 3, 4, 5, 6, 7)
