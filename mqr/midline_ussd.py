@@ -5,6 +5,7 @@ import aiohttp
 
 from mqr import config
 from vaccine.base_application import BaseApplication
+from vaccine.models import Message
 from vaccine.states import Choice, ChoiceState, EndState
 from vaccine.utils import HTTP_EXCEPTIONS, normalise_phonenumber
 
@@ -24,6 +25,35 @@ def get_rapidpro():
 
 class Application(BaseApplication):
     START_STATE = "state_eat_fruits"
+
+    async def process_message(self, message):
+        if message.session_event == Message.SESSION_EVENT.CLOSE:
+            self.user.session_id = None
+            msisdn = normalise_phonenumber(self.user.addr)
+            urn = f"whatsapp:{msisdn.lstrip(' + ')}"
+
+            async with get_rapidpro() as session:
+                for i in range(3):
+                    try:
+                        data = {
+                            "flow": config.RAPIDPRO_MIDLINE_SURVEY_TIMEOUT_FLOW,
+                            "urns": [urn],
+                        }
+                        response = await session.post(
+                            urljoin(config.RAPIDPRO_URL, "/api/v2/flow_starts.json"),
+                            json=data,
+                        )
+                        response.raise_for_status()
+                        break
+                    except HTTP_EXCEPTIONS as e:
+                        if i == 2:
+                            logger.exception(e)
+                            return []
+                        else:
+                            continue
+            return []
+
+        return await super().process_message(message)
 
     async def state_eat_fruits(self):
         question = self._("1/16\n" "\n" "Do you eat fruits at least once a day?")
