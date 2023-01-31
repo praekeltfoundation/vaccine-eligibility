@@ -591,6 +591,35 @@ async def test_state_update_bot_emoji_invalid(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
+async def test_state_update_bot_emoji_no_emoji(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["persona_emoji"] = "🦸"
+    tester.user.metadata["persona_name"] = "Caped Crusader"
+    tester.setup_state("state_update_bot_emoji")
+    await tester.user_input("I don't understand")
+
+    tester.assert_num_messages(1)
+    tester.assert_state("state_update_bot_emoji_submit")
+    tester.assert_metadata("persona_emoji", "")
+    tester.assert_message(
+        "\n".join(
+            [
+                "🤖 PERSONALISE YOUR B-WISE BOT / *Choose an emoji*",
+                "*-----*",
+                "",
+                "Wonderful! 🤖",
+                "",
+                "*What would you like to do now?*",
+                "",
+                "1. Go to the menu",
+                "2. Ask a question",
+            ]
+        )
+    )
+
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET", "POST"]
+
+
+@pytest.mark.asyncio
 async def test_state_update_location_confirm(tester: AppTester, google_api_mock):
     tester.setup_state("state_update_location")
 
