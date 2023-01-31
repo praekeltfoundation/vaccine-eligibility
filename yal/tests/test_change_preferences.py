@@ -577,6 +577,20 @@ async def test_state_update_bot_emoji_skip(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
+async def test_state_update_bot_emoji_invalid(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["persona_emoji"] = "🦸"
+    tester.user.metadata["persona_name"] = "Caped Crusader"
+    tester.setup_state("state_update_bot_emoji")
+    await tester.user_input("this is my emoji: 🙋🏿‍♂️")
+
+    tester.assert_num_messages(1)
+    tester.assert_state("state_update_bot_emoji_submit")
+    tester.assert_metadata("persona_emoji", "🙋🏿‍♂️")
+
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET", "POST"]
+
+
+@pytest.mark.asyncio
 async def test_state_update_location_confirm(tester: AppTester, google_api_mock):
     tester.setup_state("state_update_location")
 

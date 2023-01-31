@@ -1,8 +1,6 @@
 import asyncio
 import logging
 
-from emoji import EMOJI_DATA
-
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
 from yal import rapidpro, utils
@@ -94,15 +92,9 @@ class Application(BaseApplication):
         )
 
     async def state_save_persona_emoji(self):
-        def extract_first_emoji(persona_emoji):
-            emojs_present = "".join(c for c in persona_emoji if c in EMOJI_DATA)
-            if emojs_present:
-                return emojs_present[0]
-            return ""
-
         persona_emoji = self.user.answers.get("state_persona_emoji")
         if persona_emoji != "skip":
-            persona_emoji = extract_first_emoji(persona_emoji)
+            persona_emoji = utils.extract_first_emoji(persona_emoji)
             self.save_metadata("persona_emoji", persona_emoji)
 
         return await self.go_to_state("state_profile_intro")
