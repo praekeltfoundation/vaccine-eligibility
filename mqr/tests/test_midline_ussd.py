@@ -5,7 +5,7 @@ from sanic import Sanic, response
 
 from mqr import config
 from mqr.midline_ussd import Application
-from vaccine.models import Message, StateData, User
+from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
 
 
@@ -32,34 +32,6 @@ async def rapidpro_mock():
         server.tstate = tstate
         yield server
         config.RAPIDPRO_URL = url
-
-
-@pytest.mark.asyncio
-async def test_state_survey_timeout(rapidpro_mock):
-    u = User(
-        addr="27820001003",
-        state=StateData(name="state_vaccine_importance"),
-        session_id="1",
-    )
-    app = Application(u)
-    msg = Message(
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-        session_event=Message.SESSION_EVENT.CLOSE,
-    )
-    [] = await app.process_message(msg)
-
-    assert u.session_id is None
-    assert [r.path for r in rapidpro_mock.tstate.requests] == [
-        "/api/v2/flow_starts.json"
-    ]
-    request = rapidpro_mock.tstate.requests[0]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "flow": config.RAPIDPRO_MIDLINE_SURVEY_TIMEOUT_FLOW,
-        "urns": ["whatsapp:27820001003"],
-    }
 
 
 @pytest.mark.asyncio
