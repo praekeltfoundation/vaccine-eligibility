@@ -101,11 +101,19 @@ class Application(
 
         keyword = utils.clean_inbound(message.content)
         # Restart keywords that interrupt the current flow
-        if keyword in EMERGENCY_KEYWORDS:
+        if (
+            keyword in EMERGENCY_KEYWORDS
+            and message.transport_metadata.get("message", {}).get("type")
+            != "interactive"
+        ):
             # Go straight to please call me application start, phrase matches exactly
             self.user.session_id = None
             self.state_name = PleaseCallMeApplication.START_STATE
-        elif utils.check_keyword(keyword, EMERGENCY_KEYWORDS):
+        elif (
+            utils.check_keyword(keyword, EMERGENCY_KEYWORDS)
+            and message.transport_metadata.get("message", {}).get("type")
+            != "interactive"
+        ):
             self.save_metadata("emergency_keyword_previous_state", self.state_name)
             # If keyword fuzzy matches an emergency keyword,
             # First confirm redirect with user
