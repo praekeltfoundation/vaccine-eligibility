@@ -6,7 +6,7 @@ from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListSt
 from yal import rapidpro, utils
 from yal.assessments import Application as AssessmentApplication
 from yal.pushmessages_optin import Application as PushmessageOptinApplication
-from yal.utils import get_current_datetime, get_generic_error
+from yal.utils import extract_first_emoji, get_current_datetime, get_generic_error
 from yal.validators import age_validator
 
 logger = logging.getLogger(__name__)
@@ -94,7 +94,8 @@ class Application(BaseApplication):
     async def state_save_persona_emoji(self):
         persona_emoji = self.user.answers.get("state_persona_emoji")
         if persona_emoji != "skip":
-            persona_emoji = utils.extract_first_emoji(persona_emoji)
+            persona_emoji = extract_first_emoji(persona_emoji)
+            self.save_answer("state_persona_emoji", persona_emoji)
             self.save_metadata("persona_emoji", persona_emoji)
 
         return await self.go_to_state("state_profile_intro")
