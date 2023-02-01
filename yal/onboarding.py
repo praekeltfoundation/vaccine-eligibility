@@ -94,6 +94,7 @@ class Application(BaseApplication):
     async def state_save_persona_emoji(self):
         persona_emoji = self.user.answers.get("state_persona_emoji")
         if persona_emoji != "skip":
+            persona_emoji = utils.extract_first_emoji(persona_emoji)
             self.save_metadata("persona_emoji", persona_emoji)
 
         return await self.go_to_state("state_profile_intro")

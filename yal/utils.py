@@ -7,6 +7,7 @@ from typing import Any, Optional
 import phonenumbers
 import pkg_resources
 import pycountry
+from emoji import emoji_list
 from rapidfuzz import fuzz, process
 
 from yal import config
@@ -76,11 +77,20 @@ def normalise_phonenumber(phonenumber):
         raise ValueError("Invalid phone number")
 
 
+def extract_first_emoji(persona_emoji):
+    emojis_preset = emoji_list(persona_emoji)
+    if emojis_preset:
+        return emojis_preset[0]["emoji"]
+    return ""
+
+
 def replace_persona_fields(text, metadata={}):
     for key in PERSONA_FIELDS:
         value = metadata.get(key)
-        if value and value.lower() != "skip":
-            text = text.replace(f"[{key}]", value)
+        if value and value.lower() not in ["skip", ""]:
+            if key == "persona_emoji":
+                value = extract_first_emoji(value)
+            text = text.replace(f"[{key}]", re.sub(r"\s+", " ", value))
         else:
             text = text.replace(f"[{key}]", PERSONA_DEFAULTS[key])
     return text

@@ -142,6 +142,31 @@ async def test_state_persona_emoji(
 
 @pytest.mark.asyncio
 @mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_persona_emoji_invalid(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_persona_emoji")
+
+    await tester.user_input("😎\n👔\n👞👞")
+
+    tester.assert_state("state_age")
+    tester.assert_num_messages(1)
+
+    tester.assert_metadata("persona_emoji", "😎")
+
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
 async def test_state_persona_emoji_skip(
     get_current_datetime, tester: AppTester, rapidpro_mock
 ):

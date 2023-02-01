@@ -15,7 +15,12 @@ from vaccine.states import (
 )
 from vaccine.utils import HTTP_EXCEPTIONS, get_display_choices
 from yal import config, rapidpro
-from yal.utils import GENDERS, get_generic_error, normalise_phonenumber
+from yal.utils import (
+    GENDERS,
+    extract_first_emoji,
+    get_generic_error,
+    normalise_phonenumber,
+)
 from yal.validators import age_validator
 
 logger = logging.getLogger(__name__)
@@ -633,8 +638,7 @@ class Application(BaseApplication):
         choice = self.user.answers.get("state_update_bot_emoji")
         if choice == "skip":
             return await self.go_to_state("state_display_preferences")
-
-        data = {"persona_emoji": choice}
+        data = {"persona_emoji": extract_first_emoji(choice)}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
