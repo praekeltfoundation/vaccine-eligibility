@@ -271,7 +271,7 @@ async def test_reset_keyword(tester: AppTester, rapidpro_mock, contentrepo_api_m
     tester.assert_num_messages(2)
 
     assert len(rapidpro_mock.tstate.requests) == 3
-    assert len(contentrepo_api_mock.tstate.requests) == 5
+    assert len(contentrepo_api_mock.tstate.requests) == 4
 
 
 @pytest.mark.asyncio
@@ -387,7 +387,7 @@ async def test_state_start_to_mainmenu(
     tester.assert_num_messages(2)
 
     assert len(rapidpro_mock.tstate.requests) == 3
-    assert len(contentrepo_api_mock.tstate.requests) == 5
+    assert len(contentrepo_api_mock.tstate.requests) == 4
 
     tester.assert_metadata("longitude", "28.0251783")
     tester.assert_metadata("latitude", "-26.2031026")
@@ -876,7 +876,7 @@ async def test_mainmenu_payload(tester: AppTester, rapidpro_mock, contentrepo_ap
     tester.assert_num_messages(2)
 
     assert len(rapidpro_mock.tstate.requests) == 3
-    assert len(contentrepo_api_mock.tstate.requests) == 5
+    assert len(contentrepo_api_mock.tstate.requests) == 4
 
 
 @pytest.mark.asyncio

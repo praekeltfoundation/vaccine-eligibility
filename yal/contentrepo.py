@@ -85,7 +85,7 @@ async def get_choices_by_path(path: str) -> Tuple[bool, List[Choice]]:
                 break
             except HTTP_EXCEPTIONS as e:
                 if i == 2:
-                    logger.exception(e)
+                    logger.warning(e)
                     return True, []
                 else:
                     continue

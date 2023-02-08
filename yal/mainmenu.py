@@ -44,9 +44,13 @@ class Application(BaseApplication):
                     "topics_viewed", list(parent_topic_links.values())[:1]
                 )
             )
-            error, suggested_choices = await contentrepo.get_suggested_choices(
-                topics_viewed
-            )
+            if topics_viewed:
+                error, suggested_choices = await contentrepo.get_suggested_choices(
+                    topics_viewed
+                )
+            else:
+                return {}
+
             if error:
                 return {}
             self.save_metadata(
