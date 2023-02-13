@@ -84,6 +84,8 @@ async def get_choices_by_path(path: str) -> Tuple[bool, List[Choice]]:
 
                 break
             except HTTP_EXCEPTIONS as e:
+                # TODO: better error handling once contentrepo is updated to
+                # return 404 errors on page not found
                 if i == 2:
                     logger.warning(e)
                     return True, []
