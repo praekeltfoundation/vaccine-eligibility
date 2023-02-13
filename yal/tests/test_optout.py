@@ -11,9 +11,11 @@ from sanic import Sanic, response
 
 # from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
-from yal import config
+from yal import config, rapidpro
 from yal.main import Application
 from yal.utils import get_current_datetime
+
+
 
 # TODO: add number of messages assertions
 
@@ -60,6 +62,19 @@ def get_rapidpro_contact(urn):
         }
     return contact
 
+def get_fields_not_to_clear():
+    fields_not_to_clear = {
+            "onboarding_completed": "testval"
+    }    
+    return fields_not_to_clear
+
+def get_fields_to_update():
+    fields_to_update = {
+            "opted_out": "TRUE",
+            "opted_out_timestamp": get_current_datetime().isoformat(),
+            "push_message_opt_in": "False",
+    }    
+    return fields_to_update
 
 @pytest.fixture(autouse=True)
 async def rapidpro_mock():
@@ -68,6 +83,7 @@ async def rapidpro_mock():
     tstate = TState()
 
     @app.route("/api/v2/contacts.json", methods=["GET"])
+
     def get_contact(request):
         tstate.requests.append(request)
         if tstate.errormax:
@@ -213,6 +229,8 @@ async def test_state_tell_us_more(tester: AppTester):
     tester.assert_state("state_farewell_optout")
 
 
+
+
 @pytest.mark.asyncio
 @mock.patch("yal.optout.get_current_datetime")
 async def test_state_optout_delete_saved(
@@ -268,6 +286,15 @@ async def test_state_optout_delete_saved(
             "emergency_contact": "",
         },
     }
+    
+    print("FWBDEV --- FIELDS NOT TO CLEAR")
+    print(get_fields_not_to_clear())
+    print("FWBDEV --- FIELDS TO UPDATE")
+    print(get_fields_to_update())
+    print("FWBDEV --- INSTANCE FIELDS")
+    rp_fields = await rapidpro.get_instance_fields()
+    print(rp_fields)
+    
 
     tester.assert_message(
         "\n".join(
@@ -287,7 +314,34 @@ async def test_state_optout_delete_saved(
             ]
         )
     )
+async def test_get_field_keys():
+    #test edge cases, list with no results
+    instance_fields = {
+                "key": "second_phase2_send",
+                "label": "second phase2 send",
+                "value_type": "text",
+                "pinned": False
+            },{
+                "key": "assessment_reminder_name",
+                "label": "Assessment Reminder Name",
+                "value_type": "text",
+                "pinned": False
+            },{
+                "key": "phase2_invite_failed",
+                "label": "phase2 invite failed",
+                "value_type": "text",
+                "pinned": False
+            },
+           
+    expected = ["second_phase2_send", "assessment_reminder_name", "phase2_invite_failed"]
+    field_keys = rapidpro.get_field_keys(instance_fields)
+    assert field_keys == expected
 
+async def test_fritz_temp():
+    instance_fields = await rapidpro.get_instance_fields()
+    field_keys = rapidpro.get_field_keys(instance_fields)
+    print(field_keys)
+    assert True == False
 
 @pytest.mark.asyncio
 async def test_state_optout_delete_no_data(tester: AppTester, rapidpro_mock):
