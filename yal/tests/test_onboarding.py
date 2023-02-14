@@ -480,8 +480,8 @@ async def test_assessment_skip(get_current_datetime, tester: AppTester, rapidpro
             [
                 "🪱 No worries, we get it!",
                 "",
-                "I'll send you a reminder message tomorrow, so you can come back "
-                "and continue with these questions, then.",
+                "I'll send you a reminder message in 1 hour, so you can come back "
+                "and answer these questions.",
                 "",
                 "Check you later 🤙🏾",
             ]
@@ -491,8 +491,9 @@ async def test_assessment_skip(get_current_datetime, tester: AppTester, rapidpro
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
-            "assessment_reminder": "2022-06-20T16:30:00",
+            "assessment_reminder": "2022-06-19T17:30:00",
             "assessment_reminder_name": "locus_of_control",
+            "assessment_reminder_type": "later 1hour",
         },
     }
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 from unittest import mock
 
 import pytest
@@ -213,3 +214,155 @@ async def test_info_message(tester: AppTester):
             content="\n".join(["◼️", "-----", "", "Test question"]),
             buttons=["Choice 1", "Choice 2"],
         )
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.assessments.get_current_datetime")
+async def test_state_handle_assessment_reminder_response_now(
+    get_current_datetime, tester: AppTester
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.user.metadata["assessment_reminder_name"] = "sexual_health_literacy"
+    tester.user.metadata["assessment_reminder_sent"] = ""
+    tester.user.metadata["assessment_reminder_type"] = "reengagement 30min"
+
+    tester.setup_state("state_handle_assessment_reminder_response")
+    await tester.user_input("Ask away!")
+    tester.assert_state("state_survey_question")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.assessments.get_current_datetime")
+async def test_state_handle_assessment_reminder_response_1h(
+    get_current_datetime, tester: AppTester
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.user.metadata["assessment_reminder_name"] = "sexual_health_literacy"
+    tester.user.metadata["assessment_reminder_sent"] = ""
+    tester.user.metadata["assessment_reminder_type"] = "reengagement 30min"
+
+    tester.setup_state("state_handle_assessment_reminder_response")
+    await tester.user_input("Remind me in 1 hour")
+    tester.assert_state("state_generic_what_would_you_like_to_do")
+
+    assert tester.user.metadata == {
+        "assessment_reminder": "2022-06-19T17:30:00",
+        "assessment_reminder_hours": "1hour",
+        "assessment_reminder_name": "sexual_health_literacy",
+        "assessment_reminder_sent": "",
+        "assessment_reminder_type": "reengagement 1hour",
+    }
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.assessments.get_current_datetime")
+async def test_state_handle_assessment_reminder_response_23h(
+    get_current_datetime, tester: AppTester
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.user.metadata["assessment_reminder_name"] = "locus_of_control"
+    tester.user.metadata["assessment_reminder_sent"] = ""
+    tester.user.metadata["assessment_reminder_type"] = "later 1h"
+
+    tester.setup_state("state_handle_assessment_reminder_response")
+    await tester.user_input("Remind me tomorrow")
+    tester.assert_state("state_remind_tomorrow")
+
+    assert tester.user.metadata == {
+        "assessment_reminder": "2022-06-19T17:30:00",
+        "assessment_reminder_hours": "23hours",
+        "assessment_reminder_name": "locus_of_control",
+        "assessment_reminder_sent": "",
+        "assessment_reminder_type": "later 23hours",
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_handle_assessment_reminder_response_skip(tester: AppTester):
+    tester.user.metadata["assessment_reminder_name"] = "sexual_health_literacy"
+    tester.user.metadata["assessment_reminder_sent"] = ""
+    tester.user.metadata["assessment_reminder_type"] = "reengagement 30min"
+
+    tester.setup_state("state_handle_assessment_reminder_response")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="skip")
+    tester.assert_state("state_stop_assessment_reminders_confirm")
+    tester.assert_message(
+        "\n".join(
+            [
+                "Just a heads up, you'll get the best info for *YOU* if "
+                "you complete the questions first.",
+                "",
+                "*Are you sure you want to skip this step?*",
+            ]
+        )
+    )
+    await tester.user_input(content="Yes, skip it")
+    tester.assert_state("state_stop_assessment_reminders")
+    tester.assert_message(
+        "\n".join(
+            [
+                "Cool-cool.",
+                "",
+                "*What would you like to do now?*",
+            ]
+        )
+    )
+
+    assert tester.user.metadata == {
+        "" "assessment_reminder_hours": "",
+        "assessment_reminder_name": "",
+        "assessment_reminder_sent": "",
+        "assessment_reminder_type": "",
+        "sexual_health_lit_risk": "high_risk",
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_handle_assessment_reminder_response_skip_loc(tester: AppTester):
+    tester.user.metadata["assessment_reminder_name"] = "locus_of_control"
+    tester.user.metadata["assessment_reminder_sent"] = ""
+    tester.user.metadata["assessment_reminder_type"] = "reengagement 30min"
+
+    tester.setup_state("state_handle_assessment_reminder_response")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="skip")
+    tester.assert_state("state_stop_assessment_reminders_confirm")
+    tester.assert_message(
+        "\n".join(
+            [
+                "Please take note👆🏽 you can't access all parts of the "
+                "Bwise bot if you don't complete the questions first.",
+                "",
+                "You can still use the menu and ask questions, but I "
+                "can't give you a personalised journey.",
+                "",
+                "*Are you sure you want to skip?*",
+            ]
+        )
+    )
+    await tester.user_input(content="Yes, skip it")
+    tester.assert_state("state_stop_assessment_reminders")
+    tester.assert_message(
+        "\n".join(
+            [
+                "No problem.",
+                "",
+                "*What would you like to do now?*",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_handle_assessment_reminder_response_loc_tomorrow_again(
+    tester: AppTester,
+):
+    tester.user.metadata["assessment_reminder_name"] = "locus_of_control"
+    tester.user.metadata["assessment_reminder_sent"] = "True"
+    tester.user.metadata["assessment_reminder_type"] = "reengagement 30min"
+
+    tester.setup_state("state_handle_assessment_reminder_response")
+    await tester.user_input(
+        session=Message.SESSION_EVENT.NEW, content="Remind me tomorrow"
+    )
+    tester.assert_message("No problem! I'll remind you tomorrow")
+    tester.assert_state("state_remind_tomorrow")
