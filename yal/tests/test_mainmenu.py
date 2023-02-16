@@ -1677,7 +1677,7 @@ async def test_state_content_page_related(
                 "",
                 "Message test content 2",
                 "",
-                "1. Related Content 2",
+                "1. Related Content",
                 "",
                 "-----",
                 "*Or reply:*",
