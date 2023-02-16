@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, Iterable, List, Tuple
 from urllib.parse import urljoin
 
 import aiohttp
@@ -165,10 +165,12 @@ async def get_page_details(
                                 page_details["feature_redirects"].append(tag)
 
                     if response_body["related_pages"]:
-                        page_details["related_pages"] = {
-                            page["value"]: page["title"]
-                            for page in response_body["related_pages"]
-                        }
+                        # Get the content titles, because related_pages contains the
+                        # WhatsApp titles
+                        related_pages = await get_page_titles(
+                            [p["value"] for p in response_body["related_pages"]]
+                        )
+                        page_details["related_pages"] = related_pages
                     else:
                         # TODO: deprecate using tags for related content
                         related_pages = await find_related_pages(response_body["tags"])
@@ -199,17 +201,29 @@ async def get_page_details(
     return False, page_details
 
 
-async def find_related_pages(tags):
-    related_pages = {}
-    for tag in tags:
-        if tag.startswith("related_"):
-            page_id = tag.replace("related_", "")
-            error, related_choices = await get_choices_by_id(page_id)
-            if not error:
-                for choice in related_choices:
-                    related_pages[choice.value] = choice.label
+async def find_related_pages(tags: Iterable[str]) -> dict[int, str]:
+    def only_related_tags(tag: str):
+        return tag.startswith("related_")
 
-    return related_pages
+    def page_id_from_tag(tag: str):
+        return int(tag.replace("related_", ""))
+
+    page_ids = map(page_id_from_tag, filter(only_related_tags, tags))
+    return await get_page_titles(page_ids)
+
+
+async def get_page_titles(page_ids: Iterable[int]) -> dict[int, str]:
+    """
+    Given a list of page ids, return a dictionary of {id: title}
+    """
+    titles = {}
+
+    for page_id in page_ids:
+        _, choices = await get_choices_by_id(page_id)
+        for choice in choices:
+            titles[choice.value] = choice.label
+
+    return titles
 
 
 async def add_page_rating(user, page_id, helpful, comment=""):
