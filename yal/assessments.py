@@ -245,7 +245,7 @@ class Application(BaseApplication):
                 ]
             )
         )
-        # TODO: set the reminder type to later 1hour
+
         return WhatsAppButtonState(
             self,
             question=question,
@@ -306,7 +306,7 @@ class Application(BaseApplication):
                 ],
                 next={
                     "skip": "state_stop_assessment_reminders",
-                    "start": assessment_reminder_name,
+                    "start": f"state_{assessment_reminder_name}_assessment",
                 },
                 error=self._(get_generic_error()),
             )
@@ -329,7 +329,7 @@ class Application(BaseApplication):
                 ],
                 next={
                     "skip": "state_stop_assessment_reminders",
-                    "start": assessment_reminder_name,
+                    "start": f"state_{assessment_reminder_name}_assessment",
                 },
                 error=self._(get_generic_error()),
             )
