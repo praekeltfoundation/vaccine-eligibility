@@ -410,7 +410,11 @@ class Application(BaseApplication):
         assessment_reminder_hours = self.user.metadata["assessment_reminder_hours"]
         assessment_reminder_type = self.user.metadata["assessment_reminder_type"]
 
-        if assessment_reminder_sent and assessment_name == "locus_of_control":
+        if (
+            assessment_reminder_sent
+            and assessment_name == "locus_of_control"
+            and assessment_reminder_hours == "23hours"
+        ):
             data = {
                 "assessment_reminder_sent": "",  # Reset the field
                 "assessment_reminder": get_current_datetime().isoformat(),
