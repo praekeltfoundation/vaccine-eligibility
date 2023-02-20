@@ -104,6 +104,13 @@
 | state_self_perceived_healthcare_score | FALSE | Text |  TRUE  |  Save self perceived healthcare score to flow results |
 | state_sexual_health_lit_risk | TRUE | Text | TRUE | Sexual health literacy risk |
 | state_sexual_health_lit_score | TRUE | Number | TRUE | Score from sexual health literacy assessment |
+| state_locus_of_control_assessment_later |  |  |  | Update name of the locus_of_control assessment to the metadata |
+| state_sexual_health_literacy_assessment_later |  |  |  | Update name of the sexual_health_literacy assessment to the metadata |
+| state_depression_and_anxiety_assessment_later |  |  |  | Update name of the depression_and_anxiety assessment to the metadata |
+| state_connectedness_assessment_later |  |  |  | Update name of the connectedness assessment to the metadata |
+| state_gender_attitude_assessment_later |  |  |  | Update name of the gender_attitude assessment to the metadata |
+| state_body_image_assessment_later |  |  |  | Update name of the body_image assessment to the metadata |
+| state_self_perceived_healthcare_assessment_later |  |  |  | Update name of the self_perceived_healthcare assessment to the metadata |
 | state_source_tracking | TRUE | Text | TRUE | The trigger keyword that was used |
 | state_generic_what_would_you_like_to_do | TRUE | Text | TRUE | state that asks the user what they would like to do, go to main menu, aaq or update settings |
 
