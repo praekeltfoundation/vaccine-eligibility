@@ -209,13 +209,18 @@ class Application(BaseApplication):
             self.save_metadata("assessment_question_nr", 1)
             self.delete_metadata("assessment_question")
             # clear assessment reminder info
-            data = {
-                "assessment_reminder": "",
-                "assessment_reminder_type": "",
-            }
-            error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
-            if error:
-                return await self.go_to_state("state_error")
+            if self.user.metadata.get("assessment_reminder") or self.user.metadata.get(
+                "assessment_reminder_type"
+            ):
+                data = {
+                    "assessment_reminder": "",
+                    "assessment_reminder_type": "",
+                }
+                error = await rapidpro.update_profile(
+                    whatsapp_id, data, self.user.metadata
+                )
+                if error:
+                    return await self.go_to_state("state_error")
 
         if question.get("scoring"):
             scoring = question["scoring"]
