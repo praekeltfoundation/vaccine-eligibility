@@ -69,6 +69,8 @@ ASSESSMENT_REENGAGEMENT_KEYWORDS = {
     "start the questions",
     "remind me in 1 hour",
     "not interested",
+    "skip",
+    "remind me tomorrow",
 }
 CALLBACK_CHECK_KEYWORDS = {"callback"}
 FEEDBACK_KEYWORDS = {"feedback"}
