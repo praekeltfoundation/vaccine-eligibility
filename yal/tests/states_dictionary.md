@@ -233,6 +233,11 @@
 | state_assessment_later_submit              |        FALSE       |              |            TRUE          | Submits assessment_reminder and assessment_name as contact fields for a later reminder to complete assessment |
 | state_assessment_later                     |        TRUE        |     Text     |            TRUE          | Thanks user and asks the user if they'd like to go to the main menu |
 | state_sexual_health_literacy_send_risk_message |    TRUE        |     Text     |            TRUE          | Sends the user a message based on their risk score, takes in "yes" and "no" |
+| state_handle_assessment_reminder_response |    FALSE        |          |                      | Handles the response to the assessment reminders |
+| state_stop_assessment_reminders_confirm |    TRUE        |     Text     |   TRUE    | Confirms that the user no longer wants assessment reminders |
+| state_stop_assessment_reminders |    TRUE        |     Text     |   TRUE    |  Sets the user to no longer get assessment reminders, asks user if they would like to go to menu or aaq |
+| state_reschedule_assessment_reminder |    |    |    | Schedules the assessment reminders |
+| state_remind_tomorrow |    TRUE        |     Text     |   TRUE    | Lets the user know we will remind them tomorrow, asks the user if they would like to go to the mainmenu |
 
 
 ### Service finder flow

@@ -62,6 +62,14 @@ ONBOARDING_REMINDER_KEYWORDS = {
     "remind me later",
     "not interested",
 }
+ASSESSMENT_REENGAGEMENT_KEYWORDS = {
+    "continue now",
+    "lets do it",
+    "ask away",
+    "start the questions",
+    "remind me in 1 hour",
+    "not interested",
+}
 CALLBACK_CHECK_KEYWORDS = {"callback"}
 FEEDBACK_KEYWORDS = {"feedback"}
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
@@ -152,6 +160,11 @@ class Application(
             if self.user.metadata.get("onboarding_reminder_sent"):
                 self.user.session_id = None
                 self.state_name = OnboardingApplication.REMINDER_STATE
+
+        if keyword in ASSESSMENT_REENGAGEMENT_KEYWORDS:
+            if self.user.metadata.get("assessment_reminder_sent"):
+                self.user.session_id = None
+                self.state_name = AssessmentApplication.REMINDER_STATE
 
         # Fields that RapidPro sets after a feedback push message
         feedback_state = await self.get_feedback_state()

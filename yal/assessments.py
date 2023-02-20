@@ -1,5 +1,4 @@
 import asyncio
-from datetime import timedelta
 
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
@@ -9,7 +8,8 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
-from yal import rapidpro
+from yal import rapidpro, utils
+from yal.askaquestion import Application as AAQApplication
 from yal.assessment_data.A1_sexual_health_literacy import (
     ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS,
 )
@@ -34,7 +34,6 @@ from yal.assessment_data.A7_self_perceived_healthcare import (
 from yal.assessment_data.A8_self_esteem import (
     ASSESSMENT_QUESTIONS as SELF_ESTEEM_QUESTIONS,
 )
-from yal.mainmenu import Application as MainMenuApplication
 from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
 QUESTIONS = {
@@ -52,6 +51,7 @@ QUESTIONS = {
 class Application(BaseApplication):
     START_STATE = "state_survey_start"
     LATER_STATE = "state_assessment_later_submit"
+    REMINDER_STATE = "state_handle_assessment_reminder_response"
 
     async def state_survey_start(self):
         self.delete_metadata("assessment_section")
@@ -66,6 +66,19 @@ class Application(BaseApplication):
         section = str(metadata.get("assessment_section", "1"))
 
         assessment_name = metadata.get("assessment_name", "locus_of_control")
+
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "assessment_reminder": get_current_datetime().isoformat(),
+            "assessment_reminder_name": assessment_name,
+            "assessment_reminder_type": "reengagement 30min",
+        }
+
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
         questions = QUESTIONS[assessment_name]
 
         if section not in questions:
@@ -165,6 +178,17 @@ class Application(BaseApplication):
         questions = QUESTIONS[assessment_name]
         question = questions[str(section)]["questions"][current_question]
 
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "assessment_reminder": get_current_datetime().isoformat(),
+            "assessment_reminder_name": assessment_name,
+            "assessment_reminder_type": "reengagement 30min",
+        }
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
         next = None
 
         if question["next"]:
@@ -197,12 +221,12 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        reminder_time = get_current_datetime() + timedelta(hours=23)
         assessment_name = self.user.metadata.get("assessment_name", "locus_of_control")
 
         data = {
-            "assessment_reminder": reminder_time.isoformat(),
+            "assessment_reminder": get_current_datetime().isoformat(),
             "assessment_reminder_name": assessment_name,
+            "assessment_reminder_type": "later 1hour",
         }
 
         await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
@@ -214,17 +238,210 @@ class Application(BaseApplication):
                 [
                     "[persona_emoji] No worries, we get it!",
                     "",
-                    "I'll send you a reminder message tomorrow, so you can come back "
-                    "and continue with these questions, then.",
+                    "I'll send you a reminder message in 1 hour, so you can come back "
+                    "and answer these questions.",
                     "",
                     "Check you later 🤙🏾",
                 ]
             )
         )
+
         return WhatsAppButtonState(
             self,
             question=question,
             choices=[Choice("menu", "Go to main menu")],
             error=get_generic_error(),
-            next=MainMenuApplication.START_STATE,
+            next="state_pre_mainmenu",
+        )
+
+    async def state_handle_assessment_reminder_response(self):
+        inbound = utils.clean_inbound(self.inbound.content)
+        if inbound in ["continue now", "lets do it", "ask away", "start the questions"]:
+            msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+            whatsapp_id = msisdn.lstrip(" + ")
+            data = {
+                "assessment_reminder_sent": "",  # Reset the field
+            }
+
+            error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+            if error:
+                return await self.go_to_state("state_error")
+            return await self.go_to_state(
+                f"state_{self.user.metadata['assessment_reminder_name']}_assessment"
+            )
+
+        if inbound == "skip":
+            return await self.go_to_state("state_stop_assessment_reminders_confirm")
+
+        if inbound == "remind me in 1 hour":
+            self.save_metadata("assessment_reminder_hours", "1hour")
+            return await self.go_to_state("state_reschedule_assessment_reminder")
+
+        if inbound == "remind me tomorrow":
+            self.save_metadata("assessment_reminder_hours", "23hours")
+            return await self.go_to_state("state_reschedule_assessment_reminder")
+
+    async def state_stop_assessment_reminders_confirm(self):
+        assessment_reminder_name = self.user.metadata["assessment_reminder_name"]
+
+        if assessment_reminder_name == "locus_of_control":
+            return WhatsAppButtonState(
+                self,
+                question=self._(
+                    "\n".join(
+                        [
+                            "Please take note👆🏽 you can't access all parts of the "
+                            "Bwise bot if you don't complete the questions first.",
+                            "",
+                            "You can still use the menu and ask questions, but I "
+                            "can't give you a personalised journey.",
+                            "",
+                            "*Are you sure you want to skip?*",
+                        ]
+                    )
+                ),
+                choices=[
+                    Choice("skip", self._("Yes, skip it")),
+                    Choice("start", self._("Start questions")),
+                ],
+                next={
+                    "skip": "state_stop_assessment_reminders",
+                    "start": f"state_{assessment_reminder_name}_assessment",
+                },
+                error=self._(get_generic_error()),
+            )
+        else:
+            return WhatsAppButtonState(
+                self,
+                question=self._(
+                    "\n".join(
+                        [
+                            "Just a heads up, you'll get the best info for *YOU* if "
+                            "you complete the questions first.",
+                            "",
+                            "*Are you sure you want to skip this step?*",
+                        ]
+                    )
+                ),
+                choices=[
+                    Choice("skip", self._("Yes, skip it")),
+                    Choice("start", self._("Start questions")),
+                ],
+                next={
+                    "skip": "state_stop_assessment_reminders",
+                    "start": f"state_{assessment_reminder_name}_assessment",
+                },
+                error=self._(get_generic_error()),
+            )
+
+    async def state_stop_assessment_reminders(self):
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        assessment_name = self.user.metadata["assessment_reminder_name"]
+        assessment_risk = (
+            f"{assessment_name}_risk"
+            if assessment_name != "sexual_health_literacy"
+            else "sexual_health_lit_risk"
+        )
+        data = {
+            "assessment_reminder_hours": "",
+            "assessment_reminder_name": "",
+            "assessment_reminder_sent": "",
+            "assessment_reminder_type": "",
+            assessment_risk: "high_risk",
+        }  # Reset the fields
+
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
+        if assessment_name != "locus_of_control":
+            return WhatsAppButtonState(
+                self,
+                question=self._(
+                    "\n".join(
+                        [
+                            "Cool-cool.",
+                            "",
+                            "*What would you like to do now?*",
+                        ]
+                    )
+                ),
+                choices=[
+                    Choice("menu", self._("Go to the menu")),
+                    Choice("aaq", self._("Ask a question")),
+                ],
+                next={
+                    "menu": "state_pre_mainmenu",
+                    "aaq": AAQApplication.START_STATE,
+                },
+                error=self._(get_generic_error()),
+            )
+        else:
+            # TODO: set push notification to no
+            return WhatsAppButtonState(
+                self,
+                question=self._(
+                    "\n".join(
+                        [
+                            "No problem.",
+                            "",
+                            "*What would you like to do now?*",
+                        ]
+                    )
+                ),
+                choices=[
+                    Choice("menu", self._("Go to the menu")),
+                    Choice("aaq", self._("Ask a question")),
+                ],
+                next={
+                    "menu": "state_pre_mainmenu",
+                    "aaq": AAQApplication.START_STATE,
+                },
+                error=self._(get_generic_error()),
+            )
+
+    async def state_reschedule_assessment_reminder(self):
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        assessment_reminder_sent = self.user.metadata["assessment_reminder_sent"]
+
+        assessment_name = self.user.metadata["assessment_reminder_name"]
+        assessment_reminder_hours = self.user.metadata["assessment_reminder_hours"]
+        assessment_reminder_type = self.user.metadata["assessment_reminder_type"]
+
+        if assessment_reminder_sent and assessment_name == "locus_of_control":
+            data = {
+                "assessment_reminder_sent": "",  # Reset the field
+                "assessment_reminder": get_current_datetime().isoformat(),
+                "assessment_reminder_type": f"later_2 {assessment_reminder_hours}",
+            }
+        elif "reengagement" in assessment_reminder_type:
+            data = {
+                "assessment_reminder_sent": "",  # Reset the field
+                "assessment_reminder": get_current_datetime().isoformat(),
+                # only the reengagement flow allows the user to be reminded in 1h
+                "assessment_reminder_type": f"reengagement {assessment_reminder_hours}",
+            }
+        else:
+            data = {
+                "assessment_reminder_sent": "",  # Reset the field
+                "assessment_reminder": get_current_datetime().isoformat(),
+                "assessment_reminder_type": f"later {assessment_reminder_hours}",
+            }
+
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+        if assessment_reminder_hours in ["23hours"]:
+            return await self.go_to_state("state_remind_tomorrow")
+        return await self.go_to_state("state_generic_what_would_you_like_to_do")
+
+    async def state_remind_tomorrow(self):
+        return WhatsAppButtonState(
+            self,
+            question=self._("No problem! I'll remind you tomorrow"),
+            choices=[Choice("menu", "Go to main menu")],
+            next="state_pre_mainmenu",
+            error=self._(get_generic_error()),
         )
