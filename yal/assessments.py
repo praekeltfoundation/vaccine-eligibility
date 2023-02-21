@@ -34,6 +34,7 @@ from yal.assessment_data.A7_self_perceived_healthcare import (
 from yal.assessment_data.A8_self_esteem import (
     ASSESSMENT_QUESTIONS as SELF_ESTEEM_QUESTIONS,
 )
+from yal.assessment_data.reengagement import REENGAGEMENT
 from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
 QUESTIONS = {
@@ -207,6 +208,19 @@ class Application(BaseApplication):
             self.save_metadata("assessment_section", section + 1)
             self.save_metadata("assessment_question_nr", 1)
             self.delete_metadata("assessment_question")
+            # clear assessment reminder info
+            if self.user.metadata.get("assessment_reminder") or self.user.metadata.get(
+                "assessment_reminder_type"
+            ):
+                data = {
+                    "assessment_reminder": "",
+                    "assessment_reminder_type": "",
+                }
+                error = await rapidpro.update_profile(
+                    whatsapp_id, data, self.user.metadata
+                )
+                if error:
+                    return await self.go_to_state("state_error")
 
         if question.get("scoring"):
             scoring = question["scoring"]
@@ -262,13 +276,16 @@ class Application(BaseApplication):
             data = {
                 "assessment_reminder_sent": "",  # Reset the field
             }
+            assessment_name = self.user.metadata["assessment_reminder_name"]
+            # send reengagement message
+            if REENGAGEMENT.get(assessment_name):
+                await self.publish_message(REENGAGEMENT.get(assessment_name))
+                await asyncio.sleep(0.5)
 
             error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
             if error:
                 return await self.go_to_state("state_error")
-            return await self.go_to_state(
-                f"state_{self.user.metadata['assessment_reminder_name']}_assessment"
-            )
+            return await self.go_to_state(f"state_{assessment_name}_assessment")
 
         if inbound == "skip":
             return await self.go_to_state("state_stop_assessment_reminders_confirm")
@@ -410,7 +427,11 @@ class Application(BaseApplication):
         assessment_reminder_hours = self.user.metadata["assessment_reminder_hours"]
         assessment_reminder_type = self.user.metadata["assessment_reminder_type"]
 
-        if assessment_reminder_sent and assessment_name == "locus_of_control":
+        if (
+            assessment_reminder_sent
+            and assessment_name == "locus_of_control"
+            and assessment_reminder_hours == "23hours"
+        ):
             data = {
                 "assessment_reminder_sent": "",  # Reset the field
                 "assessment_reminder": get_current_datetime().isoformat(),

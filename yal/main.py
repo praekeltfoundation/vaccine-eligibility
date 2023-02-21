@@ -264,6 +264,10 @@ class Application(
         )
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
+    async def state_locus_of_control_assessment_later(self):
+        self.save_metadata("assessment_name", "locus_of_control")
+        return await self.go_to_state("state_assessment_later_submit")
+
     async def state_sexual_health_literacy_assessment(self):
         self.save_metadata("assessment_name", "sexual_health_literacy")
         self.save_metadata(
@@ -349,6 +353,10 @@ class Application(
             await asyncio.sleep(0.5)
         return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
+    async def state_sexual_health_literacy_assessment_later(self):
+        self.save_metadata("assessment_name", "sexual_health_literacy")
+        return await self.go_to_state("state_assessment_later_submit")
+
     async def state_depression_and_anxiety_assessment(self):
         self.save_metadata("assessment_name", "depression_and_anxiety")
         self.save_metadata(
@@ -412,6 +420,10 @@ class Application(
             await self.publish_message(message)
             await asyncio.sleep(0.5)
         return await self.go_to_state("state_generic_what_would_you_like_to_do")
+
+    async def state_depression_and_anxiety_assessment_later(self):
+        self.save_metadata("assessment_name", "depression_and_anxiety")
+        return await self.go_to_state("state_assessment_later_submit")
 
     async def state_connectedness_assessment(self):
         self.save_metadata("assessment_name", "connectedness")
@@ -486,6 +498,10 @@ class Application(
             await self.publish_message(message)
             await asyncio.sleep(0.5)
         return await self.go_to_state("state_generic_what_would_you_like_to_do")
+
+    async def state_connectedness_assessment_later(self):
+        self.save_metadata("assessment_name", "connectedness")
+        return await self.go_to_state("state_assessment_later_submit")
 
     async def state_gender_attitude_assessment(self):
         self.save_metadata("assessment_name", "gender_attitude")
@@ -577,6 +593,10 @@ class Application(
             await self.publish_message(message)
             await asyncio.sleep(0.5)
         return await self.go_to_state("state_generic_what_would_you_like_to_do")
+
+    async def state_gender_attitude_assessment_later(self):
+        self.save_metadata("assessment_name", "gender_attitude")
+        return await self.go_to_state("state_assessment_later_submit")
 
     async def state_body_image_assessment(self):
         self.save_metadata("assessment_name", "body_image")
@@ -670,6 +690,10 @@ class Application(
         await asyncio.sleep(0.5)
         return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
+    async def state_body_image_assessment_later(self):
+        self.save_metadata("assessment_name", "body_image")
+        return await self.go_to_state("state_assessment_later_submit")
+
     async def state_self_perceived_healthcare_assessment(self):
         self.save_metadata("assessment_name", "self_perceived_healthcare")
         self.save_metadata(
@@ -714,6 +738,10 @@ class Application(
         await self.publish_message(msg)
         await asyncio.sleep(0.5)
         return await self.go_to_state("state_generic_what_would_you_like_to_do")
+
+    async def state_self_perceived_healthcare_assessment_later(self):
+        self.save_metadata("assessment_name", "self_perceived_healthcare")
+        return await self.go_to_state("state_assessment_later_submit")
 
     async def state_generic_what_would_you_like_to_do(self):
         choices = [
