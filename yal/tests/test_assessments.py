@@ -309,7 +309,6 @@ async def test_state_handle_assessment_reminder_response_skip(tester: AppTester)
     )
 
     assert tester.user.metadata == {
-        "" "assessment_reminder_hours": "",
         "assessment_reminder_name": "",
         "assessment_reminder_sent": "",
         "assessment_reminder_type": "",
