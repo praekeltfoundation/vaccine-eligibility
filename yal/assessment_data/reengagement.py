@@ -8,7 +8,7 @@ REENGAGEMENT = {
     "sexual_health_literacy": "",
     "depression_and_anxiety": "",
     "connectedness": "",
-    "gender_attitudes": "\n".join(
+    "gender_attitude": "\n".join(
         [
             "[persona_emoji] Let me know how you feel about these next few statements.",
             "",
