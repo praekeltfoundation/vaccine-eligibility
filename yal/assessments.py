@@ -361,7 +361,6 @@ class Application(BaseApplication):
             else "sexual_health_lit_risk"
         )
         data = {
-            "assessment_reminder_hours": "",
             "assessment_reminder_name": "",
             "assessment_reminder_sent": "",
             "assessment_reminder_type": "",
