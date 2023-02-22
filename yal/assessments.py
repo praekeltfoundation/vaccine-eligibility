@@ -179,17 +179,6 @@ class Application(BaseApplication):
         questions = QUESTIONS[assessment_name]
         question = questions[str(section)]["questions"][current_question]
 
-        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
-        data = {
-            "assessment_reminder": get_current_datetime().isoformat(),
-            "assessment_reminder_name": assessment_name,
-            "assessment_reminder_type": "reengagement 30min",
-        }
-        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
-        if error:
-            return await self.go_to_state("state_error")
-
         next = None
 
         if question["next"]:
@@ -205,6 +194,8 @@ class Application(BaseApplication):
             if question_type != "info":
                 self.save_metadata("assessment_question_nr", question_number + 1)
         else:
+            msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+            whatsapp_id = msisdn.lstrip(" + ")
             self.save_metadata("assessment_section", section + 1)
             self.save_metadata("assessment_question_nr", 1)
             self.delete_metadata("assessment_question")
