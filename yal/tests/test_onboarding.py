@@ -55,10 +55,12 @@ async def rapidpro_mock():
         return response.json(
             {
                 "key": "second_phase2_send",
-			    "label": "second phase2 send",
-			    "value_type": "text",
-			    "pinned": False
-            }, status=200)    
+                "label": "second phase2 send",
+                "value_type": "text",
+                "pinned": False,
+            },
+            status=200,
+        )
 
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL

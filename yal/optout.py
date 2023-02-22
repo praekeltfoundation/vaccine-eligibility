@@ -177,33 +177,26 @@ class Application(BaseApplication):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        data = {
-            "onboarding_completed": "",
-            "opted_out": "TRUE",
+        rp_fields = await rapidpro.get_instance_fields()
+        rp_field_keys = [rp_field["key"] for rp_field in rp_fields]
+        rp_field_keys_set = set(rp_field_keys)
+        fields_to_update_and_retain = {
+            "opted_out": "True",
             "opted_out_timestamp": get_current_datetime().isoformat(),
-            "age": "",
-            "suggested_text": "",
-            "terms_accepted": "",
-            "engaged_on_facebook": "",
-            "dob_month": "",
-            "dob_day": "",
-            "dob_year": "",
-            "relationship_status": "",
-            "gender": "",
-            "province": "",
-            "suburb": "",
-            "street_name": "",
-            "street_number": "",
-            "longitude": "",
-            "latitude": "",
-            "location_description": "",
-            "persona_name": "",
-            "persona_emoji": "",
-            "emergency_contact": "",
-        } | self.reminders_to_be_cleared
+            "push_message_opt_in": "False",
+        }
+
+        for key in fields_to_update_and_retain:
+            rp_field_keys_set.discard(key)
+
+        update_rp_fields_dict = dict.fromkeys(rp_field_keys_set, "")
+        combined_update_dict = fields_to_update_and_retain | update_rp_fields_dict
+
         old_details = self._get_user_details(self.user.metadata)
 
-        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        error = await rapidpro.update_profile(
+            whatsapp_id, combined_update_dict, self.user.metadata
+        )
         if error:
             return await self.go_to_state("state_error")
 
@@ -309,4 +302,3 @@ class Application(BaseApplication):
             "gender": f"{gender}",
         }
         return result
-   

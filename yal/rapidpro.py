@@ -14,7 +14,7 @@ def get_rapidpro_api():
     return aiohttp.ClientSession(
         timeout=aiohttp.ClientTimeout(total=5),
         headers={
-            "Authorization": f"Token {config.RAPIDPRO_TOKEN_TEMP}",
+            "Authorization": f"Token {config.RAPIDPRO_TOKEN}",
             "Content-Type": "application/json",
             "User-Agent": "mqr-baseline-study-ussd",
         },
@@ -107,19 +107,19 @@ async def start_flow(whatsapp_id, flow_uuid):
                     continue
     return False
 
+
 async def get_instance_fields():
     async with get_rapidpro_api() as session:
         for i in range(3):
             try:
                 response = await session.get(
-                    urljoin(config.RAPIDPRO_URL_TEMP, "/api/v2/fields.json"),
+                    urljoin(config.RAPIDPRO_URL, "/api/v2/fields.json"),
                 )
                 response.raise_for_status()
                 response_body = await response.json()
 
                 if len(response_body["results"]) > 0:
                     fields = response_body["results"]
-                    #print(fields)
                 break
             except HTTP_EXCEPTIONS as e:
                 if i == 2:
@@ -128,39 +128,3 @@ async def get_instance_fields():
                 else:
                     continue
     return fields
-
-
-def get_field_keys(instance_fields):
-    fields = instance_fields
-    keys = [field["key"] for field in fields]
-    return keys    
-
-def get_field_keys_and_types(instance_fields):
-    fields = instance_fields['results']
-    keys_and_types = {}
-    for field in fields:
-        keys_and_types.update({field["key"]: field["value_type"]})
-    return keys_and_types  
-
-def _get_fields_to_leave_unchanged():    
-    fields_to_leave_unchanged = ["key1", "key2"]
-    return fields_to_leave_unchanged
-
-def _get_fields_to_update_and_retain():
-    fields_to_update_and_retain = {
-        "opted_out": "True",
-        "opted_out_timestamp": get_current_datetime().isoformat(),
-        "push_message_opt_in": "False",
-        
-    }
-    return fields_to_update_and_retain 
-
-
-def _prepare_fields_to_clear():
-    optout_payload = {}
-    fields_to_update_and_retain = _get_fields_to_update_and_retain()
-    fields_to_leave_unchanged = _get_fields_to_leave_unchanged()
-    return optout_payload
-
-
-   
