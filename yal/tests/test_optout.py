@@ -11,7 +11,7 @@ from sanic import Sanic, response
 
 # from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
-from yal import config, rapidpro
+from yal import config
 from yal.main import Application
 from yal.utils import get_current_datetime
 
@@ -711,43 +711,41 @@ async def test_state_optout_delete_saved(
         "/api/v2/contacts.json",
     ]
     assert expected_paths == [r.path for r in rapidpro_mock.tstate.requests]
-
     post_request = rapidpro_mock.tstate.requests[2]
-    # assert json.loads(post_request.body.decode("utf-8")) == {
-    #    "fields": {
-    #        "onboarding_completed": "",
-    #        "opted_out": "TRUE",
-    #        "opted_out_timestamp": "2022-06-19T17:30:00",
-    #        "age": "",
-    #        "suggested_text": "",
-    #        "terms_accepted": "",
-    #        "engaged_on_facebook": "",
-    #        "dob_year": "",
-    #        "dob_month": "",
-    #        "dob_day": "",
-    #        "relationship_status": "",
-    #        "gender": "",
-    #        "province": "",
-    #        "suburb": "",
-    #        "street_name": "",
-    #        "street_number": "",
-    #        "last_main_time": "",
-    #        "last_mainmenu_time": "",
-    #        "last_onboarding_time": "",
-    #        "callback_check_time": "",
-    #        "feedback_timestamp": "",
-    #        "feedback_timestamp_2": "",
-    #        "feedback_type": "",
-    #        "push_message_opt_in": "False",
-    #        "longitude": "",
-    #        "latitude": "",
-    #        "location_description": "",
-    #        "persona_name": "",
-    #        "persona_emoji": "",
-    #        "emergency_contact": "",
-    #    },
-    # }
-
+    assert json.loads(post_request.body.decode("utf-8")) == {
+        "fields": {
+            "onboarding_completed": "",
+            "opted_out": "TRUE",
+            "opted_out_timestamp": "2022-06-19T17:30:00",
+            "age": "",
+            "suggested_text": "",
+            "terms_accepted": "",
+            "engaged_on_facebook": "",
+            "dob_year": "",
+            "dob_month": "",
+            "dob_day": "",
+            "relationship_status": "",
+            "gender": "",
+            "province": "",
+            "suburb": "",
+            "street_name": "",
+            "street_number": "",
+            "last_main_time": "",
+            "last_mainmenu_time": "",
+            "last_onboarding_time": "",
+            "callback_check_time": "",
+            "feedback_timestamp": "",
+            "feedback_timestamp_2": "",
+            "feedback_type": "",
+            "push_message_opt_in": "False",
+            "longitude": "",
+            "latitude": "",
+            "location_description": "",
+            "persona_name": "",
+            "persona_emoji": "",
+            "emergency_contact": "",
+        },
+    }
     tester.assert_message(
         "\n".join(
             [
