@@ -653,5 +653,5 @@ class Application(BaseApplication):
         self.save_metadata("current_message_id", 1)
         self.save_metadata("is_suggested_page", False)
         self.save_metadata("suggested_content", {})
-
+        self.save_metadata("current_menu_level", 0)
         return await self.go_to_state("state_contentrepo_page")

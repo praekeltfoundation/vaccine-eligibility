@@ -478,7 +478,8 @@ async def test_push_message_buttons_to_display_page(
     then we should take them there
     """
     rapidpro_mock.tstate.contact_fields["push_related_page_id"] = "444"
-
+    # Set the current_menu_level to 5 so we can test that it gets reset to 1
+    tester.user.metadata["current_menu_level"] = 5
     await tester.user_input(
         "test",
         transport_metadata={
@@ -504,6 +505,7 @@ async def test_push_message_buttons_to_display_page(
         )
     )
     tester.assert_metadata("topics_viewed", ["123"])
+    tester.assert_metadata("current_menu_level", 1)
     assert len(rapidpro_mock.tstate.requests) == 4
     assert len(contentrepo_api_mock.tstate.requests) == 2
 
