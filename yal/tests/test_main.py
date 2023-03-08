@@ -523,9 +523,7 @@ async def test_push_message_page_id_buttons_display_page(
     tester.user.metadata["current_menu_level"] = 5
     await tester.user_input(
         "test",
-        transport_metadata={
-            "message": {"button": {"payload": "page_id_444"}}
-        },
+        transport_metadata={"message": {"button": {"payload": "page_id_444"}}},
     )
 
     tester.assert_state("state_display_page")
