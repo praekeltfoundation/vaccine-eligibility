@@ -111,3 +111,14 @@ def test_get_current_datetime_qa_override():
     assert utils.get_current_datetime() != datetime(2022, 3, 4, 5, 6, 7)
     config.QA_OVERRIDE_CURRENT_TIMESTAMP = "2022-03-04T05:06:07"
     assert utils.get_current_datetime() == datetime(2022, 3, 4, 5, 6, 7)
+
+
+def test_is_integer():
+    obj = "1234"
+    assert utils.is_integer(obj)
+
+    obj = "string"
+    assert not utils.is_integer(obj)
+
+    obj = 1234
+    assert utils.is_integer(obj)
