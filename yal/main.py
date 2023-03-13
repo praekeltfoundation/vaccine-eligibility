@@ -64,7 +64,7 @@ ONBOARDING_REMINDER_KEYWORDS = {
 }
 ASSESSMENT_REENGAGEMENT_KEYWORDS = {
     "continue now",
-    "lets do it",
+    "let s do it",
     "ask away",
     "start the questions",
     "remind me in 1 hour",

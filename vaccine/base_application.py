@@ -71,6 +71,7 @@ class BaseApplication:
                 self.state_name = self.START_STATE
                 self.user.answers = {}
                 self.user.session_id = None
+                self.user.metadata = {}
             state = await self.get_current_state()
             if (
                 message.session_event == Message.SESSION_EVENT.NEW
