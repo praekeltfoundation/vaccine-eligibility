@@ -128,3 +128,11 @@ def get_by_path(obj: Optional[dict], *path: str, default_value: Any = None) -> A
     if not isinstance(obj, dict) or path[0] not in obj:
         return default_value
     return get_by_path(obj[path[0]], *(path[1:]), default_value=default_value)
+
+
+def is_integer(string: str) -> bool:
+    try:
+        int(string)
+        return True
+    except ValueError:
+        return False

@@ -22,6 +22,7 @@ from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import (
     get_current_datetime,
     get_generic_error,
+    is_integer,
     normalise_phonenumber,
     replace_persona_fields,
 )
@@ -180,9 +181,14 @@ class Application(
         payload = utils.get_by_path(
             message.transport_metadata, "message", "button", "payload"
         )
-        if payload and payload.startswith("state_") and payload in dir(self):
-            self.user.session_id = None
-            self.state_name = payload
+        if payload:
+            if payload.startswith("state_") and payload in dir(self):
+                self.user.session_id = None
+                self.state_name = payload
+            elif payload.startswith("page_id_") and is_integer(payload.split("_")[-1]):
+                self.user.session_id = None
+                self.save_metadata("push_related_page_id", payload.split("_")[-1])
+                self.state_name = "state_prep_push_msg_related_page"
 
         return await super().process_message(message)
 

@@ -511,6 +511,45 @@ async def test_push_message_buttons_to_display_page(
 
 
 @pytest.mark.asyncio
+async def test_push_message_page_id_buttons_display_page(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    """
+    If there's a button payload that indicates the user should be shown a content page
+    then we should take them there
+    """
+    rapidpro_mock.tstate.contact_fields["push_related_page_id"] = "444"
+    # Set the current_menu_level to 5 so we can test that it gets reset to 1
+    tester.user.metadata["current_menu_level"] = 5
+    await tester.user_input(
+        "test",
+        transport_metadata={"message": {"button": {"payload": "page_id_444"}}},
+    )
+
+    tester.assert_state("state_display_page")
+    tester.assert_num_messages(1)
+    tester.assert_message(
+        "\n".join(
+            [
+                "Main Menu / Content Page 444",
+                "-----",
+                "",
+                "Content for page 444",
+                "",
+                "-----",
+                "*Or reply:*",
+                "0. 🏠 Back to Main *MENU*",
+                "#. 🆘Get *HELP*",
+            ]
+        )
+    )
+    tester.assert_metadata("topics_viewed", ["123"])
+    tester.assert_metadata("current_menu_level", 1)
+    assert len(rapidpro_mock.tstate.requests) == 4
+    assert len(contentrepo_api_mock.tstate.requests) == 2
+
+
+@pytest.mark.asyncio
 async def test_callback_check_response_to_handler(tester: AppTester):
     await tester.user_input(session=Message.SESSION_EVENT.NEW, content="callback")
     tester.assert_state("state_handle_callback_check_response")
