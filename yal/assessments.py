@@ -55,7 +55,7 @@ class Application(BaseApplication):
     REMINDER_STATE = "state_handle_assessment_reminder_response"
 
     def clean_name(self, name):
-        return name.replace("state_", "").replace("_assessment", "")
+        return name.removeprefix("state_").removesuffix("_assessment")
 
     async def state_survey_start(self):
         self.delete_metadata("assessment_section")

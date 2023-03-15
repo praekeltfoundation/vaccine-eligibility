@@ -380,3 +380,13 @@ async def test_state_handle_assessment_reminder_response_loc_tomorrow_again(
     )
     tester.assert_message("No problem! I'll remind you tomorrow")
     tester.assert_state("state_remind_tomorrow")
+
+
+def test_clean_name(tester: AppTester):
+    """
+    Should return the assessment name without the 'state_' or '_assessment'
+    """
+    assert (
+        tester.application.clean_name("state_mental_health_assessment")
+        == "mental_health"
+    )
