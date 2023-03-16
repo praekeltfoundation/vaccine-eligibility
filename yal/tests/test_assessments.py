@@ -387,6 +387,6 @@ def test_clean_name(tester: AppTester):
     Should return the assessment name without the 'state_' or '_assessment'
     """
     assert (
-        tester.application.clean_name("state_mental_health_assessment")
+        tester.application.clean_name("state_mental_health_assessment")  # type: ignore
         == "mental_health"
-    )  # nomypy
+    )
