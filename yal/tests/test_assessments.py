@@ -389,4 +389,4 @@ def test_clean_name(tester: AppTester):
     assert (
         tester.application.clean_name("state_mental_health_assessment")
         == "mental_health"
-    ) # nomypy
+    )  # nomypy
