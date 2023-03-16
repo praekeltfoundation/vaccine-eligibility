@@ -54,6 +54,9 @@ class Application(BaseApplication):
     LATER_STATE = "state_assessment_later_submit"
     REMINDER_STATE = "state_handle_assessment_reminder_response"
 
+    def clean_name(self, name):
+        return name.removeprefix("state_").removesuffix("_assessment")
+
     async def state_survey_start(self):
         self.delete_metadata("assessment_section")
         self.delete_metadata("assessment_question")
@@ -66,7 +69,9 @@ class Application(BaseApplication):
 
         section = str(metadata.get("assessment_section", "1"))
 
-        assessment_name = metadata.get("assessment_name", "locus_of_control")
+        assessment_name = self.clean_name(
+            metadata.get("assessment_name", "locus_of_control")
+        )
 
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
@@ -188,7 +193,9 @@ class Application(BaseApplication):
         answer = answers.get(current_question)
         question_number = metadata.get("assessment_question_nr", 1)
 
-        assessment_name = metadata.get("assessment_name", "locus_of_control")
+        assessment_name = self.clean_name(
+            metadata.get("assessment_name", "locus_of_control")
+        )
         questions = QUESTIONS[assessment_name]
         question = questions[str(section)]["questions"][current_question]
 
@@ -224,7 +231,9 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        assessment_name = self.user.metadata.get("assessment_name", "locus_of_control")
+        assessment_name = self.clean_name(
+            self.user.metadata.get("assessment_name", "locus_of_control")
+        )
 
         data = {
             "assessment_reminder": get_current_datetime().isoformat(),
@@ -270,7 +279,9 @@ class Application(BaseApplication):
             data = {
                 "assessment_reminder_sent": "",  # Reset the field
             }
-            assessment_name = self.user.metadata["assessment_reminder_name"]
+            assessment_name = self.clean_name(
+                self.user.metadata["assessment_reminder_name"]
+            )
             # send reengagement message
             if REENGAGEMENT.get(assessment_name):
                 await self.publish_message(REENGAGEMENT.get(assessment_name))
@@ -348,7 +359,9 @@ class Application(BaseApplication):
     async def state_stop_assessment_reminders(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
-        assessment_name = self.user.metadata["assessment_reminder_name"]
+        assessment_name = self.clean_name(
+            self.user.metadata["assessment_reminder_name"]
+        )
         assessment_risk = (
             f"{assessment_name}_risk"
             if assessment_name != "sexual_health_literacy"
@@ -416,7 +429,9 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
         assessment_reminder_sent = self.user.metadata["assessment_reminder_sent"]
 
-        assessment_name = self.user.metadata["assessment_reminder_name"]
+        assessment_name = self.clean_name(
+            self.user.metadata["assessment_reminder_name"]
+        )
         assessment_reminder_hours = self.user.metadata["assessment_reminder_hours"]
         assessment_reminder_type = self.user.metadata["assessment_reminder_type"]
 
