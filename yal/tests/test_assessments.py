@@ -233,6 +233,21 @@ async def test_state_handle_assessment_reminder_response_now(
 
 @pytest.mark.asyncio
 @mock.patch("yal.assessments.get_current_datetime")
+async def test_state_handle_assessment_reminder_response_now_lets_do_it(
+    get_current_datetime, tester: AppTester
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.user.metadata["assessment_reminder_name"] = "sexual_health_literacy"
+    tester.user.metadata["assessment_reminder_sent"] = ""
+    tester.user.metadata["assessment_reminder_type"] = "reengagement 30min"
+
+    tester.setup_state("state_handle_assessment_reminder_response")
+    await tester.user_input("Let's do it!")
+    tester.assert_state("state_survey_question")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.assessments.get_current_datetime")
 async def test_state_handle_assessment_reminder_response_1h(
     get_current_datetime, tester: AppTester
 ):
@@ -365,3 +380,13 @@ async def test_state_handle_assessment_reminder_response_loc_tomorrow_again(
     )
     tester.assert_message("No problem! I'll remind you tomorrow")
     tester.assert_state("state_remind_tomorrow")
+
+
+def test_clean_name(tester: AppTester):
+    """
+    Should return the assessment name without the 'state_' or '_assessment'
+    """
+    assert (
+        tester.application.clean_name("state_mental_health_assessment")  # type: ignore
+        == "mental_health"
+    )
