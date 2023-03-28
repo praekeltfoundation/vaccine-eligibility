@@ -8,6 +8,7 @@ from yal import config
 
 logger = logging.getLogger(__name__)
 
+
 def get_rapidpro_api():
     return aiohttp.ClientSession(
         timeout=aiohttp.ClientTimeout(total=5),
