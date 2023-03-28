@@ -5,10 +5,8 @@ import aiohttp
 
 from vaccine.utils import HTTP_EXCEPTIONS
 from yal import config
-from yal.utils import get_current_datetime
 
 logger = logging.getLogger(__name__)
-
 
 def get_rapidpro_api():
     return aiohttp.ClientSession(
@@ -109,6 +107,9 @@ async def start_flow(whatsapp_id, flow_uuid):
 
 
 async def get_instance_fields():
+    """
+    Gets a list of all the CUSTOM fields in a given rapidpro instance
+    """
     async with get_rapidpro_api() as session:
         for i in range(3):
             try:
