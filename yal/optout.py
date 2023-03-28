@@ -180,6 +180,7 @@ class Application(BaseApplication):
         rp_fields = await rapidpro.get_instance_fields()
         rp_field_keys = [rp_field["key"] for rp_field in rp_fields]
         rp_field_keys_set = set(rp_field_keys)
+        print("I A BEING CALLED")
         fields_to_update_and_retain = {
             "opted_out": "True",
             "opted_out_timestamp": get_current_datetime().isoformat(),
