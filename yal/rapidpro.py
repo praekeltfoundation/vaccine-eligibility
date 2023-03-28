@@ -105,3 +105,28 @@ async def start_flow(whatsapp_id, flow_uuid):
                 else:
                     continue
     return False
+
+
+async def get_instance_fields():
+    """
+    Gets a list of all the CUSTOM fields in a given rapidpro instance
+    """
+    async with get_rapidpro_api() as session:
+        for i in range(3):
+            try:
+                response = await session.get(
+                    urljoin(config.RAPIDPRO_URL, "/api/v2/fields.json"),
+                )
+                response.raise_for_status()
+                response_body = await response.json()
+
+                if len(response_body["results"]) > 0:
+                    fields = response_body["results"]
+                break
+            except HTTP_EXCEPTIONS as e:
+                if i == 2:
+                    logger.exception(e)
+                    return True
+                else:
+                    continue
+    return fields
