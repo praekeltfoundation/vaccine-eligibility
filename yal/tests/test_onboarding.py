@@ -50,18 +50,6 @@ async def rapidpro_mock():
         tstate.requests.append(request)
         return response.json({}, status=200)
 
-    @app.route("/api/v2/fields.json", methods=["GET"])
-    def get_fields(request):
-        return response.json(
-            {
-                "key": "second_phase2_send",
-                "label": "second phase2 send",
-                "value_type": "text",
-                "pinned": False,
-            },
-            status=200,
-        )
-
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"

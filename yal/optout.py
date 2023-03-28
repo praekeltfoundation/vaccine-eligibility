@@ -178,9 +178,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         rp_fields = await rapidpro.get_instance_fields()
-        rp_field_keys = [rp_field["key"] for rp_field in rp_fields]
-        rp_field_keys_set = set(rp_field_keys)
-        print("I A BEING CALLED")
+        rp_field_keys = set([rp_field["key"] for rp_field in rp_fields])
         fields_to_update_and_retain = {
             "opted_out": "True",
             "opted_out_timestamp": get_current_datetime().isoformat(),
@@ -188,9 +186,9 @@ class Application(BaseApplication):
         }
 
         for key in fields_to_update_and_retain:
-            rp_field_keys_set.discard(key)
+            rp_field_keys.discard(key)
 
-        update_rp_fields_dict = dict.fromkeys(rp_field_keys_set, "")
+        update_rp_fields_dict = dict.fromkeys(rp_field_keys, "")
         combined_update_dict = fields_to_update_and_retain | update_rp_fields_dict
 
         old_details = self._get_user_details(self.user.metadata)
