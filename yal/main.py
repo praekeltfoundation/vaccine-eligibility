@@ -56,6 +56,7 @@ TRACKING_KEYWORDS_ROUND_2 = {
     "join",
     "register2bwise",
     "connect",
+    "i saw this on facebook",
 }
 OPTOUT_KEYWORDS = {"stop", "opt out", "cancel", "quit"}
 ONBOARDING_REMINDER_KEYWORDS = {
