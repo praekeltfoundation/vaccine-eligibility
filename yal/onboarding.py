@@ -182,8 +182,7 @@ class Application(BaseApplication):
                     "ABOUT YOU / 👩🏾‍❤️‍💋‍👩🏽 *Relationship status*",
                     "-----",
                     "",
-                    "*Awesome! One last thing "
-                    "— are you seeing someone special right now?*",
+                    "*Awesome! Are you seeing someone special right now?*",
                     "",
                     "_Tap the button and select the option that "
                     "best describes your situation.._",
