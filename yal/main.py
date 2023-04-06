@@ -19,6 +19,7 @@ from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
+from yal.surveys.baseline import Application as BaselineSurveyApplication
 from yal.utils import (
     get_current_datetime,
     get_generic_error,
@@ -97,6 +98,7 @@ class Application(
     WaFbCrossoverFeedbackApplication,
     ServiceFinderFeedbackSurveyApplication,
     AssessmentApplication,
+    BaselineSurveyApplication,
 ):
     START_STATE = "state_start"
 
@@ -173,7 +175,7 @@ class Application(
 
         if keyword in SURVEY_KEYWORDS:
             self.user.session_id = None
-            self.state_name = "state_qa_start_baseline_survey"
+            self.state_name = "state_invitation"
 
         # Fields that RapidPro sets after a feedback push message
         feedback_state = await self.get_feedback_state()
@@ -205,13 +207,6 @@ class Application(
             text="QA: Success! You can now modify the timestamp in RapidPro to trigger "
             "the message early",
         )
-
-    async def state_qa_start_baseline_survey(self):
-        self.save_metadata("assessment_name", "connectedness_v2")
-        self.save_metadata(
-            "assessment_end_state", "state_connectedness_assessment_v2_end"
-        )
-        return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def get_feedback_state(self):
         """
