@@ -23,8 +23,12 @@ class Application(BaseApplication):
         )
 
         await self.publish_message(msg)
-        self.save_metadata("assessment_name", "connectedness_v2")  #example name for the baseline assessments
-        self.save_metadata("assessment_end_state", "state_connectedness_assessment_v2_end")
+        self.save_metadata(
+            "assessment_name", "connectedness_v2"
+        )  # example name for the baseline assessments
+        self.save_metadata(
+            "assessment_end_state", "state_connectedness_assessment_v2_end"
+        )
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_connectedness_assessment_v2_end(self):
@@ -107,23 +111,22 @@ class Application(BaseApplication):
         )
 
         await self.publish_message(msg)
-   
+
 
 # Self Esteem
 
-#Connectetedness
+# Connectetedness
 
-#Body Image
+# Body Image
 
-#Depression
+# Depression
 
 ##########    HALF WAY MESSAGE
 
-#Self Perceived Health Care
+# Self Perceived Health Care
 
-#Sexual Health Literacy
+# Sexual Health Literacy
 
-#Gender Attitudes
+# Gender Attitudes
 
-#Sexual Consent
-
+# Sexual Consent
