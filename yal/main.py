@@ -205,7 +205,7 @@ class Application(
             text="QA: Success! You can now modify the timestamp in RapidPro to trigger "
             "the message early",
         )
-    
+
     async def state_qa_start_baseline_survey(self):
         self.save_metadata("assessment_name", "connectedness_v2")
         self.save_metadata(
