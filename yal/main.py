@@ -17,9 +17,9 @@ from yal.pushmessages_optin import Application as PushMessageOptInApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
+from yal.surveys.baseline import Application as BaselineSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
-from yal.surveys.baseline import Application as BaselineSurveyApplication
 from yal.utils import (
     get_current_datetime,
     get_generic_error,
