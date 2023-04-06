@@ -121,7 +121,7 @@ class Application(BaseApplication):
 
 # Depression
 
-##########    HALF WAY MESSAGE
+# HALF WAY MESSAGE
 
 # Self Perceived Health Care
 
