@@ -1,8 +1,9 @@
-#import asyncio
+# import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-#from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
+
+# from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
 from yal import rapidpro
 from yal.assessments import Application as AssessmentApplication
 from yal.utils import normalise_phonenumber
