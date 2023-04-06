@@ -10,8 +10,8 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "[persona_emoji] BASELINE*Do you have someone to talk to when you "
-                        "have a worry or problem?*",
+                        "[persona_emoji] BASELINE*Do you have someone to talk "
+                        "to when you have a worry or problem?*",
                     ]
                 ),
                 "options": [
