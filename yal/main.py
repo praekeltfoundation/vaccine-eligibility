@@ -17,6 +17,7 @@ from yal.pushmessages_optin import Application as PushMessageOptInApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
+from yal.surveys.baseline import Application as BaselineSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import (
@@ -97,6 +98,7 @@ class Application(
     WaFbCrossoverFeedbackApplication,
     ServiceFinderFeedbackSurveyApplication,
     AssessmentApplication,
+    BaselineSurveyApplication,
 ):
     START_STATE = "state_start"
 
@@ -173,7 +175,7 @@ class Application(
 
         if keyword in SURVEY_KEYWORDS:
             self.user.session_id = None
-            self.state_name = "state_qa_start_baseline_survey"
+            self.state_name = "state_invitation"
 
         # Fields that RapidPro sets after a feedback push message
         feedback_state = await self.get_feedback_state()

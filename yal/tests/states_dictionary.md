@@ -420,3 +420,12 @@
 | state_a2_3_q7_self_esteem | TRUE | Text | I wish I could have more respect for myself. |
 | state_a2_3_q8_self_esteem | TRUE | Text | I definitely feel useless at times. |
 | state_a2_3_q9_self_esteem | TRUE | Text | Sometimes I think I'm no good at all. |
+
+### Baseline Survey
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_invitation | TRUE | Text | Start of Baseline Survey. |
+| state_baseline_end | TRUE | Text | End of Baseline Survey. |
+| state_body_image_assessment_v2_end | TRUE | Text | End of Body Image Assessment in Baseline Survey. |
+| state_connectedness_assessment_v2_end | TRUE | Text | End of Connectedness Assessment. |
+| state_depression_assessment_v2_end | TRUE | Text | End of Depression Assessment. |
