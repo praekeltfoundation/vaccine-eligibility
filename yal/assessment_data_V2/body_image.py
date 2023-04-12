@@ -1,8 +1,7 @@
 # Survey state naming convention
 # [survey_name]_[subsection]_q[question]_topic
 ASSESSMENT_QUESTIONS = {
-    "1":
-    {
+    "1": {
         "start": "baseline_3_q1_body_image",
         "questions": {
             "baseline_3_q1_body_image": {
@@ -14,16 +13,10 @@ ASSESSMENT_QUESTIONS = {
                         "I feel good about myself.",
                     ]
                 ),
-                "options": [
-                    "Yes",
-                    "No",
-                    "Sometimes",
-                    "I don't understand",
-                    "Skip"
-                ],
+                "options": ["Yes", "No", "Sometimes", "I don't understand", "Skip"],
                 "scoring": {
-                    "yes": 3, 
-                    "no": 1, 
+                    "yes": 3,
+                    "no": 1,
                     "sometimes": 2,
                     "dont_understand": 1,
                     "skip": 1,
@@ -34,21 +27,15 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                         "*Do you agree with this statement?*",
+                        "*Do you agree with this statement?*",
                         "",
                         "I feel good about my body.",
                     ]
                 ),
-                "options": [
-                    "Yes",
-                    "No",
-                    "Sometimes",
-                    "I don't understand",
-                    "Skip"
-                ],
+                "options": ["Yes", "No", "Sometimes", "I don't understand", "Skip"],
                 "scoring": {
-                    "yes": 3, 
-                    "no": 1, 
+                    "yes": 3,
+                    "no": 1,
                     "sometimes": 2,
                     "dont_understand": 1,
                     "skip": 1,

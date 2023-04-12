@@ -16,7 +16,7 @@ ASSESSMENT_QUESTIONS = {
                         "There are times when a woman deserves to be beaten",
                     ]
                 ),
-                 "options": [
+                "options": [
                     ("strongly_agree", "Strongly agree"),
                     ("somewhat_agree", "Somewhat agree"),
                     ("disagree", "Disagree"),
@@ -63,7 +63,7 @@ ASSESSMENT_QUESTIONS = {
                         "of contraceptive to use.",
                     ]
                 ),
-                 "options": [
+                "options": [
                     ("strongly_agree", "Strongly agree"),
                     ("somewhat_agree", "Somewhat agree"),
                     ("disagree", "Disagree"),
@@ -87,7 +87,7 @@ ASSESSMENT_QUESTIONS = {
                         "responsibility of both.",
                     ]
                 ),
-                 "options": [
+                "options": [
                     ("strongly_agree", "Strongly agree"),
                     ("somewhat_agree", "Somewhat agree"),
                     ("disagree", "Disagree"),

@@ -7,7 +7,8 @@ ASSESSMENT_QUESTIONS = {
             "baseline_1_q1_self_esteem": {
                 "type": "list",
                 "text": "\n".join(
-                    [   "How do you feel about the following statements?",
+                    [
+                        "How do you feel about the following statements?",
                         "",
                         "*I feel that I am a person who has worth — at least as much "
                         "worth as others.*",
@@ -38,7 +39,7 @@ ASSESSMENT_QUESTIONS = {
                         "*I feel that I have a number of good qualities.*",
                     ]
                 ),
-                 "options": [
+                "options": [
                     "Strongly agree",
                     "Agree",
                     "Disagree",
@@ -60,8 +61,7 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*All in all, I am inclined to feel that I am "
-                        "a failure.*",
+                        "*All in all, I am inclined to feel that I am " "a failure.*",
                     ]
                 ),
                 "options": [
@@ -89,7 +89,7 @@ ASSESSMENT_QUESTIONS = {
                         "*I am able to do things as well as most other people.*",
                     ]
                 ),
-               "options": [
+                "options": [
                     "Strongly agree",
                     "Agree",
                     "Disagree",
@@ -139,7 +139,7 @@ ASSESSMENT_QUESTIONS = {
                         "*I take a positive attitude toward myself.*",
                     ]
                 ),
-               "options": [
+                "options": [
                     "Strongly agree",
                     "Agree",
                     "Disagree",

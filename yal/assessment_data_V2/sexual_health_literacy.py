@@ -101,7 +101,7 @@ ASSESSMENT_QUESTIONS = {
                     ("moderately", "Kind of true"),
                     ("very", "Very true"),
                     ("extremely", "Extremely true"),
-                    ("dont_understand", "I don't understand" ),
+                    ("dont_understand", "I don't understand"),
                     ("skip", "Skip"),
                 ],
                 "scoring": {
@@ -129,7 +129,7 @@ ASSESSMENT_QUESTIONS = {
                     ("moderately", "Kind of true"),
                     ("very", "Very true"),
                     ("extremely", "Extremely true"),
-                    ("dont_understand", "I don't understand" ),
+                    ("dont_understand", "I don't understand"),
                     ("skip", "Skip"),
                 ],
                 "scoring": {
@@ -156,7 +156,7 @@ ASSESSMENT_QUESTIONS = {
                     ("moderately", "Kind of true"),
                     ("very", "Very true"),
                     ("extremely", "Extremely true"),
-                    ("dont_understand", "I don't understand" ),
+                    ("dont_understand", "I don't understand"),
                     ("skip", "Skip"),
                 ],
                 "scoring": {
@@ -183,7 +183,7 @@ ASSESSMENT_QUESTIONS = {
                     ("no", "No"),
                     ("dont_remember", "I don't remember"),
                     ("havent_had_sex", "I haven't had sex yet"),
-                    ("dont_understand", "I don't understand" ),
+                    ("dont_understand", "I don't understand"),
                     ("skip", "Skip"),
                 ],
                 "scoring": {
@@ -207,7 +207,7 @@ ASSESSMENT_QUESTIONS = {
                     ("yes", "Yes"),
                     ("no", "No"),
                     ("havent_had_sex", "I haven't had sex yet"),
-                    ("dont_understand", "I don't understand" ),
+                    ("dont_understand", "I don't understand"),
                     ("skip", "Skip"),
                 ],
                 "scoring": {
@@ -242,7 +242,7 @@ ASSESSMENT_QUESTIONS = {
                     ("sterilisation", "Sterilisation"),
                     ("breastfeeding", "Breastfeeding"),
                     ("havent_had_sex", "I haven't had sex yet"),
-                    ("dont_understand", "I don't understand" ),
+                    ("dont_understand", "I don't understand"),
                     ("skip", "Skip"),
                 ],
                 "scoring": {
@@ -269,7 +269,8 @@ ASSESSMENT_QUESTIONS = {
                     [
                         "*How many sexual partners did you have over the last "
                         "month?*",
-                    ]),
+                    ]
+                ),
                 "options": [
                     ("none", "None"),
                     ("one", "One"),
@@ -294,7 +295,8 @@ ASSESSMENT_QUESTIONS = {
                         "the last month.*",
                         "",
                         "Please enter any number e.g. *3*",
-                    ]),
+                    ]
+                ),
                 "next": "baseline_6_q11_sexual_health_lit",
             },
             "baseline_6_q11_sexual_health_lit": {
@@ -308,7 +310,7 @@ ASSESSMENT_QUESTIONS = {
                     ("yes", "Yes"),
                     ("no", "No"),
                     ("havent_had_sex", "I haven't had sex yet"),
-                    ("dont_understand", "I don't understand" ),
+                    ("dont_understand", "I don't understand"),
                     ("skip", "Skip"),
                 ],
                 "scoring": {
@@ -332,7 +334,7 @@ ASSESSMENT_QUESTIONS = {
                     ("no", "No"),
                     ("skip", "Skip"),
                 ],
-               "next": {
+                "next": {
                     "yes": "baseline_6_q13_sexual_health_lit",
                     "no": "baseline_6_q13_sexual_health_lit",
                     "skip": None,
@@ -351,7 +353,7 @@ ASSESSMENT_QUESTIONS = {
                     ("no", "No"),
                     ("skip", "Skip"),
                 ],
-               "next": {
+                "next": {
                     "yes": "baseline_6_q14_sexual_health_lit",
                     "no": "baseline_6_q14_sexual_health_lit",
                     "skip": None,
@@ -370,7 +372,7 @@ ASSESSMENT_QUESTIONS = {
                     ("no", "No"),
                     ("skip", "Skip"),
                 ],
-               "next": None,
+                "next": None,
             },
         },
     },
