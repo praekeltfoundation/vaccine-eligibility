@@ -150,6 +150,9 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
                 "🔔 *Notifications*",
                 "OFF",
                 "",
+                "📝 *Study Participant*",
+                "No",
+                "",
                 "*-----*",
                 "*Or reply:*",
                 "*0 -* 🏠 Back to Main *MENU*",
@@ -163,6 +166,7 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
             "Relationship?",
             "Location",
             "Notifications",
+            "Opt out of study",
         ],
     )
 
@@ -785,3 +789,23 @@ async def test_state_update_notifications_off_back(
     tester.setup_state("state_update_notifications_turn_off")
     await tester.user_input("Go back")
     tester.assert_state("state_display_preferences")
+
+
+@pytest.mark.asyncio
+async def test_study_optout(
+     tester: AppTester, google_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_update_study_optout")
+    await tester.user_input("Go back")
+    tester.assert_state("state_display_preferences")
+
+
+@pytest.mark.asyncio
+async def test_study_optout_confirm(
+     tester: AppTester, google_api_mock, rapidpro_mock
+):
+    tester.setup_state("state_update_study_optout")
+    await tester.user_input("Leave Study")
+
+    assert tester.application.user.metadata["study_optin"] == "False"
+    tester.assert_state("study_optout_confirm")

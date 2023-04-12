@@ -61,6 +61,8 @@ class Application(BaseApplication):
         else:
             notifications_change_state = "state_update_notifications_turn_on"
 
+        study_optin = self.user.metadata.get("study_optin")
+
         question = self._(
             "\n".join(
                 [
@@ -87,6 +89,9 @@ class Application(BaseApplication):
                     "🔔 *Notifications*",
                     "ON" if notifications == "True" else "OFF",
                     "",
+                    "📝 *Study Participant*",
+                    "Yes" if study_optin == "True" else "No",
+                    "",
                     "*-----*",
                     "*Or reply:*",
                     "*0 -* 🏠 Back to Main *MENU*",
@@ -105,6 +110,7 @@ class Application(BaseApplication):
                 Choice("state_update_relationship_status", self._("Relationship?")),
                 Choice("state_update_location", self._("Location")),
                 Choice(notifications_change_state, self._("Notifications")),
+                Choice("study_optin", self._("Opt out of study")),
             ],
             next=next_,
             error=self._(get_generic_error()),
@@ -802,6 +808,67 @@ class Application(BaseApplication):
                 ]
             )
         )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "menu": "state_pre_mainmenu",
+                "aaq": "state_aaq_start",
+            },
+        )
+
+    async def state_update_study_optout(self):
+        question = self._(
+            "\n".join(
+                [
+                "*You are signed up to be a part of this study*",
+                "",
+                "If you no longer want to be part of the study please click on the “” button below.",
+                "",
+                "Please note that opting out of the study  means that you will still receive daily notifications. You can opt out of these in  *chat settings/notifications.*",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[
+                Choice("leave", "Leave Study"),
+                Choice("back", "Go back"),
+            ],
+            error=self._(get_generic_error()),
+            next={
+                "leave": "study_optout_confirm",
+                "back": "state_display_preferences",
+            },
+        )
+
+    async def study_optout_confirm(self):
+        data = {"study_optin": "False"}
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
+        choices = [
+            Choice("menu", "Go to the menu"),
+            Choice("aaq", "Ask a question"),
+        ]
+
+        question = self._(
+            "\n".join(
+                [
+                "[persona emoji] *No problem! You will no longer be part of this study.*",
+                "",
+                "Remember, you can still use the menu to get the info you need.",
+                ]
+            )
+        )
+
         return WhatsAppButtonState(
             self,
             question=question,

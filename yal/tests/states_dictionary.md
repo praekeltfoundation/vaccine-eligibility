@@ -27,7 +27,8 @@
 | state_update_notifications_turn_on         |        TRUE        |     Text     |            TRUE           | Asks user if they would like to turn on daily messages |
 | state_update_notifications_turn_on_submit  |        FALSE       |              |            FALSE          | Updates user profile to turn on daily messages |
 | state_update_notifications_final           |        TRUE        |     Text     |            TRUE           | After updating the profile, asks user what they would like to do next, go to main menu or AAQ |
-
+| state_update_study_optout                  |        TRUE        |     Text     |            FALSE          | Update user profile to opt out of study
+| study_optout_confirm                       |        TRUE        |     Text     |            FALSE          | Confirms user is no longer part of study Offers user other features. User response is "menu" or "state_aaq_start"
 ### AAQ flows
 | state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                       |
 |--------------------------------------------|--------------------|--------------|---------------------------|------------------------------------------------------------------------------|
