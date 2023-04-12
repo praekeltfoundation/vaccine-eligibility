@@ -56,15 +56,18 @@ ASSESSMENT_QUESTIONS = {
                 "options": [
                     (
                         "cool_with_saying_no",
-                        "I’m cool with telling bae no if they want to have sex but I don’t.",
+                        "I’m cool with telling bae no if they want to have sex "
+                        "but I don’t.",
                     ),
                     (
                         "hard_to_say_no",
-                        "I find it hard to say no to bae if bae wants to have sex but I don’t ",
+                        "I find it hard to say no to bae if bae wants to have "
+                        "sex but I don’t ",
                     ),
                     (
                         "not_sure_how_feel",
-                        "I’m not sure how I feel about saying no when bae wants to have sex but I don’t.",
+                        "I’m not sure how I feel about saying no when bae "
+                        "wants to have sex but I don’t.",
                     ),
                     ("not_in_relationship", "I’m not in a relationship"),
                     ("dont_understand", "I don't understand"),
