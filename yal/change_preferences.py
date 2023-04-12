@@ -825,9 +825,12 @@ class Application(BaseApplication):
                 [
                     "*You are signed up to be a part of this study*",
                     "",
-                    "If you no longer want to be part of the study please click on the “” button below.",
+                    "If you no longer want to be part of the study please click"
+                    " on the “Leave Study” button below.",
                     "",
-                    "Please note that opting out of the study  means that you will still receive daily notifications. You can opt out of these in  *chat settings/notifications.*",
+                    "Please note that opting out of the study  means that you"
+                    " will still receive daily notifications. You can opt out"
+                    " of these in  *chat settings/notifications.*",
                 ]
             )
         )
@@ -862,7 +865,8 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "[persona emoji] *No problem! You will no longer be part of this study.*",
+                    "[persona emoji] *No problem! You will no longer be part"
+                    " of this study.*",
                     "",
                     "Remember, you can still use the menu to get the info you need.",
                 ]
