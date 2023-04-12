@@ -18,6 +18,12 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
+                    ("true", "True"),
+                    ("false", "False"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
+                ],
+                "options": [
                     "True",
                     "False",
                     "I don't understand",
@@ -43,10 +49,10 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "True",
-                    "False",
-                    "I don't understand",
-                    "Skip",
+                    ("true", "True"),
+                    ("false", "False"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "true": 5,
@@ -67,14 +73,14 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Strongly agree",
-                    "Agree",
-                    "Not sure",
-                    "Disagree",
-                    "Strongly disagree",
-                    "Not sexually active",
-                    "I don't understand",
-                    "Skip",
+                    ("strongly_agree", "Strongly agree"),
+                    ("agree", "Agree"),
+                    ("not_sure", "Not sure"),
+                    ("disagree", "Disagree"),
+                    ("strongly_disagree", "Strongly disagree"),
+                    ("not_sexually_active", "Not sexually active"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "strongly_agree": 5,

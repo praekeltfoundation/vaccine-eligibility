@@ -15,12 +15,12 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Never",
-                    "Some of the time",
-                    "Most of the time",
-                    "All of the time",
-                    "I don't understand",
-                    "Skip",
+                    ("never", "Never"),
+                    ("some_of_the_time", "Some of the time"),
+                    ("most_of_the_time", "Most of the time"),
+                    ("all_of_the_time", "All of the time"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "never": 0,

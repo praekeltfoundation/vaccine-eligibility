@@ -14,6 +14,15 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
+                    ("excellent", "Excellent"),
+                    ("very_good", "Very Good"),
+                    ("good", "Good"),
+                    ("fair", "Fair"),
+                    ("poor", "Poor"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
+                ],
+                "options": [
                     "Excellent",
                     "Very Good",
                     "Good",
@@ -42,11 +51,11 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Yes",
-                    "No",
-                    "Sometimes",
-                    "I don't understand",
-                    "Skip",
+                    ("yes", "Yes"),
+                    ("no", "No"),
+                    ("sometimes", "Sometimes"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "yes": 5,

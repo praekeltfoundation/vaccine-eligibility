@@ -13,7 +13,13 @@ ASSESSMENT_QUESTIONS = {
                         "I feel good about myself.",
                     ]
                 ),
-                "options": ["Yes", "No", "Sometimes", "I don't understand", "Skip"],
+                "options": [
+                    ("yes", "Yes"),
+                    ("no", "No"),
+                    ("sometimes", "Sometimes"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
+                ],
                 "scoring": {
                     "yes": 3,
                     "no": 1,
@@ -32,7 +38,13 @@ ASSESSMENT_QUESTIONS = {
                         "I feel good about my body.",
                     ]
                 ),
-                "options": ["Yes", "No", "Sometimes", "I don't understand", "Skip"],
+                "options": [
+                    ("yes", "Yes"),
+                    ("no", "No"),
+                    ("sometimes", "Sometimes"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
+                ],
                 "scoring": {
                     "yes": 3,
                     "no": 1,

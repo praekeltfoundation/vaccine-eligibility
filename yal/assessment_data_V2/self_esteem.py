@@ -15,12 +15,12 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Strongly agree",
-                    "Agree",
-                    "Disagree",
-                    "Strongly disagree",
-                    "I don't understand",
-                    "Skip",
+                    ("strongly_agree", "Strongly agree"),
+                    ("agree", "Agree"),
+                    ("disagree", "Disagree"),
+                    ("strongly_disagree", "Strongly disagree"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "strongly_agree": 3,
@@ -40,12 +40,12 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Strongly agree",
-                    "Agree",
-                    "Disagree",
-                    "Strongly disagree",
-                    "I don't understand",
-                    "Skip",
+                    ("strongly_agree", "Strongly agree"),
+                    ("agree", "Agree"),
+                    ("disagree", "Disagree"),
+                    ("strongly_disagree", "Strongly disagree"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "strongly_agree": 3,
@@ -65,12 +65,12 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Strongly agree",
-                    "Agree",
-                    "Disagree",
-                    "Strongly disagree",
-                    "I don't understand",
-                    "Skip",
+                    ("strongly_agree", "Strongly agree"),
+                    ("agree", "Agree"),
+                    ("disagree", "Disagree"),
+                    ("strongly_disagree", "Strongly disagree"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "strongly_agree": 3,
@@ -90,12 +90,12 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Strongly agree",
-                    "Agree",
-                    "Disagree",
-                    "Strongly disagree",
-                    "I don't understand",
-                    "Skip",
+                    ("strongly_agree", "Strongly agree"),
+                    ("agree", "Agree"),
+                    ("disagree", "Disagree"),
+                    ("strongly_disagree", "Strongly disagree"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "strongly_agree": 3,
@@ -115,12 +115,12 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Strongly agree",
-                    "Agree",
-                    "Disagree",
-                    "Strongly disagree",
-                    "I don't understand",
-                    "Skip",
+                    ("strongly_agree", "Strongly agree"),
+                    ("agree", "Agree"),
+                    ("disagree", "Disagree"),
+                    ("strongly_disagree", "Strongly disagree"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "strongly_agree": 3,
@@ -140,12 +140,12 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Strongly agree",
-                    "Agree",
-                    "Disagree",
-                    "Strongly disagree",
-                    "I don't understand",
-                    "Skip",
+                    ("strongly_agree", "Strongly agree"),
+                    ("agree", "Agree"),
+                    ("disagree", "Disagree"),
+                    ("strongly_disagree", "Strongly disagree"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "strongly_agree": 3,
@@ -165,12 +165,12 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Strongly agree",
-                    "Agree",
-                    "Disagree",
-                    "Strongly disagree",
-                    "I don't understand",
-                    "Skip",
+                    ("strongly_agree", "Strongly agree"),
+                    ("agree", "Agree"),
+                    ("disagree", "Disagree"),
+                    ("strongly_disagree", "Strongly disagree"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "strongly_agree": 3,
@@ -190,12 +190,12 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Strongly agree",
-                    "Agree",
-                    "Disagree",
-                    "Strongly disagree",
-                    "I don't understand",
-                    "Skip",
+                    ("strongly_agree", "Strongly agree"),
+                    ("agree", "Agree"),
+                    ("disagree", "Disagree"),
+                    ("strongly_disagree", "Strongly disagree"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "strongly_agree": 3,
@@ -215,12 +215,12 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Strongly agree",
-                    "Agree",
-                    "Disagree",
-                    "Strongly disagree",
-                    "I don't understand",
-                    "Skip",
+                    ("strongly_agree", "Strongly agree"),
+                    ("agree", "Agree"),
+                    ("disagree", "Disagree"),
+                    ("strongly_disagree", "Strongly disagree"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "strongly_agree": 3,
@@ -240,12 +240,12 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    "Strongly agree",
-                    "Agree",
-                    "Disagree",
-                    "Strongly disagree",
-                    "I don't understand",
-                    "Skip",
+                    ("strongly_agree", "Strongly agree"),
+                    ("agree", "Agree"),
+                    ("disagree", "Disagree"),
+                    ("strongly_disagree", "Strongly disagree"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "strongly_agree": 3,
