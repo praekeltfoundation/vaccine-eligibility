@@ -9,19 +9,27 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*When I have health needs (like  contraception or "
-                        "flu symptoms), I go to my closest clinic. 🏥*",
+                        "*How good a job do you feel you are doing in taking "
+                        "care of your health?*",
                     ]
                 ),
-                "options": [
-                    "Yes",
-                    "No",
-                    "Sometimes",
+               "options": [
+                    "Excellent",
+                    "Very Good",
+                    "Good",
+                    "Fair",
+                    "Poor",
+                    "I don't understand",
+                    "Skip",
                 ],
                 "scoring": {
-                    "yes": 5,
-                    "no": 0,
-                    "sometimes": 3,
+                    "excellent": 5,
+                    "very_good": 4,
+                    "good": 3,
+                    "fair": 2,
+                    "poor": 1,
+                    "dont_understand": 1,
+                    "skip": 1,
                 },
                 "next": "baseline_5_q2_healthcare",
             },
@@ -29,23 +37,23 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "[persona_emoji]  How good a job do you feel you are doing "
-                        "in taking care of your health?",
+                        "*When you have a health need (e.g. contraception, "
+                        "flu symptoms), do you go to your closest clinic?*",
                     ]
                 ),
                 "options": [
-                    "Excellent",
-                    "Very Good",
-                    "Good",
-                    "OK",
-                    "Pretty bad",
+                    "Yes",
+                    "No",
+                    "Sometimes",
+                    "I don't understand",
+                    "Skip",
                 ],
                 "scoring": {
-                    "excellent": 5,
-                    "very_good": 4,
-                    "good": 3,
-                    "ok": 2,
-                    "pretty_bad": 1,
+                    "yes": 5,
+                    "no": 1,
+                    "sometimes": 3,
+                    "dont_understand": 1,
+                    "skip": 1,
                 },
                 "next": None,
             },
