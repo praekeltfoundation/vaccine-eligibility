@@ -10,7 +10,7 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Do you have someone to talk to when you have a ",
+                        "*Do you have someone to talk to when you have a "
                         "worry or problem?*",
                     ]
                 ),

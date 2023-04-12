@@ -10,7 +10,7 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Over the last 2 weeks, how often have you been ",
+                        "*Over the last 2 weeks, how often have you been "
                         "bothered by the following problems?*",
                         "",
                         "Feeling nervous, anxious or on edge",
