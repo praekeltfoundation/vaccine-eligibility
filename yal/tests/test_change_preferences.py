@@ -792,18 +792,14 @@ async def test_state_update_notifications_off_back(
 
 
 @pytest.mark.asyncio
-async def test_study_optout(
-     tester: AppTester, google_api_mock, rapidpro_mock
-):
+async def test_study_optout(tester: AppTester, google_api_mock, rapidpro_mock):
     tester.setup_state("state_update_study_optout")
     await tester.user_input("Go back")
     tester.assert_state("state_display_preferences")
 
 
 @pytest.mark.asyncio
-async def test_study_optout_confirm(
-     tester: AppTester, google_api_mock, rapidpro_mock
-):
+async def test_study_optout_confirm(tester: AppTester, google_api_mock, rapidpro_mock):
     tester.setup_state("state_update_study_optout")
     await tester.user_input("Leave Study")
 
