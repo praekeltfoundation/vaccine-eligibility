@@ -37,39 +37,34 @@ from yal.assessment_data.A8_self_esteem import (
     ASSESSMENT_QUESTIONS as SELF_ESTEEM_QUESTIONS,
 )
 from yal.assessment_data.reengagement import REENGAGEMENT
+from yal.assessment_data_V2.alcohol import ASSESSMENT_QUESTIONS as ALCOHOL_QUESTIONS_V2
+from yal.assessment_data_V2.anxiety import ASSESSMENT_QUESTIONS as ANXIETY_QUESTIONS_V2
+from yal.assessment_data_V2.body_image import (
+    ASSESSMENT_QUESTIONS as BODY_IMAGE_QUESTIONS_V2,
+)
+from yal.assessment_data_V2.connectedness import (
+    ASSESSMENT_QUESTIONS as CONNECTEDNESS_QUESTIONS_V2,
+)
+from yal.assessment_data_V2.depression import (
+    ASSESSMENT_QUESTIONS as DEPRESSION_QUESTIONS_V2,
+)
+from yal.assessment_data_V2.gender_attitude import (
+    ASSESSMENT_QUESTIONS as GENDER_ATTITUDE_QUESTIONS_V2,
+)
 
 # Assessments that form part of the Baseline study
 from yal.assessment_data_V2.self_esteem import (
     ASSESSMENT_QUESTIONS as SELF_ESTEEM_QUESTIONS_V2,
 )
-from yal.assessment_data_V2.connectedness import (
-    ASSESSMENT_QUESTIONS as CONNECTEDNESS_QUESTIONS_V2,
-)
-from yal.assessment_data_V2.body_image import (
-    ASSESSMENT_QUESTIONS as BODY_IMAGE_QUESTIONS_V2,
-)
-from yal.assessment_data_V2.depression import (
-    ASSESSMENT_QUESTIONS as DEPRESSION_QUESTIONS_V2,
-)
-from yal.assessment_data_V2.anxiety import (
-    ASSESSMENT_QUESTIONS as ANXIETY_QUESTIONS_V2,
-)
 from yal.assessment_data_V2.self_perceived_healthcare import (
     ASSESSMENT_QUESTIONS as SELF_PERCEIVED_HEALTHCARE_QUESTIONS_V2,
-)
-from yal.assessment_data_V2.sexual_health_literacy import (
-    ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS_V2,
-)
-from yal.assessment_data_V2.gender_attitude import (
-    ASSESSMENT_QUESTIONS as GENDER_ATTITUDE_QUESTIONS_V2,
 )
 from yal.assessment_data_V2.sexual_consent import (
     ASSESSMENT_QUESTIONS as SEXUAL_CONSENT_QUESTIONS_V2,
 )
-from yal.assessment_data_V2.alcohol import (
-    ASSESSMENT_QUESTIONS as ALCOHOL_QUESTIONS_V2,
+from yal.assessment_data_V2.sexual_health_literacy import (
+    ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS_V2,
 )
-
 from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
 QUESTIONS = {

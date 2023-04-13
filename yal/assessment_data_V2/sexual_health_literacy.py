@@ -4,9 +4,9 @@ ASSESSMENT_QUESTIONS = {
     "1":
     # Sexual health literacy
     {
-        "start": "baseline_6_q1_sexual_health_lit",
+        "start": "baseline_7_q1_sexual_health_lit",
         "questions": {
-            "baseline_6_q1_sexual_health_lit": {
+            "baseline_7_q1_sexual_health_lit": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -29,9 +29,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 0,
                 },
-                "next": "baseline_6_q2_sexual_health_lit",
+                "next": "baseline_7_q2_sexual_health_lit",
             },
-            "baseline_6_q2_sexual_health_lit": {
+            "baseline_7_q2_sexual_health_lit": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -54,9 +54,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_6_q3_sexual_health_lit_info",
+                "next": "baseline_7_q3_sexual_health_lit_info",
             },
-            "baseline_6_q3_sexual_health_lit_info": {
+            "baseline_7_q3_sexual_health_lit_info": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -86,9 +86,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_6_q4_sexual_health_lit",
+                "next": "baseline_7_q4_sexual_health_lit",
             },
-            "baseline_6_q4_sexual_health_lit": {
+            "baseline_7_q4_sexual_health_lit": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -113,9 +113,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_6_q5_sexual_health_lit",
+                "next": "baseline_7_q5_sexual_health_lit",
             },
-            "baseline_6_q5_sexual_health_lit": {
+            "baseline_7_q5_sexual_health_lit": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -141,9 +141,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_6_q6_sexual_health_lit",
+                "next": "baseline_7_q6_sexual_health_lit",
             },
-            "baseline_6_q6_sexual_health_lit": {
+            "baseline_7_q6_sexual_health_lit": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -168,9 +168,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_6_q7_sexual_health_lit",
+                "next": "baseline_7_q7_sexual_health_lit",
             },
-            "baseline_6_q7_sexual_health_lit": {
+            "baseline_7_q7_sexual_health_lit": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -194,9 +194,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_6_q8_sexual_health_lit",
+                "next": "baseline_7_q8_sexual_health_lit",
             },
-            "baseline_6_q8_sexual_health_lit": {
+            "baseline_7_q8_sexual_health_lit": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -217,9 +217,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_6_q9A_sexual_health_lit",
+                "next": "baseline_7_q9A_sexual_health_lit",
             },
-            "baseline_6_q9_sexual_health_lit": {
+            "baseline_7_q9_sexual_health_lit": {
                 "type": "choice",
                 "text": "\n".join(
                     [
@@ -263,7 +263,7 @@ ASSESSMENT_QUESTIONS = {
                 },
                 "next": None,
             },
-            "baseline_6_q10A_sexual_health_lit": {
+            "baseline_7_q10A_sexual_health_lit": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -282,12 +282,12 @@ ASSESSMENT_QUESTIONS = {
                     "more_than_one": 1,
                 },
                 "next": {
-                    "none": "baseline_6_q11_sexual_health_lit",
-                    "one": "baseline_6_q11_sexual_health_lit",
-                    "more_than_one": "baseline_6_q10B_sexual_health_lit",
+                    "none": "baseline_7_q11_sexual_health_lit",
+                    "one": "baseline_7_q11_sexual_health_lit",
+                    "more_than_one": "baseline_7_q10B_sexual_health_lit",
                 },
             },
-            "baseline_6_q10B_sexual_health_lit": {
+            "baseline_7_q10B_sexual_health_lit": {
                 "type": "text",
                 "text": "\n".join(
                     [
@@ -297,9 +297,9 @@ ASSESSMENT_QUESTIONS = {
                         "Please enter any number e.g. *3*",
                     ]
                 ),
-                "next": "baseline_6_q11_sexual_health_lit",
+                "next": "baseline_7_q11_sexual_health_lit",
             },
-            "baseline_6_q11_sexual_health_lit": {
+            "baseline_7_q11_sexual_health_lit": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -320,13 +320,16 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_6_q12_sexual_health_lit",
+                "next": "baseline_7_q12_sexual_health_lit",
             },
-            "baseline_6_q12_sexual_health_lit": {
+            "baseline_7_q12_sexual_health_lit": {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Have you ever been tested for STIs or HIV?*",
+                        "*Remember*- your answers are not linked back to you or "
+                        "shared with anyone."
+                        "",
+                        "*Are you currently living with HIV?*",
                     ]
                 ),
                 "options": [
@@ -335,12 +338,12 @@ ASSESSMENT_QUESTIONS = {
                     ("skip", "Skip"),
                 ],
                 "next": {
-                    "yes": "baseline_6_q13_sexual_health_lit",
-                    "no": "baseline_6_q13_sexual_health_lit",
+                    "yes": "baseline_7_q13_sexual_health_lit",
+                    "no": "baseline_7_q13_sexual_health_lit",
                     "skip": None,
                 },
             },
-            "baseline_6_q13_sexual_health_lit": {
+            "baseline_7_q13_sexual_health_lit": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -354,12 +357,12 @@ ASSESSMENT_QUESTIONS = {
                     ("skip", "Skip"),
                 ],
                 "next": {
-                    "yes": "baseline_6_q14_sexual_health_lit",
-                    "no": "baseline_6_q14_sexual_health_lit",
+                    "yes": "baseline_7_q14_sexual_health_lit",
+                    "no": "baseline_7_q14_sexual_health_lit",
                     "skip": None,
                 },
             },
-            "baseline_6_q14_sexual_health_lit": {
+            "baseline_7_q14_sexual_health_lit": {
                 "type": "list",
                 "text": "\n".join(
                     [
