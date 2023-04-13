@@ -23,12 +23,6 @@ ASSESSMENT_QUESTIONS = {
                     ("dont_understand", "I don't understand"),
                     ("skip", "Skip"),
                 ],
-                "options": [
-                    "True",
-                    "False",
-                    "I don't understand",
-                    "Skip",
-                ],
                 "scoring": {
                     "true": 5,
                     "false": 1,
