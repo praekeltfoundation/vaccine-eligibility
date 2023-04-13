@@ -430,3 +430,32 @@
 | state_body_image_assessment_v2_end | TRUE | Text | End of Body Image Assessment in Baseline Survey. |
 | state_connectedness_assessment_v2_end | TRUE | Text | End of Connectedness Assessment. |
 | state_depression_assessment_v2_end | TRUE | Text | End of Depression Assessment. |
+
+
+### Baseline Survey
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_invitation | TRUE | Text | Start of Baseline Survey. |
+| state_baseline_end | TRUE | Text | End of Baseline Survey. |
+| state_body_image_assessment_v2_end | TRUE | Text | End of Body Image Assessment in Baseline Survey. |
+| state_connectedness_assessment_v2_end | TRUE | Text | End of Connectedness Assessment. |
+| state_depression_assessment_v2_end | TRUE | Text | End of Depression Assessment. |
+
+### Sexual health literacy assessment V2
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| baseline_7_q1_sexual_health_lit | TRUE | Text | People can reduce the risk of getting STIs by |
+| baseline_7_q2_sexual_health_lit | TRUE | Text | People can reduce the risk of getting sexual STIs by only having sex with one partner who isn't infected and who has no other partners. |
+| baseline_7_q3_sexual_health_lit | TRUE | Text | If I'm sexually active, I am able to insist on using condoms when I have sex. |
+| baseline_7_q4_sexual_health_lit | TRUE | Text | My sexual needs or desires are important. |
+| baseline_7_q5_sexual_health_lit | TRUE | Text | I think it would be important to focus on my own pleasure as well as my partner's during sexual experiences. |
+| baseline_7_q6_sexual_health_lit | TRUE | Text | I expect to enjoy sex. |
+| baseline_7_q7_sexual_health_lit | TRUE | Text | The last time you had sex, did you or your partner do or use something to avoid or delay getting pregnant? |
+| baseline_7_q8_sexual_health_lit | TRUE | Text | Did you use a condom last time you had penetrative sex? |
+| baseline_7_q9_sexual_health_lit | TRUE | Text | What's been the MAIN way you or your partner have tried to delay or avoid getting pregnant? |
+| baseline_7_q10A_sexual_health_lit | TRUE | Text | How many sexual partners did you have over the last month? |
+| baseline_7_q10B_sexual_health_lit | TRUE | Text | Please tell me how many sexual partners you had in the last month. |
+| baseline_7_q11_sexual_health_lit | TRUE | Text | Have you ever been tested for STIs or HIV? |
+| baseline_7_q12_sexual_health_lit | TRUE | Text | Are you currently living with HIV? |
+| baseline_7_q13_sexual_health_lit | TRUE | Text | Do you take ART (antiretroviral therapy) medication on a regular basis? |
+| baseline_7_q14_sexual_health_lit | TRUE | Text | Do you take PrEP (Pre-exposure prophylaxis) medication on a regular basis? |

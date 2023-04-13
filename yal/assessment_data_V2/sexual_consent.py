@@ -4,9 +4,9 @@ ASSESSMENT_QUESTIONS = {
     "1":
     # Sexual consent
     {
-        "start": "baseline_8_q1_sexual_consent",
+        "start": "baseline_9_q1_sexual_consent",
         "questions": {
-            "baseline_8_q1_sexual_consent": {
+            "baseline_9_q1_sexual_consent": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -40,9 +40,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_8_q2_sexual_consent",
+                "next": "baseline_9_q2_sexual_consent",
             },
-            "baseline_8_q2_sexual_consent": {
+            "baseline_9_q2_sexual_consent": {
                 "type": "choice",
                 "text": "\n".join(
                     [
