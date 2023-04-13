@@ -1,30 +1,34 @@
-# Assessment state naming convention
-# state_a[number]_[subsection]_q[question]_topic
+# Survey state naming convention
+# [survey_name]_[subsection]_q[question]_topic
 ASSESSMENT_QUESTIONS = {
     "1":
     # A4 Connectedness
     {
-        "start": "state_baseline_q1_connectedness",
+        "start": "baseline_2_q1_connectedness",
         "questions": {
-            "state_baseline_q1_connectedness": {
+            "baseline_2_q1_connectedness": {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "[persona_emoji] BASELINE*Do you have someone to talk "
-                        "to when you have a worry or problem?*",
+                        "*Do you have someone to talk to when you have a "
+                        "worry or problem?*",
                     ]
                 ),
                 "options": [
-                    "Never",
-                    "Sometimes",
-                    "Most of the time",
-                    "All the time",
+                    ("never", "Never"),
+                    ("some_of_the_time", "Some of the time"),
+                    ("most_of_the_time", "Most of the time"),
+                    ("all_of_the_time", "All of the time"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip", "Skip"),
                 ],
                 "scoring": {
                     "never": 0,
-                    "sometimes": 1,
-                    "most_of_the_time": 3,
-                    "all_the_time": 5,
+                    "some_of_the_time": 1,
+                    "most_of_the_time": 2,
+                    "all_of_the_time": 3,
+                    "dont_understand": 0,
+                    "skip": 0,
                 },
                 "next": None,
             },
