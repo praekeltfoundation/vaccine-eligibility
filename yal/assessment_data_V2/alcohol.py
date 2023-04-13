@@ -4,9 +4,9 @@ ASSESSMENT_QUESTIONS = {
     "1":
     # Alcohol
     {
-        "start": "baseline_9_q1_alcohol",
+        "start": "baseline_10_q1_alcohol",
         "questions": {
-            "baseline_9_q1_alcohol": {
+            "baseline_10_q1_alcohol": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -25,9 +25,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_9_q2_alcohol",
+                "next": "baseline_10_q2_alcohol",
             },
-            "baseline_9_q2_alcohol": {
+            "baseline_10_q2_alcohol": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -47,9 +47,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_9_q3_alcohol",
+                "next": "baseline_10_q3_alcohol",
             },
-            "baseline_9_q3_alcohol": {
+            "baseline_10_q3_alcohol": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -69,9 +69,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_9_q4_alcohol",
+                "next": "baseline_10_q4_alcohol",
             },
-            "baseline_9_q4_alcohol": {
+            "baseline_10_q4_alcohol": {
                 "type": "list",
                 "text": "\n".join(
                     [

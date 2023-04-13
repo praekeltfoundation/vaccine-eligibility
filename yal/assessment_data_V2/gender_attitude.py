@@ -4,9 +4,9 @@ ASSESSMENT_QUESTIONS = {
     "1":
     # Gender Attitude
     {
-        "start": "baseline_7_q1_gender_attitude",
+        "start": "baseline_8_q1_gender_attitude",
         "questions": {
-            "baseline_7_q1_gender_attitude": {
+            "baseline_8_q1_gender_attitude": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -30,9 +30,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_7_q2_gender_attitude",
+                "next": "baseline_8_q2_gender_attitude",
             },
-            "baseline_7_q2_gender_attitude": {
+            "baseline_8_q2_gender_attitude": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -53,9 +53,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_7_q3_gender_attitude",
+                "next": "baseline_8_q3_gender_attitude",
             },
-            "baseline_7_q3_gender_attitude": {
+            "baseline_8_q3_gender_attitude": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -77,9 +77,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_7_q4_gender_attitude",
+                "next": "baseline_8_q4_gender_attitude",
             },
-            "baseline_7_q4_gender_attitude": {
+            "baseline_8_q4_gender_attitude": {
                 "type": "list",
                 "text": "\n".join(
                     [
