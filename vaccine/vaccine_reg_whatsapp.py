@@ -151,48 +151,44 @@ class Application(BaseApplication):
         )
 
     async def state_age_gate(self):
-        return MenuState(
+        return ChoiceState(
             self,
             question=self._(
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
-                "Welcome to the official COVID-19 Vaccination "
-                "Self-registration Portal from the National Department of Health. "
-                "Registration will take about 5 minutes. Please have your ID, "
-                "Passport, Refugee Permit or Asylum Seeker Permit *Number* on "
-                "hand. If you have Medical Aid, we will also ask for your Medical "
-                "Aid Number.\n"
+                "Welcome to the official COVID-19 Vaccination Registration Portal from "
+                "the National Department of Health. Registration will take about 5 "
+                "minutes. Please have your Birth Certificate, ID, Passport, Refugee "
+                "Permit or Asylum Seeker Permit *Number* on hand. If you have Medical "
+                "Aid, we will also ask for your Medical Aid Number.\n"
                 "\n"
                 "*Note:*\n"
                 "- Vaccination is voluntary and no payment is required\n"
                 "- No co-payment/levy will be required if you belong to a Medical Aid\n"
                 "- Everyone who registers will be offered vaccination\n"
-                "- We will move down the age groups as quickly as we can\n"
                 "\n"
-                "Registration is currently only open to those {minimum_age} years "
-                "and older. Are you {minimum_age} or older?\n"
-            ).format(minimum_age=config.ELIGIBILITY_AGE_GATE_MIN),
+                "*Important*\n"
+                "👉 *Self* registration is available to those aged 18 and over\n"
+                "👉 For children aged 5-17, registration must be completed by someone "
+                "who can legally make decisions on behalf of the child.\n"
+                "\n"
+            ),
             error=self._(
                 "⚠️ This service works best when you use the numbered options "
                 "available\n"
                 "\n"
-                "Please confirm that you are {minimum_age} years or older by typing 1 "
-                "(or 2 if you are NOT {minimum_age} years or older)\n"
-            ).format(minimum_age=config.ELIGIBILITY_AGE_GATE_MIN),
+                "Please confirm the type of registration"
+            ),
             error_footer=self._(
                 "\n"
                 "-----\n"
                 "Or reply 📌 *0* to end this session and return to the main *MENU*"
             ),
             choices=[
-                Choice(
-                    "state_terms_pdf",
-                    self._("Yes, I am {minimum_age} or older").format(
-                        minimum_age=config.ELIGIBILITY_AGE_GATE_MIN
-                    ),
-                ),
-                Choice("state_under_age_notification", self._("No")),
+                Choice("18+", self._("18+ Self registration")),
+                Choice("5-17", self._("Register on behalf of a child aged 5-17")),
             ],
+            next="state_terms_pdf",
         )
 
     async def state_throttle(self):
@@ -258,14 +254,32 @@ class Application(BaseApplication):
         return await self.go_to_state("state_terms_and_conditions")
 
     async def state_terms_and_conditions(self):
-        return MenuState(
-            self,
-            question=self._(
+        question = self._(
+            "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+            "\n"
+            "Do you agree to the attached Electronic Vaccine Data System "
+            "PRIVACY POLICY that explains how your data is used and protected?\n"
+        )
+        if self.user.answers.get("state_age_gate") == "5-17":
+            question = self._(
                 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                 "\n"
-                "Do you agree to the attached Electronic Vaccine Data System "
-                "PRIVACY POLICY that explains how your data is used and protected?\n"
-            ),
+                "If you are using this service on behalf of a child to register for a "
+                "COVID-19 vaccination as a competent person, you need to confirm that "
+                "you are sharing the child's information in line with the Electronic "
+                "Vaccine Data System Privacy Policy.\n"
+                "\n"
+                "The POPI Act says that a competent person is someone who is legally "
+                "competent to make decisions on behalf of a child.\n"
+                "\n"
+                "Please confirm that you consent to the attached Electronic Vaccine "
+                "Data System PRIVACY POLICY that explains how all data is used and "
+                "protected *on behalf of the child*?\n"
+                "\n"
+            )
+        return MenuState(
+            self,
+            question=question,
             choices=[
                 Choice("state_terms_and_conditions_summary", self._("Read summary")),
                 Choice("state_identification_type", self._("Accept")),
