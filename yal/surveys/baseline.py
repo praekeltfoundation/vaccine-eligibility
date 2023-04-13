@@ -25,7 +25,7 @@ class Application(BaseApplication):
 
         await self.publish_message(msg)
         self.save_metadata(
-            "assessment_name", "connectedness_v2"
+            "assessment_name", "sexual_health_literacy_v2"
         )  # example name for the baseline assessments
         self.save_metadata(
             "assessment_end_state", "state_connectedness_assessment_v2_end"

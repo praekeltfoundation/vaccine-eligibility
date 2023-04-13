@@ -39,9 +39,37 @@ from yal.assessment_data.A8_self_esteem import (
 from yal.assessment_data.reengagement import REENGAGEMENT
 
 # Assessments that form part of the Baseline study
+from yal.assessment_data_V2.self_esteem import (
+    ASSESSMENT_QUESTIONS as SELF_ESTEEM_QUESTIONS_V2,
+)
 from yal.assessment_data_V2.connectedness import (
     ASSESSMENT_QUESTIONS as CONNECTEDNESS_QUESTIONS_V2,
 )
+from yal.assessment_data_V2.body_image import (
+    ASSESSMENT_QUESTIONS as BODY_IMAGE_QUESTIONS_V2,
+)
+from yal.assessment_data_V2.depression import (
+    ASSESSMENT_QUESTIONS as DEPRESSION_QUESTIONS_V2,
+)
+from yal.assessment_data_V2.anxiety import (
+    ASSESSMENT_QUESTIONS as ANXIETY_QUESTIONS_V2,
+)
+from yal.assessment_data_V2.self_perceived_healthcare import (
+    ASSESSMENT_QUESTIONS as SELF_PERCEIVED_HEALTHCARE_QUESTIONS_V2,
+)
+from yal.assessment_data_V2.sexual_health_literacy import (
+    ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS_V2,
+)
+from yal.assessment_data_V2.gender_attitude import (
+    ASSESSMENT_QUESTIONS as GENDER_ATTITUDE_QUESTIONS_V2,
+)
+from yal.assessment_data_V2.sexual_consent import (
+    ASSESSMENT_QUESTIONS as SEXUAL_CONSENT_QUESTIONS_V2,
+)
+from yal.assessment_data_V2.alcohol import (
+    ASSESSMENT_QUESTIONS as ALCOHOL_QUESTIONS_V2,
+)
+
 from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
 QUESTIONS = {
@@ -49,11 +77,22 @@ QUESTIONS = {
     "locus_of_control": LOCUS_OF_CONTROL_QUESTIONS,
     "depression_and_anxiety": DEPRESSION_AND_ANXIETY_QUESTIONS,
     "connectedness": CONNECTEDNESS_QUESTIONS,
-    "connectedness_v2": CONNECTEDNESS_QUESTIONS_V2,
     "gender_attitude": GENDER_ATTITUDE,
     "body_image": BODY_IMAGE_QUESTIONS,
     "self_perceived_healthcare": SELF_PERCEIVED_HEALTHCARE_QUESTIONS,
     "self_esteem": SELF_ESTEEM_QUESTIONS,
+     "body_image": BODY_IMAGE_QUESTIONS,
+     "self_esteem_v2": SELF_ESTEEM_QUESTIONS_V2,
+     "connectedness_v2": CONNECTEDNESS_QUESTIONS_V2,
+     "body_image_v2": BODY_IMAGE_QUESTIONS_V2,
+     "depression_v2": DEPRESSION_QUESTIONS_V2,
+     "anxiety_v2": ANXIETY_QUESTIONS_V2,
+     "self_perceived_healthcare_v2": SELF_PERCEIVED_HEALTHCARE_QUESTIONS_V2,
+     "sexual_health_literacy_v2": SEXUAL_HEALTH_LITERACY_QUESTIONS_V2,
+     "gender_attitude_v2": GENDER_ATTITUDE_QUESTIONS_V2,
+     "connectedness_v2": SEXUAL_CONSENT_QUESTIONS_V2,
+     "alcohol_v2": ALCOHOL_QUESTIONS_V2,
+     
 }
 
 
