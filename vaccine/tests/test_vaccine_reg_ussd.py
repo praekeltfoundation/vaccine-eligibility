@@ -71,7 +71,7 @@ async def eventstore_mock():
 @pytest.mark.asyncio
 async def test_age_gate():
     """
-    Should ask the user if they're over 60
+    Should notify the user of minimum age
     """
     u = User(addr="27820001001", state=StateData())
     app = Application(u)
@@ -84,7 +84,7 @@ async def test_age_gate():
         session_event=Message.SESSION_EVENT.NEW,
     )
     [reply] = await app.process_message(msg)
-    assert len(reply.content) < 140
+    assert len(reply.content) < 160
     assert u.state.name == "state_age_gate"
 
 
@@ -105,25 +105,6 @@ async def test_age_gate_error():
     [reply] = await app.process_message(msg)
     assert len(reply.content) < 140
     assert u.state.name == "state_age_gate"
-
-
-@pytest.mark.asyncio
-async def test_under_age_notification():
-    """
-    Should ask the user if they want a notification when it opens up
-    """
-    u = User(addr="27820001001", state=StateData(name="state_age_gate"), session_id=1)
-    app = Application(u)
-    msg = Message(
-        content="no",
-        to_addr="27820001002",
-        from_addr="27820001001",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-    [reply] = await app.process_message(msg)
-    assert len(reply.content) < 160
-    assert u.state.name == "state_under_age_notification"
 
 
 @pytest.mark.asyncio
@@ -222,7 +203,7 @@ async def test_identification_number():
     )
     app = Application(u)
     msg = Message(
-        content="rsa id number",
+        content="rsa id number / birth certificate number",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -1344,7 +1325,7 @@ async def test_terms_and_conditions():
     u = User(addr="27820001001", state=StateData(name="state_age_gate"), session_id=1)
     app = Application(u)
     msg = Message(
-        content="yes",
+        content="continue",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
