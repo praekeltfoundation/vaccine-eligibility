@@ -217,7 +217,7 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": "baseline_7_q9A_sexual_health_lit",
+                "next": "baseline_7_q9_sexual_health_lit",
             },
             "baseline_7_q9_sexual_health_lit": {
                 "type": "choice",
@@ -261,7 +261,7 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip": 1,
                 },
-                "next": None,
+                "next": "baseline_7_q10A_sexual_health_lit",
             },
             "baseline_7_q10A_sexual_health_lit": {
                 "type": "list",
