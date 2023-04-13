@@ -22,15 +22,6 @@ ASSESSMENT_QUESTIONS = {
                     ("dont_understand", "I don't understand"),
                     ("skip", "Skip"),
                 ],
-                "options": [
-                    "Excellent",
-                    "Very Good",
-                    "Good",
-                    "Fair",
-                    "Poor",
-                    "I don't understand",
-                    "Skip",
-                ],
                 "scoring": {
                     "excellent": 5,
                     "very_good": 4,
