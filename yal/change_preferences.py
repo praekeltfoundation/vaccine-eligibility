@@ -110,7 +110,7 @@ class Application(BaseApplication):
                 Choice("state_update_relationship_status", self._("Relationship?")),
                 Choice("state_update_location", self._("Location")),
                 Choice(notifications_change_state, self._("Notifications")),
-                Choice("study_optin", self._("Opt out of study")),
+                Choice("state_update_study_optout", self._("Opt out of study")),
             ],
             next=next_,
             error=self._(get_generic_error()),
