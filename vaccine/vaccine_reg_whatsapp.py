@@ -82,8 +82,8 @@ class Application(BaseApplication):
         super().__init__(user, worker)
 
         class ID_TYPES(Enum):
-            rsa_id = self._("RSA ID Number")
-            passport = self._("NON-RSA Passport Number")
+            rsa_id = self._("RSA ID Number / RSA Birth Certificate")
+            passport = self._("Passport Number")
             asylum_seeker = self._("Asylum Seeker Permit number")
             refugee = self._("Refugee Permit number")
 
@@ -550,8 +550,8 @@ class Application(BaseApplication):
                     question=self._(
                         "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
                         "\n"
-                        "The number you have entered appears to be a RSA ID Number. Is "
-                        "this correct?\n"
+                        "The number you have entered appears to be a RSA ID Number/RSA "
+                        "Birth Certificate ID Number. Is this correct?\n"
                     ),
                     choices=[
                         Choice("state_change_to_rsa_id", self._("Yes")),
@@ -561,7 +561,7 @@ class Application(BaseApplication):
                         "Please try again\n"
                         "\n"
                         "Please confirm that the number you have entered is a RSA ID "
-                        "Number"
+                        "Number/RSA Birth Certificate ID Number"
                     ),
                 )
         except ValueError:

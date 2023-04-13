@@ -188,7 +188,7 @@ async def test_identification_type_invalid(tester: AppTester):
 @pytest.mark.asyncio
 async def test_identification_number(tester: AppTester):
     tester.setup_state("state_identification_type")
-    await tester.user_input("rsa id number")
+    await tester.user_input("rsa id number / rsa birth certificate")
     tester.assert_state("state_identification_number")
     tester.assert_num_messages(1)
 
