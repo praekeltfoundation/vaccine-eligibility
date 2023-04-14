@@ -82,6 +82,7 @@ async def eventstore_mock():
 
 
 @pytest.mark.asyncio
+@pytest.mark.skip("Skip this until we have new translations")
 async def test_language(tester: AppTester):
     """
     Should set the user language on selection
@@ -145,17 +146,6 @@ async def test_age_gate_error(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_under_age_notification(tester: AppTester):
-    """
-    Should ask the user if they want a notification when it opens up
-    """
-    tester.setup_state("state_age_gate")
-    await tester.user_input("no")
-    tester.assert_state("state_under_age_notification")
-    tester.assert_num_messages(1)
-
-
-@pytest.mark.asyncio
 async def test_under_age_notification_error(tester: AppTester):
     """
     Should show the error message on incorrect input
@@ -198,7 +188,7 @@ async def test_identification_type_invalid(tester: AppTester):
 @pytest.mark.asyncio
 async def test_identification_number(tester: AppTester):
     tester.setup_state("state_identification_type")
-    await tester.user_input("rsa id number")
+    await tester.user_input("rsa id number / rsa birth certificate")
     tester.assert_state("state_identification_number")
     tester.assert_num_messages(1)
 
@@ -914,7 +904,7 @@ async def test_email_invalid_2(tester: AppTester):
 @pytest.mark.asyncio
 async def test_terms_and_conditions(tester: AppTester):
     tester.setup_state("state_age_gate")
-    await tester.user_input("1")
+    await tester.user_input("2")
     tester.assert_state("state_terms_and_conditions")
     tester.assert_num_messages(2)
     assert "document" in tester.application.messages[0].helper_metadata

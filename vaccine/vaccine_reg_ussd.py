@@ -75,8 +75,8 @@ class Application(BaseApplication):
         super().__init__(user, worker)
 
         class ID_TYPES(Enum):
-            rsa_id = self._("RSA ID Number")
-            passport = self._("NON-RSA Passport Number")
+            rsa_id = self._("RSA ID Number / Birth Certificate number")
+            passport = self._("Non RSA Passport Number")
             asylum_seeker = self._("Asylum Seeker Permit number")
             refugee = self._("Refugee Permit number")
 
@@ -91,21 +91,16 @@ class Application(BaseApplication):
         return MenuState(
             self,
             question=self._(
-                "VACCINE REGISTRATION\n"
+                "EVDS VACCINE REGISTRATION\n"
                 "The SA Department of Health thanks you for helping to defeat "
                 "COVID-19!\n"
                 "\n"
-                "Are you {minimum_age} years or older?"
+                "Note: Vaccinations is only available for ages {minimum_age}+"
             ).format(minimum_age=config.ELIGIBILITY_AGE_GATE_MIN),
             choices=[
-                Choice("state_terms_and_conditions", "Yes"),
-                Choice("state_under_age_notification", "No"),
+                Choice("state_terms_and_conditions", "Continue"),
             ],
-            error=self._(
-                "Self-registration is currently only available to those {minimum_age} "
-                "years of age or older. Please tell us if you are {minimum_age} or "
-                "older?"
-            ).format(minimum_age=config.ELIGIBILITY_AGE_GATE_MIN),
+            error=self._("ERROR: Please try again\n"),
         )
 
     async def state_throttle(self):
@@ -178,7 +173,7 @@ class Application(BaseApplication):
             self,
             question=self._("How would you like to register?"),
             choices=[Choice(i.name, i.value) for i in self.ID_TYPES],
-            error=self._("Please choose 1 of the following ways to register:"),
+            error=self._("Choose 1 way to register:"),
             next="state_identification_number",
         )
 
