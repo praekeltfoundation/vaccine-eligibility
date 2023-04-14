@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 class Application(BaseApplication):
     START_STATE = "state_baseline_start"
 
-    #Baseline start - Use this to link to survey from other areas
+    # Baseline start - Use this to link to survey from other areas
     async def state_baseline_start(self):
         return await self.go_to_state("state_self_esteem_assessment_v2")
- 
+
     # Self Esteem
     async def state_self_esteem_assessment_v2(self):
         self.save_metadata("assessment_name", "self_esteem_v2")
