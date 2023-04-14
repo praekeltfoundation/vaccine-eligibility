@@ -353,6 +353,7 @@
 | state_pushmessage_optin_no_submit            |        FALSE       |              |            TRUE          | Updates opted_in with False if user responds no                                   |
 | state_pushmessage_optin_no                   |        TRUE        |     Text     |            TRUE          | Sends the user confirmation that they will not receive push messages |
 | state_pushmessage_optin_final                |        TRUE        |     Text     |            TRUE          | asks if user would like to go to main menu or aaq |
+| state_is_eligible_for_study                  |        FALSE        |     Text     |            TRUE          | This is not a real state but where we save the outcome of the validation check to determine if the user is eligible for the study. Either "true" or "false" |
 | state_study_invitation                        |        TRUE        |     Text     |            TRUE          | asks if user would like to be part of the EJAF study. Options are "yes" or "no" |
 | state_study_consent                          |        TRUE        |     Text     |            TRUE          | asks the user to accept the T&Cs for the EJAF study. Options are "yes" or "no" |
 | state_study_consent_yes_submit               |        FALSE        |     Text     |            FALSE          | Updates ejaf_study_optin with True if user responded yes to state_study_consent |
