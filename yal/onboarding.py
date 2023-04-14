@@ -5,7 +5,7 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
 from yal import rapidpro, utils
 from yal.assessments import Application as AssessmentApplication
-from yal.pushmessages_and_study_optin import Application as PushmessageOptinApplication
+from yal.pushmessages_optin import Application as PushmessageOptinApplication
 from yal.utils import extract_first_emoji, get_current_datetime, get_generic_error
 from yal.validators import age_validator
 
