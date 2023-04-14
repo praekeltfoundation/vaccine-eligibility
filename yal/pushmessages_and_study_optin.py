@@ -4,7 +4,7 @@ import logging
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, WhatsAppButtonState
 from vaccine.utils import get_display_choices
-from yal import rapidpro
+from yal import contentrepo, rapidpro
 from yal.askaquestion import Application as AaqApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.surveys.baseline import Application as BaselineSurveyApplication
@@ -219,4 +219,14 @@ class Application(BaseApplication):
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
+        return await self.go_to_state("state_study_terms_pdf")
+
+    async def state_study_terms_pdf(self):
+        await self.worker.publish_message(
+            self.inbound.reply(
+                None,
+                helper_metadata={"document": contentrepo.get_privacy_policy_url()},
+            )
+        )
+        await asyncio.sleep(1.5)
         return await self.go_to_state(BaselineSurveyApplication.START_STATE)
