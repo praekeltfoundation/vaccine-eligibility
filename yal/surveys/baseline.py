@@ -12,26 +12,47 @@ logger = logging.getLogger(__name__)
 
 
 class Application(BaseApplication):
-    START_STATE = "state_invitation"
+    START_STATE = "state_baseline_start"
 
-    async def state_invitation(self):
-        msg = self._(
-            "\n".join(
-                [
-                    "we're starting now",
-                ]
-            )
-        )
+    # Baseline start - Use this to link to survey from other areas
+    async def state_baseline_start(self):
+        return await self.go_to_state("state_self_esteem_assessment_v2")
 
-        await self.publish_message(msg)
+    # Self Esteem
+    async def state_self_esteem_assessment_v2(self):
+        self.save_metadata("assessment_name", "self_esteem_v2")
         self.save_metadata(
-            "assessment_name", "sexual_health_literacy_v2"
-        )  # example name for the baseline assessments
+            "assessment_end_state", "state_self_esteem_assessment_v2_end"
+        )
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_self_esteem_assessment_v2_end(self):
+        score = self.user.metadata.get("assessment_score", 0)
+        if score <= 2:
+            # score of 0-2 high risk
+            risk = "high_risk"
+        else:
+            # score of 3-5 low risk
+            risk = "low_risk"
+
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "self_esteem_v2_risk": risk,
+            "self_esteem_v2_score": score,
+        }
+        self.save_answer("state_self_esteem_v2_risk", risk)
+        self.save_answer("state_self_esteem_v2_score", str(score))
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+        self.save_metadata("assessment_name", "connectedness_v2")
         self.save_metadata(
             "assessment_end_state", "state_connectedness_assessment_v2_end"
         )
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
+    # Connectedness
     async def state_connectedness_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
         if score <= 2:
@@ -44,11 +65,11 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "connectedness_risk": risk,
-            "connectedness_score": score,
+            "connectedness_v2_risk": risk,
+            "connectedness_v2_score": score,
         }
-        self.save_answer("state_connectedness_risk", risk)
-        self.save_answer("state_connectedness_score", str(score))
+        self.save_answer("state_connectedness_v2_risk", risk)
+        self.save_answer("state_connectedness_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -56,6 +77,7 @@ class Application(BaseApplication):
         self.save_metadata("assessment_end_state", "state_body_image_assessment_v2_end")
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
+    # Body Image
     async def state_body_image_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
         if score <= 5:
@@ -68,8 +90,8 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "body_image_risk": risk,
-            "body_image_score": score,
+            "body_image_v2_risk": risk,
+            "body_image_v2_score": score,
         }
         self.save_answer("state_body_image_risk", risk)
         self.save_answer("state_body_image_score", str(score))
@@ -80,6 +102,7 @@ class Application(BaseApplication):
         self.save_metadata("assessment_end_state", "state_depression_assessment_v2_end")
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
+    # Depression
     async def state_depression_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
         if score <= 5:
@@ -92,15 +115,54 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "depression_risk": risk,
-            "depression_score": score,
+            "depression_v2_risk": risk,
+            "depression_v2_score": score,
         }
-        self.save_answer("state_depression_risk", risk)
-        self.save_answer("state_depression_score", str(score))
+        self.save_answer("depression_v2_risk", risk)
+        self.save_answer("depression_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
         return await self.go_to_state("state_baseline_end")
+
+    # Anxiety
+
+    # Depression & Anxiety - This is not a question set, but rather a piece of
+    # logic to work out a combined "depression_and_anxiety" score
+
+    # HALF WAY MESSAGE
+
+    # Self Perceived Health Care
+
+    # Sexual Health Literacy
+    async def state_shl_assessment_v2_end(self):
+        score = self.user.metadata.get("assessment_score", 0)
+        if score <= 5:
+            # score of 0-5 high risk
+            risk = "high_risk"
+        else:
+            # score of 6-10 low risk
+            risk = "low_risk"
+
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "sexual_health_lit_v2_risk": risk,
+            "sexual_health_lit_v2_score": score,
+        }
+        self.save_answer("sexual_health_lit_v2_risk", risk)
+        self.save_answer("sexual_health_lit_v2_score", str(score))
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+        return await self.go_to_state("state_baseline_end")
+
+    # Gender Attitudes
+
+    # Sexual Consent
+
+    # Baseline End
+    # TODO: Rememeber to check for survey complete variable.
 
     async def state_baseline_end(self):
         msg = self._(
@@ -112,22 +174,3 @@ class Application(BaseApplication):
         )
 
         await self.publish_message(msg)
-
-
-# Self Esteem
-
-# Connectetedness
-
-# Body Image
-
-# Depression
-
-# HALF WAY MESSAGE
-
-# Self Perceived Health Care
-
-# Sexual Health Literacy
-
-# Gender Attitudes
-
-# Sexual Consent

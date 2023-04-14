@@ -425,18 +425,11 @@
 ### Baseline Survey
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
-| state_invitation | TRUE | Text | Start of Baseline Survey. |
+| state_baseline_start | TRUE | Text | Start of Baseline Survey. |
 | state_baseline_end | TRUE | Text | End of Baseline Survey. |
-| state_body_image_assessment_v2_end | TRUE | Text | End of Body Image Assessment in Baseline Survey. |
-| state_connectedness_assessment_v2_end | TRUE | Text | End of Connectedness Assessment. |
-| state_depression_assessment_v2_end | TRUE | Text | End of Depression Assessment. |
-
-
-### Baseline Survey
-| state_name | accepts_user_input | data_type | description |
-| ---------- | ------------------ | --------- | ----------- |
-| state_invitation | TRUE | Text | Start of Baseline Survey. |
-| state_baseline_end | TRUE | Text | End of Baseline Survey. |
+| state_self_esteem_assessment_v2 | TRUE | Text | Start of Self Esteem Assessment. |
+| state_self_esteem_assessment_v2_end | TRUE | Text | End of of Self Esteem Assessment. |
+| state_shl_assessment_v2_end | TRUE | Text | End of SHL Assessment. |
 | state_body_image_assessment_v2_end | TRUE | Text | End of Body Image Assessment in Baseline Survey. |
 | state_connectedness_assessment_v2_end | TRUE | Text | End of Connectedness Assessment. |
 | state_depression_assessment_v2_end | TRUE | Text | End of Depression Assessment. |
