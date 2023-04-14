@@ -18,6 +18,7 @@ from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
 from yal.optout import Application as OptoutApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
+from yal.pushmessages_and_study_optin import Application as OptinsApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
@@ -52,6 +53,7 @@ def get_state_sets():
     wa_fb_states = set(
         s for s in dir(WaFbCrossoverFeedbackApplication) if s.startswith("state_")
     )
+    optin_states = set(s for s in dir(OptinsApplication) if s.startswith("state_"))
 
     return [
         m_states,
@@ -69,6 +71,7 @@ def get_state_sets():
         sf_s_states,
         ss_states,
         wa_fb_states,
+        optin_states,
     ]
 
 

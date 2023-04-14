@@ -5,7 +5,7 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
 from yal import rapidpro, utils
 from yal.assessments import Application as AssessmentApplication
-from yal.pushmessages_optin import Application as PushmessageOptinApplication
+from yal.pushmessages_and_study_optin import Application as PushmessageOptinApplication
 from yal.utils import extract_first_emoji, get_current_datetime, get_generic_error
 from yal.validators import age_validator
 
@@ -194,8 +194,54 @@ class Application(BaseApplication):
             question=question,
             button="Relationship status",
             choices=rel_status_choices,
-            next="state_submit_onboarding",
+            next="state_country",
             error=self._(get_generic_error()),
+        )
+
+    async def state_country(self):
+        await self.update_last_onboarding_time()
+        country_choices = [
+            Choice("yes", self._("Yes")),
+            Choice("no", self._("No")),
+            Choice("skip", self._("Skip")),
+        ]
+
+        question = self._(
+            "\n".join(
+                [
+                    "*Are you currently living in South Africa?* 🇿🇦",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            app=self,
+            question=question,
+            choices=country_choices,
+            error=get_generic_error(),
+            next="state_seen_before",
+        )
+
+    async def state_seen_before(self):
+        await self.update_last_onboarding_time()
+        choices = [
+            Choice("yes", self._("Yes")),
+            Choice("no", self._("No")),
+            Choice("skip", self._("Skip")),
+        ]
+
+        question = self._(
+            "\n".join(
+                [
+                    "*Have you used the B-wise WhatsApp chatbot before?*",
+                ]
+            )
+        )
+        return WhatsAppButtonState(
+            app=self,
+            question=question,
+            choices=choices,
+            error=get_generic_error(),
+            next="state_submit_onboarding",
         )
 
     async def state_submit_onboarding(self):
@@ -203,6 +249,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
         persona_name = self.user.answers.get("state_persona_name", "")
         persona_emoji = self.user.answers.get("state_persona_emoji", "")
+        country = self.user.answers.get("state_country", "")
 
         data = {
             "opted_out": "FALSE",
@@ -214,26 +261,14 @@ class Application(BaseApplication):
             "relationship_status": self.user.answers.get("state_rel_status", ""),
             "onboarding_reminder_sent": "",
             "onboarding_reminder_type": "",
+            "country": "south africa" if country == "yes" else "",
+            "used_bot_before": self.user.answers.get("state_seen_before"),
         }
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
-        return await self.go_to_state("state_onboarding_complete")
-
-    async def state_onboarding_complete(self):
-        msg = self._(
-            "\n".join(
-                [
-                    "*🙏🏾 Lekker! Your profile is all set up!*",
-                    "",
-                    "Let's get you started!",
-                ]
-            )
-        )
-
-        await self.publish_message(msg)
         return await self.go_to_state("state_locus_of_control_assessment_start")
 
     async def state_locus_of_control_assessment_start(self):
@@ -286,11 +321,9 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    "🏁 🎉",
+                    "*🙏🏾 Lekker! Your profile is all set up!*",
                     "",
-                    "*Awesome. That's all the questions for now!*",
-                    "",
-                    "[persona_emoji] Thanks for being so patient and honest 😌.",
+                    "Let's get you started!",
                 ]
             )
         )
