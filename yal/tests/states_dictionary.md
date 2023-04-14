@@ -429,10 +429,19 @@
 | state_baseline_end | TRUE | Text | End of Baseline Survey. |
 | state_self_esteem_assessment_v2 | TRUE | Text | Start of Self Esteem Assessment. |
 | state_self_esteem_assessment_v2_end | TRUE | Text | End of of Self Esteem Assessment. |
-| state_shl_assessment_v2_end | TRUE | Text | End of SHL Assessment. |
+| state_sexual_health_lit_assessment_v2_end | TRUE | Text | End of SHL Assessment. |
+| state_self_perceived_healthcare_assessment_v2 | TRUE | Text | Start of SPH Assessment. |
+| state_self_perceived_healthcare_assessment_v2_end | TRUE | Text | End of SPH Assessment. |
 | state_body_image_assessment_v2_end | TRUE | Text | End of Body Image Assessment in Baseline Survey. |
 | state_connectedness_assessment_v2_end | TRUE | Text | End of Connectedness Assessment. |
+| state_gender_attitude_assessment_v2_end | TRUE | Text | End of Gender Attitude Assessment. |
 | state_depression_assessment_v2_end | TRUE | Text | End of Depression Assessment. |
+| state_anxiety_assessment_v2_end | TRUE | Text | End of Anxiety Assessment. |
+| state_depression_and_anxiety_v2_end | TRUE | Text | A state to work out a combined score for depression and anxiety. |
+| state_sexual_consent_assessment_v2_end | TRUE | Text | End of Sexual Consent Assessment. |
+| state_alcohol_assessment_v2_end | TRUE | Text | End of Alcohol Assessment. |
+| state_baseline_halfway_msg | TRUE | Text | Halfway message of baseline survey |
+
 
 ### Sexual health literacy assessment V2
 | state_name | accepts_user_input | data_type | description |
