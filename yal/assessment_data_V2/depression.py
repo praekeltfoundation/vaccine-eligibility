@@ -8,7 +8,14 @@ ASSESSMENT_QUESTIONS = {
         "questions": {
             "baseline_4_q1_depression": {
                 "type": "list",
-                "text": "Feeling down, depressed or hopeless",
+                "text": "\n".join(
+                    [
+                        "*Over the last 2 weeks, how often have you been "
+                        "bothered by the following problems?*",
+                        "",
+                        "Feeling down, depressed or hopeless",
+                    ]
+                ),
                 "options": [
                     ("not_at_all", "Not at all"),
                     ("several_days", "Several days"),
