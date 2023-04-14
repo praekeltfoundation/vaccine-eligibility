@@ -95,9 +95,9 @@ class Application(BaseApplication):
             Choice(notifications_change_state, self._("Notifications")),
         ]
 
-        study_optin = self.user.metadata.get("study_optin")
+        ejaf_study_optin = self.user.metadata.get("ejaf_study_optin")
 
-        if study_optin == "True":
+        if ejaf_study_optin == "True":
             question_list.extend(
                 [
                     "📝 *Study Participant*",
@@ -106,7 +106,7 @@ class Application(BaseApplication):
                 ]
             )
 
-            choices_list.append(Choice("study_optin", self._("Opt out of study")))
+            choices_list.append(Choice("ejaf_study_optin", self._("Opt out of study")))
 
         question_list.extend(
             [
@@ -860,7 +860,7 @@ class Application(BaseApplication):
         )
 
     async def study_optout_confirm(self):
-        data = {"study_optin": "False"}
+        data = {"ejaf_study_optin": "False"}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
