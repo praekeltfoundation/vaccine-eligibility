@@ -151,6 +151,8 @@
 | state_locus_of_control_assessment_few_qs    |        TRUE        |     Text     |            TRUE          | User responds "ok" when they start the assessment  |
 | state_locus_of_control_assessment_end |        FALSE       |              |            FALSE         | User has completed the assessment and receives the end message |
 | state_phase2_update_exising_user_profile |        FALSE       |              |            FALSE         | For phase 2 we need to send existing users back to onboarding so that they can take the assessments. This state handles the push message response and inserts them based on their profile (if their gender isn't set they go to state_gender, if it is set they go to state_rel_status) |
+| state_country                              |        TRUE       |      Text        |            TRUE         | Asks the user if they are in South Africa. User response is "yes", "no" or "skip" |
+| state_seen_before                          |        TRUE       |      Text        |            TRUE         | Asks the user if they have used the Bwise bot before. User response is "yes", "no" or "skip" |
 
 
 ### OptOut flow
@@ -342,7 +344,7 @@
 | state_submit_completed_feedback      |        FALSE       |              |            TRUE          | Starts a flow in rapidpro to save the user's feedback            |
 | state_completed_feedback             |        TRUE        |     Text     |            TRUE          | Closes the user session            |
 
-### PushMessages OptIn flow
+### PushMessages and Study OptIn flow
 | state_name                                   | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
 |----------------------------------------------|--------------------|--------------|---------------------------|----------------------------------------------------------------------------------|
 | state_start_pushmessage_optin                |        TRUE        |     Text     |            TRUE          | Asks user if they would like to receive push messages, answers include yes and no |
@@ -351,6 +353,11 @@
 | state_pushmessage_optin_no_submit            |        FALSE       |              |            TRUE          | Updates opted_in with False if user responds no                                   |
 | state_pushmessage_optin_no                   |        TRUE        |     Text     |            TRUE          | Sends the user confirmation that they will not receive push messages |
 | state_pushmessage_optin_final                |        TRUE        |     Text     |            TRUE          | asks if user would like to go to main menu or aaq |
+| state_is_eligible_for_study                  |        FALSE        |     Text     |            TRUE          | This is not a real state but where we save the outcome of the validation check to determine if the user is eligible for the study. Either "true" or "false" |
+| state_study_invitation                        |        TRUE        |     Text     |            TRUE          | asks if user would like to be part of the EJAF study. Options are "yes" or "no" |
+| state_study_consent                          |        TRUE        |     Text     |            TRUE          | asks the user to accept the T&Cs for the EJAF study. Options are "yes" or "no" |
+| state_study_consent_yes_submit               |        FALSE        |     Text     |            FALSE          | Updates ejaf_study_optin with True if user responded yes to state_study_consent |
+| state_study_terms_pdf                        |        FALSE        |     Text     |            FALSE          | Sends user terms and conditions as pdf and then routes them to the baseline survey |
 
 ### A1 Sexual health literacy assessment
 | state_name | accepts_user_input | data_type | description |

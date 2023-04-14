@@ -295,14 +295,111 @@ async def test_state_gender_from_list(
 
 
 @pytest.mark.asyncio
-async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_rel_status(get_current_datetime, tester: AppTester, rapidpro_mock):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_rel_status")
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "ABOUT YOU / 👩🏾‍❤️‍💋‍👩🏽 *Relationship status*",
+                "-----",
+                "",
+                "*Awesome! Are you seeing someone special right now?*",
+                "",
+                "_Tap the button and select the option that "
+                "best describes your situation.._",
+            ]
+        )
+    )
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
+    await tester.user_input("2")
+    tester.assert_state("state_country")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_country(get_current_datetime, tester: AppTester, rapidpro_mock):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_country")
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*Are you currently living in South Africa?* 🇿🇦",
+            ]
+        )
+    )
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
+    await tester.user_input("2")
+    tester.assert_state("state_seen_before")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_state_seen_before(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_seen_before")
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "*Have you used the B-wise WhatsApp chatbot before?*",
+            ]
+        )
+    )
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "last_onboarding_time": "2022-06-19T17:30:00",
+            "onboarding_reminder_type": "5 min",
+        },
+    }
+
+    await tester.user_input("1")
+    tester.assert_state("state_locus_of_control_assessment_few_qs")
+
+
+@pytest.mark.asyncio
+async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_seen_before")
     tester.setup_answer("state_age", "22")
     tester.setup_answer("state_gender", "other")
     tester.setup_answer("state_persona_name", "Nurse Joy")
     tester.setup_answer("state_persona_emoji", "⛑️")
+    tester.setup_answer("state_country", "yes")
+    tester.setup_answer("state_rel_status", "single")
 
-    await tester.user_input("No, I'm single")
+    await tester.user_input("yes")
 
     tester.assert_num_messages(1)
     tester.assert_message(
@@ -328,12 +425,10 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
             "onboarding_reminder_type": "",
             "persona_name": "Nurse Joy",
             "persona_emoji": "⛑️",
+            "country": "south africa",
+            "used_bot_before": "yes",
         },
     }
-
-    # Ensure that the main menu button works
-    await tester.user_input("Main menu")
-    tester.assert_state("state_welcome")
 
 
 @pytest.mark.asyncio
@@ -451,7 +546,7 @@ async def test_assessment_complete(tester: AppTester, rapidpro_mock):
     tester.assert_message(
         "\n".join(
             [
-                "If you'd like, I can also send you notifications once a day with "
+                "If you'd like, I can send you notifications once a day with "
                 "relevant info that I've put together just for you.",
                 "",
                 "*Would you like to get notifications?*",
@@ -519,22 +614,9 @@ async def test_phase2_profile_update_to_submit_when_gender_set(
     tester.assert_state("state_rel_status")
     await tester.user_input(content="It's complicated")
 
-    tester.assert_state("state_locus_of_control_assessment_few_qs")
+    tester.assert_state("state_country")
 
     assert len(rapidpro_mock.tstate.requests) == 5
-    request = rapidpro_mock.tstate.requests[4]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "age": "22",
-            "opted_out": "FALSE",
-            "onboarding_completed": "True",
-            "gender": "male",
-            "relationship_status": "complicated",
-            "onboarding_reminder_sent": "",
-            "onboarding_reminder_type": "",
-            "persona_emoji": "🪱",
-        },
-    }
 
 
 @pytest.mark.asyncio
@@ -560,19 +642,6 @@ async def test_phase2_profile_update_to_submit_when_no_gender(
     tester.assert_state("state_rel_status")
     await tester.user_input(content="It's complicated")
 
-    tester.assert_state("state_locus_of_control_assessment_few_qs")
+    tester.assert_state("state_country")
 
     assert len(rapidpro_mock.tstate.requests) == 8
-    request = rapidpro_mock.tstate.requests[7]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "age": "22",
-            "opted_out": "FALSE",
-            "onboarding_completed": "True",
-            "gender": "female",
-            "relationship_status": "complicated",
-            "onboarding_reminder_sent": "",
-            "onboarding_reminder_type": "",
-            "persona_name": "Nurse Joy",
-        },
-    }

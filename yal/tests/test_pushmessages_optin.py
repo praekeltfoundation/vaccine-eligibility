@@ -74,8 +74,13 @@ async def rapidpro_mock():
 
 
 @pytest.mark.asyncio
-async def test_state_pushmessages_optin(tester: AppTester, rapidpro_mock):
+async def test_user_too_young_not_offered_study(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["age"] = "12"
+    tester.user.metadata["country"] = "south africa"
+    tester.user.metadata["used_bot_before"] = "no"
+
     tester.setup_state("state_start_pushmessage_optin")
+
     await tester.user_input("Yes, please!")
     tester.assert_state("state_pushmessage_optin_final")
 
@@ -84,6 +89,64 @@ async def test_state_pushmessages_optin(tester: AppTester, rapidpro_mock):
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"push_message_opt_in": "True"},
     }
+    tester.assert_answer("state_is_eligible_for_study", "false")
+
+
+@pytest.mark.asyncio
+async def test_user_too_old_not_offered_study(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["age"] = "30"
+    tester.user.metadata["country"] = "south africa"
+    tester.user.metadata["used_bot_before"] = "no"
+
+    tester.setup_state("state_start_pushmessage_optin")
+
+    await tester.user_input("Yes, please!")
+    tester.assert_state("state_pushmessage_optin_final")
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"push_message_opt_in": "True"},
+    }
+    tester.assert_answer("state_is_eligible_for_study", "false")
+
+
+@pytest.mark.asyncio
+async def test_user_not_sa_not_offered_study(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["age"] = "20"
+    tester.user.metadata["country"] = ""
+    tester.user.metadata["used_bot_before"] = "no"
+
+    tester.setup_state("state_start_pushmessage_optin")
+
+    await tester.user_input("Yes, please!")
+    tester.assert_state("state_pushmessage_optin_final")
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"push_message_opt_in": "True"},
+    }
+    tester.assert_answer("state_is_eligible_for_study", "false")
+
+
+@pytest.mark.asyncio
+async def test_user_used_bot_before_not_offered_study(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["age"] = "20"
+    tester.user.metadata["country"] = "south africa"
+    tester.user.metadata["used_bot_before"] = "yes"
+
+    tester.setup_state("state_start_pushmessage_optin")
+
+    await tester.user_input("Yes, please!")
+    tester.assert_state("state_pushmessage_optin_final")
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"push_message_opt_in": "True"},
+    }
+    tester.assert_answer("state_is_eligible_for_study", "false")
 
 
 @pytest.mark.asyncio
@@ -96,4 +159,64 @@ async def test_state_pushmessages_optin_no(tester: AppTester, rapidpro_mock):
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"push_message_opt_in": "False"},
+    }
+
+
+@pytest.mark.asyncio
+async def test_eligible_user_is_offered_study(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["age"] = "20"
+    tester.user.metadata["country"] = "south africa"
+    tester.user.metadata["used_bot_before"] = "no"
+
+    tester.setup_state("state_start_pushmessage_optin")
+
+    await tester.user_input("Yes, please!")
+    tester.assert_state("state_study_invitation")
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"push_message_opt_in": "True"},
+    }
+
+    tester.assert_answer("state_is_eligible_for_study", "true")
+
+
+@pytest.mark.asyncio
+async def test_state_study_invitation_declined(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_study_invitation")
+    await tester.user_input("I'm not interested")
+    tester.assert_state("state_pushmessage_optin_final")
+
+    assert len(rapidpro_mock.tstate.requests) == 1
+
+
+@pytest.mark.asyncio
+async def test_state_study_invitation_accepted(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_study_invitation")
+    await tester.user_input("Yes I want to answer")
+    tester.assert_state("state_study_consent")
+
+    assert len(rapidpro_mock.tstate.requests) == 1
+
+
+@pytest.mark.asyncio
+async def test_state_study_consent_rejected(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_study_consent")
+    await tester.user_input("No, I don't agree")
+    tester.assert_state("state_pushmessage_optin_final")
+
+    assert len(rapidpro_mock.tstate.requests) == 1
+
+
+@pytest.mark.asyncio
+async def test_state_study_consent_accepted(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_study_consent")
+    await tester.user_input("Yes, I agree")
+    tester.assert_state("state_survey_question")
+
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"ejaf_study_optin": "True"},
     }
