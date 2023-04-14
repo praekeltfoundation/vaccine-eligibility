@@ -859,5 +859,5 @@ async def test_study_optout_confirm(tester: AppTester, google_api_mock, rapidpro
     tester.setup_state("state_update_study_optout")
     await tester.user_input("Leave Study")
 
-    assert tester.application.user.metadata["study_optin"] == "False"
+    assert tester.application.user.metadata["ejaf_study_optin"] == "False"
     tester.assert_state("study_optout_confirm")
