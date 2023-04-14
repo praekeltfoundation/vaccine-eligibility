@@ -61,57 +61,68 @@ class Application(BaseApplication):
         else:
             notifications_change_state = "state_update_notifications_turn_on"
 
+        question_list = [
+            "⚙️CHAT SETTINGS / *Update your info*",
+            "-----",
+            "Here's the info you've saved. *What info would you like to " "change?*",
+            "",
+            "🍰 *Age*",
+            age or "Empty",
+            "",
+            "🌈 *Gender*",
+            gender,
+            "",
+            "🤖 *Bot Name+emoji*",
+            "[persona_emoji] [persona_name]",
+            "",
+            "❤️ *Relationship?*",
+            relationship_status or "Empty",
+            "",
+            "📍 *Location*",
+            location or "Empty",
+            "",
+            "🔔 *Notifications*",
+            "ON" if notifications == "True" else "OFF",
+            "",
+        ]
+
+        choices_list = [
+            Choice("state_update_age", self._("Age")),
+            Choice("state_update_gender", self._("Gender")),
+            Choice("state_update_bot_name", self._("Bot name + emoji")),
+            Choice("state_update_relationship_status", self._("Relationship?")),
+            Choice("state_update_location", self._("Location")),
+            Choice(notifications_change_state, self._("Notifications")),
+        ]
+
         study_optin = self.user.metadata.get("study_optin")
 
-        question = self._(
-            "\n".join(
+        if study_optin == "True":
+            question_list.extend(
                 [
-                    "⚙️CHAT SETTINGS / *Update your info*",
-                    "-----",
-                    "Here's the info you've saved. *What info would you like to "
-                    "change?*",
-                    "",
-                    "🍰 *Age*",
-                    age or "Empty",
-                    "",
-                    "🌈 *Gender*",
-                    gender,
-                    "",
-                    "🤖 *Bot Name+emoji*",
-                    "[persona_emoji] [persona_name]",
-                    "",
-                    "❤️ *Relationship?*",
-                    relationship_status or "Empty",
-                    "",
-                    "📍 *Location*",
-                    location or "Empty",
-                    "",
-                    "🔔 *Notifications*",
-                    "ON" if notifications == "True" else "OFF",
-                    "",
                     "📝 *Study Participant*",
-                    "Yes" if study_optin == "True" else "No",
+                    "Yes",
                     "",
-                    "*-----*",
-                    "*Or reply:*",
-                    "*0 -* 🏠 Back to Main *MENU*",
-                    "*# -* 🆘 Get *HELP*",
                 ]
             )
+
+            choices_list.append(Choice("study_optin", self._("Opt out of study")))
+
+        question_list.extend(
+            [
+                "*-----*",
+                "*Or reply:*",
+                "*0 -* 🏠 Back to Main *MENU*",
+                "*# -* 🆘 Get *HELP*",
+            ]
         )
+
+        question = self._("\n".join(question_list))
 
         return WhatsAppListState(
             self,
             question=question,
-            choices=[
-                Choice("state_update_age", self._("Age")),
-                Choice("state_update_gender", self._("Gender")),
-                Choice("state_update_bot_name", self._("Bot name + emoji")),
-                Choice("state_update_relationship_status", self._("Relationship?")),
-                Choice("state_update_location", self._("Location")),
-                Choice(notifications_change_state, self._("Notifications")),
-                Choice("state_update_study_optout", self._("Opt out of study")),
-            ],
+            choices=choices_list,
             next=next_,
             error=self._(get_generic_error()),
             error_footer=self._("\n" "Reply with the number that matches your choice."),

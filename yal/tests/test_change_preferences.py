@@ -120,6 +120,7 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
     tester.user.metadata["persona_emoji"] = "🦸"
     tester.user.metadata["persona_name"] = "Caped Crusader"
     tester.user.metadata["push_message_opt_in"] = "False"
+    tester.user.metadata["study_optin"] = "True"
     tester.setup_state("state_display_preferences")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
     tester.assert_num_messages(1)
@@ -151,7 +152,7 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
                 "OFF",
                 "",
                 "📝 *Study Participant*",
-                "No",
+                "Yes",
                 "",
                 "*-----*",
                 "*Or reply:*",
