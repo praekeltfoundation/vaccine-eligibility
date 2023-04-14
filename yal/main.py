@@ -175,7 +175,7 @@ class Application(
 
         if keyword in SURVEY_KEYWORDS:
             self.user.session_id = None
-            self.state_name = "state_invitation"
+            self.state_name = "state_baseline_start"
 
         # Fields that RapidPro sets after a feedback push message
         feedback_state = await self.get_feedback_state()
