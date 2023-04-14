@@ -230,7 +230,7 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 0,
                     "skip": 0,
                 },
-                "next": "baseline_1_final",
+                "next": "baseline_1_q10_self_esteem",
             },
             "baseline_1_q10_self_esteem": {
                 "type": "list",
