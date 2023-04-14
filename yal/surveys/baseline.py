@@ -12,8 +12,12 @@ logger = logging.getLogger(__name__)
 
 
 class Application(BaseApplication):
-    START_STATE = "state_self_esteem_assessment_v2"
+    START_STATE = "state_baseline_start"
 
+    #Baseline start - Use this to link to survey from other areas
+    async def state_baseline_start(self):
+        return await self.go_to_state("state_self_esteem_assessment_v2")
+ 
     # Self Esteem
     async def state_self_esteem_assessment_v2(self):
         self.save_metadata("assessment_name", "self_esteem_v2")
@@ -64,8 +68,8 @@ class Application(BaseApplication):
             "connectedness_v2_risk": risk,
             "connectedness_v2_score": score,
         }
-        self.save_answer("state_connectednessv2__risk", risk)
-        self.save_answer("state_connectednessv2__score", str(score))
+        self.save_answer("state_connectedness_v2_risk", risk)
+        self.save_answer("state_connectedness_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -131,7 +135,7 @@ class Application(BaseApplication):
     # Self Perceived Health Care
 
     # Sexual Health Literacy
-    async def state_sexual_health_literacy_v2_assessment_v2_end(self):
+    async def state_shl_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
         if score <= 5:
             # score of 0-5 high risk
