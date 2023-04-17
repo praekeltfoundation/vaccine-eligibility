@@ -10,24 +10,22 @@ from yal.utils import normalise_phonenumber
 logger = logging.getLogger(__name__)
 
 # TODO:
-# Check reason for text cutoff
+# Check reason for text cutoff - WIP
 # Add combined calc for dep and anxiety
-# Fix interference for skip response
+# Fix interference for skip response - WIP
+# Check reminders
+# Add fields to flow results
+# Check flow results
 
 
 class Application(BaseApplication):
+    depression_score = ""
+    anxiety_score = ""
     START_STATE = "state_baseline_start"
 
     # Baseline start - Use this to link to survey from other areas
     async def state_baseline_start(self):
-        # return await self.go_to_state("state_self_esteem_assessment_v2")
-        return await self.go_to_state("state_test_qset")
-
-    # TEMP TEST SPECIFIC QUESTION SET
-    async def state_test_qset(self):
-        self.save_metadata("assessment_name", "depression_v2")
-        self.save_metadata("assessment_end_state", "state_depression_assessment_v2_end")
-        return await self.go_to_state(AssessmentApplication.START_STATE)
+        return await self.go_to_state("state_self_esteem_assessment_v2")
 
     # Self Esteem
     async def state_self_esteem_assessment_v2(self):
@@ -116,6 +114,7 @@ class Application(BaseApplication):
     # Depression
     async def state_depression_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
+        self.depression_score = score
         if score <= 5:
             # score of 0-5 high risk
             risk = "high_risk"
@@ -141,6 +140,7 @@ class Application(BaseApplication):
     # Anxiety
     async def state_anxiety_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
+        self.anxiety_score = score
         if score <= 5:
             # score of 0-5 high risk
             risk = "high_risk"
