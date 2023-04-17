@@ -22,7 +22,7 @@ ASSESSMENT_QUESTIONS = {
                     ("more_than_half_the_days", "More than half the days"),
                     ("nearly_every_day", "Nearly every day"),
                     ("dont_understand", "I don't understand"),
-                    ("skip_question", "Skip"),
+                    ("skip_question", "Skip question"),
                 ],
                 "scoring": {
                     "not_at_all": 3,
@@ -46,7 +46,7 @@ ASSESSMENT_QUESTIONS = {
                     ),
                     ("nearly_every_day", "Nearly every day"),
                     ("dont_understand", "I don't understand"),
-                    ("skip_question", "Skip"),
+                    ("skip_question", "Skip question"),
                 ],
                 "scoring": {
                     "not_at_all": 3,
