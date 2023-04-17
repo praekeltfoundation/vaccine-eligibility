@@ -4,7 +4,9 @@ import logging
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, WhatsAppButtonState
 from yal import rapidpro
+from yal.askaquestion import Application as AAQApplication
 from yal.assessments import Application as AssessmentApplication
+from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.utils import normalise_phonenumber
 
 logger = logging.getLogger(__name__)
@@ -16,6 +18,8 @@ logger = logging.getLogger(__name__)
 # Check reminders
 # Add fields to flow results
 # Check flow results
+# Get understanding of the content people get sent based on these answers
+# specifically for the depression_and_anxiety one
 
 
 class Application(BaseApplication):
@@ -346,12 +350,30 @@ class Application(BaseApplication):
     # TODO: Rememeber to check for survey complete variable.
 
     async def state_baseline_end(self):
-        msg = self._(
-            "\n".join(
-                [
-                    "Thank you for taking our survey",
-                ]
-            )
+        return WhatsAppButtonState(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "*And thats a wrap!*",
+                        "",
+                        "Thank you for taking part in our survey 🙏🏽",
+                        "",
+                        "*You will get your R30 airtime within 24 hours.*",
+                        "",
+                        "The B-Wise chatbot will send you some  helpful messages.",
+                    ]
+                )
+            ),
+            choices=[
+                Choice("menu", self._("Go to the menu")),
+                Choice("aaq", self._("Ask a question")),
+                Choice("update_settings", self._("Update Settings")),
+            ],
+            next={
+                "menu": "state_pre_mainmenu",
+                "aaq": AAQApplication.START_STATE,
+                "update_settings": ChangePreferencesApplication.START_STATE,
+            },
+            error=self.go_to_state("state_error"),
         )
-
-        await self.publish_message(msg)

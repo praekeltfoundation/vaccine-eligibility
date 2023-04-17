@@ -3,7 +3,7 @@
 ASSESSMENT_QUESTIONS = {
     "1": {
         # Self-perceived healthcare assessment
-        "start": "baseline_6_q1_healthcare",
+        "start": "baseline_6_q1_self_perceived_healthcare",
         "questions": {
             "baseline_6_q1_healthcare": {
                 "type": "list",
@@ -20,7 +20,7 @@ ASSESSMENT_QUESTIONS = {
                     ("fair", "Fair"),
                     ("poor", "Poor"),
                     ("dont_understand", "I don't understand"),
-                    ("skip", "Skip"),
+                    ("skip_question", "Skip question"),
                 ],
                 "scoring": {
                     "excellent": 5,
@@ -29,11 +29,11 @@ ASSESSMENT_QUESTIONS = {
                     "fair": 2,
                     "poor": 1,
                     "dont_understand": 1,
-                    "skip": 1,
+                    "skip_question": 1,
                 },
-                "next": "baseline_6_q2_healthcare",
+                "next": "baseline_6_q2_self_perceived_healthcare",
             },
-            "baseline_6_q2_healthcare": {
+            "baseline_6_q2_self_perceived_healthcare": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -46,14 +46,14 @@ ASSESSMENT_QUESTIONS = {
                     ("no", "No"),
                     ("sometimes", "Sometimes"),
                     ("dont_understand", "I don't understand"),
-                    ("skip", "Skip"),
+                    ("skip_question", "Skip question"),
                 ],
                 "scoring": {
                     "yes": 5,
                     "no": 1,
                     "sometimes": 3,
                     "dont_understand": 1,
-                    "skip": 1,
+                    "skip_question": 1,
                 },
                 "next": None,
             },

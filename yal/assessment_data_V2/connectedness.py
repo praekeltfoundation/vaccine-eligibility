@@ -20,7 +20,7 @@ ASSESSMENT_QUESTIONS = {
                     ("most_of_the_time", "Most of the time"),
                     ("all_of_the_time", "All of the time"),
                     ("dont_understand", "I don't understand"),
-                    ("skip", "Skip"),
+                    ("skip_question", "Skip question"),
                 ],
                 "scoring": {
                     "never": 0,
@@ -28,7 +28,7 @@ ASSESSMENT_QUESTIONS = {
                     "most_of_the_time": 2,
                     "all_of_the_time": 3,
                     "dont_understand": 0,
-                    "skip": 0,
+                    "skip_question": 0,
                 },
                 "next": None,
             },
