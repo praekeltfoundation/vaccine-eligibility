@@ -339,7 +339,7 @@ ASSESSMENT_QUESTIONS = {
                 ],
                 "next": {
                     "yes": "baseline_7_q13_sexual_health_lit",
-                    "no": "baseline_7_q13_sexual_health_lit",
+                    "no": "baseline_7_q14_sexual_health_lit",
                     "skip_question": None,
                 },
             },

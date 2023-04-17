@@ -94,13 +94,13 @@ def test_all_states_added_to_docs():
                 if details.get("type", "info") != "info":
                     existing_states.add(name)
 
-     # States from V2 assessments are dynamic
+    # States from V2 assessments are dynamic
     for assessment in iter_modules(["yal/assessment_data"]):
         module = assessment.module_finder.find_module(assessment.name).load_module()
         for section in module.ASSESSMENT_QUESTIONS.values():
             for name, details in section["questions"].items():
                 if details.get("type", "info") != "info":
-                    existing_states.add(name)                
+                    existing_states.add(name)
 
     loader = ptr.MarkdownTableFileLoader("yal/tests/states_dictionary.md")
     documented_states = set()
