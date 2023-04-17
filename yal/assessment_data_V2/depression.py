@@ -8,11 +8,18 @@ ASSESSMENT_QUESTIONS = {
         "questions": {
             "baseline_4_q1_depression": {
                 "type": "list",
-                "text": "Feeling down, depressed or hopeless",
+                "text": "\n".join(
+                    [
+                        "*Over the last 2 weeks, how often have you been "
+                        "bothered by the following problems?*",
+                        "",
+                        "Feeling down, depressed or hopeless",
+                    ]
+                ),
                 "options": [
                     ("not_at_all", "Not at all"),
                     ("several_days", "Several days"),
-                    ("more_than_half_the_days", "More than half the days"),
+                    ("more_than_half", "More than half the days"),
                     ("nearly_every_day", "Nearly every day"),
                     ("dont_understand", "I don't understand"),
                     ("skip", "Skip"),
@@ -33,7 +40,10 @@ ASSESSMENT_QUESTIONS = {
                 "options": [
                     ("not_at_all", "Not at all"),
                     ("several_days", "Several days"),
-                    ("more_than_half_the_days", "More than half the days"),
+                    (
+                        "more_than_half_the_days_this_can_be_super_long_as_long",
+                        "More t half the days",
+                    ),
                     ("nearly_every_day", "Nearly every day"),
                     ("dont_understand", "I don't understand"),
                     ("skip", "Skip"),

@@ -9,13 +9,25 @@ from yal.utils import normalise_phonenumber
 
 logger = logging.getLogger(__name__)
 
+# TODO:
+# Check reason for text cutoff
+# Add combined calc for dep and anxiety
+# Fix interference for skip response
+
 
 class Application(BaseApplication):
     START_STATE = "state_baseline_start"
 
     # Baseline start - Use this to link to survey from other areas
     async def state_baseline_start(self):
-        return await self.go_to_state("state_self_esteem_assessment_v2")
+        # return await self.go_to_state("state_self_esteem_assessment_v2")
+        return await self.go_to_state("state_test_qset")
+
+    # TEMP TEST SPECIFIC QUESTION SET
+    async def state_test_qset(self):
+        self.save_metadata("assessment_name", "depression_v2")
+        self.save_metadata("assessment_end_state", "state_depression_assessment_v2_end")
+        return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Self Esteem
     async def state_self_esteem_assessment_v2(self):

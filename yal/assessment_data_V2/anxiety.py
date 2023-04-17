@@ -8,14 +8,7 @@ ASSESSMENT_QUESTIONS = {
         "questions": {
             "baseline_5_q1_anxiety": {
                 "type": "list",
-                "text": "\n".join(
-                    [
-                        "*Over the last 2 weeks, how often have you been "
-                        "bothered by the following problems?*",
-                        "",
-                        "Feeling nervous, anxious or on edge",
-                    ]
-                ),
+                "text": "Feeling nervous, anxious or on edge",
                 "options": [
                     ("not_at_all", "Not at all"),
                     ("several_days", "Several days"),
