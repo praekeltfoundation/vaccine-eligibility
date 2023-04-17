@@ -106,7 +106,7 @@ class Application(BaseApplication):
                 ]
             )
 
-            choices_list.append(Choice("ejaf_study_optin", self._("Opt out of study")))
+            choices_list.append(Choice("state_update_study_optout", self._("Opt out of study")))
 
         question_list.extend(
             [
