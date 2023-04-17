@@ -10,7 +10,7 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Have you ever felt guilty about drinking or drug " "use?* 🍻💉",
+                        "*Have you ever felt guilty about drinking or drug use?* 🍻💉",
                     ]
                 ),
                 "options": [

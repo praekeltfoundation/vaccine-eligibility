@@ -54,9 +54,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip_question": 1,
                 },
-                "next": "baseline_7_q3_sexual_health_lit_info",
+                "next": "baseline_7_q3_sexual_health_lit",
             },
-            "baseline_7_q3_sexual_health_lit_info": {
+            "baseline_7_q3_sexual_health_lit": {
                 "type": "list",
                 "text": "\n".join(
                     [
