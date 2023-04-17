@@ -120,6 +120,7 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
     tester.user.metadata["persona_emoji"] = "🦸"
     tester.user.metadata["persona_name"] = "Caped Crusader"
     tester.user.metadata["push_message_opt_in"] = "False"
+    tester.user.metadata["ejaf_study_optin"] = "True"
     tester.setup_state("state_display_preferences")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
     tester.assert_num_messages(1)
@@ -151,7 +152,7 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
                 "OFF",
                 "",
                 "📝 *Study Participant*",
-                "No",
+                "Yes",
                 "",
                 "*-----*",
                 "*Or reply:*",
@@ -167,6 +168,61 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
             "Location",
             "Notifications",
             "Opt out of study",
+        ],
+    )
+
+    assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+
+
+@pytest.mark.asyncio
+async def test_state_display_preferences_study_false(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["persona_emoji"] = "🦸"
+    tester.user.metadata["persona_name"] = "Caped Crusader"
+    tester.user.metadata["push_message_opt_in"] = "False"
+    tester.user.metadata["ejaf_study_optin"] = "False"
+    tester.setup_state("state_display_preferences")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+    tester.assert_num_messages(1)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "⚙️CHAT SETTINGS / *Update your info*",
+                "-----",
+                "Here's the info you've saved. *What info would you like to "
+                "change?*",
+                "",
+                "🍰 *Age*",
+                "22",
+                "",
+                "🌈 *Gender*",
+                "Male",
+                "",
+                "🤖 *Bot Name+emoji*",
+                "🦸 Caped Crusader",
+                "",
+                "❤️ *Relationship?*",
+                "Empty",
+                "",
+                "📍 *Location*",
+                "test street Test Suburb",
+                "",
+                "🔔 *Notifications*",
+                "OFF",
+                "",
+                "*-----*",
+                "*Or reply:*",
+                "*0 -* 🏠 Back to Main *MENU*",
+                "*# -* 🆘 Get *HELP*",
+            ]
+        ),
+        list_items=[
+            "Age",
+            "Gender",
+            "Bot name + emoji",
+            "Relationship?",
+            "Location",
+            "Notifications",
         ],
     )
 
@@ -803,5 +859,5 @@ async def test_study_optout_confirm(tester: AppTester, google_api_mock, rapidpro
     tester.setup_state("state_update_study_optout")
     await tester.user_input("Leave Study")
 
-    assert tester.application.user.metadata["study_optin"] == "False"
+    assert tester.application.user.metadata["ejaf_study_optin"] == "False"
     tester.assert_state("study_optout_confirm")
