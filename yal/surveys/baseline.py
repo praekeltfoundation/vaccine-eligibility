@@ -4,10 +4,10 @@ import logging
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, WhatsAppButtonState
 from yal import rapidpro
-from yal.assessments import Application as AssessmentApplication
-from yal.utils import normalise_phonenumber
 from yal.askaquestion import Application as AAQApplication
+from yal.assessments import Application as AssessmentApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
+from yal.utils import normalise_phonenumber
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 # Check flow results
 # Get understanding of the content people get sent based on these answers
 # specifically for the depression_and_anxiety one
-# Finish ending
 
 
 class Application(BaseApplication):
