@@ -10,24 +10,22 @@ from yal.utils import normalise_phonenumber
 logger = logging.getLogger(__name__)
 
 # TODO:
-# Check reason for text cutoff
+# Check reason for text cutoff - WIP
 # Add combined calc for dep and anxiety
-# Fix interference for skip response
+# Fix interference for skip response - WIP
+# Check reminders
+# Add fields to flow results
+# Check flow results
 
 
 class Application(BaseApplication):
+    depression_score = ""
+    anxiety_score = ""
     START_STATE = "state_baseline_start"
 
     # Baseline start - Use this to link to survey from other areas
     async def state_baseline_start(self):
-        # return await self.go_to_state("state_self_esteem_assessment_v2")
-        return await self.go_to_state("state_test_qset")
-
-    # TEMP TEST SPECIFIC QUESTION SET
-    async def state_test_qset(self):
-        self.save_metadata("assessment_name", "depression_v2")
-        self.save_metadata("assessment_end_state", "state_depression_assessment_v2_end")
-        return await self.go_to_state(AssessmentApplication.START_STATE)
+        return await self.go_to_state("state_self_esteem_assessment_v2")
 
     # Self Esteem
     async def state_self_esteem_assessment_v2(self):
@@ -39,11 +37,11 @@ class Application(BaseApplication):
 
     async def state_self_esteem_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 2:
-            # score of 0-2 high risk
+        if score <= 14:
+            # score of 0-14 high risk
             risk = "high_risk"
         else:
-            # score of 3-5 low risk
+            # score of 15-30 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -66,11 +64,11 @@ class Application(BaseApplication):
     # Connectedness
     async def state_connectedness_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 2:
-            # score of 0-2 high risk
+        if score <= 1:
+            # score of 0-1 high risk
             risk = "high_risk"
         else:
-            # score of 3-5 low risk
+            # score of 2-3 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -91,11 +89,11 @@ class Application(BaseApplication):
     # Body Image
     async def state_body_image_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 5:
-            # score of 0-5 high risk
+        if score <= 4:
+            # score of 0-4 high risk
             risk = "high_risk"
         else:
-            # score of 6-10 low risk
+            # score of 5-6 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -116,11 +114,12 @@ class Application(BaseApplication):
     # Depression
     async def state_depression_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 5:
-            # score of 0-5 high risk
+        self.depression_score = score
+        if score >= 3:
+            # score of 3-6 high risk
             risk = "high_risk"
         else:
-            # score of 6-10 low risk
+            # score of 0-2 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -141,11 +140,12 @@ class Application(BaseApplication):
     # Anxiety
     async def state_anxiety_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 5:
-            # score of 0-5 high risk
+        self.anxiety_score = score
+        if score >= 3:
+            # score of 3-6 high risk
             risk = "high_risk"
         else:
-            # score of 6-10 low risk
+            # score of 0-2 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -216,11 +216,11 @@ class Application(BaseApplication):
 
     async def state_self_perceived_healthcare_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 5:
-            # score of 0-5 high risk
+        if score <= 6:
+            # score of 2-6 high risk
             risk = "high_risk"
         else:
-            # score of 6-10 low risk
+            # score of 7-10 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -243,11 +243,11 @@ class Application(BaseApplication):
     # Sexual Health Literacy
     async def state_sexual_health_lit_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 5:
-            # score of 0-5 high risk
+        if score <= 33:
+            # score of 0-33 high risk
             risk = "high_risk"
         else:
-            # score of 6-10 low risk
+            # score of 34-55 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -270,11 +270,11 @@ class Application(BaseApplication):
     # Gender Attitudes
     async def state_gender_attitude_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 5:
-            # score of 0-5 high risk
+        if score <= 8:
+            # score of 0-8 high risk
             risk = "high_risk"
         else:
-            # score of 6-10 low risk
+            # score of 9-12 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -297,11 +297,11 @@ class Application(BaseApplication):
     # Sexual Consent
     async def state_sexual_consent_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 5:
-            # score of 0-5 high risk
+        if score <= 6:
+            # score of 0-6 high risk
             risk = "high_risk"
         else:
-            # score of 6-10 low risk
+            # score of 7-10 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -322,11 +322,11 @@ class Application(BaseApplication):
     # Alcohol
     async def state_alcohol_assessment_v2_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 5:
-            # score of 0-5 high risk
+        if score >= 13:
+            # score of 13-20 high risk
             risk = "high_risk"
         else:
-            # score of 6-10 low risk
+            # score of 4-12 low risk
             risk = "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
