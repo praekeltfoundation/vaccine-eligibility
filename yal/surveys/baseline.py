@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 # Check flow results
 # Get understanding of the content people get sent based on these answers
 # specifically for the depression_and_anxiety one
+# Finish ending
 
 
 class Application(BaseApplication):
