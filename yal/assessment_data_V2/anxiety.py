@@ -12,7 +12,7 @@ ASSESSMENT_QUESTIONS = {
                 "options": [
                     ("not_at_all", "Not at all"),
                     ("several_days", "Several days"),
-                    ("more_than_half_the_days", "More than half the days"),
+                    ("half_of_the_days", "Half of the days"),
                     ("nearly_every_day", "Nearly every day"),
                     ("dont_understand", "I don't understand"),
                     ("skip_question", "Skip question"),
@@ -20,7 +20,7 @@ ASSESSMENT_QUESTIONS = {
                 "scoring": {
                     "not_at_all": 3,
                     "several_days": 2,
-                    "more_than_half_the_days": 1,
+                    "half_of_the_days": 1,
                     "nearly_every_day": 0,
                     "dont_understand": 0,
                     "skip_question": 0,
@@ -37,7 +37,7 @@ ASSESSMENT_QUESTIONS = {
                 "options": [
                     ("not_at_all", "Not at all"),
                     ("several_days", "Several days"),
-                    ("more_than_half_the_days", "More than half the days"),
+                    ("half_of_the_days", "Half of the days"),
                     ("nearly_every_day", "Nearly every day"),
                     ("dont_understand", "I don't understand"),
                     ("skip_question", "Skip question"),
@@ -45,7 +45,7 @@ ASSESSMENT_QUESTIONS = {
                 "scoring": {
                     "not_at_all": 3,
                     "several_days": 2,
-                    "more_than_half_the_days": 1,
+                    "half_of_the_days": 1,
                     "nearly_every_day": 0,
                     "dont_understand": 0,
                     "skip_question": 0,

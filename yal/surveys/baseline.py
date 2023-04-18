@@ -12,9 +12,6 @@ from yal.utils import get_current_datetime, normalise_phonenumber
 logger = logging.getLogger(__name__)
 
 # TODO:
-# Check reason for text cutoff - WIP
-# Add combined calc for dep and anxiety
-# Fix interference for skip response - WIP
 # Check reminders
 # Add fields to flow results
 # Check flow results
@@ -182,9 +179,9 @@ class Application(BaseApplication):
     # logic to work out a combined "depression_and_anxiety" score
 
     async def state_depression_and_anxiety_v2_end(self):
-        score = self.user.metadata.get("assessment_score", 0)
-        if score <= 5:
-            # score of 0-5 high risk
+        score = self.anxiety_score + self.depression_score
+        if score >= 6:
+            # score of 6-12 high risk
             risk = "high_risk"
         else:
             # score of 6-10 low risk
