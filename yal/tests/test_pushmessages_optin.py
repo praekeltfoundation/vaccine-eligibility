@@ -215,7 +215,7 @@ async def test_state_study_consent_accepted(tester: AppTester, rapidpro_mock):
     await tester.user_input("Yes, I agree")
     tester.assert_state("state_survey_question")
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 4
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"ejaf_study_optin": "True"},

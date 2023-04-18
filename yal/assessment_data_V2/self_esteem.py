@@ -10,8 +10,8 @@ ASSESSMENT_QUESTIONS = {
                     [
                         "How do you feel about the following statements?",
                         "",
-                        "*I feel that I am a person who has worth — at least as much "
-                        "worth as others.*",
+                        "*I feel that I am a person of worth, at least on an "
+                        "equal plane with others.*",
                     ]
                 ),
                 "options": [
