@@ -390,7 +390,11 @@ async def test_state_seen_before(
 
 
 @pytest.mark.asyncio
-async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
+@mock.patch("yal.onboarding.get_current_datetime")
+async def test_submit_onboarding(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_seen_before")
     tester.setup_answer("state_age", "22")
     tester.setup_answer("state_gender", "other")
@@ -427,6 +431,10 @@ async def test_submit_onboarding(tester: AppTester, rapidpro_mock):
             "persona_emoji": "⛑️",
             "country": "south africa",
             "used_bot_before": "yes",
+            "assessment_reminder_sent": "",
+            "assessment_reminder": "2022-06-19T17:30:00",
+            "assessment_reminder_name": "locus_of_control",
+            "assessment_reminder_type": "reengagement 30min",
         },
     }
 
