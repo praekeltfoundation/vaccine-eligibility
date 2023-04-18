@@ -224,7 +224,7 @@ class Application(BaseApplication):
             self,
             question=msg,
             choices=[Choice("OK", "OK Let's do it")],
-            error=self.go_to_state("state_error"),
+            error=await self.go_to_state("state_error"),
             next="state_self_perceived_healthcare_assessment_v2",
         )
 
@@ -404,5 +404,5 @@ class Application(BaseApplication):
                 "aaq": AAQApplication.START_STATE,
                 "update_settings": ChangePreferencesApplication.START_STATE,
             },
-            error=self.go_to_state("state_error"),
+            error=await self.go_to_state("state_error"),
         )
