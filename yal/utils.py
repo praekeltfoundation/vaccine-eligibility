@@ -63,19 +63,15 @@ def get_bot_age():
 
 
 def normalise_phonenumber(phonenumber):
-    try:
-        if phonenumber is not None:
-            if phonenumber.startswith("0"):
-                pn = phonenumbers.parse(phonenumber, "ZA")
-            else:
-                if not phonenumber.startswith("+") and not phonenumber.startswith("0"):
-                    phonenumber = f"+{phonenumber}"
-                pn = phonenumbers.parse(phonenumber, None)
-            assert phonenumbers.is_possible_number(pn)
-            assert phonenumbers.is_valid_number(pn)
-            return phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.E164)
-    except (phonenumbers.phonenumberutil.NumberParseException, AssertionError):
-        raise ValueError("Invalid phone number")
+    if phonenumber.startswith("0"):
+        pn = phonenumbers.parse(phonenumber, "ZA")
+    else:
+        if not phonenumber.startswith("+") and not phonenumber.startswith("0"):
+            phonenumber = f"+{phonenumber}"
+        pn = phonenumbers.parse(phonenumber, None)
+    assert phonenumbers.is_possible_number(pn)
+    assert phonenumbers.is_valid_number(pn)
+    return phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.E164)
 
 
 def extract_first_emoji(persona_emoji):
