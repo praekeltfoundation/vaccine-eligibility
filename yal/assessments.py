@@ -331,6 +331,12 @@ class Application(BaseApplication):
             error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
             if error:
                 return await self.go_to_state("state_error")
+            if "v2" in assessment_name:
+                # for v2 names we have to move _v2 to the end to get the state name
+                return await self.go_to_state(
+                    f"state_{assessment_name.replace('_v2', '')}_assessment_v2"
+                )
+
             return await self.go_to_state(f"state_{assessment_name}_assessment")
 
         if inbound == "skip":
