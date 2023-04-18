@@ -47,6 +47,7 @@ class Application(BaseApplication):
         self.save_metadata(
             "assessment_end_state", "state_self_esteem_assessment_v2_end"
         )
+        await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_self_esteem_assessment_v2_end(self):
@@ -73,6 +74,7 @@ class Application(BaseApplication):
         self.save_metadata(
             "assessment_end_state", "state_connectedness_assessment_v2_end"
         )
+        await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Connectedness
@@ -98,6 +100,8 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
         self.save_metadata("assessment_name", "body_image_v2")
         self.save_metadata("assessment_end_state", "state_body_image_assessment_v2_end")
+
+        await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Body Image
@@ -123,6 +127,8 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
         self.save_metadata("assessment_name", "depression_v2")
         self.save_metadata("assessment_end_state", "state_depression_assessment_v2_end")
+
+        await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Depression
@@ -149,6 +155,8 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
         self.save_metadata("assessment_name", "anxiety_v2")
         self.save_metadata("assessment_end_state", "state_anxiety_assessment_v2_end")
+
+        await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Anxiety
@@ -226,6 +234,8 @@ class Application(BaseApplication):
         self.save_metadata(
             "assessment_end_state", "state_self_perceived_healthcare_assessment_v2_end"
         )
+
+        await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_self_perceived_healthcare_assessment_v2_end(self):
@@ -252,6 +262,8 @@ class Application(BaseApplication):
         self.save_metadata(
             "assessment_end_state", "state_sexual_health_lit_assessment_v2_end"
         )
+
+        await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Sexual Health Literacy
@@ -279,6 +291,8 @@ class Application(BaseApplication):
         self.save_metadata(
             "assessment_end_state", "state_gender_attitude_assessment_v2_end"
         )
+
+        await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Gender Attitudes
@@ -306,6 +320,8 @@ class Application(BaseApplication):
         self.save_metadata(
             "assessment_end_state", "state_sexual_consent_assessment_v2_end"
         )
+
+        await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Sexual Consent
@@ -331,6 +347,8 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
         self.save_metadata("assessment_name", "alcohol_v2")
         self.save_metadata("assessment_end_state", "state_alcohol_assessment_v2_end")
+
+        await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Alcohol
@@ -354,6 +372,7 @@ class Application(BaseApplication):
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
+
         return await self.go_to_state("state_baseline_end")
 
     # Baseline End
