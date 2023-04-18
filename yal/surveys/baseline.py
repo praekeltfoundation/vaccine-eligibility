@@ -12,8 +12,6 @@ from yal.utils import get_current_datetime, get_generic_error, normalise_phonenu
 logger = logging.getLogger(__name__)
 
 # TODO:
-# Check reminders
-# Add fields to flow results
 # Check flow results
 # Get understanding of the content people get sent based on these answers
 # specifically for the depression_and_anxiety one
