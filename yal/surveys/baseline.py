@@ -20,8 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 class Application(BaseApplication):
-    depression_score = ""
-    anxiety_score = ""
+    depression_score = 0
+    anxiety_score = 0
     START_STATE = "state_baseline_start"
 
     async def set_reminder_timer(self):
@@ -187,7 +187,7 @@ class Application(BaseApplication):
     # logic to work out a combined "depression_and_anxiety" score
 
     async def state_depression_and_anxiety_v2_end(self):
-        score = self.anxiety_score + self.depression_score
+        score = int(self.anxiety_score) + int(self.depression_score)
         if score >= 6:
             # score of 6-12 high risk
             risk = "high_risk"
