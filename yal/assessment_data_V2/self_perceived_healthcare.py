@@ -5,7 +5,7 @@ ASSESSMENT_QUESTIONS = {
         # Self-perceived healthcare assessment
         "start": "baseline_6_q1_self_perceived_healthcare",
         "questions": {
-            "baseline_6_q1_healthcare": {
+            "baseline_6_q1_self_perceived_healthcare": {
                 "type": "list",
                 "text": "\n".join(
                     [
