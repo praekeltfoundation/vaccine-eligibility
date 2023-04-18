@@ -263,6 +263,11 @@ class Application(BaseApplication):
             "onboarding_reminder_type": "",
             "country": "south africa" if country == "yes" else "",
             "used_bot_before": self.user.answers.get("state_seen_before"),
+            # Since the next step is the loc assessment, just set reminder details now
+            "assessment_reminder_sent": "",
+            "assessment_reminder": get_current_datetime().isoformat(),
+            "assessment_reminder_name": "locus_of_control",
+            "assessment_reminder_type": "reengagement 30min",
         }
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
@@ -272,7 +277,6 @@ class Application(BaseApplication):
         return await self.go_to_state("state_locus_of_control_assessment_start")
 
     async def state_locus_of_control_assessment_start(self):
-        # TODO: add timeout and reminders to complete assessments
         msg = self._(
             "\n".join(
                 [
