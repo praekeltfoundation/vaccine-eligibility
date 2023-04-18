@@ -122,7 +122,8 @@ class Application(
                 and message.transport_metadata.get("message", {}).get("type")
                 != "interactive"
             ):
-                # Go straight to please call me application start, phrase matches exactly
+                # Go straight to please call me application start,
+                # phrase matches exactly
                 self.user.session_id = None
                 self.state_name = PleaseCallMeApplication.START_STATE
             elif (
