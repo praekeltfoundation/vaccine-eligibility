@@ -7,7 +7,7 @@ from yal import rapidpro
 from yal.askaquestion import Application as AAQApplication
 from yal.assessments import Application as AssessmentApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
-from yal.utils import get_current_datetime, normalise_phonenumber, get_generic_error
+from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
 logger = logging.getLogger(__name__)
 
