@@ -31,7 +31,7 @@ from yal.wa_fb_crossover_feedback import Application as WaFbCrossoverFeedbackApp
 
 logger = logging.getLogger(__name__)
 
-GREETING_KEYWORDS = {"hi", "hello", "menu", "0", "main menu"}
+GREETING_KEYWORDS = {"hi", "hello", "menu", "0", "main menu", "go to main menu"}
 HELP_KEYWORDS = {"#", "help", "please call me", "talk to a counsellor"}
 TRACKING_KEYWORDS = {
     "hie",
@@ -74,12 +74,15 @@ ASSESSMENT_REENGAGEMENT_KEYWORDS = {
     "not interested",
     "skip",
     "remind me tomorrow",
+    "I m not interested",
+    "ok let s do it",
 }
 SURVEY_KEYWORDS = {"baseline"}
 CALLBACK_CHECK_KEYWORDS = {"callback"}
 FEEDBACK_KEYWORDS = {"feedback"}
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
 EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
+AAQ_KEYWORDS = {"ask a question"}
 
 
 class Application(
@@ -154,6 +157,10 @@ class Application(
         if keyword in FEEDBACK_KEYWORDS:
             self.user.session_id = None
             self.state_name = FeedbackApplication.START_STATE
+
+        if keyword in AAQ_KEYWORDS:
+            self.user.session_id = None
+            self.state_name = AaqApplication.START_STATE
 
         if keyword in CALLBACK_CHECK_KEYWORDS:
             self.user.session_id = None

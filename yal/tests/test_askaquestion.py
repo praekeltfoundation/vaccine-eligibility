@@ -170,6 +170,19 @@ async def test_aaq_start_coming_soon(tester: AppTester):
 
 
 @pytest.mark.asyncio
+@mock.patch("yal.askaquestion.config")
+async def test_aaq_keywords_to_aaq_start(mock_config, tester: AppTester, rapidpro_mock):
+    mock_config.AAQ_URL = "http://aaq-test.com"
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "True"
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = "True"
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="Ask a question")
+    tester.assert_state("state_aaq_start")
+    tester.assert_num_messages(1)
+
+    assert len(rapidpro_mock.tstate.requests) == 1
+
+
+@pytest.mark.asyncio
 @mock.patch("yal.askaquestion.get_current_datetime")
 async def test_start_state_response_sets_timeout(
     get_current_datetime, tester: AppTester, rapidpro_mock, aaq_mock
