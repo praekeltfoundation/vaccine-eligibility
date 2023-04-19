@@ -125,7 +125,8 @@ class Application(
                 and message.transport_metadata.get("message", {}).get("type")
                 != "interactive"
             ):
-                # Go straight to please call me application start, phrase matches exactly
+                # Go straight to please call me application start,
+                # phrase matches exactly
                 self.user.session_id = None
                 self.state_name = PleaseCallMeApplication.START_STATE
             elif (
@@ -201,7 +202,9 @@ class Application(
                 if payload.startswith("state_") and payload in dir(self):
                     self.user.session_id = None
                     self.state_name = payload
-                elif payload.startswith("page_id_") and is_integer(payload.split("_")[-1]):
+                elif payload.startswith("page_id_") and is_integer(
+                    payload.split("_")[-1]
+                ):
                     self.user.session_id = None
                     self.save_metadata("push_related_page_id", payload.split("_")[-1])
                     self.state_name = "state_prep_push_msg_related_page"
