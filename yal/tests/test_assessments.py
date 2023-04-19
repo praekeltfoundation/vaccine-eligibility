@@ -80,7 +80,7 @@ async def test_survey_next_question(tester: AppTester):
     tester.setup_state("state_survey_question")
     await tester.user_input("2")
     tester.assert_state("state_survey_question")
-    tester.assert_answer("state_a2_1_q1_loc_of_ctrl", "a_little_true")
+    tester.assert_answer("state_a2_1_q1_loc_of_ctrl", "applies_somewhat")
 
 
 @pytest.mark.asyncio
