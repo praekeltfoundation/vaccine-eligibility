@@ -106,104 +106,112 @@ class Application(
     START_STATE = "state_start"
 
     async def process_message(self, message):
-        msisdn = utils.normalise_phonenumber(message.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
-        error, fields = await rapidpro.get_profile(whatsapp_id)
-        if error:
-            return await self.go_to_state("state_error")
-        for key, value in fields.items():
-            if value:
-                self.save_metadata(key, value)
-            else:
-                self.delete_metadata(key)
+        try:
+            msisdn = utils.normalise_phonenumber(message.from_addr)
+            whatsapp_id = msisdn.lstrip(" + ")
+            error, fields = await rapidpro.get_profile(whatsapp_id)
+            if error:
+                return await self.go_to_state("state_error")
+            for key, value in fields.items():
+                if value:
+                    self.save_metadata(key, value)
+                else:
+                    self.delete_metadata(key)
 
-        keyword = utils.clean_inbound(message.content)
-        # Restart keywords that interrupt the current flow
-        if (
-            keyword in EMERGENCY_KEYWORDS
-            and message.transport_metadata.get("message", {}).get("type")
-            != "interactive"
-        ):
-            # Go straight to please call me application start, phrase matches exactly
-            self.user.session_id = None
-            self.state_name = PleaseCallMeApplication.START_STATE
-        elif (
-            utils.check_keyword(keyword, EMERGENCY_KEYWORDS)
-            and message.transport_metadata.get("message", {}).get("type")
-            != "interactive"
-        ):
-            self.save_metadata("emergency_keyword_previous_state", self.state_name)
-            # If keyword fuzzy matches an emergency keyword,
-            # First confirm redirect with user
-            self.user.session_id = None
-            self.state_name = PleaseCallMeApplication.CONFIRM_REDIRECT
-
-        if (
-            keyword in GREETING_KEYWORDS
-            or keyword in TRACKING_KEYWORDS
-            or keyword in TRACKING_KEYWORDS_ROUND_2
-        ):
-            self.user.session_id = None
-            self.state_name = self.START_STATE
-
-        if keyword in HELP_KEYWORDS:
-            self.user.session_id = None
-            self.state_name = PleaseCallMeApplication.START_STATE
-
-        if keyword in OPTOUT_KEYWORDS:
-            self.user.session_id = None
-            self.state_name = OptOutApplication.START_STATE
-
-        if keyword in FEEDBACK_KEYWORDS:
-            self.user.session_id = None
-            self.state_name = FeedbackApplication.START_STATE
-
-        if keyword in AAQ_KEYWORDS:
-            self.user.session_id = None
-            self.state_name = AaqApplication.START_STATE
-
-        if keyword in CALLBACK_CHECK_KEYWORDS:
-            self.user.session_id = None
-            self.state_name = PleaseCallMeApplication.CALLBACK_RESPONSE_STATE
-
-        if keyword in QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS:
-            self.user.session_id = None
-            self.state_name = "state_qa_reset_feedback_timestamp_keywords"
-
-        if keyword in ONBOARDING_REMINDER_KEYWORDS:
-            if self.user.metadata.get("onboarding_reminder_sent"):
+            keyword = utils.clean_inbound(message.content)
+            # Restart keywords that interrupt the current flow
+            if (
+                keyword in EMERGENCY_KEYWORDS
+                and message.transport_metadata.get("message", {}).get("type")
+                != "interactive"
+            ):
+                # Go straight to please call me application start,
+                # phrase matches exactly
                 self.user.session_id = None
-                self.state_name = OnboardingApplication.REMINDER_STATE
-
-        if keyword in ASSESSMENT_REENGAGEMENT_KEYWORDS:
-            if self.user.metadata.get("assessment_reminder_sent"):
+                self.state_name = PleaseCallMeApplication.START_STATE
+            elif (
+                utils.check_keyword(keyword, EMERGENCY_KEYWORDS)
+                and message.transport_metadata.get("message", {}).get("type")
+                != "interactive"
+            ):
+                self.save_metadata("emergency_keyword_previous_state", self.state_name)
+                # If keyword fuzzy matches an emergency keyword,
+                # First confirm redirect with user
                 self.user.session_id = None
-                self.state_name = AssessmentApplication.REMINDER_STATE
+                self.state_name = PleaseCallMeApplication.CONFIRM_REDIRECT
 
-        if keyword in SURVEY_KEYWORDS:
-            self.user.session_id = None
-            self.state_name = "state_baseline_start"
-
-        # Fields that RapidPro sets after a feedback push message
-        feedback_state = await self.get_feedback_state()
-        if feedback_state:
-            if not self.user.session_id:
-                self.user.session_id = random_id()
-            message.session_event = Message.SESSION_EVENT.RESUME
-            self.state_name = feedback_state
-
-        # Replies to template push messages
-        payload = utils.get_by_path(
-            message.transport_metadata, "message", "button", "payload"
-        )
-        if payload:
-            if payload.startswith("state_") and payload in dir(self):
+            if (
+                keyword in GREETING_KEYWORDS
+                or keyword in TRACKING_KEYWORDS
+                or keyword in TRACKING_KEYWORDS_ROUND_2
+            ):
                 self.user.session_id = None
-                self.state_name = payload
-            elif payload.startswith("page_id_") and is_integer(payload.split("_")[-1]):
+                self.state_name = self.START_STATE
+
+            if keyword in HELP_KEYWORDS:
                 self.user.session_id = None
-                self.save_metadata("push_related_page_id", payload.split("_")[-1])
-                self.state_name = "state_prep_push_msg_related_page"
+                self.state_name = PleaseCallMeApplication.START_STATE
+
+            if keyword in OPTOUT_KEYWORDS:
+                self.user.session_id = None
+                self.state_name = OptOutApplication.START_STATE
+
+            if keyword in FEEDBACK_KEYWORDS:
+                self.user.session_id = None
+                self.state_name = FeedbackApplication.START_STATE
+
+            if keyword in AAQ_KEYWORDS:
+                self.user.session_id = None
+                self.state_name = AaqApplication.START_STATE
+
+            if keyword in CALLBACK_CHECK_KEYWORDS:
+                self.user.session_id = None
+                self.state_name = PleaseCallMeApplication.CALLBACK_RESPONSE_STATE
+
+            if keyword in QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS:
+                self.user.session_id = None
+                self.state_name = "state_qa_reset_feedback_timestamp_keywords"
+
+            if keyword in ONBOARDING_REMINDER_KEYWORDS:
+                if self.user.metadata.get("onboarding_reminder_sent"):
+                    self.user.session_id = None
+                    self.state_name = OnboardingApplication.REMINDER_STATE
+
+            if keyword in ASSESSMENT_REENGAGEMENT_KEYWORDS:
+                if self.user.metadata.get("assessment_reminder_sent"):
+                    self.user.session_id = None
+                    self.state_name = AssessmentApplication.REMINDER_STATE
+
+            if keyword in SURVEY_KEYWORDS:
+                self.user.session_id = None
+                self.state_name = "state_baseline_start"
+
+            # Fields that RapidPro sets after a feedback push message
+            feedback_state = await self.get_feedback_state()
+            if feedback_state:
+                if not self.user.session_id:
+                    self.user.session_id = random_id()
+                message.session_event = Message.SESSION_EVENT.RESUME
+                self.state_name = feedback_state
+
+            # Replies to template push messages
+            payload = utils.get_by_path(
+                message.transport_metadata, "message", "button", "payload"
+            )
+            if payload:
+                if payload.startswith("state_") and payload in dir(self):
+                    self.user.session_id = None
+                    self.state_name = payload
+                elif payload.startswith("page_id_") and is_integer(
+                    payload.split("_")[-1]
+                ):
+                    self.user.session_id = None
+                    self.save_metadata("push_related_page_id", payload.split("_")[-1])
+                    self.state_name = "state_prep_push_msg_related_page"
+
+        except Exception:
+            logger.exception("Application error")
+            self.state_name = self.ERROR_STATE
 
         return await super().process_message(message)
 
