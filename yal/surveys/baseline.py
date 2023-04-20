@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 # TODO:
 # Check flow results
+# Double check scores and risks
 # Get understanding of the content people get sent based on these answers
 # specifically for the depression_and_anxiety one
 
@@ -196,8 +197,8 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "state_depression_and_anxiety_v2_risk": risk,
-            "state_depression_and_anxiety_v2_score": score,
+            "depression_and_anxiety_v2_risk": risk,
+            "depression_and_anxiety_v2_score": score,
         }
         self.save_answer("state_depression_and_anxiety_v2_risk", risk)
         self.save_answer("state_depression_and_anxiety_v2_score", str(score))
