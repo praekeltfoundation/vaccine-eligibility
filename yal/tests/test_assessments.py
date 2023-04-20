@@ -410,14 +410,9 @@ async def test_state_handle_assessment_reminder_response_loc_tomorrow_again(
 async def test_state_handle_assessment_reminder_response_not_interested(
     tester: AppTester, contentrepo_api_mock
 ):
-    tester.user.metadata["assessment_reminder_name"] = "locus_of_control"
     tester.user.metadata["assessment_reminder_sent"] = "True"
-    tester.user.metadata["assessment_reminder_type"] = "reengagement 30min"
-
-    tester.setup_state("state_handle_assessment_reminder_response")
-    await tester.user_input(
-        session=Message.SESSION_EVENT.NEW, content="I'm not interested"
-    )
+    tester.setup_state("state_survey_question")
+    await tester.user_input("I'm not interested")
     tester.assert_state("state_mainmenu")
 
 
