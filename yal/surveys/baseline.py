@@ -211,7 +211,7 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    "*We’re getting there! you’re doing great!* 🎉",
+                    "*We’re getting there! You’re doing great!* 🎉",
                     "",
                     "Just a few more questions to go and your R30 airtime will "
                     "be sent to you! 🤑",
