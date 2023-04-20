@@ -468,8 +468,8 @@
 | baseline_7_q12_sexual_health_lit | TRUE | Text | Are you currently living with HIV? |
 | baseline_7_q13_sexual_health_lit | TRUE | Text | Do you take ART (antiretroviral therapy) medication on a regular basis? |
 | baseline_7_q14_sexual_health_lit | TRUE | Text | Do you take PrEP (Pre-exposure prophylaxis) medication on a regular basis? |
-| state_sexual_health_lit_v2_risk | FALSE | Text | The risk rating for Sexual Health literacy |
-| state_sexual_health_lit_v2_score | FALSE | Text | The score for Sexual Health literacy |
+| state_sexual_health_lit_v2_risk | TRUE | Text | The risk rating for Sexual Health literacy |
+| state_sexual_health_lit_v2_score | TRUE | Text | The score for Sexual Health literacy |
 
 ### Baseline Self Esteem assessment V2
 | state_name | accepts_user_input | data_type | description |
@@ -484,45 +484,45 @@
 | baseline_1_q8_self_esteem | TRUE | Text | I wish I could have more respect for myself. |
 | baseline_1_q9_self_esteem | TRUE | Text | I certainly feel useless at times. |
 | baseline_1_q10_self_esteem | TRUE | Text | At times I think I am no good at all. |
-| state_self_esteem_v2_risk | FALSE | Text | The risk rating for Self Esteem |
-| state_self_esteem_v2_score | FALSE | Text | The score for Self Esteem |
+| state_self_esteem_v2_risk | TRUE | Text | The risk rating for Self Esteem |
+| state_self_esteem_v2_score | TRUE | Text | The score for Self Esteem |
 
 ### Baseline Connectedness assessment V2
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
 | baseline_2_q1_connectedness | TRUE | Text | Do you have someone to talk to when you have a worry or problem? |
-| state_connectedness_v2_risk | FALSE | Text | The risk rating for Connectedness |
-| state_connectedness_v2_score | FALSE | Text | The score for Connectedness |
+| state_connectedness_v2_risk | TRUE | Text | The risk rating for Connectedness |
+| state_connectedness_v2_score | TRUE | Text | The score for Connectedness |
 
 ### Baseline Body Image assessment V2
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
 | baseline_3_q1_body_image | TRUE | Text | I feel good about myself. |
 | baseline_3_q2_body_image | TRUE | Text | I feel good about my body. |
-| state_body_image_v2_risk | FALSE | Text | The risk rating for Body Image |
-| state_body_image_v2_score | FALSE | Text | The score for Body Image |
+| state_body_image_v2_risk | TRUE | Text | The risk rating for Body Image |
+| state_body_image_v2_score | TRUE | Text | The score for Body Image |
 
 ### Baseline Depression assessment V2
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
 | baseline_4_q1_depression | TRUE | Text | Feeling down, depressed or hopeless |
 | baseline_4_q2_depression | TRUE | Text | Little interest or pleasure in doing things |
-| state_depression_v2_risk | FALSE | Text | The risk rating for Depression |
-| state_depression_v2_score | FALSE | Text | The score for Depression |
+| state_depression_v2_risk | TRUE | Text | The risk rating for Depression |
+| state_depression_v2_score | TRUE | Text | The score for Depression |
 
 ### Baseline Anxiety assessment V2
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
 | baseline_5_q1_anxiety | TRUE | Text | Feeling nervous, anxious or on edge |
 | baseline_5_q2_anxiety | TRUE | Text | Not being able to stop or control worrying |
-| state_anxiety_v2_risk | FALSE | Text | The risk rating for Anxiety |
-| state_anxiety_v2_score | FALSE | Text | The score for Anxiety |
+| state_anxiety_v2_risk | TRUE | Text | The risk rating for Anxiety |
+| state_anxiety_v2_score | TRUE | Text | The score for Anxiety |
 
 ### Baseline Depression and Anxiety assessment V2
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
-| state_depression_and_anxiety_v2_risk | FALSE | Text | The risk rating for Depression and Anxiety |
-| state_depression_and_anxiety_v2_score | FALSE | Text | The score for Depression and Anxiety |
+| state_depression_and_anxiety_v2_risk | TRUE | Text | The risk rating for Depression and Anxiety |
+| state_depression_and_anxiety_v2_score | TRUE | Text | The score for Depression and Anxiety |
 
 ### Baseline Self Perceived Healthcare assessment V2
 | state_name | accepts_user_input | data_type | description |
@@ -539,16 +539,16 @@
 | baseline_8_q2_gender_attitude | TRUE | Text | It’s a woman’s responsibility to avoid getting pregnant. |
 | baseline_8_q3_gender_attitude | TRUE | Text | A man and a woman should decide together what type of contraceptive to use. |
 | baseline_8_q4_gender_attitude | TRUE | Text | If a guy gets a women pregnant, the child is responsibility of both. |
-| state_gender_attitude_v2_risk | FALSE | Text | The risk rating for Gender Attitude |
-| state_gender_attitude_v2_score | FALSE | Text | The score for Gender Attitude |
+| state_gender_attitude_v2_risk | TRUE | Text | The risk rating for Gender Attitude |
+| state_gender_attitude_v2_score | TRUE | Text | The score for Gender Attitude |
 
 ### Baseline Sexual Consent assessment V2
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
 | baseline_9_q1_sexual_consent | TRUE | Text | Robert has the right to force Samantha to have sex. |
 | baseline_9_q2_sexual_consent | TRUE | Text | If you're in a relationship, which of these statements describes you best? |
-| state_sexual_consent_v2_risk | FALSE | Text | The risk rating for Sexual Consent |
-| state_sexual_consent_v2_score | FALSE | Text | The score for Sexual Consent |
+| state_sexual_consent_v2_risk | TRUE | Text | The risk rating for Sexual Consent |
+| state_sexual_consent_v2_score | TRUE | Text | The score for Sexual Consent |
 
 ### Baseline Alcohol assessment V2
 | state_name | accepts_user_input | data_type | description |
@@ -557,5 +557,5 @@
 | baseline_10_q2_alcohol | TRUE | Text | Have you ever felt you needed to cut down on your drinking or drug use? |
 | baseline_10_q3_alcohol | TRUE | Text | Have people annoyed you by criticising your drinking or drug use? |
 | baseline_10_q4_alcohol | TRUE | Text | Have you ever felt you needed a drink or used drugs first thing in the morning (eye‐opener)? |
-| state_alcohol_v2_risk | FALSE | Text | The risk rating for Alcohol |
-| state_alcohol_v2_score | FALSE | Text | The score for Alcohol |
+| state_alcohol_v2_risk | TRUE | Text | The risk rating for Alcohol |
+| state_alcohol_v2_score | TRUE | Text | The score for Alcohol |
