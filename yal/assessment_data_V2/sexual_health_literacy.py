@@ -357,8 +357,8 @@ ASSESSMENT_QUESTIONS = {
                     ("skip_question", "Skip question"),
                 ],
                 "next": {
-                    "yes": "baseline_7_q14_sexual_health_lit",
-                    "no": "baseline_7_q14_sexual_health_lit",
+                    "yes": None,
+                    "no": None,
                     "skip_question": None,
                 },
             },
