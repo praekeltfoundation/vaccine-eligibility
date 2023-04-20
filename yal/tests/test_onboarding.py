@@ -535,6 +535,7 @@ async def test_assessment_start(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_locus_of_control_assessment_start")
     await tester.user_input("OK, let's start!")
     tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "locus_of_control")
     tester.assert_metadata(
         "assessment_end_state", "state_locus_of_control_assessment_end"
     )
