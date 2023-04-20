@@ -48,6 +48,11 @@ async def rapidpro_mock():
             status=200,
         )
 
+    @app.route("/api/v2/contacts.json", methods=["POST"])
+    def update_contact(request):
+        tstate.requests.append(request)
+        return response.json({}, status=200)
+
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
@@ -70,3 +75,18 @@ async def test_state_baseline_end_invalid_input(tester: AppTester):
     assert (
         message.content in get_generic_errors()
     ), f"Message content not in provided list, it is {message.content}"
+
+
+@pytest.mark.asyncio
+async def test_state_halfway_message(tester: AppTester):
+
+    tester.setup_state("state_baseline_halfway_msg")
+
+    await tester.user_input("OK Let's do it")
+
+    # tester.assert_state("state_baseline_halfway_msg")
+    [message] = tester.application.messages
+    # print(message.content)
+    # tester.assert_message(
+    #    "*How good a job do you feel you are doing in taking care of your health?*"
+    # )
