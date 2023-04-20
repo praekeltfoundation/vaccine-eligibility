@@ -529,8 +529,8 @@
 | ---------- | ------------------ | --------- | ----------- |
 | baseline_6_q1_self_perceived_healthcare | TRUE | Text | How good a job do you feel you are doing in taking care of your health? |
 | baseline_6_q2_self_perceived_healthcare | TRUE | Text | When you have a health need do you go to your closest clinic? |
-| state_self_perceived_healthcare_v2_risk | FALSE | Text | The risk rating for Self Perceived Healthcare |
-| state_self_perceived_healthcare_V2_score | FALSE | Text | The score for Self Perceived Healthcare |
+| state_self_perceived_healthcare_v2_risk | TRUE | Text | The risk rating for Self Perceived Healthcare |
+| state_self_perceived_healthcare_v2_score | TRUE | Text | The score for Self Perceived Healthcare |
 
 ### Baseline Gender Attitude assessment V2
 | state_name | accepts_user_input | data_type | description |
@@ -540,7 +540,7 @@
 | baseline_8_q3_gender_attitude | TRUE | Text | A man and a woman should decide together what type of contraceptive to use. |
 | baseline_8_q4_gender_attitude | TRUE | Text | If a guy gets a women pregnant, the child is responsibility of both. |
 | state_gender_attitude_v2_risk | FALSE | Text | The risk rating for Gender Attitude |
-| state_gender_attitude_V2_score | FALSE | Text | The score for Gender Attitude |
+| state_gender_attitude_v2_score | FALSE | Text | The score for Gender Attitude |
 
 ### Baseline Sexual Consent assessment V2
 | state_name | accepts_user_input | data_type | description |
@@ -548,7 +548,7 @@
 | baseline_9_q1_sexual_consent | TRUE | Text | Robert has the right to force Samantha to have sex. |
 | baseline_9_q2_sexual_consent | TRUE | Text | If you're in a relationship, which of these statements describes you best? |
 | state_sexual_consent_v2_risk | FALSE | Text | The risk rating for Sexual Consent |
-| state_sexual_consent_V2_score | FALSE | Text | The score for Sexual Consent |
+| state_sexual_consent_v2_score | FALSE | Text | The score for Sexual Consent |
 
 ### Baseline Alcohol assessment V2
 | state_name | accepts_user_input | data_type | description |
@@ -558,4 +558,4 @@
 | baseline_10_q3_alcohol | TRUE | Text | Have people annoyed you by criticising your drinking or drug use? |
 | baseline_10_q4_alcohol | TRUE | Text | Have you ever felt you needed a drink or used drugs first thing in the morning (eye‐opener)? |
 | state_alcohol_v2_risk | FALSE | Text | The risk rating for Alcohol |
-| state_alcohol_V2_score | FALSE | Text | The score for Alcohol |
+| state_alcohol_v2_score | FALSE | Text | The score for Alcohol |
