@@ -61,6 +61,30 @@ async def rapidpro_mock():
         config.RAPIDPRO_URL = url
 
 
+@pytest.fixture
+async def contentrepo_api_mock():
+    Sanic.test_mode = True
+    app = Sanic("contentrepo_api_mock")
+    tstate = TState()
+
+    @app.route("/api/v2/pages", methods=["GET"])
+    def get_main_menu(request):
+        tstate.requests.append(request)
+        return response.json(
+            {
+                "count": 1,
+                "results": [{"id": 111, "title": "Main Menu 1 💊"}],
+            }
+        )
+
+    async with run_sanic(app) as server:
+        url = config.CONTENTREPO_API_URL
+        config.CONTENTREPO_API_URL = f"http://{server.host}:{server.port}"
+        server.tstate = tstate
+        yield server
+        config.CONTENTREPO_API_URL = url
+
+
 @pytest.mark.asyncio
 async def test_survey_start(tester: AppTester):
     """
@@ -380,6 +404,21 @@ async def test_state_handle_assessment_reminder_response_loc_tomorrow_again(
     )
     tester.assert_message("No problem! I'll remind you tomorrow")
     tester.assert_state("state_remind_tomorrow")
+
+
+@pytest.mark.asyncio
+async def test_state_handle_assessment_reminder_response_not_interested(
+    tester: AppTester, contentrepo_api_mock
+):
+    tester.user.metadata["assessment_reminder_name"] = "locus_of_control"
+    tester.user.metadata["assessment_reminder_sent"] = "True"
+    tester.user.metadata["assessment_reminder_type"] = "reengagement 30min"
+
+    tester.setup_state("state_handle_assessment_reminder_response")
+    await tester.user_input(
+        session=Message.SESSION_EVENT.NEW, content="I'm not interested"
+    )
+    tester.assert_state("state_mainmenu")
 
 
 def test_clean_name(tester: AppTester):

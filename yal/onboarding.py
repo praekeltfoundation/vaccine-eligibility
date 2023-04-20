@@ -303,6 +303,7 @@ class Application(BaseApplication):
             )
         )
 
+        self.save_metadata("assessment_name", "locus_of_control")
         self.save_metadata(
             "assessment_end_state", "state_locus_of_control_assessment_end"
         )
