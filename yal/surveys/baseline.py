@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 # TODO:
 # Check flow results
-# Double check scores and risks
 # Get understanding of the content people get sent based on these answers
 # specifically for the depression_and_anxiety one
 
@@ -119,8 +118,8 @@ class Application(BaseApplication):
             "body_image_v2_risk": risk,
             "body_image_v2_score": score,
         }
-        self.save_answer("state_body_image_v2_risk", risk)
-        self.save_answer("state_body_image_v2_score", str(score))
+        self.save_answer("state_body_image_risk", risk)
+        self.save_answer("state_body_image_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -147,8 +146,8 @@ class Application(BaseApplication):
             "depression_v2_risk": risk,
             "depression_v2_score": score,
         }
-        self.save_answer("state_depression_v2_risk", risk)
-        self.save_answer("state_depression_v2_score", str(score))
+        self.save_answer("depression_v2_risk", risk)
+        self.save_answer("depression_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -175,8 +174,8 @@ class Application(BaseApplication):
             "anxiety_v2_risk": risk,
             "anxiety_v2_score": score,
         }
-        self.save_answer("state_anxiety_v2_risk", risk)
-        self.save_answer("state_anxiety_v2_score", str(score))
+        self.save_answer("anxiety_v2_risk", risk)
+        self.save_answer("anxiety_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -200,8 +199,8 @@ class Application(BaseApplication):
             "depression_and_anxiety_v2_risk": risk,
             "depression_and_anxiety_v2_score": score,
         }
-        self.save_answer("state_depression_and_anxiety_v2_risk", risk)
-        self.save_answer("state_depression_and_anxiety_v2_score", str(score))
+        self.save_answer("depression_and_anxiety_v2_risk", risk)
+        self.save_answer("depression_and_anxiety_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -212,7 +211,7 @@ class Application(BaseApplication):
         msg = self._(
             "\n".join(
                 [
-                    "*We’re getting there! You’re doing great!* 🎉",
+                    "*We’re getting there! you’re doing great!* 🎉",
                     "",
                     "Just a few more questions to go and your R30 airtime will "
                     "be sent to you! 🤑",
@@ -252,8 +251,8 @@ class Application(BaseApplication):
             "self_perceived_healthcare_v2_risk": risk,
             "self_perceived_healthcare_v2_score": score,
         }
-        self.save_answer("state_self_perceived_healthcare_v2_risk", risk)
-        self.save_answer("state_self_perceived_healthcare_V2_score", str(score))
+        self.save_answer("self_perceived_healthcare_v2_risk", risk)
+        self.save_answer("self_perceived_healthcare_V2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -281,8 +280,8 @@ class Application(BaseApplication):
             "sexual_health_lit_v2_risk": risk,
             "sexual_health_lit_v2_score": score,
         }
-        self.save_answer("state_sexual_health_lit_v2_risk", risk)
-        self.save_answer("state_sexual_health_lit_v2_score", str(score))
+        self.save_answer("sexual_health_lit_v2_risk", risk)
+        self.save_answer("sexual_health_lit_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -310,8 +309,8 @@ class Application(BaseApplication):
             "gender_attitude_v2_risk": risk,
             "gender_attitude_v2_score": score,
         }
-        self.save_answer("state_gender_attitude_v2_risk", risk)
-        self.save_answer("state_gender_attitude_V2_score", str(score))
+        self.save_answer("gender_attitude_v2_risk", risk)
+        self.save_answer("gender_attitude_V2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -339,8 +338,8 @@ class Application(BaseApplication):
             "sexual_consent_v2_risk": risk,
             "sexual_consent_v2_score": score,
         }
-        self.save_answer("state_sexual_consent_v2_risk", risk)
-        self.save_answer("state_sexual_consent_V2_score", str(score))
+        self.save_answer("sexual_consent_v2_risk", risk)
+        self.save_answer("sexual_consent_V2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -366,8 +365,8 @@ class Application(BaseApplication):
             "alcohol_v2_risk": risk,
             "alcohol_v2_score": score,
         }
-        self.save_answer("state_alcohol_v2_risk", risk)
-        self.save_answer("state_alcohol_V2_score", str(score))
+        self.save_answer("alcohol_v2_risk", risk)
+        self.save_answer("alcohol_V2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
