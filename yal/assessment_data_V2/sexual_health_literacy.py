@@ -27,7 +27,7 @@ ASSESSMENT_QUESTIONS = {
                     "true": 5,
                     "false": 1,
                     "dont_understand": 1,
-                    "skip_question": 0,
+                    "skip_question": 1,
                 },
                 "next": "baseline_7_q2_sexual_health_lit",
             },
