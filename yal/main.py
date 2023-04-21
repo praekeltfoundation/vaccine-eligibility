@@ -74,7 +74,7 @@ ASSESSMENT_REENGAGEMENT_KEYWORDS = {
     "not interested",
     "skip",
     "remind me tomorrow",
-    "I m not interested",
+    "i m not interested",
 }
 SURVEY_KEYWORDS = {"baseline"}
 CALLBACK_CHECK_KEYWORDS = {"callback"}
