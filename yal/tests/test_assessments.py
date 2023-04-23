@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from unittest import mock
 
@@ -72,8 +73,8 @@ async def contentrepo_api_mock():
         tstate.requests.append(request)
         return response.json(
             {
-                "count": 1,
-                "results": [{"id": 111, "title": "Main Menu 1 💊"}],
+                "count": 0,
+                "results": [],
             }
         )
 
@@ -408,12 +409,25 @@ async def test_state_handle_assessment_reminder_response_loc_tomorrow_again(
 
 @pytest.mark.asyncio
 async def test_state_handle_assessment_reminder_response_not_interested(
-    tester: AppTester, contentrepo_api_mock
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
     tester.user.metadata["assessment_reminder_sent"] = "True"
     tester.setup_state("state_survey_question")
     await tester.user_input("I'm not interested")
     tester.assert_state("state_mainmenu")
+
+    assert len(rapidpro_mock.tstate.requests) == 4
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "assessment_reminder_name": "",
+            "assessment_reminder_sent": "",
+            "assessment_reminder_type": "",
+        },
+    }
+    tester.assert_metadata("assessment_reminder_name", "")
+    tester.assert_metadata("assessment_reminder_sent", "")
+    tester.assert_metadata("assessment_reminder_type", "")
 
 
 def test_clean_name(tester: AppTester):
