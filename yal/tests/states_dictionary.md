@@ -448,7 +448,7 @@
 | state_sexual_consent_assessment_v2_end | TRUE | Text | End of Sexual Consent Assessment. |
 | state_alcohol_assessment_v2_end | TRUE | Text | End of Alcohol Assessment. |
 | state_baseline_halfway_msg | TRUE | Text | Halfway message of baseline survey |
-| state_baseline_airtime_incentive | False | Text | Sets airtime incentive field to False on RP |
+| state_submit_baseline_completed | False | Text | Saves flow results and contact fields relevant to baseline survey end |
 
 
 ### Baseline Sexual Health literacy assessment V2
