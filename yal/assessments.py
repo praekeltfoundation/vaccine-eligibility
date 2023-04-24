@@ -351,7 +351,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_reschedule_assessment_reminder")
 
         if inbound == "i m not interested":
-            return await self.go_to_state("state_pre_mainmenu")
+            return await self.go_to_state("state_stop_assessment_reminders")
 
     async def state_stop_assessment_reminders_confirm(self):
         assessment_reminder_name = self.user.metadata["assessment_reminder_name"]

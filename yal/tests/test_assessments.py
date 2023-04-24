@@ -408,12 +408,21 @@ async def test_state_handle_assessment_reminder_response_loc_tomorrow_again(
 
 @pytest.mark.asyncio
 async def test_state_handle_assessment_reminder_response_not_interested(
-    tester: AppTester, contentrepo_api_mock
+    tester: AppTester, rapidpro_mock
 ):
     tester.user.metadata["assessment_reminder_sent"] = "True"
+    tester.user.metadata["assessment_reminder_name"] = "sexual_health_literacy"
     tester.setup_state("state_survey_question")
     await tester.user_input("I'm not interested")
-    tester.assert_state("state_mainmenu")
+    tester.assert_state("state_stop_assessment_reminders")
+
+    assert tester.user.metadata == {
+        "assessment_reminder_name": "",
+        "assessment_reminder_sent": "",
+        "assessment_reminder_type": "",
+        "sexual_health_lit_risk": "high_risk",
+    }
+    assert [r.method for r in rapidpro_mock.tstate.requests] == ["GET", "POST"]
 
 
 def test_clean_name(tester: AppTester):
