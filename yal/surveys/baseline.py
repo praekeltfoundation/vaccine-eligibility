@@ -253,7 +253,7 @@ class Application(BaseApplication):
             "self_perceived_healthcare_v2_score": score,
         }
         self.save_answer("state_self_perceived_healthcare_v2_risk", risk)
-        self.save_answer("state_self_perceived_healthcare_V2_score", str(score))
+        self.save_answer("state_self_perceived_healthcare_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -311,7 +311,7 @@ class Application(BaseApplication):
             "gender_attitude_v2_score": score,
         }
         self.save_answer("state_gender_attitude_v2_risk", risk)
-        self.save_answer("state_gender_attitude_V2_score", str(score))
+        self.save_answer("state_gender_attitude_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -340,7 +340,7 @@ class Application(BaseApplication):
             "sexual_consent_v2_score": score,
         }
         self.save_answer("state_sexual_consent_v2_risk", risk)
-        self.save_answer("state_sexual_consent_V2_score", str(score))
+        self.save_answer("state_sexual_consent_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -367,7 +367,7 @@ class Application(BaseApplication):
             "alcohol_v2_score": score,
         }
         self.save_answer("state_alcohol_v2_risk", risk)
-        self.save_answer("state_alcohol_V2_score", str(score))
+        self.save_answer("state_alcohol_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
