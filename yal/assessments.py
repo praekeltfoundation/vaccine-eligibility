@@ -351,7 +351,18 @@ class Application(BaseApplication):
             return await self.go_to_state("state_reschedule_assessment_reminder")
 
         if inbound == "i m not interested":
-            return await self.go_to_state("state_stop_assessment_reminders")
+            msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+            whatsapp_id = msisdn.lstrip(" + ")
+            data = {
+                "assessment_reminder_name": "",
+                "assessment_reminder_sent": "",
+                "assessment_reminder_type": "",
+            }  # Reset the fields
+
+            error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+            if error:
+                return await self.go_to_state("state_error")
+            return await self.go_to_state("state_pre_mainmenu")
 
     async def state_stop_assessment_reminders_confirm(self):
         assessment_reminder_name = self.user.metadata["assessment_reminder_name"]
