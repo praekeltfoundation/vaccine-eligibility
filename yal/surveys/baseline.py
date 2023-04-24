@@ -61,8 +61,8 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "self_esteem_v2_risk": risk,
-            "self_esteem_v2_score": score,
+            "self_esteem_risk": risk,
+            "self_esteem_score": score,
         }
         self.save_answer("state_self_esteem_v2_risk", risk)
         self.save_answer("state_self_esteem_v2_score", str(score))
@@ -89,8 +89,8 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "connectedness_v2_risk": risk,
-            "connectedness_v2_score": score,
+            "connectedness_risk": risk,
+            "connectedness_score": score,
         }
         self.save_answer("state_connectedness_v2_risk", risk)
         self.save_answer("state_connectedness_v2_score", str(score))
@@ -116,8 +116,8 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "body_image_v2_risk": risk,
-            "body_image_v2_score": score,
+            "body_image_risk": risk,
+            "body_image_score": score,
         }
         self.save_answer("state_body_image_v2_risk", risk)
         self.save_answer("state_body_image_v2_score", str(score))
@@ -144,8 +144,8 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "depression_v2_risk": risk,
-            "depression_v2_score": score,
+            "depression_risk": risk,
+            "depression_score": score,
         }
         self.save_answer("state_depression_v2_risk", risk)
         self.save_answer("state_depression_v2_score", str(score))
@@ -172,8 +172,8 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "anxiety_v2_risk": risk,
-            "anxiety_v2_score": score,
+            "anxiety_risk": risk,
+            "anxiety_score": score,
         }
         self.save_answer("state_anxiety_v2_risk", risk)
         self.save_answer("state_anxiety_v2_score", str(score))
@@ -197,8 +197,8 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "depression_and_anxiety_v2_risk": risk,
-            "depression_and_anxiety_v2_score": score,
+            "depression_and_anxiety_risk": risk,
+            "depression_and_anxiety_score": score,
         }
         self.save_answer("state_depression_and_anxiety_v2_risk", risk)
         self.save_answer("state_depression_and_anxiety_v2_score", str(score))
@@ -249,11 +249,11 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "self_perceived_healthcare_v2_risk": risk,
-            "self_perceived_healthcare_v2_score": score,
+            "self_perceived_healthcare_risk": risk,
+            "self_perceived_healthcare_score": score,
         }
         self.save_answer("state_self_perceived_healthcare_v2_risk", risk)
-        self.save_answer("state_self_perceived_healthcare_V2_score", str(score))
+        self.save_answer("state_self_perceived_healthcare_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -278,8 +278,8 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "sexual_health_lit_v2_risk": risk,
-            "sexual_health_lit_v2_score": score,
+            "sexual_health_lit_risk": risk,
+            "sexual_health_lit_score": score,
         }
         self.save_answer("state_sexual_health_lit_v2_risk", risk)
         self.save_answer("state_sexual_health_lit_v2_score", str(score))
@@ -307,11 +307,11 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "gender_attitude_v2_risk": risk,
-            "gender_attitude_v2_score": score,
+            "gender_attitude_risk": risk,
+            "gender_attitude_score": score,
         }
         self.save_answer("state_gender_attitude_v2_risk", risk)
-        self.save_answer("state_gender_attitude_V2_score", str(score))
+        self.save_answer("state_gender_attitude_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -336,11 +336,11 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "sexual_consent_v2_risk": risk,
-            "sexual_consent_v2_score": score,
+            "sexual_consent_risk": risk,
+            "sexual_consent_score": score,
         }
         self.save_answer("state_sexual_consent_v2_risk", risk)
-        self.save_answer("state_sexual_consent_V2_score", str(score))
+        self.save_answer("state_sexual_consent_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -363,11 +363,11 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "alcohol_v2_risk": risk,
-            "alcohol_v2_score": score,
+            "alcohol_risk": risk,
+            "alcohol_score": score,
         }
         self.save_answer("state_alcohol_v2_risk", risk)
-        self.save_answer("state_alcohol_V2_score", str(score))
+        self.save_answer("state_alcohol_v2_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -378,6 +378,18 @@ class Application(BaseApplication):
     # TODO: Rememeber to check for survey complete variable.
 
     async def state_baseline_end(self):
+
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "baseline_survey_completed": True,
+        }
+        self.save_answer("baseline_survey_completed", True)
+
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
         return WhatsAppButtonState(
             self,
             question=self._(
