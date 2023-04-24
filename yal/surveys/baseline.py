@@ -380,6 +380,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
             "ejaf_airtime_incentive_sent": "False",
+            "ejaf_completed_on": get_current_datetime().isoformat(),
         }
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
