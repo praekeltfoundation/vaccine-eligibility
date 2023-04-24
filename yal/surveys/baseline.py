@@ -378,6 +378,18 @@ class Application(BaseApplication):
     # TODO: Rememeber to check for survey complete variable.
 
     async def state_baseline_end(self):
+
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "baseline_survey_completed": True,
+        }
+        self.save_answer("baseline_survey_completed", True)
+
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
         return WhatsAppButtonState(
             self,
             question=self._(
