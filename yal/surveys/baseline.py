@@ -372,23 +372,29 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
-        return await self.go_to_state("state_baseline_end")
+        return await self.go_to_state("state_submit_baseline_completed")
 
-    # Baseline End
-    # TODO: Rememeber to check for survey complete variable.
-
-    async def state_baseline_end(self):
-
+    # Baseline Airtime Incentive
+    async def state_submit_baseline_completed(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
             "baseline_survey_completed": "TRUE",
+            "ejaf_airtime_incentive_sent": "False",
+            "ejaf_baseline_completed_on": get_current_datetime().isoformat(),
         }
         self.save_answer("baseline_survey_completed", "TRUE")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
+
+        return await self.go_to_state("state_baseline_end")
+
+    # Baseline End
+    # TODO: Rememeber to check for survey complete variable.
+
+    async def state_baseline_end(self):
 
         return WhatsAppButtonState(
             self,

@@ -1,6 +1,11 @@
+import json
+from datetime import datetime
+from unittest import mock
+
 import pytest
 from sanic import Sanic, response
 
+from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.main import Application
@@ -60,6 +65,33 @@ async def rapidpro_mock():
         server.tstate = tstate
         yield server
         config.RAPIDPRO_URL = url
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.surveys.baseline.get_current_datetime")
+async def test_state_submit_baseline_completed(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("state_alcohol_assessment_v2_end")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_state("state_baseline_end")
+
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[2]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "baseline_survey_completed": "TRUE",
+            "ejaf_airtime_incentive_sent": "False",
+            "ejaf_baseline_completed_on": "2022-06-19T17:30:00",
+        },
+    }
+    tester.assert_metadata("baseline_survey_completed", "TRUE")
+    tester.assert_metadata("ejaf_airtime_incentive_sent", "False")
+    tester.assert_metadata("ejaf_baseline_completed_on", "2022-06-19T17:30:00")
+
+    tester.assert_answer("baseline_survey_completed", "TRUE")
 
 
 @pytest.mark.asyncio
