@@ -372,6 +372,20 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
+        return await self.go_to_state("state_baseline_airtime_incentive")
+
+    # Baseline Airtime Incentive
+    async def state_baseline_airtime_incentive(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "ejaf_airtime_incentive_sent": "False",
+        }
+
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
         return await self.go_to_state("state_baseline_end")
 
     # Baseline End
