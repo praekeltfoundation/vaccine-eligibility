@@ -103,6 +103,13 @@ class Application(BaseApplication):
         self.delete_metadata("assessment_question")
         self.delete_metadata("assessment_question_nr")
         self.delete_metadata("assessment_score")
+
+        metadata = self.user.metadata
+        assessment_name = self.clean_name(
+            metadata.get("assessment_name", "locus_of_control")
+        )
+        self.save_answer("assessment_started", assessment_name)
+
         return await self.go_to_state("state_survey_question")
 
     async def state_survey_question(self):
@@ -145,6 +152,7 @@ class Application(BaseApplication):
                 )
                 if error:
                     return await self.go_to_state("state_error")
+            self.save_answer("assessment_completed", assessment_name)
             return await self.go_to_state(metadata["assessment_end_state"])
 
         current_question = metadata.get("assessment_question")

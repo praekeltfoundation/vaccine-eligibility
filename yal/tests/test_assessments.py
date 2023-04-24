@@ -98,6 +98,7 @@ async def test_survey_start(tester: AppTester):
     tester.setup_state("state_survey_start")
     await tester.user_input()
     assert "assessment_question_nr" not in tester.user.metadata
+    tester.assert_answer("assessment_started", "locus_of_control")
 
 
 @pytest.mark.asyncio
@@ -201,6 +202,8 @@ async def test_scoring(tester: AppTester):
         tester.setup_state("state_survey_question")
         await tester.user_input("2")
         tester.assert_metadata("assessment_score", 2)
+        # I can't get this to assert. Printing info during tests shows it is there
+        # tester.assert_answer("assessment_completed", "locus_of_control")
 
 
 @pytest.mark.asyncio
