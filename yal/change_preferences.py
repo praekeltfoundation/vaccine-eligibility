@@ -878,7 +878,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "[persona emoji] *No problem! You will no longer be part"
+                    "[persona_emoji] *No problem! You will no longer be part"
                     " of this study.*",
                     "",
                     "Remember, you can still use the menu to get the info you need.",
