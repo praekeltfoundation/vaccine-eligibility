@@ -382,9 +382,9 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "baseline_survey_completed": True,
+            "baseline_survey_completed": "TRUE",
         }
-        self.save_answer("baseline_survey_completed", True)
+        self.save_answer("baseline_survey_completed", "TRUE")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
