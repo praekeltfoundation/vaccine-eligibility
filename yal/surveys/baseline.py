@@ -11,12 +11,6 @@ from yal.utils import get_current_datetime, get_generic_error, normalise_phonenu
 
 logger = logging.getLogger(__name__)
 
-# TODO:
-# Check flow results
-# Double check scores and risks
-# Get understanding of the content people get sent based on these answers
-# specifically for the depression_and_anxiety one
-
 
 class Application(BaseApplication):
     depression_score = 0
@@ -390,9 +384,6 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         return await self.go_to_state("state_baseline_end")
-
-    # Baseline End
-    # TODO: Rememeber to check for survey complete variable.
 
     async def state_baseline_end(self):
 
