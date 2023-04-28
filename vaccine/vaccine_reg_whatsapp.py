@@ -245,9 +245,9 @@ class Application(BaseApplication):
             self.inbound.reply(
                 None,
                 helper_metadata={
-                    "document": "https://healthcheck-rasa-images.s3.af-south-1.amazonaw"
-                    "s.com/ELECTRONIC+VACCINATION+DATA+SYSTEM+(EVDS)+%E2%80%93+DATA+"
-                    "PROTECTION+%26+PRIVACY+POLICY+(WhatsApp).pdf"
+                    "document": "https://healthcheck-images-rasa.s3.af-south-1.amazonaw"
+                    "s.com/ELECTRONIC+VACCINATION+DATA+SYSTEM+(EVDS)+%E2%80%93+DATA+PRO"
+                    "TECTION+%26+PRIVACY+POLICY+(WhatsApp)_Updated+20+April+2023.pdf"
                 },
             )
         )

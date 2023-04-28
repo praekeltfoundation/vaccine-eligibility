@@ -82,7 +82,6 @@ async def eventstore_mock():
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip("Skip this until we have new translations")
 async def test_language(tester: AppTester):
     """
     Should set the user language on selection
@@ -111,13 +110,15 @@ async def test_language(tester: AppTester):
                 "- Akukho okuzokhokhwa ngokuhlanganyela / intela ezodingeka uma "
                 "ungaphansi kweMedical Aid ",
                 "- Wonke umuntu obhalisile uzonikezwa umuthi wokugoma ",
-                "- Sizohamba ngamaqembu eminyeka ngokushesha okukhulu ",
                 " ",
-                "Ukubhalisa okwamanje kuvulelwe abaneminyaka engu-60 nangaphezulu "
-                "kuphela. Uneminyaka engu-60 noma ngaphezulu? ",
+                "*NB*",
+                "👉*Ukuzibhalisa* kuyatholakala kulabo abaneminyaka ewu-18 nangaphezulu",
+                "👉Ezinganeni ezineminyaka ewu-5-17, ukubhaliswa kufanele kugcwaliswe "
+                "ngumuntu ongenza izinqumo ngokusemthethweni egameni lengane",
                 "",
-                "1. Yebo, ngineminyaka engu-60 noma ngaphezulu",
-                "2. Cha",
+                "",
+                "1. 18+ Ukuzibhalisela ngokwakho",
+                "2. Bhalisa egameni lengane eneminyaka engu-5-17",
             ]
         )
     )
