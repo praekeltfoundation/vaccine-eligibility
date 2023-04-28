@@ -373,11 +373,11 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "baseline_survey_completed": "TRUE",
+            "baseline_survey_completed": "True",
             "ejaf_airtime_incentive_sent": "False",
             "ejaf_baseline_completed_on": get_current_datetime().isoformat(),
         }
-        self.save_answer("baseline_survey_completed", "TRUE")
+        self.save_answer("baseline_survey_completed", "True")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
