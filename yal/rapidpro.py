@@ -13,8 +13,7 @@ def get_rapidpro_api():
     return aiohttp.ClientSession(
         timeout=aiohttp.ClientTimeout(total=5),
         headers={
-            # "Authorization": f"Token {config.RAPIDPRO_TOKEN}",
-            "Authorization": f"Token f67eef9c8228b7d89c169080b90ae714dbb04c63",
+            "Authorization": f"Token {config.RAPIDPRO_TOKEN}",
             "Content-Type": "application/json",
             "User-Agent": "mqr-baseline-study-ussd",
         },
@@ -142,9 +141,8 @@ async def check_if_baseline_active():
         for i in range(3):
             try:
                 response = await session.get(
-                    # urljoin(config.RAPIDPRO_URL, "/api/v2/globals.json?key=baseline_survey_active"),
                     urljoin(
-                        "https://rapidpro-prd.yal-k8s.prd-p6t.org/",
+                        config.RAPIDPRO_URL,
                         "/api/v2/globals.json?key=baseline_survey_active",
                     ),
                 )
