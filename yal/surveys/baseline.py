@@ -11,12 +11,6 @@ from yal.utils import get_current_datetime, get_generic_error, normalise_phonenu
 
 logger = logging.getLogger(__name__)
 
-# TODO:
-# Check flow results
-# Double check scores and risks
-# Get understanding of the content people get sent based on these answers
-# specifically for the depression_and_anxiety one
-
 
 class Application(BaseApplication):
     depression_score = 0
@@ -379,20 +373,17 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "baseline_survey_completed": "TRUE",
+            "baseline_survey_completed": "True",
             "ejaf_airtime_incentive_sent": "False",
             "ejaf_baseline_completed_on": get_current_datetime().isoformat(),
         }
-        self.save_answer("baseline_survey_completed", "TRUE")
+        self.save_answer("baseline_survey_completed", "True")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
 
         return await self.go_to_state("state_baseline_end")
-
-    # Baseline End
-    # TODO: Rememeber to check for survey complete variable.
 
     async def state_baseline_end(self):
 

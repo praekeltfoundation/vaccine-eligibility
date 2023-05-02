@@ -64,6 +64,26 @@ async def rapidpro_mock():
         tstate.requests.append(request)
         return response.json({}, status=200)
 
+    @app.route("/api/v2/globals.json", methods=["GET"])
+    def check_if_baseline_active(request):
+        tstate.requests.append(request)
+        assert request.args.get("key") == "baseline_survey_active"
+        return response.json(
+            {
+                "next": None,
+                "previous": None,
+                "results": [
+                    {
+                        "key": "baseline_survey_active",
+                        "name": "Baseline Survey Active",
+                        "value": "True",
+                        "modified_on": "2023-04-28T07:34:06.216776Z",
+                    }
+                ],
+            },
+            status=200,
+        )
+
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
@@ -84,7 +104,7 @@ async def test_user_too_young_not_offered_study(tester: AppTester, rapidpro_mock
     await tester.user_input("Yes, please!")
     tester.assert_state("state_pushmessage_optin_final")
 
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"push_message_opt_in": "True"},
@@ -103,7 +123,7 @@ async def test_user_too_old_not_offered_study(tester: AppTester, rapidpro_mock):
     await tester.user_input("Yes, please!")
     tester.assert_state("state_pushmessage_optin_final")
 
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"push_message_opt_in": "True"},
@@ -122,7 +142,7 @@ async def test_user_not_sa_not_offered_study(tester: AppTester, rapidpro_mock):
     await tester.user_input("Yes, please!")
     tester.assert_state("state_pushmessage_optin_final")
 
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"push_message_opt_in": "True"},
@@ -141,7 +161,7 @@ async def test_user_used_bot_before_not_offered_study(tester: AppTester, rapidpr
     await tester.user_input("Yes, please!")
     tester.assert_state("state_pushmessage_optin_final")
 
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"push_message_opt_in": "True"},
@@ -162,6 +182,10 @@ async def test_state_pushmessages_optin_no(tester: AppTester, rapidpro_mock):
     }
 
 
+# TODO: Add a test that checks that the user is not invited when
+# the is_baseline_active flag is False
+
+
 @pytest.mark.asyncio
 async def test_eligible_user_is_offered_study(tester: AppTester, rapidpro_mock):
     tester.user.metadata["age"] = "20"
@@ -173,7 +197,7 @@ async def test_eligible_user_is_offered_study(tester: AppTester, rapidpro_mock):
     await tester.user_input("Yes, please!")
     tester.assert_state("state_study_invitation")
 
-    assert len(rapidpro_mock.tstate.requests) == 2
+    assert len(rapidpro_mock.tstate.requests) == 3
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"push_message_opt_in": "True"},
