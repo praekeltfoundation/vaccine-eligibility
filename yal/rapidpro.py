@@ -13,7 +13,8 @@ def get_rapidpro_api():
     return aiohttp.ClientSession(
         timeout=aiohttp.ClientTimeout(total=5),
         headers={
-            "Authorization": f"Token {config.RAPIDPRO_TOKEN}",
+            # "Authorization": f"Token {config.RAPIDPRO_TOKEN}",
+            "Authorization": f"Token f67eef9c8228b7d89c169080b90ae714dbb04c63",
             "Content-Type": "application/json",
             "User-Agent": "mqr-baseline-study-ussd",
         },
@@ -130,3 +131,34 @@ async def get_instance_fields():
                 else:
                     continue
     return fields
+
+
+async def check_if_baseline_active():
+    """
+    Checks a Global var on the RapidPro instance to see if the Baseline survey is active
+    """
+    async with get_rapidpro_api() as session:
+        is_baseline_survey_active = False
+        for i in range(3):
+            try:
+                response = await session.get(
+                    # urljoin(config.RAPIDPRO_URL, "/api/v2/globals.json?key=baseline_survey_active"),
+                    urljoin(
+                        "https://rapidpro-prd.yal-k8s.prd-p6t.org/",
+                        "/api/v2/globals.json?key=baseline_survey_active",
+                    ),
+                )
+                response.raise_for_status()
+                response_body = await response.json()
+
+                if len(response_body["results"]) > 0:
+                    is_baseline_survey_active = response_body["results"][0]["value"]
+
+                break
+            except HTTP_EXCEPTIONS as e:
+                if i == 2:
+                    logger.exception(e)
+                    return True
+                else:
+                    continue
+    return is_baseline_survey_active

@@ -7,7 +7,7 @@ from sanic import Sanic, response
 
 from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
-from yal import config
+from yal import config, rapidpro
 from yal.main import Application
 from yal.utils import GENERIC_ERRORS, replace_persona_fields
 
