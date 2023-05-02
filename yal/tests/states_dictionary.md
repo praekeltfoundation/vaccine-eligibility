@@ -449,7 +449,7 @@
 | state_alcohol_assessment_v2_end | TRUE | Text | End of Alcohol Assessment. |
 | state_baseline_halfway_msg | TRUE | Text | Halfway message of baseline survey |
 | state_submit_baseline_completed | False | Text | Saves flow results and contact fields relevant to baseline survey end |
-| baseline_survey_completed | False | Text | Flad to show end of survey reachedcd  |
+| baseline_survey_completed | False | Text | Flag to show end of survey reachedcd  |
 
 
 ### Baseline Sexual Health literacy assessment V2
