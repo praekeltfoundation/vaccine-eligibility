@@ -180,7 +180,7 @@ async def test_state_pushmessages_optin_no(tester: AppTester, rapidpro_mock):
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"push_message_opt_in": "False"},
     }
-
+# TODO: Add a test that checks that the user is not invited when the is_baseline_active flag is False
 
 @pytest.mark.asyncio
 async def test_eligible_user_is_offered_study(tester: AppTester, rapidpro_mock):
