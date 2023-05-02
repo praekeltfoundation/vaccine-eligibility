@@ -182,7 +182,8 @@ async def test_state_pushmessages_optin_no(tester: AppTester, rapidpro_mock):
     }
 
 
-# TODO: Add a test that checks that the user is not invited when the is_baseline_active flag is False
+# TODO: Add a test that checks that the user is not invited when 
+# the is_baseline_active flag is False
 
 
 @pytest.mark.asyncio
