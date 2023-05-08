@@ -1450,7 +1450,7 @@ async def test_timeout(tester: AppTester):
                 "We haven’t heard from you in a while!",
                 "",
                 "The registration session has timed out due to inactivity. You will "
-                "need to start again. Just TYPE the word REGISTER.",
+                "need to start again. Just TYPE the word *REGISTER*.",
                 "",
                 "-----",
                 "Reply *SUPPORT* for details on how to get help with your registration",
