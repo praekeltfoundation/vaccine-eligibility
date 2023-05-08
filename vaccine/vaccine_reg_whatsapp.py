@@ -106,7 +106,7 @@ class Application(BaseApplication):
                 "We haven’t heard from you in a while!\n"
                 "\n"
                 "The registration session has timed out due to inactivity. You "
-                "will need to start again. Just TYPE the word REGISTER.\n"
+                "will need to start again. Just TYPE the word *REGISTER*.\n"
                 "\n"
                 "-----\n"
                 "Reply *SUPPORT* for details on how to get help with your "
