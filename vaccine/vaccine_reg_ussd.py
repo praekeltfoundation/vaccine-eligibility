@@ -98,7 +98,7 @@ class Application(BaseApplication):
                 "Note: Vaccinations is only available for ages {minimum_age}+"
             ).format(minimum_age=config.ELIGIBILITY_AGE_GATE_MIN),
             choices=[
-                Choice("state_terms_and_conditions", "Continue"),
+                Choice("state_terms_and_conditions", self._("Continue")),
             ],
             error=self._("ERROR: Please try again\n"),
         )
