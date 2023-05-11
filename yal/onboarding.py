@@ -4,10 +4,10 @@ import logging
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
+    ChoiceState,
     FreeText,
     WhatsAppButtonState,
     WhatsAppListState,
-    ChoiceState,
 )
 from yal import rapidpro, utils
 from yal.assessments import Application as AssessmentApplication
