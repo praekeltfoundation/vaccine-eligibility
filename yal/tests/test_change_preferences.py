@@ -250,7 +250,7 @@ async def test_state_update_gender(tester: AppTester, rapidpro_mock):
                 "*1* - Female",
                 "*2* - Male",
                 "*3* - Non-binary",
-                "*4* - None of these",
+                "*4* - None of the above",
                 "*5* - Rather not say",
                 "*6* - Skip",
             ]
@@ -259,7 +259,7 @@ async def test_state_update_gender(tester: AppTester, rapidpro_mock):
             "Female",
             "Male",
             "Non-binary",
-            "None of these",
+            "None of the above",
             "Rather not say",
             "Skip",
         ],

@@ -2,7 +2,13 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState
+from vaccine.states import (
+    Choice,
+    ChoiceState,
+    FreeText,
+    WhatsAppButtonState,
+    WhatsAppListState,
+)
 from yal import rapidpro, utils
 from yal.assessments import Application as AssessmentApplication
 from yal.pushmessages_optin import Application as PushmessageOptinApplication
@@ -155,7 +161,7 @@ class Application(BaseApplication):
                     "",
                     "*Which gender do you most identify with?*",
                     "",
-                    "_Tap the button and select the option you think best fits._",
+                    "Tap the button and select the option you think best fits.",
                 ]
             )
         )
@@ -184,8 +190,8 @@ class Application(BaseApplication):
                     "",
                     "*Awesome! Are you seeing someone special right now?*",
                     "",
-                    "_Tap the button and select the option that "
-                    "best describes your situation.._",
+                    "Tap the button and select the option that "
+                    "best describes your situation.",
                 ]
             )
         )
@@ -218,6 +224,52 @@ class Application(BaseApplication):
             question=question,
             choices=country_choices,
             error=get_generic_error(),
+            next="state_monthly_household_income",
+        )
+
+    async def state_monthly_household_income(self):
+        await self.update_last_onboarding_time()
+        choices = [
+            Choice("no_income", self._("No income")),
+            Choice("R1_R400", self._("R1 - R400")),
+            Choice("R401_R800", self._("R401 - R800")),
+            Choice("R801_R1600", self._("R801 - R1600")),
+            Choice("R1601_R3200", self._("R1 601 - R3200")),
+            Choice("R3201_R6400", self._("R3 201 - R6400")),
+            Choice("R6401_R12800", self._("R6 401 - R12800")),
+            Choice("R12801_R25600", self._("R12 801 - R25600")),
+            Choice("R25601_R51200", self._("R25 601 - R51200")),
+            Choice("R51201_R102 400", self._("R51 201 - R102 400")),
+            Choice("R102401_R204 800", self._("R102 401 - R204 800")),
+            Choice("R204801_or_more", self._("R204 801 or more")),
+            Choice("skip_question", self._("Skip question")),
+        ]
+
+        question = self._(
+            "\n".join(
+                [
+                    "*What is the total monthly income of your whole household?*",
+                    "",
+                    "Please respond with the *number* of an option below",
+                ]
+            )
+        )
+        # TODO: Check this validation copy
+        error = self._(
+            "\n".join(
+                [
+                    "*Oops. We did not understand your answer*",
+                    "Please respond with the *number* of an option below",
+                    "",
+                    "What is the total monthly income of your whole household?",
+                ]
+            )
+        )
+        return ChoiceState(
+            self,
+            question=question,
+            error=error,
+            choices=choices,
             next="state_seen_before",
         )
 

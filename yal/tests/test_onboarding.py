@@ -252,7 +252,7 @@ async def test_state_gender(get_current_datetime, tester: AppTester, rapidpro_mo
                 "",
                 "*Which gender do you most identify with?*",
                 "",
-                "_Tap the button and select the option you think best fits._",
+                "Tap the button and select the option you think best fits.",
             ]
         )
     )
@@ -310,8 +310,8 @@ async def test_state_rel_status(get_current_datetime, tester: AppTester, rapidpr
                 "",
                 "*Awesome! Are you seeing someone special right now?*",
                 "",
-                "_Tap the button and select the option that "
-                "best describes your situation.._",
+                "Tap the button and select the option that "
+                "best describes your situation.",
             ]
         )
     )
@@ -355,7 +355,7 @@ async def test_state_country(get_current_datetime, tester: AppTester, rapidpro_m
     }
 
     await tester.user_input("2")
-    tester.assert_state("state_seen_before")
+    tester.assert_state("state_monthly_household_income")
 
 
 @pytest.mark.asyncio
