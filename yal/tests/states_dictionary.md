@@ -153,6 +153,7 @@
 | state_phase2_update_exising_user_profile |        FALSE       |              |            FALSE         | For phase 2 we need to send existing users back to onboarding so that they can take the assessments. This state handles the push message response and inserts them based on their profile (if their gender isn't set they go to state_gender, if it is set they go to state_rel_status) |
 | state_country                              |        TRUE       |      Text        |            TRUE         | Asks the user if they are in South Africa. User response is "yes", "no" or "skip" |
 | state_seen_before                          |        TRUE       |      Text        |            TRUE         | Asks the user if they have used the Bwise bot before. User response is "yes", "no" or "skip" |
+| state_monthly_household_income               |        TRUE       |      Text        |            TRUE         | Asks the user what their total monthly household income is. Response is a numbered list  |
 
 
 ### OptOut flow
