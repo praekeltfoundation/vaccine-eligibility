@@ -2,7 +2,13 @@ import asyncio
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, FreeText, WhatsAppButtonState, WhatsAppListState, ChoiceState
+from vaccine.states import (
+    Choice,
+    FreeText,
+    WhatsAppButtonState,
+    WhatsAppListState,
+    ChoiceState,
+)
 from yal import rapidpro, utils
 from yal.assessments import Application as AssessmentApplication
 from yal.pushmessages_optin import Application as PushmessageOptinApplication
@@ -220,7 +226,7 @@ class Application(BaseApplication):
             error=get_generic_error(),
             next="state_monthly_household_income",
         )
-    
+
     async def state_monthly_household_income(self):
         await self.update_last_onboarding_time()
         choices = [
@@ -248,7 +254,7 @@ class Application(BaseApplication):
                 ]
             )
         )
-        # TODO: Check this validation copy 
+        # TODO: Check this validation copy
         error = self._(
             "\n".join(
                 [
@@ -266,7 +272,6 @@ class Application(BaseApplication):
             choices=choices,
             next="state_seen_before",
         )
-
 
     async def state_seen_before(self):
         await self.update_last_onboarding_time()
