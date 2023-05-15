@@ -37,6 +37,32 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
+                        "*In the past 7 days, how many days did you go hungry?*",
+                        
+                    ]
+                ),
+                "options": [
+                    ("none", "None"),
+                    ("1_2", "1-2"),
+                    ("3_4", "3-4"),
+                    ("5_7", "5-7"),
+                    ("rather_not_say", "Rather not say"),
+                    ("skip_question", "Skip question"),
+                ],
+                "scoring": {
+                    "none": 0,
+                    "1_2": 0,
+                    "3_4": 0,
+                    "5_7": 0,
+                    "rather_not_say": 0,
+                    "skip_question": 0,
+                },
+                "next": "baseline_6_q3_self_perceived_healthcare",
+            },
+            "baseline_6_q3_self_perceived_healthcare": {
+                "type": "list",
+                "text": "\n".join(
+                    [
                         "*When you have a health need (e.g. contraception, "
                         "flu symptoms), do you go to your closest clinic?*",
                     ]
