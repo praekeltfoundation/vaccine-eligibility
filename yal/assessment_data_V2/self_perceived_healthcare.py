@@ -38,7 +38,6 @@ ASSESSMENT_QUESTIONS = {
                 "text": "\n".join(
                     [
                         "*In the past 7 days, how many days did you go hungry?*",
-                        
                     ]
                 ),
                 "options": [

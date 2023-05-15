@@ -37,9 +37,9 @@ ASSESSMENT_QUESTIONS = {
                     [
                         "*Is the following statement true or false?*",
                         "",
-                        "People can reduce the risk of getting sexual STIs by only "
-                        "having sex with one partner who isn't infected and who has no "
-                        "other partners.",
+                        "People can reduce the risk of getting sexually "
+                        "transmitted infections (STIs) by only having sex with "
+                        "one partner who isn't infected and who has no other partners.",
                     ]
                 ),
                 "options": [
