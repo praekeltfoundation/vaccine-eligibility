@@ -210,7 +210,7 @@ class Application(BaseApplication):
                     "data outside the BWise WhatsApp Chatbot team.",
                     "",
                     "📄  We have sent you a copy of this consent and the privacy ",
-                    "policy. Please see above."
+                    "policy. Please see above.",
                     "",
                     "*Are you happy with this?*",
                 ]
