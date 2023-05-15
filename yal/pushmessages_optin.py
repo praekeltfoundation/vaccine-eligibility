@@ -209,7 +209,8 @@ class Application(BaseApplication):
                     "👤 Your answers are anonymous and confidential. We won't share "
                     "data outside the BWise WhatsApp Chatbot team.",
                     "",
-                    "📄  We'll send you a copy of this consent and the privacy policy."
+                    "📄  We have sent you a copy of this consent and the privacy ",
+                    "policy. Please see above."
                     "",
                     "*Are you happy with this?*",
                 ]
