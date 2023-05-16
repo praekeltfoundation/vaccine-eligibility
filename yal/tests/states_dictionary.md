@@ -358,7 +358,7 @@
 | state_study_invitation                        |        TRUE        |     Text     |            TRUE          | asks if user would like to be part of the EJAF study. Options are "yes" or "no" |
 | state_study_consent                          |        TRUE        |     Text     |            TRUE          | asks the user to accept the T&Cs for the EJAF study. Options are "yes" or "no" |
 | state_study_consent_yes_submit               |        FALSE        |     Text     |            FALSE          | Updates ejaf_study_optin with True if user responded yes to state_study_consent |
-| state_study_terms_pdf                        |        FALSE        |     Text     |            FALSE          | Sends user terms and conditions as pdf and then routes them to the baseline survey |
+| state_study_consent_pdf                        |        FALSE        |     Text     |            FALSE          | Sends user terms and conditions as pdf and then routes them to the baseline survey |
 
 ### A1 Sexual health literacy assessment
 | state_name | accepts_user_input | data_type | description |

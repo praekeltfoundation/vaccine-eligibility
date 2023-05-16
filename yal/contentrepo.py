@@ -39,6 +39,12 @@ def get_privacy_policy_url():
     )
 
 
+def get_study_consent_form_url():
+    return urljoin(
+        config.CONTENTREPO_API_URL, f"/documents/{config.STUDY_CONSENT_FORM_PDF}"
+    )
+
+
 async def get_choices_by_tag(tag: str) -> Tuple[bool, List[Choice]]:
     return await get_choices_by_path(f"/api/v2/pages?tag={tag}")
 
