@@ -166,16 +166,16 @@ class Application(BaseApplication):
             choices=choices,
             error=self._(get_generic_error()),
             next={
-                "yes": "state_study_terms_pdf",
+                "yes": "state_study_consent_pdf",
                 "no": "state_pushmessage_optin_final",
             },
         )
 
-    async def state_study_terms_pdf(self):
+    async def state_study_consent_pdf(self):
         await self.worker.publish_message(
             self.inbound.reply(
                 None,
-                helper_metadata={"document": contentrepo.get_privacy_policy_url()},
+                helper_metadata={"document": contentrepo.get_study_consent_form_url()},
             )
         )
         await asyncio.sleep(1.5)
@@ -201,7 +201,12 @@ class Application(BaseApplication):
                     "completing the survey, you will *not* be able to receive the R30 "
                     "airtime voucher._",
                     "",
-                    "❓ You can skip any questions you don't want to answer.",
+                    "❓ You can skip any questions you don't want to answer. "
+                    "To try improve South Africa’s sexual health we need to ask "
+                    "a number of questions that may be sensitive; for instance, "
+                    "we ask about sexual behaviours,sexual orientation and health "
+                    "status, among other topics. "
+                    "",
                     "",
                     "🔒 You've seen and agreed to our privacy policy. Just a reminder "
                     "that we promise to keep all your info private and secure.",
@@ -209,8 +214,8 @@ class Application(BaseApplication):
                     "👤 Your answers are anonymous and confidential. We won't share "
                     "data outside the BWise WhatsApp Chatbot team.",
                     "",
-                    "📄  We have sent you a copy of this consent and the privacy ",
-                    "policy. Please see above.",
+                    "📄  We have sent you a copy of this consent document. "
+                    "Please see above. ",
                     "",
                     "*Are you happy with this?*",
                 ]
