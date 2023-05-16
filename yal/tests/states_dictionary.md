@@ -531,7 +531,8 @@
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
 | baseline_6_q1_self_perceived_healthcare | TRUE | Text | How good a job do you feel you are doing in taking care of your health? |
-| baseline_6_q2_self_perceived_healthcare | TRUE | Text | When you have a health need do you go to your closest clinic? |
+| baseline_6_q2_self_perceived_healthcare | TRUE | Text | In the past 7 days, how many days did you go hungry? |
+| baseline_6_q3_self_perceived_healthcare | TRUE | Text | When you have a health need do you go to your closest clinic? |
 | state_self_perceived_healthcare_v2_risk | TRUE | Text | The risk rating for Self Perceived Healthcare |
 | state_self_perceived_healthcare_v2_score | TRUE | Text | The score for Self Perceived Healthcare |
 
