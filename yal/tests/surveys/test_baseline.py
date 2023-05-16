@@ -123,6 +123,7 @@ async def test_state_baseline_end_invalid_input(tester: AppTester):
 #    "*How good a job do you feel you are doing in taking care of your health?*"
 # )
 
+
 @pytest.mark.asyncio
 async def test_state_self_esteem_assessment_v2_end(tester: AppTester):
 
@@ -134,7 +135,9 @@ async def test_state_self_esteem_assessment_v2_end(tester: AppTester):
     )
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "connectedness_v2")
-    tester.assert_metadata("assessment_end_state", "state_connectedness_assessment_v2_end")
+    tester.assert_metadata(
+        "assessment_end_state", "state_connectedness_assessment_v2_end"
+    )
 
 
 @pytest.mark.asyncio
@@ -204,13 +207,19 @@ async def test_state_self_perceived_healthcare_assessment_v2_end(tester: AppTest
     await tester.user_input(
         "test",
         transport_metadata={
-            "message": {"button": {"payload": "state_self_perceived_healthcare_assessment_v2_end"}}
+            "message": {
+                "button": {
+                    "payload": "state_self_perceived_healthcare_assessment_v2_end"
+                }
+            }
         },
     )
 
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "sexual_health_literacy_v2")
-    tester.assert_metadata("assessment_end_state", "state_sexual_health_lit_assessment_v2_end")
+    tester.assert_metadata(
+        "assessment_end_state", "state_sexual_health_lit_assessment_v2_end"
+    )
 
 
 @pytest.mark.asyncio
@@ -219,13 +228,17 @@ async def test_state_sexual_health_lit_assessment_v2_end(tester: AppTester):
     await tester.user_input(
         "test",
         transport_metadata={
-            "message": {"button": {"payload": "state_sexual_health_lit_assessment_v2_end"}}
+            "message": {
+                "button": {"payload": "state_sexual_health_lit_assessment_v2_end"}
+            }
         },
     )
 
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "gender_attitude_v2")
-    tester.assert_metadata("assessment_end_state", "state_gender_attitude_assessment_v2_end")
+    tester.assert_metadata(
+        "assessment_end_state", "state_gender_attitude_assessment_v2_end"
+    )
 
 
 @pytest.mark.asyncio
@@ -234,13 +247,17 @@ async def test_state_gender_attitude_assessment_v2_end(tester: AppTester):
     await tester.user_input(
         "test",
         transport_metadata={
-            "message": {"button": {"payload": "state_gender_attitude_assessment_v2_end"}}
+            "message": {
+                "button": {"payload": "state_gender_attitude_assessment_v2_end"}
+            }
         },
     )
 
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "sexual_consent_v2")
-    tester.assert_metadata("assessment_end_state", "state_sexual_consent_assessment_v2_end")
+    tester.assert_metadata(
+        "assessment_end_state", "state_sexual_consent_assessment_v2_end"
+    )
 
 
 @pytest.mark.asyncio
@@ -269,4 +286,3 @@ async def test_state_alcohol_assessment_v2_end(tester: AppTester):
     )
 
     tester.assert_state("state_baseline_end")
-
