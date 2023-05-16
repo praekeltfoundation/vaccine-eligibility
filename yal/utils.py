@@ -30,7 +30,7 @@ GENDERS = {
     "female": "Female",
     "male": "Male",
     "non_binary": "Non-binary",
-    "other": "None of these",
+    "other": "None of the above",
     "rather_not_say": "Rather not say",
 }
 BACK_TO_MAIN = "0. 🏠 Back to Main *MENU*"

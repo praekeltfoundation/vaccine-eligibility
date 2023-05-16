@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-01-27 10:09+0200\n"
-"PO-Revision-Date: 2022-01-27 11:08+0200\n"
+"POT-Creation-Date: 2023-05-08 15:56+0100\n"
+"PO-Revision-Date: 2023-05-08 16:02+0100\n"
 "Last-Translator: Rudi Giesler <rudi@praekelt.org>\n"
 "Language-Team: \n"
 "Language: zu\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n==0 || n==1);\n"
 "Generated-By: pygettext.py 1.5\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: vaccine/healthcheck_vacreg_ussd.py:41
 msgid "Welcome to the NATIONAL DEPARTMENT OF HEALTH's COVID-19 Response service"
@@ -63,12 +63,12 @@ msgstr ""
 "\n"
 "Reply"
 
-#: vaccine/vaccine_reg_ussd.py:78 vaccine/vaccine_reg_whatsapp.py:85
-msgid "RSA ID Number"
-msgstr "Inombolo ye-ID yaseNingizimu Afrika"
+#: vaccine/vaccine_reg_ussd.py:78
+msgid "RSA ID Number / Birth Certificate number"
+msgstr "Inombolo ye-ID yaseNingizimu Afrika / Isitifiketi Sokuzalwa sase-SA"
 
-#: vaccine/vaccine_reg_ussd.py:79 vaccine/vaccine_reg_whatsapp.py:86
-msgid "NON-RSA Passport Number"
+#: vaccine/vaccine_reg_ussd.py:79
+msgid "Non RSA Passport Number"
 msgstr "Ipasipoti okungeyona eyase-RSA"
 
 #: vaccine/vaccine_reg_ussd.py:80 vaccine/vaccine_reg_whatsapp.py:87
@@ -81,25 +81,25 @@ msgstr "Inombolo yemvume yababaleki"
 
 #: vaccine/vaccine_reg_ussd.py:93
 msgid ""
-"VACCINE REGISTRATION\n"
+"EVDS VACCINE REGISTRATION\n"
 "The SA Department of Health thanks you for helping to defeat COVID-19!\n"
 "\n"
-"Are you {minimum_age} years or older?"
+"Note: Vaccinations is only available for ages {minimum_age}+"
 msgstr ""
 "UKUBHALISELA UMGOMO WE-EVDS\n"
 "UMnyango Wezempilo waseSA uyabonga ngokusiza ukunqoba iCOVID-19!\n"
 "\n"
-"Uneminyaka engu{minimum_age} nangaphezulu?"
+"Qaphela:Imithi yokugoma itholwa abaneminyaka ewu-{minimum_age}+"
 
-#: vaccine/vaccine_reg_ussd.py:104
-msgid ""
-"Self-registration is currently only available to those {minimum_age} years of "
-"age or older. Please tell us if you are {minimum_age} or older?"
-msgstr ""
-"Ukuzibhalisela wena kusavuleleke kulabo abaneminyaka engu-{minimum_age} "
-"nangaphezulu kuphela. Ngabe uneminyaka engu-{minimum_age} nangaphezulu?"
+#: vaccine/vaccine_reg_ussd.py:101
+msgid "Continue"
+msgstr "Qhubeka"
 
-#: vaccine/vaccine_reg_ussd.py:114
+#: vaccine/vaccine_reg_ussd.py:103
+msgid "ERROR: Please try again\n"
+msgstr "IPHUTHA: Sicela uzame futhi\n"
+
+#: vaccine/vaccine_reg_ussd.py:109
 msgid ""
 "We are currently experiencing high volumes of registrations.\n"
 "\n"
@@ -109,7 +109,7 @@ msgstr ""
 " \n"
 "Ukubhaliswa kwakho kubalulekile! Sicela uzame futhi emizuzwini engu-15"
 
-#: vaccine/vaccine_reg_ussd.py:125
+#: vaccine/vaccine_reg_ussd.py:120
 msgid ""
 "Self-registration is only available to people {minimum_age} years or older. "
 "Can we contact you on this number when this changes?"
@@ -117,26 +117,26 @@ msgstr ""
 "Ukuzibhalisa kutholakala kuphela kubantu abaneminyaka engu-{minimum_age} noma "
 "ngaphezulu. Singakwazi ukuxhumana nawe kule nombolo uma lokhu kuguquka?"
 
-#: vaccine/vaccine_reg_ussd.py:129 vaccine/vaccine_reg_ussd.py:228
-#: vaccine/vaccine_reg_ussd.py:592 vaccine/vaccine_reg_ussd.py:660
-#: vaccine/vaccine_reg_whatsapp.py:225 vaccine/vaccine_reg_whatsapp.py:543
-#: vaccine/vaccine_reg_whatsapp.py:857 vaccine/vaccine_reg_whatsapp.py:929
+#: vaccine/vaccine_reg_ussd.py:124 vaccine/vaccine_reg_ussd.py:223
+#: vaccine/vaccine_reg_ussd.py:587 vaccine/vaccine_reg_ussd.py:655
+#: vaccine/vaccine_reg_whatsapp.py:221 vaccine/vaccine_reg_whatsapp.py:557
+#: vaccine/vaccine_reg_whatsapp.py:871 vaccine/vaccine_reg_whatsapp.py:943
 msgid "Yes"
 msgstr "Yebo"
 
-#: vaccine/vaccine_reg_ussd.py:129 vaccine/vaccine_reg_ussd.py:229
-#: vaccine/vaccine_reg_ussd.py:593 vaccine/vaccine_reg_ussd.py:660
-#: vaccine/vaccine_reg_whatsapp.py:194 vaccine/vaccine_reg_whatsapp.py:225
-#: vaccine/vaccine_reg_whatsapp.py:313 vaccine/vaccine_reg_whatsapp.py:544
-#: vaccine/vaccine_reg_whatsapp.py:858 vaccine/vaccine_reg_whatsapp.py:930
+#: vaccine/vaccine_reg_ussd.py:124 vaccine/vaccine_reg_ussd.py:224
+#: vaccine/vaccine_reg_ussd.py:588 vaccine/vaccine_reg_ussd.py:655
+#: vaccine/vaccine_reg_whatsapp.py:221 vaccine/vaccine_reg_whatsapp.py:327
+#: vaccine/vaccine_reg_whatsapp.py:558 vaccine/vaccine_reg_whatsapp.py:872
+#: vaccine/vaccine_reg_whatsapp.py:944
 msgid "No"
 msgstr "Cha"
 
-#: vaccine/vaccine_reg_ussd.py:130
+#: vaccine/vaccine_reg_ussd.py:125
 msgid "Can we notify you to let you know when you can register?"
 msgstr "Singakwazisa ukuthi ungabhalisa nini?"
 
-#: vaccine/vaccine_reg_ussd.py:140
+#: vaccine/vaccine_reg_ussd.py:135
 msgid ""
 "PRIVACY POLICY\n"
 "EVDS is POPIA compliant. Your data is kept private + confidential & only used "
@@ -147,23 +147,24 @@ msgstr ""
 "isetshenziswa ngemvume yakho ngenhloso yokugonywa.\n"
 "\n"
 
-#: vaccine/vaccine_reg_ussd.py:146 vaccine/vaccine_reg_ussd.py:158
+#: vaccine/vaccine_reg_ussd.py:141 vaccine/vaccine_reg_ussd.py:153
 msgid "Next"
 msgstr "Olandelayo"
 
-#: vaccine/vaccine_reg_ussd.py:147 vaccine/vaccine_reg_ussd.py:159
+#: vaccine/vaccine_reg_ussd.py:142 vaccine/vaccine_reg_ussd.py:154
 msgid "TYPE 1 to continue"
 msgstr "BHALA u-1 ukuze uqhubeke"
 
-#: vaccine/vaccine_reg_ussd.py:153
+#: vaccine/vaccine_reg_ussd.py:148
 msgid ""
 "EVDS uses your data to check eligibility & inform you  of your vaccination "
 "date & venue. Registration is voluntary & does not guarantee vaccination.\n"
 msgstr ""
 "iEVDS isebenzisa idatha yakho ukuhlola ukufaneleka nokukwazisa ngosuku "
-"nanendawo yokugoma. Ukubhalisa kungokuzithandela futhi akusho ukuthi uzogoma.\n"
+"nanendawo yokugoma. Ukubhalisa kungokuzithandela futhi akusho ukuthi "
+"uzogoma.\n"
 
-#: vaccine/vaccine_reg_ussd.py:165
+#: vaccine/vaccine_reg_ussd.py:160
 msgid ""
 "All security measures are taken to make sure your information is safe. No "
 "personal data will be transferred from EVDS without POPIA compliance\n"
@@ -171,41 +172,41 @@ msgstr ""
 "Zonke izinyathelo ziyathathwa ukuqinisekisa ukuphepha kwemininingwane yakho. "
 "Idatha yomuntu angeke idluliswe isuka kuEVDS ngaphandle kokulandela iPOPIA\n"
 
-#: vaccine/vaccine_reg_ussd.py:170
+#: vaccine/vaccine_reg_ussd.py:165
 msgid "ACCEPT"
 msgstr "VUMA"
 
-#: vaccine/vaccine_reg_ussd.py:171
+#: vaccine/vaccine_reg_ussd.py:166
 msgid "TYPE 1 to ACCEPT our Privacy Policy"
 msgstr "BHALA u-1 UKWAMUKELA Inqubomgomo yethu Yemfihlo"
 
-#: vaccine/vaccine_reg_ussd.py:179
+#: vaccine/vaccine_reg_ussd.py:174
 msgid "How would you like to register?"
 msgstr "Ungathanda ukubhalisa kanjani?"
 
-#: vaccine/vaccine_reg_ussd.py:181
-msgid "Please choose 1 of the following ways to register:"
+#: vaccine/vaccine_reg_ussd.py:176
+msgid "Choose 1 way to register:"
 msgstr "Sicela ukhethe indlela youkubhalisa:"
 
-#: vaccine/vaccine_reg_ussd.py:193
+#: vaccine/vaccine_reg_ussd.py:188
 msgid "Invalid {id_type}. Please try again"
 msgstr ""
 "IMPAZAMO: Sicela uzame futhi.\n"
 "\n"
 "Sicele ufake i-{id_type} yakho"
 
-#: vaccine/vaccine_reg_ussd.py:206
+#: vaccine/vaccine_reg_ussd.py:201
 msgid "Please enter your {id_type}"
 msgstr "Sicele ufake i-{id_type} yakho"
 
-#: vaccine/vaccine_reg_ussd.py:223
+#: vaccine/vaccine_reg_ussd.py:218
 msgid ""
 "The number you have entered appears to be a RSA ID Number. Is this correct?\n"
 msgstr ""
 "Le nombolo oyifakile ibonakala iyinombolo ye-ID yaseNingizimu Afrika. Ngabe "
 "lokhu kulungile?\n"
 
-#: vaccine/vaccine_reg_ussd.py:231 vaccine/vaccine_reg_whatsapp.py:546
+#: vaccine/vaccine_reg_ussd.py:226
 msgid ""
 "Please try again\n"
 "\n"
@@ -216,146 +217,146 @@ msgstr ""
 "Sicela uqinisekise ukuthi le nombolo oyifakile iyinombolo ye-ID yaseNingizimu "
 "Afrika"
 
-#: vaccine/vaccine_reg_ussd.py:264 vaccine/vaccine_reg_ussd.py:265
+#: vaccine/vaccine_reg_ussd.py:259 vaccine/vaccine_reg_ussd.py:260
 msgid "Which country issued your passport?"
 msgstr "Yiliphi izwe elikhiphe iphasipothi yakho?"
 
-#: vaccine/vaccine_reg_ussd.py:267
+#: vaccine/vaccine_reg_ussd.py:262
 msgid "Zimbabwe"
 msgstr "i-Zimbabwe"
 
-#: vaccine/vaccine_reg_ussd.py:268
+#: vaccine/vaccine_reg_ussd.py:263
 msgid "Mozambique"
 msgstr "i-Mozambique"
 
-#: vaccine/vaccine_reg_ussd.py:269
+#: vaccine/vaccine_reg_ussd.py:264
 msgid "Malawi"
 msgstr "i-Malawi"
 
-#: vaccine/vaccine_reg_ussd.py:270
+#: vaccine/vaccine_reg_ussd.py:265
 msgid "Nigeria"
 msgstr "i-Nigeria"
 
-#: vaccine/vaccine_reg_ussd.py:271
+#: vaccine/vaccine_reg_ussd.py:266
 msgid "DRC"
 msgstr "i-DRC"
 
-#: vaccine/vaccine_reg_ussd.py:272
+#: vaccine/vaccine_reg_ussd.py:267
 msgid "Somalia"
 msgstr "i-Somalia"
 
-#: vaccine/vaccine_reg_ussd.py:273 vaccine/vaccine_reg_ussd.py:296
-#: vaccine/vaccine_reg_ussd.py:320 vaccine/vaccine_reg_ussd.py:535
-#: vaccine/vaccine_reg_ussd.py:537 vaccine/vaccine_reg_ussd.py:559
-#: vaccine/vaccine_reg_ussd.py:561 vaccine/vaccine_reg_whatsapp.py:589
-#: vaccine/vaccine_reg_whatsapp.py:831
+#: vaccine/vaccine_reg_ussd.py:268 vaccine/vaccine_reg_ussd.py:291
+#: vaccine/vaccine_reg_ussd.py:315 vaccine/vaccine_reg_ussd.py:530
+#: vaccine/vaccine_reg_ussd.py:532 vaccine/vaccine_reg_ussd.py:554
+#: vaccine/vaccine_reg_ussd.py:556 vaccine/vaccine_reg_whatsapp.py:603
+#: vaccine/vaccine_reg_whatsapp.py:845
 msgid "Other"
 msgstr "Okunye"
 
-#: vaccine/vaccine_reg_ussd.py:281
+#: vaccine/vaccine_reg_ussd.py:276
 msgid "Please TYPE in your passport's COUNTRY of origin."
 msgstr "Uyacelwa ukuthi ubhale IZWE LAKHO lendabuko lephasiphothi yakho."
 
-#: vaccine/vaccine_reg_ussd.py:299
+#: vaccine/vaccine_reg_ussd.py:294
 msgid "Please choose the best match for your COUNTRY of origin:"
 msgstr "Sicela ukhethe okumesha kahle kakhulu neZWE lakho lendabuko:"
 
-#: vaccine/vaccine_reg_ussd.py:301 vaccine/vaccine_reg_whatsapp.py:599
+#: vaccine/vaccine_reg_ussd.py:296 vaccine/vaccine_reg_whatsapp.py:613
 msgid "Do any of these match your COUNTRY:"
 msgstr "Ingabe okunye kwalokhu kumesha nezwe lakho:"
 
-#: vaccine/vaccine_reg_ussd.py:316
+#: vaccine/vaccine_reg_ussd.py:311
 msgid "What is your gender?"
 msgstr "Buyini UBULILI bakho?"
 
-#: vaccine/vaccine_reg_ussd.py:318 vaccine/vaccine_reg_whatsapp.py:829
+#: vaccine/vaccine_reg_ussd.py:313 vaccine/vaccine_reg_whatsapp.py:843
 msgid "Male"
 msgstr "Owesilisa"
 
-#: vaccine/vaccine_reg_ussd.py:319 vaccine/vaccine_reg_whatsapp.py:830
+#: vaccine/vaccine_reg_ussd.py:314 vaccine/vaccine_reg_whatsapp.py:844
 msgid "Female"
 msgstr "Owesifazane"
 
-#: vaccine/vaccine_reg_ussd.py:322
+#: vaccine/vaccine_reg_ussd.py:317
 msgid "Please select your gender using one of the numbers below"
 msgstr ""
 "Sicela ukhethe ubulili bakho usebenzisa eyodwa yalezi zinombolo ezingezansi"
 
-#: vaccine/vaccine_reg_ussd.py:344
+#: vaccine/vaccine_reg_ussd.py:339
 msgid ""
 "REQUIRED: Please TYPE the 4 digits of the YEAR you were born (Example: 1980)"
 msgstr ""
 "KUDINGEKA: Sicela UBHALE izinombolo ezingu-4 zonyaka owazalwa ngawo "
 "(Isibonelo: 1980)"
 
-#: vaccine/vaccine_reg_ussd.py:355 vaccine/vaccine_reg_whatsapp.py:704
+#: vaccine/vaccine_reg_ussd.py:350 vaccine/vaccine_reg_whatsapp.py:718
 msgid ""
 "The YEAR you have given does not match the YEAR of your ID number. Please try "
 "again"
 msgstr ""
 "UNYAKA owunikile awufani NONYAKA okwinombolo ye-ID yakho. Sicela uzame futhi"
 
-#: vaccine/vaccine_reg_ussd.py:363
+#: vaccine/vaccine_reg_ussd.py:358
 msgid "Date of birth: In which YEAR were you born? (Please TYPE just the YEAR)"
 msgstr "Usuku lokuzalwa: Wazalelwa ngamuphi UNYAKA? (Sicela ubhale unyaka nje)"
 
-#: vaccine/vaccine_reg_ussd.py:382
+#: vaccine/vaccine_reg_ussd.py:377
 msgid "Date of birth: In which MONTH were you born?"
 msgstr "Usuku lokuzalwa: Wazalwa kuyiphi INYANGA?"
 
-#: vaccine/vaccine_reg_ussd.py:384
+#: vaccine/vaccine_reg_ussd.py:379
 msgid "Jan"
 msgstr "Jan"
 
-#: vaccine/vaccine_reg_ussd.py:385
+#: vaccine/vaccine_reg_ussd.py:380
 msgid "Feb"
 msgstr "Feb"
 
-#: vaccine/vaccine_reg_ussd.py:386
+#: vaccine/vaccine_reg_ussd.py:381
 msgid "Mar"
 msgstr "Mar"
 
-#: vaccine/vaccine_reg_ussd.py:387
+#: vaccine/vaccine_reg_ussd.py:382
 msgid "Apr"
 msgstr "Apr"
 
-#: vaccine/vaccine_reg_ussd.py:388 vaccine/vaccine_reg_whatsapp.py:742
+#: vaccine/vaccine_reg_ussd.py:383 vaccine/vaccine_reg_whatsapp.py:756
 msgid "May"
 msgstr "May"
 
-#: vaccine/vaccine_reg_ussd.py:389 vaccine/vaccine_reg_whatsapp.py:743
+#: vaccine/vaccine_reg_ussd.py:384 vaccine/vaccine_reg_whatsapp.py:757
 msgid "June"
 msgstr "June"
 
-#: vaccine/vaccine_reg_ussd.py:390 vaccine/vaccine_reg_whatsapp.py:744
+#: vaccine/vaccine_reg_ussd.py:385 vaccine/vaccine_reg_whatsapp.py:758
 msgid "July"
 msgstr "July"
 
-#: vaccine/vaccine_reg_ussd.py:391
+#: vaccine/vaccine_reg_ussd.py:386
 msgid "Aug"
 msgstr "Aug"
 
-#: vaccine/vaccine_reg_ussd.py:392
+#: vaccine/vaccine_reg_ussd.py:387
 msgid "Sep"
 msgstr "Sep"
 
-#: vaccine/vaccine_reg_ussd.py:393
+#: vaccine/vaccine_reg_ussd.py:388
 msgid "Oct"
 msgstr "Oct"
 
-#: vaccine/vaccine_reg_ussd.py:394
+#: vaccine/vaccine_reg_ussd.py:389
 msgid "Nov"
 msgstr "Nov"
 
-#: vaccine/vaccine_reg_ussd.py:395
+#: vaccine/vaccine_reg_ussd.py:390
 msgid "Dec"
 msgstr "Dec"
 
-#: vaccine/vaccine_reg_ussd.py:398
+#: vaccine/vaccine_reg_ussd.py:393
 msgid "REQUIRED: Choose your birthday MONTH using the numbers below:"
 msgstr "KUDINGEKA: Khetha inombolo enenyanga yakho yokuzalwa ngezansi:"
 
-#: vaccine/vaccine_reg_ussd.py:421
+#: vaccine/vaccine_reg_ussd.py:416
 msgid ""
 "ERROR: Please reply with just the DAY of your birthday.\n"
 "\n"
@@ -365,7 +366,7 @@ msgstr ""
 " \n"
 "Isibonelo: Uma ngabe wazalwa ngomhlaka 31 Meyi, bhala _31_"
 
-#: vaccine/vaccine_reg_ussd.py:430
+#: vaccine/vaccine_reg_ussd.py:425
 msgid ""
 "Date of birth: On which DAY of the month were you born? (Please type just the "
 "DAY)"
@@ -373,25 +374,28 @@ msgstr ""
 "Usuku lokuzalwa: Wazalwa ngaluphi USUKU lwenyanga? (Sicela ubhale usuku nje "
 "kuphela)"
 
-#: vaccine/vaccine_reg_ussd.py:448
-msgid "Please TYPE your FIRST NAME as it appears in your identification document"
+#: vaccine/vaccine_reg_ussd.py:443
+msgid ""
+"Please TYPE your FIRST NAME as it appears in your identification document"
 msgstr "Sicela UBHALE IGAMA lakho LOKUQALA njengoba livela kumazisi wakho"
 
-#: vaccine/vaccine_reg_ussd.py:453
+#: vaccine/vaccine_reg_ussd.py:448
 msgid ""
-"ERROR: Reply with your FIRST NAME as it appears in your identification document"
-msgstr "IMPAZAMO: Phendula ngegama lakho LOKUQALA njengoba livela kumazisi wakho"
+"ERROR: Reply with your FIRST NAME as it appears in your identification "
+"document"
+msgstr ""
+"IMPAZAMO: Phendula ngegama lakho LOKUQALA njengoba livela kumazisi wakho"
 
-#: vaccine/vaccine_reg_ussd.py:464
+#: vaccine/vaccine_reg_ussd.py:459
 msgid "Please TYPE your SURNAME as it appears in your identification document."
 msgstr "Sicela UBHALE ISIBONGO sakho njengoba sivela kumazisi wakho."
 
-#: vaccine/vaccine_reg_ussd.py:469
+#: vaccine/vaccine_reg_ussd.py:464
 msgid ""
 "ERROR: Reply with your SURNAME as it appears in your identification document"
 msgstr "IMPAZAMO: Phendula NGESIBONGO sakho njengoba sivela kumazisi wakho"
 
-#: vaccine/vaccine_reg_ussd.py:483
+#: vaccine/vaccine_reg_ussd.py:478
 msgid ""
 "Confirm the following:\n"
 "\n"
@@ -403,17 +407,17 @@ msgstr ""
 "{first_name} {surname}\n"
 "{id_number}\n"
 
-#: vaccine/vaccine_reg_ussd.py:490 vaccine/vaccine_reg_ussd.py:630
-#: vaccine/vaccine_reg_whatsapp.py:664
+#: vaccine/vaccine_reg_ussd.py:485 vaccine/vaccine_reg_ussd.py:625
+#: vaccine/vaccine_reg_whatsapp.py:678
 msgid "Correct"
 msgstr "Kulungile"
 
-#: vaccine/vaccine_reg_ussd.py:491 vaccine/vaccine_reg_ussd.py:631
-#: vaccine/vaccine_reg_whatsapp.py:665
+#: vaccine/vaccine_reg_ussd.py:486 vaccine/vaccine_reg_ussd.py:626
+#: vaccine/vaccine_reg_whatsapp.py:679
 msgid "Wrong"
 msgstr "Akulungile"
 
-#: vaccine/vaccine_reg_ussd.py:493 vaccine/vaccine_reg_whatsapp.py:667
+#: vaccine/vaccine_reg_ussd.py:488 vaccine/vaccine_reg_whatsapp.py:681
 msgid ""
 "Is the information you shared correct?\n"
 "\n"
@@ -424,57 +428,58 @@ msgstr ""
 "{first_name} {surname}\n"
 "{id_number}"
 
-#: vaccine/vaccine_reg_ussd.py:504
+#: vaccine/vaccine_reg_ussd.py:499
 msgid "Select Your Province"
 msgstr "Khetha isifundazwe sakho"
 
-#: vaccine/vaccine_reg_ussd.py:506 vaccine/vaccine_reg_ussd.py:579
-#: vaccine/vaccine_reg_whatsapp.py:351 vaccine/vaccine_reg_whatsapp.py:372
+#: vaccine/vaccine_reg_ussd.py:501 vaccine/vaccine_reg_ussd.py:574
+#: vaccine/vaccine_reg_whatsapp.py:365 vaccine/vaccine_reg_whatsapp.py:386
 msgid "Reply with a NUMBER:"
 msgstr "Phendula nge-NOMBOLO:"
 
-#: vaccine/vaccine_reg_ussd.py:513
+#: vaccine/vaccine_reg_ussd.py:508
 msgid "Please TYPE the name of the SUBURB to help us allocate your appointment"
 msgstr ""
 "Sicela ubhale igama LEPHETHELO LEDOLOBHA ukusisiza ukuhlela i-aphoyintimenti "
 "yakho"
 
-#: vaccine/vaccine_reg_ussd.py:532
+#: vaccine/vaccine_reg_ussd.py:527
 msgid "Please select your municipality"
 msgstr "Phendula nge-NOMBOLO"
 
-#: vaccine/vaccine_reg_ussd.py:557
+#: vaccine/vaccine_reg_ussd.py:552
 msgid "Please choose the best match for your location:"
 msgstr "Sicela ukhethe okumesha kahle kakhulu nendawo yakho:"
 
-#: vaccine/vaccine_reg_ussd.py:566
+#: vaccine/vaccine_reg_ussd.py:561
 msgid "Do any of these match your location:"
 msgstr "Ingabe okunye kwalokhu kumesha nendawo yakho:"
 
-#: vaccine/vaccine_reg_ussd.py:577
+#: vaccine/vaccine_reg_ussd.py:572
 msgid "Suburb not found. Try again"
 msgstr "I-suburb alitholakali. Zama futhi"
 
-#: vaccine/vaccine_reg_ussd.py:587
-msgid "Can we use this number: {number} to send you SMS appointment information?"
+#: vaccine/vaccine_reg_ussd.py:582
+msgid ""
+"Can we use this number: {number} to send you SMS appointment information?"
 msgstr ""
 "Singayisebenzisa le nombolo: {number} ukukuthumela imininingwane ye-"
 "appointment nge-SMS?"
 
-#: vaccine/vaccine_reg_ussd.py:595
+#: vaccine/vaccine_reg_ussd.py:590
 msgid ""
 "Please reply with a number 1 or 2 to confirm if we can use this number: "
 "{number} to send you SMS appointment information?"
 msgstr ""
-"Sicela uphendule ngo-1 noma 2 ukuqinisekisa ukuthi singayisebenzisa le nombolo "
-"na: {number} ukukuthumela imininingwane ye-aphoyintimenti nge-SMS?"
+"Sicela uphendule ngo-1 noma 2 ukuqinisekisa ukuthi singayisebenzisa le "
+"nombolo na: {number} ukukuthumela imininingwane ye-aphoyintimenti nge-SMS?"
 
-#: vaccine/vaccine_reg_ussd.py:607
+#: vaccine/vaccine_reg_ussd.py:602
 msgid "ERROR: Please enter a valid mobile number (do not use spaces)"
 msgstr ""
 "IMPAZAMO: Sicela ufake inombolo yeselula evumelekile (ungazifaki izikhala)"
 
-#: vaccine/vaccine_reg_ussd.py:614
+#: vaccine/vaccine_reg_ussd.py:609
 msgid ""
 "Please TYPE a MOBILE NUMBER we can send an SMS to with your appointment "
 "information"
@@ -482,46 +487,46 @@ msgstr ""
 "Sicela uthayiphe INOMBOLO YE-selula esingathumela kuyo iSMS enemininingwane "
 "yakho ye-appointment"
 
-#: vaccine/vaccine_reg_ussd.py:626
+#: vaccine/vaccine_reg_ussd.py:621
 msgid "Please confirm that your number is {number}."
 msgstr "Sicela uqinisekise ukuthi inombolo yakho ngu-{number}."
 
-#: vaccine/vaccine_reg_ussd.py:633
+#: vaccine/vaccine_reg_ussd.py:628
 msgid "ERROR: Please try again. Is the number {number} correct?"
 msgstr "IMPAZAMO: Sicela uzame futhi. Ingabe inombolo u-{number} ilungile?"
 
-#: vaccine/vaccine_reg_ussd.py:641
+#: vaccine/vaccine_reg_ussd.py:636
 msgid "In which time slot would you prefer to get your vaccination?\n"
 msgstr "Ungathanda ukuthola umgomo ngasiphi isikhathi?\n"
 
-#: vaccine/vaccine_reg_ussd.py:645 vaccine/vaccine_reg_whatsapp.py:1017
+#: vaccine/vaccine_reg_ussd.py:640 vaccine/vaccine_reg_whatsapp.py:1031
 msgid "Weekday Morning"
 msgstr "Ezinsukwini zeviki ekuseni"
 
-#: vaccine/vaccine_reg_ussd.py:646 vaccine/vaccine_reg_whatsapp.py:1018
+#: vaccine/vaccine_reg_ussd.py:641 vaccine/vaccine_reg_whatsapp.py:1032
 msgid "Weekday Afternoon"
 msgstr "Ezinsukwini zeviki ntambama"
 
-#: vaccine/vaccine_reg_ussd.py:647 vaccine/vaccine_reg_whatsapp.py:1019
+#: vaccine/vaccine_reg_ussd.py:642 vaccine/vaccine_reg_whatsapp.py:1033
 msgid "Weekend Morning"
 msgstr "Impelasonto Ekuseni"
 
-#: vaccine/vaccine_reg_ussd.py:649
+#: vaccine/vaccine_reg_ussd.py:644
 msgid ""
 "When would you prefer your vaccine appointment based on the options below?"
 msgstr ""
 "Ungathanda ibe nini i-aphoyintimenti yakho yokugoma ngokuya ngezinketho "
 "ezingezansi?"
 
-#: vaccine/vaccine_reg_ussd.py:659
+#: vaccine/vaccine_reg_ussd.py:654
 msgid "Do you belong to a Medical Aid?"
 msgstr "Ingabe ungaphansi kwe-Medical Aid?"
 
-#: vaccine/vaccine_reg_ussd.py:661
+#: vaccine/vaccine_reg_ussd.py:656
 msgid "ERROR: Please try again. Do you belong to a Medical Aid?"
 msgstr "IMPAZAMO: Sicela uzame futhi. Ngabe ungaphansi kweMedical Aid Scheme?"
 
-#: vaccine/vaccine_reg_ussd.py:808
+#: vaccine/vaccine_reg_ussd.py:803
 msgid ""
 ":) You have SUCCESSFULLY registered to get vaccinated. Additional information "
 "and appointment details will be sent via SMS."
@@ -529,13 +534,21 @@ msgstr ""
 ":) Usubhalisele ukugonywa NGEMPUMELELO. Imininingwane eyengeziwe "
 "nemininingwane ye-aphoyintimenti izothunyelwa nge-SMS."
 
-#: vaccine/vaccine_reg_ussd.py:817
+#: vaccine/vaccine_reg_ussd.py:812
 msgid ""
-"Something went wrong with your registration session. Your registration was not "
-"able to be processed. Please try again later"
+"Something went wrong with your registration session. Your registration was "
+"not able to be processed. Please try again later"
 msgstr ""
 "Kukhona okungahambanga kahle ngeseshini yakho yokubhalisa. Ukubhalisa kwakho "
 "akukwazanga ukucutshungulwa. Sicela uzame futhi emuva kwesikhathi"
+
+#: vaccine/vaccine_reg_whatsapp.py:85
+msgid "RSA ID Number / RSA Birth Certificate"
+msgstr "Inombolo ye-ID yaseNingizimu Afrika / Isitifiketi Sokuzalwa sase-SA"
+
+#: vaccine/vaccine_reg_whatsapp.py:86
+msgid "Passport Number"
+msgstr "Inombolo Yephasiphothi"
 
 #: vaccine/vaccine_reg_whatsapp.py:103
 msgid ""
@@ -544,7 +557,7 @@ msgid ""
 "We haven’t heard from you in a while!\n"
 "\n"
 "The registration session has timed out due to inactivity. You will need to "
-"start again. Just TYPE the word REGISTER.\n"
+"start again. Just TYPE the word *REGISTER*.\n"
 "\n"
 "-----\n"
 "Reply *SUPPORT* for details on how to get help with your registration\n"
@@ -555,7 +568,7 @@ msgstr ""
 "Sekuyisikhathi singakezwa kuwe! \n"
 " \n"
 "Iseshini yokubhalisa isiphelelwe isikhathi ngenxa yokungasebenzi. Uzodinga "
-"ukuqala phansi. Vele UBHALE igama elithi REGISTER. \n"
+"ukuqala phansi. Vele UBHALE igama elithi *REGISTER*. \n"
 " \n"
 "—— \n"
 "📌Phendula *0* ukuze ubuyele *MENU* olukhulu\n"
@@ -566,19 +579,22 @@ msgstr ""
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
-"Welcome to the official COVID-19 Vaccination Self-registration Portal from the "
+"Welcome to the official COVID-19 Vaccination Registration Portal from the "
 "National Department of Health. Registration will take about 5 minutes. Please "
-"have your ID, Passport, Refugee Permit or Asylum Seeker Permit *Number* on "
-"hand. If you have Medical Aid, we will also ask for your Medical Aid Number.\n"
+"have your Birth Certificate, ID, Passport, Refugee Permit or Asylum Seeker "
+"Permit *Number* on hand. If you have Medical Aid, we will also ask for your "
+"Medical Aid Number.\n"
 "\n"
 "*Note:*\n"
 "- Vaccination is voluntary and no payment is required\n"
 "- No co-payment/levy will be required if you belong to a Medical Aid\n"
 "- Everyone who registers will be offered vaccination\n"
-"- We will move down the age groups as quickly as we can\n"
 "\n"
-"Registration is currently only open to those {minimum_age} years and older. "
-"Are you {minimum_age} or older?\n"
+"*Important*\n"
+"👉 *Self* registration is available to those aged 18 and over\n"
+"👉 For children aged 5-17, registration must be completed by someone who can "
+"legally make decisions on behalf of the child.\n"
+"\n"
 msgstr ""
 "*INGXOXO EPHEPHILE YOKUBHALISELA UKUGOMA*🔐 \n"
 " \n"
@@ -593,24 +609,23 @@ msgstr ""
 "- Akukho okuzokhokhwa ngokuhlanganyela / intela ezodingeka uma ungaphansi "
 "kweMedical Aid \n"
 "- Wonke umuntu obhalisile uzonikezwa umuthi wokugoma \n"
-"- Sizohamba ngamaqembu eminyeka ngokushesha okukhulu \n"
 " \n"
-"Ukubhalisa okwamanje kuvulelwe abaneminyaka engu-{minimum_age} nangaphezulu "
-"kuphela. Uneminyaka engu-{minimum_age} noma ngaphezulu? \n"
+"*NB*\n"
+"👉*Ukuzibhalisa* kuyatholakala kulabo abaneminyaka ewu-18 nangaphezulu\n"
+"👉Ezinganeni ezineminyaka ewu-5-17, ukubhaliswa kufanele kugcwaliswe ngumuntu "
+"ongenza izinqumo ngokusemthethweni egameni lengane\n"
+"\n"
 
-#: vaccine/vaccine_reg_whatsapp.py:175
+#: vaccine/vaccine_reg_whatsapp.py:176
 msgid ""
 "⚠️ This service works best when you use the numbered options available\n"
 "\n"
-"Please confirm that you are {minimum_age} years or older by typing 1 (or 2 if "
-"you are NOT {minimum_age} years or older)\n"
+"Please confirm the type of registration"
 msgstr ""
-"⚠️ Le sevisi isebenza kahle kakhulu uma usebenzisa izinketho ezinenombolo "
-"ezitholakalayo\n"
+"⚠️ Le sevisi isebenza kahle kakhulu uma uphendula ngenye yezinombolo eceleni "
+"kwezinketho ezinikeziwe. \n"
 " \n"
-"Sicela uqinisekise ukuthi uneminyaka engu-{minimum_age} noma ngaphezulu "
-"ngokublala u-1 (noma u-2 uma ungekho eminyakeni engu-{minimum_age} noma "
-"ngaphezulu)\n"
+"Sicela uqinisekise uhlobo lokubhalisa"
 
 #: vaccine/vaccine_reg_whatsapp.py:182
 msgid ""
@@ -622,11 +637,15 @@ msgstr ""
 "----- \n"
 "Noma phendula 📌 ngo- *0* ukuqeda leseshini bese ubuyela ku- *MENU* olukhulu\""
 
-#: vaccine/vaccine_reg_whatsapp.py:190
-msgid "Yes, I am {minimum_age} or older"
-msgstr "Yebo, ngineminyaka engu-{minimum_age} noma ngaphezulu"
+#: vaccine/vaccine_reg_whatsapp.py:188
+msgid "18+ Self registration"
+msgstr "18+ Ukuzibhalisela ngokwakho"
 
-#: vaccine/vaccine_reg_whatsapp.py:201
+#: vaccine/vaccine_reg_whatsapp.py:189
+msgid "Register on behalf of a child aged 5-17"
+msgstr "Bhalisa egameni lengane eneminyaka engu-5-17"
+
+#: vaccine/vaccine_reg_whatsapp.py:197
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -649,7 +668,7 @@ msgstr ""
 "kanjani usizo ngokubhalisa kwakho\n"
 "📌Phendula *0* ukuze ubuyele *MENU* olukhulu"
 
-#: vaccine/vaccine_reg_whatsapp.py:219
+#: vaccine/vaccine_reg_whatsapp.py:215
 msgid ""
 "Self-registration is only available to people {minimum_age} years or older.\n"
 "\n"
@@ -658,7 +677,7 @@ msgstr ""
 "Singakwazi ukukwazisa ngeWhatsapp kule nombolo lapho izibuyekezo mayelana "
 "nokugonywa sezitholakala? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:226
+#: vaccine/vaccine_reg_whatsapp.py:222
 msgid ""
 "\n"
 "REPLY with the NUMBER of the option you have chosen."
@@ -666,7 +685,7 @@ msgstr ""
 "\n"
 "PHENDULA NGENOMBOLO yalenketho oyikhethile."
 
-#: vaccine/vaccine_reg_whatsapp.py:227
+#: vaccine/vaccine_reg_whatsapp.py:223
 msgid ""
 "⚠️ This service works best when you use the numbered options available.\n"
 "\n"
@@ -679,7 +698,7 @@ msgstr ""
 "Sicela usazise uma singakwazisa ngeWhatsapp kule nombolo lapho izibuyekezo "
 "mayelana nokugonywa sezitholakala? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:234
+#: vaccine/vaccine_reg_whatsapp.py:230
 msgid ""
 "\n"
 "-----\n"
@@ -688,15 +707,16 @@ msgid ""
 msgstr ""
 "\n"
 "-----\n"
-"Noma phendula 📌 ngo- *0* ukuqeda leseshini bese ubuyela ku- *MENU* olukhulu.\n"
-"Phendula ngokuthi *SUPPORT* noma nini uma udinga usizo oluvela 📞 ethimbeni Le-"
-"Hotline"
+"Noma phendula 📌 ngo- *0* ukuqeda leseshini bese ubuyela ku- *MENU* "
+"olukhulu.\n"
+"Phendula ngokuthi *SUPPORT* noma nini uma udinga usizo oluvela 📞 ethimbeni "
+"Le-Hotline"
 
-#: vaccine/vaccine_reg_whatsapp.py:245
+#: vaccine/vaccine_reg_whatsapp.py:241
 msgid "Thank you for confirming"
 msgstr "Siyabonga ngokuqinisekisa"
 
-#: vaccine/vaccine_reg_whatsapp.py:263
+#: vaccine/vaccine_reg_whatsapp.py:257
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -709,15 +729,46 @@ msgstr ""
 "enamathiselwe echaza ukuthi idatha yakho isetshenziswa futhi ivikelwe "
 "kanjani? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:270
+#: vaccine/vaccine_reg_whatsapp.py:264
+msgid ""
+"*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
+"\n"
+"If you are using this service on behalf of a child to register for a COVID-19 "
+"vaccination as a competent person, you need to confirm that you are sharing "
+"the child's information in line with the Electronic Vaccine Data System "
+"Privacy Policy.\n"
+"\n"
+"The POPI Act says that a competent person is someone who is legally competent "
+"to make decisions on behalf of a child.\n"
+"\n"
+"Please confirm that you consent to the attached Electronic Vaccine Data "
+"System PRIVACY POLICY that explains how all data is used and protected *on "
+"behalf of the child*?\n"
+"\n"
+msgstr ""
+"*UKUBHALISA UMGOMO KWINGXOXO EPHEPHILE* 🔐\n"
+"\n"
+"Uma usebenzisa le-Service ukubhalisela ingane ukugomela i-COVID-19 "
+"njengomuntu othenjiwe, udinga ukuqinisekisa ukuthi wabelana ngolwazi lwengane "
+"oluyiqiniso ne-Electronic Vaccine Data System Privacy Policy.\n"
+"\n"
+"Umthetho we-POPI uthi umuntu onekhono ngumuntu onegunya elisemthethweni "
+"lokuthathela ingane izinqumo.\n"
+"\n"
+"Sicela uqinisekise ukuthi uyavumelana ne-Electronic Vaccine Data System "
+"POLICY enamathiselwe echaza ukuthi yonke I-Data isetshenziswa futhi ivikelwe "
+"kanjani *egameni lengane*?\n"
+"\n"
+
+#: vaccine/vaccine_reg_whatsapp.py:284
 msgid "Read summary"
 msgstr "Funda isifinyezo"
 
-#: vaccine/vaccine_reg_whatsapp.py:271
+#: vaccine/vaccine_reg_whatsapp.py:285
 msgid "Accept"
 msgstr "Yamukela"
 
-#: vaccine/vaccine_reg_whatsapp.py:273
+#: vaccine/vaccine_reg_whatsapp.py:287
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided.\n"
@@ -725,7 +776,7 @@ msgstr ""
 "⚠️ Le sevisi isebenza kahle kakhulu uma uphendula ngenye yezinombolo eceleni "
 "kwezinketho ezinikeziwe. \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:277
+#: vaccine/vaccine_reg_whatsapp.py:291
 msgid ""
 "\n"
 "Reply 1 to read a summary of the DATA PROTECTION & PRIVACY POLICY. Reply 2 to "
@@ -735,7 +786,7 @@ msgstr ""
 "Phendula ngo-1 ukuze ufunde okufinqiwe NGENQUBOMGOMO YEMFIHLO NOKUVIKELA "
 "KWEDATHA. Phendula ngo-2 ukwamukela"
 
-#: vaccine/vaccine_reg_whatsapp.py:287
+#: vaccine/vaccine_reg_whatsapp.py:301
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -748,8 +799,8 @@ msgid ""
 "are processed with your consent for the agreed purpose (to support the "
 "COVID-19 Vaccination roll out in South Africa) and remain confidential.\n"
 "\n"
-"EVDS uses your data to check your eligibility & inform you of the date & venue "
-"of your vaccination.\n"
+"EVDS uses your data to check your eligibility & inform you of the date & "
+"venue of your vaccination.\n"
 "\n"
 "Registration is voluntary & does not guarantee vaccination.\n"
 "\n"
@@ -782,11 +833,11 @@ msgstr ""
 " \n"
 "Uyasamukela Isaziso Sobumfihlo se-EVDS? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:312
+#: vaccine/vaccine_reg_whatsapp.py:326
 msgid "Yes, I accept"
 msgstr "Yebo, ngiyamukela"
 
-#: vaccine/vaccine_reg_whatsapp.py:315
+#: vaccine/vaccine_reg_whatsapp.py:329
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided.\n"
@@ -798,7 +849,7 @@ msgstr ""
 " \n"
 "Uyasamukela Isaziso Sobumfihlo se-EVDS? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:321
+#: vaccine/vaccine_reg_whatsapp.py:335
 msgid ""
 "\n"
 "------\n"
@@ -808,7 +859,7 @@ msgstr ""
 "------ \n"
 "Noma phendula 📌 ngo- *0* ukuqeda leseshini bese ubuyela ku- *MENU* olukhulu"
 
-#: vaccine/vaccine_reg_whatsapp.py:331
+#: vaccine/vaccine_reg_whatsapp.py:345
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -820,28 +871,28 @@ msgstr ""
 "Siyabonga. Uma ushintsha umqondo wakho, bhala u- *REGISTER* ukuqala kabusha "
 "iseshini yakho yokubhalisa"
 
-#: vaccine/vaccine_reg_whatsapp.py:342
+#: vaccine/vaccine_reg_whatsapp.py:356
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
-"We need your location to help us allocate you to an available vaccination site "
-"as close and as soon as possible\n"
+"We need your location to help us allocate you to an available vaccination "
+"site as close and as soon as possible\n"
 "\n"
 "Select your province"
 msgstr ""
 "*INGXOXO EPHEPHILE YOKUBHALISELA UKUGOMA*🔐 \n"
 " \n"
-"Sidinga indawo okuyo ukusisiza ukuthi sikunikeze indawo yokugoma eseduze futhi "
-"ngokushesha okukhulu. \n"
+"Sidinga indawo okuyo ukusisiza ukuthi sikunikeze indawo yokugoma eseduze "
+"futhi ngokushesha okukhulu. \n"
 " \n"
 "Khetha isifundazwe sakho"
 
-#: vaccine/vaccine_reg_whatsapp.py:362
+#: vaccine/vaccine_reg_whatsapp.py:376
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
-"⚠️ Your suburb could not be found. Please try again by selecting your province. "
-"Reply *SUPPORT* anytime if you need help from the 📞 Hotline Team\n"
+"⚠️ Your suburb could not be found. Please try again by selecting your "
+"province. Reply *SUPPORT* anytime if you need help from the 📞 Hotline Team\n"
 "\n"
 "Select your province"
 msgstr ""
@@ -853,7 +904,7 @@ msgstr ""
 " \n"
 "Khetha isifundazwe sakho"
 
-#: vaccine/vaccine_reg_whatsapp.py:379
+#: vaccine/vaccine_reg_whatsapp.py:393
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -863,7 +914,7 @@ msgstr ""
 " \n"
 "Sicela UBHALE igama lephethelo ledolobha lapho ufuna ukugonywa khona"
 
-#: vaccine/vaccine_reg_whatsapp.py:406
+#: vaccine/vaccine_reg_whatsapp.py:420
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -873,7 +924,7 @@ msgstr ""
 " \n"
 "Sicela uqinisekise UMASIPALA wakwiphethelo ledolobha olinikezile: \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:412
+#: vaccine/vaccine_reg_whatsapp.py:426
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided.\n"
@@ -887,7 +938,7 @@ msgstr ""
 "Uyacelwa ukuthi UPHENDULE NGENOMBOLO kusuka kuhlu olungezansi ukuze "
 "uqinisekise umasipala wephethelo ledolobha owabelane ngalo: \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:419 vaccine/vaccine_reg_whatsapp.py:460
+#: vaccine/vaccine_reg_whatsapp.py:433 vaccine/vaccine_reg_whatsapp.py:474
 msgid ""
 "\n"
 "------\n"
@@ -897,10 +948,10 @@ msgstr ""
 "\n"
 "------ \n"
 "Noma phendula 📌 ngo- *0* ukuqeda leseshini bese ubuyela ku- *MENU* olukhulu\n"
-"Phendula ngokuthi *SUPPORT* noma nini uma udinga usizo oluvela 📞 ethimbeni Le-"
-"Hotline"
+"Phendula ngokuthi *SUPPORT* noma nini uma udinga usizo oluvela 📞 ethimbeni "
+"Le-Hotline"
 
-#: vaccine/vaccine_reg_whatsapp.py:447
+#: vaccine/vaccine_reg_whatsapp.py:461
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -910,7 +961,7 @@ msgstr ""
 " \n"
 "Sicela UPHENDULE NGENOMBOLO ukuqinisekisa indawo okuyo: \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:453
+#: vaccine/vaccine_reg_whatsapp.py:467
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided.\n"
@@ -924,7 +975,7 @@ msgstr ""
 "Sicela UPHENDULE NGENOMBOLO kusuka kuhlu olungezansi ukuze uqinisekise indawo "
 "owabelane ngayo: \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:472
+#: vaccine/vaccine_reg_whatsapp.py:486
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -934,7 +985,7 @@ msgstr ""
 " \n"
 "Iyiphi indlela ongathanda ukuyisebenzisa ukuzazisa? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:478
+#: vaccine/vaccine_reg_whatsapp.py:492
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided.\n"
@@ -947,7 +998,7 @@ msgstr ""
 " \n"
 "Sicela ukhethe uhlobo lukamazisi onalo ohlwini olungezansi?\n"
 
-#: vaccine/vaccine_reg_whatsapp.py:485
+#: vaccine/vaccine_reg_whatsapp.py:499
 msgid ""
 "\n"
 "-------\n"
@@ -959,7 +1010,7 @@ msgstr ""
 "Uma uhlangabezana nanoma yiziphi izinkinga ngokubhaliswa kwakho, phendula "
 "ngokuthi *SUPPORT* manje ukuze uthole usizo oluvela 📞 ethimbeni Le-Hotline"
 
-#: vaccine/vaccine_reg_whatsapp.py:499
+#: vaccine/vaccine_reg_whatsapp.py:513
 msgid ""
 "⚠️ Please enter a valid {id_type}\n"
 "\n"
@@ -969,10 +1020,10 @@ msgstr ""
 "⚠️ Sicela ufake i-{id_type} evumelekile \n"
 " \n"
 "Noma phendula 📌 ngo- *0* ukuqeda leseshini bese ubuyela ku- *MENU* olukhulu\n"
-"Phendula ngokuthi *SUPPORT* noma nini uma udinga usizo oluvela 📞 ethimbeni Le-"
-"Hotline"
+"Phendula ngokuthi *SUPPORT* noma nini uma udinga usizo oluvela 📞 ethimbeni "
+"Le-Hotline"
 
-#: vaccine/vaccine_reg_whatsapp.py:515
+#: vaccine/vaccine_reg_whatsapp.py:529
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -982,18 +1033,31 @@ msgstr ""
 " \n"
 "Sicela ubhale i-{id_type} yakho."
 
-#: vaccine/vaccine_reg_whatsapp.py:536
+#: vaccine/vaccine_reg_whatsapp.py:550
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
-"The number you have entered appears to be a RSA ID Number. Is this correct?\n"
+"The number you have entered appears to be a RSA ID Number/RSA Birth "
+"Certificate ID Number. Is this correct?\n"
 msgstr ""
 "*INGXOXO EPHEPHILE YOKUBHALISELA UKUGOMA*🔐\n"
 "\n"
-"Le nombolo oyifakile ibonakala iyinombolo ye-ID yaseNingizimu Afrika. Ngabe "
-"lokhu kulungile?\n"
+"Le nombolo oyifakile ibonakala iyinombolo ye-ID yaseNingizimu Afrika / "
+"Isitifiketi Sokuzalwa sase-SA. Ngabe lokhu kulungile?\n"
 
-#: vaccine/vaccine_reg_whatsapp.py:569
+#: vaccine/vaccine_reg_whatsapp.py:560
+msgid ""
+"Please try again\n"
+"\n"
+"Please confirm that the number you have entered is a RSA ID Number/RSA Birth "
+"Certificate ID Number"
+msgstr ""
+"Sicela uzame futhi \n"
+"\n"
+"Sicela uqinisekise ukuthi le nombolo oyifakile iyinombolo ye-ID yaseNingizimu "
+"Afrika / Isitifiketi Sokuzalwa sase-SA"
+
+#: vaccine/vaccine_reg_whatsapp.py:583
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1005,7 +1069,7 @@ msgstr ""
 "Uyacelwa ukuthi ubhale IZWE LAKHO lendabuko lephasiphothi yakho. \n"
 "Isibonelo _Zimbabwe_"
 
-#: vaccine/vaccine_reg_whatsapp.py:592
+#: vaccine/vaccine_reg_whatsapp.py:606
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "Please confirm your passport's COUNTRY of origin.\n"
@@ -1017,7 +1081,7 @@ msgstr ""
 " \n"
 "Phendula NGENOMBOLO kusuka kuhlu olungezansi:"
 
-#: vaccine/vaccine_reg_whatsapp.py:604
+#: vaccine/vaccine_reg_whatsapp.py:618
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1027,7 +1091,7 @@ msgstr ""
 " \n"
 "Sicela UBHALE IGAMA lakho LOKUQALA njengoba livela kumazisi wakho."
 
-#: vaccine/vaccine_reg_whatsapp.py:610
+#: vaccine/vaccine_reg_whatsapp.py:624
 msgid ""
 "⚠️ Please try again\n"
 "\n"
@@ -1046,7 +1110,7 @@ msgstr ""
 "Uma uhlangabezana nanoma yiziphi izinkinga ngokubhaliswa kwakho, phendula "
 "ngokuthi *SUPPORT* manje ukuze uthole usizo oluvela 📞 ethimbeni Le-Hotline"
 
-#: vaccine/vaccine_reg_whatsapp.py:625
+#: vaccine/vaccine_reg_whatsapp.py:639
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1056,7 +1120,7 @@ msgstr ""
 " \n"
 "Sicela UBHALE ISIBONGO sakho njengoba sivela kumazisi wakho."
 
-#: vaccine/vaccine_reg_whatsapp.py:631
+#: vaccine/vaccine_reg_whatsapp.py:645
 msgid ""
 "⚠️ Please try again\n"
 "\n"
@@ -1075,7 +1139,7 @@ msgstr ""
 "Uma uhlangabezana nanoma yiziphi izinkinga ngokubhaliswa kwakho, phendula "
 "ngokuthi *SUPPORT* manje ukuze uthole usizo oluvela 📞 ethimbeni Le-Hotline"
 
-#: vaccine/vaccine_reg_whatsapp.py:655
+#: vaccine/vaccine_reg_whatsapp.py:669
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1091,7 +1155,7 @@ msgstr ""
 "{first_name} {surname} \n"
 "{id_number} \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:693
+#: vaccine/vaccine_reg_whatsapp.py:707
 msgid ""
 "⚠️  Please TYPE in only the YEAR you were born.\n"
 "Example _1980_"
@@ -1099,7 +1163,7 @@ msgstr ""
 "⚠️ Sicela UBHALE UNYAKA owazalwa ngawo kuphela. \n"
 "Isibonelo _1980_"
 
-#: vaccine/vaccine_reg_whatsapp.py:712
+#: vaccine/vaccine_reg_whatsapp.py:726
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1109,7 +1173,7 @@ msgstr ""
 " \n"
 "Sicela UBHALE UNYAKA owazalwa ngawo?"
 
-#: vaccine/vaccine_reg_whatsapp.py:732
+#: vaccine/vaccine_reg_whatsapp.py:746
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1119,47 +1183,47 @@ msgstr ""
 " \n"
 "Wazalwa ngayiphi INYANGA? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:738
+#: vaccine/vaccine_reg_whatsapp.py:752
 msgid "January"
 msgstr "January"
 
-#: vaccine/vaccine_reg_whatsapp.py:739
+#: vaccine/vaccine_reg_whatsapp.py:753
 msgid "February"
 msgstr "February"
 
-#: vaccine/vaccine_reg_whatsapp.py:740
+#: vaccine/vaccine_reg_whatsapp.py:754
 msgid "March"
 msgstr "March"
 
-#: vaccine/vaccine_reg_whatsapp.py:741
+#: vaccine/vaccine_reg_whatsapp.py:755
 msgid "April"
 msgstr "April"
 
-#: vaccine/vaccine_reg_whatsapp.py:745
+#: vaccine/vaccine_reg_whatsapp.py:759
 msgid "August"
 msgstr "August"
 
-#: vaccine/vaccine_reg_whatsapp.py:746
+#: vaccine/vaccine_reg_whatsapp.py:760
 msgid "September"
 msgstr "September"
 
-#: vaccine/vaccine_reg_whatsapp.py:747
+#: vaccine/vaccine_reg_whatsapp.py:761
 msgid "October"
 msgstr "October"
 
-#: vaccine/vaccine_reg_whatsapp.py:748
+#: vaccine/vaccine_reg_whatsapp.py:762
 msgid "November"
 msgstr "November"
 
-#: vaccine/vaccine_reg_whatsapp.py:749
+#: vaccine/vaccine_reg_whatsapp.py:763
 msgid "December"
 msgstr "December"
 
-#: vaccine/vaccine_reg_whatsapp.py:752
+#: vaccine/vaccine_reg_whatsapp.py:766
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
-"options provided. Reply *SUPPORT* anytime if you need help from the 📞 Hotline "
-"Team\n"
+"options provided. Reply *SUPPORT* anytime if you need help from the 📞 "
+"Hotline Team\n"
 "\n"
 "In which MONTH were you born?\n"
 msgstr ""
@@ -1169,7 +1233,7 @@ msgstr ""
 "\n"
 "Wazalwa ngayiphi INYANGA?\n"
 
-#: vaccine/vaccine_reg_whatsapp.py:759
+#: vaccine/vaccine_reg_whatsapp.py:773
 msgid ""
 "\n"
 "Reply with the number next to the month."
@@ -1177,7 +1241,7 @@ msgstr ""
 "\n"
 "Phendula ngenombolo eseduze kwenyanga."
 
-#: vaccine/vaccine_reg_whatsapp.py:780
+#: vaccine/vaccine_reg_whatsapp.py:794
 msgid ""
 "⚠️ Please enter a valid calendar DAY for your birth date. Type in only the "
 "day.\n"
@@ -1198,7 +1262,7 @@ msgstr ""
 "Uma uhlangabezana nanoma yiziphi izinkinga ngokubhaliswa kwakho, phendula "
 "ngokuthi *SUPPORT* manje ukuze uthole usizo oluvela 📞 ethimbeni Le-Hotline"
 
-#: vaccine/vaccine_reg_whatsapp.py:796
+#: vaccine/vaccine_reg_whatsapp.py:810
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1212,7 +1276,7 @@ msgstr ""
 " \n"
 "Isibonelo: Uma ngabe wazalwa ngomhlaka 31 Meyi, bhala _31_"
 
-#: vaccine/vaccine_reg_whatsapp.py:825
+#: vaccine/vaccine_reg_whatsapp.py:839
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1222,7 +1286,7 @@ msgstr ""
 " \n"
 "Buyini UBULILI bakho? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:833
+#: vaccine/vaccine_reg_whatsapp.py:847
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided. If you experiencing any problems with your registration, "
@@ -1237,12 +1301,12 @@ msgstr ""
 "\n"
 "PHENDULA NGENOMBOLO eseduze kobulili bakho kuhlu olungezansi.\n"
 
-#: vaccine/vaccine_reg_whatsapp.py:848
+#: vaccine/vaccine_reg_whatsapp.py:862
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
-"We will use your mobile phone number to send you notifications and updates via "
-"WhatsApp and/or SMS about getting vaccinated.\n"
+"We will use your mobile phone number to send you notifications and updates "
+"via WhatsApp and/or SMS about getting vaccinated.\n"
 "\n"
 "Can we use {number}?"
 msgstr ""
@@ -1253,7 +1317,7 @@ msgstr ""
 " \n"
 "Singawusebenzisa u-{number}?"
 
-#: vaccine/vaccine_reg_whatsapp.py:860
+#: vaccine/vaccine_reg_whatsapp.py:874
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided.\n"
@@ -1265,7 +1329,7 @@ msgstr ""
 " \n"
 "Sicela uqinisekise ukuthi singawusebenzisa u-{number} ukuxhumana nawe. \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:874
+#: vaccine/vaccine_reg_whatsapp.py:888
 msgid ""
 "⚠️ Please type a valid cell phone number.\n"
 "Example _081234567_"
@@ -1273,7 +1337,7 @@ msgstr ""
 "⚠️ Sicela ubhale inombolo evumelekile yeselula. \n"
 "Isibonelo _081234567_"
 
-#: vaccine/vaccine_reg_whatsapp.py:882
+#: vaccine/vaccine_reg_whatsapp.py:896
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1283,7 +1347,7 @@ msgstr ""
 " \n"
 "Sicela UBHALE INOMBOLO YOCINGO ethintekayo esingaxhumana nawe kuyo."
 
-#: vaccine/vaccine_reg_whatsapp.py:899
+#: vaccine/vaccine_reg_whatsapp.py:913
 msgid ""
 "⚠️ Please TYPE a valid EMAIL address. (Or type SKIP if you are unable to share "
 "an email address.)"
@@ -1291,7 +1355,7 @@ msgstr ""
 "⚠️ Sicela UBHALE ikheli le-IMEYILI elivumelekile. (Noma bhala SKIP uma "
 "ungakwazi ukwabelana ngekheli le-imeyili.)"
 
-#: vaccine/vaccine_reg_whatsapp.py:907
+#: vaccine/vaccine_reg_whatsapp.py:921
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1303,7 +1367,7 @@ msgstr ""
 "Sicela UBHALE ikheli lakho le-IMEYILI. (Noma bhala SKIP uma ungakwazi "
 "ukwabelana ngekheli le-imeyili.)"
 
-#: vaccine/vaccine_reg_whatsapp.py:920
+#: vaccine/vaccine_reg_whatsapp.py:934
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1319,7 +1383,7 @@ msgstr ""
 " \n"
 "Ingabe ungaphansi kwe-Medical Aid yaseNingizimu Afrika? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:932
+#: vaccine/vaccine_reg_whatsapp.py:946
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided.\n"
@@ -1332,7 +1396,7 @@ msgstr ""
 "Sicela uqinisekise ukuthi ngabe ungaphansi kweMedical Aid yaseNingizimu "
 "Afrika. \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:943
+#: vaccine/vaccine_reg_whatsapp.py:957
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1342,11 +1406,11 @@ msgstr ""
 " \n"
 "Sicela UBHALE igama LOMHLINZEKI wakho we-Medical Aid."
 
-#: vaccine/vaccine_reg_whatsapp.py:962
+#: vaccine/vaccine_reg_whatsapp.py:976
 msgid "None of these"
 msgstr "None of these"
 
-#: vaccine/vaccine_reg_whatsapp.py:965
+#: vaccine/vaccine_reg_whatsapp.py:979
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1355,14 +1419,14 @@ msgid ""
 msgstr ""
 "*INGXOXO EPHEPHILE YOKUBHALISELA UKUGOMA*🔐 \n"
 " \n"
-"Sicela uqinisekise uMhlinzeki wakho we-Medical Aid. Phendula NGENOMBOLO kusuka "
-"kuhlu olungezansi: \n"
+"Sicela uqinisekise uMhlinzeki wakho we-Medical Aid. Phendula NGENOMBOLO "
+"kusuka kuhlu olungezansi: \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:972
+#: vaccine/vaccine_reg_whatsapp.py:986
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
-"options provided. Reply *SUPPORT* anytime if you need help from the 📞 Hotline "
-"Team\n"
+"options provided. Reply *SUPPORT* anytime if you need help from the 📞 "
+"Hotline Team\n"
 "REPLY with the NUMBER next to the name of your Medical Aid Provider:\n"
 msgstr ""
 "⚠️ Le sevisi isebenza kahle kakhulu uma uphendula ngenye yezinombolo eceleni "
@@ -1371,7 +1435,7 @@ msgstr ""
 "\n"
 "PHENDULA NGENOMBOLO eseduze negama lomhlonzeki le-Medical Aid yakho: \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:979
+#: vaccine/vaccine_reg_whatsapp.py:993
 msgid ""
 "\n"
 "📌 Or reply *0* to end this session and return to the main *MENU*"
@@ -1379,7 +1443,7 @@ msgstr ""
 "\n"
 "Noma phendula 📌 ngo- *0* ukuqeda leseshini bese ubuyela ku- *MENU* olukhulu"
 
-#: vaccine/vaccine_reg_whatsapp.py:986
+#: vaccine/vaccine_reg_whatsapp.py:1000
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1389,7 +1453,7 @@ msgstr ""
 " \n"
 "Sicela UTHAYPHE INOMBOLO yakho ye-Medical Aid."
 
-#: vaccine/vaccine_reg_whatsapp.py:991
+#: vaccine/vaccine_reg_whatsapp.py:1005
 msgid ""
 "⚠️ Please try again\n"
 "\n"
@@ -1403,7 +1467,7 @@ msgstr ""
 " \n"
 "Noma phendula 📌 ngo- *0* ukuqeda leseshini bese ubuyela ku- *MENU* olukhulu"
 
-#: vaccine/vaccine_reg_whatsapp.py:1009
+#: vaccine/vaccine_reg_whatsapp.py:1023
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1415,7 +1479,7 @@ msgstr ""
 "Qaphela: Sizozama ukuhlela i-aphoyintimenti ngokuya ngokuthanda kwakho. \n"
 "Iyiphi inketho oyiqokayo nge-aphoyinyimenti yakho yokugoma? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:1021
+#: vaccine/vaccine_reg_whatsapp.py:1035
 msgid ""
 "⚠️ This service works best when you reply with one of the numbers next to the "
 "options provided.\n"
@@ -1427,7 +1491,7 @@ msgstr ""
 " \n"
 "Ungatholakala nini ukuhlela i-aphoyintimenti yokugoma? \n"
 
-#: vaccine/vaccine_reg_whatsapp.py:1176
+#: vaccine/vaccine_reg_whatsapp.py:1190
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1447,13 +1511,13 @@ msgstr ""
 "wokugomela i-COVID-19. \n"
 "\n"
 "Qaphela imilayezo evela kule nombolo (060 012 3456) kuWhatsApp NOMA kwi-SMS/i-"
-"imeyili. Sizokuthumelela ulwazi olubalulekile mayelana ne-aphoyintimenti yakho "
-"nokuthi yini ongayilindela. \n"
+"imeyili. Sizokuthumelela ulwazi olubalulekile mayelana ne-aphoyintimenti "
+"yakho nokuthi yini ongayilindela. \n"
 "\n"
 "-----\n"
 "📌Phendula *0* ukuze ubuyele *MENU* olukhulu"
 
-#: vaccine/vaccine_reg_whatsapp.py:1194
+#: vaccine/vaccine_reg_whatsapp.py:1208
 msgid ""
 "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
 "\n"
@@ -1473,6 +1537,32 @@ msgstr ""
 "----- \n"
 "📌Phendula *0* ukuze ubuyele *MENU* olukhulu"
 
+#~ msgid "RSA ID Number"
+#~ msgstr "Inombolo ye-ID yaseNingizimu Afrika"
+
+#~ msgid ""
+#~ "Self-registration is currently only available to those {minimum_age} years "
+#~ "of age or older. Please tell us if you are {minimum_age} or older?"
+#~ msgstr ""
+#~ "Ukuzibhalisela wena kusavuleleke kulabo abaneminyaka engu-{minimum_age} "
+#~ "nangaphezulu kuphela. Ngabe uneminyaka engu-{minimum_age} nangaphezulu?"
+
+#~ msgid ""
+#~ "⚠️ This service works best when you use the numbered options available\n"
+#~ "\n"
+#~ "Please confirm that you are {minimum_age} years or older by typing 1 (or 2 "
+#~ "if you are NOT {minimum_age} years or older)\n"
+#~ msgstr ""
+#~ "⚠️ Le sevisi isebenza kahle kakhulu uma usebenzisa izinketho ezinenombolo "
+#~ "ezitholakalayo\n"
+#~ " \n"
+#~ "Sicela uqinisekise ukuthi uneminyaka engu-{minimum_age} noma ngaphezulu "
+#~ "ngokublala u-1 (noma u-2 uma ungekho eminyakeni engu-{minimum_age} noma "
+#~ "ngaphezulu)\n"
+
+#~ msgid "Yes, I am {minimum_age} or older"
+#~ msgstr "Yebo, ngineminyaka engu-{minimum_age} noma ngaphezulu"
+
 #~ msgid ""
 #~ "\n"
 #~ "-----\n"
@@ -1480,7 +1570,8 @@ msgstr ""
 #~ msgstr ""
 #~ "\n"
 #~ "----- \n"
-#~ "Noma phendula 📌 ngo- *0* ukuqeda leseshini bese ubuyela ku- *MENU* olukhulu"
+#~ "Noma phendula 📌 ngo- *0* ukuqeda leseshini bese ubuyela ku- *MENU* "
+#~ "olukhulu"
 
 #~ msgid ""
 #~ "⚠️ Please enter a valid calendar DAY for your birth date. Type in only the "
@@ -1492,6 +1583,3 @@ msgstr ""
 #~ "Bhala usuku kuphela. \n"
 #~ " \n"
 #~ "Isibonelo: Uma ngabe wazalwa ngomhla ka-20 Meyi, thayipha _20_"
-
-#~ msgid "Passport Number"
-#~ msgstr "Inombolo Yephasiphothi"

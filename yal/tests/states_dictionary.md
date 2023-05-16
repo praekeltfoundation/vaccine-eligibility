@@ -153,6 +153,7 @@
 | state_phase2_update_exising_user_profile |        FALSE       |              |            FALSE         | For phase 2 we need to send existing users back to onboarding so that they can take the assessments. This state handles the push message response and inserts them based on their profile (if their gender isn't set they go to state_gender, if it is set they go to state_rel_status) |
 | state_country                              |        TRUE       |      Text        |            TRUE         | Asks the user if they are in South Africa. User response is "yes", "no" or "skip" |
 | state_seen_before                          |        TRUE       |      Text        |            TRUE         | Asks the user if they have used the Bwise bot before. User response is "yes", "no" or "skip" |
+| state_monthly_household_income               |        TRUE       |      Text        |            TRUE         | Asks the user what their total monthly household income is. Response is a numbered list  |
 
 
 ### OptOut flow
@@ -357,7 +358,7 @@
 | state_study_invitation                        |        TRUE        |     Text     |            TRUE          | asks if user would like to be part of the EJAF study. Options are "yes" or "no" |
 | state_study_consent                          |        TRUE        |     Text     |            TRUE          | asks the user to accept the T&Cs for the EJAF study. Options are "yes" or "no" |
 | state_study_consent_yes_submit               |        FALSE        |     Text     |            FALSE          | Updates ejaf_study_optin with True if user responded yes to state_study_consent |
-| state_study_terms_pdf                        |        FALSE        |     Text     |            FALSE          | Sends user terms and conditions as pdf and then routes them to the baseline survey |
+| state_study_consent_pdf                        |        FALSE        |     Text     |            FALSE          | Sends user terms and conditions as pdf and then routes them to the baseline survey |
 
 ### A1 Sexual health literacy assessment
 | state_name | accepts_user_input | data_type | description |
@@ -449,6 +450,7 @@
 | state_alcohol_assessment_v2_end | TRUE | Text | End of Alcohol Assessment. |
 | state_baseline_halfway_msg | TRUE | Text | Halfway message of baseline survey |
 | state_submit_baseline_completed | False | Text | Saves flow results and contact fields relevant to baseline survey end |
+| baseline_survey_completed | False | Text | Flag to show end of survey reachedcd  |
 
 
 ### Baseline Sexual Health literacy assessment V2
@@ -529,7 +531,8 @@
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
 | baseline_6_q1_self_perceived_healthcare | TRUE | Text | How good a job do you feel you are doing in taking care of your health? |
-| baseline_6_q2_self_perceived_healthcare | TRUE | Text | When you have a health need do you go to your closest clinic? |
+| baseline_6_q2_self_perceived_healthcare | TRUE | Text | In the past 7 days, how many days did you go hungry? |
+| baseline_6_q3_self_perceived_healthcare | TRUE | Text | When you have a health need do you go to your closest clinic? |
 | state_self_perceived_healthcare_v2_risk | TRUE | Text | The risk rating for Self Perceived Healthcare |
 | state_self_perceived_healthcare_v2_score | TRUE | Text | The score for Self Perceived Healthcare |
 

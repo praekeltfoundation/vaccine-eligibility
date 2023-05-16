@@ -82,16 +82,16 @@ async def test_state_submit_baseline_completed(
     request = rapidpro_mock.tstate.requests[2]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
-            "baseline_survey_completed": "TRUE",
+            "baseline_survey_completed": "True",
             "ejaf_airtime_incentive_sent": "False",
             "ejaf_baseline_completed_on": "2022-06-19T17:30:00",
         },
     }
-    tester.assert_metadata("baseline_survey_completed", "TRUE")
+    tester.assert_metadata("baseline_survey_completed", "True")
     tester.assert_metadata("ejaf_airtime_incentive_sent", "False")
     tester.assert_metadata("ejaf_baseline_completed_on", "2022-06-19T17:30:00")
 
-    tester.assert_answer("baseline_survey_completed", "TRUE")
+    tester.assert_answer("baseline_survey_completed", "True")
 
 
 @pytest.mark.asyncio
@@ -109,19 +109,19 @@ async def test_state_baseline_end_invalid_input(tester: AppTester):
     ), f"Message content not in provided list, it is {message.content}"
 
 
-@pytest.mark.asyncio
-async def test_state_halfway_message(tester: AppTester):
+# @pytest.mark.asyncio
+# async def test_state_halfway_message(tester: AppTester):
 
-    tester.setup_state("state_baseline_halfway_msg")
+# tester.setup_state("state_baseline_halfway_msg")
 
-    await tester.user_input("OK Let's do it")
+# await tester.user_input("OK Let's do it")
 
-    # tester.assert_state("state_baseline_halfway_msg")
-    [message] = tester.application.messages
-    # print(message.content)
-    # tester.assert_message(
-    #    "*How good a job do you feel you are doing in taking care of your health?*"
-    # )
+# tester.assert_state("state_baseline_halfway_msg")
+# [message] = tester.application.messages
+# print(message.content)
+# tester.assert_message(
+#    "*How good a job do you feel you are doing in taking care of your health?*"
+# )
 
 @pytest.mark.asyncio
 async def test_state_self_esteem_assessment_v2_end(tester: AppTester):

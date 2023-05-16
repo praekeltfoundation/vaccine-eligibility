@@ -82,11 +82,17 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
+        is_baseline_survey_active = await rapidpro.check_if_baseline_active() == "True"
         is_in_south_africa = self.user.metadata.get("country") == "south africa"
         is_in_age_range = 18 <= int(self.user.metadata.get("age")) <= 24
         not_used_bot_before = self.user.metadata.get("used_bot_before") == "no"
 
-        if is_in_south_africa and is_in_age_range and not_used_bot_before:
+        if (
+            is_baseline_survey_active
+            and is_in_south_africa
+            and is_in_age_range
+            and not_used_bot_before
+        ):
             self.save_answer("state_is_eligible_for_study", "true")
             return await self.go_to_state("state_study_invitation")
 
@@ -160,10 +166,20 @@ class Application(BaseApplication):
             choices=choices,
             error=self._(get_generic_error()),
             next={
-                "yes": "state_study_consent",
+                "yes": "state_study_consent_pdf",
                 "no": "state_pushmessage_optin_final",
             },
         )
+
+    async def state_study_consent_pdf(self):
+        await self.worker.publish_message(
+            self.inbound.reply(
+                None,
+                helper_metadata={"document": contentrepo.get_study_consent_form_url()},
+            )
+        )
+        await asyncio.sleep(1.5)
+        return await self.go_to_state("state_study_consent")
 
     async def state_study_consent(self):
         choices = [
@@ -185,7 +201,12 @@ class Application(BaseApplication):
                     "completing the survey, you will *not* be able to receive the R30 "
                     "airtime voucher._",
                     "",
-                    "❓ You can skip any questions you don't want to answer.",
+                    "❓ You can skip any questions you don't want to answer. "
+                    "To try improve South Africa’s sexual health we need to ask "
+                    "a number of questions that may be sensitive; for instance, "
+                    "we ask about sexual behaviours,sexual orientation and health "
+                    "status, among other topics. "
+                    "",
                     "",
                     "🔒 You've seen and agreed to our privacy policy. Just a reminder "
                     "that we promise to keep all your info private and secure.",
@@ -193,7 +214,8 @@ class Application(BaseApplication):
                     "👤 Your answers are anonymous and confidential. We won't share "
                     "data outside the BWise WhatsApp Chatbot team.",
                     "",
-                    "📄  We'll send you a copy of this consent and the privacy policy."
+                    "📄  We have sent you a copy of this consent document. "
+                    "Please see above. ",
                     "",
                     "*Are you happy with this?*",
                 ]
@@ -219,14 +241,4 @@ class Application(BaseApplication):
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
-        return await self.go_to_state("state_study_terms_pdf")
-
-    async def state_study_terms_pdf(self):
-        await self.worker.publish_message(
-            self.inbound.reply(
-                None,
-                helper_metadata={"document": contentrepo.get_privacy_policy_url()},
-            )
-        )
-        await asyncio.sleep(1.5)
         return await self.go_to_state(BaselineSurveyApplication.START_STATE)
