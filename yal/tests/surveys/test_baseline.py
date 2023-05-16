@@ -122,3 +122,151 @@ async def test_state_halfway_message(tester: AppTester):
     # tester.assert_message(
     #    "*How good a job do you feel you are doing in taking care of your health?*"
     # )
+
+@pytest.mark.asyncio
+async def test_state_self_esteem_assessment_v2_end(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_self_esteem_assessment_v2_end"}}
+        },
+    )
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "connectedness_v2")
+    tester.assert_metadata("assessment_end_state", "state_connectedness_assessment_v2_end")
+
+
+@pytest.mark.asyncio
+async def test_state_connectedness_assessment_v2_end(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_connectedness_assessment_v2_end"}}
+        },
+    )
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "body_image_v2")
+    tester.assert_metadata("assessment_end_state", "state_body_image_assessment_v2_end")
+
+
+@pytest.mark.asyncio
+async def test_state_body_image_assessment_v2_end(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_body_image_assessment_v2_end"}}
+        },
+    )
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "depression_v2")
+    tester.assert_metadata("assessment_end_state", "state_depression_assessment_v2_end")
+
+
+@pytest.mark.asyncio
+async def test_depression_assessment_v2_end(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_depression_assessment_v2_end"}}
+        },
+    )
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "anxiety_v2")
+    tester.assert_metadata("assessment_end_state", "state_anxiety_assessment_v2_end")
+
+
+@pytest.mark.asyncio
+async def test_state_anxiety_assessment_v2_end(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_anxiety_assessment_v2_end"}}
+        },
+    )
+    tester.assert_state("state_baseline_halfway_msg")
+
+
+# @pytest.mark.asyncio
+# async def test_state_baseline_halfway_msg(tester: AppTester):
+#     tester.setup_state("state_baseline_halfway_msg")
+#     await tester.user_input("OK Let's do it")
+#     tester.assert_state("state_self_perceived_healthcare_assessment_v2")
+
+
+@pytest.mark.asyncio
+async def test_state_self_perceived_healthcare_assessment_v2_end(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_self_perceived_healthcare_assessment_v2_end"}}
+        },
+    )
+
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "sexual_health_literacy_v2")
+    tester.assert_metadata("assessment_end_state", "state_sexual_health_lit_assessment_v2_end")
+
+
+@pytest.mark.asyncio
+async def test_state_sexual_health_lit_assessment_v2_end(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_sexual_health_lit_assessment_v2_end"}}
+        },
+    )
+
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "gender_attitude_v2")
+    tester.assert_metadata("assessment_end_state", "state_gender_attitude_assessment_v2_end")
+
+
+@pytest.mark.asyncio
+async def test_state_gender_attitude_assessment_v2_end(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_gender_attitude_assessment_v2_end"}}
+        },
+    )
+
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "sexual_consent_v2")
+    tester.assert_metadata("assessment_end_state", "state_sexual_consent_assessment_v2_end")
+
+
+@pytest.mark.asyncio
+async def test_state_sexual_consent_assessment_v2_end(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_sexual_consent_assessment_v2_end"}}
+        },
+    )
+
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "alcohol_v2")
+    tester.assert_metadata("assessment_end_state", "state_alcohol_assessment_v2_end")
+
+
+@pytest.mark.asyncio
+async def test_state_alcohol_assessment_v2_end(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_alcohol_assessment_v2_end"}}
+        },
+    )
+
+    tester.assert_state("state_baseline_end")
+
