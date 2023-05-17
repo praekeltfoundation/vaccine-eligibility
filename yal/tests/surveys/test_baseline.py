@@ -279,7 +279,8 @@ async def test_state_self_perceived_healthcare_assessment_v2_end(tester: AppTest
             "",
             "*Is the following statement true or false?*",
             "",
-            "People can reduce the risk of getting sexually transmitted infections (STIs) "
+            "People can reduce the risk of getting sexually"
+            "" transmitted infections (STIs) "
             "by using condoms every time they have sex.",
         ]
     )
