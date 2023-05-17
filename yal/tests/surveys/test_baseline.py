@@ -121,7 +121,7 @@ async def test_state_halfway_message(tester: AppTester):
             "◼️◽️◽️",
             "-----",
             "",
-            "*How good a job do you feel you are doing in taking care of your health?*"
+            "*How good a job do you feel you are doing in taking care of your health?*",
         ]
     )
 
@@ -143,7 +143,7 @@ async def test_state_self_esteem_assessment_v2_end(tester: AppTester):
             "◼️",
             "-----",
             "",
-            "*Do you have someone to talk to when you have a worry or problem?*"
+            "*Do you have someone to talk to when you have a worry or problem?*",
         ]
     )
 
@@ -249,7 +249,6 @@ async def test_state_anxiety_assessment_v2_end(tester: AppTester):
             "*We’re getting there! You’re doing great!* 🎉",
             "",
             "Just a few more questions to go and your R30 airtime will be sent to you! 🤑",
-
         ]
     )
 
@@ -271,7 +270,6 @@ async def test_state_self_perceived_healthcare_assessment_v2_end(tester: AppTest
         },
     )
 
-
     message = "\n".join(
         [
             "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
@@ -279,8 +277,7 @@ async def test_state_self_perceived_healthcare_assessment_v2_end(tester: AppTest
             "",
             "*Is the following statement true or false?*",
             "",
-            "People can reduce the risk of getting sexually transmitted infections (STIs) by using condoms every time they have sex."
-
+            "People can reduce the risk of getting sexually transmitted infections (STIs) by using condoms every time they have sex.",
         ]
     )
 
@@ -311,8 +308,7 @@ async def test_state_sexual_health_lit_assessment_v2_end(tester: AppTester):
             "",
             "**How do you feel about each of the following statements?* *",
             "",
-            "There are times when a woman deserves to be beaten"
-
+            "There are times when a woman deserves to be beaten",
         ]
     )
 
@@ -346,7 +342,6 @@ async def test_state_gender_attitude_assessment_v2_end(tester: AppTester):
             "*To what extent do you agree with this statement:*",
             "",
             "Robert has the right to force Samantha to have sex.",
-
         ]
     )
 
