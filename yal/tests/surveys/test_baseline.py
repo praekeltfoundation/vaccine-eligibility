@@ -197,7 +197,8 @@ async def test_state_body_image_assessment_v2_end(tester: AppTester):
             "◼️◽️",
             "-----",
             "",
-            "*Over the last 2 weeks, how often have you been bothered by the following problems?*",
+            "*Over the last 2 weeks, how often have you been "
+            "bothered by the following problems?*",
             "",
             "Feeling down, depressed or hopeless",
         ]
@@ -248,7 +249,8 @@ async def test_state_anxiety_assessment_v2_end(tester: AppTester):
         [
             "*We’re getting there! You’re doing great!* 🎉",
             "",
-            "Just a few more questions to go and your R30 airtime will be sent to you! 🤑",
+            "Just a few more questions to go and your R30 airtime"
+            " will be sent to you! 🤑",
         ]
     )
 
@@ -277,7 +279,8 @@ async def test_state_self_perceived_healthcare_assessment_v2_end(tester: AppTest
             "",
             "*Is the following statement true or false?*",
             "",
-            "People can reduce the risk of getting sexually transmitted infections (STIs) by using condoms every time they have sex.",
+            "People can reduce the risk of getting sexually transmitted infections (STIs) "
+            "by using condoms every time they have sex.",
         ]
     )
 
@@ -337,7 +340,11 @@ async def test_state_gender_attitude_assessment_v2_end(tester: AppTester):
             "◼️◽️",
             "-----",
             "",
-            "Robert and Samantha have been dating for 5 years and love each other very much. 👩🏾\u200d❤️\u200d👨🏾\n\nEvery year on Robert's birthday, Samantha promises him sex for his birthday. This year, Samantha tells Robert that she is too tired for sex. ",
+            "Robert and Samantha have been dating for 5 years and"
+            " love each other very much."
+            " 👩🏾\u200d❤️\u200d👨🏾\n\nEvery year on Robert's birthday, "
+            "Samantha promises him sex for his birthday. "
+            "This year, Samantha tells Robert that she is too tired for sex. ",
             "",
             "*To what extent do you agree with this statement:*",
             "",
