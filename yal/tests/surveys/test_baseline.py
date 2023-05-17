@@ -5,11 +5,11 @@ from unittest import mock
 import pytest
 from sanic import Sanic, response
 
-from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.main import Application
 from yal.utils import GENERIC_ERRORS, replace_persona_fields
+from vaccine.models import Message, StateData, User
 
 
 @pytest.fixture
@@ -56,6 +56,10 @@ async def rapidpro_mock():
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
         tstate.requests.append(request)
+        if tstate.errormax:
+            if tstate.errors < tstate.errormax:
+                tstate.errors += 1
+                return response.json({}, status=500)
         return response.json({}, status=200)
 
     async with run_sanic(app) as server:
@@ -95,6 +99,26 @@ async def test_state_submit_baseline_completed(
 
 
 @pytest.mark.asyncio
+async def test_state_submit_baseline_completed_error(tester: AppTester, rapidpro_mock):
+    rapidpro_mock.tstate.errormax = 3
+    u = User(
+        addr="27820001003", state=StateData(name="state_submit_baseline_completed")
+    )
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == ("Something went wrong. Please try again later.")
+
+
+@pytest.mark.asyncio
 async def test_state_baseline_end_invalid_input(tester: AppTester):
 
     tester.setup_state("state_baseline_end")
@@ -129,6 +153,23 @@ async def test_state_halfway_message(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_state_self_esteem_assessment_v2(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_self_esteem_assessment_v2"}}
+        },
+    )
+
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "self_esteem_v2")
+    tester.assert_metadata(
+        "assessment_end_state", "state_self_esteem_assessment_v2_end"
+    )
+
+
+@pytest.mark.asyncio
 async def test_state_self_esteem_assessment_v2_end(tester: AppTester):
 
     await tester.user_input(
@@ -156,6 +197,29 @@ async def test_state_self_esteem_assessment_v2_end(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_state_self_esteem_assessment_v2_end_error(
+    tester: AppTester, rapidpro_mock
+):
+
+    rapidpro_mock.tstate.errormax = 3
+    u = User(
+        addr="27820001003", state=StateData(name="state_self_esteem_assessment_v2_end")
+    )
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == ("Something went wrong. Please try again later.")
+
+
+@pytest.mark.asyncio
 async def test_state_connectedness_assessment_v2_end(tester: AppTester):
 
     await tester.user_input(
@@ -180,6 +244,30 @@ async def test_state_connectedness_assessment_v2_end(tester: AppTester):
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "body_image_v2")
     tester.assert_metadata("assessment_end_state", "state_body_image_assessment_v2_end")
+
+
+@pytest.mark.asyncio
+async def test_state_connectedness_assessment_v2_end_error(
+    tester: AppTester, rapidpro_mock
+):
+
+    rapidpro_mock.tstate.errormax = 3
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_connectedness_assessment_v2_end"),
+    )
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -211,6 +299,29 @@ async def test_state_body_image_assessment_v2_end(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_state_body_image_assessment_v2_end_error(
+    tester: AppTester, rapidpro_mock
+):
+
+    rapidpro_mock.tstate.errormax = 3
+    u = User(
+        addr="27820001003", state=StateData(name="state_body_image_assessment_v2_end")
+    )
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == ("Something went wrong. Please try again later.")
+
+
+@pytest.mark.asyncio
 async def test_depression_assessment_v2_end(tester: AppTester):
 
     await tester.user_input(
@@ -236,6 +347,29 @@ async def test_depression_assessment_v2_end(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_state_depression_assessment_v2_end_error(
+    tester: AppTester, rapidpro_mock
+):
+
+    rapidpro_mock.tstate.errormax = 3
+    u = User(
+        addr="27820001003", state=StateData(name="state_depression_assessment_v2_end")
+    )
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == ("Something went wrong. Please try again later.")
+
+
+@pytest.mark.asyncio
 async def test_state_anxiety_assessment_v2_end(tester: AppTester):
 
     await tester.user_input(
@@ -256,6 +390,69 @@ async def test_state_anxiety_assessment_v2_end(tester: AppTester):
 
     tester.assert_message(message)
     tester.assert_state("state_baseline_halfway_msg")
+
+
+@pytest.mark.asyncio
+async def test_state_anxiety_assessment_v2_end_error(tester: AppTester, rapidpro_mock):
+    rapidpro_mock.tstate.errormax = 3
+    u = User(
+        addr="27820001003", state=StateData(name="state_anxiety_assessment_v2_end")
+    )
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == ("Something went wrong. Please try again later.")
+
+
+@pytest.mark.asyncio
+async def test_state_baseline_start(tester: AppTester, rapidpro_mock):
+    await tester.user_input(
+        "test",
+        transport_metadata={"message": {"button": {"payload": "state_baseline_start"}}},
+    )
+
+    message = "\n".join(
+        [
+            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "-----",
+            "",
+            "How do you feel about the following statements?",
+            "",
+            "*I feel that I am a person of worth,"
+            " at least on an equal plane with others.*",
+        ]
+    )
+    tester.assert_message(message)
+
+
+@pytest.mark.asyncio
+async def test_state_depression_and_anxiety_v2_end_error(
+    tester: AppTester, rapidpro_mock
+):
+    rapidpro_mock.tstate.errormax = 3
+    u = User(
+        addr="27820001003", state=StateData(name="state_depression_and_anxiety_v2_end")
+    )
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -294,6 +491,30 @@ async def test_state_self_perceived_healthcare_assessment_v2_end(tester: AppTest
 
 
 @pytest.mark.asyncio
+async def test_state_state_self_perceived_healthcare_assessment_v2_end_error(
+    tester: AppTester, rapidpro_mock
+):
+
+    rapidpro_mock.tstate.errormax = 3
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_self_perceived_healthcare_assessment_v2_end"),
+    )
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == ("Something went wrong. Please try again later.")
+
+
+@pytest.mark.asyncio
 async def test_state_sexual_health_lit_assessment_v2_end(tester: AppTester):
 
     await tester.user_input(
@@ -322,6 +543,30 @@ async def test_state_sexual_health_lit_assessment_v2_end(tester: AppTester):
     tester.assert_metadata(
         "assessment_end_state", "state_gender_attitude_assessment_v2_end"
     )
+
+
+@pytest.mark.asyncio
+async def test_state_sexual_health_lit_assessment_v2_end_error(
+    tester: AppTester, rapidpro_mock
+):
+
+    rapidpro_mock.tstate.errormax = 3
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_sexual_health_lit_assessment_v2_end"),
+    )
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -362,6 +607,30 @@ async def test_state_gender_attitude_assessment_v2_end(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_state_gender_attitude_assessment_v2_end_error(
+    tester: AppTester, rapidpro_mock
+):
+
+    rapidpro_mock.tstate.errormax = 3
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_gender_attitude_assessment_v2_end"),
+    )
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == ("Something went wrong. Please try again later.")
+
+
+@pytest.mark.asyncio
 async def test_state_sexual_consent_assessment_v2_end(tester: AppTester):
 
     await tester.user_input(
@@ -384,6 +653,30 @@ async def test_state_sexual_consent_assessment_v2_end(tester: AppTester):
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "alcohol_v2")
     tester.assert_metadata("assessment_end_state", "state_alcohol_assessment_v2_end")
+
+
+@pytest.mark.asyncio
+async def test_state_sexual_consent_assessment_v2_end_error(
+    tester: AppTester, rapidpro_mock
+):
+
+    rapidpro_mock.tstate.errormax = 3
+    u = User(
+        addr="27820001003",
+        state=StateData(name="state_sexual_consent_assessment_v2_end"),
+    )
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -410,3 +703,24 @@ async def test_state_alcohol_assessment_v2_end(tester: AppTester):
 
     tester.assert_message(message)
     tester.assert_state("state_baseline_end")
+
+
+@pytest.mark.asyncio
+async def test_state_alcohol_assessment_v2_end_error(tester: AppTester, rapidpro_mock):
+
+    rapidpro_mock.tstate.errormax = 3
+    u = User(
+        addr="27820001003", state=StateData(name="state_alcohol_assessment_v2_end")
+    )
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [reply] = await app.process_message(msg)
+
+    assert reply.content == ("Something went wrong. Please try again later.")
