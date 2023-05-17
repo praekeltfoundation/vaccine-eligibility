@@ -113,9 +113,9 @@ async def test_state_submit_baseline_completed_error(tester: AppTester, rapidpro
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
     )
-    [reply] = await app.process_message(msg)
+    [resp] = await app.process_message(msg)
 
-    assert reply.content == ("Something went wrong. Please try again later.")
+    assert resp.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -214,9 +214,9 @@ async def test_state_self_esteem_assessment_v2_end_error(
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
     )
-    [reply] = await app.process_message(msg)
+    [resp] = await app.process_message(msg)
 
-    assert reply.content == ("Something went wrong. Please try again later.")
+    assert resp.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -265,9 +265,9 @@ async def test_state_connectedness_assessment_v2_end_error(
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
     )
-    [reply] = await app.process_message(msg)
+    [resp] = await app.process_message(msg)
 
-    assert reply.content == ("Something went wrong. Please try again later.")
+    assert resp.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -316,9 +316,9 @@ async def test_state_body_image_assessment_v2_end_error(
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
     )
-    [reply] = await app.process_message(msg)
+    [resp] = await app.process_message(msg)
 
-    assert reply.content == ("Something went wrong. Please try again later.")
+    assert resp.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -364,9 +364,9 @@ async def test_state_depression_assessment_v2_end_error(
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
     )
-    [reply] = await app.process_message(msg)
+    [resp] = await app.process_message(msg)
 
-    assert reply.content == ("Something went wrong. Please try again later.")
+    assert resp.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -407,9 +407,9 @@ async def test_state_anxiety_assessment_v2_end_error(tester: AppTester, rapidpro
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
     )
-    [reply] = await app.process_message(msg)
+    [resp] = await app.process_message(msg)
 
-    assert reply.content == ("Something went wrong. Please try again later.")
+    assert resp.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -450,9 +450,9 @@ async def test_state_depression_and_anxiety_v2_end_error(
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
     )
-    [reply] = await app.process_message(msg)
+    [resp] = await app.process_message(msg)
 
-    assert reply.content == ("Something went wrong. Please try again later.")
+    assert resp.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -509,9 +509,9 @@ async def test_state_state_self_perceived_healthcare_assessment_v2_end_error(
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
     )
-    [reply] = await app.process_message(msg)
+    [resp] = await app.process_message(msg)
 
-    assert reply.content == ("Something went wrong. Please try again later.")
+    assert resp.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -564,9 +564,9 @@ async def test_state_sexual_health_lit_assessment_v2_end_error(
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
     )
-    [reply] = await app.process_message(msg)
+    [resp] = await app.process_message(msg)
 
-    assert reply.content == ("Something went wrong. Please try again later.")
+    assert resp.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -625,9 +625,9 @@ async def test_state_gender_attitude_assessment_v2_end_error(
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
     )
-    [reply] = await app.process_message(msg)
+    [resp] = await app.process_message(msg)
 
-    assert reply.content == ("Something went wrong. Please try again later.")
+    assert resp.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -674,9 +674,9 @@ async def test_state_sexual_consent_assessment_v2_end_error(
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
     )
-    [reply] = await app.process_message(msg)
+    [resp] = await app.process_message(msg)
 
-    assert reply.content == ("Something went wrong. Please try again later.")
+    assert resp.content == ("Something went wrong. Please try again later.")
 
 
 @pytest.mark.asyncio
@@ -721,6 +721,6 @@ async def test_state_alcohol_assessment_v2_end_error(tester: AppTester, rapidpro
         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
         session_event=Message.SESSION_EVENT.NEW,
     )
-    [reply] = await app.process_message(msg)
+    [resp] = await app.process_message(msg)
 
-    assert reply.content == ("Something went wrong. Please try again later.")
+    assert resp.content == ("Something went wrong. Please try again later.")
