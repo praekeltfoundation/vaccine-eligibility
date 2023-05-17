@@ -5,11 +5,11 @@ from unittest import mock
 import pytest
 from sanic import Sanic, response
 
+from vaccine.models import Message, StateData, User
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.main import Application
 from yal.utils import GENERIC_ERRORS, replace_persona_fields
-from vaccine.models import Message, StateData, User
 
 
 @pytest.fixture
