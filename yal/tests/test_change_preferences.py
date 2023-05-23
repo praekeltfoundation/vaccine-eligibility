@@ -304,7 +304,7 @@ async def test_state_update_gender_skip(tester: AppTester, rapidpro_mock):
 
     await tester.user_input("Skip")
 
-    tester.assert_answer("state_update_gender", "skip")
+    tester.assert_answer("state_update_gender", "skip update preference")
     tester.setup_state("state_display_preferences")
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
@@ -399,6 +399,16 @@ async def test_state_update_age(tester: AppTester, rapidpro_mock):
     )
 
     assert [r.path for r in rapidpro_mock.tstate.requests] == ["/api/v2/contacts.json"]
+
+
+@pytest.mark.asyncio
+async def test_state_update_age_skip(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_update_age")
+
+    await tester.user_input("Skip")
+
+    tester.assert_answer("state_update_age", "skip update preference")
+    tester.setup_state("state_display_preferences")
 
 
 @pytest.mark.asyncio
@@ -568,7 +578,7 @@ async def test_state_update_bot_name_skip(tester: AppTester, rapidpro_mock):
     tester.user.metadata["persona_emoji"] = "🦸"
     tester.user.metadata["persona_name"] = "Caped Crusader"
     tester.setup_state("state_update_bot_name")
-    await tester.user_input("skip")
+    await tester.user_input("skip update preference")
 
     assert len(tester.fake_worker.outbound_messages) == 0
 
@@ -628,7 +638,7 @@ async def test_state_update_bot_emoji_skip(tester: AppTester, rapidpro_mock):
     tester.user.metadata["persona_emoji"] = "🦸"
     tester.user.metadata["persona_name"] = "Caped Crusader"
     tester.setup_state("state_update_bot_emoji")
-    await tester.user_input("skip")
+    await tester.user_input("skip update preference")
 
     tester.assert_state("state_display_preferences")
     tester.assert_metadata("persona_emoji", "🦸")

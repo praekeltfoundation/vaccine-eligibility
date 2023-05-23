@@ -41,8 +41,8 @@ class Application(BaseApplication):
             return choice.value
 
         def get_field(name):
-            value = self.user.metadata.get(name) or "skip"
-            if value == "skip":
+            value = self.user.metadata.get(name) or "skip update preference"
+            if value == "skip update preference":
                 return "Empty"
 
             if name == "gender":
@@ -162,12 +162,12 @@ class Application(BaseApplication):
                     )
                 )
             ),
-            buttons=[Choice("skip", self._("Skip"))],
+            buttons=[Choice("skip update preference", self._("Skip"))],
         )
 
     async def state_update_age_confirm(self):
         age = self.user.answers.get("state_update_age")
-        if age == "skip":
+        if age == "skip update preference":
             return await self.go_to_state("state_display_preferences")
 
         choices = [
@@ -200,7 +200,7 @@ class Application(BaseApplication):
         )
 
     async def state_update_age_submit(self):
-        if self.user.answers.get("state_update_age") == "skip":
+        if self.user.answers.get("state_update_age") == "skip update preference":
             return await self.go_to_state("state_display_preferences")
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -250,7 +250,7 @@ class Application(BaseApplication):
             Choice("relationship", self._("Yes, in relationship")),
             Choice("complicated", self._("It's complicated")),
             Choice("single", self._("Not seeing anyone")),
-            Choice("skip", self._("Skip")),
+            Choice("skip update preference", self._("Skip")),
         ]
         question = self._(
             "\n".join(
@@ -276,7 +276,7 @@ class Application(BaseApplication):
 
     async def state_update_relationship_status_confirm(self):
         rel = self.user.answers.get("state_update_relationship_status")
-        if rel == "skip":
+        if rel == "skip update preference":
             return await self.go_to_state("state_display_preferences")
 
         choices = [
@@ -375,7 +375,7 @@ class Application(BaseApplication):
             question=question,
             next="state_get_updated_description_from_coords",
             check=store_location_coords,
-            buttons=[Choice("skip", self._("Skip"))],
+            buttons=[Choice("skip update preference", self._("Skip"))],
         )
 
     async def state_get_updated_description_from_coords(self):
@@ -477,7 +477,7 @@ class Application(BaseApplication):
         )
         gender_choices = [Choice(code, name) for code, name in GENDERS.items()]
         gender_text = f"{gender_text}\n*{len(gender_choices) + 1}* - Skip"
-        gender_choices.append(Choice("skip", self._("Skip")))
+        gender_choices.append(Choice("skip update preference", self._("Skip")))
 
         question = self._(
             "\n".join(
@@ -505,7 +505,7 @@ class Application(BaseApplication):
 
     async def state_update_other_gender(self):
         gender = self.user.answers.get("state_update_gender")
-        if gender == "skip":
+        if gender == "skip update preference":
             return await self.go_to_state("state_display_preferences")
         if gender != "other":
             return await self.go_to_state("state_update_gender_confirm")
@@ -531,7 +531,7 @@ class Application(BaseApplication):
 
     async def state_update_gender_confirm(self):
         gender = self.user.answers.get("state_update_gender").lower()
-        if gender == "skip" or gender == "rather not say":
+        if gender == "skip update preference" or gender == "rather not say":
             return await self.go_to_state("state_display_preferences")
         if gender == "other":
             gender = self.user.answers.get("state_update_other_gender", "")
@@ -602,12 +602,12 @@ class Application(BaseApplication):
             self,
             question=question,
             next="state_update_bot_name_submit",
-            buttons=[Choice("skip", self._("Skip"))],
+            buttons=[Choice("skip update preference", self._("Skip"))],
         )
 
     async def state_update_bot_name_submit(self):
         choice = self.user.answers.get("state_update_bot_name")
-        if choice == "skip":
+        if choice == "skip update preference":
             return await self.go_to_state("state_update_bot_emoji")
 
         data = {"persona_name": choice}
@@ -650,12 +650,12 @@ class Application(BaseApplication):
             self,
             question=question,
             next="state_update_bot_emoji_submit",
-            buttons=[Choice("skip", self._("Skip"))],
+            buttons=[Choice("skip update preference", self._("Skip"))],
         )
 
     async def state_update_bot_emoji_submit(self):
         choice = self.user.answers.get("state_update_bot_emoji")
-        if choice == "skip":
+        if choice == "skip update preference":
             return await self.go_to_state("state_display_preferences")
         data = {"persona_emoji": extract_first_emoji(choice)}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
