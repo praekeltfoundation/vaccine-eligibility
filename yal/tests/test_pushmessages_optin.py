@@ -244,3 +244,22 @@ async def test_state_study_consent_accepted(tester: AppTester, rapidpro_mock):
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"ejaf_study_optin": "True"},
     }
+
+
+@pytest.mark.asyncio
+async def test_user_with_no_age_not_offered_study(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["age"] = None
+    tester.user.metadata["country"] = "south africa"
+    tester.user.metadata["used_bot_before"] = "no"
+
+    tester.setup_state("state_start_pushmessage_optin")
+
+    await tester.user_input("Yes, please!")
+    tester.assert_state("state_pushmessage_optin_final")
+
+    assert len(rapidpro_mock.tstate.requests) == 3
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"push_message_opt_in": "True"},
+    }
+    tester.assert_answer("state_is_eligible_for_study", "false")
