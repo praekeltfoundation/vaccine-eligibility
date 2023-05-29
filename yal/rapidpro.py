@@ -36,7 +36,7 @@ async def get_profile(whatsapp_id):
                 if len(response_body["results"]) > 0:
                     contact = response_body["results"][0]
                     fields = contact["fields"]
-
+                response.close()
                 break
             except HTTP_EXCEPTIONS as e:
                 if i == 2:
@@ -73,6 +73,7 @@ async def update_profile(whatsapp_id, fields, metadata):
                 response.raise_for_status()
                 for key, value in fields.items():
                     metadata[key] = value
+                response.close()
                 break
             except HTTP_EXCEPTIONS as e:
                 if i == 2:
