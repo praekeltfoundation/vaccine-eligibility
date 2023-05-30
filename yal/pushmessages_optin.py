@@ -84,7 +84,9 @@ class Application(BaseApplication):
 
         is_baseline_survey_active = await rapidpro.check_if_baseline_active() == "True"
         is_in_south_africa = self.user.metadata.get("country") == "south africa"
-        is_in_age_range = 18 <= int(self.user.metadata.get("age")) <= 24
+        is_in_age_range = None
+        if self.user.metadata.get("age"):
+            is_in_age_range = 18 <= int(self.user.metadata.get("age")) <= 24
         not_used_bot_before = self.user.metadata.get("used_bot_before") == "no"
 
         if (
