@@ -405,7 +405,7 @@ async def test_mainmenu_show_privacy_policy(
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
     tester.assert_num_messages(2)
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 4
     assert rapidpro_mock.tstate.contact_fields["privacy_reminder_sent"] == "True"
     _, privacy_message = tester.application.messages
     assert privacy_message.content == "\n".join(
