@@ -18,6 +18,7 @@ from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.surveys.baseline import Application as BaselineSurveyApplication
+from yal.surveys.endline import Application as EndlineSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import (
@@ -101,6 +102,7 @@ class Application(
     ServiceFinderFeedbackSurveyApplication,
     AssessmentApplication,
     BaselineSurveyApplication,
+    EndlineSurveyApplication,
 ):
     START_STATE = "state_start"
 

@@ -65,6 +65,39 @@ from yal.assessment_data_V2.sexual_consent import (
 from yal.assessment_data_V2.sexual_health_literacy import (
     ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS_V2,
 )
+from yal.question_sets.endline.self_esteem import (
+        ASSESSMENT_QUESTIONS as SELF_ESTEEM_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.connectedness import (
+        ASSESSMENT_QUESTIONS as CONNECTEDNESS_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.body_image import (
+        ASSESSMENT_QUESTIONS as BODY_IMAGE_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.depression import (
+        ASSESSMENT_QUESTIONS as DEPRESSION_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.anxiety import (
+        ASSESSMENT_QUESTIONS as ANXIETY_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.self_perceived_healthcare import (
+        ASSESSMENT_QUESTIONS as SELF_PERCEIVED_HEALTHCARE_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.sexual_health_literacy import (
+        ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.gender_attitude import (
+        ASSESSMENT_QUESTIONS as GENDER_ATTITUDE_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.sexual_consent import (
+        ASSESSMENT_QUESTIONS as SEXUAL_CONSENT_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.alcohol import (
+        ASSESSMENT_QUESTIONS as ALCOHOL_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.platform_review import (
+        ASSESSMENT_QUESTIONS as PLATFORM_REVIEW_QUESTIONS_ENDLINE,
+)
 from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
 QUESTIONS = {
@@ -87,6 +120,17 @@ QUESTIONS = {
     "gender_attitude_v2": GENDER_ATTITUDE_QUESTIONS_V2,
     "sexual_consent_v2": SEXUAL_CONSENT_QUESTIONS_V2,
     "alcohol_v2": ALCOHOL_QUESTIONS_V2,
+    "self_esteem_endline": SELF_ESTEEM_QUESTIONS_ENDLINE,
+    "connectedness_endline": CONNECTEDNESS_QUESTIONS_ENDLINE,
+    "body_image_endline": BODY_IMAGE_QUESTIONS_ENDLINE,
+    "depression_endline": DEPRESSION_QUESTIONS_ENDLINE,
+    "anxiety_endline": ANXIETY_QUESTIONS_ENDLINE,
+    "self_perceived_healthcare_endline": SELF_PERCEIVED_HEALTHCARE_QUESTIONS_ENDLINE,
+    "sexual_health_literacy_endline": SEXUAL_HEALTH_LITERACY_QUESTIONS_ENDLINE,
+    "gender_attitude_endline": GENDER_ATTITUDE_QUESTIONS_ENDLINE,
+    "sexual_consent_endline": SEXUAL_CONSENT_QUESTIONS_ENDLINE,
+    "alcohol_endline": ALCOHOL_QUESTIONS_ENDLINE,
+    "platform_review_endline": PLATFORM_REVIEW_QUESTIONS_ENDLINE,
 }
 
 
