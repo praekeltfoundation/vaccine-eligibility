@@ -86,6 +86,26 @@ async def rapidpro_mock():
             status=200,
         )
 
+    @app.route("/api/v2/globals.json", methods=["GET"])
+    def check_if_service_finder_active(request):
+        tstate.requests.append(request)
+        assert request.args.get("key") == "service_finder_active"
+        return response.json(
+            {
+                "next": None,
+                "previous": None,
+                "results": [
+                    {
+                        "key": "service_finder_active",
+                        "name": "Survice Finder Active",
+                        "value": "True",
+                        "modified_on": "2023-05-30T07:34:06.216776Z",
+                    }
+                ],
+            },
+            status=200,
+        )
+
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
@@ -385,7 +405,7 @@ async def test_mainmenu_show_privacy_policy(
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
     tester.assert_num_messages(2)
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 4
     assert rapidpro_mock.tstate.contact_fields["privacy_reminder_sent"] == "True"
     _, privacy_message = tester.application.messages
     assert privacy_message.content == "\n".join(
@@ -467,7 +487,7 @@ async def test_state_mainmenu_start(
         "/api/v2/pages/777",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 4
+    assert len(rapidpro_mock.tstate.requests) == 5
     assert (
         rapidpro_mock.tstate.contact_fields["last_mainmenu_time"]
         == "2022-06-19T17:30:00"
@@ -538,7 +558,7 @@ async def test_state_mainmenu_start_suggested_populated(
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 4
     assert (
         rapidpro_mock.tstate.contact_fields["last_mainmenu_time"]
         == "2022-06-19T17:30:00"
@@ -568,7 +588,7 @@ async def test_state_mainmenu_static(
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 4
+    assert len(rapidpro_mock.tstate.requests) == 5
 
 
 @pytest.mark.asyncio
@@ -591,7 +611,7 @@ async def test_state_mainmenu_aaq(
         "/api/v2/pages",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 4
+    assert len(rapidpro_mock.tstate.requests) == 5
 
 
 @pytest.mark.asyncio
@@ -630,7 +650,7 @@ async def test_state_mainmenu_contentrepo(
 
     tester.assert_metadata("topics_viewed", ["111"])
 
-    assert len(rapidpro_mock.tstate.requests) == 6
+    assert len(rapidpro_mock.tstate.requests) == 7
     assert rapidpro_mock.tstate.contact_fields["last_mainmenu_time"] == ""
     assert (
         rapidpro_mock.tstate.contact_fields["suggested_text"]
@@ -682,7 +702,7 @@ async def test_state_mainmenu_contentrepo_help_content(
     request = contentrepo_api_mock.tstate.requests[-1]
     assert request.args["message"] == ["2"]
 
-    assert len(rapidpro_mock.tstate.requests) == 10
+    assert len(rapidpro_mock.tstate.requests) == 11
     assert rapidpro_mock.tstate.contact_fields["last_mainmenu_time"] == ""
     assert (
         rapidpro_mock.tstate.contact_fields["suggested_text"]
@@ -733,7 +753,7 @@ async def test_state_mainmenu_contentrepo_relationship_content_rel_set(
 
     tester.assert_metadata("topics_viewed", ["222"])
 
-    assert len(rapidpro_mock.tstate.requests) == 6
+    assert len(rapidpro_mock.tstate.requests) == 7
     assert rapidpro_mock.tstate.contact_fields["last_mainmenu_time"] == ""
     assert (
         rapidpro_mock.tstate.contact_fields["suggested_text"]
@@ -780,7 +800,7 @@ async def test_state_mainmenu_contentrepo_relationship_status(
 
     tester.assert_metadata("topics_viewed", ["222"])
 
-    assert len(rapidpro_mock.tstate.requests) == 4
+    assert len(rapidpro_mock.tstate.requests) == 5
     assert rapidpro_mock.tstate.contact_fields["last_mainmenu_time"] == ""
     assert rapidpro_mock.tstate.contact_fields["suggested_text"] == ""
 
@@ -951,7 +971,7 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["data__session_id"][0] == "1"
     assert params["data__user_addr"][0] == "27820001001"
 
-    assert len(rapidpro_mock.tstate.requests) == 10
+    assert len(rapidpro_mock.tstate.requests) == 11
     assert rapidpro_mock.tstate.contact_fields["last_mainmenu_time"] == ""
     assert (
         rapidpro_mock.tstate.contact_fields["last_main_time"] == "2022-06-19T17:30:00"
