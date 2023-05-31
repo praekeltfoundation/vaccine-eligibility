@@ -134,7 +134,7 @@ async def test_state_endline_end_invalid_input(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_self_esteem_assessment(tester: AppTester):
+async def test_state_self_esteem_assessment_endline(tester: AppTester):
 
     await tester.user_input(
         "test",
@@ -151,7 +151,7 @@ async def test_state_self_esteem_assessment(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_self_esteem_assessment_end(tester: AppTester):
+async def test_state_self_esteem_assessment_endline_end(tester: AppTester):
 
     await tester.user_input(
         "test",
@@ -171,7 +171,7 @@ async def test_state_self_esteem_assessment_end(tester: AppTester):
 
     tester.assert_message(message)
     tester.assert_state("state_survey_question")
-    tester.assert_metadata("assessment_name", "connectedness_endline")
+    tester.assert_metadata("assessment_name", "connectedness_v2")
     tester.assert_metadata(
         "assessment_end_state", "state_connectedness_assessment_endline_end"
     )
@@ -394,25 +394,25 @@ async def test_state_anxiety_assessment_endline_end_error(tester: AppTester, rap
     assert resp.content == ("Something went wrong. Please try again later.")
 
 
-# @pytest.mark.asyncio
-# async def test_state_endline_start(tester: AppTester, rapidpro_mock):
-#     await tester.user_input(
-#         "test",
-#         transport_metadata={"message": {"button": {"payload": "state_endline_start"}}},
-#     )
+@pytest.mark.asyncio
+async def test_state_endline_start(tester: AppTester, rapidpro_mock):
+    await tester.user_input(
+        "test",
+        transport_metadata={"message": {"button": {"payload": "state_endline_start"}}},
+    )
 
-#     message = "\n".join(
-#         [
-#             "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
-#             "-----",
-#             "",
-#             "How do you feel about the following statements?",
-#             "",
-#             "*I feel that I am a person of worth,"
-#             " at least on an equal plane with others.*",
-#         ]
-#     )
-#     tester.assert_message(message)
+    message = "\n".join(
+        [
+            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "-----",
+            "",
+            "How do you feel about the following statements?",
+            "",
+            "*I feel that I am a person of worth,"
+            " at least on an equal plane with others.*",
+        ]
+    )
+    tester.assert_message(message)
 
 
 @pytest.mark.asyncio
@@ -661,48 +661,49 @@ async def test_state_sexual_consent_assessment_endline_end_error(
     assert resp.content == ("Something went wrong. Please try again later.")
 
 
-# @pytest.mark.asyncio
-# async def test_state_alcohol_assessment_v2_end(tester: AppTester):
+@pytest.mark.asyncio
+async def test_state_alcohol_assessment_endline_end(tester: AppTester):
 
-#     await tester.user_input(
-#         "test",
-#         transport_metadata={
-#             "message": {"button": {"payload": "state_alcohol_assessment_v2_end"}}
-#         },
-#     )
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_alcohol_assessment_endline_end"}}
+        },
+    )
 
-#     message = "\n".join(
-#         [
-#             "*And thats a wrap!*",
-#             "",
-#             "Thank you for taking part in our survey 🙏🏽",
-#             "",
-#             "*You will get your R30 airtime within 24 hours.*",
-#             "",
-#             "The B-Wise chatbot will send you some  helpful messages.",
-#         ]
-#     )
+    message = "\n".join(
+        [
+            "*And thats a wrap!*",
+            "",
+            "Thank you for taking part in our survey 🙏🏽",
+            "",
+            "*You will get your R50 airtime within 24 hours.*",
+            "",
+            "You can engage with the B-Wise chatbot at any time "
+            "for some helpful messages or to ask any questions.",
+        ]
+    )
 
-#     tester.assert_message(message)
-#     tester.assert_state("state_endline_end")
+    tester.assert_message(message)
+    tester.assert_state("state_endline_end")
 
 
-# @pytest.mark.asyncio
-# async def test_state_alcohol_assessment_v2_end_error(tester: AppTester, rapidpro_mock):
+@pytest.mark.asyncio
+async def test_state_alcohol_assessment_endline_end_error(tester: AppTester, rapidpro_mock):
 
-#     rapidpro_mock.tstate.errormax = 3
-#     u = User(
-#         addr="27820001003", state=StateData(name="state_alcohol_assessment_v2_end")
-#     )
-#     app = Application(u)
-#     msg = Message(
-#         content=None,
-#         to_addr="27820001002",
-#         from_addr="27820001003",
-#         transport_name="whatsapp",
-#         transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-#         session_event=Message.SESSION_EVENT.NEW,
-#     )
-#     [resp] = await app.process_message(msg)
+    rapidpro_mock.tstate.errormax = 3
+    u = User(
+        addr="27820001003", state=StateData(name="state_alcohol_assessment_endline_end")
+    )
+    app = Application(u)
+    msg = Message(
+        content=None,
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+        session_event=Message.SESSION_EVENT.NEW,
+    )
+    [resp] = await app.process_message(msg)
 
-#     assert resp.content == ("Something went wrong. Please try again later.")
+    assert resp.content == ("Something went wrong. Please try again later.")

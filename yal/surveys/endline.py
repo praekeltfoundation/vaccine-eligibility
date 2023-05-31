@@ -32,7 +32,7 @@ class Application(BaseApplication):
 
     # Endline start - Use this to link to survey from other areas
     async def state_endline_start(self):
-        return await self.go_to_state("state_self_esteem_assessment")
+        return await self.go_to_state("state_self_esteem_assessment_endline")
 
     # Self Esteem
     async def state_self_esteem_assessment_endline(self):
@@ -42,6 +42,7 @@ class Application(BaseApplication):
         )
         await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
+
 
     async def state_self_esteem_assessment_endline_end(self):
         score = self.user.metadata.get("assessment_score", 0)
@@ -58,12 +59,12 @@ class Application(BaseApplication):
             "self_esteem_risk": risk,
             "self_esteem_score": score,
         }
-        self.save_answer("state_self_esteem_risk", risk)
-        self.save_answer("state_self_esteem_score", str(score))
+        self.save_answer("state_self_esteem_endline_risk", risk)
+        self.save_answer("state_self_esteem_endline_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
-        self.save_metadata("assessment_name", "connectedness_endline")
+        self.save_metadata("assessment_name", "connectedness_v2")
         self.save_metadata(
             "assessment_end_state", "state_connectedness_assessment_endline_end"
         )
@@ -347,7 +348,7 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
-        return await self.go_to_state("state_submit_endline_completed")
+        return await self.go_to_state("state_platform_review_endline")
     
     # Platform Review
     async def state_platform_review_endline(self):
@@ -385,7 +386,7 @@ class Application(BaseApplication):
                         "*You will get your R50 airtime within 24 hours.*",
                         "",
                         "You can engage with the B-Wise chatbot at any time "
-                        "for some helpful messages or to ask any questions",
+                        "for some helpful messages or to ask any questions.",
                     ]
                 )
             ),

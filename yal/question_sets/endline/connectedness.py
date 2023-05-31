@@ -2,11 +2,10 @@
 # [survey_name]_[subsection]_q[question]_topic
 ASSESSMENT_QUESTIONS = {
     "1":
-    # A4 Connectedness
     {
         "start": "endline_3_q1_connectedness",
         "questions": {
-            "endline_2_q1_connectedness": {
+            "baseline_2_q1_connectedness": {
                 "type": "list",
                 "text": "\n".join(
                     [
