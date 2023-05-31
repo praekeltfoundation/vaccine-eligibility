@@ -177,7 +177,7 @@ async def check_if_service_finder_active():
                         "/api/v2/globals.json?key=service_finder_active",
                     ),
                 )
-                print(">>>>>", response)
+
                 response.raise_for_status()
                 response_body = await response.json()
 
