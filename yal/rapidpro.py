@@ -157,7 +157,7 @@ async def check_if_baseline_active():
             except HTTP_EXCEPTIONS as e:
                 if i == 2:
                     logger.exception(e)
-                    return True
+                    return False
                 else:
                     continue
     return is_baseline_survey_active
@@ -168,7 +168,7 @@ async def check_if_service_finder_active():
     Checks a Global var on the RapidPro instance to see if the Service finder is active
     """
     async with get_rapidpro_api() as session:
-        is_service_finder_active = False
+        is_service_finder_active = "False"
         for i in range(3):
             try:
                 response = await session.get(
@@ -188,7 +188,7 @@ async def check_if_service_finder_active():
             except HTTP_EXCEPTIONS as e:
                 if i == 2:
                     logger.exception(e)
-                    return True
+                    return "False"
                 else:
                     continue
     return is_service_finder_active
