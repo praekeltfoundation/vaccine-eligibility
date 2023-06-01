@@ -72,6 +72,15 @@ class Application(BaseApplication):
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Connectedness
+    async def state_connectedness_assessment_endline(self):
+        self.save_metadata("assessment_name", "connectedness_v2")
+        self.save_metadata(
+            "assessment_end_state", "state_connectedness_assessment_endline_end"
+        )
+        await self.set_reminder_timer()
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+
     async def state_connectedness_assessment_endline_end(self):
         score = self.user.metadata.get("assessment_score", 0)
         if score <= 1:
@@ -99,6 +108,13 @@ class Application(BaseApplication):
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Body Image
+    async def state_body_image_assessment_endline(self):
+        self.save_metadata("assessment_name", "body_image_endline")
+        self.save_metadata("assessment_end_state", "state_body_image_assessment_endline_end")
+
+        await self.set_reminder_timer()
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
     async def state_body_image_assessment_endline_end(self):
         score = self.user.metadata.get("assessment_score", 0)
         if score <= 4:
@@ -120,12 +136,20 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
         self.save_metadata("assessment_name", "depression_endline")
-        self.save_metadata("assessment_end_state", "state_depression_assessment_endline_end")
+        self.save_metadata("assessment_end_state", "state_depression_assessment_endline")
 
         await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Depression
+    async def state_depression_assessment_endline(self):
+        self.save_metadata("assessment_name", "depression_endline")
+        self.save_metadata("assessment_end_state", "state_depression_assessment_endline_end")
+
+        await self.set_reminder_timer()
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+    
+
     async def state_depression_assessment_endline_end(self):
         score = self.user.metadata.get("assessment_score", 0)
         self.depression_score = score
@@ -148,12 +172,20 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
         self.save_metadata("assessment_name", "anxiety_endline")
-        self.save_metadata("assessment_end_state", "state_anxiety_assessment_endline_end")
+        self.save_metadata("assessment_end_state", "state_anxiety_assessment_endline")
 
         await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Anxiety
+    async def state_anxiety_assessment_endline(self):
+        self.save_metadata("assessment_name", "anxiety_endline")
+        self.save_metadata("assessment_end_state", "state_anxiety_assessment_endline_end")
+
+        await self.set_reminder_timer()
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+    
+
     async def state_anxiety_assessment_endline_end(self):
         score = self.user.metadata.get("assessment_score", 0)
         self.anxiety_score = score
@@ -170,8 +202,8 @@ class Application(BaseApplication):
             "anxiety_risk": risk,
             "anxiety_score": score,
         }
-        self.save_answer("state_anxiety_v2_risk", risk)
-        self.save_answer("state_anxiety_v2_score", str(score))
+        self.save_answer("state_anxiety_endline_risk", risk)
+        self.save_answer("state_anxiety_endline_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
@@ -228,11 +260,21 @@ class Application(BaseApplication):
             "self_perceived_healthcare_risk": risk,
             "self_perceived_healthcare_score": score,
         }
-        self.save_answer("state_self_perceived_healthcare_v2_risk", risk)
-        self.save_answer("state_self_perceived_healthcare_v2_score", str(score))
+        self.save_answer("state_self_perceived_healthcare_endline_risk", risk)
+        self.save_answer("state_self_perceived_healthcare_endline_score", str(score))
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
+        self.save_metadata("assessment_name", "sexual_health_literacy_endline")
+        self.save_metadata(
+            "assessment_end_state", "state_sexual_health_lit_assessment_endline"
+        )
+
+        await self.set_reminder_timer()
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    # Sexual Health Literacy
+    async def state_sexual_health_lit_assessment_endline(self):
         self.save_metadata("assessment_name", "sexual_health_literacy_endline")
         self.save_metadata(
             "assessment_end_state", "state_sexual_health_lit_assessment_endline_end"
@@ -241,7 +283,7 @@ class Application(BaseApplication):
         await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
-    # Sexual Health Literacy
+
     async def state_sexual_health_lit_assessment_endline_end(self):
         score = self.user.metadata.get("assessment_score", 0)
         if score <= 33:
@@ -264,13 +306,22 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
         self.save_metadata("assessment_name", "gender_attitude_endline")
         self.save_metadata(
-            "assessment_end_state", "state_gender_attitude_assessment_endline_end"
+            "assessment_end_state", "state_gender_attitude_assessment_endline"
         )
 
         await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Gender Attitudes
+    async def state_gender_attitude_assessment_endline(self):
+        self.save_metadata("assessment_name", "gender_attitude_endline")
+        self.save_metadata(
+            "assessment_end_state", "state_gender_attitude_assessment_endline_end"
+        )
+
+        await self.set_reminder_timer()
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
     async def state_gender_attitude_assessment_endline_end(self):
         score = self.user.metadata.get("assessment_score", 0)
         if score <= 8:
@@ -293,13 +344,23 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
         self.save_metadata("assessment_name", "sexual_consent_endline")
         self.save_metadata(
-            "assessment_end_state", "state_sexual_consent_assessment_endline_end"
+            "assessment_end_state", "state_sexual_consent_assessment_endline"
         )
 
         await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
-    # # Sexual Consent
+    # Sexual Consent
+    async def state_sexual_consent_assessment_endline(self):
+        self.save_metadata("assessment_name", "sexual_consent_endline")
+        self.save_metadata(
+            "assessment_end_state", "state_sexual_consent_assessment_endline_end"
+        )
+
+        await self.set_reminder_timer()
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+    
+
     async def state_sexual_consent_assessment_endline_end(self):
         score = self.user.metadata.get("assessment_score", 0)
         if score <= 6:
@@ -321,12 +382,20 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
         self.save_metadata("assessment_name", "alcohol_endline")
-        self.save_metadata("assessment_end_state", "state_alcohol_assessment_endline_end")
+        self.save_metadata("assessment_end_state", "state_alcohol_assessment_endline")
 
         await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Alcohol
+    async def state_alcohol_assessment_endline(self):
+        self.save_metadata("assessment_name", "alcohol_endline")
+        self.save_metadata("assessment_end_state", "state_alcohol_assessment_endline_end")
+
+        await self.set_reminder_timer()
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+    
+
     async def state_alcohol_assessment_endline_end(self):
         score = self.user.metadata.get("assessment_score", 0)
         if score >= 13:

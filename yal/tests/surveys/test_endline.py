@@ -226,6 +226,21 @@ async def test_state_connectedness_assessment_end(tester: AppTester):
     tester.assert_metadata("assessment_name", "body_image_endline")
     tester.assert_metadata("assessment_end_state", "state_body_image_assessment_endline_end")
 
+@pytest.mark.asyncio
+async def test_state_connectedness_assessment_endline(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_connectedness_assessment_endline"}}
+        },
+    )
+
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "connectedness_v2")
+    tester.assert_metadata(
+        "assessment_end_state", "state_connectedness_assessment_endline_end"
+    )
 
 @pytest.mark.asyncio
 async def test_state_connectedness_assessment_endline_end_error(
@@ -250,6 +265,21 @@ async def test_state_connectedness_assessment_endline_end_error(
 
     assert resp.content == ("Something went wrong. Please try again later.")
 
+@pytest.mark.asyncio
+async def test_state_body_image_assessment_endline(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_body_image_assessment_endline"}}
+        },
+    )
+
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "body_image_endline")
+    tester.assert_metadata(
+        "assessment_end_state", "state_body_image_assessment_endline_end"
+    )
 
 @pytest.mark.asyncio
 async def test_state_body_image_assessment_end(tester: AppTester):
@@ -276,7 +306,7 @@ async def test_state_body_image_assessment_end(tester: AppTester):
     tester.assert_message(message)
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "depression_endline")
-    tester.assert_metadata("assessment_end_state", "state_depression_assessment_endline_end")
+    tester.assert_metadata("assessment_end_state", "state_depression_assessment_endline")
 
 
 @pytest.mark.asyncio
@@ -301,6 +331,21 @@ async def test_state_body_image_assessment_endline_end_error(
 
     assert resp.content == ("Something went wrong. Please try again later.")
 
+@pytest.mark.asyncio
+async def test_state_depression_assessment_endline(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_depression_assessment_endline"}}
+        },
+    )
+
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "depression_endline")
+    tester.assert_metadata(
+        "assessment_end_state", "state_depression_assessment_endline_end"
+    )
 
 @pytest.mark.asyncio
 async def test_depression_assessment_endline_end(tester: AppTester):
@@ -324,7 +369,7 @@ async def test_depression_assessment_endline_end(tester: AppTester):
     tester.assert_message(message)
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "anxiety_endline")
-    tester.assert_metadata("assessment_end_state", "state_anxiety_assessment_endline_end")
+    tester.assert_metadata("assessment_end_state", "state_anxiety_assessment_endline")
 
 
 @pytest.mark.asyncio
@@ -349,6 +394,22 @@ async def test_state_depression_assessment_endline_end_error(
 
     assert resp.content == ("Something went wrong. Please try again later.")
 
+
+@pytest.mark.asyncio
+async def test_state_depression_assessment_endline(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_anxiety_assessment_endline"}}
+        },
+    )
+
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "anxiety_endline")
+    tester.assert_metadata(
+        "assessment_end_state", "state_anxiety_assessment_endline_end"
+    )
 
 @pytest.mark.asyncio
 async def test_state_anxiety_assessment_endline_end(tester: AppTester):
@@ -436,6 +497,21 @@ async def test_state_depression_and_anxiety_endline_end_error(
 
     assert resp.content == ("Something went wrong. Please try again later.")
 
+@pytest.mark.asyncio
+async def test_state_perceived_healthcare_assessment_endline(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_self_perceived_healthcare_assessment_endline"}}
+        },
+    )
+
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "self_perceived_healthcare_endline")
+    tester.assert_metadata(
+        "assessment_end_state", "state_self_perceived_healthcare_assessment_endline_end"
+    )
 
 @pytest.mark.asyncio
 async def test_state_self_perceived_healthcare_assessment_endline_end(tester: AppTester):
@@ -468,7 +544,7 @@ async def test_state_self_perceived_healthcare_assessment_endline_end(tester: Ap
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "sexual_health_literacy_endline")
     tester.assert_metadata(
-        "assessment_end_state", "state_sexual_health_lit_assessment_endline_end"
+        "assessment_end_state", "state_sexual_health_lit_assessment_endline"
     )
 
 
@@ -495,6 +571,22 @@ async def test_state_state_self_perceived_healthcare_assessment_endline_end_erro
 
     assert resp.content == ("Something went wrong. Please try again later.")
 
+
+@pytest.mark.asyncio
+async def test_state_sexual_health_lit_assessment_endline(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_sexual_health_lit_assessment_endline"}}
+        },
+    )
+
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "sexual_health_literacy_endline")
+    tester.assert_metadata(
+        "assessment_end_state", "state_sexual_health_lit_assessment_endline_end"
+    )
 
 @pytest.mark.asyncio
 async def test_state_sexual_health_lit_assessment_endline_end(tester: AppTester):
@@ -584,10 +676,24 @@ async def test_state_gender_attitude_assessment_endline_end(tester: AppTester):
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "sexual_consent_endline")
     tester.assert_metadata(
-        "assessment_end_state", "state_sexual_consent_assessment_endline_end"
+        "assessment_end_state", "state_sexual_consent_assessment_endline"
     )
 
+@pytest.mark.asyncio
+async def test_state_gender_attitudes_assessment_endline(tester: AppTester):
 
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_gender_attitude_assessment_endline"}}
+        },
+    )
+
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "gender_attitude_endline")
+    tester.assert_metadata(
+        "assessment_end_state", "state_gender_attitude_assessment_endline_end"
+    )
 @pytest.mark.asyncio
 async def test_state_gender_attitude_assessment_endline_end_error(
     tester: AppTester, rapidpro_mock
@@ -611,6 +717,21 @@ async def test_state_gender_attitude_assessment_endline_end_error(
 
     assert resp.content == ("Something went wrong. Please try again later.")
 
+@pytest.mark.asyncio
+async def test_state_sexual_consent_assessment_endline(tester: AppTester):
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_sexual_consent_assessment_endline"}}
+        },
+    )
+
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "sexual_consent_endline")
+    tester.assert_metadata(
+        "assessment_end_state", "state_sexual_consent_assessment_endline_end"
+    )
 
 @pytest.mark.asyncio
 async def test_state_sexual_consent_assessment_endline_end(tester: AppTester):
@@ -634,7 +755,7 @@ async def test_state_sexual_consent_assessment_endline_end(tester: AppTester):
     tester.assert_message(message)
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "alcohol_endline")
-    tester.assert_metadata("assessment_end_state", "state_alcohol_assessment_endline_end")
+    tester.assert_metadata("assessment_end_state", "state_alcohol_assessment_endline")
 
 
 @pytest.mark.asyncio
