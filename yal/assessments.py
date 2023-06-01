@@ -83,7 +83,7 @@ QUESTIONS = {
     "depression_v2": DEPRESSION_QUESTIONS_V2,
     "anxiety_v2": ANXIETY_QUESTIONS_V2,
     "self_perceived_healthcare_v2": SELF_PERCEIVED_HEALTHCARE_QUESTIONS_V2,
-    "sexual_health_literacy_v2": SEXUAL_HEALTH_LITERACY_QUESTIONS_V2,
+    "sexual_health_lit_v2": SEXUAL_HEALTH_LITERACY_QUESTIONS_V2,
     "gender_attitude_v2": GENDER_ATTITUDE_QUESTIONS_V2,
     "sexual_consent_v2": SEXUAL_CONSENT_QUESTIONS_V2,
     "alcohol_v2": ALCOHOL_QUESTIONS_V2,

@@ -268,7 +268,7 @@ class Application(BaseApplication):
 
     # Sexual Health Literacy
     async def state_sexual_health_lit_assessment_v2(self):
-        self.save_metadata("assessment_name", "sexual_health_literacy_v2")
+        self.save_metadata("assessment_name", "sexual_health_lit_v2")
         self.save_metadata(
             "assessment_end_state", "state_sexual_health_lit_assessment_v2_end"
         )
