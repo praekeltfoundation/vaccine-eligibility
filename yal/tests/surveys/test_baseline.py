@@ -484,7 +484,7 @@ async def test_state_self_perceived_healthcare_assessment_v2_end(tester: AppTest
 
     tester.assert_message(message)
     tester.assert_state("state_survey_question")
-    tester.assert_metadata("assessment_name", "sexual_health_literacy_v2")
+    tester.assert_metadata("assessment_name", "sexual_health_lit_v2")
     tester.assert_metadata(
         "assessment_end_state", "state_sexual_health_lit_assessment_v2_end"
     )
