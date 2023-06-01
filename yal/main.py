@@ -20,6 +20,7 @@ from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplica
 from yal.surveys.baseline import Application as BaselineSurveyApplication
 from yal.surveys.endline import Application as EndlineSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
+from yal.endline_terms_and_conditions import Application as EndlineTermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import (
     get_current_datetime,
@@ -103,6 +104,7 @@ class Application(
     AssessmentApplication,
     BaselineSurveyApplication,
     EndlineSurveyApplication,
+    EndlineTermsApplication,
 ):
     START_STATE = "state_start"
 
@@ -268,8 +270,11 @@ class Application(
                 return await self.go_to_state(MainMenuApplication.START_STATE)
             elif terms_accepted:
                 return await self.go_to_state(OnboardingApplication.START_STATE)
+            # elif baseline_completed:
+            #     return await self.go_to_state(EndlineTermsApplication.START_STATE)
             else:
                 return await self.go_to_state(TermsApplication.START_STATE)
+
 
         return await self.go_to_state("state_catch_all")
 
