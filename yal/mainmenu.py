@@ -89,14 +89,19 @@ class Application(BaseApplication):
                 "🏥 *NEED HELP?*",
                 [
                     Choice(PleaseCallMeApplication.START_STATE, "Talk to a counsellor"),
-                    Choice(
-                        ServiceFinderApplication.START_STATE,
-                        "Find clinics and services",
-                    ),
                 ]
                 + submenu_choices,
             )
         ]
+
+        if (await rapidpro.check_if_service_finder_active()).lower() == "true":
+            sections[0][1].insert(
+                1,
+                Choice(
+                    ServiceFinderApplication.START_STATE,
+                    "Find clinics and services",
+                ),
+            )
 
         error, choices = await contentrepo.get_choices_by_tag("mainmenu")
         if error:
