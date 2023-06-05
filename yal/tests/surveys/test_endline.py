@@ -70,6 +70,23 @@ async def rapidpro_mock():
         yield server
         config.RAPIDPRO_URL = url
 
+@pytest.mark.asyncio
+async def test_state_platform_review_endline(
+    tester: AppTester, rapidpro_mock
+):
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_alcohol_assessment_endline_end"}}
+        },
+    )
+
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "platform_review_endline")
+    tester.assert_metadata(
+        "assessment_end_state", "state_submit_endline_completed"
+    )
+
 
 @pytest.mark.asyncio
 @mock.patch("yal.surveys.endline.get_current_datetime")
@@ -77,20 +94,11 @@ async def test_state_submit_endline_completed(
     get_current_datetime, tester: AppTester, rapidpro_mock
 ):
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-    tester.setup_state("state_alcohol_assessment_endline_end")
+    tester.setup_state("state_submit_endline_completed")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
     tester.assert_state("state_endline_end")
 
-    assert len(rapidpro_mock.tstate.requests) == 3
-    request = rapidpro_mock.tstate.requests[2]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "endline_survey_completed": "True",
-            "ejaf_endline_airtime_incentive_sent": "False",
-            "ejaf_endline_completed_on": "2022-06-19T17:30:00",
-        },
-    }
     tester.assert_metadata("endline_survey_completed", "True")
     tester.assert_metadata("ejaf_endline_airtime_incentive_sent", "False")
     tester.assert_metadata("ejaf_endline_completed_on", "2022-06-19T17:30:00")
@@ -794,19 +802,17 @@ async def test_state_alcohol_assessment_endline_end(tester: AppTester):
 
     message = "\n".join(
         [
-            "*And thats a wrap!*",
+            "◼️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "-----",
             "",
-            "Thank you for taking part in our survey 🙏🏽",
+            "You have received a lot of content from BWise.",
             "",
-            "*You will get your R50 airtime within 24 hours.*",
-            "",
-            "You can engage with the B-Wise chatbot at any time "
-            "for some helpful messages or to ask any questions.",
+            "*Did BWise send you content that related to your sexual needs?*"
         ]
     )
 
     tester.assert_message(message)
-    tester.assert_state("state_endline_end")
+    tester.assert_state("state_survey_question")
 
 
 @pytest.mark.asyncio
@@ -828,3 +834,4 @@ async def test_state_alcohol_assessment_endline_end_error(tester: AppTester, rap
     [resp] = await app.process_message(msg)
 
     assert resp.content == ("Something went wrong. Please try again later.")
+

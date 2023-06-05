@@ -421,8 +421,13 @@ class Application(BaseApplication):
     
     # Platform Review
     async def state_platform_review_endline(self):
+        self.save_metadata("assessment_name", "platform_review_endline")
+        self.save_metadata(
+            "assessment_end_state", "state_submit_endline_completed"
+        )
 
-        return await self.go_to_state("state_submit_endline_completed")
+        await self.set_reminder_timer()
+        return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Baseline Airtime Incentive
     async def state_submit_endline_completed(self):
