@@ -9,6 +9,7 @@ from yal.askaquestion import Application as AaqApplication
 from yal.assessments import Application as AssessmentApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.content_feedback_survey import ContentFeedbackSurveyApplication
+from yal.endline_terms_and_conditions import Application as EndlineTermsApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
 from yal.optout import Application as OptOutApplication
@@ -20,7 +21,6 @@ from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplica
 from yal.surveys.baseline import Application as BaselineSurveyApplication
 from yal.surveys.endline import Application as EndlineSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
-from yal.endline_terms_and_conditions import Application as EndlineTermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import (
     get_current_datetime,
