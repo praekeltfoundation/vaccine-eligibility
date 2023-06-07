@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 from unittest import mock
 
@@ -70,10 +69,9 @@ async def rapidpro_mock():
         yield server
         config.RAPIDPRO_URL = url
 
+
 @pytest.mark.asyncio
-async def test_state_platform_review_endline(
-    tester: AppTester, rapidpro_mock
-):
+async def test_state_platform_review_endline(tester: AppTester, rapidpro_mock):
     await tester.user_input(
         "test",
         transport_metadata={
@@ -83,9 +81,7 @@ async def test_state_platform_review_endline(
 
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "platform_review_endline")
-    tester.assert_metadata(
-        "assessment_end_state", "state_submit_endline_completed"
-    )
+    tester.assert_metadata("assessment_end_state", "state_submit_endline_completed")
 
 
 @pytest.mark.asyncio
@@ -109,9 +105,7 @@ async def test_state_submit_endline_completed(
 @pytest.mark.asyncio
 async def test_state_submit_endline_completed_error(tester: AppTester, rapidpro_mock):
     rapidpro_mock.tstate.errormax = 3
-    u = User(
-        addr="27820001003", state=StateData(name="state_submit_endline_completed")
-    )
+    u = User(addr="27820001003", state=StateData(name="state_submit_endline_completed"))
     app = Application(u)
     msg = Message(
         content=None,
@@ -164,7 +158,9 @@ async def test_state_self_esteem_assessment_endline_end(tester: AppTester):
     await tester.user_input(
         "test",
         transport_metadata={
-            "message": {"button": {"payload": "state_self_esteem_assessment_endline_end"}}
+            "message": {
+                "button": {"payload": "state_self_esteem_assessment_endline_end"}
+            }
         },
     )
 
@@ -186,13 +182,12 @@ async def test_state_self_esteem_assessment_endline_end(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_self_esteem_assessment_end_error(
-    tester: AppTester, rapidpro_mock
-):
+async def test_state_self_esteem_assessment_end_error(tester: AppTester, rapidpro_mock):
 
     rapidpro_mock.tstate.errormax = 3
     u = User(
-        addr="27820001003", state=StateData(name="state_self_esteem_assessment_endline_end")
+        addr="27820001003",
+        state=StateData(name="state_self_esteem_assessment_endline_end"),
     )
     app = Application(u)
     msg = Message(
@@ -214,7 +209,9 @@ async def test_state_connectedness_assessment_end(tester: AppTester):
     await tester.user_input(
         "test",
         transport_metadata={
-            "message": {"button": {"payload": "state_connectedness_assessment_endline_end"}}
+            "message": {
+                "button": {"payload": "state_connectedness_assessment_endline_end"}
+            }
         },
     )
 
@@ -232,7 +229,10 @@ async def test_state_connectedness_assessment_end(tester: AppTester):
     tester.assert_message(message)
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "body_image_endline")
-    tester.assert_metadata("assessment_end_state", "state_body_image_assessment_endline_end")
+    tester.assert_metadata(
+        "assessment_end_state", "state_body_image_assessment_endline_end"
+    )
+
 
 @pytest.mark.asyncio
 async def test_state_connectedness_assessment_endline(tester: AppTester):
@@ -249,6 +249,7 @@ async def test_state_connectedness_assessment_endline(tester: AppTester):
     tester.assert_metadata(
         "assessment_end_state", "state_connectedness_assessment_endline_end"
     )
+
 
 @pytest.mark.asyncio
 async def test_state_connectedness_assessment_endline_end_error(
@@ -273,6 +274,7 @@ async def test_state_connectedness_assessment_endline_end_error(
 
     assert resp.content == ("Something went wrong. Please try again later.")
 
+
 @pytest.mark.asyncio
 async def test_state_body_image_assessment_endline(tester: AppTester):
 
@@ -289,13 +291,16 @@ async def test_state_body_image_assessment_endline(tester: AppTester):
         "assessment_end_state", "state_body_image_assessment_endline_end"
     )
 
+
 @pytest.mark.asyncio
 async def test_state_body_image_assessment_end(tester: AppTester):
 
     await tester.user_input(
         "test",
         transport_metadata={
-            "message": {"button": {"payload": "state_body_image_assessment_endline_end"}}
+            "message": {
+                "button": {"payload": "state_body_image_assessment_endline_end"}
+            }
         },
     )
 
@@ -314,7 +319,9 @@ async def test_state_body_image_assessment_end(tester: AppTester):
     tester.assert_message(message)
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "depression_endline")
-    tester.assert_metadata("assessment_end_state", "state_depression_assessment_endline")
+    tester.assert_metadata(
+        "assessment_end_state", "state_depression_assessment_endline"
+    )
 
 
 @pytest.mark.asyncio
@@ -324,7 +331,8 @@ async def test_state_body_image_assessment_endline_end_error(
 
     rapidpro_mock.tstate.errormax = 3
     u = User(
-        addr="27820001003", state=StateData(name="state_body_image_assessment_endline_end")
+        addr="27820001003",
+        state=StateData(name="state_body_image_assessment_endline_end"),
     )
     app = Application(u)
     msg = Message(
@@ -338,6 +346,7 @@ async def test_state_body_image_assessment_endline_end_error(
     [resp] = await app.process_message(msg)
 
     assert resp.content == ("Something went wrong. Please try again later.")
+
 
 @pytest.mark.asyncio
 async def test_state_depression_assessment_endline(tester: AppTester):
@@ -355,13 +364,16 @@ async def test_state_depression_assessment_endline(tester: AppTester):
         "assessment_end_state", "state_depression_assessment_endline_end"
     )
 
+
 @pytest.mark.asyncio
 async def test_depression_assessment_endline_end(tester: AppTester):
 
     await tester.user_input(
         "test",
         transport_metadata={
-            "message": {"button": {"payload": "state_depression_assessment_endline_end"}}
+            "message": {
+                "button": {"payload": "state_depression_assessment_endline_end"}
+            }
         },
     )
 
@@ -387,7 +399,8 @@ async def test_state_depression_assessment_endline_end_error(
 
     rapidpro_mock.tstate.errormax = 3
     u = User(
-        addr="27820001003", state=StateData(name="state_depression_assessment_endline_end")
+        addr="27820001003",
+        state=StateData(name="state_depression_assessment_endline_end"),
     )
     app = Application(u)
     msg = Message(
@@ -404,7 +417,7 @@ async def test_state_depression_assessment_endline_end_error(
 
 
 @pytest.mark.asyncio
-async def test_state_depression_assessment_endline(tester: AppTester):
+async def test_state_anxiety_assessment_endline(tester: AppTester):
 
     await tester.user_input(
         "test",
@@ -418,6 +431,7 @@ async def test_state_depression_assessment_endline(tester: AppTester):
     tester.assert_metadata(
         "assessment_end_state", "state_anxiety_assessment_endline_end"
     )
+
 
 @pytest.mark.asyncio
 async def test_state_anxiety_assessment_endline_end(tester: AppTester):
@@ -444,7 +458,9 @@ async def test_state_anxiety_assessment_endline_end(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_anxiety_assessment_endline_end_error(tester: AppTester, rapidpro_mock):
+async def test_state_anxiety_assessment_endline_end_error(
+    tester: AppTester, rapidpro_mock
+):
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003", state=StateData(name="state_anxiety_assessment_endline_end")
@@ -490,7 +506,8 @@ async def test_state_depression_and_anxiety_endline_end_error(
 ):
     rapidpro_mock.tstate.errormax = 3
     u = User(
-        addr="27820001003", state=StateData(name="state_depression_and_anxiety_endline_end")
+        addr="27820001003",
+        state=StateData(name="state_depression_and_anxiety_endline_end"),
     )
     app = Application(u)
     msg = Message(
@@ -505,13 +522,18 @@ async def test_state_depression_and_anxiety_endline_end_error(
 
     assert resp.content == ("Something went wrong. Please try again later.")
 
+
 @pytest.mark.asyncio
 async def test_state_perceived_healthcare_assessment_endline(tester: AppTester):
 
     await tester.user_input(
         "test",
         transport_metadata={
-            "message": {"button": {"payload": "state_self_perceived_healthcare_assessment_endline"}}
+            "message": {
+                "button": {
+                    "payload": "state_self_perceived_healthcare_assessment_endline"
+                }
+            }
         },
     )
 
@@ -521,8 +543,11 @@ async def test_state_perceived_healthcare_assessment_endline(tester: AppTester):
         "assessment_end_state", "state_self_perceived_healthcare_assessment_endline_end"
     )
 
+
 @pytest.mark.asyncio
-async def test_state_self_perceived_healthcare_assessment_endline_end(tester: AppTester):
+async def test_state_self_perceived_healthcare_assessment_endline_end(
+    tester: AppTester,
+):
 
     await tester.user_input(
         "test",
@@ -586,7 +611,9 @@ async def test_state_sexual_health_lit_assessment_endline(tester: AppTester):
     await tester.user_input(
         "test",
         transport_metadata={
-            "message": {"button": {"payload": "state_sexual_health_lit_assessment_endline"}}
+            "message": {
+                "button": {"payload": "state_sexual_health_lit_assessment_endline"}
+            }
         },
     )
 
@@ -595,6 +622,7 @@ async def test_state_sexual_health_lit_assessment_endline(tester: AppTester):
     tester.assert_metadata(
         "assessment_end_state", "state_sexual_health_lit_assessment_endline_end"
     )
+
 
 @pytest.mark.asyncio
 async def test_state_sexual_health_lit_assessment_endline_end(tester: AppTester):
@@ -687,13 +715,16 @@ async def test_state_gender_attitude_assessment_endline_end(tester: AppTester):
         "assessment_end_state", "state_sexual_consent_assessment_endline"
     )
 
+
 @pytest.mark.asyncio
 async def test_state_gender_attitudes_assessment_endline(tester: AppTester):
 
     await tester.user_input(
         "test",
         transport_metadata={
-            "message": {"button": {"payload": "state_gender_attitude_assessment_endline"}}
+            "message": {
+                "button": {"payload": "state_gender_attitude_assessment_endline"}
+            }
         },
     )
 
@@ -702,6 +733,8 @@ async def test_state_gender_attitudes_assessment_endline(tester: AppTester):
     tester.assert_metadata(
         "assessment_end_state", "state_gender_attitude_assessment_endline_end"
     )
+
+
 @pytest.mark.asyncio
 async def test_state_gender_attitude_assessment_endline_end_error(
     tester: AppTester, rapidpro_mock
@@ -725,13 +758,16 @@ async def test_state_gender_attitude_assessment_endline_end_error(
 
     assert resp.content == ("Something went wrong. Please try again later.")
 
+
 @pytest.mark.asyncio
 async def test_state_sexual_consent_assessment_endline(tester: AppTester):
 
     await tester.user_input(
         "test",
         transport_metadata={
-            "message": {"button": {"payload": "state_sexual_consent_assessment_endline"}}
+            "message": {
+                "button": {"payload": "state_sexual_consent_assessment_endline"}
+            }
         },
     )
 
@@ -741,13 +777,16 @@ async def test_state_sexual_consent_assessment_endline(tester: AppTester):
         "assessment_end_state", "state_sexual_consent_assessment_endline_end"
     )
 
+
 @pytest.mark.asyncio
 async def test_state_sexual_consent_assessment_endline_end(tester: AppTester):
 
     await tester.user_input(
         "test",
         transport_metadata={
-            "message": {"button": {"payload": "state_sexual_consent_assessment_endline_end"}}
+            "message": {
+                "button": {"payload": "state_sexual_consent_assessment_endline_end"}
+            }
         },
     )
 
@@ -807,7 +846,7 @@ async def test_state_alcohol_assessment_endline_end(tester: AppTester):
             "",
             "You have received a lot of content from BWise.",
             "",
-            "*Did BWise send you content that related to your sexual needs?*"
+            "*Did BWise send you content that related to your sexual needs?*",
         ]
     )
 
@@ -816,7 +855,9 @@ async def test_state_alcohol_assessment_endline_end(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_alcohol_assessment_endline_end_error(tester: AppTester, rapidpro_mock):
+async def test_state_alcohol_assessment_endline_end_error(
+    tester: AppTester, rapidpro_mock
+):
 
     rapidpro_mock.tstate.errormax = 3
     u = User(
@@ -834,4 +875,3 @@ async def test_state_alcohol_assessment_endline_end_error(tester: AppTester, rap
     [resp] = await app.process_message(msg)
 
     assert resp.content == ("Something went wrong. Please try again later.")
-

@@ -4,9 +4,9 @@ ASSESSMENT_QUESTIONS = {
     "1":
     # Depression
     {
-        "start": "endline_4_q1_depression",
+        "start": "endline_6_q1_depression",
         "questions": {
-            "endline_4_q1_depression": {
+            "endline_6_q1_depression": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -32,9 +32,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 3,
                     "skip_question": 3,
                 },
-                "next": "endline_4_q2_depression",
+                "next": "endline_6_q2_depression",
             },
-            "endline_4_q2_depression": {
+            "endline_6_q2_depression": {
                 "type": "list",
                 "text": "Little interest or pleasure in doing things",
                 "options": [

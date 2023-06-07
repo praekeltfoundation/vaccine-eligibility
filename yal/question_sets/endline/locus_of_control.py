@@ -3,9 +3,9 @@
 ASSESSMENT_QUESTIONS = {
     # A2
     "1": {
-        "start": "endline_2_q1_loc",
+        "start": "endline_1_q1_loc",
         "questions": {
-            "endline_2_q1_loc": {
+            "endline_1_q1_loc": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -23,7 +23,7 @@ ASSESSMENT_QUESTIONS = {
                 ],
                 "next": "endline_2_q2_loc",
             },
-            "endline_2_q2_loc": {
+            "endline_1_q2_loc": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -41,7 +41,7 @@ ASSESSMENT_QUESTIONS = {
                 ],
                 "next": "endline_2_q3_loc",
             },
-            "endline_2_q3_loc": {
+            "endline_1_q3_loc": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -59,7 +59,7 @@ ASSESSMENT_QUESTIONS = {
                 ],
                 "next": "endline_2_q4_loc",
             },
-            "endline_2_q4_loc": {
+            "endline_1_q4_loc": {
                 "type": "list",
                 "text": "\n".join(
                     [

@@ -275,7 +275,6 @@ class Application(
             else:
                 return await self.go_to_state(TermsApplication.START_STATE)
 
-
         return await self.go_to_state("state_catch_all")
 
     async def state_catch_all(self):

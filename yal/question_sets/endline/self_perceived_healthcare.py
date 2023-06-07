@@ -3,9 +3,9 @@
 ASSESSMENT_QUESTIONS = {
     "1": {
         # Self-perceived healthcare assessment
-        "start": "endline_6_q1_self_perceived_healthcare",
+        "start": "endline_7_q1_self_perceived_healthcare",
         "questions": {
-            "endline_6_q1_self_perceived_healthcare": {
+            "endline_7_q1_self_perceived_healthcare": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -31,9 +31,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip_question": 1,
                 },
-                "next": "endline_6_q2_self_perceived_healthcare",
+                "next": "endline_7_q2_self_perceived_healthcare",
             },
-            "endline_6_q2_self_perceived_healthcare": {
+            "endline_7_q2_self_perceived_healthcare": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -56,9 +56,9 @@ ASSESSMENT_QUESTIONS = {
                     "rather_not_say": 0,
                     "skip_question": 0,
                 },
-                "next": "endline_6_q3_self_perceived_healthcare",
+                "next": "endline_7_q3_self_perceived_healthcare",
             },
-            "endline_6_q3_self_perceived_healthcare": {
+            "endline_7_q3_self_perceived_healthcare": {
                 "type": "list",
                 "text": "\n".join(
                     [

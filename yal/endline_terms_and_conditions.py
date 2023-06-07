@@ -2,6 +2,7 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, ChoiceState, WhatsAppButtonState
 from yal.utils import get_generic_error
 
+
 class Application(BaseApplication):
     START_STATE = "state_start"
 
@@ -9,13 +10,15 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "Hi there from [insert custom name] [insert custom emoji] and your BWise friends.",
+                    "Hi there from [insert custom name] [insert custom emoji] "
+                    "and your BWise friends.",
                     "",
-                    "About 3 months ago you joined BWise. Answer a few questions about BWise and get *R50 airtime*🤑.",
+                    "About 3 months ago you joined BWise. Answer a few questions "
+                    "about BWise and get *R50 airtime*🤑.",
                     "",
                     "This should only take 10-15 mins.",
                     "",
-                    "Reply wth *ANSWER* to start."
+                    "Reply wth *ANSWER* to start.",
                 ]
             )
         )
@@ -33,10 +36,9 @@ class Application(BaseApplication):
             next={
                 "accept": "state_accept_consent",
                 "decline": "state_accept_consent",
-                "reminder": "state_accept_consent"
+                "reminder": "state_accept_consent",
             },
         )
-    
 
     async def state_consent(self):
         question = self._(
@@ -82,16 +84,15 @@ class Application(BaseApplication):
             choices=[
                 Choice("yes", "yes, I agree"),
                 Choice("no", "No, I don't agree"),
-                Choice("question", "I have some questions")
+                Choice("question", "I have some questions"),
             ],
             error=error,
             next={
                 "yes": "state_accept_consent",
                 "no": "state_accept_consent",
-                "question": "state_accept_consent"
-            }
+                "question": "state_accept_consent",
+            },
         )
-    
 
     async def state_accept_consent(self):
         question = self._(
@@ -120,17 +121,16 @@ class Application(BaseApplication):
             next={
                 "ok": "state_relationship_status",
                 "no": "state_accept_consent",
-            }
+            },
         )
-    
 
     async def state_relationship_status(self):
-        choices=[
-                Choice("yes", "Yes"),
-                Choice("no", "No"),
-                Choice("complicated", "It is complicated"),
-                Choice("rather", "Rather not say"),
-                Choice("skip", "Skip question")
+        choices = [
+            Choice("yes", "Yes"),
+            Choice("no", "No"),
+            Choice("complicated", "It is complicated"),
+            Choice("rather", "Rather not say"),
+            Choice("skip", "Skip question"),
         ]
         question = self._(
             "\n".join(

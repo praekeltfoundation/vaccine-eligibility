@@ -2,9 +2,9 @@
 # [survey_name]_[subsection]_q[question]_topic
 ASSESSMENT_QUESTIONS = {
     "1": {
-        "start": "endline_1_q1_self_esteem",
+        "start": "endline_2_q1_self_esteem",
         "questions": {
-            "endline_1_q1_self_esteem": {
+            "endline_2_q1_self_esteem": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -30,9 +30,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 0,
                     "skip_question": 0,
                 },
-                "next": "endline_1_q2_self_esteem",
+                "next": "endline_2_q2_self_esteem",
             },
-            "endline_1_q2_self_esteem": {
+            "endline_2_q2_self_esteem": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -55,9 +55,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 0,
                     "skip_question": 0,
                 },
-                "next": "endline_1_q3_self_esteem",
+                "next": "endline_2_q3_self_esteem",
             },
-            "endline_1_q3_self_esteem": {
+            "endline_2_q3_self_esteem": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -80,9 +80,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 0,
                     "skip_question": 0,
                 },
-                "next": "endline_1_q4_self_esteem",
+                "next": "endline_2_q4_self_esteem",
             },
-            "endline_1_q4_self_esteem": {
+            "endline_2_q4_self_esteem": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -105,9 +105,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 0,
                     "skip_question": 0,
                 },
-                "next": "endline_1_q5_self_esteem",
+                "next": "endline_2_q5_self_esteem",
             },
-            "endline_1_q5_self_esteem": {
+            "endline_2_q5_self_esteem": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -130,9 +130,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 0,
                     "skip_question": 0,
                 },
-                "next": "endline_1_q6_self_esteem",
+                "next": "endline_2_q6_self_esteem",
             },
-            "endline_1_q6_self_esteem": {
+            "endline_2_q6_self_esteem": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -157,7 +157,7 @@ ASSESSMENT_QUESTIONS = {
                 },
                 "next": "endline_1_q7_self_esteem",
             },
-            "endline_1_q7_self_esteem": {
+            "endline_2_q7_self_esteem": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -180,9 +180,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 0,
                     "skip_question": 0,
                 },
-                "next": "endline_1_q8_self_esteem",
+                "next": "endline_2_q8_self_esteem",
             },
-            "endline_1_q8_self_esteem": {
+            "endline_2_q8_self_esteem": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -205,9 +205,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 0,
                     "skip_question": 0,
                 },
-                "next": "endline_1_q9_self_esteem",
+                "next": "endline_2_q9_self_esteem",
             },
-            "endline_1_q9_self_esteem": {
+            "endline_2_q9_self_esteem": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -230,9 +230,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 0,
                     "skip_question": 0,
                 },
-                "next": "endline_1_q10_self_esteem",
+                "next": "endline_2_q10_self_esteem",
             },
-            "endline_1_q10_self_esteem": {
+            "endline_2_q10_self_esteem": {
                 "type": "list",
                 "text": "\n".join(
                     [

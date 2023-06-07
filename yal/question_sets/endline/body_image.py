@@ -2,9 +2,9 @@
 # [survey_name]_[subsection]_q[question]_topic
 ASSESSMENT_QUESTIONS = {
     "1": {
-        "start": "endline_8_q1_body_image",
+        "start": "endline_4_q1_body_image",
         "questions": {
-            "endline_8_q1_body_image": {
+            "endline_4_q1_body_image": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -27,9 +27,9 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip_question": 1,
                 },
-                "next": "endline_8_q2_body_image",
+                "next": "endline_4_q2_body_image",
             },
-            "endline_8_q2_body_image": {
+            "endline_4_q2_body_image": {
                 "type": "list",
                 "text": "\n".join(
                     [

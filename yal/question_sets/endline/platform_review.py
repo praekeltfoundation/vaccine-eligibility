@@ -12,7 +12,8 @@ ASSESSMENT_QUESTIONS = {
                     [
                         "You have received a lot of content from BWise.",
                         "",
-                        "*Did BWise send you content that related to your sexual needs?*"
+                        "*Did BWise send you content that related to your "
+                        "sexual needs?*",
                     ]
                 ),
                 "options": [
@@ -92,7 +93,6 @@ ASSESSMENT_QUESTIONS = {
                         "or sexual health?*",
                     ]
                 ),
-                
                 "options": [
                     ("yes", "Yes"),
                     ("no", "No"),
@@ -100,8 +100,8 @@ ASSESSMENT_QUESTIONS = {
                     ("skip_question", "Skip question"),
                 ],
                 "next": "endline_12_q6_platform_review",
-        },
-        "endline_12_q6_platform_review": {
+            },
+            "endline_12_q6_platform_review": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -117,59 +117,61 @@ ASSESSMENT_QUESTIONS = {
                     ("skip_question", "Skip question"),
                 ],
                 "next": "endline_12_q7_platform_review",
+            },
+            "endline_12_q7_platform_review": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*Did you ever go to one of the services that "
+                        "BWise recommended?*",
+                    ]
+                ),
+                "options": [
+                    ("yes_got_help", "Yes, and got help"),
+                    ("yes_got_no_help", "Yes, but wasn't helpful"),
+                    ("no_too_far", "No, too far away"),
+                    ("no_not_relevant", "No, not relevant"),
+                    ("no_other_reason", "No, for another reason"),
+                    ("skip_question", "Skip question"),
+                ],
+                "next": "endline_12_q8_platform_review",
+            },
+            "endline_12_q8_platform_review": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*Since joining BWise, have you ever felt like you "
+                        "needed to speak to a counsellor about your mental "
+                        "or sexual health?*",
+                    ]
+                ),
+                "options": [
+                    ("yes", "Yes"),
+                    ("no", "No"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip_question", "Skip question"),
+                ],
+                "next": "endline_12_q9_platform_review",
+            },
+            "endline_12_q9_platform_review": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*Did you know you can request a callback from a "
+                        "LoveLife counsellor "
+                        "through the B-Wise WhatsApp chatbot?*"
+                    ]
+                ),
+                "options": [
+                    ("yes_got_help", "Yes, and I got help"),
+                    ("yes_no_help", "Yes, but I didn't help"),
+                    ("yes_never_used", "Yes, but I never used it"),
+                    ("no", "No, I didn't know that"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip_question", "Skip question"),
+                ],
+                "next": None,
+            },
         },
-        "endline_12_q7_platform_review": {
-        "type": "list",
-        "text": "\n".join(
-            [
-                "*Did you ever go to one of the services that BWise recommended?*",
-            ]
-        ),
-        "options": [
-            ("yes_got_help", "Yes, and got help"),
-            ("yes_got_no_help", "Yes, but wasn't helpful"),
-            ("no_too_far", "No, too far away"),
-            ("no_not_relevant", "No, not relevant"),
-            ("no_other_reason", "No, for another reason"),
-            ("skip_question", "Skip question"),
-        ],
-        "next": "endline_12_q8_platform_review",
-        },
-        "endline_12_q8_platform_review": {
-        "type": "list",
-        "text": "\n".join(
-            [
-                "*Since joining BWise, have you ever felt like you "
-                "needed to speak to a counsellor about your mental "
-                "or sexual health?*",
-            ]
-        ),
-        "options": [
-            ("yes", "Yes"),
-            ("no", "No"),
-            ("dont_understand", "I don't understand"),
-            ("skip_question", "Skip question"),
-        ],
-        "next": "endline_12_q9_platform_review",
-        },
-        "endline_12_q9_platform_review": {
-        "type": "list",
-        "text": "\n".join(
-            [
-                "*Did you know you can request a callback from a LoveLife counsellor "
-                "through the B-Wise WhatsApp chatbot?*"
-            ]
-        ),
-        "options": [
-            ("yes_got_help", "Yes, and I got help"),
-            ("yes_no_help", "Yes, but I didn't help"),
-            ("yes_never_used", "Yes, but I never used it"),
-            ("no", "No, I didn't know that"),
-            ("dont_understand", "I don't understand"),
-            ("skip_question", "Skip question"),
-        ],
-        "next": None,
-        },
-    },
     },
 }

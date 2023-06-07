@@ -1,8 +1,7 @@
 # Survey state naming convention
 # [survey_name]_[subsection]_q[question]_topic
 ASSESSMENT_QUESTIONS = {
-    "1":
-    {
+    "1": {
         "start": "endline_3_q1_connectedness",
         "questions": {
             "baseline_2_q1_connectedness": {
