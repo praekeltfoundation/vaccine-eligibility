@@ -95,11 +95,11 @@ from yal.question_sets.endline.self_esteem import (
 from yal.question_sets.endline.self_perceived_healthcare import (
     ASSESSMENT_QUESTIONS as SELF_PERCEIVED_HEALTHCARE_QUESTIONS_ENDLINE,
 )
-from yal.question_sets.endline.sexual_health_literacy import (
-    ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS_ENDLINE,
-)
 from yal.question_sets.endline.sexual_consent import (
     ASSESSMENT_QUESTIONS as SEXUAL_CONSENT_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.sexual_health_literacy import (
+    ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS_ENDLINE,
 )
 from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
