@@ -85,7 +85,6 @@ QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
 EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
 AAQ_KEYWORDS = {"ask a question"}
 
-
 class Application(
     TermsApplication,
     OnboardingApplication,
@@ -252,6 +251,7 @@ class Application(
     async def state_start(self):
         terms_accepted = self.user.metadata.get("terms_accepted")
         onboarding_completed = self.user.metadata.get("onboarding_completed")
+        endline_terms_accepted = self.user.metadata.get("endline_terms_accepted")
 
         inbound = utils.clean_inbound(self.inbound.content)
 
@@ -270,8 +270,8 @@ class Application(
                 return await self.go_to_state(MainMenuApplication.START_STATE)
             elif terms_accepted:
                 return await self.go_to_state(OnboardingApplication.START_STATE)
-            # elif baseline_completed:
-            #     return await self.go_to_state(EndlineTermsApplication.START_STATE)
+            elif endline_terms_accepted:
+                return await self.go_to_state(EndlineSurveyApplication.START_STATE)
             else:
                 return await self.go_to_state(TermsApplication.START_STATE)
 

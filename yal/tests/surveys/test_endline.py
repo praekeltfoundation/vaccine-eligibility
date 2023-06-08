@@ -488,13 +488,10 @@ async def test_state_endline_start(tester: AppTester, rapidpro_mock):
 
     message = "\n".join(
         [
-            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "◼️◽️◽️◽️",
             "-----",
             "",
-            "How do you feel about the following statements?",
-            "",
-            "*I feel that I am a person of worth,"
-            " at least on an equal plane with others.*",
+            "*I'm my own boss.* 😎"
         ]
     )
     tester.assert_message(message)

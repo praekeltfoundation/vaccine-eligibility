@@ -578,6 +578,7 @@
 | ---------- | ------------------ | --------- | ----------- |
 | state_endline_start | TRUE | Text | Start of Endline Survey. |
 | state_endline_end | TRUE | Text | End of Endline Survey. |
+| state_locus_of_control_assessment_endline | True | Text | Starts locus of control Assesment |
 | state_self_esteem_assessment_endline | TRUE | Text | Start of Self Esteem Assessment. |
 | state_self_esteem_assessment_endline_end | TRUE | Text | End of of Self Esteem Assessment. |
 | state_sexual_health_lit_assessment_endline | TRUE | Text | Start of SHL Assessment. |
@@ -602,6 +603,7 @@
 | state_submit_endline_completed | False | Text | Saves flow results and contact fields relevant to Endline survey end |
 | endline_survey_completed | False | Text | Flag to show end of survey reachedcd  |
 | state_accept_consent | False | Text | Consent to the endline study |
+| state_no_consent | False | Text | No consent to the endline study |
 | state_consent | False | Text | Ask for consent to the study |
 | state_platform_review_endline | False | Text | Review the platform |
 

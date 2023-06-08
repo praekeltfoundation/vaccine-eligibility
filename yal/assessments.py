@@ -370,6 +370,7 @@ class Application(BaseApplication):
             "let s do it",
             "ask away",
             "start the questions",
+            "Yes, I want to answer",
         ]:
             msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
             whatsapp_id = msisdn.lstrip(" + ")
@@ -391,6 +392,11 @@ class Application(BaseApplication):
                 # for v2 names we have to move _v2 to the end to get the state name
                 return await self.go_to_state(
                     f"state_{assessment_name.replace('_v2', '')}_assessment_v2"
+                )
+            if "endline" in assessment_name:
+                # for v2 names we have to move _v2 to the end to get the state name
+                return await self.go_to_state(
+                    f"state_{assessment_name.replace('_endline', '')}_assessment_endline"
                 )
 
             return await self.go_to_state(f"state_{assessment_name}_assessment")
@@ -418,7 +424,26 @@ class Application(BaseApplication):
             error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
             if error:
                 return await self.go_to_state("state_error")
+
+            if "endline" in assessment_name:
+                return self.go_to_state("state_not_interested")
+
             return await self.go_to_state("state_pre_mainmenu")
+
+    async def state_not_interested(self):
+            return FreeText(
+                self,
+                question=self._(
+                    "\n".join(
+                        [
+                            "That's completely okay, there are no consequences "
+                            "to not taking part in this study. Please enjoy the "
+                            "BWise tool and stay safe. If you change your mind, "
+                            "please send *Answer* to this number",
+                        ]
+                    )
+                )
+            )
 
     async def state_stop_assessment_reminders_confirm(self):
         assessment_reminder_name = self.user.metadata["assessment_reminder_name"]

@@ -1,46 +1,16 @@
+import asyncio
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, ChoiceState, WhatsAppButtonState
-from yal.utils import get_generic_error
+from vaccine.states import Choice, ChoiceState, FreeText, WhatsAppButtonState
+from yal import rapidpro
+from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
+from yal.surveys.endline import Application as EndlineApplication
+
 
 
 class Application(BaseApplication):
-    START_STATE = "state_start"
+    START_STATE = "state_start_terms"
 
-    async def state_start(self):
-        question = self._(
-            "\n".join(
-                [
-                    "Hi there from [insert custom name] [insert custom emoji] "
-                    "and your BWise friends.",
-                    "",
-                    "About 3 months ago you joined BWise. Answer a few questions "
-                    "about BWise and get *R50 airtime*🤑.",
-                    "",
-                    "This should only take 10-15 mins.",
-                    "",
-                    "Reply wth *ANSWER* to start.",
-                ]
-            )
-        )
-        error = self._(get_generic_error())
-
-        return WhatsAppButtonState(
-            self,
-            question=question,
-            choices=[
-                Choice("accept", "Yes, I want to answer"),
-                Choice("reminder", "Remind me tomorrow"),
-                Choice("decline", "I’m not interested"),
-            ],
-            error=error,
-            next={
-                "accept": "state_accept_consent",
-                "decline": "state_accept_consent",
-                "reminder": "state_accept_consent",
-            },
-        )
-
-    async def state_consent(self):
+    async def state_start_terms(self):
         question = self._(
             "\n".join(
                 [
@@ -82,15 +52,15 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("yes", "yes, I agree"),
+                Choice("yes", "Yes, I agree"),
                 Choice("no", "No, I don't agree"),
                 Choice("question", "I have some questions"),
             ],
             error=error,
             next={
                 "yes": "state_accept_consent",
-                "no": "state_accept_consent",
-                "question": "state_accept_consent",
+                "no": "state_no_consent",
+                "question": "state_have_questions",
             },
         )
 
@@ -114,17 +84,51 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("yes", "yes, I agree"),
-                Choice("no", "No, I don't agree"),
+                Choice("yes", "ok, let's start"),
+                Choice("no", "I can't right now"),
             ],
             error=error,
             next={
-                "ok": "state_relationship_status",
-                "no": "state_accept_consent",
+                "yes": "state_relationship_status_endline",
+                "no": "state_set_reminder_timer",
             },
         )
 
-    async def state_relationship_status(self):
+    async def state_no_consent(self):
+        question = self._(
+            "\n".join(
+                [
+                   "That's completely okay, there are no consequences to not taking ,"
+                   "part in this study. Please enjoy the BWise tool and stay safe. "
+                   "If you change your mind, please send *Answer* to this number",
+                ]
+            )
+        )
+
+        return FreeText(
+            self,
+            question=question,
+            next=None
+        )
+    
+    async def state_have_questions(self):
+        question = self._(
+            "\n".join(
+                [
+                   "You should be able to find the answer to any questions you "
+                   "have in the consent doc we sent you. If you still have "
+                   "questions, please email bwise@praekelt.org",
+                ]
+            )
+        )
+
+        return FreeText(
+            self,
+            question=question,
+            next=None,
+        )
+
+    async def state_relationship_status_endline(self):
         choices = [
             Choice("yes", "Yes"),
             Choice("no", "No"),
@@ -146,10 +150,10 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="state_monthly_household_income",
+            next="state_monthly_household_income_endline",
         )
 
-    async def state_monthly_household_income(self):
+    async def state_monthly_household_income_endline(self):
         choices = [
             Choice("no_income", self._("No income")),
             Choice("R1_R400", self._("R1 - R400")),
@@ -190,5 +194,36 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            # where to go from here
+            next="state_submit_terms_and_conditions_endline",
         )
+    
+    async def state_set_reminder_timer(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        assessment_name = self.user.metadata.get(
+            "assessment_name", "state_accept_consent"
+        )
+        data = {
+            "assessment_reminder": get_current_datetime().isoformat(),
+            "assessment_reminder_name": assessment_name,
+            "assessment_reminder_type": "reengagement 30min",
+        }
+
+        return await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+
+    async def state_submit_terms_and_conditions_endline(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        error = await rapidpro.update_profile(
+            whatsapp_id, {"endline_terms_accepted": "True"}, self.user.metadata
+        )
+        if error:
+            return await self.go_to_state("state_error")
+
+        await self.worker.publish_message(
+            self.inbound.reply(self._("Excellent - now we can get you set up."))
+        )
+        await asyncio.sleep(0.5)
+        return await self.go_to_state(EndlineApplication.START_STATE)

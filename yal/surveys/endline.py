@@ -34,7 +34,16 @@ class Application(BaseApplication):
 
     # Endline start - Use this to link to survey from other areas
     async def state_endline_start(self):
-        return await self.go_to_state("state_self_esteem_assessment_endline")
+        return await self.go_to_state("state_locus_of_control_assessment_endline")
+    
+    #Locus of Control
+    async def state_locus_of_control_assessment_endline(self):
+        self.save_metadata("assessment_name", "locus_of_control_endline")
+        self.save_metadata(
+            "assessment_end_state", "state_self_esteem_assessment_endline"
+        )
+        await self.set_reminder_timer()
+        return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Self Esteem
     async def state_self_esteem_assessment_endline(self):
@@ -411,7 +420,7 @@ class Application(BaseApplication):
         await self.set_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
-    # Baseline Airtime Incentive
+    # Endline Airtime Incentive
     async def state_submit_endline_completed(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
