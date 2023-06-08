@@ -35,8 +35,8 @@ class Application(BaseApplication):
     # Endline start - Use this to link to survey from other areas
     async def state_endline_start(self):
         return await self.go_to_state("state_locus_of_control_assessment_endline")
-    
-    #Locus of Control
+
+    # Locus of Control
     async def state_locus_of_control_assessment_endline(self):
         self.save_metadata("assessment_name", "locus_of_control_endline")
         self.save_metadata(

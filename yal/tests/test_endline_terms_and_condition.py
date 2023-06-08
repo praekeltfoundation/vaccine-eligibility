@@ -36,6 +36,7 @@ async def rapidpro_mock():
         yield server
         config.RAPIDPRO_URL = url
 
+
 @pytest.mark.asyncio
 async def test_state_start_terms_accept(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_start_terms")
@@ -55,6 +56,7 @@ async def test_state_start_terms_accept(tester: AppTester, rapidpro_mock):
     )
     tester.assert_message(message)
 
+
 @pytest.mark.asyncio
 async def test_state_terms_decline(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_start_terms")
@@ -70,6 +72,7 @@ async def test_state_terms_decline(tester: AppTester, rapidpro_mock):
     )
     tester.assert_message(message)
 
+
 @pytest.mark.asyncio
 async def test_state_accept_consent_reminder(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_accept_consent")
@@ -81,7 +84,9 @@ async def test_state_accept_consent_reminder(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_submit_terms_and_conditions_accept(tester: AppTester, rapidpro_mock):
+async def test_state_submit_terms_and_conditions_accept(
+    tester: AppTester, rapidpro_mock
+):
     tester.setup_state("state_monthly_household_income_endline")
     await tester.user_input("1")
 

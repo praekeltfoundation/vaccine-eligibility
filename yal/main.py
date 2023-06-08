@@ -85,6 +85,7 @@ QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
 EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
 AAQ_KEYWORDS = {"ask a question"}
 
+
 class Application(
     TermsApplication,
     OnboardingApplication,

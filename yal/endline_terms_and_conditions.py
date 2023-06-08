@@ -1,10 +1,10 @@
 import asyncio
+
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, ChoiceState, FreeText, WhatsAppButtonState
 from yal import rapidpro
-from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 from yal.surveys.endline import Application as EndlineApplication
-
+from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
 
 class Application(BaseApplication):
@@ -110,7 +110,7 @@ class Application(BaseApplication):
             question=question,
             next=None
         )
-    
+
     async def state_have_questions(self):
         question = self._(
             "\n".join(
@@ -196,7 +196,7 @@ class Application(BaseApplication):
             choices=choices,
             next="state_submit_terms_and_conditions_endline",
         )
-    
+
     async def state_set_reminder_timer(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")

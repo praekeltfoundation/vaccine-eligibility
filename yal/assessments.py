@@ -394,9 +394,9 @@ class Application(BaseApplication):
                     f"state_{assessment_name.replace('_v2', '')}_assessment_v2"
                 )
             if "endline" in assessment_name:
-                # for v2 names we have to move _v2 to the end to get the state name
+                assessment_name_replace = assessment_name.replace('_endline', '')
                 return await self.go_to_state(
-                    f"state_{assessment_name.replace('_endline', '')}_assessment_endline"
+                    f"state_{assessment_name_replace}_assessment_endline"
                 )
 
             return await self.go_to_state(f"state_{assessment_name}_assessment")
@@ -431,19 +431,19 @@ class Application(BaseApplication):
             return await self.go_to_state("state_pre_mainmenu")
 
     async def state_not_interested(self):
-            return FreeText(
-                self,
-                question=self._(
-                    "\n".join(
-                        [
-                            "That's completely okay, there are no consequences "
-                            "to not taking part in this study. Please enjoy the "
-                            "BWise tool and stay safe. If you change your mind, "
-                            "please send *Answer* to this number",
-                        ]
-                    )
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "That's completely okay, there are no consequences "
+                        "to not taking part in this study. Please enjoy the "
+                        "BWise tool and stay safe. If you change your mind, "
+                        "please send *Answer* to this number",
+                    ]
                 )
             )
+        )
 
     async def state_stop_assessment_reminders_confirm(self):
         assessment_reminder_name = self.user.metadata["assessment_reminder_name"]
