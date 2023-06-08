@@ -98,26 +98,22 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                   "That's completely okay, there are no consequences to not taking ,"
-                   "part in this study. Please enjoy the BWise tool and stay safe. "
-                   "If you change your mind, please send *Answer* to this number",
+                    "That's completely okay, there are no consequences to not taking ,"
+                    "part in this study. Please enjoy the BWise tool and stay safe. "
+                    "If you change your mind, please send *Answer* to this number",
                 ]
             )
         )
 
-        return FreeText(
-            self,
-            question=question,
-            next=None
-        )
+        return FreeText(self, question=question, next=None)
 
     async def state_have_questions(self):
         question = self._(
             "\n".join(
                 [
-                   "You should be able to find the answer to any questions you "
-                   "have in the consent doc we sent you. If you still have "
-                   "questions, please email bwise@praekelt.org",
+                    "You should be able to find the answer to any questions you "
+                    "have in the consent doc we sent you. If you still have "
+                    "questions, please email bwise@praekelt.org",
                 ]
             )
         )

@@ -486,14 +486,7 @@ async def test_state_endline_start(tester: AppTester, rapidpro_mock):
         transport_metadata={"message": {"button": {"payload": "state_endline_start"}}},
     )
 
-    message = "\n".join(
-        [
-            "◼️◽️◽️◽️",
-            "-----",
-            "",
-            "*I'm my own boss.* 😎"
-        ]
-    )
+    message = "\n".join(["◼️◽️◽️◽️", "-----", "", "*I'm my own boss.* 😎"])
     tester.assert_message(message)
 
 

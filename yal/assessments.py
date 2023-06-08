@@ -394,7 +394,7 @@ class Application(BaseApplication):
                     f"state_{assessment_name.replace('_v2', '')}_assessment_v2"
                 )
             if "endline" in assessment_name:
-                assessment_name_replace = assessment_name.replace('_endline', '')
+                assessment_name_replace = assessment_name.replace("_endline", "")
                 return await self.go_to_state(
                     f"state_{assessment_name_replace}_assessment_endline"
                 )
@@ -442,7 +442,7 @@ class Application(BaseApplication):
                         "please send *Answer* to this number",
                     ]
                 )
-            )
+            ),
         )
 
     async def state_stop_assessment_reminders_confirm(self):
