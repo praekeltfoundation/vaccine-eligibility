@@ -84,7 +84,7 @@ FEEDBACK_KEYWORDS = {"feedback"}
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
 EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
 AAQ_KEYWORDS = {"ask a question"}
-
+EJAF_ENDLINE_SURVEY_KEYWORDS = {"answer"}
 
 class Application(
     TermsApplication,
@@ -189,6 +189,9 @@ class Application(
                 self.user.session_id = None
                 self.state_name = "state_baseline_start"
 
+            if keyword in EJAF_ENDLINE_SURVEY_KEYWORDS:
+                self.user.session_id = None
+                self.state_name = EndlineTermsApplication.START_STATE
             # Fields that RapidPro sets after a feedback push message
             feedback_state = await self.get_feedback_state()
             if feedback_state:
