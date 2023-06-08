@@ -65,6 +65,42 @@ from yal.assessment_data_V2.sexual_consent import (
 from yal.assessment_data_V2.sexual_health_literacy import (
     ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS_V2,
 )
+from yal.question_sets.endline.alcohol_endline import (
+    ASSESSMENT_QUESTIONS as ALCOHOL_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.anxiety_endline import (
+    ASSESSMENT_QUESTIONS as ANXIETY_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.body_image_endline import (
+    ASSESSMENT_QUESTIONS as BODY_IMAGE_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.connectedness_endline import (
+    ASSESSMENT_QUESTIONS as CONNECTEDNESS_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.depression_endline import (
+    ASSESSMENT_QUESTIONS as DEPRESSION_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.gender_attitude_endline import (
+    ASSESSMENT_QUESTIONS as GENDER_ATTITUDE_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.locus_of_control_endline import (
+    ASSESSMENT_QUESTIONS as LOCUS_OF_CONTROL_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.platform_review_endline import (
+    ASSESSMENT_QUESTIONS as PLATFORM_REVIEW_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.self_esteem_endline import (
+    ASSESSMENT_QUESTIONS as SELF_ESTEEM_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.self_perceived_healthcare_endline import (
+    ASSESSMENT_QUESTIONS as SELF_PERCEIVED_HEALTHCARE_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.sexual_consent_endline import (
+    ASSESSMENT_QUESTIONS as SEXUAL_CONSENT_QUESTIONS_ENDLINE,
+)
+from yal.question_sets.endline.sexual_health_literacy_endline import (
+    ASSESSMENT_QUESTIONS as SEXUAL_HEALTH_LITERACY_QUESTIONS_ENDLINE,
+)
 from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
 QUESTIONS = {
@@ -87,6 +123,18 @@ QUESTIONS = {
     "gender_attitude_v2": GENDER_ATTITUDE_QUESTIONS_V2,
     "sexual_consent_v2": SEXUAL_CONSENT_QUESTIONS_V2,
     "alcohol_v2": ALCOHOL_QUESTIONS_V2,
+    "self_esteem_endline": SELF_ESTEEM_QUESTIONS_ENDLINE,
+    "connectedness_endline": CONNECTEDNESS_QUESTIONS_ENDLINE,
+    "body_image_endline": BODY_IMAGE_QUESTIONS_ENDLINE,
+    "depression_endline": DEPRESSION_QUESTIONS_ENDLINE,
+    "anxiety_endline": ANXIETY_QUESTIONS_ENDLINE,
+    "self_perceived_healthcare_endline": SELF_PERCEIVED_HEALTHCARE_QUESTIONS_ENDLINE,
+    "sexual_health_literacy_endline": SEXUAL_HEALTH_LITERACY_QUESTIONS_ENDLINE,
+    "gender_attitude_endline": GENDER_ATTITUDE_QUESTIONS_ENDLINE,
+    "sexual_consent_endline": SEXUAL_CONSENT_QUESTIONS_ENDLINE,
+    "alcohol_endline": ALCOHOL_QUESTIONS_ENDLINE,
+    "platform_review_endline": PLATFORM_REVIEW_QUESTIONS_ENDLINE,
+    "locus_of_control_endline": LOCUS_OF_CONTROL_QUESTIONS_ENDLINE,
 }
 
 
@@ -322,6 +370,7 @@ class Application(BaseApplication):
             "let s do it",
             "ask away",
             "start the questions",
+            "Yes, I want to answer",
         ]:
             msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
             whatsapp_id = msisdn.lstrip(" + ")
@@ -343,6 +392,11 @@ class Application(BaseApplication):
                 # for v2 names we have to move _v2 to the end to get the state name
                 return await self.go_to_state(
                     f"state_{assessment_name.replace('_v2', '')}_assessment_v2"
+                )
+            if "endline" in assessment_name:
+                assessment_name_replace = assessment_name.replace("_endline", "")
+                return await self.go_to_state(
+                    f"state_{assessment_name_replace}_assessment_endline"
                 )
 
             return await self.go_to_state(f"state_{assessment_name}_assessment")
@@ -370,7 +424,26 @@ class Application(BaseApplication):
             error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
             if error:
                 return await self.go_to_state("state_error")
+            # TODO: Hlami, check if the the survey is endline.
+            # if "endline" in assessment_name:
+            #     return self.go_to_state("state_not_interested")
+
             return await self.go_to_state("state_pre_mainmenu")
+
+    async def state_not_interested(self):
+        return FreeText(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "That's completely okay, there are no consequences "
+                        "to not taking part in this study. Please enjoy the "
+                        "BWise tool and stay safe. If you change your mind, "
+                        "please send *Answer* to this number",
+                    ]
+                )
+            ),
+        )
 
     async def state_stop_assessment_reminders_confirm(self):
         assessment_reminder_name = self.user.metadata["assessment_reminder_name"]

@@ -571,3 +571,170 @@
 | baseline_10_q4_alcohol | TRUE | Text | Have you ever felt you needed a drink or used drugs first thing in the morning (eye‐opener)? |
 | state_alcohol_v2_risk | TRUE | Text | The risk rating for Alcohol |
 | state_alcohol_v2_score | TRUE | Text | The score for Alcohol |
+
+
+### Endline Survey
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_endline_start | TRUE | Text | Start of Endline Survey. |
+| state_endline_end | TRUE | Text | End of Endline Survey. |
+| state_locus_of_control_assessment_endline | True | Text | Starts locus of control Assesment |
+| state_self_esteem_assessment_endline | TRUE | Text | Start of Self Esteem Assessment. |
+| state_self_esteem_assessment_endline_end | TRUE | Text | End of of Self Esteem Assessment. |
+| state_sexual_health_lit_assessment_endline | TRUE | Text | Start of SHL Assessment. |
+| state_sexual_health_lit_assessment_endline_end | TRUE | Text | End of SHL Assessment. |
+| state_self_perceived_healthcare_assessment_endline | TRUE | Text | Start of SPH Assessment. |
+| state_self_perceived_healthcare_assessment_endline_end | TRUE | Text | End of SPH Assessment. |
+| state_body_image_assessment_endline | TRUE | Text | Start of Body Image Assessment in Endline Survey. |
+| state_body_image_assessment_endline_end | TRUE | Text | End of Body Image Assessment in Endline Survey. |
+| state_connectedness_assessment_endline | TRUE | Text | Start of Connectedness Assessment. |
+| state_connectedness_assessment_endline_end | TRUE | Text | End of Connectedness Assessment. |
+| state_gender_attitude_assessment_endline | TRUE | Text | Start of Gender Attitude Assessment. |
+| state_gender_attitude_assessment_endline_end | TRUE | Text | End of Gender Attitude Assessment. |
+| state_depression_assessment_endline | TRUE | Text | Start of Depression Assessment. |
+| state_depression_assessment_endline_end | TRUE | Text | End of Depression Assessment. |
+| state_anxiety_assessment_endline | TRUE | Text | Start of Anxiety Assessment. |
+| state_anxiety_assessment_endline_end | TRUE | Text | End of Anxiety Assessment. |
+| state_depression_and_anxiety_endline_end | TRUE | Text | A state to work out a combined score for depression and anxiety. |
+| state_sexual_consent_assessment_endline | TRUE | Text | Start of Sexual Consent Assessment. |
+| state_sexual_consent_assessment_endline_end | TRUE | Text | End of Sexual Consent Assessment. |
+| state_alcohol_assessment_endline | TRUE | Text | Start of Alcohol Assessment. |
+| state_alcohol_assessment_endline_end | TRUE | Text | End of Alcohol Assessment. |
+| state_submit_endline_completed | False | Text | Saves flow results and contact fields relevant to Endline survey end |
+| endline_survey_completed | False | Text | Flag to show end of survey reachedcd  |
+| state_accept_consent | False | Text | Consent to the endline study |
+| state_no_consent | False | Text | No consent to the endline study |
+| state_consent | False | Text | Ask for consent to the study |
+| state_platform_review_endline | False | Text | Review the platform |
+| state_relationship_status_endline | False | Text | endline relationship status |
+| state_submit_terms_and_conditions_endline | False | Text | Endline Terms and Condition Submit |
+| state_not_interested | False | Text | Endline Survery not interested |
+| state_monthly_household_income_endline | False | Text | Endline household income |
+| state_start_terms | False | Text | Endline terms and conditions |
+| state_set_reminder_timer | False | Text | Endline terms and conditions reminder |
+| state_have_questions | False | Text | Endline I have move questions |
+
+### Endline Sexual Health literacy assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| endline_7_q1_sexual_health_lit | TRUE | Text | People can reduce the risk of getting STIs by |
+| endline_7_q2_sexual_health_lit | TRUE | Text | People can reduce the risk of getting sexual STIs by only having sex with one partner who isn't infected and who has no other partners. |
+| endline_7_q3_sexual_health_lit | TRUE | Text | If I'm sexually active, I am able to insist on using condoms when I have sex. |
+| endline_7_q4_sexual_health_lit | TRUE | Text | My sexual needs or desires are important. |
+| endline_7_q5_sexual_health_lit | TRUE | Text | I think it would be important to focus on my own pleasure as well as my partner's during sexual experiences. |
+| ednline_7_q6_sexual_health_lit | TRUE | Text | I expect to enjoy sex. |
+| endline_7_q7_sexual_health_lit | TRUE | Text | The last time you had sex, did you or your partner do or use something to avoid or delay getting pregnant? |
+| endline_7_q8_sexual_health_lit | TRUE | Text | Did you use a condom last time you had penetrative sex? |
+| endline_7_q9_sexual_health_lit | TRUE | Text | What's been the MAIN way you or your partner have tried to delay or avoid getting pregnant? |
+| endline_7_q10A_sexual_health_lit | TRUE | Text | How many sexual partners did you have over the last month? |
+| endline_7_q10B_sexual_health_lit | TRUE | Text | Please tell me how many sexual partners you had in the last month. |
+| endline_7_q11_sexual_health_lit | TRUE | Text | Have you ever been tested for STIs or HIV? |
+| endline_7_q12_sexual_health_lit | TRUE | Text | Are you currently living with HIV? |
+| endline_7_q13_sexual_health_lit | TRUE | Text | Do you take ART (antiretroviral therapy) medication on a regular basis? |
+| endline_7_q14_sexual_health_lit | TRUE | Text | Do you take PrEP (Pre-exposure prophylaxis) medication on a regular basis? |
+| state_sexual_health_lit_endline_risk | TRUE | Text | The risk rating for Sexual Health literacy |
+| state_sexual_health_lit_endline_score | TRUE | Text | The score for Sexual Health literacy |
+
+### Endline Self Esteem assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| endline_1_q1_self_esteem | TRUE | Text | I feel that I am a person who has worth |
+| endline_1_q2_self_esteem | TRUE | Text | I feel that I have a number of good qualities. |
+| endline_1_q3_self_esteem | TRUE | Text | All in all, I am inclined to feel that I am a failure. |
+| endline_1_q4_self_esteem | TRUE | Text | I am able to do things as well as most other people. |
+| endline_1_q5_self_esteem | TRUE | Text | I feel I do not have much to be proud of. |
+| endline_1_q6_self_esteem | TRUE | Text | I take a positive attitude toward myself. |
+| endline_1_q7_self_esteem | TRUE | Text | On the whole, I am satisfied with myself. |
+| endline_1_q8_self_esteem | TRUE | Text | I wish I could have more respect for myself. |
+| endline_1_q9_self_esteem | TRUE | Text | I certainly feel useless at times. |
+| endline_1_q10_self_esteem | TRUE | Text | At times I think I am no good at all. |
+| state_self_esteem_endline_risk | TRUE | Text | The risk rating for Self Esteem |
+| state_self_esteem_endline_score | TRUE | Text | The score for Self Esteem |
+
+### Endline Connectedness assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| endline_2_q1_connectedness | TRUE | Text | Do you have someone to talk to when you have a worry or problem? |
+| state_connectedness_endline_risk | TRUE | Text | The risk rating for Connectedness |
+| state_connectedness_endline_score | TRUE | Text | The score for Connectedness |
+
+### Endline Body Image assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| endline_3_q1_body_image | TRUE | Text | I feel good about myself. |
+| endline_3_q2_body_image | TRUE | Text | I feel good about my body. |
+| state_body_image_endline_risk | TRUE | Text | The risk rating for Body Image |
+| state_body_image_endline_score | TRUE | Text | The score for Body Image |
+
+### Endline Depression assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| endline_4_q1_depression | TRUE | Text | Feeling down, depressed or hopeless |
+| endline_4_q2_depression | TRUE | Text | Little interest or pleasure in doing things |
+| state_depression_endline_risk | TRUE | Text | The risk rating for Depression |
+| state_depression_endline_score | TRUE | Text | The score for Depression |
+
+### Endline Anxiety assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| endline_5_q1_anxiety | TRUE | Text | Feeling nervous, anxious or on edge |
+| endline_5_q2_anxiety | TRUE | Text | Not being able to stop or control worrying |
+| state_anxiety_endline_risk | TRUE | Text | The risk rating for Anxiety |
+| state_anxiety_endline_score | TRUE | Text | The score for Anxiety |
+
+### Endline Depression and Anxiety assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_depression_and_anxiety_endline_risk | TRUE | Text | The risk rating for Depression and Anxiety |
+| state_depression_and_anxiety_endline_score | TRUE | Text | The score for Depression and Anxiety |
+
+### Endline Self Perceived Healthcare assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| endline_6_q1_self_perceived_healthcare | TRUE | Text | How good a job do you feel you are doing in taking care of your health? |
+| endline_6_q2_self_perceived_healthcare | TRUE | Text | In the past 7 days, how many days did you go hungry? |
+| endline_6_q3_self_perceived_healthcare | TRUE | Text | When you have a health need do you go to your closest clinic? |
+| state_self_perceived_healthcare_endline_risk | TRUE | Text | The risk rating for Self Perceived Healthcare |
+| state_self_perceived_healthcare_endline_score | TRUE | Text | The score for Self Perceived Healthcare |
+
+### Endline Gender Attitude assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| endline_8_q1_gender_attitude | TRUE | Text | There are times when a woman deserves to be beaten |
+| endline_8_q2_gender_attitude | TRUE | Text | It’s a woman’s responsibility to avoid getting pregnant. |
+| endline_8_q3_gender_attitude | TRUE | Text | A man and a woman should decide together what type of contraceptive to use. |
+| endline_8_q4_gender_attitude | TRUE | Text | If a guy gets a women pregnant, the child is responsibility of both. |
+| state_gender_attitude_endline_risk | TRUE | Text | The risk rating for Gender Attitude |
+| state_gender_attitude_endline_score | TRUE | Text | The score for Gender Attitude |
+
+### Endline Sexual Consent assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| endline_9_q1_sexual_consent | TRUE | Text | Robert has the right to force Samantha to have sex. |
+| endline_9_q2_sexual_consent | TRUE | Text | If you're in a relationship, which of these statements describes you best? |
+| state_sexual_consent_endline_risk | TRUE | Text | The risk rating for Sexual Consent |
+| state_sexual_consent_endline_score | TRUE | Text | The score for Sexual Consent |
+
+### Endline Alcohol assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| endline_11_q1_alcohol | TRUE | Text | Have you ever felt guilty about drinking or drug use? |
+| endline_11_q2_alcohol | TRUE | Text | Have you ever felt you needed to cut down on your drinking or drug use? |
+| endline_11_q3_alcohol | TRUE | Text | Have people annoyed you by criticising your drinking or drug use? |
+| endline_11_q4_alcohol | TRUE | Text | Have you ever felt you needed a drink or used drugs first thing in the morning (eye‐opener)? |
+| state_alcohol_v2_risk | TRUE | Text | The risk rating for Alcohol |
+| state_alcohol_v2_score | TRUE | Text | The score for Alcohol |
+
+
+### Endline Platform Review assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| endline_12_q1_platfor_review | TRUE | Text | Did BWise send you content that related to your sexual needs? |
+| endline_12_q2_platfor_review | TRUE | Text | For the content that BWise sent you that related to your needs, was the content that BWise sent you interesting? |
+| endline_12_q3_platfor_review | TRUE | Text | How useful did you find the information the BWise sent you for managing your sexual health and relationship needs? |
+| endline_12_q4_platfor_review | TRUE | Text | HDid you know BWise is on Facebook and, if so, have you ever visited? |
+| endline_12_q5_platfor_review | TRUE | Text | Since joining BWise, have you ever felt like you needed to see a medical service about your mental or sexual health? |
+| endline_12_q6_platfor_review | TRUE | Text | Did you know you can use BWise WA to find a clinic for you based on your needs? |
+| endline_12_q7_platfor_review | TRUE | Text | Did you ever go to one of the services that BWise recommended? |
+| endline_12_q8_platfor_review | TRUE | Text | Since joining BWise, have you ever felt like you needed to speak to a counsellor about your mental or sexual health? |
+| endline_12_q9_platfor_review | TRUE | Text | Did you know you can request a callback from a LoveLife counsellor through the B-Wise WhatsApp chatbot? |

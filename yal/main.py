@@ -9,6 +9,7 @@ from yal.askaquestion import Application as AaqApplication
 from yal.assessments import Application as AssessmentApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.content_feedback_survey import ContentFeedbackSurveyApplication
+from yal.endline_terms_and_conditions import Application as EndlineTermsApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
 from yal.optout import Application as OptOutApplication
@@ -18,6 +19,7 @@ from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.surveys.baseline import Application as BaselineSurveyApplication
+from yal.surveys.endline import Application as EndlineSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import (
@@ -82,6 +84,7 @@ FEEDBACK_KEYWORDS = {"feedback"}
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
 EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
 AAQ_KEYWORDS = {"ask a question"}
+EJAF_ENDLINE_SURVEY_KEYWORDS = {"answer"}
 
 
 class Application(
@@ -101,6 +104,8 @@ class Application(
     ServiceFinderFeedbackSurveyApplication,
     AssessmentApplication,
     BaselineSurveyApplication,
+    EndlineSurveyApplication,
+    EndlineTermsApplication,
 ):
     START_STATE = "state_start"
 
@@ -185,6 +190,20 @@ class Application(
                 self.user.session_id = None
                 self.state_name = "state_baseline_start"
 
+            baseline_survey_completed = self.user.metadata.get(
+                "baseline_survey_completed"
+            )
+            endline_survey_completed = self.user.metadata.get(
+                "endline_survey_completed"
+            )
+
+            if (
+                keyword in EJAF_ENDLINE_SURVEY_KEYWORDS
+                and baseline_survey_completed
+                and not endline_survey_completed
+            ):
+                self.user.session_id = None
+                self.state_name = EndlineTermsApplication.START_STATE
             # Fields that RapidPro sets after a feedback push message
             feedback_state = await self.get_feedback_state()
             if feedback_state:
@@ -248,6 +267,7 @@ class Application(
     async def state_start(self):
         terms_accepted = self.user.metadata.get("terms_accepted")
         onboarding_completed = self.user.metadata.get("onboarding_completed")
+        endline_terms_accepted = self.user.metadata.get("endline_terms_accepted")
 
         inbound = utils.clean_inbound(self.inbound.content)
 
@@ -266,6 +286,8 @@ class Application(
                 return await self.go_to_state(MainMenuApplication.START_STATE)
             elif terms_accepted:
                 return await self.go_to_state(OnboardingApplication.START_STATE)
+            elif endline_terms_accepted:
+                return await self.go_to_state(EndlineSurveyApplication.START_STATE)
             else:
                 return await self.go_to_state(TermsApplication.START_STATE)
 
