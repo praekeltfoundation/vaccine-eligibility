@@ -85,9 +85,7 @@ async def test_state_monthly_household_income_endline(tester: AppTester, rapidpr
 
 
 @pytest.mark.asyncio
-async def test_state_accept_consent_reminder(
-    tester: AppTester, rapidpro_mock
-):
+async def test_state_accept_consent_reminder(tester: AppTester, rapidpro_mock):
 
     tester.setup_state("state_accept_consent")
     await tester.user_input("I can't right now")
