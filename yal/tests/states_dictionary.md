@@ -606,6 +606,13 @@
 | state_no_consent | False | Text | No consent to the endline study |
 | state_consent | False | Text | Ask for consent to the study |
 | state_platform_review_endline | False | Text | Review the platform |
+| state_relationship_status_endline | False | Text | endline relationship status |
+| state_submit_terms_and_conditions_endline | False | Text | Endline Terms and Condition Submit |
+| state_not_interested | False | Text | Endline Survery not interested |
+| state_monthly_household_income_endline | False | Text | Endline household income |
+| state_start_terms | False | Text | Endline terms and conditions |
+| state_set_reminder_timer | False | Text | Endline terms and conditions reminder |
+| state_have_questions | False | Text | Endline I have move questions |
 
 ### Endline Sexual Health literacy assessment
 | state_name | accepts_user_input | data_type | description |

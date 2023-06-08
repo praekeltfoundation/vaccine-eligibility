@@ -190,7 +190,18 @@ class Application(
                 self.user.session_id = None
                 self.state_name = "state_baseline_start"
 
-            if keyword in EJAF_ENDLINE_SURVEY_KEYWORDS:
+            baseline_survey_completed = self.user.metadata.get(
+                "baseline_survey_completed"
+            )
+            endline_survey_completed = self.user.metadata.get(
+                "endline_survey_completed"
+            )
+
+            if (
+                keyword in EJAF_ENDLINE_SURVEY_KEYWORDS
+                and baseline_survey_completed
+                and not endline_survey_completed
+            ):
                 self.user.session_id = None
                 self.state_name = EndlineTermsApplication.START_STATE
             # Fields that RapidPro sets after a feedback push message

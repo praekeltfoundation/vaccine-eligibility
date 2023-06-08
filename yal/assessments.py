@@ -424,9 +424,9 @@ class Application(BaseApplication):
             error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
             if error:
                 return await self.go_to_state("state_error")
-
-            if "endline" in assessment_name:
-                return self.go_to_state("state_not_interested")
+            # TODO: Hlami, check if the the survey is endline.
+            # if "endline" in assessment_name:
+            #     return self.go_to_state("state_not_interested")
 
             return await self.go_to_state("state_pre_mainmenu")
 
