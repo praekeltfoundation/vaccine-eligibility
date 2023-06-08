@@ -86,6 +86,7 @@ EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
 AAQ_KEYWORDS = {"ask a question"}
 EJAF_ENDLINE_SURVEY_KEYWORDS = {"answer"}
 
+
 class Application(
     TermsApplication,
     OnboardingApplication,
