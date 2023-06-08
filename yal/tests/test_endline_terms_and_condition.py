@@ -1,7 +1,10 @@
+from datetime import datetime
 import json
+from unittest import mock
 
 import pytest
 from sanic import Sanic, response
+from vaccine.hotline_callback import get_current_datetime
 
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
@@ -72,16 +75,35 @@ async def test_state_terms_decline(tester: AppTester, rapidpro_mock):
     )
     tester.assert_message(message)
 
+@pytest.mark.asyncio
+async def test_state_monthly_household_income_endline(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_monthly_household_income_endline")
+    await tester.user_input("1")
 
-#  TODO: Hlami fix this
-# @pytest.mark.asyncio
-# async def test_state_accept_consent_reminder(tester: AppTester, rapidpro_mock):
-#     tester.setup_state("state_accept_consent")
-#     await tester.user_input("I can't right now")
+    tester.assert_state("state_survey_question")
 
-# breakpoint()
+    message = "\n".join(
+        [
+            "◼️◽️◽️◽️",
+            "-----",
+            "",
+            "*I'm my own boss.* 😎"
+        ]
+    )
+    tester.assert_message(message)
 
-# tester.assert_state("state_set_reminder_timer")
+    
+@pytest.mark.asyncio
+@mock.patch("yal.surveys.endline.get_current_datetime")
+async def test_state_accept_consent_reminder(get_current_datetime, tester: AppTester, rapidpro_mock):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+
+    tester.setup_state("state_accept_consent")
+    await tester.user_input("I can't right now")
+
+    tester.assert_metadata("assessment_reminder_name", "state_accept_consent")
+    tester.assert_metadata("assessment_reminder_type", "reengagement 30min")
+    # tester.assert_metadata("assessment_reminder", "2022-06-19T17:30:00")
 
 
 @pytest.mark.asyncio

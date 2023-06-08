@@ -1,7 +1,7 @@
 import asyncio
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, ChoiceState, FreeText, WhatsAppButtonState
+from vaccine.states import Choice, ChoiceState, FreeText, WhatsAppButtonState, WhatsAppListState
 from yal import rapidpro
 from yal.surveys.endline import Application as EndlineApplication
 from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
@@ -141,7 +141,7 @@ class Application(BaseApplication):
         )
         error = self._(get_generic_error())
 
-        return ChoiceState(
+        return WhatsAppListState(
             self,
             question=question,
             error=error,
