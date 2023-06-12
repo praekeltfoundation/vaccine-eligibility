@@ -152,6 +152,7 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
+            button="Choose Option",
             next="state_monthly_household_income_endline",
         )
 
