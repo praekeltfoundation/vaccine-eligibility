@@ -92,7 +92,6 @@ async def test_state_accept_consent_reminder(tester: AppTester, rapidpro_mock):
 
     tester.assert_metadata("assessment_reminder_name", "state_accept_consent")
     tester.assert_metadata("assessment_reminder_type", "reengagement 30min")
-    # tester.assert_metadata("assessment_reminder", "2022-06-19T17:30:00")
 
 
 @pytest.mark.asyncio
