@@ -73,15 +73,25 @@ async def test_state_terms_decline(tester: AppTester, rapidpro_mock):
     tester.assert_message(message)
 
 
-#  TODO: Hlami fix this
-# @pytest.mark.asyncio
-# async def test_state_accept_consent_reminder(tester: AppTester, rapidpro_mock):
-#     tester.setup_state("state_accept_consent")
-#     await tester.user_input("I can't right now")
+@pytest.mark.asyncio
+async def test_state_monthly_household_income_endline(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_monthly_household_income_endline")
+    await tester.user_input("1")
 
-# breakpoint()
+    tester.assert_state("state_survey_question")
 
-# tester.assert_state("state_set_reminder_timer")
+    message = "\n".join(["◼️◽️◽️◽️", "-----", "", "*I'm my own boss.* 😎"])
+    tester.assert_message(message)
+
+
+@pytest.mark.asyncio
+async def test_state_accept_consent_reminder(tester: AppTester, rapidpro_mock):
+
+    tester.setup_state("state_accept_consent")
+    await tester.user_input("I can't right now")
+
+    tester.assert_metadata("assessment_reminder_name", "state_accept_consent")
+    tester.assert_metadata("assessment_reminder_type", "reengagement 30min")
 
 
 @pytest.mark.asyncio
