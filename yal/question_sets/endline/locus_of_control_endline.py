@@ -21,7 +21,7 @@ ASSESSMENT_QUESTIONS = {
                     "I don't understand",
                     "Skip question",
                 ],
-                "next": "endline_2_q2_loc",
+                "next": "endline_1_q2_loc",
             },
             "endline_1_q2_loc": {
                 "type": "list",
@@ -39,7 +39,7 @@ ASSESSMENT_QUESTIONS = {
                     "I don't understand",
                     "Skip question",
                 ],
-                "next": "endline_2_q3_loc",
+                "next": "endline_1_q3_loc",
             },
             "endline_1_q3_loc": {
                 "type": "list",
@@ -57,7 +57,7 @@ ASSESSMENT_QUESTIONS = {
                     "I don't understand",
                     "Skip question",
                 ],
-                "next": "endline_2_q4_loc",
+                "next": "endline_1_q4_loc",
             },
             "endline_1_q4_loc": {
                 "type": "list",

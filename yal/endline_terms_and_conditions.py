@@ -205,7 +205,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         assessment_name = self.user.metadata.get(
-            "assessment_name", "state_accept_consent"
+            "assessment_name", "locus_of_control_endline"
         )
         data = {
             "assessment_reminder": get_current_datetime().isoformat(),
