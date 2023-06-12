@@ -155,7 +155,7 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 0,
                     "skip_question": 0,
                 },
-                "next": "endline_1_q7_self_esteem",
+                "next": "endline_2_q7_self_esteem",
             },
             "endline_2_q7_self_esteem": {
                 "type": "list",
