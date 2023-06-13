@@ -17,7 +17,7 @@ class Application(BaseApplication):
     anxiety_score = 0
     START_STATE = "state_endline_start"
 
-    async def set_reminder_timer(self):
+    async def set_endline_reminder_timer(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
@@ -27,7 +27,7 @@ class Application(BaseApplication):
         data = {
             "assessment_reminder": get_current_datetime().isoformat(),
             "assessment_reminder_name": assessment_name,
-            "assessment_reminder_type": "reengagement 30min",
+            "assessment_reminder_type": "endline reengagement 30min",
         }
 
         return await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
@@ -42,7 +42,7 @@ class Application(BaseApplication):
         self.save_metadata(
             "assessment_end_state", "state_self_esteem_assessment_endline"
         )
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Self Esteem
@@ -51,7 +51,7 @@ class Application(BaseApplication):
         self.save_metadata(
             "assessment_end_state", "state_self_esteem_assessment_endline_end"
         )
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_self_esteem_assessment_endline_end(self):
@@ -78,7 +78,7 @@ class Application(BaseApplication):
         self.save_metadata(
             "assessment_end_state", "state_connectedness_assessment_endline_end"
         )
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Connectedness
@@ -87,7 +87,7 @@ class Application(BaseApplication):
         self.save_metadata(
             "assessment_end_state", "state_connectedness_assessment_endline_end"
         )
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_connectedness_assessment_endline_end(self):
@@ -115,7 +115,7 @@ class Application(BaseApplication):
             "assessment_end_state", "state_body_image_assessment_endline_end"
         )
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Body Image
@@ -125,7 +125,7 @@ class Application(BaseApplication):
             "assessment_end_state", "state_body_image_assessment_endline_end"
         )
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_body_image_assessment_endline_end(self):
@@ -153,7 +153,7 @@ class Application(BaseApplication):
             "assessment_end_state", "state_depression_assessment_endline"
         )
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Depression
@@ -163,7 +163,7 @@ class Application(BaseApplication):
             "assessment_end_state", "state_depression_assessment_endline_end"
         )
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_depression_assessment_endline_end(self):
@@ -190,7 +190,7 @@ class Application(BaseApplication):
         self.save_metadata("assessment_name", "anxiety_endline")
         self.save_metadata("assessment_end_state", "state_anxiety_assessment_endline")
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Anxiety
@@ -200,7 +200,7 @@ class Application(BaseApplication):
             "assessment_end_state", "state_anxiety_assessment_endline_end"
         )
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_anxiety_assessment_endline_end(self):
@@ -236,7 +236,7 @@ class Application(BaseApplication):
             "state_self_perceived_healthcare_assessment_endline_end",
         )
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_self_perceived_healthcare_assessment_endline_end(self):
@@ -264,7 +264,7 @@ class Application(BaseApplication):
             "assessment_end_state", "state_sexual_health_lit_assessment_endline"
         )
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Sexual Health Literacy
@@ -274,7 +274,7 @@ class Application(BaseApplication):
             "assessment_end_state", "state_sexual_health_lit_assessment_endline_end"
         )
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_sexual_health_lit_assessment_endline_end(self):
@@ -302,7 +302,7 @@ class Application(BaseApplication):
             "assessment_end_state", "state_gender_attitude_assessment_endline"
         )
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Gender Attitudes
@@ -312,7 +312,7 @@ class Application(BaseApplication):
             "assessment_end_state", "state_gender_attitude_assessment_endline_end"
         )
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_gender_attitude_assessment_endline_end(self):
@@ -340,7 +340,7 @@ class Application(BaseApplication):
             "assessment_end_state", "state_sexual_consent_assessment_endline"
         )
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Sexual Consent
@@ -350,7 +350,7 @@ class Application(BaseApplication):
             "assessment_end_state", "state_sexual_consent_assessment_endline_end"
         )
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_sexual_consent_assessment_endline_end(self):
@@ -376,7 +376,7 @@ class Application(BaseApplication):
         self.save_metadata("assessment_name", "alcohol_endline")
         self.save_metadata("assessment_end_state", "state_alcohol_assessment_endline")
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Alcohol
@@ -386,7 +386,7 @@ class Application(BaseApplication):
             "assessment_end_state", "state_alcohol_assessment_endline_end"
         )
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     async def state_alcohol_assessment_endline_end(self):
@@ -417,7 +417,7 @@ class Application(BaseApplication):
         self.save_metadata("assessment_name", "platform_review_endline")
         self.save_metadata("assessment_end_state", "state_submit_endline_completed")
 
-        await self.set_reminder_timer()
+        await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Endline Airtime Incentive

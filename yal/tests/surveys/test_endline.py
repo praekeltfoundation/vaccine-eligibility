@@ -865,3 +865,17 @@ async def test_state_alcohol_assessment_endline_end_error(
     [resp] = await app.process_message(msg)
 
     assert resp.content == ("Something went wrong. Please try again later.")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.surveys.endline.get_current_datetime")
+async def test_state_body_image_assessment_endline_reminder(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+    tester.setup_state("set_endline_reminder_timer")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_metadata("assessment_reminder", "2022-06-19T17:30:00")
+    tester.assert_metadata("assessment_reminder_name", "self_esteem_endline")
+    tester.assert_metadata("assessment_reminder_type", "endline reengagement 30min")

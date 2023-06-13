@@ -91,7 +91,7 @@ async def test_state_accept_consent_reminder(tester: AppTester, rapidpro_mock):
     await tester.user_input("I can't right now")
 
     tester.assert_metadata("assessment_reminder_name", "locus_of_control_endline")
-    tester.assert_metadata("assessment_reminder_type", "reengagement 30min")
+    tester.assert_metadata("assessment_reminder_type", "endline reengagement 30min")
 
 
 @pytest.mark.asyncio
