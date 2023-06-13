@@ -27,7 +27,7 @@ class Application(BaseApplication):
         data = {
             "assessment_reminder": get_current_datetime().isoformat(),
             "assessment_reminder_name": assessment_name,
-            "assessment_reminder_type": "reengagement 30min",
+            "assessment_reminder_type": "endline reengagement 30min",
         }
 
         return await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
