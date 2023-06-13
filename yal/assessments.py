@@ -502,7 +502,7 @@ class Application(BaseApplication):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         assessment_name = self.clean_name(
-            self.user.metadata["assessment_reminder_name"]
+            self.user.metadata.get("assessment_reminder_name")
         )
         assessment_risk = (
             f"{assessment_name}_risk"
