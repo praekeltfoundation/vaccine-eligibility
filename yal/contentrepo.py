@@ -87,7 +87,7 @@ async def get_choices_by_path(path: str) -> Tuple[bool, List[Choice]]:
 
                 for page in response_body["results"]:
                     choices.append(Choice(str(page["id"]), page["title"]))
-
+                response.close()
                 break
             except HTTP_EXCEPTIONS as e:
                 # TODO: better error handling once contentrepo is updated to
@@ -196,7 +196,7 @@ async def get_page_details(
                     response.raise_for_status()
                     response_body = await response.json()
                     page_details["image_path"] = response_body["meta"]["download_url"]
-
+                response.close()
                 break
             except HTTP_EXCEPTIONS as e:
                 if i == 2:
@@ -249,6 +249,7 @@ async def add_page_rating(user, page_id, helpful, comment=""):
                     },
                 )
                 response.raise_for_status()
+                response.close()
                 break
             except HTTP_EXCEPTIONS as e:
                 if i == 2:
