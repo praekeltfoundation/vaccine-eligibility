@@ -433,6 +433,34 @@ async def test_state_handle_assessment_reminder_response_not_interested(
     tester.assert_metadata("assessment_reminder_type", "")
 
 
+@pytest.mark.asyncio
+async def test_state_state_survey_question_endline(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    tester.user.metadata["assessment_name"] = "locus_of_control_endline"
+    tester.user.metadata["assessment_reminder_sent"] = "True"
+
+    tester.setup_state("state_survey_question")
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_metadata("assessment_reminder_type", "endline reengagement 30min")
+
+
+@pytest.mark.asyncio
+async def test_state_state_survey_question_baseline(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    tester.user.metadata["assessment_name"] = "locus_of_control"
+    tester.user.metadata["assessment_reminder_sent"] = "True"
+
+    tester.setup_state("state_survey_question")
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_metadata("assessment_reminder_type", "reengagement 30min")
+
+
 def test_clean_name(tester: AppTester):
     """
     Should return the assessment name without the 'state_' or '_assessment'
