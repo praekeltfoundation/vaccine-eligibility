@@ -168,13 +168,14 @@ class Application(BaseApplication):
         assessment_name = self.clean_name(
             metadata.get("assessment_name", "locus_of_control")
         )
+        survey = "endline " if assessment_name.endswith("endline") else ""
 
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
             "assessment_reminder": get_current_datetime().isoformat(),
             "assessment_reminder_name": assessment_name,
-            "assessment_reminder_type": "reengagement 30min",
+            "assessment_reminder_type": f"{survey}reengagement 30min",
         }
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
