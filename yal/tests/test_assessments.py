@@ -441,3 +441,41 @@ def test_clean_name(tester: AppTester):
         tester.application.clean_name("state_mental_health_assessment")  # type: ignore
         == "mental_health"
     )
+
+
+@pytest.mark.asyncio
+async def test_state_handle_stop_assessment_reminder_none(tester: AppTester):
+    tester.user.metadata["assessment_reminder_name"] = None
+    tester.user.metadata["assessment_reminder_sent"] = ""
+    tester.user.metadata["assessment_reminder_type"] = "reengagement 30min"
+
+    tester.setup_state("state_stop_assessment_reminders")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="skip")
+    tester.assert_state("state_stop_assessment_reminders")
+    tester.assert_message(
+        "\n".join(
+            [
+                "Cool-cool.",
+                "",
+                "*What would you like to do now?*",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_stop_assessment_reminder_without_reminder_name(tester: AppTester):
+    tester.user.metadata["assessment_reminder_sent"] = ""
+    tester.user.metadata["assessment_reminder_type"] = "reengagement 30min"
+
+    tester.setup_state("state_stop_assessment_reminders")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="skip")
+    tester.assert_message(
+        "\n".join(
+            [
+                "Cool-cool.",
+                "",
+                "*What would you like to do now?*",
+            ]
+        )
+    )
