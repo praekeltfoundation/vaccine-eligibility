@@ -22,7 +22,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         assessment_name = self.user.metadata.get(
-            "assessment_name", "self_esteem_endline"
+            "assessment_name", "locus_of_control_endline"
         )
         data = {
             "assessment_reminder": get_current_datetime().isoformat(),
@@ -74,7 +74,7 @@ class Application(BaseApplication):
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
-        self.save_metadata("assessment_name", "connectedness_v2")
+        self.save_metadata("assessment_name", "connectedness_endline")
         self.save_metadata(
             "assessment_end_state", "state_connectedness_assessment_endline_end"
         )
@@ -83,7 +83,7 @@ class Application(BaseApplication):
 
     # Connectedness
     async def state_connectedness_assessment_endline(self):
-        self.save_metadata("assessment_name", "connectedness_v2")
+        self.save_metadata("assessment_name", "connectedness_endline")
         self.save_metadata(
             "assessment_end_state", "state_connectedness_assessment_endline_end"
         )

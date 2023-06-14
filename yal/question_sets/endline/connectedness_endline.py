@@ -4,7 +4,7 @@ ASSESSMENT_QUESTIONS = {
     "1": {
         "start": "endline_3_q1_connectedness",
         "questions": {
-            "baseline_2_q1_connectedness": {
+            "endline_3_q1_connectedness": {
                 "type": "list",
                 "text": "\n".join(
                     [

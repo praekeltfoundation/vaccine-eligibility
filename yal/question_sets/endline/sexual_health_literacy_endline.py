@@ -320,61 +320,6 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip_question": 1,
                 },
-                "next": "endline_8_q12_sexual_health_lit",
-            },
-            "endline_8_q12_sexual_health_lit": {
-                "type": "list",
-                "text": "\n".join(
-                    [
-                        "*Remember*- your answers are not linked back to you or "
-                        "shared with anyone."
-                        "",
-                        "*Are you currently living with HIV?*",
-                    ]
-                ),
-                "options": [
-                    ("yes", "Yes"),
-                    ("no", "No"),
-                    ("skip_question", "Skip question"),
-                ],
-                "next": {
-                    "yes": "endline_8_q13_sexual_health_lit",
-                    "no": "endline_8_q14_sexual_health_lit",
-                    "skip_question": None,
-                },
-            },
-            "endline_8_q13_sexual_health_lit": {
-                "type": "list",
-                "text": "\n".join(
-                    [
-                        "*Do you take ART (antiretroviral therapy) medication "
-                        "on a regular basis?*",
-                    ]
-                ),
-                "options": [
-                    ("yes", "Yes"),
-                    ("no", "No"),
-                    ("skip_question", "Skip question"),
-                ],
-                "next": {
-                    "yes": None,
-                    "no": None,
-                    "skip_question": None,
-                },
-            },
-            "endline_8_q14_sexual_health_lit": {
-                "type": "list",
-                "text": "\n".join(
-                    [
-                        "*Do you take PrEP (Pre-exposure prophylaxis) "
-                        "medication on a regular basis?*",
-                    ]
-                ),
-                "options": [
-                    ("yes", "Yes"),
-                    ("no", "No"),
-                    ("skip_question", "Skip question"),
-                ],
                 "next": None,
             },
         },
