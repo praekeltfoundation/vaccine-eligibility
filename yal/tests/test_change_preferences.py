@@ -861,3 +861,16 @@ async def test_study_optout_confirm(tester: AppTester, google_api_mock, rapidpro
 
     assert tester.application.user.metadata["ejaf_study_optin"] == "False"
     tester.assert_state("study_optout_confirm")
+
+
+@pytest.mark.asyncio
+async def test_state_update_location_confirm_none_latlng(
+    tester: AppTester, google_api_mock, rapidpro_mock
+):
+    tester.user.metadata["latitude"] = None
+    tester.user.metadata["longitude"] = None
+    tester.user.metadata["location_description"] = "277 Bedford Avenue, Brooklyn, NY"
+    tester.setup_state("state_update_location_confirm")
+
+    await tester.user_input("no")
+    tester.assert_state("state_update_location")
