@@ -434,6 +434,29 @@ async def test_state_handle_assessment_reminder_response_not_interested(
 
 
 @pytest.mark.asyncio
+async def test_state_handle_assessment_reminder_response_not_interested_endline(
+    tester: AppTester, contentrepo_api_mock, rapidpro_mock
+):
+    tester.user.metadata["assessment_reminder_sent"] = "True"
+    tester.user.metadata["assessment_reminder_name"] = "self_esteem_endline"
+    tester.setup_state("state_survey_question")
+    await tester.user_input("I'm not interested")
+    tester.assert_state("state_not_interested")
+
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "assessment_reminder_name": "",
+            "assessment_reminder_sent": "",
+            "assessment_reminder_type": "",
+        },
+    }
+    tester.assert_metadata("assessment_reminder_name", "")
+    tester.assert_metadata("assessment_reminder_sent", "")
+    tester.assert_metadata("assessment_reminder_type", "")
+
+
+@pytest.mark.asyncio
 async def test_state_state_survey_question_endline(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
@@ -507,3 +530,21 @@ async def test_stop_assessment_reminder_without_reminder_name(tester: AppTester)
             ]
         )
     )
+
+
+@pytest.mark.asyncio
+async def test_state_assessment_later_submit_baseline(tester: AppTester):
+    tester.user.metadata["assessment_reminder_name"] = "locus_of_control"
+
+    tester.setup_state("state_assessment_later_submit")
+
+    tester.assert_metadata("assessment_reminder_name", "locus_of_control")
+
+
+@pytest.mark.asyncio
+async def test_state_assessment_later_submit_endline(tester: AppTester):
+    tester.user.metadata["assessment_reminder_name"] = "locus_of_control_endline"
+
+    tester.setup_state("state_assessment_later_submit")
+
+    tester.assert_metadata("assessment_reminder_name", "locus_of_control_endline")
