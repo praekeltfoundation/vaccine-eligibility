@@ -22,7 +22,7 @@ class Application(BaseApplication):
         whatsapp_id = msisdn.lstrip(" + ")
 
         assessment_name = self.user.metadata.get(
-            "assessment_name", "self_esteem_endline"
+            "assessment_name", "locus_of_control_endline"
         )
         data = {
             "assessment_reminder": get_current_datetime().isoformat(),
@@ -74,7 +74,7 @@ class Application(BaseApplication):
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
-        self.save_metadata("assessment_name", "connectedness_v2")
+        self.save_metadata("assessment_name", "connectedness_endline")
         self.save_metadata(
             "assessment_end_state", "state_connectedness_assessment_endline_end"
         )
@@ -83,7 +83,7 @@ class Application(BaseApplication):
 
     # Connectedness
     async def state_connectedness_assessment_endline(self):
-        self.save_metadata("assessment_name", "connectedness_v2")
+        self.save_metadata("assessment_name", "connectedness_endline")
         self.save_metadata(
             "assessment_end_state", "state_connectedness_assessment_endline_end"
         )
@@ -148,45 +148,6 @@ class Application(BaseApplication):
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
-        self.save_metadata("assessment_name", "depression_endline")
-        self.save_metadata(
-            "assessment_end_state", "state_depression_assessment_endline"
-        )
-
-        await self.set_endline_reminder_timer()
-        return await self.go_to_state(AssessmentApplication.START_STATE)
-
-    # Depression
-    async def state_depression_assessment_endline(self):
-        self.save_metadata("assessment_name", "depression_endline")
-        self.save_metadata(
-            "assessment_end_state", "state_depression_assessment_endline_end"
-        )
-
-        await self.set_endline_reminder_timer()
-        return await self.go_to_state(AssessmentApplication.START_STATE)
-
-    async def state_depression_assessment_endline_end(self):
-        score = self.user.metadata.get("assessment_score", 0)
-        self.depression_score = score
-        if score >= 3:
-            # score of 3-6 high risk
-            risk = "high_risk"
-        else:
-            # score of 0-2 low risk
-            risk = "low_risk"
-
-        msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
-        data = {
-            "depression_risk": risk,
-            "depression_score": score,
-        }
-        self.save_answer("state_depression_endline_risk", risk)
-        self.save_answer("state_depression_endline_score", str(score))
-        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
-        if error:
-            return await self.go_to_state("state_error")
         self.save_metadata("assessment_name", "anxiety_endline")
         self.save_metadata("assessment_end_state", "state_anxiety_assessment_endline")
 
@@ -224,9 +185,46 @@ class Application(BaseApplication):
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
             return await self.go_to_state("state_error")
-        return await self.go_to_state(
-            "state_self_perceived_healthcare_assessment_endline"
+        return await self.go_to_state("state_depression_assessment_endline")
+
+    # Depression
+    async def state_depression_assessment_endline(self):
+        self.save_metadata("assessment_name", "depression_endline")
+        self.save_metadata(
+            "assessment_end_state", "state_depression_assessment_endline_end"
         )
+
+        await self.set_endline_reminder_timer()
+        return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_depression_assessment_endline_end(self):
+        score = self.user.metadata.get("assessment_score", 0)
+        self.depression_score = score
+        if score >= 3:
+            # score of 3-6 high risk
+            risk = "high_risk"
+        else:
+            # score of 0-2 low risk
+            risk = "low_risk"
+
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "depression_risk": risk,
+            "depression_score": score,
+        }
+        self.save_answer("state_depression_endline_risk", risk)
+        self.save_answer("state_depression_endline_score", str(score))
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+        self.save_metadata("assessment_name", "self_perceived_healthcare_endline")
+        self.save_metadata(
+            "assessment_end_state", "state_self_perceived_healthcare_assessment_endline"
+        )
+
+        await self.set_endline_reminder_timer()
+        return await self.go_to_state(AssessmentApplication.START_STATE)
 
     # Self Perceived Healthcare
     async def state_self_perceived_healthcare_assessment_endline(self):

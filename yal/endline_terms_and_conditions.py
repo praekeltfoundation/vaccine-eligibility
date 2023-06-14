@@ -9,6 +9,7 @@ from vaccine.states import (
     WhatsAppListState,
 )
 from yal import rapidpro
+from yal.assessments import Application as AssessmentApplication
 from yal.surveys.endline import Application as EndlineApplication
 from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
@@ -213,7 +214,11 @@ class Application(BaseApplication):
             "assessment_reminder_type": "endline reengagement 30min",
         }
 
-        return await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
+        return await self.go_to_state(AssessmentApplication.LATER_STATE)
 
     async def state_submit_terms_and_conditions_endline(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)

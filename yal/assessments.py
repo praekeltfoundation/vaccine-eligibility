@@ -168,13 +168,14 @@ class Application(BaseApplication):
         assessment_name = self.clean_name(
             metadata.get("assessment_name", "locus_of_control")
         )
+        survey = "endline " if assessment_name.endswith("endline") else ""
 
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
             "assessment_reminder": get_current_datetime().isoformat(),
             "assessment_reminder_name": assessment_name,
-            "assessment_reminder_type": "reengagement 30min",
+            "assessment_reminder_type": f"{survey}reengagement 30min",
         }
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
@@ -328,8 +329,12 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
+        survey = ""
+        if "assessment_reminder_name" in self.user.metadata:
+            survey = "_endline"
+
         assessment_name = self.clean_name(
-            self.user.metadata.get("assessment_name", "locus_of_control")
+            self.user.metadata.get("assessment_name", f"locus_of_control{survey}")
         )
 
         data = {
@@ -365,6 +370,9 @@ class Application(BaseApplication):
 
     async def state_handle_assessment_reminder_response(self):
         inbound = utils.clean_inbound(self.inbound.content)
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
         if inbound in [
             "continue now",
             "let s do it",
@@ -372,8 +380,6 @@ class Application(BaseApplication):
             "start the questions",
             "Yes, I want to answer",
         ]:
-            msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-            whatsapp_id = msisdn.lstrip(" + ")
             data = {
                 "assessment_reminder_sent": "",  # Reset the field
             }
@@ -413,8 +419,9 @@ class Application(BaseApplication):
             return await self.go_to_state("state_reschedule_assessment_reminder")
 
         if inbound == "i m not interested":
-            msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-            whatsapp_id = msisdn.lstrip(" + ")
+            assessment_name = ""
+            if "assessment_reminder_name" in self.user.metadata:
+                assessment_name = self.user.metadata["assessment_reminder_name"]
             data = {
                 "assessment_reminder_name": "",
                 "assessment_reminder_sent": "",
@@ -424,25 +431,32 @@ class Application(BaseApplication):
             error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
             if error:
                 return await self.go_to_state("state_error")
-            # TODO: Hlami, check if the the survey is endline.
-            # if "endline" in assessment_name:
-            #     return self.go_to_state("state_not_interested")
+
+            if assessment_name.endswith("endline"):
+                return await self.go_to_state("state_not_interested")
 
             return await self.go_to_state("state_pre_mainmenu")
 
     async def state_not_interested(self):
-        return FreeText(
+        return WhatsAppButtonState(
             self,
             question=self._(
                 "\n".join(
                     [
-                        "That's completely okay, there are no consequences "
-                        "to not taking part in this study. Please enjoy the "
-                        "BWise tool and stay safe. If you change your mind, "
-                        "please send *Answer* to this number",
+                        "[persona emoji] *No problem! You will no longer "
+                        "be part of this survey.*",
+                        "",
+                        "Remember, you can still use the menu to get the info you "
+                        "need.",
                     ]
                 )
             ),
+            choices=[
+                Choice("menu", self._("Go to the menu")),
+                Choice("aaq", self._("Ask a question")),
+            ],
+            next=None,
+            error=self._(get_generic_error()),
         )
 
     async def state_stop_assessment_reminders_confirm(self):
