@@ -309,19 +309,14 @@ async def test_state_body_image_assessment_end(tester: AppTester):
             "◼️◽️",
             "-----",
             "",
-            "*Over the last 2 weeks, how often have you been "
-            "bothered by the following problems?*",
-            "",
-            "Feeling down, depressed or hopeless",
+            "Feeling nervous, anxious or on edge",
         ]
     )
 
     tester.assert_message(message)
     tester.assert_state("state_survey_question")
-    tester.assert_metadata("assessment_name", "depression_endline")
-    tester.assert_metadata(
-        "assessment_end_state", "state_depression_assessment_endline"
-    )
+    tester.assert_metadata("assessment_name", "anxiety_endline")
+    tester.assert_metadata("assessment_end_state", "state_anxiety_assessment_endline")
 
 
 @pytest.mark.asyncio
@@ -379,17 +374,20 @@ async def test_depression_assessment_endline_end(tester: AppTester):
 
     message = "\n".join(
         [
-            "◼️◽️",
+            "◼️◽️◽️",
             "-----",
             "",
-            "Feeling nervous, anxious or on edge",
+            "*How good a job do you feel you are doing in taking"
+            " care of your health?*",
         ]
     )
 
     tester.assert_message(message)
     tester.assert_state("state_survey_question")
-    tester.assert_metadata("assessment_name", "anxiety_endline")
-    tester.assert_metadata("assessment_end_state", "state_anxiety_assessment_endline")
+    tester.assert_metadata("assessment_name", "self_perceived_healthcare_endline")
+    tester.assert_metadata(
+        "assessment_end_state", "state_self_perceived_healthcare_assessment_endline"
+    )
 
 
 @pytest.mark.asyncio
@@ -445,11 +443,13 @@ async def test_state_anxiety_assessment_endline_end(tester: AppTester):
 
     message = "\n".join(
         [
-            "◼️◽️◽️",
+            "◼️◽️",
             "-----",
             "",
-            "*How good a job do you feel you are doing in taking"
-            " care of your health?*",
+            "*Over the last 2 weeks, how often have you been "
+            "bothered by the following problems?*",
+            "",
+            "Feeling down, depressed or hopeless",
         ]
     )
 
