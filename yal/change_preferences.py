@@ -387,39 +387,41 @@ class Application(BaseApplication):
         longitude = metadata.get("longitude")
 
         async with get_google_api() as session:
-            for i in range(3):
-                try:
-                    response = await session.get(
-                        urljoin(
-                            config.GOOGLE_PLACES_URL,
-                            "/maps/api/geocode/json",
-                        ),
-                        params={
-                            "latlng": f"{latitude},{longitude}",
-                            "key": config.GOOGLE_PLACES_KEY,
-                            "sessiontoken": secrets.token_bytes(20).hex(),
-                            "language": "en",
-                        },
-                    )
-                    response.raise_for_status()
-                    data = await response.json()
+            if latitude and longitude:
+                for i in range(3):
+                    try:
+                        response = await session.get(
+                            urljoin(
+                                config.GOOGLE_PLACES_URL,
+                                "/maps/api/geocode/json",
+                            ),
+                            params={
+                                "latlng": f"{latitude},{longitude}",
+                                "key": config.GOOGLE_PLACES_KEY,
+                                "sessiontoken": secrets.token_bytes(20).hex(),
+                                "language": "en",
+                            },
+                        )
+                        response.raise_for_status()
+                        data = await response.json()
 
-                    if data["status"] != "OK":
-                        return await self.go_to_state("state_error")
+                        if data["status"] != "OK":
+                            return await self.go_to_state("state_error")
 
-                    first_result = data["results"][0]
-                    self.save_metadata("place_id", first_result["place_id"])
-                    self.save_metadata(
-                        "new_location_description", first_result["formatted_address"]
-                    )
+                        first_result = data["results"][0]
+                        self.save_metadata("place_id", first_result["place_id"])
+                        self.save_metadata(
+                            "new_location_description",
+                            first_result["formatted_address"],
+                        )
 
-                    return await self.go_to_state("state_update_location_confirm")
-                except HTTP_EXCEPTIONS as e:
-                    if i == 2:
-                        logger.exception(e)
-                        return await self.go_to_state("state_error")
-                    else:
-                        continue
+                        return await self.go_to_state("state_update_location_confirm")
+                    except HTTP_EXCEPTIONS as e:
+                        if i == 2:
+                            logger.exception(e)
+                            return await self.go_to_state("state_error")
+                        else:
+                            continue
 
     async def state_update_location_confirm(self):
         location = self.user.metadata.get("new_location_description")
