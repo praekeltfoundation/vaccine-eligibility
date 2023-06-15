@@ -316,7 +316,9 @@ async def test_state_body_image_assessment_end(tester: AppTester):
     tester.assert_message(message)
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "anxiety_endline")
-    tester.assert_metadata("assessment_end_state", "state_anxiety_assessment_endline")
+    tester.assert_metadata(
+        "assessment_end_state", "state_anxiety_assessment_endline_end"
+    )
 
 
 @pytest.mark.asyncio
@@ -386,7 +388,7 @@ async def test_depression_assessment_endline_end(tester: AppTester):
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "self_perceived_healthcare_endline")
     tester.assert_metadata(
-        "assessment_end_state", "state_self_perceived_healthcare_assessment_endline"
+        "assessment_end_state", "state_self_perceived_healthcare_assessment_endline_end"
     )
 
 
@@ -452,7 +454,6 @@ async def test_state_anxiety_assessment_endline_end(tester: AppTester):
             "Feeling down, depressed or hopeless",
         ]
     )
-
     tester.assert_message(message)
     tester.assert_state("state_survey_question")
 
@@ -567,7 +568,7 @@ async def test_state_self_perceived_healthcare_assessment_endline_end(
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "sexual_health_literacy_endline")
     tester.assert_metadata(
-        "assessment_end_state", "state_sexual_health_lit_assessment_endline"
+        "assessment_end_state", "state_sexual_health_lit_assessment_endline_end"
     )
 
 
@@ -621,7 +622,7 @@ async def test_state_sexual_health_lit_assessment_endline_end(tester: AppTester)
         "test",
         transport_metadata={
             "message": {
-                "button": {"payload": "state_sexual_health_lit_assessment_v2_end"}
+                "button": {"payload": "state_sexual_health_lit_assessment_endline_end"}
             }
         },
     )
@@ -639,9 +640,9 @@ async def test_state_sexual_health_lit_assessment_endline_end(tester: AppTester)
 
     tester.assert_message(message)
     tester.assert_state("state_survey_question")
-    tester.assert_metadata("assessment_name", "gender_attitude_v2")
+    tester.assert_metadata("assessment_name", "gender_attitude_endline")
     tester.assert_metadata(
-        "assessment_end_state", "state_gender_attitude_assessment_v2_end"
+        "assessment_end_state", "state_gender_attitude_assessment_endline_end"
     )
 
 
@@ -702,7 +703,7 @@ async def test_state_gender_attitude_assessment_endline_end(tester: AppTester):
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "sexual_consent_endline")
     tester.assert_metadata(
-        "assessment_end_state", "state_sexual_consent_assessment_endline"
+        "assessment_end_state", "state_sexual_consent_assessment_endline_end"
     )
 
 
@@ -792,7 +793,9 @@ async def test_state_sexual_consent_assessment_endline_end(tester: AppTester):
     tester.assert_message(message)
     tester.assert_state("state_survey_question")
     tester.assert_metadata("assessment_name", "alcohol_endline")
-    tester.assert_metadata("assessment_end_state", "state_alcohol_assessment_endline")
+    tester.assert_metadata(
+        "assessment_end_state", "state_alcohol_assessment_endline_end"
+    )
 
 
 @pytest.mark.asyncio
@@ -879,3 +882,220 @@ async def test_state_body_image_assessment_endline_reminder(
     tester.assert_metadata("assessment_reminder", "2022-06-19T17:30:00")
     tester.assert_metadata("assessment_reminder_name", "locus_of_control_endline")
     tester.assert_metadata("assessment_reminder_type", "endline reengagement 30min")
+
+
+@pytest.mark.asyncio
+async def test_endline_flow(tester: AppTester, rapidpro_mock):
+    await tester.user_input(
+        "test",
+        transport_metadata={"message": {"button": {"payload": "state_endline_start"}}},
+    )
+
+    # LOC
+    message = "\n".join(["◼️◽️◽️◽️", "-----", "", "*I'm my own boss.* 😎"])
+    tester.assert_message(message)
+    await tester.user_input("Applies")
+    await tester.user_input("Applies")
+    await tester.user_input("Applies")
+    await tester.user_input("Applies")
+
+    # Self Esteem
+    message = "\n".join(
+        [
+            "◼️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "-----",
+            "",
+            "How do you feel about the following statements?",
+            "",
+            "*I feel that I am a person of worth,"
+            " at least on an equal plane with others.*",
+        ]
+    )
+    tester.assert_message(message)
+    await tester.user_input("Agree")
+    await tester.user_input("Agree")
+    await tester.user_input("Agree")
+    await tester.user_input("Skip question")
+    await tester.user_input("Disagree")
+    await tester.user_input("Agree")
+    await tester.user_input("Agree")
+    await tester.user_input("Skip question")
+    await tester.user_input("Skip question")
+
+    # Connectedness
+    message = "\n".join(
+        [
+            "◼️",
+            "-----",
+            "",
+            "*Do you have someone to talk to when you have a worry or problem?*",
+        ]
+    )
+
+    tester.assert_message(message)
+    await tester.user_input("All of the time")
+
+    # Body Image
+    message = "\n".join(
+        [
+            "◼️◽️",
+            "-----",
+            "",
+            "*Do you agree with this statement?*",
+            "",
+            "I feel good about myself.",
+        ]
+    )
+
+    tester.assert_message(message)
+    await tester.user_input("Yes")
+    await tester.user_input("No")
+
+    # # Anxiety
+    message = "\n".join(
+        [
+            "◼️◽️",
+            "-----",
+            "",
+            "Feeling nervous, anxious or on edge",
+        ]
+    )
+
+    tester.assert_message(message)
+
+    await tester.user_input("Not at all")
+    await tester.user_input("Not at all")
+
+    # Depression
+    message = "\n".join(
+        [
+            "◼️◽️",
+            "-----",
+            "",
+            "*Over the last 2 weeks, how often have you been "
+            "bothered by the following problems?*",
+            "",
+            "Feeling down, depressed or hopeless",
+        ]
+    )
+
+    tester.assert_message(message)
+    await tester.user_input("Not at all")
+    await tester.user_input("Not at all")
+
+    # self percieved health
+    message = "\n".join(
+        [
+            "◼️◽️◽️",
+            "-----",
+            "",
+            "*How good a job do you feel you are doing in taking"
+            " care of your health?*",
+        ]
+    )
+
+    tester.assert_message(message)
+    await tester.user_input("Excellent")
+    await tester.user_input("None")
+    await tester.user_input("Yes")
+
+    # sexual literacy
+    message = "\n".join(
+        [
+            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "-----",
+            "",
+            "*Is the following statement true or false?*",
+            "",
+            "People can reduce the risk of getting sexually"
+            " transmitted infections (STIs) "
+            "by using condoms every time they have sex.",
+        ]
+    )
+
+    tester.assert_message(message)
+
+    await tester.user_input("True")
+    await tester.user_input("True")
+    await tester.user_input("Agree")
+    await tester.user_input("Very true")
+    await tester.user_input("Skip question")
+    await tester.user_input("Very true")
+    await tester.user_input("Skip question")
+    await tester.user_input("Skip question")
+    await tester.user_input("Pill")
+    await tester.user_input("None")
+    await tester.user_input("Yes")
+
+    # Gender
+
+    message = "\n".join(
+        [
+            "◼️◽️◽️◽️",
+            "-----",
+            "",
+            "**How do you feel about each of the following statements?* *",
+            "",
+            "There are times when a woman deserves to be beaten",
+        ]
+    )
+
+    tester.assert_message(message)
+
+    await tester.user_input("Skip question")
+    await tester.user_input("Strongly agree")
+    await tester.user_input("Skip question")
+    await tester.user_input("Strongly agree")
+
+    # Sexual Consent
+    message = "\n".join(
+        [
+            "◼️◽️",
+            "-----",
+            "",
+            "Robert and Samantha have been dating for 5 years and"
+            " love each other very much."
+            " 👩🏾\u200d❤️\u200d👨🏾\n\nEvery year on Robert's birthday, "
+            "Samantha promises him sex for his birthday. "
+            "This year, Samantha tells Robert that she is too tired for sex. ",
+            "",
+            "*To what extent do you agree with this statement:*",
+            "",
+            "Robert has the right to force Samantha to have sex.",
+        ]
+    )
+
+    tester.assert_message(message)
+
+    await tester.user_input("Strongly agree")
+    await tester.user_input("Skip question")
+
+    message = "\n".join(
+        [
+            "◼️◽️◽️◽️",
+            "-----",
+            "",
+            "*Have you ever felt guilty about drinking or drug use?* 🍻💉",
+        ]
+    )
+
+    tester.assert_message(message)
+
+    await tester.user_input("Yes")
+    await tester.user_input("No")
+    await tester.user_input("Yes")
+    await tester.user_input("No")
+
+    # Platform
+    message = "\n".join(
+        [
+            "◼️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "-----",
+            "",
+            "You have received a lot of content from BWise.",
+            "",
+            "*Did BWise send you content that related to your sexual needs?*",
+        ]
+    )
+
+    tester.assert_message(message)
