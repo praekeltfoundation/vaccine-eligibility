@@ -443,7 +443,7 @@ class Application(BaseApplication):
             question=self._(
                 "\n".join(
                     [
-                        "[persona emoji] *No problem! You will no longer "
+                        "[persona_emoji] *No problem! You will no longer "
                         "be part of this survey.*",
                         "",
                         "Remember, you can still use the menu to get the info you "
