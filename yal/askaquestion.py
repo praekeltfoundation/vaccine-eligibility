@@ -464,9 +464,24 @@ class Application(BaseApplication):
 
     async def state_no_question_not_answered_thank_you(self):
         choices = [
-            Choice("clinic", self._("Find a clinic")),
             Choice("counsellor", self._("Talk to a counsellor")),
         ]
+
+        next = {
+            "counsellor": PleaseCallMeApplication.START_STATE,
+        }
+
+        if (await rapidpro.check_if_service_finder_active()).lower() == "true":
+            choices = [
+                Choice("clinic", self._("Find a clinic")),
+                Choice("counsellor", self._("Talk to a counsellor")),
+            ]
+
+            next = {
+                "clinic": ServiceFinderApplication.START_STATE,
+                "counsellor": PleaseCallMeApplication.START_STATE,
+            }
+
         question = self._(
             "\n".join(
                 [
@@ -490,10 +505,7 @@ class Application(BaseApplication):
             question=question,
             choices=choices,
             error=self._(get_generic_error()),
-            next={
-                "clinic": ServiceFinderApplication.START_STATE,
-                "counsellor": PleaseCallMeApplication.START_STATE,
-            },
+            next=next,
         )
 
     async def state_handle_list_timeout(self):

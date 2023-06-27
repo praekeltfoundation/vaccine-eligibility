@@ -120,6 +120,26 @@ async def rapidpro_mock():
         tstate.requests.append(request)
         return response.json({}, status=200)
 
+    @app.route("/api/v2/globals.json", methods=["GET"])
+    def check_if_service_finder_active(request):
+        tstate.requests.append(request)
+        assert request.args.get("key") == "service_finder_active"
+        return response.json(
+            {
+                "next": None,
+                "previous": None,
+                "results": [
+                    {
+                        "key": "service_finder_active",
+                        "name": "Survice Finder Active",
+                        "value": "True",
+                        "modified_on": "2023-05-30T07:34:06.216776Z",
+                    }
+                ],
+            },
+            status=200,
+        )
+
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
@@ -625,7 +645,7 @@ async def test_state_handle_timeout_handles_type_1_no(tester: AppTester, rapidpr
     tester.setup_state("state_handle_timeout_response")
     await tester.user_input("no, I'm good")
 
-    assert len(rapidpro_mock.tstate.requests) == 4
+    assert len(rapidpro_mock.tstate.requests) == 5
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"feedback_survey_sent": "", "feedback_timestamp": ""},
