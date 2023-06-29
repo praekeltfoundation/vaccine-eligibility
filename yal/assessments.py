@@ -412,10 +412,12 @@ class Application(BaseApplication):
 
         if inbound == "remind me in 1 hour":
             self.save_metadata("assessment_reminder_hours", "1hour")
+            self.save_metadata("assessment_reminder_type", "later 1hour")
             return await self.go_to_state("state_reschedule_assessment_reminder")
 
         if inbound == "remind me tomorrow":
             self.save_metadata("assessment_reminder_hours", "23hours")
+            self.save_metadata("assessment_reminder_type", "later 23hours")
             return await self.go_to_state("state_reschedule_assessment_reminder")
 
         if inbound == "i m not interested":
