@@ -293,7 +293,7 @@ async def test_state_handle_assessment_reminder_response_1h(
         "assessment_reminder_hours": "1hour",
         "assessment_reminder_name": "sexual_health_literacy",
         "assessment_reminder_sent": "",
-        "assessment_reminder_type": "reengagement 1hour",
+        "assessment_reminder_type": "later 1hour",
     }
 
 
