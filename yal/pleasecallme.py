@@ -256,7 +256,6 @@ class Application(BaseApplication):
                         trace_request_ctx={"msisdn": f"*{msisdn[-4:]}"},
                     )
                     response.raise_for_status()
-                    response.close()
                     break
                 except HTTP_EXCEPTIONS as e:
                     if i == 2:
