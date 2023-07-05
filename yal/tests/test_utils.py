@@ -1,3 +1,4 @@
+import unittest
 from datetime import datetime
 from unittest import TestCase
 
@@ -122,3 +123,21 @@ def test_is_integer():
 
     obj = 1234
     assert utils.is_integer(obj)
+
+
+class PhoneNumberTest(unittest.TestCase):
+    def test_normalise_phone_number_is_valid(self):
+        res = utils.normalise_phonenumber("0781234567")
+        self.assertEqual(res, "+27781234567")
+
+    def test_normalise_phone_number_with_plus(self):
+        res = utils.normalise_phonenumber("+27781234567")
+        self.assertEqual(res, "+27781234567")
+
+    def test_normalise_phone_number_without_plus(self):
+        res = utils.normalise_phonenumber("27781234567")
+        self.assertEqual(res, "+27781234567")
+
+    def test_normalise_phone_number_invalid(self):
+        with self.assertRaises(ValueError):
+            utils.normalise_phonenumber("2778123456")
