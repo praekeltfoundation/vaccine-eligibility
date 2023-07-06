@@ -75,7 +75,7 @@ def normalise_phonenumber(phonenumber):
             assert phonenumbers.is_valid_number(pn)
             return phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.E164)
     except (phonenumbers.phonenumberutil.NumberParseException, AssertionError):
-        raise ValueError(f"Invalid phone number {phonenumber}")
+        raise ValueError("Invalid phone number")
 
 
 def extract_first_emoji(persona_emoji):
