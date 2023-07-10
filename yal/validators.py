@@ -39,7 +39,7 @@ def year_validator(error_text):
 
 def phone_number_validator(error_text):
     async def validator(value):
-        if value.startswith("+") or value.isdigit():
+        if value:
             try:
                 normalise_phonenumber(value)
             except ValueError as e:

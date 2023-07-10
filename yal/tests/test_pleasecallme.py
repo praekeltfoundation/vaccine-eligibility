@@ -941,3 +941,13 @@ async def state_state_specify_msisdn_invalid_input_with_plus(tester: AppTester):
     tester.assert_message(
         "\n".join(["⚠️ Please type a valid cell phone number.", "Example _081234567_"])
     )
+
+
+@pytest.mark.asyncio
+async def state_state_specify_msisdn_empty_input(tester: AppTester):
+    tester.setup_state("state_specify_msisdn")
+    await tester.user_input(None)
+    tester.assert_state("state_specify_msisdn")
+    tester.assert_message(
+        "\n".join(["⚠️ Please type a valid cell phone number.", "Example _081234567_"])
+    )
