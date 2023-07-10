@@ -921,3 +921,23 @@ async def state_call_not_helpful_try_again_declined_to_update(tester: AppTester)
     tester.setup_state("state_call_not_helpful_try_again_declined")
     await tester.user_input("Update your info")
     tester.assert_state("state_display_preferences")
+
+
+@pytest.mark.asyncio
+async def state_state_specify_msisdn_string_input(tester: AppTester):
+    tester.setup_state("state_specify_msisdn")
+    await tester.user_input("277812frog")
+    tester.assert_state("state_specify_msisdn")
+    tester.assert_message(
+        "\n".join(["⚠️ Please type a valid cell phone number.", "Example _081234567_"])
+    )
+
+
+@pytest.mark.asyncio
+async def state_state_specify_msisdn_invalid_input_with_plus(tester: AppTester):
+    tester.setup_state("state_specify_msisdn")
+    await tester.user_input("+2778123456")
+    tester.assert_state("state_specify_msisdn")
+    tester.assert_message(
+        "\n".join(["⚠️ Please type a valid cell phone number.", "Example _081234567_"])
+    )
