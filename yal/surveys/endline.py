@@ -40,10 +40,34 @@ class Application(BaseApplication):
     async def state_locus_of_control_assessment_endline(self):
         self.save_metadata("assessment_name", "locus_of_control_endline")
         self.save_metadata(
-            "assessment_end_state", "state_self_esteem_assessment_endline"
+            "assessment_end_state", "state_locus_of_control_assessment_endline_end"
         )
         await self.set_endline_reminder_timer()
         return await self.go_to_state(AssessmentApplication.START_STATE)
+
+    async def state_locus_of_control_assessment_endline_end(self):
+        score = self.user.metadata.get("assessment_score", 0)
+        if score <= 12:
+            # score of 0-14 high risk
+            risk = "high_risk"
+        else:
+            # score of 15-30 low risk
+            risk = "low_risk"
+
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "locus_of_control_risk": risk,
+            "locus_of_control_score": score,
+        }
+        self.save_answer("state_locus_of_control_endline_risk", risk)
+        self.save_answer("state_locus_of_control_endline_score", str(score))
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
+        await self.set_endline_reminder_timer()
+        return await self.go_to_state("state_self_esteem_assessment_endline")
 
     # Self Esteem
     async def state_self_esteem_assessment_endline(self):

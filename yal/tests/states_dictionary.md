@@ -579,6 +579,7 @@
 | state_endline_start | TRUE | Text | Start of Endline Survey. |
 | state_endline_end | TRUE | Text | End of Endline Survey. |
 | state_locus_of_control_assessment_endline | True | Text | Starts locus of control Assesment |
+| state_locus_of_control_assessment_endline_end | True | Text | End of locus of control Assesment |
 | state_self_esteem_assessment_endline | TRUE | Text | Start of Self Esteem Assessment. |
 | state_self_esteem_assessment_endline_end | TRUE | Text | End of of Self Esteem Assessment. |
 | state_sexual_health_lit_assessment_endline | TRUE | Text | Start of SHL Assessment. |
@@ -634,6 +635,16 @@
 | endline_7_q14_sexual_health_lit | TRUE | Text | Do you take PrEP (Pre-exposure prophylaxis) medication on a regular basis? |
 | state_sexual_health_lit_endline_risk | TRUE | Text | The risk rating for Sexual Health literacy |
 | state_sexual_health_lit_endline_score | TRUE | Text | The score for Sexual Health literacy |
+
+### Endline LOC assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| endline_1_q1_loc | TRUE | Text | I'm my own boss. |
+| endline_1_q2_loc | TRUE | Text | If I work hard, I will be successful. |
+| endline_1_q3_loc | TRUE | Text | What I do mainly depends on other people. |
+| endline_1_q4_loc | TRUE | Text | Fate often gets in the way of my plans. |
+| state_locus_of_control_endline_risk | TRUE | Text | The risk rating for Locus of Control |
+| state_locus_of_control_endline_score | TRUE | Text | The score for Locus of Control |
 
 ### Endline Self Esteem assessment
 | state_name | accepts_user_input | data_type | description |
