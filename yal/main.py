@@ -84,7 +84,7 @@ FEEDBACK_KEYWORDS = {"feedback"}
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
 EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
 AAQ_KEYWORDS = {"ask a question"}
-EJAF_ENDLINE_SURVEY_KEYWORDS = {"answer"}
+EJAF_ENDLINE_SURVEY_KEYWORDS = {"answer", "yes  i want to answer"}
 
 
 class Application(
