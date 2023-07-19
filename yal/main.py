@@ -84,7 +84,7 @@ FEEDBACK_KEYWORDS = {"feedback"}
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
 EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
 AAQ_KEYWORDS = {"ask a question"}
-EJAF_ENDLINE_SURVEY_KEYWORDS = {"answer", "yes  i want to answer"}
+EJAF_ENDLINE_SURVEY_KEYWORDS = {"answer", "yes i want to answer"}
 
 
 class Application(
@@ -196,7 +196,6 @@ class Application(
             endline_survey_completed = self.user.metadata.get(
                 "endline_survey_completed"
             )
-
             if (
                 keyword in EJAF_ENDLINE_SURVEY_KEYWORDS
                 and baseline_survey_completed
