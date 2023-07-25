@@ -9,7 +9,6 @@ from vaccine.states import (
     WhatsAppListState,
 )
 from yal import rapidpro
-from yal.assessments import Application as AssessmentApplication
 from yal.surveys.endline import Application as EndlineApplication
 from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
@@ -218,7 +217,26 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
-        return await self.go_to_state(AssessmentApplication.LATER_STATE)
+        question = self._(
+            "\n".join(
+                [
+                    "[persona_emoji] No worries, we get it!",
+                    "",
+                    "I'll send you a reminder message in 30 mins, so you can come back "
+                    "and answer these questions.",
+                    "",
+                    "Check you later 🤙🏾",
+                ]
+            )
+        )
+
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=[Choice("menu", "Go to main menu")],
+            error=get_generic_error(),
+            next="state_pre_mainmenu",
+        )
 
     async def state_submit_terms_and_conditions_endline(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)

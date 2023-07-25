@@ -90,9 +90,21 @@ async def test_state_accept_consent_reminder(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_accept_consent")
     await tester.user_input("I can't right now")
 
-    tester.assert_state("state_assessment_later")
+    tester.assert_state("state_set_reminder_timer")
     tester.assert_metadata("assessment_reminder_name", "locus_of_control_endline")
-    tester.assert_metadata("assessment_reminder_type", "later 1hour")
+    tester.assert_metadata("assessment_reminder_type", "endline reengagement 30min")
+
+    message = "\n".join(
+        [
+            "🤖 No worries, we get it!",
+            "",
+            "I'll send you a reminder message in 30 mins, so you can come back"
+            " and answer these questions.",
+            "",
+            "Check you later 🤙🏾",
+        ]
+    )
+    tester.assert_message(message)
 
 
 @pytest.mark.asyncio
