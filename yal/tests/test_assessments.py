@@ -454,6 +454,16 @@ async def test_state_handle_assessment_reminder_response_not_interested_endline(
     tester.assert_metadata("assessment_reminder_name", "")
     tester.assert_metadata("assessment_reminder_sent", "")
     tester.assert_metadata("assessment_reminder_type", "")
+    tester.assert_message(
+        "\n".join(
+            [
+                "That's completely okay, there are no consequences to not "
+                "taking part in this study. Please enjoy the BWise tool "
+                "and stay safe. If you change your mind, please send "
+                "*Answer* to this number"
+            ]
+        )
+    )
 
 
 @pytest.mark.asyncio
