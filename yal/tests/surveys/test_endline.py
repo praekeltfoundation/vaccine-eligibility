@@ -92,6 +92,52 @@ async def test_endline_invitation_i_want_to_answer(tester: AppTester, rapidpro_m
 
     assert user.state.name == "state_start_terms"
 
+@pytest.mark.asyncio
+async def test_endline_invitation_remind_me_tomorrow(
+    tester: AppTester, rapidpro_mock,
+):
+    user = User(
+        addr="278201234567",
+        state=StateData(),
+        session_id=1,
+        metadata={"baseline_survey_completed": True},
+    )
+    app = Application(user)
+    msg = Message(
+        content="Remind me tomorrow",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+
+    [reply] = await app.process_message(msg)
+
+    assert user.state.name == "state_handle_assessment_reminder_response"
+
+@pytest.mark.asyncio
+async def test_endline_invitation_not_interested(
+    tester: AppTester, rapidpro_mock,
+):
+    user = User(
+        addr="278201234567",
+        state=StateData(),
+        session_id=1,
+        metadata={"baseline_survey_completed": True},
+    )
+    app = Application(user)
+    msg = Message(
+        content="I'm not interested",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+
+    [reply] = await app.process_message(msg)
+
+    assert user.state.name == "state_no_consent"
+
 
 @pytest.mark.asyncio
 async def test_endline_invitation_answer(tester: AppTester, rapidpro_mock):
