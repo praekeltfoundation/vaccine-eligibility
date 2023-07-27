@@ -84,7 +84,12 @@ FEEDBACK_KEYWORDS = {"feedback"}
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
 EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
 AAQ_KEYWORDS = {"ask a question"}
-EJAF_ENDLINE_SURVEY_KEYWORDS = {"answer", "yes i want to answer", "remind me tomorrow", "i m not interested"}
+EJAF_ENDLINE_SURVEY_KEYWORDS = {
+    "answer",
+    "yes i want to answer",
+    "remind me tomorrow",
+    "i m not interested",
+}
 
 
 class Application(
@@ -180,7 +185,7 @@ class Application(
                 if self.user.metadata.get("onboarding_reminder_sent"):
                     self.user.session_id = None
                     self.state_name = OnboardingApplication.REMINDER_STATE
-    
+
             if keyword in ASSESSMENT_REENGAGEMENT_KEYWORDS:
                 if self.user.metadata.get("assessment_reminder_sent"):
                     self.user.session_id = None
@@ -189,7 +194,6 @@ class Application(
             if keyword in SURVEY_KEYWORDS:
                 self.user.session_id = None
                 self.state_name = "state_baseline_start"
-
 
             baseline_survey_completed = self.user.metadata.get(
                 "baseline_survey_completed"
@@ -205,7 +209,6 @@ class Application(
             ):
                 self.save_metadata("assessment_reminder_sent", False)
                 self.save_metadata("assessment_reminder_name", "")
-
 
                 if keyword == "remind me tomorrow":
                     self.user.session_id = None

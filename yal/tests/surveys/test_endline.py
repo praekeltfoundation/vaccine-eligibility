@@ -92,9 +92,11 @@ async def test_endline_invitation_i_want_to_answer(tester: AppTester, rapidpro_m
 
     assert user.state.name == "state_start_terms"
 
+
 @pytest.mark.asyncio
 async def test_endline_invitation_remind_me_tomorrow(
-    tester: AppTester, rapidpro_mock,
+    tester: AppTester,
+    rapidpro_mock,
 ):
     user = User(
         addr="278201234567",
@@ -115,9 +117,11 @@ async def test_endline_invitation_remind_me_tomorrow(
 
     assert user.state.name == "state_remind_tomorrow"
 
+
 @pytest.mark.asyncio
 async def test_endline_invitation_not_interested(
-    tester: AppTester, rapidpro_mock,
+    tester: AppTester,
+    rapidpro_mock,
 ):
     user = User(
         addr="278201234567",
