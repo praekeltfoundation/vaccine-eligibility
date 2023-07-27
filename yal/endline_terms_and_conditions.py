@@ -61,7 +61,7 @@ class Application(BaseApplication):
             choices=[
                 Choice("yes", "Yes, I agree"),
                 Choice("no", "No, I don't agree"),
-                Choice("question", "I have some questions"),
+                Choice("question", "I have a question"),
             ],
             error=error,
             next={
