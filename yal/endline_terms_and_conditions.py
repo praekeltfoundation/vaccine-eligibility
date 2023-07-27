@@ -221,7 +221,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "[persona_emoji] No worries, we get it!",
+                    "No worries, we get it!",
                     "",
                     "I'll send you a reminder message in 30 mins, so you can come back "
                     "and answer these questions.",
@@ -231,12 +231,10 @@ class Application(BaseApplication):
             )
         )
 
-        return WhatsAppButtonState(
+        return FreeText(
             self,
             question=question,
-            choices=[Choice("menu", "Go to main menu")],
-            error=get_generic_error(),
-            next="state_pre_mainmenu",
+            next=None,
         )
 
     async def state_submit_terms_and_conditions_endline(self):

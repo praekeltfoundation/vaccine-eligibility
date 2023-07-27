@@ -198,16 +198,14 @@ class Application(
                 "endline_survey_completed"
             )
 
-            # self.save_metadata("survey_name", "baseline_survey")
-
             if (
                 keyword in EJAF_ENDLINE_SURVEY_KEYWORDS
                 and baseline_survey_completed
                 and not endline_survey_completed
             ):
-                # self.save_metadata("survey_name", "endline_survey")
-                # self.save_metadata("assessment_reminder_sent", False)
-                # self.save_metadata("assessment_reminder_name", "Not set")
+                self.save_metadata("assessment_reminder_sent", False)
+                self.save_metadata("assessment_reminder_name", "")
+
 
                 if keyword == "remind me tomorrow":
                     self.user.session_id = None
