@@ -84,7 +84,12 @@ FEEDBACK_KEYWORDS = {"feedback"}
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
 EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
 AAQ_KEYWORDS = {"ask a question"}
-EJAF_ENDLINE_SURVEY_KEYWORDS = {"answer", "yes i want to answer"}
+EJAF_ENDLINE_SURVEY_KEYWORDS = {
+    "answer",
+    "yes i want to answer",
+    "remind me tomorrow",
+    "i m not interested",
+}
 
 
 class Application(
@@ -196,13 +201,25 @@ class Application(
             endline_survey_completed = self.user.metadata.get(
                 "endline_survey_completed"
             )
+
             if (
                 keyword in EJAF_ENDLINE_SURVEY_KEYWORDS
                 and baseline_survey_completed
                 and not endline_survey_completed
             ):
-                self.user.session_id = None
-                self.state_name = EndlineTermsApplication.START_STATE
+                self.save_metadata("assessment_reminder_sent", False)
+                self.save_metadata("assessment_reminder_name", "")
+
+                if keyword == "remind me tomorrow":
+                    self.user.session_id = None
+                    self.state_name = AssessmentApplication.REMINDER_STATE
+                elif keyword == "i m not interested":
+                    self.user.session_id = None
+                    self.state_name = EndlineTermsApplication.NO_CONSENT_STATE
+                else:
+                    self.user.session_id = None
+                    self.state_name = EndlineTermsApplication.START_STATE
+
             # Fields that RapidPro sets after a feedback push message
             feedback_state = await self.get_feedback_state()
             if feedback_state:

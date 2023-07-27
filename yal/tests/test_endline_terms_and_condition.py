@@ -96,7 +96,7 @@ async def test_state_accept_consent_reminder(tester: AppTester, rapidpro_mock):
 
     message = "\n".join(
         [
-            "🤖 No worries, we get it!",
+            "No worries, we get it!",
             "",
             "I'll send you a reminder message in 30 mins, so you can come back"
             " and answer these questions.",
