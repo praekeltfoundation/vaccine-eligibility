@@ -113,7 +113,7 @@ async def test_endline_invitation_remind_me_tomorrow(
 
     [reply] = await app.process_message(msg)
 
-    assert user.state.name == "state_handle_assessment_reminder_response"
+    assert user.state.name == "state_remind_tomorrow"
 
 @pytest.mark.asyncio
 async def test_endline_invitation_not_interested(

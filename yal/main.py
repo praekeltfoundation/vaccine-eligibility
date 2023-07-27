@@ -197,15 +197,22 @@ class Application(
             endline_survey_completed = self.user.metadata.get(
                 "endline_survey_completed"
             )
+
+            # self.save_metadata("survey_name", "baseline_survey")
+
             if (
                 keyword in EJAF_ENDLINE_SURVEY_KEYWORDS
                 and baseline_survey_completed
                 and not endline_survey_completed
             ):
+                # self.save_metadata("survey_name", "endline_survey")
+                # self.save_metadata("assessment_reminder_sent", False)
+                # self.save_metadata("assessment_reminder_name", "Not set")
+
                 if keyword == "remind me tomorrow":
                     self.user.session_id = None
                     self.state_name = AssessmentApplication.REMINDER_STATE
-                if keyword == "i m not interested":
+                elif keyword == "i m not interested":
                     self.user.session_id = None
                     self.state_name = EndlineTermsApplication.NO_STATE
                 else:
