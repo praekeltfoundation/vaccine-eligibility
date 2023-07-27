@@ -215,7 +215,7 @@ class Application(
                     self.state_name = AssessmentApplication.REMINDER_STATE
                 elif keyword == "i m not interested":
                     self.user.session_id = None
-                    self.state_name = EndlineTermsApplication.NO_STATE
+                    self.state_name = EndlineTermsApplication.NO_CONSENT_STATE
                 else:
                     self.user.session_id = None
                     self.state_name = EndlineTermsApplication.START_STATE

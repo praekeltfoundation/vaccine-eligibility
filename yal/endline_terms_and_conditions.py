@@ -15,7 +15,7 @@ from yal.utils import get_current_datetime, get_generic_error, normalise_phonenu
 
 class Application(BaseApplication):
     START_STATE = "state_start_terms"
-    NO_STATE = "state_no_consent"
+    NO_CONSENT_STATE = "state_no_consent"
 
     async def state_start_terms(self):
         question = self._(
