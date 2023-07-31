@@ -102,7 +102,7 @@ async def test_endline_invitation_remind_me_tomorrow(
         addr="278201234567",
         state=StateData(),
         session_id=1,
-        metadata={"baseline_survey_completed": True, "endline_reminder": True},
+        metadata={"baseline_survey_completed": True, "endline_survey_started": True},
     )
     app = Application(user)
     msg = Message(
