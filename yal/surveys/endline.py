@@ -425,8 +425,12 @@ class Application(BaseApplication):
             "endline_survey_completed": "True",
             "ejaf_endline_airtime_incentive_sent": "False",
             "ejaf_endline_completed_on": get_current_datetime().isoformat(),
+            "endline_survey_started": "",
+            "endline_reminder": "",
         }
         self.save_answer("endline_survey_completed", "True")
+        self.save_answer("endline_survey_started", "False")
+        self.save_answer("endline_reminder", "False")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:

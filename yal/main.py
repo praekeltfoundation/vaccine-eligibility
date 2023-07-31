@@ -1,8 +1,9 @@
 import asyncio
 import logging
+import random
 
 from vaccine.models import Message
-from vaccine.states import Choice, EndState, WhatsAppButtonState
+from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
 from vaccine.utils import get_display_choices, random_id
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AaqApplication
@@ -202,6 +203,7 @@ class Application(
             )
 
             endline_survey_started = self.user.metadata.get("endline_survey_started")
+            endline_reminder = self.user.metadata.get("endline_reminder")
 
             if (
                 keyword in EJAF_ENDLINE_SURVEY_KEYWORDS
@@ -215,7 +217,7 @@ class Application(
                     self.user.session_id = None
                     self.state_name = AssessmentApplication.REMINDER_STATE
                 elif keyword == "i m not interested":
-                    if endline_survey_started:
+                    if endline_reminder:
                         self.user.session_id = None
                         self.state_name = (
                             AssessmentApplication.REMINDER_NOT_INTERESTED_STATE
@@ -226,6 +228,10 @@ class Application(
                 else:
                     self.user.session_id = None
                     self.state_name = EndlineTermsApplication.START_STATE
+
+            if endline_survey_started and not self.state_name:
+                self.user.session_id = None
+                self.state_name = "state_survey_validation"
 
             # Fields that RapidPro sets after a feedback push message
             feedback_state = await self.get_feedback_state()
@@ -855,3 +861,24 @@ class Application(
         """
         content = replace_persona_fields(question, self.user.metadata)
         await self.worker.publish_message(self.inbound.reply(content))
+
+    async def state_survey_validation(self):
+        """
+        Validates survey keywords from RapidPro
+        """
+
+        GENERIC_ERRORS = (
+            "Oh oh 👀, I don't understand your reply. But don't worry, we can "
+            "try again. This time, please reply with the option that matches "
+            "your choice.👍🏾",
+            "Oops, looks like I don't have that option available.🤔 Please "
+            "try again - I'll get it if you use the option that matches your "
+            "choice, promise.👍🏾",
+            "Umm...I'm sorry but I'm not sure what that means "
+            "[persona_emoji]👩🏾. You can help me by trying again. This time, "
+            "look for the option matching your choice and send that👍🏾",
+        )
+
+        random_error = random.choice(GENERIC_ERRORS)
+
+        return FreeText(self, question=random_error, next=None)
