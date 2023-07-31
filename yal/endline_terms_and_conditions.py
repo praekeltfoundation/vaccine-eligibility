@@ -105,7 +105,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "That's completely okay, there are no consequences to not taking ,"
+                    "That's completely okay, there are no consequences to not taking "
                     "part in this study. Please enjoy the BWise tool and stay safe. "
                     "If you change your mind, please send *Answer* to this number",
                 ]
