@@ -142,6 +142,7 @@ class Application(BaseApplication):
     START_STATE = "state_survey_start"
     LATER_STATE = "state_assessment_later_submit"
     REMINDER_STATE = "state_handle_assessment_reminder_response"
+    REMINDER_NOT_INTERESTED_STATE = "state_reminder_not_interested"
 
     def clean_name(self, name):
         return name.removeprefix("state_").removesuffix("_assessment")
@@ -626,10 +627,47 @@ class Application(BaseApplication):
         return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
     async def state_remind_tomorrow(self):
+
+        endline_survey_started = self.user.metadata.get("endline_survey_started")
+
+        question = "No problem! I'll remind you tomorrow"
+
+        if endline_survey_started:
+            return FreeText(self, question=question, next=None)
+        else:
+            return WhatsAppButtonState(
+                self,
+                question=question,
+                choices=[Choice("menu", "Go to main menu")],
+                next="state_pre_mainmenu",
+                error=self._(get_generic_error()),
+            )
+
+    async def state_reminder_not_interested(self):
+
+        choices = [
+            Choice("menu", "Go to the menu"),
+            Choice("aaq", "Ask a question"),
+        ]
+
+        question = self._(
+            "\n".join(
+                [
+                    "[persona_emoji] *No problem! You will no longer be part"
+                    " of this study.*",
+                    "",
+                    "Remember, you can still use the menu to get the info you need.",
+                ]
+            )
+        )
+
         return WhatsAppButtonState(
             self,
-            question=self._("No problem! I'll remind you tomorrow"),
-            choices=[Choice("menu", "Go to main menu")],
-            next="state_pre_mainmenu",
+            question=question,
+            choices=choices,
             error=self._(get_generic_error()),
+            next={
+                "menu": "state_pre_mainmenu",
+                "aaq": "state_aaq_start",
+            },
         )

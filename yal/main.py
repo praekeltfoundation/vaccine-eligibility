@@ -185,7 +185,6 @@ class Application(
                 if self.user.metadata.get("onboarding_reminder_sent"):
                     self.user.session_id = None
                     self.state_name = OnboardingApplication.REMINDER_STATE
-
             if keyword in ASSESSMENT_REENGAGEMENT_KEYWORDS:
                 if self.user.metadata.get("assessment_reminder_sent"):
                     self.user.session_id = None
@@ -202,6 +201,8 @@ class Application(
                 "endline_survey_completed"
             )
 
+            endline_survey_started = self.user.metadata.get("endline_survey_started")
+
             if (
                 keyword in EJAF_ENDLINE_SURVEY_KEYWORDS
                 and baseline_survey_completed
@@ -214,8 +215,14 @@ class Application(
                     self.user.session_id = None
                     self.state_name = AssessmentApplication.REMINDER_STATE
                 elif keyword == "i m not interested":
-                    self.user.session_id = None
-                    self.state_name = EndlineTermsApplication.NO_CONSENT_STATE
+                    if endline_survey_started:
+                        self.user.session_id = None
+                        self.state_name = (
+                            AssessmentApplication.REMINDER_NOT_INTERESTED_STATE
+                        )
+                    else:
+                        self.user.session_id = None
+                        self.state_name = EndlineTermsApplication.NO_CONSENT_STATE
                 else:
                     self.user.session_id = None
                     self.state_name = EndlineTermsApplication.START_STATE
