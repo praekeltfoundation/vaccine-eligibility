@@ -246,6 +246,7 @@
 | state_sexual_health_literacy_send_risk_message |    TRUE        |     Text     |            TRUE          | Sends the user a message based on their risk score, takes in "yes" and "no" |
 | state_handle_assessment_reminder_response |    FALSE        |          |                      | Handles the response to the assessment reminders |
 | state_stop_assessment_reminders_confirm |    TRUE        |     Text     |   TRUE    | Confirms that the user no longer wants assessment reminders |
+| state_stop_assessment_reminders_clear_fields |    FALSE        |     Text     |   FALSE    |  Clears the users  assessment reminders, then send user on to next state to determine where they want to go
 | state_stop_assessment_reminders |    TRUE        |     Text     |   TRUE    |  Sets the user to no longer get assessment reminders, asks user if they would like to go to menu or aaq |
 | state_reschedule_assessment_reminder |    |    |    | Schedules the assessment reminders |
 | state_remind_tomorrow |    TRUE        |     Text     |   TRUE    | Lets the user know we will remind them tomorrow, asks the user if they would like to go to the mainmenu |

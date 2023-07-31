@@ -485,7 +485,7 @@ class Application(BaseApplication):
                     Choice("start", self._("Start questions")),
                 ],
                 next={
-                    "skip": "state_stop_assessment_reminders",
+                    "skip": "state_stop_assessment_reminders_clear_fields",
                     "start": f"state_{assessment_reminder_name}_assessment",
                 },
                 error=self._(get_generic_error()),
@@ -508,13 +508,13 @@ class Application(BaseApplication):
                     Choice("start", self._("Start questions")),
                 ],
                 next={
-                    "skip": "state_stop_assessment_reminders",
+                    "skip": "state_stop_assessment_reminders_clear_fields",
                     "start": f"state_{assessment_reminder_name}_assessment",
                 },
                 error=self._(get_generic_error()),
             )
 
-    async def state_stop_assessment_reminders(self):
+    async def state_stop_assessment_reminders_clear_fields(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         assessment_name = None
@@ -538,7 +538,15 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
-        if assessment_name != "locus_of_control":
+        self.save_metadata("last_assessment_reminder_cleared_name", assessment_name)
+        return await self.go_to_state("state_stop_assessment_reminders")
+
+    async def state_stop_assessment_reminders(self):
+        last_assessment_reminder_cleared_name = self.user.metadata.get(
+            "last_assessment_reminder_cleared_name"
+        )
+        self.delete_metadata("last_assessment_reminder_cleared_name")
+        if last_assessment_reminder_cleared_name != "locus_of_control":
             return WhatsAppButtonState(
                 self,
                 question=self._(
