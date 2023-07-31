@@ -26,6 +26,17 @@ GENERIC_ERRORS = (
     "me by trying again. This time, look for the number matching your choice and send "
     "that👍🏽",
 )
+GENERIC_ERROR_OPTIONS = (
+    "Oh oh 👀, I don't understand your reply. But don't worry, we can "
+    "try again. This time, please reply with the option that matches "
+    "your choice.👍🏾",
+    "Oops, looks like I don't have that option available.🤔 Please "
+    "try again - I'll get it if you use the option that matches your "
+    "choice, promise.👍🏾",
+    "Umm...I'm sorry but I'm not sure what that means "
+    "[persona_emoji]👩🏾. You can help me by trying again. This time, "
+    "look for the option matching your choice and send that👍🏾",
+)
 GENDERS = {
     "female": "Female",
     "male": "Male",
@@ -137,3 +148,7 @@ def is_integer(string: str) -> bool:
         return True
     except ValueError:
         return False
+
+
+def get_generic_error_options():
+    return random.choice(GENERIC_ERROR_OPTIONS)

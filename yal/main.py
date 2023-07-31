@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import random
 
 from vaccine.models import Message
 from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
@@ -26,6 +25,7 @@ from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import (
     get_current_datetime,
     get_generic_error,
+    get_generic_error_options,
     is_integer,
     normalise_phonenumber,
     replace_persona_fields,
@@ -866,19 +866,6 @@ class Application(
         """
         Validates survey keywords from RapidPro
         """
-
-        GENERIC_ERRORS = (
-            "Oh oh 👀, I don't understand your reply. But don't worry, we can "
-            "try again. This time, please reply with the option that matches "
-            "your choice.👍🏾",
-            "Oops, looks like I don't have that option available.🤔 Please "
-            "try again - I'll get it if you use the option that matches your "
-            "choice, promise.👍🏾",
-            "Umm...I'm sorry but I'm not sure what that means "
-            "[persona_emoji]👩🏾. You can help me by trying again. This time, "
-            "look for the option matching your choice and send that👍🏾",
-        )
-
-        random_error = random.choice(GENERIC_ERRORS)
+        random_error = get_generic_error_options()
 
         return FreeText(self, question=random_error, next=None)
