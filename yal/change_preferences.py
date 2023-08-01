@@ -166,7 +166,7 @@ class Application(BaseApplication):
         )
 
     async def state_update_age_confirm(self):
-        age = self.user.answers.get("state_update_age")
+        age = self.user.answers.get("state_update_age").lower()
         if age == "skip":
             return await self.go_to_state("state_display_preferences")
 
@@ -200,7 +200,7 @@ class Application(BaseApplication):
         )
 
     async def state_update_age_submit(self):
-        if self.user.answers.get("state_update_age") == "skip":
+        if self.user.answers.get("state_update_age").lower() == "skip":
             return await self.go_to_state("state_display_preferences")
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
