@@ -152,7 +152,7 @@ async def test_endline_reminder_not_interested(
         addr="278201234567",
         state=StateData(),
         session_id=1,
-        metadata={"baseline_survey_completed": True, "endline_survey_started": True},
+        metadata={"baseline_survey_completed": True, "endline_reminder": True},
     )
     app = Application(user)
     msg = Message(
@@ -189,6 +189,29 @@ async def test_endline_invitation_answer(tester: AppTester, rapidpro_mock):
     [reply] = await app.process_message(msg)
 
     assert user.state.name == "state_start_terms"
+
+
+@pytest.mark.asyncio
+async def test_endline_survey_validation(tester: AppTester, rapidpro_mock):
+
+    user = User(
+        addr="278201234567",
+        state=StateData(),
+        session_id=1,
+        metadata={"baseline_survey_completed": True, "endline_survey_started": True},
+    )
+    app = Application(user)
+    msg = Message(
+        content="this is wrong input",
+        to_addr="27820001002",
+        from_addr="27820001003",
+        transport_name="whatsapp",
+        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
+    )
+
+    [reply] = await app.process_message(msg)
+
+    assert user.state.name == "state_survey_validation"
 
 
 @pytest.mark.asyncio

@@ -2,12 +2,17 @@
 import logging
 
 from vaccine.base_application import BaseApplication
-from vaccine.states import Choice, WhatsAppButtonState
+from vaccine.states import Choice, FreeText, WhatsAppButtonState
 from yal import rapidpro
 from yal.askaquestion import Application as AAQApplication
 from yal.assessments import Application as AssessmentApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
-from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
+from yal.utils import (
+    get_current_datetime,
+    get_generic_error,
+    get_generic_error_options,
+    normalise_phonenumber,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +21,7 @@ class Application(BaseApplication):
     depression_score = 0
     anxiety_score = 0
     START_STATE = "state_endline_start"
+    SURVEY_VALIDATION_STATE = "state_survey_validation"
 
     async def set_endline_reminder_timer(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
@@ -425,8 +431,12 @@ class Application(BaseApplication):
             "endline_survey_completed": "True",
             "ejaf_endline_airtime_incentive_sent": "False",
             "ejaf_endline_completed_on": get_current_datetime().isoformat(),
+            "endline_survey_started": "",
+            "endline_reminder": "",
         }
         self.save_answer("endline_survey_completed", "True")
+        self.save_answer("endline_survey_started", "False")
+        self.save_answer("endline_reminder", "False")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
@@ -464,3 +474,11 @@ class Application(BaseApplication):
             },
             error=self._(get_generic_error()),
         )
+
+    async def state_survey_validation(self):
+        """
+        Validates survey keywords from RapidPro
+        """
+        random_error = get_generic_error_options()
+
+        return FreeText(self, question=random_error, next=None)

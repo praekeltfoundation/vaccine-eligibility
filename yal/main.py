@@ -202,6 +202,7 @@ class Application(
             )
 
             endline_survey_started = self.user.metadata.get("endline_survey_started")
+            endline_reminder = self.user.metadata.get("endline_reminder")
 
             if (
                 keyword in EJAF_ENDLINE_SURVEY_KEYWORDS
@@ -215,7 +216,7 @@ class Application(
                     self.user.session_id = None
                     self.state_name = AssessmentApplication.REMINDER_STATE
                 elif keyword == "i m not interested":
-                    if endline_survey_started:
+                    if endline_reminder:
                         self.user.session_id = None
                         self.state_name = (
                             AssessmentApplication.REMINDER_NOT_INTERESTED_STATE
@@ -226,6 +227,10 @@ class Application(
                 else:
                     self.user.session_id = None
                     self.state_name = EndlineTermsApplication.START_STATE
+
+            if endline_survey_started and not self.state_name:
+                self.user.session_id = None
+                self.state_name = EndlineSurveyApplication.SURVEY_VALIDATION_STATE
 
             # Fields that RapidPro sets after a feedback push message
             feedback_state = await self.get_feedback_state()
