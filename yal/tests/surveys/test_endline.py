@@ -77,7 +77,7 @@ async def test_endline_invitation_i_want_to_answer(tester: AppTester, rapidpro_m
         addr="278201234567",
         state=StateData(),
         session_id=1,
-        metadata={"baseline_survey_completed": True},
+        metadata={"baseline_survey_completed": True, "endline_survey_started": True},
     )
     app = Application(user)
     msg = Message(
@@ -127,7 +127,7 @@ async def test_endline_invitation_not_interested(
         addr="278201234567",
         state=StateData(),
         session_id=1,
-        metadata={"baseline_survey_completed": True},
+        metadata={"baseline_survey_completed": True, "endline_survey_started": True},
     )
     app = Application(user)
     msg = Message(
@@ -152,7 +152,11 @@ async def test_endline_reminder_not_interested(
         addr="278201234567",
         state=StateData(),
         session_id=1,
-        metadata={"baseline_survey_completed": True, "endline_reminder": True},
+        metadata={
+            "baseline_survey_completed": True,
+            "endline_reminder": True,
+            "endline_survey_started": True,
+        },
     )
     app = Application(user)
     msg = Message(
@@ -175,7 +179,7 @@ async def test_endline_invitation_answer(tester: AppTester, rapidpro_mock):
         addr="278201234567",
         state=StateData(),
         session_id=1,
-        metadata={"baseline_survey_completed": True},
+        metadata={"baseline_survey_completed": True, "endline_survey_started": True},
     )
     app = Application(user)
     msg = Message(
@@ -198,7 +202,7 @@ async def test_endline_survey_validation(tester: AppTester, rapidpro_mock):
         addr="278201234567",
         state=StateData(),
         session_id=1,
-        metadata={"baseline_survey_completed": True, "endline_survey_started": "True"},
+        metadata={"baseline_survey_completed": True, "endline_survey_started": True},
     )
     app = Application(user)
     msg = Message(
