@@ -8,7 +8,7 @@ from vaccine.models import Message, StateData, User
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.main import Application
-from yal.utils import GENERIC_ERRORS, replace_persona_fields
+from yal.utils import GENERIC_ERROR_OPTIONS, GENERIC_ERRORS, replace_persona_fields
 
 
 @pytest.fixture
@@ -198,7 +198,7 @@ async def test_endline_survey_validation(tester: AppTester, rapidpro_mock):
         addr="278201234567",
         state=StateData(),
         session_id=1,
-        metadata={"baseline_survey_completed": True, "endline_survey_started": True},
+        metadata={"baseline_survey_completed": True, "endline_survey_started": "True"},
     )
     app = Application(user)
     msg = Message(
@@ -212,6 +212,7 @@ async def test_endline_survey_validation(tester: AppTester, rapidpro_mock):
     [reply] = await app.process_message(msg)
 
     assert user.state.name == "state_survey_validation"
+    assert reply.content in GENERIC_ERROR_OPTIONS
 
 
 @pytest.mark.asyncio
