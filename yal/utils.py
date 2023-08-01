@@ -34,7 +34,7 @@ GENERIC_ERROR_OPTIONS = (
     "try again - I'll get it if you use the option that matches your "
     "choice, promise.👍🏾",
     "Umm...I'm sorry but I'm not sure what that means "
-    "[persona_emoji]👩🏾. You can help me by trying again. This time, "
+    "[persona_emoji]. You can help me by trying again. This time, "
     "look for the option matching your choice and send that👍🏾",
 )
 GENDERS = {
