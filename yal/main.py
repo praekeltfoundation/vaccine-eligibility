@@ -228,7 +228,7 @@ class Application(
                     self.user.session_id = None
                     self.state_name = EndlineTermsApplication.START_STATE
 
-            if endline_survey_started and not self.state_name:
+            if endline_survey_started == "True" and not self.state_name:
                 self.user.session_id = None
                 self.state_name = EndlineSurveyApplication.SURVEY_VALIDATION_STATE
 
