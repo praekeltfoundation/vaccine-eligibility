@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from vaccine.models import Message
-from vaccine.states import Choice, EndState, FreeText, WhatsAppButtonState
+from vaccine.states import Choice, EndState, WhatsAppButtonState
 from vaccine.utils import get_display_choices, random_id
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AaqApplication
@@ -25,7 +25,6 @@ from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import (
     get_current_datetime,
     get_generic_error,
-    get_generic_error_options,
     is_integer,
     normalise_phonenumber,
     replace_persona_fields,
@@ -231,7 +230,7 @@ class Application(
 
             if endline_survey_started and not self.state_name:
                 self.user.session_id = None
-                self.state_name = "state_survey_validation"
+                self.state_name = EndlineSurveyApplication.SURVEY_VALIDATION_STATE
 
             # Fields that RapidPro sets after a feedback push message
             feedback_state = await self.get_feedback_state()
@@ -861,11 +860,3 @@ class Application(
         """
         content = replace_persona_fields(question, self.user.metadata)
         await self.worker.publish_message(self.inbound.reply(content))
-
-    async def state_survey_validation(self):
-        """
-        Validates survey keywords from RapidPro
-        """
-        random_error = get_generic_error_options()
-
-        return FreeText(self, question=random_error, next=None)
