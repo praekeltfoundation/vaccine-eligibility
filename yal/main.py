@@ -59,15 +59,7 @@ TRACKING_KEYWORDS_ROUND_2 = {
     "connect",
     "i saw this on facebook",
 }
-TRACKING_KEYWORDS_ROUND_3 = {
-    "youth",
-    "yth",
-    "yuth",
-    "yut",
-    "yoth",
-    "yot",
-    "yoh"
-}
+TRACKING_KEYWORDS_ROUND_3 = {"youth", "yth", "yuth", "yut", "yoth", "yot", "yoh"}
 OPTOUT_KEYWORDS = {"stop", "opt out", "cancel", "quit"}
 ONBOARDING_REMINDER_KEYWORDS = {
     "continue",
@@ -262,7 +254,11 @@ class Application(
         inbound = utils.clean_inbound(self.inbound.content)
 
         # Save keywords that are used for source tracking
-        if inbound in TRACKING_KEYWORDS or inbound in TRACKING_KEYWORDS_ROUND_2 or inbound in TRACKING_KEYWORDS_ROUND_3:
+        if (
+            inbound in TRACKING_KEYWORDS
+            or inbound in TRACKING_KEYWORDS_ROUND_2
+            or inbound in TRACKING_KEYWORDS_ROUND_3
+        ):
             self.save_answer("state_source_tracking", inbound)
 
         if inbound in OPTOUT_KEYWORDS:
