@@ -59,6 +59,15 @@ TRACKING_KEYWORDS_ROUND_2 = {
     "connect",
     "i saw this on facebook",
 }
+TRACKING_KEYWORDS_ROUND_3 = {
+    "youth",
+    "yth",
+    "yuth",
+    "yut",
+    "yoth",
+    "yot",
+    "yoh"
+}
 OPTOUT_KEYWORDS = {"stop", "opt out", "cancel", "quit"}
 ONBOARDING_REMINDER_KEYWORDS = {
     "continue",
@@ -143,6 +152,7 @@ class Application(
                 keyword in GREETING_KEYWORDS
                 or keyword in TRACKING_KEYWORDS
                 or keyword in TRACKING_KEYWORDS_ROUND_2
+                or keyword in TRACKING_KEYWORDS_ROUND_3
             ):
                 self.user.session_id = None
                 self.state_name = self.START_STATE
@@ -252,7 +262,7 @@ class Application(
         inbound = utils.clean_inbound(self.inbound.content)
 
         # Save keywords that are used for source tracking
-        if inbound in TRACKING_KEYWORDS or inbound in TRACKING_KEYWORDS_ROUND_2:
+        if inbound in TRACKING_KEYWORDS or inbound in TRACKING_KEYWORDS_ROUND_2 or inbound in TRACKING_KEYWORDS_ROUND_3:
             self.save_answer("state_source_tracking", inbound)
 
         if inbound in OPTOUT_KEYWORDS:
@@ -261,6 +271,7 @@ class Application(
             inbound in GREETING_KEYWORDS
             or inbound in TRACKING_KEYWORDS
             or inbound in TRACKING_KEYWORDS_ROUND_2
+            or inbound in TRACKING_KEYWORDS_ROUND_3
         ):
             if terms_accepted and onboarding_completed:
                 return await self.go_to_state(MainMenuApplication.START_STATE)
