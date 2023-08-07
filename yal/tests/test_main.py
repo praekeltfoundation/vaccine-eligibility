@@ -419,6 +419,485 @@ async def test_state_start_contact_fields(
 
 
 @pytest.mark.asyncio
+async def test_help_keywords(tester: AppTester, rapidpro_mock):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
+    await tester.user_input("help")
+    tester.assert_state("state_in_hours")
+
+
+@pytest.mark.asyncio
+async def test_feedback_keywords(tester: AppTester, rapidpro_mock):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["usertesting_feedback_complete"] = "PENDING"
+    await tester.user_input("feedback")
+    tester.assert_state("state_feedback_pleasecallme")
+
+
+@pytest.mark.asyncio
+async def test_assessment_reminder_keywords(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
+    rapidpro_mock.tstate.contact_fields["assessment_reminder_sent"] = True
+    rapidpro_mock.tstate.contact_fields[
+        "assessment_reminder_name"
+    ] = "locus_of_control_endline"
+
+    await tester.user_input("continue now")
+    tester.assert_state("state_survey_question")
+
+
+@pytest.mark.asyncio
+async def test_endline_catch_all(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
+    rapidpro_mock.tstate.contact_fields["assessment_reminder_sent"] = True
+    rapidpro_mock.tstate.contact_fields["endline_survey_started"] = True
+
+    await tester.user_input("this is giberish")
+    tester.assert_state("state_survey_validation")
+
+
+@pytest.mark.asyncio
+async def test_survey_stop(tester: AppTester, rapidpro_mock, contentrepo_api_mock):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
+    rapidpro_mock.tstate.contact_fields["assessment_reminder_sent"] = True
+    rapidpro_mock.tstate.contact_fields["endline_survey_started"] = True
+
+    await tester.user_input("stop")
+    tester.assert_state("state_optout")
+
+
+@pytest.mark.asyncio
+async def test_terms_accepted(tester: AppTester, rapidpro_mock, contentrepo_api_mock):
+
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
+
+    await tester.user_input("hi")
+    tester.assert_state("state_persona_name")
+
+
+@pytest.mark.asyncio
+async def test_endline_terms_accepted(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["endline_terms_accepted"] = True
+
+    await tester.user_input("hi")
+    tester.assert_state("state_survey_question")
+
+
+@pytest.mark.asyncio
+async def test_state_locus_of_control_assessment_later(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_locus_of_control_assessment_later"}
+            }
+        },
+    )
+
+    message = "\n".join(
+        [
+            "🤖 No worries, we get it!",
+            "",
+            "I'll send you a reminder message in 1 hour, so you can come back "
+            "and answer these questions.",
+            "",
+            "Check you later 🤙🏾",
+        ]
+    )
+    tester.assert_message(message)
+
+
+@pytest.mark.asyncio
+async def test_state_sexual_health_literacy_assessment(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_sexual_health_literacy_assessment"}
+            }
+        },
+    )
+
+    message = "\n".join(
+        [
+            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "-----",
+            "",
+            "Is the following statement true or false?",
+            "",
+            "People can reduce the risk of getting sexual STIs"
+            " by using condoms every time they have sexual intercourse.",
+            "",
+            "🤖 Reply with the number of your chosen answer:",
+            "",
+            "1. True",
+            "2. False",
+        ]
+    )
+
+    tester.assert_message(message)
+    tester.assert_state("state_survey_question")
+    tester.assert_metadata("assessment_name", "sexual_health_literacy")
+    tester.assert_metadata(
+        "assessment_end_state", "state_sexual_health_literacy_assessment_end"
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_sexual_health_literacy_assessment_end(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_sexual_health_literacy_assessment_end"}
+            }
+        },
+    )
+
+    message = "\n".join(
+        [
+            "*What would you like to do now?*",
+            "1. Go to the menu",
+            "2. Ask a question",
+            "3. Update settings",
+        ]
+    )
+
+    tester.assert_message(message)
+    tester.assert_state("state_generic_what_would_you_like_to_do")
+
+
+@pytest.mark.asyncio
+async def test_state_depression_and_anxiety_assessment_end(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_depression_and_anxiety_assessment_end"}
+            }
+        },
+    )
+
+    message = "\n".join(
+        [
+            "*What would you like to do now?*",
+            "1. Go to the menu",
+            "2. Ask a question",
+            "3. Update settings",
+        ]
+    )
+
+    tester.assert_message(message)
+    tester.assert_state("state_generic_what_would_you_like_to_do")
+
+
+@pytest.mark.asyncio
+async def test_state_depression_and_anxiety_assessment_later(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_depression_and_anxiety_assessment_later"}
+            }
+        },
+    )
+
+    message = "\n".join(
+        [
+            "🤖 No worries, we get it!",
+            "",
+            "I'll send you a reminder message in 1 hour, so you can come back "
+            "and answer these questions.",
+            "",
+            "Check you later 🤙🏾",
+        ]
+    )
+    tester.assert_message(message)
+
+
+@pytest.mark.asyncio
+async def test_state_connectedness_assessment_end(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_connectedness_assessment_end"}}
+        },
+    )
+
+    message = "\n".join(
+        [
+            "*What would you like to do now?*",
+            "1. Go to the menu",
+            "2. Ask a question",
+            "3. Update settings",
+        ]
+    )
+
+    tester.assert_message(message)
+    tester.assert_state("state_generic_what_would_you_like_to_do")
+
+
+@pytest.mark.asyncio
+async def test_state_connectedness_assessment_later(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_connectedness_assessment_later"}}
+        },
+    )
+
+    message = "\n".join(
+        [
+            "🤖 No worries, we get it!",
+            "",
+            "I'll send you a reminder message in 1 hour, so you can come back "
+            "and answer these questions.",
+            "",
+            "Check you later 🤙🏾",
+        ]
+    )
+    tester.assert_message(message)
+
+
+@pytest.mark.asyncio
+async def test_state_gender_attitude_assessment_end(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_gender_attitude_assessment_end"}}
+        },
+    )
+
+    message = "\n".join(
+        [
+            "*What would you like to do now?*",
+            "1. Go to the menu",
+            "2. Ask a question",
+            "3. Update settings",
+        ]
+    )
+
+    tester.assert_message(message)
+    tester.assert_state("state_generic_what_would_you_like_to_do")
+
+
+@pytest.mark.asyncio
+async def test_state_gender_attitude_assessment_later(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_gender_attitude_assessment_later"}}
+        },
+    )
+
+    message = "\n".join(
+        [
+            "🤖 No worries, we get it!",
+            "",
+            "I'll send you a reminder message in 1 hour, so you can come back "
+            "and answer these questions.",
+            "",
+            "Check you later 🤙🏾",
+        ]
+    )
+    tester.assert_message(message)
+
+
+@pytest.mark.asyncio
+async def test_state_body_image_assessment_end(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_body_image_assessment_end"}}
+        },
+    )
+
+    message = "\n".join(
+        [
+            "*What would you like to do now?*",
+            "1. Go to the menu",
+            "2. Ask a question",
+            "3. Update settings",
+        ]
+    )
+
+    tester.assert_message(message)
+    tester.assert_state("state_generic_what_would_you_like_to_do")
+
+
+@pytest.mark.asyncio
+async def test_state_body_image_assessment_later(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_body_image_assessment_later"}}
+        },
+    )
+
+    message = "\n".join(
+        [
+            "🤖 No worries, we get it!",
+            "",
+            "I'll send you a reminder message in 1 hour, so you can come back "
+            "and answer these questions.",
+            "",
+            "Check you later 🤙🏾",
+        ]
+    )
+    tester.assert_message(message)
+
+
+@pytest.mark.asyncio
+async def test_state_self_perceived_healthcare_assessment_end(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {"payload": "state_self_perceived_healthcare_assessment_end"}
+            }
+        },
+    )
+
+    message = "\n".join(
+        [
+            "*What would you like to do now?*",
+            "1. Go to the menu",
+            "2. Ask a question",
+            "3. Update settings",
+        ]
+    )
+
+    tester.assert_message(message)
+    tester.assert_state("state_generic_what_would_you_like_to_do")
+
+
+@pytest.mark.asyncio
+async def test_state_self_perceived_healthcare_assessment_later(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {
+                "button": {
+                    "payload": "state_self_perceived_healthcare_assessment_later"
+                }
+            }
+        },
+    )
+
+    message = "\n".join(
+        [
+            "🤖 No worries, we get it!",
+            "",
+            "I'll send you a reminder message in 1 hour, so you can come back "
+            "and answer these questions.",
+            "",
+            "Check you later 🤙🏾",
+        ]
+    )
+    tester.assert_message(message)
+
+
+@pytest.mark.asyncio
+async def test_baseline_survey_start_keywords(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
+    rapidpro_mock.tstate.contact_fields["assessment_reminder_sent"] = True
+    await tester.user_input("baseline")
+    tester.assert_state("state_survey_question")
+
+
+@pytest.mark.asyncio
+async def test_endline_survey_start_keywords(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
+    rapidpro_mock.tstate.contact_fields["baseline_survey_completed"] = True
+    rapidpro_mock.tstate.contact_fields["endline_survey_completed"] = False
+
+    await tester.user_input("answer")
+    tester.assert_state("state_start_terms")
+
+
+@pytest.mark.asyncio
+async def test_endline_remind_me_tomorrow_keywords(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
+    rapidpro_mock.tstate.contact_fields["baseline_survey_completed"] = True
+    rapidpro_mock.tstate.contact_fields["endline_survey_completed"] = False
+
+    await tester.user_input("remind me tomorrow")
+    tester.assert_state("state_remind_tomorrow")
+
+
+@pytest.mark.asyncio
+async def test_endline_survey_not_interested_reminder_keywords(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
+    rapidpro_mock.tstate.contact_fields["baseline_survey_completed"] = True
+    rapidpro_mock.tstate.contact_fields["endline_survey_completed"] = False
+    rapidpro_mock.tstate.contact_fields["endline_reminder"] = True
+
+    await tester.user_input("I'm not interested")
+    tester.assert_state("state_reminder_not_interested")
+
+
+@pytest.mark.asyncio
+async def test_endline_survey_not_interested_keywords(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
+    rapidpro_mock.tstate.contact_fields["baseline_survey_completed"] = True
+    rapidpro_mock.tstate.contact_fields["endline_survey_completed"] = False
+
+    await tester.user_input("I'm not interested")
+    tester.assert_state("state_no_consent")
+
+
+@pytest.mark.asyncio
 async def test_tracked_keywords_saved(
     tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
