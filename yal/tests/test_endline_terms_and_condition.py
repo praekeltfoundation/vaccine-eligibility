@@ -78,9 +78,19 @@ async def test_state_monthly_household_income_endline(tester: AppTester, rapidpr
     tester.setup_state("state_monthly_household_income_endline")
     await tester.user_input("1")
 
-    tester.assert_state("state_survey_question")
+    tester.assert_state("state_household_number_of_people")
 
-    message = "\n".join(["◼️◽️◽️◽️", "-----", "", "*I'm my own boss.* 😎"])
+    message = "\n".join(
+        [
+            "*How many people (including yourself) live in the household now?"
+            " Don’t forget to include babies.*",
+            "",
+            "(If you’re unsure - this counts as anyone sleeping the house"
+            "4 nights in the past week).",
+        ]
+    )
+    tester.assert_message(message)
+
     tester.assert_message(message)
 
 
@@ -111,7 +121,7 @@ async def test_state_accept_consent_reminder(tester: AppTester, rapidpro_mock):
 async def test_state_submit_terms_and_conditions_accept(
     tester: AppTester, rapidpro_mock
 ):
-    tester.setup_state("state_monthly_household_income_endline")
+    tester.setup_state("state_household_number_of_people")
     await tester.user_input("1")
 
     assert len(rapidpro_mock.tstate.requests) == 3
@@ -119,3 +129,35 @@ async def test_state_submit_terms_and_conditions_accept(
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"endline_terms_accepted": "True"},
     }
+
+
+@pytest.mark.asyncio
+async def test_state_household_number_of_people(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_household_number_of_people")
+    await tester.user_input("2")
+    message = "\n".join(["◼️◽️◽️◽️", "-----", "", "*I'm my own boss.* 😎"])
+
+    tester.assert_message(message)
+    tester.assert_state("state_survey_question")
+
+
+@pytest.mark.asyncio
+async def test_state_household_number_of_people_more(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_household_number_of_people")
+    await tester.user_input("7")
+    message = "\n".join(["◼️◽️◽️◽️", "-----", "", "*I'm my own boss.* 😎"])
+
+    tester.assert_message(message)
+    tester.assert_state("state_survey_question")
+
+
+@pytest.mark.asyncio
+async def test_state_household_number_of_people_eight_or_more(
+    tester: AppTester, rapidpro_mock
+):
+    tester.setup_state("state_household_number_of_people_eight_or_more")
+    await tester.user_input("1")
+    message = "\n".join(["◼️◽️◽️◽️", "-----", "", "*I'm my own boss.* 😎"])
+
+    tester.assert_message(message)
+    tester.assert_state("state_survey_question")

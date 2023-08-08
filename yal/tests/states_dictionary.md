@@ -252,6 +252,8 @@
 | state_remind_tomorrow |    TRUE        |     Text     |   TRUE    | Lets the user know we will remind them tomorrow, asks the user if they would like to go to the mainmenu |
 | state_reminder_not_interested | True | Text | TRUE | Lets the user know that they will no longer be prt of the study |
 | state_survey_validation | True | Text | TRUE | endline survey catch all validation |
+ state_household_number_of_people | False | Text | Endline number of peopleing living in househould |
+| state_household_number_of_people_eight_or_more | False | Text | Endline number of peopleing living in househould if more than 8 people |
 
 
 ### Service finder flow
