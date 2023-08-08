@@ -251,7 +251,7 @@
 | state_reschedule_assessment_reminder |    |    |    | Schedules the assessment reminders |
 | state_remind_tomorrow |    TRUE        |     Text     |   TRUE    | Lets the user know we will remind them tomorrow, asks the user if they would like to go to the mainmenu |
 | state_reminder_not_interested | True | Text | TRUE | Lets the user know that they will no longer be prt of the study |
-| state_survey_validation | True | Text | TRUE | endline survey catch all validation |
+| state_survey_validation | True | Text | TRUE | endline survey catcha |
 
 
 ### Service finder flow
@@ -612,8 +612,6 @@
 | state_platform_review_endline | False | Text | Review the platform |
 | state_relationship_status_endline | False | Text | endline relationship status |
 | state_submit_terms_and_conditions_endline | False | Text | Endline Terms and Condition Submit |
-| state_household_number_of_people | False | Text | Endline number of peopleing living in househould |
-| state_household_number_of_people_more | False | Text | Endline number of peopleing living in househould if more than 8 people |
 | state_not_interested | False | Text | Endline Survery not interested |
 | state_monthly_household_income_endline | False | Text | Endline household income |
 | state_start_terms | False | Text | Endline terms and conditions |

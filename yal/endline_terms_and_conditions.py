@@ -105,7 +105,7 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "That's completely okay, there are no consequences to not taking "
+                    "That's completely okay, there are no consequences to not taking ,"
                     "part in this study. Please enjoy the BWise tool and stay safe. "
                     "If you change your mind, please send *Answer* to this number",
                 ]
@@ -190,105 +190,6 @@ class Application(BaseApplication):
                     "Please respond with the *number* of an option below",
                     "",
                     "What is the total monthly income of your whole household?",
-                ]
-            )
-        )
-        return ChoiceState(
-            self,
-            question=question,
-            error=error,
-            choices=choices,
-            next="state_household_number_of_people",
-        )
-
-    async def state_household_number_of_people(self):
-        choices = [
-            Choice("one", self._("Just me")),
-            Choice("two", self._("Two people")),
-            Choice("three", self._("Three people")),
-            Choice("four", self._("Four people")),
-            Choice("five", self._("Five people")),
-            Choice("six", self._("Six people")),
-            Choice("seven", self._("Seven people")),
-            Choice("eight_more", self._("Eight or more")),
-            Choice("rather", "Rather not say"),
-            Choice("skip_question", self._("Skip question")),
-        ]
-
-        question = self._(
-            "\n".join(
-                [
-                    "*How many people (including yourself) live in the household now?"
-                    " Don’t forget to include babies.*",
-                    "",
-                    "(If you’re unsure - this counts as anyone sleeping the house"
-                    "4 nights in the past week).",
-                ]
-            )
-        )
-        error = self._(
-            "\n".join(
-                [
-                    "*Oops. We did not understand your answer*",
-                    "Please respond with the *number* of an option below",
-                    "",
-                    "How many people (including yourself) live in the household now?",
-                ]
-            )
-        )
-
-        next = (
-            {
-                "one": "state_submit_terms_and_conditions_endline",
-                "two": "state_submit_terms_and_conditions_endline",
-                "three": "state_submit_terms_and_conditions_endline",
-                "four": "state_submit_terms_and_conditions_endline",
-                "five": "state_submit_terms_and_conditions_endline",
-                "six": "state_submit_terms_and_conditions_endline",
-                "seven": "state_submit_terms_and_conditions_endline",
-                "eight_more": "state_household_number_of_people_more",
-            },
-        )
-        return ChoiceState(
-            self,
-            question=question,
-            error=error,
-            choices=choices,
-            next=next,
-        )
-
-    async def state_household_number_of_people_more(self):
-        choices = [
-            Choice("eight", self._("Including me")),
-            Choice("nine", self._("Nine people")),
-            Choice("ten", self._("Ten people")),
-            Choice("eleven", self._("Eleven people")),
-            Choice("twelve", self._("Twelve people")),
-            Choice("thirteen", self._("Thirteen people")),
-            Choice("fourteen", self._("Fourteen people")),
-            Choice("fifteen", self._("Fifteen people")),
-            Choice("rather", "Rather not say"),
-            Choice("skip_question", self._("Skip question")),
-        ]
-
-        question = self._(
-            "\n".join(
-                [
-                    "*Okay - you said there are 8 or more people in your household.*",
-                    "*How many people (including yourself) live in the household now?*",
-                    " Don’t forget to include babies." "",
-                    "(If you’re unsure - this counts as anyone sleeping the house"
-                    " 4 nights in the past week).",
-                ]
-            )
-        )
-        error = self._(
-            "\n".join(
-                [
-                    "*Oops. We did not understand your answer*",
-                    "Please respond with the *number* of an option below",
-                    "",
-                    "How many people (including yourself) live in the household now?",
                 ]
             )
         )

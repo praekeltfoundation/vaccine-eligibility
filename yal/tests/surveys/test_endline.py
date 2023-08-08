@@ -216,7 +216,11 @@ async def test_endline_survey_validation(tester: AppTester, rapidpro_mock):
     [reply] = await app.process_message(msg)
 
     assert user.state.name == "state_survey_validation"
-    assert reply.content in GENERIC_ERROR_OPTIONS
+    error_content = reply.content
+    if "Umm.." in error_content:
+        error_content = error_content.replace("🤖", "[persona_emoji]")
+
+    assert error_content in GENERIC_ERROR_OPTIONS
 
 
 @pytest.mark.asyncio
