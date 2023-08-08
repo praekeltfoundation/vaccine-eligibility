@@ -164,7 +164,7 @@ async def test_endline_reminder_not_interested(
         metadata={
             "baseline_survey_completed": True,
             "endline_reminder": True,
-            "endline_survey_started": "Pegndin",
+            "endline_survey_started": "Pending",
         },
     )
     app = Application(user)
