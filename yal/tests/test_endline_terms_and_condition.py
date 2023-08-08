@@ -87,16 +87,6 @@ async def test_state_monthly_household_income_endline(tester: AppTester, rapidpr
             "",
             "(If you’re unsure - this counts as anyone sleeping the house"
             "4 nights in the past week).",
-            "1. Just me",
-            "2. Two people",
-            "3. Three people",
-            "4. Four people",
-            "5. Five people",
-            "6. Six people",
-            "7. Seven people",
-            "8. Eight or more",
-            "9. Rather not say",
-            "10. Skip question",
         ]
     )
     tester.assert_message(message)

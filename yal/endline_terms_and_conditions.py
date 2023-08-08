@@ -242,12 +242,13 @@ class Application(BaseApplication):
         if choices[0].value == "eight_more":
             next = "state_household_number_of_people_more"
 
-        return ChoiceState(
+        return WhatsAppListState(
             self,
             question=question,
             error=error,
             choices=choices,
             next=next,
+            button="Choose Option",
         )
 
     async def state_household_number_of_people_eight_or_more(self):
@@ -286,12 +287,13 @@ class Application(BaseApplication):
             )
         )
 
-        return ChoiceState(
+        return WhatsAppListState(
             self,
             question=question,
             error=error,
             choices=choices,
             next="state_submit_terms_and_conditions_endline",
+            button="Choose Option",
         )
 
     async def state_set_reminder_timer(self):
