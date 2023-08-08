@@ -117,7 +117,7 @@ async def test_menu(tester: AppTester):
                 "---------------------",
                 "",
                 "📧 Questions and queries can also be emailed directly to "
-                "info@vaccinesupport.org.za",
+                "healthhotline@health.gov.za",
                 "",
                 "---------------------",
                 "",
