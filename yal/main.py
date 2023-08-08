@@ -128,8 +128,32 @@ class Application(
                     self.delete_metadata(key)
 
             keyword = utils.clean_inbound(message.content)
+
+            baseline_survey_completed = self.user.metadata.get(
+                "baseline_survey_completed"
+            )
+            endline_survey_completed = self.user.metadata.get(
+                "endline_survey_completed"
+            )
+
+            endline_survey_started = self.user.metadata.get("endline_survey_started")
+            endline_reminder = self.user.metadata.get("endline_reminder")
+            feedback_state = await self.get_feedback_state()
+            payload = utils.get_by_path(
+                message.transport_metadata, "message", "button", "payload"
+            )
+
             # Restart keywords that interrupt the current flow
+
             if (
+                keyword in GREETING_KEYWORDS
+                or keyword in TRACKING_KEYWORDS
+                or keyword in TRACKING_KEYWORDS_ROUND_2
+            ):
+                self.user.session_id = None
+                self.state_name = self.START_STATE
+
+            elif (
                 keyword in EMERGENCY_KEYWORDS
                 and message.transport_metadata.get("message", {}).get("type")
                 != "interactive"
@@ -149,62 +173,46 @@ class Application(
                 self.user.session_id = None
                 self.state_name = PleaseCallMeApplication.CONFIRM_REDIRECT
 
-            if (
-                keyword in GREETING_KEYWORDS
-                or keyword in TRACKING_KEYWORDS
-                or keyword in TRACKING_KEYWORDS_ROUND_2
-            ):
-                self.user.session_id = None
-                self.state_name = self.START_STATE
-
-            if keyword in HELP_KEYWORDS:
+            elif keyword in HELP_KEYWORDS:
                 self.user.session_id = None
                 self.state_name = PleaseCallMeApplication.START_STATE
 
-            if keyword in OPTOUT_KEYWORDS:
+            elif keyword in OPTOUT_KEYWORDS:
                 self.user.session_id = None
                 self.state_name = OptOutApplication.START_STATE
 
-            if keyword in FEEDBACK_KEYWORDS:
+            elif keyword in FEEDBACK_KEYWORDS:
                 self.user.session_id = None
                 self.state_name = FeedbackApplication.START_STATE
 
-            if keyword in AAQ_KEYWORDS:
+            elif keyword in AAQ_KEYWORDS:
                 self.user.session_id = None
                 self.state_name = AaqApplication.START_STATE
 
-            if keyword in CALLBACK_CHECK_KEYWORDS:
+            elif keyword in CALLBACK_CHECK_KEYWORDS:
                 self.user.session_id = None
                 self.state_name = PleaseCallMeApplication.CALLBACK_RESPONSE_STATE
 
-            if keyword in QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS:
+            elif keyword in QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS:
                 self.user.session_id = None
                 self.state_name = "state_qa_reset_feedback_timestamp_keywords"
 
-            if keyword in ONBOARDING_REMINDER_KEYWORDS:
-                if self.user.metadata.get("onboarding_reminder_sent"):
-                    self.user.session_id = None
-                    self.state_name = OnboardingApplication.REMINDER_STATE
-            if keyword in ASSESSMENT_REENGAGEMENT_KEYWORDS:
-                if self.user.metadata.get("assessment_reminder_sent"):
-                    self.user.session_id = None
-                    self.state_name = AssessmentApplication.REMINDER_STATE
+            elif keyword in ONBOARDING_REMINDER_KEYWORDS and self.user.metadata.get(
+                "onboarding_reminder_sent"
+            ):
+                self.user.session_id = None
+                self.state_name = OnboardingApplication.REMINDER_STATE
+            elif keyword in ASSESSMENT_REENGAGEMENT_KEYWORDS and self.user.metadata.get(
+                "assessment_reminder_sent"
+            ):
+                self.user.session_id = None
+                self.state_name = AssessmentApplication.REMINDER_STATE
 
-            if keyword in SURVEY_KEYWORDS:
+            elif keyword in SURVEY_KEYWORDS:
                 self.user.session_id = None
                 self.state_name = "state_baseline_start"
 
-            baseline_survey_completed = self.user.metadata.get(
-                "baseline_survey_completed"
-            )
-            endline_survey_completed = self.user.metadata.get(
-                "endline_survey_completed"
-            )
-
-            endline_survey_started = self.user.metadata.get("endline_survey_started")
-            endline_reminder = self.user.metadata.get("endline_reminder")
-
-            if (
+            elif (
                 keyword in EJAF_ENDLINE_SURVEY_KEYWORDS
                 and baseline_survey_completed
                 and not endline_survey_completed
@@ -225,32 +233,30 @@ class Application(
                 else:
                     self.state_name = EndlineTermsApplication.START_STATE
 
-            if endline_survey_started and keyword not in EJAF_ENDLINE_SURVEY_KEYWORDS:
-                self.user.session_id = None
-                self.state_name = EndlineSurveyApplication.SURVEY_VALIDATION_STATE
-
             # Fields that RapidPro sets after a feedback push message
-            feedback_state = await self.get_feedback_state()
-            if feedback_state:
+            elif feedback_state:
                 if not self.user.session_id:
                     self.user.session_id = random_id()
                 message.session_event = Message.SESSION_EVENT.RESUME
                 self.state_name = feedback_state
 
             # Replies to template push messages
-            payload = utils.get_by_path(
-                message.transport_metadata, "message", "button", "payload"
-            )
-            if payload:
-                if payload.startswith("state_") and payload in dir(self):
-                    self.user.session_id = None
-                    self.state_name = payload
-                elif payload.startswith("page_id_") and is_integer(
-                    payload.split("_")[-1]
-                ):
-                    self.user.session_id = None
-                    self.save_metadata("push_related_page_id", payload.split("_")[-1])
-                    self.state_name = "state_prep_push_msg_related_page"
+            elif payload and payload.startswith("state_") and payload in dir(self):
+                self.user.session_id = None
+                self.state_name = payload
+
+            elif (
+                payload
+                and payload.startswith("page_id_")
+                and is_integer(payload.split("_")[-1])
+            ):
+                self.user.session_id = None
+                self.save_metadata("push_related_page_id", payload.split("_")[-1])
+                self.state_name = "state_prep_push_msg_related_page"
+
+            elif endline_survey_started and keyword not in EJAF_ENDLINE_SURVEY_KEYWORDS:
+                self.user.session_id = None
+                self.state_name = EndlineSurveyApplication.SURVEY_VALIDATION_STATE
 
         except Exception:
             logger.exception("Application error")

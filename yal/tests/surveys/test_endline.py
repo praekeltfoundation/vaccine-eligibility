@@ -216,7 +216,11 @@ async def test_endline_survey_validation(tester: AppTester, rapidpro_mock):
     [reply] = await app.process_message(msg)
 
     assert user.state.name == "state_survey_validation"
-    assert reply.content in GENERIC_ERROR_OPTIONS
+    error_content = reply.content
+    if "Umm.." in error_content:
+        error_content = error_content.replace("🤖", "[persona_emoji]")
+
+    assert error_content in GENERIC_ERROR_OPTIONS
 
 
 @pytest.mark.asyncio
@@ -1031,6 +1035,18 @@ async def test_state_body_image_assessment_endline_reminder(
     tester.assert_metadata("assessment_reminder", "2022-06-19T17:30:00")
     tester.assert_metadata("assessment_reminder_name", "locus_of_control_endline")
     tester.assert_metadata("assessment_reminder_type", "endline reengagement 30min")
+
+
+@pytest.mark.asyncio
+async def test_endline_stop_during_assessment(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["endline_survey_started"] = True
+    tester.user.metadata["baseline_survey_completed"] = True
+    tester.user.metadata["terms_accepted"] = True
+    tester.user.metadata["onboarding_completed"] = True
+    tester.setup_state("state_gender_attitude_assessment_endline")
+
+    await tester.user_input("stop")
+    tester.assert_state("state_optout")
 
 
 @pytest.mark.asyncio

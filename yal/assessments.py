@@ -441,6 +441,15 @@ class Application(BaseApplication):
             return await self.go_to_state("state_pre_mainmenu")
 
     async def state_not_interested(self):
+        msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "endline_survey_started": "",
+        }
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
         return WhatsAppButtonState(
             self,
             question=self._(
