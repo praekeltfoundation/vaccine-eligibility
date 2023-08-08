@@ -233,6 +233,15 @@ class Application(
                 else:
                     self.state_name = EndlineTermsApplication.START_STATE
 
+                    data = {
+                        "endline_survey_started": "True",
+                    }
+                    error = await rapidpro.update_profile(
+                        whatsapp_id, data, self.user.metadata
+                    )
+                    if error:
+                        return await self.go_to_state("state_error")
+
             # Fields that RapidPro sets after a feedback push message
             elif feedback_state:
                 if not self.user.session_id:
@@ -254,7 +263,10 @@ class Application(
                 self.save_metadata("push_related_page_id", payload.split("_")[-1])
                 self.state_name = "state_prep_push_msg_related_page"
 
-            elif endline_survey_started and keyword not in EJAF_ENDLINE_SURVEY_KEYWORDS:
+            elif (
+                endline_survey_started == "Pending"
+                and keyword not in EJAF_ENDLINE_SURVEY_KEYWORDS
+            ):
                 self.user.session_id = None
                 self.state_name = EndlineSurveyApplication.SURVEY_VALIDATION_STATE
 

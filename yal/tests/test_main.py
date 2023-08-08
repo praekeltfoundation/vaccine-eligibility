@@ -457,7 +457,7 @@ async def test_endline_catch_all(
     rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
     rapidpro_mock.tstate.contact_fields["assessment_reminder_sent"] = True
-    rapidpro_mock.tstate.contact_fields["endline_survey_started"] = True
+    rapidpro_mock.tstate.contact_fields["endline_survey_started"] = "Pending"
 
     await tester.user_input("this is giberish")
     tester.assert_state("state_survey_validation")
@@ -468,7 +468,7 @@ async def test_survey_stop(tester: AppTester, rapidpro_mock, contentrepo_api_moc
     rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
     rapidpro_mock.tstate.contact_fields["assessment_reminder_sent"] = True
-    rapidpro_mock.tstate.contact_fields["endline_survey_started"] = True
+    rapidpro_mock.tstate.contact_fields["endline_survey_started"] = "Pending"
 
     await tester.user_input("stop")
     tester.assert_state("state_optout")

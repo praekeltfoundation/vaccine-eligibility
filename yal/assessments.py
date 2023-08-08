@@ -649,7 +649,7 @@ class Application(BaseApplication):
 
         question = "No problem! I'll remind you tomorrow"
 
-        if endline_survey_started:
+        if endline_survey_started == "True":
             return FreeText(self, question=question, next=None)
         else:
             return WhatsAppButtonState(
