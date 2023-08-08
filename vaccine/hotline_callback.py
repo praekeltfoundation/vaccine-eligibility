@@ -145,7 +145,7 @@ class Application(BaseApplication):
             "---------------------\n"
             "\n"
             "📧 Questions and queries can also be emailed directly to "
-            "info@vaccinesupport.org.za\n"
+            "healthhotline@health.gov.za\n"
             "\n"
             "---------------------\n"
             "\n"
