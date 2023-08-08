@@ -65,7 +65,7 @@ async def test_state_terms_decline(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_no_consent")
     message = "\n".join(
         [
-            "That's completely okay, there are no consequences to not taking ,"
+            "That's completely okay, there are no consequences to not taking "
             "part in this study. Please enjoy the BWise tool and stay safe. "
             "If you change your mind, please send *Answer* to this number",
         ]
