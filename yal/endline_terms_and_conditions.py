@@ -222,7 +222,7 @@ class Application(BaseApplication):
                     " Don’t forget to include babies.*",
                     "",
                     "(If you’re unsure - this counts as anyone sleeping the house"
-                    "4 nights in the past week).",
+                    " 4 nights in the past week).",
                 ]
             )
         )
@@ -237,17 +237,17 @@ class Application(BaseApplication):
             )
         )
 
-        next = "state_submit_terms_and_conditions_endline"
-
-        if choices[0].value == "eight_more":
-            next = "state_household_number_of_people_more"
+        async def next_state(choice: Choice):
+            if choice.value == "eight_more":
+                return "state_household_number_of_people_more"
+            return "state_submit_terms_and_conditions_endline"
 
         return WhatsAppListState(
             self,
             question=question,
             error=error,
             choices=choices,
-            next=next,
+            next=next_state,
             button="Choose Option",
         )
 

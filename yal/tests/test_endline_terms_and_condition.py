@@ -86,7 +86,7 @@ async def test_state_monthly_household_income_endline(tester: AppTester, rapidpr
             " Don’t forget to include babies.*",
             "",
             "(If you’re unsure - this counts as anyone sleeping the house"
-            "4 nights in the past week).",
+            " 4 nights in the past week).",
         ]
     )
     tester.assert_message(message)
