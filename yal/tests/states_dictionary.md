@@ -251,7 +251,7 @@
 | state_reschedule_assessment_reminder |    |    |    | Schedules the assessment reminders |
 | state_remind_tomorrow |    TRUE        |     Text     |   TRUE    | Lets the user know we will remind them tomorrow, asks the user if they would like to go to the mainmenu |
 | state_reminder_not_interested | True | Text | TRUE | Lets the user know that they will no longer be prt of the study |
-| state_survey_validation | True | Text | TRUE | endline survey catcha |
+| state_survey_validation | True | Text | TRUE | endline survey catch all validation |
 
 
 ### Service finder flow
