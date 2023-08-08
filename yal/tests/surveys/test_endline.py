@@ -77,7 +77,10 @@ async def test_endline_invitation_i_want_to_answer(tester: AppTester, rapidpro_m
         addr="278201234567",
         state=StateData(),
         session_id=1,
-        metadata={"baseline_survey_completed": True, "endline_survey_started": True},
+        metadata={
+            "baseline_survey_completed": True,
+            "endline_survey_started": "Pending",
+        },
     )
     app = Application(user)
     msg = Message(
@@ -102,7 +105,10 @@ async def test_endline_invitation_remind_me_tomorrow(
         addr="278201234567",
         state=StateData(),
         session_id=1,
-        metadata={"baseline_survey_completed": True, "endline_survey_started": True},
+        metadata={
+            "baseline_survey_completed": True,
+            "endline_survey_started": "Pending",
+        },
     )
     app = Application(user)
     msg = Message(
@@ -127,7 +133,10 @@ async def test_endline_invitation_not_interested(
         addr="278201234567",
         state=StateData(),
         session_id=1,
-        metadata={"baseline_survey_completed": True, "endline_survey_started": True},
+        metadata={
+            "baseline_survey_completed": True,
+            "endline_survey_started": "Pending",
+        },
     )
     app = Application(user)
     msg = Message(
@@ -155,7 +164,7 @@ async def test_endline_reminder_not_interested(
         metadata={
             "baseline_survey_completed": True,
             "endline_reminder": True,
-            "endline_survey_started": True,
+            "endline_survey_started": "Pending",
         },
     )
     app = Application(user)
@@ -179,7 +188,10 @@ async def test_endline_invitation_answer(tester: AppTester, rapidpro_mock):
         addr="278201234567",
         state=StateData(),
         session_id=1,
-        metadata={"baseline_survey_completed": True, "endline_survey_started": True},
+        metadata={
+            "baseline_survey_completed": True,
+            "endline_survey_started": "Pending",
+        },
     )
     app = Application(user)
     msg = Message(
@@ -202,7 +214,10 @@ async def test_endline_survey_validation(tester: AppTester, rapidpro_mock):
         addr="278201234567",
         state=StateData(),
         session_id=1,
-        metadata={"baseline_survey_completed": True, "endline_survey_started": True},
+        metadata={
+            "baseline_survey_completed": True,
+            "endline_survey_started": "Pending",
+        },
     )
     app = Application(user)
     msg = Message(
@@ -1039,7 +1054,7 @@ async def test_state_body_image_assessment_endline_reminder(
 
 @pytest.mark.asyncio
 async def test_endline_stop_during_assessment(tester: AppTester, rapidpro_mock):
-    tester.user.metadata["endline_survey_started"] = True
+    tester.user.metadata["endline_survey_started"] = "Pending"
     tester.user.metadata["baseline_survey_completed"] = True
     tester.user.metadata["terms_accepted"] = True
     tester.user.metadata["onboarding_completed"] = True
@@ -1264,3 +1279,18 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
     )
 
     tester.assert_message(message)
+
+
+@pytest.mark.asyncio
+async def test_endline_agree_terms_and_condition(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["baseline_survey_completed"] = True
+    tester.user.metadata["endline_survey_started"] = "Pending"
+    tester.user.metadata["terms_accepted"] = True
+    tester.user.metadata["onboarding_completed"] = True
+
+    await tester.user_input("Yes, I want to answer")
+    tester.assert_state("state_start_terms")
+    tester.assert_metadata("endline_survey_started", "True")
+
+    await tester.user_input("Yes, I agree")
+    tester.assert_state("state_accept_consent")
