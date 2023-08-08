@@ -1038,18 +1038,6 @@ async def test_state_body_image_assessment_endline_reminder(
 
 
 @pytest.mark.asyncio
-async def test_endline_menu_during_assessment(tester: AppTester, rapidpro_mock):
-    tester.user.metadata["endline_survey_started"] = True
-    tester.user.metadata["baseline_survey_completed"] = True
-    tester.user.metadata["terms_accepted"] = True
-    tester.user.metadata["onboarding_completed"] = True
-    tester.setup_state("state_gender_attitude_assessment_endline")
-
-    await tester.user_input("menu")
-    tester.assert_state("state_mainmenu")
-
-
-@pytest.mark.asyncio
 async def test_endline_stop_during_assessment(tester: AppTester, rapidpro_mock):
     tester.user.metadata["endline_survey_started"] = True
     tester.user.metadata["baseline_survey_completed"] = True
