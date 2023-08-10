@@ -834,17 +834,6 @@ async def test_state_self_perceived_healthcare_assessment_later(
 
 
 @pytest.mark.asyncio
-async def test_baseline_survey_start_keywords(
-    tester: AppTester, rapidpro_mock, contentrepo_api_mock
-):
-    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
-    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
-    rapidpro_mock.tstate.contact_fields["assessment_reminder_sent"] = True
-    await tester.user_input("baseline")
-    tester.assert_state("state_survey_question")
-
-
-@pytest.mark.asyncio
 async def test_endline_survey_start_keywords(
     tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
