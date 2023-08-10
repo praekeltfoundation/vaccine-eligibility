@@ -4,7 +4,7 @@ import logging
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, WhatsAppButtonState
 from vaccine.utils import get_display_choices
-from yal import contentrepo, rapidpro
+from yal import contentrepo, rapidpro, utils
 from yal.askaquestion import Application as AaqApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.surveys.baseline import Application as BaselineSurveyApplication
@@ -82,7 +82,7 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
-        is_baseline_survey_active = await rapidpro.check_if_baseline_active() == "True"
+        is_baseline_survey_active = await utils.check_if_baseline_active()
         is_in_south_africa = self.user.metadata.get("country") == "south africa"
         is_in_age_range = None
         if self.user.metadata.get("age"):

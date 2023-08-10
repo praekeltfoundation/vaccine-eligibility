@@ -94,7 +94,7 @@ class Application(BaseApplication):
             )
         ]
 
-        if (await rapidpro.check_if_service_finder_active()).lower() == "true":
+        if await utils.check_if_service_finder_active():
             sections[0][1].insert(
                 1,
                 Choice(

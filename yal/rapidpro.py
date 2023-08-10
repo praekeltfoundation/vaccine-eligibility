@@ -133,25 +133,27 @@ async def get_instance_fields():
     return fields
 
 
-async def check_if_baseline_active():
+async def get_global_flag(global_name):
     """
-    Checks a Global var on the RapidPro instance to see if the Baseline survey is active
+    Checks a Global var on the RapidPro instance to see if it is active
     """
     async with get_rapidpro_api() as session:
-        is_baseline_survey_active = False
+        is_active = False
         for i in range(3):
             try:
                 response = await session.get(
                     urljoin(
                         config.RAPIDPRO_URL,
-                        "/api/v2/globals.json?key=baseline_survey_active",
+                        f"/api/v2/globals.json?key={global_name}",
                     ),
                 )
                 response.raise_for_status()
                 response_body = await response.json()
 
                 if len(response_body["results"]) > 0:
-                    is_baseline_survey_active = response_body["results"][0]["value"]
+                    is_active = (
+                        str(response_body["results"][0]["value"]).lower() == "true"
+                    )
 
                 break
             except HTTP_EXCEPTIONS as e:
@@ -160,35 +162,4 @@ async def check_if_baseline_active():
                     return False
                 else:
                     continue
-    return is_baseline_survey_active
-
-
-async def check_if_service_finder_active():
-    """
-    Checks a Global var on the RapidPro instance to see if the Service finder is active
-    """
-    async with get_rapidpro_api() as session:
-        is_service_finder_active = "False"
-        for i in range(3):
-            try:
-                response = await session.get(
-                    urljoin(
-                        config.RAPIDPRO_URL,
-                        "/api/v2/globals.json?key=service_finder_active",
-                    ),
-                )
-
-                response.raise_for_status()
-                response_body = await response.json()
-
-                if len(response_body["results"]) > 0:
-                    is_service_finder_active = response_body["results"][0]["value"]
-                response.close()
-                break
-            except HTTP_EXCEPTIONS as e:
-                if i == 2:
-                    logger.exception(e)
-                    return "False"
-                else:
-                    continue
-    return is_service_finder_active
+    return is_active

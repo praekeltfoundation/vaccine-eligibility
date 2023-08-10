@@ -15,7 +15,7 @@ from vaccine.states import (
 )
 from vaccine.utils import get_display_choices
 from vaccine.validators import nonempty_validator
-from yal import aaq_core, config, rapidpro
+from yal import aaq_core, config, rapidpro, utils
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.utils import (
@@ -471,7 +471,7 @@ class Application(BaseApplication):
             "counsellor": PleaseCallMeApplication.START_STATE,
         }
 
-        if (await rapidpro.check_if_service_finder_active()).lower() == "true":
+        if await utils.check_if_service_finder_active():
             choices = [
                 Choice("clinic", self._("Find a clinic")),
                 Choice("counsellor", self._("Talk to a counsellor")),
