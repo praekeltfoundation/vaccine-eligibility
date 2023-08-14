@@ -239,7 +239,7 @@ class Application(BaseApplication):
 
         async def next_state(choice: Choice):
             if choice.value == "eight_more":
-                return "state_household_number_of_people_more"
+                return "state_household_number_of_people_eight_or_more"
             return "state_submit_terms_and_conditions_endline"
 
         return WhatsAppListState(
