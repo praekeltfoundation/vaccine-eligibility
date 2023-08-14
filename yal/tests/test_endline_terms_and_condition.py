@@ -148,6 +148,7 @@ async def test_state_household_number_of_people_more(tester: AppTester, rapidpro
             "*Okay - you said there are 8 or more people in your household.*",
             "*How many people (including yourself) live in the household now?"
             " Don’t forget to include babies.*",
+            "",
             "(If you’re unsure - this counts as anyone sleeping the house"
             "4 nights in the past week).",
         ]
