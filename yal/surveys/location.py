@@ -8,6 +8,8 @@ from vaccine.states import (
 )
 from vaccine.validators import nonempty_validator
 from yal import rapidpro
+from yal.askaquestion import Application as AAQApplication
+from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.utils import get_generic_error, normalise_phonenumber
 
 
@@ -217,7 +219,7 @@ class Application(BaseApplication):
         return await self.go_to_state("state_location_end")
 
     async def state_location_end(self):
-        msg = self._(
+        question = self._(
             "\n".join(
                 [
                     "*And that's a wrap!*",
@@ -231,8 +233,18 @@ class Application(BaseApplication):
                 ]
             )
         )
-        return EndState(
+        return WhatsAppButtonState(
             self,
-            msg,
-            next=self.START_STATE,
+            question=question,
+            choices=[
+                Choice("menu", self._("Go to the menu")),
+                Choice("aaq", self._("Ask a question")),
+                Choice("update_settings", self._("Update Settings")),
+            ],
+            next={
+                "menu": "state_pre_mainmenu",
+                "aaq": AAQApplication.START_STATE,
+                "update_settings": ChangePreferencesApplication.START_STATE,
+            },
+            error=self._(get_generic_error()),
         )
