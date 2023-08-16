@@ -2,6 +2,7 @@ import pytest
 
 from vaccine.models import Message
 from vaccine.testing import AppTester
+
 # TODO: fix this import once this flow is hooked up in main application
 from yal.surveys.location import Application
 
