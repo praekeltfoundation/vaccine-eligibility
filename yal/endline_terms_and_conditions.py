@@ -273,7 +273,7 @@ class Application(BaseApplication):
                     " Don’t forget to include babies.*",
                     "",
                     "(If you’re unsure - this counts as anyone sleeping in the house"
-                    "4 nights in the past week).",
+                    " 4 nights in the past week).",
                 ]
             )
         )
