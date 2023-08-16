@@ -419,11 +419,15 @@ async def test_state_start_contact_fields(
 
 
 @pytest.mark.asyncio
-async def test_help_keywords(tester: AppTester, rapidpro_mock):
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_help_keywords(get_current_datetime, tester: AppTester, rapidpro_mock):
     rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "TRUE"
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+
     await tester.user_input("help")
-    tester.assert_state("state_in_hours")
+
+    tester.assert_state("state_out_of_hours")
 
 
 @pytest.mark.asyncio
