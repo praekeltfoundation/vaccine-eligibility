@@ -769,3 +769,6 @@
 | state_location_group_invite | TRUE | Text | Invite user to group discussions
 | state_location_update_status | FALSE | Text | Updates ejaf_location_survey_status contact field on rapidpro
 | state_location_end | TRUE | Text | Tells user the survey is over with some prompts to go to different places
+| state_location_question | TRUE | text | Asks user if they'd like to continue after seeing consent pdf
+| state_send_consent_pdf | FALSE | text | Send the consent pdf to the user
+| state_location_decline | FALSE | text | Tells users there are no consequences for not joining study

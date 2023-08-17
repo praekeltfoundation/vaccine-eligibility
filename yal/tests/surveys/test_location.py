@@ -137,9 +137,64 @@ async def test_state_location_introduction_pending(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_state_location_decline(tester: AppTester):
+    tester.setup_state("state_location_introduction")
+    await tester.user_input("2")
+
+    tester.assert_state("state_start")
+    tester.assert_message(
+        "That's completely okay, there are no consequences to not taking part in this "
+        "study. Please enjoy the BWise tool and stay safe."
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_location_question(tester: AppTester):
+    tester.setup_state("state_location_introduction")
+    await tester.user_input("3")
+
+    tester.assert_state("state_location_question")
+    tester.assert_message(
+        "\n".join(
+            [
+                "You should be able to find the answer to any questions you have in "
+                "the consent doc we sent you. If you still have questions, please "
+                "email bwise@praekelt.org",
+                "",
+                "Would you like to continue?",
+            ]
+        )
+    )
+
+    [msg] = tester.fake_worker.outbound_messages
+    assert msg.helper_metadata == {
+        "document": "https://contenrepo/documents/1/sample.pdf"
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_location_question_continue(tester: AppTester):
+    tester.setup_state("state_location_question")
+    await tester.user_input("1")
+
+    tester.assert_state("state_location_province")
+
+
+@pytest.mark.asyncio
+async def test_state_location_question_decline(tester: AppTester):
+    tester.setup_state("state_location_question")
+    await tester.user_input("2")
+
+    tester.assert_state("state_start")
+    tester.assert_message(
+        "That's completely okay, there are no consequences to not taking part in this "
+        "study. Please enjoy the BWise tool and stay safe."
+    )
+
+
+@pytest.mark.asyncio
 async def test_state_location_province(tester: AppTester):
     tester.setup_state("state_location_introduction")
-    tester.user.metadata["ejaf_location_survey_status"] = "pending"
     await tester.user_input("1")
 
     tester.assert_state("state_location_province")
