@@ -105,9 +105,10 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "That's completely okay, there are no consequences to not taking "
-                    "part in this study. Please enjoy the BWise tool and stay safe. "
-                    "If you change your mind, please send *Answer* to this number",
+                    "[persona_emoji] *No problem! You will no longer be part of this "
+                    "survey.*",
+                    "",
+                    "Remember, you can still use the menu to get the info you need.",
                 ]
             )
         )
