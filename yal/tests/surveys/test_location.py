@@ -8,12 +8,23 @@ from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 
 # TODO: fix this import once this flow is hooked up in main application
-from yal.surveys.location import Application
+from yal.main import Application
 
 
 @pytest.fixture
 def tester():
     return AppTester(Application)
+
+
+def get_rapidpro_contact(urn):
+    status = "pending"
+    if "27820001002" in urn:
+        status = "completed"
+    if "27820001003" in urn:
+        status = None
+    return {
+        "fields": {"ejaf_location_survey_status": status},
+    }
 
 
 @pytest.fixture(autouse=True)
@@ -27,6 +38,21 @@ async def rapidpro_mock():
         tstate.requests.append(request)
         return response.json({}, status=200)
 
+    @app.route("/api/v2/contacts.json", methods=["GET"])
+    def get_contact(request):
+        tstate.requests.append(request)
+
+        urn = request.args.get("urn")
+        contacts = [get_rapidpro_contact(urn)]
+
+        return response.json(
+            {
+                "results": contacts,
+                "next": None,
+            },
+            status=200,
+        )
+
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
@@ -38,22 +64,23 @@ async def rapidpro_mock():
 
 @pytest.mark.asyncio
 async def test_state_location_introduction_already_completed(tester: AppTester):
+    tester.setup_user_address("27820001002")
     tester.setup_state("state_location_introduction")
-    tester.user.metadata["ejaf_location_survey_status"] = "completed"
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
-    tester.assert_state("state_location_introduction")
+    tester.assert_state("state_start")
 
     tester.assert_message("This number has already completed the location survey.")
 
 
 @pytest.mark.asyncio
 async def test_state_location_introduction_not_invited(tester: AppTester):
+    tester.setup_user_address("27820001003")
     tester.setup_state("state_location_introduction")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
-    tester.assert_state("state_location_introduction")
+    tester.assert_state("state_start")
 
     tester.assert_message(
         "Unfortunately it looks like we already have enough people answering this "
@@ -124,7 +151,7 @@ async def test_state_location_province_excluded(tester: AppTester):
     tester.setup_state("state_location_province")
     await tester.user_input("4")
 
-    tester.assert_state("state_location_introduction")
+    tester.assert_state("state_start")
     tester.assert_message(
         "\n".join(
             [
@@ -199,7 +226,7 @@ async def test_state_location_group_invite_submit(tester: AppTester, rapidpro_mo
     tester.setup_state("state_location_group_invite")
     await tester.user_input("1")
 
-    tester.assert_state("state_location_introduction")
+    tester.assert_state("state_location_end")
     tester.assert_message(
         "\n".join(
             [
@@ -215,8 +242,8 @@ async def test_state_location_group_invite_submit(tester: AppTester, rapidpro_mo
         )
     )
 
-    assert len(rapidpro_mock.tstate.requests) == 1
-    request = rapidpro_mock.tstate.requests[0]
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"ejaf_location_survey_status": "completed"},
     }

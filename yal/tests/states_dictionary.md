@@ -754,3 +754,18 @@
 | endline_12_q7_platfor_review | TRUE | Text | Did you ever go to one of the services that BWise recommended? |
 | endline_12_q8_platfor_review | TRUE | Text | Since joining BWise, have you ever felt like you needed to speak to a counsellor about your mental or sexual health? |
 | endline_12_q9_platfor_review | TRUE | Text | Did you know you can request a callback from a LoveLife counsellor through the B-Wise WhatsApp chatbot? |
+
+
+## EJAF Location Survey
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_location_introduction | TRUE | Text | Surveu introduction
+| state_location_not_invited | FALSE | Text | Tells user they weren't invited to the study
+| state_location_already_completed | FALSE | Text | Tells user they already completed the study
+| state_location_province | TRUE | Text | Ask user which province they live in
+| state_location_not_recruiting | FALSE | Text | Tells user we're not recruiting in the province they live in
+| state_location_name_city | TRUE | Text | Ask user the name of the city they live in
+| state_location_area_type | TRUE | Text | Ask user the area type they live in
+| state_location_group_invite | TRUE | Text | Invite user to group discussions
+| state_location_update_status | FALSE | Text | Updates ejaf_location_survey_status contact field on rapidpro
+| state_location_end | TRUE | Text | Tells user the survey is over with some prompts to go to different places

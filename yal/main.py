@@ -20,6 +20,7 @@ from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.surveys.baseline import Application as BaselineSurveyApplication
 from yal.surveys.endline import Application as EndlineSurveyApplication
+from yal.surveys.location import Application as LocationSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import (
@@ -91,6 +92,7 @@ EJAF_ENDLINE_SURVEY_KEYWORDS = {
     "remind me tomorrow",
     "i m not interested",
 }
+EJAF_LOCATION_SURVEY_KEYWORDS = {"location"}
 
 
 class Application(
@@ -112,6 +114,7 @@ class Application(
     BaselineSurveyApplication,
     EndlineSurveyApplication,
     EndlineTermsApplication,
+    LocationSurveyApplication,
 ):
     START_STATE = "state_start"
 
@@ -271,6 +274,9 @@ class Application(
             ):
                 self.user.session_id = None
                 self.state_name = EndlineSurveyApplication.SURVEY_VALIDATION_STATE
+            elif keyword in EJAF_LOCATION_SURVEY_KEYWORDS:
+                self.user.session_id = None
+                self.state_name = LocationSurveyApplication.START_STATE
 
         except Exception:
             logger.exception("Application error")
