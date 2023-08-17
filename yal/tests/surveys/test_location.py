@@ -300,5 +300,42 @@ async def test_state_location_group_invite_submit(tester: AppTester, rapidpro_mo
     assert len(rapidpro_mock.tstate.requests) == 2
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"ejaf_location_survey_status": "completed"},
+        "fields": {
+            "ejaf_location_survey_status": "completed",
+            "ejaf_location_survey_optin": "yes",
+        },
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_location_group_invite_submit_dont_understand(
+    tester: AppTester, rapidpro_mock
+):
+    tester.setup_state("state_location_group_invite")
+    await tester.user_input("3")
+
+    tester.assert_state("state_location_end")
+    tester.assert_message(
+        "\n".join(
+            [
+                "No problem! If you would like to learn more about the platform, "
+                "please email the Bwise team at bwise@praekelt.org",
+                "",
+                "Thank you for taking part in our survey 🙏🏽",
+                "",
+                "*You will get your R10 airtime within 24 hours*",
+                "",
+                "You can engage with the B-Wise chatbot at any time for some helpful "
+                "messages or to ask any questions.",
+            ]
+        )
+    )
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "ejaf_location_survey_status": "completed",
+            "ejaf_location_survey_optin": "dont_understand",
+        },
     }
