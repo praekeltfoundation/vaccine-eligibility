@@ -133,6 +133,30 @@ async def get_instance_fields():
     return fields
 
 
+async def get_group_membership_count(group_name):
+    async with get_rapidpro_api() as session:
+        for i in range(3):
+            try:
+                response = await session.get(
+                    urljoin(
+                        config.RAPIDPRO_URL, f"/api/v2/groups.json?name={group_name}"
+                    ),
+                )
+                response.raise_for_status()
+                response_body = await response.json()
+
+                if len(response_body["results"]) > 0:
+                    count = response_body["results"][0]["count"]
+                break
+            except HTTP_EXCEPTIONS as e:
+                if i == 2:
+                    logger.exception(e)
+                    return True, 0
+                else:
+                    continue
+    return False, count
+
+
 async def check_if_baseline_active():
     """
     Checks a Global var on the RapidPro instance to see if the Baseline survey is active

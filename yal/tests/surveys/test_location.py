@@ -18,13 +18,26 @@ def tester():
 
 def get_rapidpro_contact(urn):
     status = "pending"
+    survey_group = "1"
     if "27820001002" in urn:
         status = "completed"
     if "27820001003" in urn:
         status = None
+    if "27820001004" in urn:
+        survey_group = "2"
     return {
-        "fields": {"ejaf_location_survey_status": status},
+        "fields": {
+            "ejaf_location_survey_status": status,
+            "ejaf_location_survey_group": survey_group,
+        },
     }
+
+
+def get_rapidpro_group(name):
+    count = 315
+    if name == "EJAF location survey completed 2":
+        count = 431
+    return {"count": count}
 
 
 @pytest.fixture(autouse=True)
@@ -48,6 +61,21 @@ async def rapidpro_mock():
         return response.json(
             {
                 "results": contacts,
+                "next": None,
+            },
+            status=200,
+        )
+
+    @app.route("/api/v2/groups.json", methods=["GET"])
+    def get_group(request):
+        tstate.requests.append(request)
+
+        name = request.args.get("name")
+        groups = [get_rapidpro_group(name)]
+
+        return response.json(
+            {
+                "results": groups,
                 "next": None,
             },
             status=200,
@@ -77,6 +105,20 @@ async def test_state_location_introduction_already_completed(tester: AppTester):
 @pytest.mark.asyncio
 async def test_state_location_introduction_not_invited(tester: AppTester):
     tester.setup_user_address("27820001003")
+    tester.setup_state("state_location_introduction")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_state("state_start")
+
+    tester.assert_message(
+        "Unfortunately it looks like we already have enough people answering this "
+        "survey, but thank you for your interest."
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_location_introduction_group_max(tester: AppTester):
+    tester.setup_user_address("27820001004")
     tester.setup_state("state_location_introduction")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
