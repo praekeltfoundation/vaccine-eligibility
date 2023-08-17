@@ -71,7 +71,6 @@ class Application(BaseApplication):
                 ]
             )
         )
-        # TODO: no and question destinations
         return WhatsAppButtonState(
             self,
             question=question,
@@ -261,9 +260,14 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
+        optin = self.user.answers["state_location_group_invite"]
+
         error = await rapidpro.update_profile(
             whatsapp_id,
-            {"ejaf_location_survey_status": "completed"},
+            {
+                "ejaf_location_survey_status": "completed",
+                "ejaf_location_survey_optin": optin,
+            },
             self.user.metadata,
         )
         if error:
@@ -272,21 +276,39 @@ class Application(BaseApplication):
         return await self.go_to_state("state_location_end")
 
     async def state_location_end(self):
-        # TODO: handle the don't understand branch
-        question = self._(
-            "\n".join(
-                [
-                    "*And that's a wrap!*",
-                    "",
-                    "Thank you for taking part in our survey 🙏🏽",
-                    "",
-                    "*You will get your R10 airtime within 24 hours.*",
-                    "",
-                    "You can engage with the B-Wise chatbot at any time for some "
-                    "helpful messages or to ask any questions.",
-                ]
+        optin = self.user.answers["state_location_group_invite"]
+
+        if optin == "dont_understand":
+            question = self._(
+                "\n".join(
+                    [
+                        "No problem! If you would like to learn more about the "
+                        "platform, please email the Bwise team at bwise@praekelt.org",
+                        "",
+                        "Thank you for taking part in our survey 🙏🏽",
+                        "",
+                        "*You will get your R10 airtime within 24 hours*",
+                        "",
+                        "You can engage with the B-Wise chatbot at any time for some "
+                        "helpful messages or to ask any questions.",
+                    ]
+                )
             )
-        )
+        else:
+            question = self._(
+                "\n".join(
+                    [
+                        "*And that's a wrap!*",
+                        "",
+                        "Thank you for taking part in our survey 🙏🏽",
+                        "",
+                        "*You will get your R10 airtime within 24 hours.*",
+                        "",
+                        "You can engage with the B-Wise chatbot at any time for some "
+                        "helpful messages or to ask any questions.",
+                    ]
+                )
+            )
         return WhatsAppButtonState(
             self,
             question=question,
