@@ -1,3 +1,5 @@
+import asyncio
+
 from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
@@ -7,7 +9,7 @@ from vaccine.states import (
     WhatsAppListState,
 )
 from vaccine.validators import nonempty_validator
-from yal import rapidpro
+from yal import contentrepo, rapidpro
 from yal.askaquestion import Application as AAQApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.utils import get_generic_error, normalise_phonenumber
@@ -75,7 +77,11 @@ class Application(BaseApplication):
             question=question,
             choices=choices,
             error=self._(get_generic_error()),
-            next={"yes": "state_location_province", "no": "TODO", "question": "TODO"},
+            next={
+                "yes": "state_location_province",
+                "no": "state_location_decline",
+                "question": "state_send_consent_pdf",
+            },
         )
 
     async def state_location_not_invited(self):
@@ -93,6 +99,53 @@ class Application(BaseApplication):
             self,
             self._("This number has already completed the location survey."),
             next=self.START_STATE,
+        )
+
+    async def state_location_decline(self):
+        return EndState(
+            self,
+            self._(
+                "That's completely okay, there are no consequences to not taking part "
+                "in this study. Please enjoy the BWise tool and stay safe."
+            ),
+            next=self.START_STATE,
+        )
+
+    async def state_send_consent_pdf(self):
+        await self.worker.publish_message(
+            self.inbound.reply(
+                None,
+                helper_metadata={"document": contentrepo.get_privacy_policy_url()},
+            )
+        )
+        await asyncio.sleep(1.5)
+        return await self.go_to_state("state_location_question")
+
+    async def state_location_question(self):
+        async def _next(choice: Choice):
+            if choice.value == "decline":
+                return "state_location_decline"
+            return "state_location_province"
+
+        return WhatsAppButtonState(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "You should be able to find the answer to any questions you "
+                        "have in the consent doc we sent you. If you still have "
+                        "questions, please email bwise@praekelt.org",
+                        "",
+                        "Would you like to continue?",
+                    ]
+                )
+            ),
+            choices=[
+                Choice("continue", "Continue"),
+                Choice("decline", "No, thank you"),
+            ],
+            next=_next,
+            error=self._(get_generic_error()),
         )
 
     async def state_location_province(self):
@@ -219,6 +272,7 @@ class Application(BaseApplication):
         return await self.go_to_state("state_location_end")
 
     async def state_location_end(self):
+        # TODO: handle the don't understand branch
         question = self._(
             "\n".join(
                 [
