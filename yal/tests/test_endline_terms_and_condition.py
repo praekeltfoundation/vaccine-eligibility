@@ -85,7 +85,7 @@ async def test_state_monthly_household_income_endline(tester: AppTester, rapidpr
             "*How many people (including yourself) live in the household now?"
             " Don’t forget to include babies.*",
             "",
-            "(If you’re unsure - this counts as anyone sleeping the house"
+            "(If you’re unsure - this counts as anyone sleeping in the house"
             " 4 nights in the past week).",
         ]
     )
