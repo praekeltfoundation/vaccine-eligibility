@@ -772,3 +772,5 @@
 | state_location_question | TRUE | text | Asks user if they'd like to continue after seeing consent pdf
 | state_send_consent_pdf | FALSE | text | Send the consent pdf to the user
 | state_location_decline | FALSE | text | Tells users there are no consequences for not joining study
+| state_location_update_invalid_province | FALSE | text | Updates the ejaf_location_survey_status contact field on rapidpro
+| state_location_invalid_province | FALSE | text | Tells them they are not eligible for the survey

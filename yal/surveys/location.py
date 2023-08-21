@@ -33,6 +33,8 @@ class Application(BaseApplication):
 
         if survey_status in ("completed", "airtime_sent"):
             return await self.go_to_state("state_location_already_completed")
+        elif survey_status == "invalid_province":
+            return await self.go_to_state("state_location_invalid_province")
         elif (
             group_count >= config.LOCATION_STUDY_GROUP_LIMIT
             or survey_status != "pending"
@@ -105,6 +107,22 @@ class Application(BaseApplication):
             next=self.START_STATE,
         )
 
+    async def state_location_invalid_province(self):
+        return EndState(
+            self,
+            self._(
+                "\n".join(
+                    [
+                        "Unfortunately, this number is not eligible for this survey "
+                        "at this moment.",
+                        "",
+                        "Reply with “menu” to return to the main menu”.",
+                    ]
+                )
+            ),
+            next=self.START_STATE,
+        )
+
     async def state_location_already_completed(self):
         return EndState(
             self,
@@ -162,7 +180,7 @@ class Application(BaseApplication):
     async def state_location_province(self):
         async def _next(choice: Choice):
             if choice.value == "other":
-                return "state_location_not_recruiting"
+                return "state_location_update_invalid_province"
             return "state_location_name_city"
 
         question = "*What province do you live in?*"
@@ -180,6 +198,20 @@ class Application(BaseApplication):
             next=_next,
             error=self._(get_generic_error()),
         )
+
+    async def state_location_update_invalid_province(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        error = await rapidpro.update_profile(
+            whatsapp_id,
+            {"ejaf_location_survey_status": "invalid_province"},
+            self.user.metadata,
+        )
+        if error:
+            return await self.go_to_state("state_error")
+
+        return await self.go_to_state("state_location_not_recruiting")
 
     async def state_location_not_recruiting(self):
         return EndState(
