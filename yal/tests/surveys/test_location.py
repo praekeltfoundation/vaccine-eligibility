@@ -6,7 +6,6 @@ from sanic import Sanic, response
 from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
-
 from yal.main import Application
 
 
