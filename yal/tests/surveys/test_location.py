@@ -7,7 +7,6 @@ from vaccine.models import Message
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 
-# TODO: fix this import once this flow is hooked up in main application
 from yal.main import Application
 
 
@@ -176,6 +175,8 @@ async def test_state_location_introduction_pending(tester: AppTester):
             ]
         )
     )
+
+    tester.assert_answer("ejaf_location_survey_group", "1")
 
 
 @pytest.mark.asyncio
