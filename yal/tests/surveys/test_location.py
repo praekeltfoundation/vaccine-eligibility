@@ -23,6 +23,8 @@ def get_rapidpro_contact(urn):
         status = None
     if "27820001004" in urn:
         survey_group = "2"
+    if "27820001005" in urn:
+        status = "invalid_province"
     return {
         "fields": {
             "ejaf_location_survey_status": status,
@@ -98,6 +100,27 @@ async def test_state_location_introduction_already_completed(tester: AppTester):
     tester.assert_state("state_start")
 
     tester.assert_message("This number has already completed the location survey.")
+
+
+@pytest.mark.asyncio
+async def test_state_location_introduction_invalid_province(tester: AppTester):
+    tester.setup_user_address("27820001005")
+    tester.setup_state("state_location_introduction")
+
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_state("state_start")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Unfortunately, this number is not eligible for this survey at this "
+                "moment.",
+                "",
+                "Reply with “menu” to return to the main menu”.",
+            ]
+        )
+    )
 
 
 @pytest.mark.asyncio
@@ -244,7 +267,7 @@ async def test_state_location_province(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_location_province_excluded(tester: AppTester):
+async def test_state_location_province_excluded(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_location_province")
     await tester.user_input("4")
 
@@ -259,6 +282,12 @@ async def test_state_location_province_excluded(tester: AppTester):
             ]
         )
     )
+
+    assert len(rapidpro_mock.tstate.requests) == 2
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"ejaf_location_survey_status": "invalid_province"},
+    }
 
 
 @pytest.mark.asyncio
