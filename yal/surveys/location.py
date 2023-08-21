@@ -9,7 +9,7 @@ from vaccine.states import (
     WhatsAppListState,
 )
 from vaccine.validators import nonempty_validator
-from yal import contentrepo, rapidpro
+from yal import config, contentrepo, rapidpro
 from yal.askaquestion import Application as AAQApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.utils import get_generic_error, normalise_phonenumber
@@ -22,9 +22,19 @@ class Application(BaseApplication):
         survey_status = self.user.metadata.get(
             "ejaf_location_survey_status", "not_invited"
         )
+        survey_group = self.user.metadata.get("ejaf_location_survey_group")
+        error, group_count = await rapidpro.get_group_membership_count(
+            group_name=f"EJAF location survey completed {survey_group}"
+        )
+        if error:
+            return await self.go_to_state("state_error")
+
         if survey_status in ("completed", "airtime_sent"):
             return await self.go_to_state("state_location_already_completed")
-        elif survey_status != "pending":
+        elif (
+            group_count >= config.LOCATION_STUDY_GROUP_LIMIT
+            or survey_status != "pending"
+        ):
             return await self.go_to_state("state_location_not_invited")
 
         choices = [
