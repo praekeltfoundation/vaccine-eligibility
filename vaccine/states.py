@@ -216,6 +216,7 @@ class FreeText:
         override_answer_name: Optional[str] = None,
         footer: Optional[str] = None,
         header: Optional[str] = None,
+        text_only_error: Optional[str] = None,
     ):
         self.app = app
         self.question = question
@@ -225,8 +226,12 @@ class FreeText:
         self.override_answer_name = override_answer_name
         self.footer = footer
         self.header = header
+        self.text_only_error = text_only_error
 
     async def process_message(self, message: Message):
+        if self.text_only_error is not None and message.transport_metadata:
+            if message.transport_metadata.get("message", {}).get("type") != "text":
+                return self.app.send_message(self.text_only_error)
         if self.check is not None:
             if not isinstance(self.check, list):
                 self.check = [self.check]

@@ -263,6 +263,7 @@ class Application(BaseApplication):
             question=question,
             next="state_location_area_type",
             check=nonempty_validator(question),
+            text_only_error=question,
         )
 
     async def state_location_area_type(self):

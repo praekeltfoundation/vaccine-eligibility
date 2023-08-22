@@ -309,6 +309,32 @@ async def test_state_location_name_city(tester: AppTester):
 
 
 @pytest.mark.asyncio
+async def test_state_location_name_city_invalid(tester: AppTester):
+    tester.setup_state("state_location_name_city")
+    await tester.user_input(
+        "",
+        transport_metadata={
+            "message": {
+                "type": "image",
+                "image": {"id": "img1", "mime_type": "image/jpeg"},
+            }
+        },
+    )
+
+    tester.assert_state("state_location_name_city")
+    tester.assert_message(
+        "\n".join(
+            [
+                "*What is the name of the city or town you live in or live closest "
+                "to?*",
+                "",
+                "Please *TYPE* in the name of the city or town.",
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
 async def test_state_location_area_type(tester: AppTester):
     tester.setup_state("state_location_name_city")
     await tester.user_input("jhb")
