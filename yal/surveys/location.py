@@ -98,13 +98,22 @@ class Application(BaseApplication):
         )
 
     async def state_location_not_invited(self):
-        return EndState(
+        question = self._(
+            "Unfortunately it looks like we already have enough people answering this "
+            "survey, but thank you for your interest."
+        )
+        return WhatsAppButtonState(
             self,
-            self._(
-                "Unfortunately it looks like we already have enough people answering "
-                "this survey, but thank you for your interest."
-            ),
-            next=self.START_STATE,
+            question=question,
+            choices=[
+                Choice("menu", self._("Go to the menu")),
+                Choice("aaq", self._("Ask a question")),
+            ],
+            next={
+                "menu": "state_pre_mainmenu",
+                "aaq": AAQApplication.START_STATE,
+            },
+            error=self._(get_generic_error()),
         )
 
     async def state_location_invalid_province(self):
@@ -124,10 +133,19 @@ class Application(BaseApplication):
         )
 
     async def state_location_already_completed(self):
-        return EndState(
+        question = self._("This number has already completed the location survey.")
+        return WhatsAppButtonState(
             self,
-            self._("This number has already completed the location survey."),
-            next=self.START_STATE,
+            question=question,
+            choices=[
+                Choice("menu", self._("Go to the menu")),
+                Choice("aaq", self._("Ask a question")),
+            ],
+            next={
+                "menu": "state_pre_mainmenu",
+                "aaq": AAQApplication.START_STATE,
+            },
+            error=self._(get_generic_error()),
         )
 
     async def state_location_decline(self):

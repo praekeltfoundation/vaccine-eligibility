@@ -97,7 +97,7 @@ async def test_state_location_introduction_already_completed(tester: AppTester):
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
-    tester.assert_state("state_start")
+    tester.assert_state("state_location_already_completed")
 
     tester.assert_message("This number has already completed the location survey.")
 
@@ -129,7 +129,7 @@ async def test_state_location_introduction_not_invited(tester: AppTester):
     tester.setup_state("state_location_introduction")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
-    tester.assert_state("state_start")
+    tester.assert_state("state_location_not_invited")
 
     tester.assert_message(
         "Unfortunately it looks like we already have enough people answering this "
@@ -143,7 +143,7 @@ async def test_state_location_introduction_group_max(tester: AppTester):
     tester.setup_state("state_location_introduction")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
-    tester.assert_state("state_start")
+    tester.assert_state("state_location_not_invited")
 
     tester.assert_message(
         "Unfortunately it looks like we already have enough people answering this "
