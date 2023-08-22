@@ -216,7 +216,6 @@ class FreeText:
         override_answer_name: Optional[str] = None,
         footer: Optional[str] = None,
         header: Optional[str] = None,
-        text_only_error: Optional[str] = None,
     ):
         self.app = app
         self.question = question
@@ -226,12 +225,8 @@ class FreeText:
         self.override_answer_name = override_answer_name
         self.footer = footer
         self.header = header
-        self.text_only_error = text_only_error
 
     async def process_message(self, message: Message):
-        if self.text_only_error is not None and message.transport_metadata:
-            if message.transport_metadata.get("message", {}).get("type") != "text":
-                return self.app.send_message(self.text_only_error)
         if self.check is not None:
             if not isinstance(self.check, list):
                 self.check = [self.check]
@@ -257,6 +252,23 @@ class FreeText:
         if self.header is not None:
             text = f"{self.header}\n{text}"
         return self.app.send_message(text, helper_metadata=helper_metadata)
+
+
+class WhatsAppTextOnlyFreetext(FreeText):
+    def __init__(
+        self,
+        *args,
+        text_only_error: Optional[str] = None,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.text_only_error = text_only_error
+
+    async def process_message(self, message: Message):
+        if self.text_only_error is not None and message.transport_metadata:
+            if message.transport_metadata.get("message", {}).get("type") != "text":
+                return self.app.send_message(self.text_only_error)
+        return await super().process_message(message)
 
 
 class BaseWhatsAppChoiceState(ChoiceState):
