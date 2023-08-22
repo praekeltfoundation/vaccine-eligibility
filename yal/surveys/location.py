@@ -4,9 +4,9 @@ from vaccine.base_application import BaseApplication
 from vaccine.states import (
     Choice,
     EndState,
-    FreeText,
     WhatsAppButtonState,
     WhatsAppListState,
+    WhatsAppTextOnlyFreetext,
 )
 from vaccine.validators import nonempty_validator
 from yal import config, contentrepo, rapidpro
@@ -258,11 +258,12 @@ class Application(BaseApplication):
                 ]
             )
         )
-        return FreeText(
+        return WhatsAppTextOnlyFreetext(
             self,
             question=question,
             next="state_location_area_type",
             check=nonempty_validator(question),
+            text_only_error=question,
         )
 
     async def state_location_area_type(self):
