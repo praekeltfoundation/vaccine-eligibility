@@ -65,9 +65,9 @@ async def test_state_terms_decline(tester: AppTester, rapidpro_mock):
     tester.assert_state("state_no_consent")
     message = "\n".join(
         [
-            "That's completely okay, there are no consequences to not taking "
-            "part in this study. Please enjoy the BWise tool and stay safe. "
-            "If you change your mind, please send *Answer* to this number",
+            "🤖 *No problem! You will no longer be part of this survey.*",
+            "",
+            "Remember, you can still use the menu to get the info you need.",
         ]
     )
     tester.assert_message(message)
@@ -85,7 +85,7 @@ async def test_state_monthly_household_income_endline(tester: AppTester, rapidpr
             "*How many people (including yourself) live in the household now?"
             " Don’t forget to include babies.*",
             "",
-            "(If you’re unsure - this counts as anyone sleeping the house"
+            "(If you’re unsure - this counts as anyone sleeping in the house"
             " 4 nights in the past week).",
         ]
     )
@@ -149,8 +149,8 @@ async def test_state_household_number_of_people_more(tester: AppTester, rapidpro
             "*How many people (including yourself) live in the household now?"
             " Don’t forget to include babies.*",
             "",
-            "(If you’re unsure - this counts as anyone sleeping the house"
-            "4 nights in the past week).",
+            "(If you’re unsure - this counts as anyone sleeping in the house"
+            " 4 nights in the past week).",
         ]
     )
 

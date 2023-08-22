@@ -91,7 +91,7 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("yes", "ok, let's start"),
+                Choice("yes", "Ok, let's start"),
                 Choice("no", "I can't right now"),
             ],
             error=error,
@@ -105,9 +105,10 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "That's completely okay, there are no consequences to not taking "
-                    "part in this study. Please enjoy the BWise tool and stay safe. "
-                    "If you change your mind, please send *Answer* to this number",
+                    "[persona_emoji] *No problem! You will no longer be part of this "
+                    "survey.*",
+                    "",
+                    "Remember, you can still use the menu to get the info you need.",
                 ]
             )
         )
@@ -221,7 +222,7 @@ class Application(BaseApplication):
                     "*How many people (including yourself) live in the household now?"
                     " Don’t forget to include babies.*",
                     "",
-                    "(If you’re unsure - this counts as anyone sleeping the house"
+                    "(If you’re unsure - this counts as anyone sleeping in the house"
                     " 4 nights in the past week).",
                 ]
             )
@@ -272,8 +273,8 @@ class Application(BaseApplication):
                     "*How many people (including yourself) live in the household now?"
                     " Don’t forget to include babies.*",
                     "",
-                    "(If you’re unsure - this counts as anyone sleeping the house"
-                    "4 nights in the past week).",
+                    "(If you’re unsure - this counts as anyone sleeping in the house"
+                    " 4 nights in the past week).",
                 ]
             )
         )
