@@ -413,10 +413,10 @@ class Application(BaseApplication):
         if error:
             return await self.go_to_state("state_error")
 
-        return await self.go_to_state("state_platform_review_endline")
+        return await self.go_to_state("state_platform_review_assessment_endline")
 
     # Platform Review
-    async def state_platform_review_endline(self):
+    async def state_platform_review_assessment_endline(self):
         self.save_metadata("assessment_name", "platform_review_endline")
         self.save_metadata("assessment_end_state", "state_submit_endline_completed")
 
