@@ -147,6 +147,18 @@ class Application(
                 message.transport_metadata, "message", "button", "payload"
             )
 
+            whatsapp_delivery_failed = self.user.metadata.get("whatsapp_delivery_failed", "False")
+
+            if whatsapp_delivery_failed == "True":
+                data = {
+                    "whatsapp_delivery_failed": "False",
+                }
+                error = await rapidpro.update_profile(
+                    whatsapp_id, data, self.user.metadata
+                )
+                if error:
+                    return await self.go_to_state("state_error")
+
             # Restart keywords that interrupt the current flow
 
             if (

@@ -1490,3 +1490,17 @@ async def test_phase2_payload_message_directs_to_onboarding_rel_status(
     tester.assert_state("state_rel_status")
 
     assert len(rapidpro_mock.tstate.requests) == 2
+
+
+@pytest.mark.asyncio
+async def test_whatsapp_user_reactivate(
+    tester: AppTester, rapidpro_mock
+):
+    tester.user.metadata["whatsapp_delivery_failed"] = "True"
+    tester.user.metadata["terms_accepted"] = True
+    tester.user.metadata["onboarding_completed"] = True
+
+    await tester.user_input("menu")
+
+    tester.assert_metadata("whatsapp_delivery_failed", "False")
+    tester.assert_state("state_mainmenu")
