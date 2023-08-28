@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from pkgutil import iter_modules
 from unittest import mock
@@ -1502,3 +1503,8 @@ async def test_whatsapp_user_reactivate(tester: AppTester, rapidpro_mock):
 
     tester.assert_metadata("whatsapp_delivery_failed", "False")
     tester.assert_state("state_mainmenu")
+
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"whatsapp_delivery_failed": "False"}
+    }
