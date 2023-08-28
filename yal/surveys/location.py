@@ -23,6 +23,10 @@ class Application(BaseApplication):
             "ejaf_location_survey_status", "not_invited"
         )
         survey_group = self.user.metadata.get("ejaf_location_survey_group")
+
+        if not survey_group:
+            return await self.go_to_state("state_location_not_invited")
+
         self.save_answer("ejaf_location_survey_group", survey_group)
 
         error, group_count = await rapidpro.get_group_membership_count(
