@@ -611,7 +611,7 @@
 | state_accept_consent | False | Text | Consent to the endline study |
 | state_no_consent | False | Text | No consent to the endline study |
 | state_consent | False | Text | Ask for consent to the study |
-| state_platform_review_endline | False | Text | Review the platform |
+| state_platform_review_assessment_endline | False | Text | Review the platform |
 | state_relationship_status_endline | False | Text | endline relationship status |
 | state_submit_terms_and_conditions_endline | False | Text | Endline Terms and Condition Submit |
 | state_not_interested | False | Text | Endline Survery not interested |

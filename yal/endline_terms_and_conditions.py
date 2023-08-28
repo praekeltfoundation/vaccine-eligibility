@@ -302,12 +302,9 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        assessment_name = self.user.metadata.get(
-            "assessment_name", "locus_of_control_endline"
-        )
         data = {
             "assessment_reminder": get_current_datetime().isoformat(),
-            "assessment_reminder_name": assessment_name,
+            "assessment_reminder_name": "locus_of_control_endline",
             "assessment_reminder_type": "endline reengagement 30min",
         }
 
