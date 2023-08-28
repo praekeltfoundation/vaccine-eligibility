@@ -1493,9 +1493,7 @@ async def test_phase2_payload_message_directs_to_onboarding_rel_status(
 
 
 @pytest.mark.asyncio
-async def test_whatsapp_user_reactivate(
-    tester: AppTester, rapidpro_mock
-):
+async def test_whatsapp_user_reactivate(tester: AppTester, rapidpro_mock):
     tester.user.metadata["whatsapp_delivery_failed"] = "True"
     tester.user.metadata["terms_accepted"] = True
     tester.user.metadata["onboarding_completed"] = True

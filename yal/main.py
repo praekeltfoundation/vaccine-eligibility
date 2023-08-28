@@ -147,7 +147,9 @@ class Application(
                 message.transport_metadata, "message", "button", "payload"
             )
 
-            whatsapp_delivery_failed = self.user.metadata.get("whatsapp_delivery_failed", "False")
+            whatsapp_delivery_failed = self.user.metadata.get(
+                "whatsapp_delivery_failed", "False"
+            )
 
             if whatsapp_delivery_failed == "True":
                 data = {
