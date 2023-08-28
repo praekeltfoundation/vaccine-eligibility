@@ -21,10 +21,13 @@ def get_rapidpro_contact(urn):
         status = "completed"
     if "27820001003" in urn:
         status = None
+        survey_group = None
     if "27820001004" in urn:
         survey_group = "2"
     if "27820001005" in urn:
         status = "invalid_province"
+    if "27820001006" in urn:
+        status = None
     return {
         "fields": {
             "ejaf_location_survey_status": status,
@@ -126,6 +129,20 @@ async def test_state_location_introduction_invalid_province(tester: AppTester):
 @pytest.mark.asyncio
 async def test_state_location_introduction_not_invited(tester: AppTester):
     tester.setup_user_address("27820001003")
+    tester.setup_state("state_location_introduction")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_state("state_location_not_invited")
+
+    tester.assert_message(
+        "Unfortunately it looks like we already have enough people answering this "
+        "survey, but thank you for your interest."
+    )
+
+
+@pytest.mark.asyncio
+async def test_state_location_introduction_not_invited_with_group(tester: AppTester):
+    tester.setup_user_address("27820001006")
     tester.setup_state("state_location_introduction")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
