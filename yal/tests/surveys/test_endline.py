@@ -1316,4 +1316,4 @@ async def test_state_accept_consent_reminder_lets_do_this(
     tester.user.metadata["assessment_reminder_sent"] = True
     await tester.user_input("Let's do it")
 
-    tester.assert_state("state_start_terms")
+    tester.assert_state("state_relationship_status_endline")

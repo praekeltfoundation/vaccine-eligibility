@@ -460,7 +460,7 @@ async def test_assessment_reminder_keywords(
     ] = "locus_of_control_endline"
 
     await tester.user_input("continue now")
-    tester.assert_state("state_start_terms")
+    tester.assert_state("state_relationship_status_endline")
 
 
 @pytest.mark.asyncio
