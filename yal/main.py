@@ -147,19 +147,7 @@ class Application(
                 message.transport_metadata, "message", "button", "payload"
             )
 
-            whatsapp_delivery_failed = self.user.metadata.get(
-                "whatsapp_delivery_failed", "False"
-            )
-
-            if whatsapp_delivery_failed == "True":
-                data = {
-                    "whatsapp_delivery_failed": "False",
-                }
-                error = await rapidpro.update_profile(
-                    whatsapp_id, data, self.user.metadata
-                )
-                if error:
-                    return await self.go_to_state("state_error")
+            await self.reset_whatsapp_delivery_failure(whatsapp_id)
 
             # Restart keywords that interrupt the current flow
 
@@ -902,3 +890,17 @@ class Application(
         """
         content = replace_persona_fields(question, self.user.metadata)
         await self.worker.publish_message(self.inbound.reply(content))
+
+    async def reset_whatsapp_delivery_failure(self, whatsapp_id):
+
+        whatsapp_delivery_failed = self.user.metadata.get(
+            "whatsapp_delivery_failed", "False"
+        )
+
+        if whatsapp_delivery_failed.lower() == "true":
+            data = {
+                "whatsapp_delivery_failed": "False",
+            }
+            error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+            if error:
+                return await self.go_to_state("state_error")
