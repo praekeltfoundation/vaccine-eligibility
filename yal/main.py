@@ -63,6 +63,7 @@ TRACKING_KEYWORDS_ROUND_2 = {
     "i saw this on facebook",
 }
 TRACKING_KEYWORDS_ROUND_3 = {"youth", "yth", "yuth", "yut", "yoth", "yot", "yoh"}
+TRACKING_KEYWORDS_TIKTOK = {"sho"}
 OPTOUT_KEYWORDS = {"stop", "opt out", "cancel", "quit"}
 ONBOARDING_REMINDER_KEYWORDS = {
     "continue",
@@ -156,6 +157,7 @@ class Application(
                 or keyword in TRACKING_KEYWORDS
                 or keyword in TRACKING_KEYWORDS_ROUND_2
                 or keyword in TRACKING_KEYWORDS_ROUND_3
+                or keyword in TRACKING_KEYWORDS_TIKTOK
             ):
                 self.user.session_id = None
                 self.state_name = self.START_STATE
@@ -329,6 +331,7 @@ class Application(
             inbound in TRACKING_KEYWORDS
             or inbound in TRACKING_KEYWORDS_ROUND_2
             or inbound in TRACKING_KEYWORDS_ROUND_3
+            or inbound in TRACKING_KEYWORDS_TIKTOK
         ):
             self.save_answer("state_source_tracking", inbound)
 
@@ -339,6 +342,7 @@ class Application(
             or inbound in TRACKING_KEYWORDS
             or inbound in TRACKING_KEYWORDS_ROUND_2
             or inbound in TRACKING_KEYWORDS_ROUND_3
+            or inbound in TRACKING_KEYWORDS_TIKTOK
         ):
             if terms_accepted and onboarding_completed:
                 return await self.go_to_state(MainMenuApplication.START_STATE)
