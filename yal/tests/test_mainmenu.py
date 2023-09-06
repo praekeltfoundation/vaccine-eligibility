@@ -487,7 +487,7 @@ async def test_state_mainmenu_start(
         "/api/v2/pages/777",
     ]
 
-    assert len(rapidpro_mock.tstate.requests) == 5
+    assert len(rapidpro_mock.tstate.requests) == 6
     assert (
         rapidpro_mock.tstate.contact_fields["last_mainmenu_time"]
         == "2022-06-19T17:30:00"
@@ -650,7 +650,7 @@ async def test_state_mainmenu_contentrepo(
 
     tester.assert_metadata("topics_viewed", ["111"])
 
-    assert len(rapidpro_mock.tstate.requests) == 7
+    assert len(rapidpro_mock.tstate.requests) == 8
     assert rapidpro_mock.tstate.contact_fields["last_mainmenu_time"] == ""
     assert (
         rapidpro_mock.tstate.contact_fields["suggested_text"]
@@ -971,7 +971,7 @@ async def test_state_mainmenu_contentrepo_children(
     assert params["data__session_id"][0] == "1"
     assert params["data__user_addr"][0] == "27820001001"
 
-    assert len(rapidpro_mock.tstate.requests) == 11
+    assert len(rapidpro_mock.tstate.requests) == 12
     assert rapidpro_mock.tstate.contact_fields["last_mainmenu_time"] == ""
     assert (
         rapidpro_mock.tstate.contact_fields["last_main_time"] == "2022-06-19T17:30:00"
@@ -1701,6 +1701,44 @@ async def test_state_content_page_related(
                 "",
                 "-----",
                 "*Or reply:*",
+                BACK_TO_MAIN,
+                GET_HELP,
+            ]
+        )
+    )
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.contentrepo.rapidpro.check_if_service_finder_active")
+async def test_mainmenu_service_finder_disabled(
+    check_if_service_finder_active,
+    tester: AppTester,
+    rapidpro_mock,
+    contentrepo_api_mock,
+):
+    check_if_service_finder_active.return_value = "False"
+
+    tester.setup_state("state_contentrepo_page")
+    tester.user.metadata["selected_page_id"] = "1235"
+    tester.user.metadata["current_message_id"] = 1
+    tester.user.metadata["current_menu_level"] = 1
+    tester.user.metadata["last_topic_viewed"] = "1"
+    tester.user.metadata["suggested_content"] = {}
+
+    tester.user.session_id = 123
+    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Main Menu 1 💊",
+                "-----",
+                "",
+                "Message test content 1",
+                "",
+                "-----",
+                "*Or reply:*",
+                "1. ⬅️ Parent Title",
                 BACK_TO_MAIN,
                 GET_HELP,
             ]
