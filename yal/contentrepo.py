@@ -168,10 +168,7 @@ async def get_page_details(
 
                         tags = ["aaq", "pleasecallme"]
 
-                        if (
-                            await utils.check_if_service_finder_active()
-                            is True
-                        ):
+                        if await utils.check_if_service_finder_active() is True:
                             tags.append("servicefinder")
 
                         for tag in tags:
