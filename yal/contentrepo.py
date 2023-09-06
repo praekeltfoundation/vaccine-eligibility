@@ -7,7 +7,7 @@ import aiohttp
 from vaccine.models import User
 from vaccine.states import Choice
 from vaccine.utils import HTTP_EXCEPTIONS
-from yal import config
+from yal import config, utils
 
 logger = logging.getLogger(__name__)
 
@@ -166,7 +166,12 @@ async def get_page_details(
                             ][0]
                             page_details["quiz_tag"] = quiz_tag
 
-                        for tag in ["servicefinder", "aaq", "pleasecallme"]:
+                        tags = ["aaq", "pleasecallme"]
+
+                        if await utils.check_if_service_finder_active() is True:
+                            tags.append("servicefinder")
+
+                        for tag in tags:
                             if tag in page_details["tags"]:
                                 page_details["feature_redirects"].append(tag)
 
