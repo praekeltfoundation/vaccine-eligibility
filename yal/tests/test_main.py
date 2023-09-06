@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from pkgutil import iter_modules
 from unittest import mock
@@ -22,6 +23,9 @@ from yal.pushmessages_optin import Application as OptinsApplication
 from yal.quiz import Application as QuizApplication
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
+from yal.surveys.baseline import Application as BaselineSurveyApplication
+from yal.surveys.endline import Application as EndlineSurveyApplication
+from yal.surveys.location import Application as LocationSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.tests.test_mainmenu import build_message_detail
 from yal.usertest_feedback import Application as FeedbackApplication
@@ -49,6 +53,9 @@ def get_state_sets():
     sf_s_states = set(
         s for s in dir(ServiceFinderFeedbackSurveyApplication) if s.startswith("state_")
     )
+    bs_states = set(s for s in dir(BaselineSurveyApplication) if s.startswith("state_"))
+    es_states = set(s for s in dir(EndlineSurveyApplication) if s.startswith("state_"))
+    ls_states = set(s for s in dir(LocationSurveyApplication) if s.startswith("state_"))
     ss_states = set(s for s in dir(SegmentSurveyApplication) if s.startswith("state_"))
     wa_fb_states = set(
         s for s in dir(WaFbCrossoverFeedbackApplication) if s.startswith("state_")
@@ -69,6 +76,9 @@ def get_state_sets():
         fb_states,
         c_fb_states,
         sf_s_states,
+        bs_states,
+        es_states,
+        ls_states,
         ss_states,
         wa_fb_states,
         optin_states,
@@ -419,11 +429,15 @@ async def test_state_start_contact_fields(
 
 
 @pytest.mark.asyncio
-async def test_help_keywords(tester: AppTester, rapidpro_mock):
+@mock.patch("yal.pleasecallme.get_current_datetime")
+async def test_help_keywords(get_current_datetime, tester: AppTester, rapidpro_mock):
     rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "TRUE"
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+
     await tester.user_input("help")
-    tester.assert_state("state_in_hours")
+
+    tester.assert_state("state_out_of_hours")
 
 
 @pytest.mark.asyncio
@@ -447,7 +461,7 @@ async def test_assessment_reminder_keywords(
     ] = "locus_of_control_endline"
 
     await tester.user_input("continue now")
-    tester.assert_state("state_survey_question")
+    tester.assert_state("state_relationship_status_endline")
 
 
 @pytest.mark.asyncio
@@ -963,6 +977,32 @@ async def test_tracked_keywords_saved_for_new_user_ads_round_3(
 
 
 @pytest.mark.asyncio
+async def test_tracked_keywords_tiktok(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "True"
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = "True"
+    await tester.user_input("sho")
+    tester.assert_state("state_mainmenu")
+    tester.assert_num_messages(2)
+
+    tester.assert_answer("state_source_tracking", "sho")
+
+
+@pytest.mark.asyncio
+async def test_tracked_keywords_saved_for_new_user_tiktok(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = ""
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = ""
+    await tester.user_input("sho")
+    tester.assert_state("state_welcome")
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_source_tracking", "sho")
+
+
+@pytest.mark.asyncio
 async def test_onboarding_reminder_response_to_reminder_handler(
     tester: AppTester, rapidpro_mock
 ):
@@ -1466,3 +1506,20 @@ async def test_phase2_payload_message_directs_to_onboarding_rel_status(
     tester.assert_state("state_rel_status")
 
     assert len(rapidpro_mock.tstate.requests) == 2
+
+
+@pytest.mark.asyncio
+async def test_whatsapp_user_reactivate(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["whatsapp_delivery_failed"] = "True"
+    tester.user.metadata["terms_accepted"] = True
+    tester.user.metadata["onboarding_completed"] = True
+
+    await tester.user_input("menu")
+
+    tester.assert_metadata("whatsapp_delivery_failed", "False")
+    tester.assert_state("state_mainmenu")
+
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"whatsapp_delivery_failed": "False"}
+    }

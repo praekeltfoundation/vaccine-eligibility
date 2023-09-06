@@ -1294,3 +1294,26 @@ async def test_endline_agree_terms_and_condition(tester: AppTester, rapidpro_moc
 
     await tester.user_input("Yes, I agree")
     tester.assert_state("state_accept_consent")
+
+
+@pytest.mark.asyncio
+async def test_state_accept_consent_reminder_lets_do_this(
+    tester: AppTester, rapidpro_mock
+):
+
+    tester.user.metadata["baseline_survey_completed"] = True
+    tester.user.metadata["endline_survey_started"] = "True"
+    tester.user.metadata["terms_accepted"] = True
+    tester.user.metadata["onboarding_completed"] = True
+
+    tester.setup_state("state_accept_consent")
+    await tester.user_input("I can't right now")
+
+    tester.assert_state("state_set_reminder_timer")
+    tester.assert_metadata("assessment_reminder_name", "locus_of_control_endline")
+    tester.assert_metadata("assessment_reminder_type", "endline reengagement 30min")
+
+    tester.user.metadata["assessment_reminder_sent"] = True
+    await tester.user_input("Let's do it")
+
+    tester.assert_state("state_relationship_status_endline")

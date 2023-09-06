@@ -254,6 +254,23 @@ class FreeText:
         return self.app.send_message(text, helper_metadata=helper_metadata)
 
 
+class WhatsAppTextOnlyFreetext(FreeText):
+    def __init__(
+        self,
+        *args,
+        text_only_error: Optional[str] = None,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.text_only_error = text_only_error
+
+    async def process_message(self, message: Message):
+        if self.text_only_error is not None and message.transport_metadata:
+            if message.transport_metadata.get("message", {}).get("type") != "text":
+                return self.app.send_message(self.text_only_error)
+        return await super().process_message(message)
+
+
 class BaseWhatsAppChoiceState(ChoiceState):
     """
     Base class for all whatsapp choice states.

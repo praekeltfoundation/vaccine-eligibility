@@ -401,10 +401,7 @@ class Application(BaseApplication):
                     f"state_{assessment_name.replace('_v2', '')}_assessment_v2"
                 )
             if "endline" in assessment_name:
-                assessment_name_replace = assessment_name.replace("_endline", "")
-                return await self.go_to_state(
-                    f"state_{assessment_name_replace}_assessment_endline"
-                )
+                return await self.go_to_state("state_relationship_status_endline")
 
             return await self.go_to_state(f"state_{assessment_name}_assessment")
 

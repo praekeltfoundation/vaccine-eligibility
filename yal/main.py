@@ -20,6 +20,7 @@ from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.surveys.baseline import Application as BaselineSurveyApplication
 from yal.surveys.endline import Application as EndlineSurveyApplication
+from yal.surveys.location import Application as LocationSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
 from yal.utils import (
@@ -62,6 +63,7 @@ TRACKING_KEYWORDS_ROUND_2 = {
     "i saw this on facebook",
 }
 TRACKING_KEYWORDS_ROUND_3 = {"youth", "yth", "yuth", "yut", "yoth", "yot", "yoh"}
+TRACKING_KEYWORDS_TIKTOK = {"sho"}
 OPTOUT_KEYWORDS = {"stop", "opt out", "cancel", "quit"}
 ONBOARDING_REMINDER_KEYWORDS = {
     "continue",
@@ -90,6 +92,7 @@ EJAF_ENDLINE_SURVEY_KEYWORDS = {
     "remind me tomorrow",
     "i m not interested",
 }
+EJAF_LOCATION_SURVEY_KEYWORDS = {"location"}
 
 
 class Application(
@@ -111,6 +114,7 @@ class Application(
     BaselineSurveyApplication,
     EndlineSurveyApplication,
     EndlineTermsApplication,
+    LocationSurveyApplication,
 ):
     START_STATE = "state_start"
 
@@ -143,6 +147,8 @@ class Application(
                 message.transport_metadata, "message", "button", "payload"
             )
 
+            await self.reset_whatsapp_delivery_failure(whatsapp_id)
+
             # Restart keywords that interrupt the current flow
 
             if (
@@ -150,6 +156,7 @@ class Application(
                 or keyword in TRACKING_KEYWORDS
                 or keyword in TRACKING_KEYWORDS_ROUND_2
                 or keyword in TRACKING_KEYWORDS_ROUND_3
+                or keyword in TRACKING_KEYWORDS_TIKTOK
             ):
                 self.user.session_id = None
                 self.state_name = self.START_STATE
@@ -266,6 +273,9 @@ class Application(
             ):
                 self.user.session_id = None
                 self.state_name = EndlineSurveyApplication.SURVEY_VALIDATION_STATE
+            elif keyword in EJAF_LOCATION_SURVEY_KEYWORDS:
+                self.user.session_id = None
+                self.state_name = LocationSurveyApplication.START_STATE
 
         except Exception:
             logger.exception("Application error")
@@ -316,6 +326,7 @@ class Application(
             inbound in TRACKING_KEYWORDS
             or inbound in TRACKING_KEYWORDS_ROUND_2
             or inbound in TRACKING_KEYWORDS_ROUND_3
+            or inbound in TRACKING_KEYWORDS_TIKTOK
         ):
             self.save_answer("state_source_tracking", inbound)
 
@@ -326,6 +337,7 @@ class Application(
             or inbound in TRACKING_KEYWORDS
             or inbound in TRACKING_KEYWORDS_ROUND_2
             or inbound in TRACKING_KEYWORDS_ROUND_3
+            or inbound in TRACKING_KEYWORDS_TIKTOK
         ):
             if terms_accepted and onboarding_completed:
                 return await self.go_to_state(MainMenuApplication.START_STATE)
@@ -877,3 +889,17 @@ class Application(
         """
         content = replace_persona_fields(question, self.user.metadata)
         await self.worker.publish_message(self.inbound.reply(content))
+
+    async def reset_whatsapp_delivery_failure(self, whatsapp_id):
+
+        whatsapp_delivery_failed = self.user.metadata.get(
+            "whatsapp_delivery_failed", "False"
+        )
+
+        if whatsapp_delivery_failed.lower() == "true":
+            data = {
+                "whatsapp_delivery_failed": "False",
+            }
+            error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+            if error:
+                return await self.go_to_state("state_error")

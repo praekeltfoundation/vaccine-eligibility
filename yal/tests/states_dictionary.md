@@ -611,7 +611,7 @@
 | state_accept_consent | False | Text | Consent to the endline study |
 | state_no_consent | False | Text | No consent to the endline study |
 | state_consent | False | Text | Ask for consent to the study |
-| state_platform_review_endline | False | Text | Review the platform |
+| state_platform_review_assessment_endline | False | Text | Review the platform |
 | state_relationship_status_endline | False | Text | endline relationship status |
 | state_submit_terms_and_conditions_endline | False | Text | Endline Terms and Condition Submit |
 | state_not_interested | False | Text | Endline Survery not interested |
@@ -754,3 +754,23 @@
 | endline_12_q7_platfor_review | TRUE | Text | Did you ever go to one of the services that BWise recommended? |
 | endline_12_q8_platfor_review | TRUE | Text | Since joining BWise, have you ever felt like you needed to speak to a counsellor about your mental or sexual health? |
 | endline_12_q9_platfor_review | TRUE | Text | Did you know you can request a callback from a LoveLife counsellor through the B-Wise WhatsApp chatbot? |
+
+
+## EJAF Location Survey
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| state_location_introduction | TRUE | Text | Surveu introduction
+| state_location_not_invited | TRUE | Text | Tells user they weren't invited to the study
+| state_location_already_completed | TRUE | Text | Tells user they already completed the study
+| state_location_province | TRUE | Text | Ask user which province they live in
+| state_location_not_recruiting | FALSE | Text | Tells user we're not recruiting in the province they live in
+| state_location_name_city | TRUE | Text | Ask user the name of the city they live in
+| state_location_area_type | TRUE | Text | Ask user the area type they live in
+| state_location_group_invite | TRUE | Text | Invite user to group discussions
+| state_location_update_status | FALSE | Text | Updates ejaf_location_survey_status contact field on rapidpro
+| state_location_end | TRUE | Text | Tells user the survey is over with some prompts to go to different places
+| state_location_question | TRUE | text | Asks user if they'd like to continue after seeing consent pdf
+| state_send_consent_pdf | FALSE | text | Send the consent pdf to the user
+| state_location_decline | FALSE | text | Tells users there are no consequences for not joining study
+| state_location_update_invalid_province | FALSE | text | Updates the ejaf_location_survey_status contact field on rapidpro
+| state_location_invalid_province | FALSE | text | Tells them they are not eligible for the survey

@@ -17,9 +17,10 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    ("very_relatable", "Very Relatable"),
+                    ("very_relatable", "Very relatable"),
                     ("relatable_well", "Related well"),
                     ("relatable_fine", "Related fine"),
+                    ("relatable_little", "Related a little"),
                     ("dont_relate", "Didn't relate at all"),
                     ("dont_understand", "I don't understand"),
                     ("skip_question", "Skip question"),
@@ -131,7 +132,7 @@ ASSESSMENT_QUESTIONS = {
                     ("yes_got_no_help", "Yes, but wasn't helpful"),
                     ("no_too_far", "No, too far away"),
                     ("no_not_relevant", "No, not relevant"),
-                    ("no_other_reason", "No, other reason"),
+                    ("no_other_reason", "No, other reasons"),
                     ("skip_question", "Skip question"),
                 ],
                 "next": "endline_12_q8_platform_review",

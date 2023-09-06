@@ -91,7 +91,7 @@ class Application(BaseApplication):
             self,
             question=question,
             choices=[
-                Choice("yes", "ok, let's start"),
+                Choice("yes", "Ok, let's start"),
                 Choice("no", "I can't right now"),
             ],
             error=error,
@@ -105,9 +105,10 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "That's completely okay, there are no consequences to not taking "
-                    "part in this study. Please enjoy the BWise tool and stay safe. "
-                    "If you change your mind, please send *Answer* to this number",
+                    "[persona_emoji] *No problem! You will no longer be part of this "
+                    "survey.*",
+                    "",
+                    "Remember, you can still use the menu to get the info you need.",
                 ]
             )
         )
@@ -221,8 +222,8 @@ class Application(BaseApplication):
                     "*How many people (including yourself) live in the household now?"
                     " Don’t forget to include babies.*",
                     "",
-                    "(If you’re unsure - this counts as anyone sleeping the house"
-                    "4 nights in the past week).",
+                    "(If you’re unsure - this counts as anyone sleeping in the house"
+                    " 4 nights in the past week).",
                 ]
             )
         )
@@ -237,17 +238,17 @@ class Application(BaseApplication):
             )
         )
 
-        next = "state_submit_terms_and_conditions_endline"
-
-        if choices[0].value == "eight_more":
-            next = "state_household_number_of_people_more"
+        async def next_state(choice: Choice):
+            if choice.value == "eight_more":
+                return "state_household_number_of_people_eight_or_more"
+            return "state_submit_terms_and_conditions_endline"
 
         return WhatsAppListState(
             self,
             question=question,
             error=error,
             choices=choices,
-            next=next,
+            next=next_state,
             button="Choose Option",
         )
 
@@ -271,8 +272,9 @@ class Application(BaseApplication):
                     "*Okay - you said there are 8 or more people in your household.*",
                     "*How many people (including yourself) live in the household now?"
                     " Don’t forget to include babies.*",
-                    "(If you’re unsure - this counts as anyone sleeping the house"
-                    "4 nights in the past week).",
+                    "",
+                    "(If you’re unsure - this counts as anyone sleeping in the house"
+                    " 4 nights in the past week).",
                 ]
             )
         )
@@ -300,12 +302,9 @@ class Application(BaseApplication):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 
-        assessment_name = self.user.metadata.get(
-            "assessment_name", "locus_of_control_endline"
-        )
         data = {
             "assessment_reminder": get_current_datetime().isoformat(),
-            "assessment_reminder_name": assessment_name,
+            "assessment_reminder_name": "locus_of_control_endline",
             "assessment_reminder_type": "endline reengagement 30min",
         }
 
