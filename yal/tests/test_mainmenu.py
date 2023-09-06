@@ -87,7 +87,7 @@ async def rapidpro_mock():
         )
 
     @app.route("/api/v2/globals.json", methods=["GET"])
-    def get_global_flag(request):
+    def check_if_service_finder_active(request):
         tstate.requests.append(request)
         assert request.args.get("key") == "service_finder_active"
         return response.json(
@@ -1709,14 +1709,14 @@ async def test_state_content_page_related(
 
 
 @pytest.mark.asyncio
-@mock.patch("yal.rapidpro.get_global_flag")
+@mock.patch("yal.utils.check_if_service_finder_active")
 async def test_mainmenu_service_finder_disabled(
-    get_global_flag,
+    check_if_service_finder_active,
     tester: AppTester,
     rapidpro_mock,
     contentrepo_api_mock,
 ):
-    get_global_flag.return_value = False
+    check_if_service_finder_active.return_value = False
 
     tester.setup_state("state_contentrepo_page")
     tester.user.metadata["selected_page_id"] = "1235"

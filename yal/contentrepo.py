@@ -7,7 +7,7 @@ import aiohttp
 from vaccine.models import User
 from vaccine.states import Choice
 from vaccine.utils import HTTP_EXCEPTIONS
-from yal import config, rapidpro
+from yal import config, utils
 
 logger = logging.getLogger(__name__)
 
@@ -169,7 +169,7 @@ async def get_page_details(
                         tags = ["aaq", "pleasecallme"]
 
                         if (
-                            await rapidpro.get_global_flag("service_finder_active")
+                            await utils.check_if_service_finder_active()
                             is True
                         ):
                             tags.append("servicefinder")
