@@ -81,7 +81,6 @@ ASSESSMENT_REENGAGEMENT_KEYWORDS = {
     "remind me tomorrow",
     "i m not interested",
 }
-SURVEY_KEYWORDS = {"baseline"}
 CALLBACK_CHECK_KEYWORDS = {"callback"}
 FEEDBACK_KEYWORDS = {"feedback"}
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
@@ -216,10 +215,6 @@ class Application(
             ):
                 self.user.session_id = None
                 self.state_name = AssessmentApplication.REMINDER_STATE
-
-            elif keyword in SURVEY_KEYWORDS:
-                self.user.session_id = None
-                self.state_name = "state_baseline_start"
 
             elif (
                 keyword in EJAF_ENDLINE_SURVEY_KEYWORDS

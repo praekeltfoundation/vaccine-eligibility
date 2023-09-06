@@ -10,7 +10,7 @@ import pycountry
 from emoji import emoji_list
 from rapidfuzz import fuzz, process
 
-from yal import config
+from yal import config, rapidpro
 
 TZ_SAST = timezone(timedelta(hours=2), "SAST")
 PROVINCES = sorted(
@@ -152,3 +152,17 @@ def is_integer(string: str) -> bool:
 
 def get_generic_error_options():
     return random.choice(GENERIC_ERROR_OPTIONS)
+
+
+async def check_if_baseline_active():
+    """
+    Checks a Global var on the RapidPro instance to see if the Baseline survey is active
+    """
+    return await rapidpro.get_global_flag("baseline_survey_active")
+
+
+async def check_if_service_finder_active():
+    """
+    Checks a Global var on the RapidPro instance to see if the Service finder is active
+    """
+    return await rapidpro.get_global_flag("service_finder_active")
