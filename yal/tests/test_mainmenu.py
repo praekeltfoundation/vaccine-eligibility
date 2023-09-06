@@ -1709,7 +1709,7 @@ async def test_state_content_page_related(
 
 
 @pytest.mark.asyncio
-@mock.patch("yal.contentrepo.rapidpro.check_if_service_finder_active")
+@mock.patch("yal.rapidpro.check_if_service_finder_active")
 async def test_mainmenu_service_finder_disabled(
     check_if_service_finder_active,
     tester: AppTester,
