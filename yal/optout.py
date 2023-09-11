@@ -196,7 +196,7 @@ class Application(BaseApplication):
         items = list(combined_update_dict.items())
         batches = []
 
-        # splitting combined list into batches off 100
+        # splitting combined dictionary into batches off 100
         # RapidPro can only update 100 fields at a time
         for i in range(0, len(items), batch_size):
             batch = items[i : i + batch_size]  # noqa
