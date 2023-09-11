@@ -190,14 +190,26 @@ class Application(BaseApplication):
 
         update_rp_fields_dict = dict.fromkeys(rp_field_keys, "")
         combined_update_dict = fields_to_update_and_retain | update_rp_fields_dict
-
         old_details = self._get_user_details(self.user.metadata)
 
-        error = await rapidpro.update_profile(
-            whatsapp_id, combined_update_dict, self.user.metadata
-        )
-        if error:
-            return await self.go_to_state("state_error")
+        batch_size = 100
+        items = list(combined_update_dict.items())
+        batches = []
+
+        # splitting combined list into batches off 100
+        # RapidPro can only update 100 fields at a time
+        for i in range(0, len(items), batch_size):
+            batch = items[i : i + batch_size]  # noqa
+            batches.append(batch)
+
+        for batch in batches:
+            batch_dict = dict(batch)
+
+            error = await rapidpro.update_profile(
+                whatsapp_id, batch_dict, self.user.metadata
+            )
+            if error:
+                return await self.go_to_state("state_error")
 
         question = self._(
             "\n".join(
