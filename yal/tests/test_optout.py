@@ -94,78 +94,90 @@ async def rapidpro_mock():
     @app.route("/api/v2/fields.json", methods=["GET"])
     def get_instance_fields(request):
         tstate.requests.append(request)
+
+        results = [
+            {
+                "key": "second_phase2_send",
+                "label": "second phase2 send",
+                "value_type": "text",
+                "pinned": False,
+            },
+            {
+                "key": "assessment_reminder_name",
+                "label": "Assessment Reminder Name",
+                "value_type": "text",
+                "pinned": False,
+            },
+            {
+                "key": "total_push_msgs_received",
+                "label": "total push msgs received",
+                "value_type": "numeric",
+                "pinned": False,
+            },
+            {
+                "key": "push_msg_intro_completed",
+                "label": "push msg intro completed",
+                "value_type": "text",
+                "pinned": False,
+            },
+            {
+                "key": "last_topic_sent",
+                "label": "Last Topic Sent",
+                "value_type": "text",
+                "pinned": False,
+            },
+            {
+                "key": "test_template_id",
+                "label": "Test Template ID",
+                "value_type": "text",
+                "pinned": False,
+            },
+            {
+                "key": "assessment_reminder_type",
+                "label": "Assessment Reminder Type",
+                "value_type": "text",
+                "pinned": False,
+            },
+            {
+                "key": "second_phase2_send",
+                "label": "second phase2 send",
+                "value_type": "text",
+                "pinned": False,
+            },
+            {
+                "key": "assessment_reminder_name",
+                "label": "Assessment Reminder Name",
+                "value_type": "text",
+                "pinned": False,
+            },
+            {
+                "key": "phase2_invite_failed",
+                "label": "phase2 invite failed",
+                "value_type": "text",
+                "pinned": False,
+            },
+            {
+                "key": "sent_phase2_invite",
+                "label": "sent phase2 invite",
+                "value_type": "text",
+                "pinned": False,
+            },
+        ]
+
+        for i in range(90):
+            field = {
+                "key": f"field_{i}",
+                "label": f"field {i}",
+                "value_type": "text",
+                "pinned": False,
+            }
+            results.append(field)
+
         return response.json(
             {
                 "next": None,
                 "previous": None,
-                "results": [
-                    {
-                        "key": "second_phase2_send",
-                        "label": "second phase2 send",
-                        "value_type": "text",
-                        "pinned": False,
-                    },
-                    {
-                        "key": "assessment_reminder_name",
-                        "label": "Assessment Reminder Name",
-                        "value_type": "text",
-                        "pinned": False,
-                    },
-                    {
-                        "key": "total_push_msgs_received",
-                        "label": "total push msgs received",
-                        "value_type": "numeric",
-                        "pinned": False,
-                    },
-                    {
-                        "key": "push_msg_intro_completed",
-                        "label": "push msg intro completed",
-                        "value_type": "text",
-                        "pinned": False,
-                    },
-                    {
-                        "key": "last_topic_sent",
-                        "label": "Last Topic Sent",
-                        "value_type": "text",
-                        "pinned": False,
-                    },
-                    {
-                        "key": "test_template_id",
-                        "label": "Test Template ID",
-                        "value_type": "text",
-                        "pinned": False,
-                    },
-                    {
-                        "key": "assessment_reminder_type",
-                        "label": "Assessment Reminder Type",
-                        "value_type": "text",
-                        "pinned": False,
-                    },
-                    {
-                        "key": "second_phase2_send",
-                        "label": "second phase2 send",
-                        "value_type": "text",
-                        "pinned": False,
-                    },
-                    {
-                        "key": "assessment_reminder_name",
-                        "label": "Assessment Reminder Name",
-                        "value_type": "text",
-                        "pinned": False,
-                    },
-                    {
-                        "key": "phase2_invite_failed",
-                        "label": "phase2 invite failed",
-                        "value_type": "text",
-                        "pinned": False,
-                    },
-                    {
-                        "key": "sent_phase2_invite",
-                        "label": "sent phase2 invite",
-                        "value_type": "text",
-                        "pinned": False,
-                    },
-                ],
+                "results": results,
             },
             status=200,
         )
@@ -305,32 +317,50 @@ async def test_state_optout_delete_saved(
     await tester.user_input("2")
     tester.assert_state("state_delete_saved")
 
-    # Three API calls:
-    # Get profile to get old details, get all instance fields, update profile
-    assert len(rapidpro_mock.tstate.requests) == 3
+    # Four API calls:
+    # Get profile to get old details, get all instance fields, update profile twice
+    # because the fields to be updated are more than 100
+    assert len(rapidpro_mock.tstate.requests) == 4
     expected_paths = [
         "/api/v2/contacts.json",
         "/api/v2/fields.json",
         "/api/v2/contacts.json",
+        "/api/v2/contacts.json",
     ]
     assert expected_paths == [r.path for r in rapidpro_mock.tstate.requests]
-    post_request = rapidpro_mock.tstate.requests[2]
+    post_request_one = rapidpro_mock.tstate.requests[2]
+    post_request_two = rapidpro_mock.tstate.requests[3]
 
-    assert json.loads(post_request.body.decode("utf-8")) == {
-        "fields": {
-            "assessment_reminder_name": "",
-            "assessment_reminder_type": "",
-            "last_topic_sent": "",
-            "opted_out": "True",
-            "opted_out_timestamp": "2022-06-19T17:30:00",
-            "phase2_invite_failed": "",
-            "push_msg_intro_completed": "",
-            "push_message_opt_in": "False",
-            "second_phase2_send": "",
-            "sent_phase2_invite": "",
-            "test_template_id": "",
-            "total_push_msgs_received": "",
-        },
+    results = {}
+    for i in range(90):
+        results[f"field_{i}"] = ""
+
+    fields = {
+        "assessment_reminder_name": "",
+        "assessment_reminder_type": "",
+        "last_topic_sent": "",
+        "opted_out": "True",
+        "opted_out_timestamp": "2022-06-19T17:30:00",
+        "phase2_invite_failed": "",
+        "push_msg_intro_completed": "",
+        "push_message_opt_in": "False",
+        "second_phase2_send": "",
+        "sent_phase2_invite": "",
+    }
+
+    fields = fields | results
+
+    assert json.loads(post_request_one.body.decode("utf-8")) == {
+        "fields": fields,
+    }
+
+    fields = {
+        "test_template_id": "",
+        "total_push_msgs_received": "",
+    }
+
+    assert json.loads(post_request_two.body.decode("utf-8")) == {
+        "fields": fields,
     }
     tester.assert_message(
         "\n".join(
