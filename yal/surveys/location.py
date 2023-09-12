@@ -12,7 +12,7 @@ from vaccine.validators import nonempty_validator
 from yal import config, contentrepo, rapidpro
 from yal.askaquestion import Application as AAQApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
-from yal.utils import get_generic_error, normalise_phonenumber
+from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
 
 
 class Application(BaseApplication):
@@ -329,10 +329,12 @@ class Application(BaseApplication):
 
         optin = self.user.answers["state_location_group_invite"]
 
+        current_datetime = get_current_datetime().isoformat()
         error = await rapidpro.update_profile(
             whatsapp_id,
             {
                 "ejaf_location_survey_status": "completed",
+                "ejaf_location_survey_complete_time": current_datetime,
                 "ejaf_location_survey_optin": optin,
             },
             self.user.metadata,

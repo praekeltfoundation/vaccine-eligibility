@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+from unittest import mock
 
 import pytest
 from sanic import Sanic, response
@@ -391,7 +393,11 @@ async def test_state_location_group_invite(tester: AppTester):
 
 
 @pytest.mark.asyncio
-async def test_state_location_group_invite_submit(tester: AppTester, rapidpro_mock):
+@mock.patch("yal.surveys.location.get_current_datetime")
+async def test_state_location_group_invite_submit(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_location_group_invite")
     await tester.user_input("1")
 
@@ -417,14 +423,17 @@ async def test_state_location_group_invite_submit(tester: AppTester, rapidpro_mo
         "fields": {
             "ejaf_location_survey_status": "completed",
             "ejaf_location_survey_optin": "yes",
+            "ejaf_location_survey_complete_time": "2022-06-19T17:30:00",
         },
     }
 
 
 @pytest.mark.asyncio
+@mock.patch("yal.surveys.location.get_current_datetime")
 async def test_state_location_group_invite_submit_dont_understand(
-    tester: AppTester, rapidpro_mock
+    get_current_datetime, tester: AppTester, rapidpro_mock
 ):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_location_group_invite")
     await tester.user_input("3")
 
@@ -451,5 +460,6 @@ async def test_state_location_group_invite_submit_dont_understand(
         "fields": {
             "ejaf_location_survey_status": "completed",
             "ejaf_location_survey_optin": "dont_understand",
+            "ejaf_location_survey_complete_time": "2022-06-19T17:30:00",
         },
     }
