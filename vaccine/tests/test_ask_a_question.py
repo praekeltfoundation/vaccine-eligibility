@@ -124,7 +124,8 @@ async def test_display_response_choices(tester: AppTester, model_mock):
                 "3. Do we know what's in the vaccines?",
                 "",
                 "[💡Tip: If you don't see what you're looking for, try typing your "
-                "question again using different words or reply *FAQ* to browse topics]",
+                "question again using different words or reply *MENU* to browse "
+                "topics]",
             ]
         )
     )
@@ -182,7 +183,7 @@ async def test_model_no_responses(tester: AppTester, model_mock):
                 "*No Results Found*",
                 "",
                 "[💡Tip: Try typing your question again using different words or reply "
-                "*FAQ* to browse topics]",
+                "*MENU* to browse topics]",
             ]
         )
     )
