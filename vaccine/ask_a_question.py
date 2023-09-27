@@ -69,7 +69,6 @@ class Application(BaseApplication):
         if keyword in (
             "menu",
             "0",
-            "faq",
             "cases",
             "news",
             "vaccine",
@@ -153,7 +152,7 @@ class Application(BaseApplication):
             "*No Results Found*\n"
             "\n"
             "[💡Tip: Try typing your question again using different words or reply "
-            "*FAQ* to browse topics]"
+            "*MENU* to browse topics]"
         )
 
         async def check(text: Optional[str]):
@@ -174,7 +173,7 @@ class Application(BaseApplication):
             next="state_submit_user_choice",
             footer=self._(
                 "\n[💡Tip: If you don't see what you're looking for, try typing your "
-                "question again using different words or reply *FAQ* to browse topics]"
+                "question again using different words or reply *MENU* to browse topics]"
             ),
         )
 
