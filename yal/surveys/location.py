@@ -17,6 +17,7 @@ from yal.utils import get_current_datetime, get_generic_error, normalise_phonenu
 
 class Application(BaseApplication):
     START_STATE = "state_location_introduction"
+    NOT_INTERESTED_STATE = "state_location_decline"
 
     async def state_location_introduction(self):
         survey_status = self.user.metadata.get(
