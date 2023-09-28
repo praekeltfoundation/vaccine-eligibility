@@ -174,7 +174,7 @@ async def test_state_location_introduction_group_max(tester: AppTester):
 async def test_state_location_introduction_pending(tester: AppTester):
     tester.setup_state("state_location_introduction")
     tester.user.metadata["ejaf_location_survey_status"] = "pending"
-    await tester.user_input(session=Message.SESSION_EVENT.NEW)
+    await tester.user_input("start survey")
 
     tester.assert_state("state_location_introduction")
 

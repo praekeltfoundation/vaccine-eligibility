@@ -92,7 +92,10 @@ EJAF_ENDLINE_SURVEY_KEYWORDS = {
     "remind me tomorrow",
     "i m not interested",
 }
-EJAF_LOCATION_SURVEY_KEYWORDS = {"location"}
+EJAF_LOCATION_SURVEY_KEYWORDS = {
+    "start survey",
+    "i m not interested",
+}
 
 
 class Application(
@@ -273,9 +276,15 @@ class Application(
             ):
                 self.user.session_id = None
                 self.state_name = EndlineSurveyApplication.SURVEY_VALIDATION_STATE
-            elif keyword in EJAF_LOCATION_SURVEY_KEYWORDS:
+            elif (
+                keyword in EJAF_LOCATION_SURVEY_KEYWORDS
+                and self.user.metadata.get("ejaf_location_survey_status") == "pending"
+            ):
                 self.user.session_id = None
-                self.state_name = LocationSurveyApplication.START_STATE
+                if keyword == "i m not interested":
+                    self.state_name = LocationSurveyApplication.NOT_INTERESTED_STATE
+                else:
+                    self.state_name = LocationSurveyApplication.START_STATE
 
         except Exception:
             logger.exception("Application error")
