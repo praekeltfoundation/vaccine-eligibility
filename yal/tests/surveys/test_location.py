@@ -182,16 +182,16 @@ async def test_state_location_introduction_pending(tester: AppTester):
     assert greeting_msg.content == "\n".join(
         [
             "*Fantastic! 👏🏾 🎉 And thank you 🙏🏽*",
-                "",
-                "*Before we start, here are a few important notes.* 📈",
-                "",
-                "This survey is just to understand who may be interested in "
-                "joining a focus group discussion in September and where would be "
-                "convenient for those users to meet. You do not have to be "
-                "interested in participating in focus groups to complete this "
-                "survey. If you indicate that you`re interested, we may phone you "
-                "about being part of a focus group in the future, however you do "
-                "not need to agree to participate in any future discussion.",
+            "",
+            "*Before we start, here are a few important notes.* 📈",
+            "",
+            "This survey is just to understand who may be interested in "
+            "joining a focus group discussion in September and where would be "
+            "convenient for those users to meet. You do not have to be "
+            "interested in participating in focus groups to complete this "
+            "survey. If you indicate that you`re interested, we may phone you "
+            "about being part of a focus group in the future, however you do "
+            "not need to agree to participate in any future discussion.",
         ]
     )
 
