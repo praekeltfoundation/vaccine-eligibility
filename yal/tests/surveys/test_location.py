@@ -98,7 +98,7 @@ async def rapidpro_mock():
 @pytest.mark.asyncio
 async def test_state_location_introduction_already_completed(tester: AppTester):
     tester.setup_user_address("27820001002")
-    tester.setup_state("state_location_introduction")
+    tester.setup_state("state_location_validation")
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
@@ -110,7 +110,7 @@ async def test_state_location_introduction_already_completed(tester: AppTester):
 @pytest.mark.asyncio
 async def test_state_location_introduction_invalid_province(tester: AppTester):
     tester.setup_user_address("27820001005")
-    tester.setup_state("state_location_introduction")
+    tester.setup_state("state_location_validation")
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
@@ -131,7 +131,7 @@ async def test_state_location_introduction_invalid_province(tester: AppTester):
 @pytest.mark.asyncio
 async def test_state_location_introduction_not_invited(tester: AppTester):
     tester.setup_user_address("27820001003")
-    tester.setup_state("state_location_introduction")
+    tester.setup_state("state_location_validation")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
     tester.assert_state("state_location_not_invited")
@@ -145,7 +145,7 @@ async def test_state_location_introduction_not_invited(tester: AppTester):
 @pytest.mark.asyncio
 async def test_state_location_introduction_not_invited_with_group(tester: AppTester):
     tester.setup_user_address("27820001006")
-    tester.setup_state("state_location_introduction")
+    tester.setup_state("state_location_validation")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
     tester.assert_state("state_location_not_invited")
@@ -159,7 +159,7 @@ async def test_state_location_introduction_not_invited_with_group(tester: AppTes
 @pytest.mark.asyncio
 async def test_state_location_introduction_group_max(tester: AppTester):
     tester.setup_user_address("27820001004")
-    tester.setup_state("state_location_introduction")
+    tester.setup_state("state_location_validation")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
     tester.assert_state("state_location_not_invited")
@@ -178,10 +178,10 @@ async def test_state_location_introduction_pending(tester: AppTester):
 
     tester.assert_state("state_location_introduction")
 
-    tester.assert_message(
-        "\n".join(
-            [
-                "*Fantastic! 👏🏾 🎉 And thank you 🙏🏽*",
+    [greeting_msg] = tester.fake_worker.outbound_messages
+    assert greeting_msg.content == "\n".join(
+        [
+            "*Fantastic! 👏🏾 🎉 And thank you 🙏🏽*",
                 "",
                 "*Before we start, here are a few important notes.* 📈",
                 "",
@@ -192,7 +192,12 @@ async def test_state_location_introduction_pending(tester: AppTester):
                 "survey. If you indicate that you`re interested, we may phone you "
                 "about being part of a focus group in the future, however you do "
                 "not need to agree to participate in any future discussion.",
-                "",
+        ]
+    )
+
+    tester.assert_message(
+        "\n".join(
+            [
                 "*It should only take 3 mins and we'll give you R10 airtime at the "
                 "end.*",
                 "",
@@ -222,7 +227,7 @@ async def test_state_location_introduction_pending(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_location_decline(tester: AppTester):
-    tester.setup_state("state_location_introduction")
+    tester.setup_state("state_location_validation")
     await tester.user_input("2")
 
     tester.assert_state("state_start")
@@ -234,7 +239,7 @@ async def test_state_location_decline(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_location_question(tester: AppTester):
-    tester.setup_state("state_location_introduction")
+    tester.setup_state("state_location_validation")
     await tester.user_input("3")
 
     tester.assert_state("state_location_question")
@@ -250,7 +255,7 @@ async def test_state_location_question(tester: AppTester):
         )
     )
 
-    [msg] = tester.fake_worker.outbound_messages
+    [_, msg] = tester.fake_worker.outbound_messages
     assert msg.helper_metadata == {
         "document": "https://contenrepo/documents/1/sample.pdf"
     }
@@ -278,7 +283,7 @@ async def test_state_location_question_decline(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_location_province(tester: AppTester):
-    tester.setup_state("state_location_introduction")
+    tester.setup_state("state_location_validation")
     await tester.user_input("1")
 
     tester.assert_state("state_location_province")
