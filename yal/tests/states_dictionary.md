@@ -759,7 +759,8 @@
 ## EJAF Location Survey
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
-| state_location_introduction | TRUE | Text | Surveu introduction
+| state_location_validation | FALSE | Text | Survey validation
+| state_location_introduction | TRUE | Text | Survey introduction
 | state_location_not_invited | TRUE | Text | Tells user they weren't invited to the study
 | state_location_already_completed | TRUE | Text | Tells user they already completed the study
 | state_location_province | TRUE | Text | Ask user which province they live in
