@@ -60,7 +60,7 @@ class Application(BaseApplication):
                         "interested in participating in focus groups to complete this "
                         "survey. If you indicate that you`re interested, we may phone "
                         "you about being part of a focus group in the future, however "
-                        "you do  not need to agree to participate in any future "
+                        "you do not need to agree to participate in any future "
                         "discussion.",
                     ]
                 )
