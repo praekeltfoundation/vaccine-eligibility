@@ -173,15 +173,6 @@ class Application(BaseApplication):
 
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
-        data = {
-            "assessment_reminder": get_current_datetime().isoformat(),
-            "assessment_reminder_name": assessment_name,
-            "assessment_reminder_type": f"{survey}reengagement 30min",
-        }
-
-        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
-        if error:
-            return await self.go_to_state("state_error")
 
         questions = QUESTIONS[assessment_name]
 
@@ -204,6 +195,16 @@ class Application(BaseApplication):
                     return await self.go_to_state("state_error")
             self.save_answer("assessment_completed", assessment_name)
             return await self.go_to_state(metadata["assessment_end_state"])
+
+        data = {
+            "assessment_reminder": get_current_datetime().isoformat(),
+            "assessment_reminder_name": assessment_name,
+            "assessment_reminder_type": f"{survey}reengagement 30min",
+        }
+
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
 
         current_question = metadata.get("assessment_question")
 
