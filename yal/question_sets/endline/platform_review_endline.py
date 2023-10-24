@@ -89,6 +89,24 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
+                        "*Before joining B-Wise, how often did",
+                        " you have discussions or interact with"
+                        " content about sexual topics?*",
+                    ]
+                ),
+                "options": [
+                    ("a_lot", "A lot"),
+                    ("somewhat", "Somewhat"),
+                    ("not_much", "Not much"),
+                    ("never", "Never"),
+                    ("skip_question", "Skip question"),
+                ],
+                "next": "endline_12_q6_platform_review",
+            },
+            "endline_12_q6_platform_review": {
+                "type": "list",
+                "text": "\n".join(
+                    [
                         "*Since joining BWise, have you ever felt like you needed "
                         "to see a medical service about your mental "
                         "or sexual health?*",
@@ -100,9 +118,9 @@ ASSESSMENT_QUESTIONS = {
                     ("dont_understand", "I don't understand"),
                     ("skip_question", "Skip question"),
                 ],
-                "next": "endline_12_q6_platform_review",
+                "next": "endline_12_q7_platform_review",
             },
-            "endline_12_q6_platform_review": {
+            "endline_12_q7_platform_review": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -117,9 +135,9 @@ ASSESSMENT_QUESTIONS = {
                     ("dont_understand", "I don't understand"),
                     ("skip_question", "Skip question"),
                 ],
-                "next": "endline_12_q7_platform_review",
+                "next": "endline_12_q8_platform_review",
             },
-            "endline_12_q7_platform_review": {
+            "endline_12_q8_platform_review": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -135,9 +153,9 @@ ASSESSMENT_QUESTIONS = {
                     ("no_other_reason", "No, other reasons"),
                     ("skip_question", "Skip question"),
                 ],
-                "next": "endline_12_q8_platform_review",
+                "next": "endline_12_q9_platform_review",
             },
-            "endline_12_q8_platform_review": {
+            "endline_12_q9_platform_review": {
                 "type": "list",
                 "text": "\n".join(
                     [
@@ -152,9 +170,9 @@ ASSESSMENT_QUESTIONS = {
                     ("dont_understand", "I don't understand"),
                     ("skip_question", "Skip question"),
                 ],
-                "next": "endline_12_q9_platform_review",
+                "next": "endline_12_q10_platform_review",
             },
-            "endline_12_q9_platform_review": {
+            "endline_12_q10_platform_review": {
                 "type": "list",
                 "text": "\n".join(
                     [
