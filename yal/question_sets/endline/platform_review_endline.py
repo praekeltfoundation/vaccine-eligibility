@@ -89,9 +89,9 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Before joining B-Wise, how often did",
-                        " you have discussions or interact with"
-                        " content about sexual topics?*",
+                        "*Before joining B-Wise, how often did "
+                        "you have discussions or interact with "
+                        "content about sexual topics?*",
                     ]
                 ),
                 "options": [
@@ -108,8 +108,7 @@ ASSESSMENT_QUESTIONS = {
                 "text": "\n".join(
                     [
                         "*Since joining BWise, have you ever felt like you needed "
-                        "to see a medical service about your mental "
-                        "or sexual health?*",
+                        "to see a medical service about your mental or sexual health?*",
                     ]
                 ),
                 "options": [

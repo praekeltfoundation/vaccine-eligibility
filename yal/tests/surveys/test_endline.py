@@ -800,7 +800,7 @@ async def test_state_sexual_health_lit_assessment_endline_end(tester: AppTester)
             "◼️◽️◽️◽️",
             "-----",
             "",
-            "**How do you feel about each of the following statements?* *",
+            "*How do you feel about each of the following statements?*",
             "",
             "There are times when a woman deserves to be beaten",
         ]
@@ -1220,7 +1220,7 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
             "◼️◽️◽️◽️",
             "-----",
             "",
-            "**How do you feel about each of the following statements?* *",
+            "*How do you feel about each of the following statements?*",
             "",
             "There are times when a woman deserves to be beaten",
         ]

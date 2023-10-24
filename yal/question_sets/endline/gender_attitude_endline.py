@@ -10,8 +10,7 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "**How do you feel about each of the following "
-                        "statements?* *",
+                        "*How do you feel about each of the following statements?*",
                         "",
                         "There are times when a woman deserves to be beaten",
                     ]
