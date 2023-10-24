@@ -83,9 +83,8 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Which of these has most influenced",
-                        " your attitudes about sexual",
-                        " relationships and interactions?",
+                        "*Which of these has most influenced your attitudes "
+                        "about sexual relationships and interactions?*",
                     ]
                 ),
                 "options": [

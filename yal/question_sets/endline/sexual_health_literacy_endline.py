@@ -326,10 +326,9 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Over the past 5 months, do you think",
-                        " that your knowledge about the",
-                        " importance of using condoms has",
-                        "changed? *",
+                        "*Over the past 5 months, do you think that your "
+                        "knowledge about the importance of using condoms has "
+                        "changed?*",
                     ]
                 ),
                 "options": [
@@ -347,9 +346,8 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Which of these has most influenced",
-                        " your knowledge about using",
-                        " condoms?*",
+                        "*Which of these has most influenced your knowledge "
+                        "about using condoms?*",
                     ]
                 ),
                 "options": [
@@ -377,8 +375,8 @@ ASSESSMENT_QUESTIONS = {
                 "type": "text",
                 "text": "\n".join(
                     [
-                        "*Do you mind telling us what has most",
-                        " influenced your knowledge of using" " condoms?*",
+                        "*Do you mind telling us what has most influenced "
+                        "your knowledge of usingcondoms?*",
                     ]
                 ),
                 "next": "endline_8_q14_sexual_health_lit",
@@ -387,8 +385,7 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Are you planning to have a child",
-                        " within the next year?*",
+                        "*Are you planning to have a child within the next year?*",
                     ]
                 ),
                 "options": [
@@ -403,9 +400,8 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Do you now plan to  use condoms",
-                        " more consistently than you did 5",
-                        " months ago?*",
+                        "*Do you now plan to use condoms more consistently "
+                        "than you did 5 months ago?*",
                     ]
                 ),
                 "options": [
@@ -423,9 +419,8 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Do you now plan to go for STI or HIV",
-                        " tests more often than you did 5",
-                        " months ago?*",
+                        "*Do you now plan to go for STI or HIV tests more "
+                        "often than you did 5 months ago?*",
                     ]
                 ),
                 "options": [
@@ -443,9 +438,8 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Which of these has most influenced",
-                        " your plans to use condoms or test for",
-                        " STIs/HIV?*",
+                        "*Which of these has most influenced your plans to "
+                        "use condoms or test for STIs/HIV?*",
                     ]
                 ),
                 "options": [
@@ -473,9 +467,8 @@ ASSESSMENT_QUESTIONS = {
                 "type": "text",
                 "text": "\n".join(
                     [
-                        "*Do you mind telling us what has",
-                        " most influenced your plans to use",
-                        " condoms or test for STIs/HIV? *",
+                        "*Do you mind telling us what has most influenced "
+                        "your plans to use condoms or test for STIs/HIV? *",
                     ]
                 ),
                 "next": None,
