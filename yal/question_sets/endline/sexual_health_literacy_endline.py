@@ -376,7 +376,7 @@ ASSESSMENT_QUESTIONS = {
                 "text": "\n".join(
                     [
                         "*Do you mind telling us what has most influenced "
-                        "your knowledge of usingcondoms?*",
+                        "your knowledge of using condoms?*",
                     ]
                 ),
                 "next": "endline_8_q14_sexual_health_lit",
