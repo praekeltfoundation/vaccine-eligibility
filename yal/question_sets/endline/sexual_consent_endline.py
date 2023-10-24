@@ -77,6 +77,45 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip_question": 1,
                 },
+                "next": "endline_10_q3_sexual_consent",
+            },
+            "endline_10_q3_sexual_consent": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*Which of these has most influenced",
+                        " your attitudes about sexual",
+                        " relationships and interactions?",
+                    ]
+                ),
+                "options": [
+                    ("social_media", "Web / social media"),
+                    ("bwise_facebook", "B-Wise / facebook "),
+                    ("friends_partner", "Friends / partner"),
+                    ("school_university", "School / university"),
+                    ("health_facility", "Health facility"),
+                    ("tv_radio", "TV / radio"),
+                    ("other", "Other"),
+                ],
+                "next": {
+                    "other": "endline_10_q3B_sexual_consent",
+                    "social_media": None,
+                    "bwise_facebook": None,
+                    "friends_partner": None,
+                    "school_university": None,
+                    "health_facility": None,
+                    "tv_radio": None,
+                },
+            },
+            "endline_10_q3B_sexual_consent": {
+                "type": "text",
+                "text": "\n".join(
+                    [
+                        "*Do you mind telling us what has most",
+                        " influenced your attitudes about sexual",
+                        " relationships and interactions? * ",
+                    ]
+                ),
                 "next": None,
             },
         },

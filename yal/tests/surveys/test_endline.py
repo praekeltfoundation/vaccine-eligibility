@@ -721,7 +721,7 @@ async def test_state_self_perceived_healthcare_assessment_endline_end(
 
     message = "\n".join(
         [
-            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
             "-----",
             "",
             "*Is the following statement true or false?*",
@@ -852,7 +852,7 @@ async def test_state_gender_attitude_assessment_endline_end(tester: AppTester):
 
     message = "\n".join(
         [
-            "◼️◽️",
+            "◼️◽️◽️◽️",
             "-----",
             "",
             "Robert and Samantha have been dating for 5 years and"
@@ -1002,7 +1002,7 @@ async def test_state_alcohol_assessment_endline_end(tester: AppTester):
 
     message = "\n".join(
         [
-            "◼️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
             "-----",
             "",
             "You have received a lot of content from BWise.",
@@ -1182,7 +1182,7 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
     # sexual literacy
     message = "\n".join(
         [
-            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
             "-----",
             "",
             "*Is the following statement true or false?*",
@@ -1206,6 +1206,12 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
     await tester.user_input("Pill")
     await tester.user_input("None")
     await tester.user_input("Yes")
+    await tester.user_input("Yes, improved a lot")
+    await tester.user_input("TV / radio")
+    await tester.user_input("Yes")
+    await tester.user_input("No")
+    await tester.user_input("No")
+    await tester.user_input("No change")
 
     # Gender
 
@@ -1230,7 +1236,7 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
     # Sexual Consent
     message = "\n".join(
         [
-            "◼️◽️",
+            "◼️◽️◽️◽️",
             "-----",
             "",
             "Robert and Samantha have been dating for 5 years and"
@@ -1249,6 +1255,7 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
 
     await tester.user_input("Strongly agree")
     await tester.user_input("Skip question")
+    await tester.user_input("Health facility")
 
     message = "\n".join(
         [
@@ -1269,7 +1276,7 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
     # Platform
     message = "\n".join(
         [
-            "◼️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
             "-----",
             "",
             "You have received a lot of content from BWise.",

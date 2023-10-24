@@ -320,6 +320,164 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 1,
                     "skip_question": 1,
                 },
+                "next": "endline_8_q12_sexual_health_lit",
+            },
+            "endline_8_q12_sexual_health_lit": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*Over the past 5 months, do you think",
+                        " that your knowledge about the",
+                        " importance of using condoms has",
+                        "changed? *",
+                    ]
+                ),
+                "options": [
+                    ("yes_improved", "Yes, improved a lot"),
+                    ("yes_abit", "Yes, improved a bit "),
+                    ("same", "Stayed the same"),
+                    ("little_worse", "It’s a little worse"),
+                    ("lost_worse", "It’s a lot worse"),
+                    ("dont_understand", "I don’t understand"),
+                    ("skip_question", "Skip question"),
+                ],
+                "next": "endline_8_q13_sexual_health_lit",
+            },
+            "endline_8_q13_sexual_health_lit": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*Which of these has most influenced",
+                        " your knowledge about using",
+                        " condoms?*",
+                    ]
+                ),
+                "options": [
+                    ("social_media", "Web / social media"),
+                    ("bwise_facebook", "B-Wise / facebook "),
+                    ("friends_partner", "Friends / partner"),
+                    ("school_university", "School / university"),
+                    ("health_facility", "Health facility"),
+                    ("tv_radio", "TV / radio"),
+                    ("other", "Other"),
+                    ("no_change", "No change"),
+                ],
+                "next": {
+                    "other": "endline_8_q13B_sexual_health_lit",
+                    "social_media": "endline_8_q14_sexual_health_lit",
+                    "bwise_facebook": "endline_8_q14_sexual_health_lit",
+                    "friends_partner": "endline_8_q14_sexual_health_lit",
+                    "school_university": "endline_8_q14_sexual_health_lit",
+                    "health_facility": "endline_8_q14_sexual_health_lit",
+                    "tv_radio": "endline_8_q14_sexual_health_lit",
+                    "no_change": "endline_8_q14_sexual_health_lit",
+                },
+            },
+            "endline_8_q13B_sexual_health_lit": {
+                "type": "text",
+                "text": "\n".join(
+                    [
+                        "*Do you mind telling us what has most",
+                        " influenced your knowledge of using" " condoms?*",
+                    ]
+                ),
+                "next": "endline_8_q14_sexual_health_lit",
+            },
+            "endline_8_q14_sexual_health_lit": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*Are you planning to have a child",
+                        " within the next year?*",
+                    ]
+                ),
+                "options": [
+                    ("yes", "Yes"),
+                    ("maybe", "Maybe"),
+                    ("no", "No"),
+                    ("skip_question", "Skip question"),
+                ],
+                "next": "endline_8_q15_sexual_health_lit",
+            },
+            "endline_8_q15_sexual_health_lit": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*Do you now plan to  use condoms",
+                        " more consistently than you did 5",
+                        " months ago?*",
+                    ]
+                ),
+                "options": [
+                    ("yes_lot_more", "Yes, a lot more"),
+                    ("yes_little_more", "Yes, a little more"),
+                    ("no", "No"),
+                    ("no_little_less", "No, a little less"),
+                    ("no_lot_less", "No, a lot less"),
+                    ("dont_understand", "I don’t understand"),
+                    ("skip_question", "Skip question"),
+                ],
+                "next": "endline_8_q16_sexual_health_lit",
+            },
+            "endline_8_q16_sexual_health_lit": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*Do you now plan to go for STI or HIV",
+                        " tests more often than you did 5",
+                        " months ago?*",
+                    ]
+                ),
+                "options": [
+                    ("yes_lot_more", "Yes, a lot more"),
+                    ("yes_little_more", "Yes, a little more"),
+                    ("no", "No"),
+                    ("no_little_less", "No, a little less"),
+                    ("no_lot_less", "No, a lot less"),
+                    ("dont_understand", "I don’t understand"),
+                    ("skip_question", "Skip question"),
+                ],
+                "next": "endline_8_q17_sexual_health_lit",
+            },
+            "endline_8_q17_sexual_health_lit": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*Which of these has most influenced",
+                        " your plans to use condoms or test for",
+                        " STIs/HIV?*",
+                    ]
+                ),
+                "options": [
+                    ("social_media", "Web / social media"),
+                    ("bwise_facebook", "B-Wise / facebook "),
+                    ("friends_partner", "Friends / partner"),
+                    ("school_university", "School / university"),
+                    ("health_facility", "Health facility"),
+                    ("tv_radio", "TV / radiod"),
+                    ("other", "Other"),
+                    ("no_change", "No change"),
+                ],
+                "next": {
+                    "other": "endline_8_q17B_sexual_health_lit",
+                    "social_media": None,
+                    "bwise_facebook": None,
+                    "friends_partner": None,
+                    "school_university": None,
+                    "health_facility": None,
+                    "tv_radio": None,
+                    "no_change": None,
+                },
+            },
+            "endline_8_q17B_sexual_health_lit": {
+                "type": "text",
+                "text": "\n".join(
+                    [
+                        "*Do you mind telling us what has",
+                        " most influenced your plans to use",
+                        " condoms or test for STIs/HIV? *",
+                    ]
+                ),
                 "next": None,
             },
         },
