@@ -468,7 +468,7 @@ ASSESSMENT_QUESTIONS = {
                 "text": "\n".join(
                     [
                         "*Do you mind telling us what has most influenced "
-                        "your plans to use condoms or test for STIs/HIV? *",
+                        "your plans to use condoms or test for STIs/HIV?*",
                     ]
                 ),
                 "next": None,
