@@ -448,7 +448,7 @@ ASSESSMENT_QUESTIONS = {
                     ("friends_partner", "Friends / partner"),
                     ("school_university", "School / university"),
                     ("health_facility", "Health facility"),
-                    ("tv_radio", "TV / radiod"),
+                    ("tv_radio", "TV / radio"),
                     ("other", "Other"),
                     ("no_change", "No change"),
                 ],
