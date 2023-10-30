@@ -332,7 +332,7 @@ async def test_state_handle_assessment_reminder_response_skip_no(tester: AppTest
     tester.assert_message(
         "\n".join(
             [
-                "If you'd like, I can send you notifications once a day with relevant ",
+                "If you'd like, I can send you notifications once a day with relevant "
                 "info that I've put together just for you.",
                 "",
                 "*Would you like to get notifications?*",
@@ -340,7 +340,7 @@ async def test_state_handle_assessment_reminder_response_skip_no(tester: AppTest
                 "1. Yes, please!",
                 "2. No thanks",
                 "",
-                '_💡You can turn the notifications off at any time, just reply "STOP" '
+                '💡 _You can turn the notifications off at any time, just reply "STOP" '
                 "or go to your profile._",
             ]
         )
@@ -387,7 +387,7 @@ async def test_state_handle_assessment_reminder_response_skip_yes(tester: AppTes
                 "1. Yes, please!",
                 "2. No thanks",
                 "",
-                '_💡You can turn the notifications off at any time, just reply "STOP" '
+                '💡 _You can turn the notifications off at any time, just reply "STOP" '
                 "or go to your profile._",
             ]
         )

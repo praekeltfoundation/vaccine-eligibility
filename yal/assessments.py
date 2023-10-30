@@ -514,7 +514,7 @@ class Application(BaseApplication):
                             "",
                             get_display_choices(choices),
                             "",
-                            "_💡You can turn the notifications off at any time, just "
+                            "💡 _You can turn the notifications off at any time, just "
                             'reply "STOP" or go to your profile._',
                         ]
                     )
