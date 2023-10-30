@@ -78,6 +78,7 @@ ASSESSMENT_REENGAGEMENT_KEYWORDS = {
     "remind me in 1 hour",
     "not interested",
     "skip",
+    "skip survey",
     "remind me tomorrow",
     "i m not interested",
 }

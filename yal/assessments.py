@@ -8,6 +8,7 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
+from vaccine.utils import get_display_choices
 from yal import rapidpro, utils
 from yal.askaquestion import Application as AAQApplication
 
@@ -405,7 +406,7 @@ class Application(BaseApplication):
 
             return await self.go_to_state(f"state_{assessment_name}_assessment")
 
-        if inbound == "skip":
+        if inbound in ["skip", "skip survey"]:
             return await self.go_to_state("state_stop_assessment_reminders_confirm")
 
         if inbound == "remind me in 1 hour":
@@ -497,28 +498,88 @@ class Application(BaseApplication):
                 error=self._(get_generic_error()),
             )
         else:
-            return WhatsAppButtonState(
-                self,
-                question=self._(
+            notifications = self.user.metadata.get("push_message_opt_in")
+            if notifications is None:
+                choices = [
+                    Choice("yes", "Yes, please!"),
+                    Choice("no", "No thanks"),
+                ]
+                question = self._(
                     "\n".join(
                         [
-                            "Just a heads up, you'll get the best info for *YOU* if "
-                            "you complete the questions first.",
+                            "If you'd like, I can send you notifications once a day "
+                            "with relevant info that I've put together just for you.",
                             "",
-                            "*Are you sure you want to skip this step?*",
+                            "*Would you like to get notifications?*",
+                            "",
+                            get_display_choices(choices),
+                            "",
+                            "💡 _You can turn the notifications off at any time, just "
+                            'reply "STOP" or go to your profile._',
                         ]
                     )
-                ),
-                choices=[
-                    Choice("skip", self._("Yes, skip it")),
-                    Choice("start", self._("Start questions")),
-                ],
-                next={
-                    "skip": "state_stop_assessment_reminders_clear_fields",
-                    "start": f"state_{assessment_reminder_name}_assessment",
-                },
-                error=self._(get_generic_error()),
-            )
+                )
+                return WhatsAppButtonState(
+                    self,
+                    question=question,
+                    choices=choices,
+                    error=self._(get_generic_error()),
+                    next={
+                        "yes": "state_notification_yes_submit",
+                        "no": "state_notification_no_submit",
+                    },
+                )
+            else:
+                return await self.go_to_state(
+                    "state_stop_assessment_reminders_clear_fields"
+                )
+
+    async def state_notification_no_submit(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "push_message_opt_in": "False",
+        }
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+        return await self.go_to_state("state_stop_assessment_reminders_clear_fields")
+
+    async def state_notification_yes_submit(self):
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+        data = {
+            "push_message_opt_in": "True",
+        }
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            return await self.go_to_state("state_error")
+
+        return await self.go_to_state("state_notification_yes_submit_done")
+
+    async def state_notification_yes_submit_done(self):
+        return WhatsAppButtonState(
+            self,
+            question=self._(
+                "\n".join(
+                    [
+                        "You have signed up for notifications 🔔",
+                        "",
+                        "Feel free to chat with us or ask questions if you "
+                        "need some advice.",
+                    ]
+                )
+            ),
+            choices=[
+                Choice("menu", self._("Main Menu")),
+                Choice("aaq", self._("Ask a question")),
+            ],
+            next={
+                "menu": "state_pre_mainmenu",
+                "aaq": AAQApplication.START_STATE,
+            },
+            error=self._(get_generic_error()),
+        )
 
     async def state_stop_assessment_reminders_clear_fields(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
@@ -558,14 +619,16 @@ class Application(BaseApplication):
                 question=self._(
                     "\n".join(
                         [
-                            "Cool-cool.",
+                            "We respect your decision.",
                             "",
-                            "*What would you like to do now?*",
+                            "You can still use the whole B-Wise service. Feel "
+                            "free to chat with us or ask questions if you need "
+                            "some advice.",
                         ]
                     )
                 ),
                 choices=[
-                    Choice("menu", self._("Go to the menu")),
+                    Choice("menu", self._("Main Menu")),
                     Choice("aaq", self._("Ask a question")),
                 ],
                 next={
