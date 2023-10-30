@@ -229,31 +229,34 @@
 
 
 ### Segmentation survey flow
-| state_name                                 | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
-|--------------------------------------------|--------------------|--------------|---------------------------|---------------------------------------------------------------------------------|
-| state_survey_already_completed             |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "state_aaq_state" or "state_pre_mainmenu"             |
-| state_survey_decline                       |        TRUE        |     Text     |            TRUE          | User declined survey. Offers user other features. User response is "state_aaq_state" or "state_pre_mainmenu" |
-| state_start_survey                         |        FALSE       |              |            TRUE          | Sets user expectations |
-| state_survey_start                      |        FALSE        |     |            | |
-| state_survey_question                      |        TRUE        |     Text     |            TRUE          | Sends the user a survey question. User response is based on content |
-| state_survey_process_answer                |        FALSE       |              |            TRUE          | Caches user answer and progresses the survey |
-| state_survey_done                          |        TRUE        |     Text     |            TRUE          | Thanks user and directs them to claim their airtime. User response is "get_airtime" |
-| state_trigger_airtime_flow                 |        FALSE       |              |            TRUE          | Starts the user on the airtime flow in RapidPro |
-| state_prompt_next_action                   |        TRUE        |     Text     |            TRUE          | Offers user other features. User response is "state_aaq_start", "state_pre_mainmenu" or "state_no_airtime" |
-| state_no_airtime                           |        FALSE       |              |            TRUE          | Thanks user and closes session |
-| state_assessment_later_submit              |        FALSE       |              |            TRUE          | Submits assessment_reminder and assessment_name as contact fields for a later reminder to complete assessment |
-| state_assessment_later                     |        TRUE        |     Text     |            TRUE          | Thanks user and asks the user if they'd like to go to the main menu |
-| state_sexual_health_literacy_send_risk_message |    TRUE        |     Text     |            TRUE          | Sends the user a message based on their risk score, takes in "yes" and "no" |
-| state_handle_assessment_reminder_response |    FALSE        |          |                      | Handles the response to the assessment reminders |
-| state_stop_assessment_reminders_confirm |    TRUE        |     Text     |   TRUE    | Confirms that the user no longer wants assessment reminders |
-| state_stop_assessment_reminders_clear_fields |    FALSE        |     Text     |   FALSE    |  Clears the users  assessment reminders, then send user on to next state to determine where they want to go
-| state_stop_assessment_reminders |    TRUE        |     Text     |   TRUE    |  Sets the user to no longer get assessment reminders, asks user if they would like to go to menu or aaq |
-| state_reschedule_assessment_reminder |    |    |    | Schedules the assessment reminders |
-| state_remind_tomorrow |    TRUE        |     Text     |   TRUE    | Lets the user know we will remind them tomorrow, asks the user if they would like to go to the mainmenu |
-| state_reminder_not_interested | True | Text | TRUE | Lets the user know that they will no longer be prt of the study |
-| state_survey_validation | True | Text | TRUE | endline survey catch all validation |
- state_household_number_of_people | False | Text | Endline number of peopleing living in househould |
-| state_household_number_of_people_eight_or_more | False | Text | Endline number of peopleing living in househould if more than 8 people |
+| state_name                                     | accepts_user_input |   data_type  | added_to_flow_results_app | description                                                                      |
+|------------------------------------------------|--------------------|--------------|---------------------------|---------------------------------------------------------------------------------|
+| state_survey_already_completed                 |        TRUE        |     Text     |            TRUE           | Offers user other features. User response is "state_aaq_state" or "state_pre_mainmenu"             |
+| state_survey_decline                           |        TRUE        |     Text     |            TRUE           | User declined survey. Offers user other features. User response is "state_aaq_state" or "state_pre_mainmenu" |
+| state_start_survey                             |        FALSE       |              |            TRUE           | Sets user expectations |
+| state_survey_start                             |        FALSE       |              |                           | |
+| state_survey_question                          |        TRUE        |     Text     |            TRUE           | Sends the user a survey question. User response is based on content |
+| state_survey_process_answer                    |        FALSE       |              |            TRUE           | Caches user answer and progresses the survey |
+| state_survey_done                              |        TRUE        |     Text     |            TRUE           | Thanks user and directs them to claim their airtime. User response is "get_airtime" |
+| state_trigger_airtime_flow                     |        FALSE       |              |            TRUE           | Starts the user on the airtime flow in RapidPro |
+| state_prompt_next_action                       |        TRUE        |     Text     |            TRUE           | Offers user other features. User response is "state_aaq_start", "state_pre_mainmenu" or "state_no_airtime" |
+| state_no_airtime                               |        FALSE       |              |            TRUE           | Thanks user and closes session |
+| state_assessment_later_submit                  |        FALSE       |              |            TRUE           | Submits assessment_reminder and assessment_name as contact fields for a later reminder to complete assessment |
+| state_assessment_later                         |        TRUE        |     Text     |            TRUE           | Thanks user and asks the user if they'd like to go to the main menu |
+| state_sexual_health_literacy_send_risk_message |        TRUE        |     Text     |            TRUE           | Sends the user a message based on their risk score, takes in "yes" and "no" |
+| state_handle_assessment_reminder_response      |        FALSE       |              |                           | Handles the response to the assessment reminders |
+| state_stop_assessment_reminders_confirm        |        TRUE        |     Text     |            TRUE           | Confirms that the user no longer wants assessment reminders |
+| state_stop_assessment_reminders_clear_fields   |        FALSE       |              |                           |  Clears the users  assessment reminders, then send user on to next state to determine where they want to go |
+| state_stop_assessment_reminders                |        TRUE        |     Text     |            TRUE           |  Sets the user to no longer get assessment reminders, asks user if they would like to go to menu or aaq |
+| state_reschedule_assessment_reminder           |                    |              |                           | Schedules the assessment reminders |
+| state_remind_tomorrow                          |        TRUE        |     Text     |            TRUE           | Lets the user know we will remind them tomorrow, asks the user if they would like to go to the mainmenu |
+| state_reminder_not_interested                  |        TRUE        |     Text     |            TRUE           | Lets the user know that they will no longer be prt of the study |
+| state_survey_validation                        |        TRUE        |     Text     |            TRUE           | endline survey catch all validation |
+| state_household_number_of_people               |        TRUE        |     Text     |            TRUE           | Endline number of peopleing living in househould |
+| state_household_number_of_people_eight_or_more |        TRUE        |     Text     |            TRUE           | Endline number of peopleing living in househould if more than 8 people |
+| state_notification_no_submit                   |        FALSE       |              |                           | Updates opted_in with False |
+| state_notification_yes_submit                  |        FALSE       |              |                           | Updates opted_in with True |
+| state_notification_yes_submit_done             |        TRUE        |     Text     |            TRUE           | Displays success message and asks user what they want to do next |
 
 
 ### Service finder flow

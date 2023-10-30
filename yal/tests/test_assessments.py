@@ -321,7 +321,7 @@ async def test_state_handle_assessment_reminder_response_23h(
 
 
 @pytest.mark.asyncio
-async def test_state_handle_assessment_reminder_response_skip(tester: AppTester):
+async def test_state_handle_assessment_reminder_response_skip_no(tester: AppTester):
     tester.user.metadata["assessment_reminder_name"] = "sexual_health_literacy"
     tester.user.metadata["assessment_reminder_sent"] = ""
     tester.user.metadata["assessment_reminder_type"] = "reengagement 30min"
@@ -332,21 +332,28 @@ async def test_state_handle_assessment_reminder_response_skip(tester: AppTester)
     tester.assert_message(
         "\n".join(
             [
-                "Just a heads up, you'll get the best info for *YOU* if "
-                "you complete the questions first.",
+                "If you'd like, I can send you notifications once a day with relevant ",
+                "info that I've put together just for you.",
                 "",
-                "*Are you sure you want to skip this step?*",
+                "*Would you like to get notifications?*",
+                "",
+                "1. Yes, please!",
+                "2. No thanks",
+                "",
+                '_💡You can turn the notifications off at any time, just reply "STOP" '
+                "or go to your profile._",
             ]
         )
     )
-    await tester.user_input(content="Yes, skip it")
+    await tester.user_input(content="No thanks")
     tester.assert_state("state_stop_assessment_reminders")
     tester.assert_message(
         "\n".join(
             [
-                "Cool-cool.",
+                "We respect your decision.",
                 "",
-                "*What would you like to do now?*",
+                "You can still use the whole B-Wise service. Feel free to chat with "
+                "us or ask questions if you need some advice.",
             ]
         )
     )
@@ -356,6 +363,52 @@ async def test_state_handle_assessment_reminder_response_skip(tester: AppTester)
         "assessment_reminder_sent": "",
         "assessment_reminder_type": "",
         "sexual_health_lit_risk": "high_risk",
+        "push_message_opt_in": "False",
+    }
+
+
+@pytest.mark.asyncio
+async def test_state_handle_assessment_reminder_response_skip_yes(tester: AppTester):
+    tester.user.metadata["assessment_reminder_name"] = "sexual_health_literacy"
+    tester.user.metadata["assessment_reminder_sent"] = ""
+    tester.user.metadata["assessment_reminder_type"] = "reengagement 30min"
+
+    tester.setup_state("state_handle_assessment_reminder_response")
+    await tester.user_input(session=Message.SESSION_EVENT.NEW, content="skip")
+    tester.assert_state("state_stop_assessment_reminders_confirm")
+    tester.assert_message(
+        "\n".join(
+            [
+                "If you'd like, I can send you notifications once a day with relevant "
+                "info that I've put together just for you.",
+                "",
+                "*Would you like to get notifications?*",
+                "",
+                "1. Yes, please!",
+                "2. No thanks",
+                "",
+                '_💡You can turn the notifications off at any time, just reply "STOP" '
+                "or go to your profile._",
+            ]
+        )
+    )
+    await tester.user_input(content="Yes, please!")
+    tester.assert_state("state_notification_yes_submit_done")
+    tester.assert_message(
+        "\n".join(
+            [
+                "You have signed up for notifications 🔔",
+                "",
+                "Feel free to chat with us or ask questions if you need some advice.",
+            ]
+        )
+    )
+
+    assert tester.user.metadata == {
+        "assessment_reminder_name": "sexual_health_literacy",
+        "assessment_reminder_sent": "",
+        "assessment_reminder_type": "reengagement 30min",
+        "push_message_opt_in": "True",
     }
 
 
@@ -516,9 +569,10 @@ async def test_state_handle_stop_assessment_reminder_none(tester: AppTester):
     tester.assert_message(
         "\n".join(
             [
-                "Cool-cool.",
+                "We respect your decision.",
                 "",
-                "*What would you like to do now?*",
+                "You can still use the whole B-Wise service. Feel free to chat with "
+                "us or ask questions if you need some advice.",
             ]
         )
     )
@@ -534,9 +588,10 @@ async def test_stop_assessment_reminder_without_reminder_name(tester: AppTester)
     tester.assert_message(
         "\n".join(
             [
-                "Cool-cool.",
+                "We respect your decision.",
                 "",
-                "*What would you like to do now?*",
+                "You can still use the whole B-Wise service. Feel free to chat with "
+                "us or ask questions if you need some advice.",
             ]
         )
     )
