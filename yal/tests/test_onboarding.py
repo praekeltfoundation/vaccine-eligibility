@@ -434,7 +434,7 @@ async def test_submit_onboarding(
             "assessment_reminder_sent": "",
             "assessment_reminder": "2022-06-19T17:30:00",
             "assessment_reminder_name": "locus_of_control",
-            "assessment_reminder_type": "reengagement 30min",
+            "assessment_reminder_type": "reengagement 23hours",
         },
     }
 
