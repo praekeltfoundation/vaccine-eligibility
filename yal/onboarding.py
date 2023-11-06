@@ -319,7 +319,7 @@ class Application(BaseApplication):
             "assessment_reminder_sent": "",
             "assessment_reminder": get_current_datetime().isoformat(),
             "assessment_reminder_name": "locus_of_control",
-            "assessment_reminder_type": "reengagement 30min",
+            "assessment_reminder_type": "reengagement 23hours",
         }
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
