@@ -544,7 +544,7 @@ async def test_state_state_survey_question_baseline(
 
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
 
-    tester.assert_metadata("assessment_reminder_type", "reengagement 30min")
+    tester.assert_metadata("assessment_reminder_type", "reengagement 23hours")
 
 
 def test_clean_name(tester: AppTester):
