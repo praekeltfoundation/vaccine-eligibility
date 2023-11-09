@@ -477,6 +477,9 @@ async def test_state_body_image_assessment_end(tester: AppTester):
             "◼️◽️",
             "-----",
             "",
+            "*Over the last 2 weeks, how often have you been "
+            "bothered by the following problems?*",
+            "",
             "Feeling nervous, anxious or on edge",
         ]
     )
@@ -1136,6 +1139,9 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
         [
             "◼️◽️",
             "-----",
+            "",
+            "*Over the last 2 weeks, how often have you been "
+            "bothered by the following problems?*",
             "",
             "Feeling nervous, anxious or on edge",
         ]
