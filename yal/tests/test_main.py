@@ -899,6 +899,13 @@ async def test_endline_survey_not_interested_keywords(
     await tester.user_input("I'm not interested")
     tester.assert_state("state_no_consent")
 
+    tester.assert_metadata("endline_survey_started", "not_interested")
+
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {"endline_survey_started": "not_interested"}
+    }
+
 
 @pytest.mark.asyncio
 async def test_tracked_keywords_saved(

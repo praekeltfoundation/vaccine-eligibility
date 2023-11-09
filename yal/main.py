@@ -238,6 +238,15 @@ class Application(
                         )
                     else:
                         self.state_name = EndlineTermsApplication.NO_CONSENT_STATE
+
+                        data = {
+                            "endline_survey_started": "not_interested",
+                        }
+                        error = await rapidpro.update_profile(
+                            whatsapp_id, data, self.user.metadata
+                        )
+                        if error:
+                            return await self.go_to_state("state_error")
                 else:
                     self.state_name = EndlineTermsApplication.START_STATE
 
