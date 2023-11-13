@@ -1533,7 +1533,12 @@ async def test_whatsapp_user_reactivate(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
-async def test_survey_invite_remind_me_tomorrow(tester: AppTester, rapidpro_mock):
+@mock.patch("yal.assessments.get_current_datetime")
+async def test_survey_invite_remind_me_tomorrow(
+    get_current_datetime, tester: AppTester, rapidpro_mock
+):
+    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
+
     tester.user.metadata["terms_accepted"] = True
     tester.user.metadata["onboarding_completed"] = True
     tester.user.metadata["baseline_survey_completed"] = True
@@ -1541,5 +1546,15 @@ async def test_survey_invite_remind_me_tomorrow(tester: AppTester, rapidpro_mock
 
     await tester.user_input("remind me tomorrow")
 
+    tester.assert_metadata("assessment_reminder", "2022-06-19T17:30:00")
     tester.assert_metadata("assessment_reminder_type", "endline later 23hours")
     tester.assert_metadata("assessment_reminder_hours", "23hours")
+
+    request = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "assessment_reminder": "2022-06-19T17:30:00",
+            "assessment_reminder_sent": "",
+            "assessment_reminder_type": "endline later 23hours",
+        }
+    }
