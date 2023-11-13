@@ -378,7 +378,7 @@ class Application(BaseApplication):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         endline_survey_started = self.user.metadata.get("endline_survey_started")
-        survey = "endline " if endline_survey_started == "pending" else ""
+        survey = "endline " if endline_survey_started == "Pending" else ""
 
         if inbound in [
             "continue now",

@@ -1542,7 +1542,7 @@ async def test_survey_invite_remind_me_tomorrow(
     tester.user.metadata["terms_accepted"] = True
     tester.user.metadata["onboarding_completed"] = True
     tester.user.metadata["baseline_survey_completed"] = True
-    tester.user.metadata["endline_survey_started"] = "pending"
+    tester.user.metadata["endline_survey_started"] = "Pending"
 
     await tester.user_input("remind me tomorrow")
 
