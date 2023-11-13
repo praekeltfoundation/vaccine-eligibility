@@ -1531,13 +1531,13 @@ async def test_whatsapp_user_reactivate(tester: AppTester, rapidpro_mock):
         "fields": {"whatsapp_delivery_failed": "False"}
     }
 
+
 @pytest.mark.asyncio
 async def test_survey_invite_remind_me_tomorrow(tester: AppTester, rapidpro_mock):
     tester.user.metadata["terms_accepted"] = True
     tester.user.metadata["onboarding_completed"] = True
     tester.user.metadata["baseline_survey_completed"] = True
     tester.user.metadata["endline_survey_started"] = "pending"
-
 
     await tester.user_input("remind me tomorrow")
 

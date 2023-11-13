@@ -380,7 +380,6 @@ class Application(BaseApplication):
         endline_survey_started = self.user.metadata.get("endline_survey_started")
         survey = "endline " if endline_survey_started == "pending" else ""
 
-
         if inbound in [
             "continue now",
             "let s do it",
