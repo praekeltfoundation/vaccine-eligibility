@@ -685,23 +685,26 @@ class Application(BaseApplication):
             and assessment_name == "locus_of_control"
             and assessment_reminder_hours == "23hours"
         ):
+            reminder_type = f"{survey}later_2 {assessment_reminder_hours}"
             data = {
                 "assessment_reminder_sent": "",  # Reset the field
                 "assessment_reminder": get_current_datetime().isoformat(),
-                "assessment_reminder_type": f"{survey}later_2 {assessment_reminder_hours}",
+                "assessment_reminder_type": reminder_type,
             }
         elif "reengagement" in assessment_reminder_type:
+            reminder_type = f"{survey}reengagement {assessment_reminder_hours}"
             data = {
                 "assessment_reminder_sent": "",  # Reset the field
                 "assessment_reminder": get_current_datetime().isoformat(),
                 # only the reengagement flow allows the user to be reminded in 1h
-                "assessment_reminder_type": f"{survey}reengagement {assessment_reminder_hours}",
+                "assessment_reminder_type": reminder_type,
             }
         else:
+            reminder_type = f"{survey}later {assessment_reminder_hours}"
             data = {
                 "assessment_reminder_sent": "",  # Reset the field
                 "assessment_reminder": get_current_datetime().isoformat(),
-                "assessment_reminder_type": f"{survey}later {assessment_reminder_hours}",
+                "assessment_reminder_type": reminder_type,
             }
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
