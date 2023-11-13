@@ -377,6 +377,9 @@ class Application(BaseApplication):
         inbound = utils.clean_inbound(self.inbound.content)
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
+        endline_survey_started = self.user.metadata.get("endline_survey_started")
+        survey = "endline " if endline_survey_started == "pending" else ""
+
 
         if inbound in [
             "continue now",
@@ -419,7 +422,7 @@ class Application(BaseApplication):
 
         if inbound == "remind me tomorrow":
             self.save_metadata("assessment_reminder_hours", "23hours")
-            self.save_metadata("assessment_reminder_type", "later 23hours")
+            self.save_metadata("assessment_reminder_type", f"{survey}later 23hours")
             return await self.go_to_state("state_reschedule_assessment_reminder")
 
         if inbound == "i m not interested":
@@ -672,8 +675,11 @@ class Application(BaseApplication):
         assessment_name = self.clean_name(
             self.user.metadata["assessment_reminder_name"]
         )
+
         assessment_reminder_hours = self.user.metadata["assessment_reminder_hours"]
         assessment_reminder_type = self.user.metadata["assessment_reminder_type"]
+
+        survey = "endline " if "endline" in assessment_reminder_type else ""
 
         if (
             assessment_reminder_sent
@@ -683,20 +689,20 @@ class Application(BaseApplication):
             data = {
                 "assessment_reminder_sent": "",  # Reset the field
                 "assessment_reminder": get_current_datetime().isoformat(),
-                "assessment_reminder_type": f"later_2 {assessment_reminder_hours}",
+                "assessment_reminder_type": f"{survey}later_2 {assessment_reminder_hours}",
             }
         elif "reengagement" in assessment_reminder_type:
             data = {
                 "assessment_reminder_sent": "",  # Reset the field
                 "assessment_reminder": get_current_datetime().isoformat(),
                 # only the reengagement flow allows the user to be reminded in 1h
-                "assessment_reminder_type": f"reengagement {assessment_reminder_hours}",
+                "assessment_reminder_type": f"{survey}reengagement {assessment_reminder_hours}",
             }
         else:
             data = {
                 "assessment_reminder_sent": "",  # Reset the field
                 "assessment_reminder": get_current_datetime().isoformat(),
-                "assessment_reminder_type": f"later {assessment_reminder_hours}",
+                "assessment_reminder_type": f"{survey}later {assessment_reminder_hours}",
             }
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
