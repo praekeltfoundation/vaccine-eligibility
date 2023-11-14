@@ -172,7 +172,7 @@ class Application(BaseApplication):
         )
 
         assessment_reminder_type = "reengagement 23hours"
-        if assessment_name.endswith("endline"):
+        if "endline" in assessment_name:
             assessment_reminder_type = "endline reengagement 30min"
 
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
