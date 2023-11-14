@@ -427,7 +427,9 @@ class Application(BaseApplication):
         if inbound == "i m not interested":
             assessment_reminder_type = ""
             if "assessment_reminder_type" in self.user.metadata:
-                assessment_reminder_type = self.user.metadata["assessment_reminder_type"]
+                assessment_reminder_type = self.user.metadata[
+                    "assessment_reminder_type"
+                ]
             data = {
                 "assessment_reminder_name": "",
                 "assessment_reminder_sent": "",
