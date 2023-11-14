@@ -481,6 +481,7 @@ async def test_state_handle_assessment_reminder_response_not_interested(
             "assessment_reminder_type": "",
         },
     }
+
     tester.assert_metadata("assessment_reminder_name", "")
     tester.assert_metadata("assessment_reminder_sent", "")
     tester.assert_metadata("assessment_reminder_type", "")
@@ -496,17 +497,25 @@ async def test_state_handle_assessment_reminder_response_not_interested_endline(
     await tester.user_input("I'm not interested")
     tester.assert_state("state_not_interested")
 
-    request = rapidpro_mock.tstate.requests[1]
-    assert json.loads(request.body.decode("utf-8")) == {
+    request_one = rapidpro_mock.tstate.requests[1]
+    assert json.loads(request_one.body.decode("utf-8")) == {
         "fields": {
             "assessment_reminder_name": "",
             "assessment_reminder_sent": "",
             "assessment_reminder_type": "",
         },
     }
+
+    request_two = rapidpro_mock.tstate.requests[2]
+    assert json.loads(request_two.body.decode("utf-8")) == {
+        "fields": {
+            "endline_survey_started": "not_interested",
+        },
+    }
     tester.assert_metadata("assessment_reminder_name", "")
     tester.assert_metadata("assessment_reminder_sent", "")
     tester.assert_metadata("assessment_reminder_type", "")
+    tester.assert_metadata("endline_survey_started", "not_interested")
     tester.assert_message(
         "\n".join(
             [

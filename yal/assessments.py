@@ -438,7 +438,7 @@ class Application(BaseApplication):
             if error:
                 return await self.go_to_state("state_error")
 
-            if assessment_name.endswith("endline"):
+            if "endline" in assessment_name:
                 return await self.go_to_state("state_not_interested")
 
             return await self.go_to_state("state_pre_mainmenu")
@@ -447,7 +447,7 @@ class Application(BaseApplication):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
         data = {
-            "endline_survey_started": "",
+            "endline_survey_started": "not_interested",
         }
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
