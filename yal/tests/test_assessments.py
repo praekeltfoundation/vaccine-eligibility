@@ -492,7 +492,7 @@ async def test_state_handle_assessment_reminder_response_not_interested_endline(
     tester: AppTester, contentrepo_api_mock, rapidpro_mock
 ):
     tester.user.metadata["assessment_reminder_sent"] = "True"
-    tester.user.metadata["assessment_reminder_name"] = "self_esteem_endline"
+    tester.user.metadata["assessment_reminder_type"] = "endline later 23hours"
     tester.setup_state("state_survey_question")
     await tester.user_input("I'm not interested")
     tester.assert_state("state_not_interested")

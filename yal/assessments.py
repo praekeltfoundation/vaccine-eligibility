@@ -425,9 +425,9 @@ class Application(BaseApplication):
             return await self.go_to_state("state_reschedule_assessment_reminder")
 
         if inbound == "i m not interested":
-            assessment_name = ""
-            if "assessment_reminder_name" in self.user.metadata:
-                assessment_name = self.user.metadata["assessment_reminder_name"]
+            assessment_reminder_type = ""
+            if "assessment_reminder_type" in self.user.metadata:
+                assessment_reminder_type = self.user.metadata["assessment_reminder_type"]
             data = {
                 "assessment_reminder_name": "",
                 "assessment_reminder_sent": "",
@@ -438,7 +438,7 @@ class Application(BaseApplication):
             if error:
                 return await self.go_to_state("state_error")
 
-            if "endline" in assessment_name:
+            if "endline" in assessment_reminder_type:
                 return await self.go_to_state("state_not_interested")
 
             return await self.go_to_state("state_pre_mainmenu")
