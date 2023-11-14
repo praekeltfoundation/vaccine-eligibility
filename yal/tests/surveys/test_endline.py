@@ -660,6 +660,8 @@ async def test_state_endline_start(tester: AppTester, rapidpro_mock):
 
     message = "\n".join(["◼️◽️◽️◽️", "-----", "", "*I'm my own boss.* 😎"])
     tester.assert_message(message)
+    tester.assert_metadata("assessment_reminder_name", "locus_of_control_endline")
+    tester.assert_metadata("assessment_reminder_type", "endline reengagement 30min")
 
 
 @pytest.mark.asyncio
