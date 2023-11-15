@@ -425,11 +425,9 @@ class Application(BaseApplication):
             return await self.go_to_state("state_reschedule_assessment_reminder")
 
         if inbound == "i m not interested":
-            assessment_reminder_type = ""
-            if "assessment_reminder_type" in self.user.metadata:
-                assessment_reminder_type = self.user.metadata[
-                    "assessment_reminder_type"
-                ]
+            assessment_reminder_type = self.clean_name(
+                self.user.metadata.get("assessment_reminder_type", "")
+            )
             data = {
                 "assessment_reminder_name": "",
                 "assessment_reminder_sent": "",
