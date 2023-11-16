@@ -145,7 +145,6 @@ class Application(
             )
 
             endline_survey_started = self.user.metadata.get("endline_survey_started")
-            endline_reminder = self.user.metadata.get("endline_reminder")
             feedback_state = await self.get_feedback_state()
             payload = utils.get_by_path(
                 message.transport_metadata, "message", "button", "payload"
@@ -232,21 +231,7 @@ class Application(
                 if keyword == "remind me tomorrow":
                     self.state_name = AssessmentApplication.REMINDER_STATE
                 elif keyword == "i m not interested":
-                    if endline_reminder:
-                        self.state_name = (
-                            AssessmentApplication.REMINDER_NOT_INTERESTED_STATE
-                        )
-                    else:
-                        self.state_name = EndlineTermsApplication.NO_CONSENT_STATE
-
-                        data = {
-                            "endline_survey_started": "not_interested",
-                        }
-                        error = await rapidpro.update_profile(
-                            whatsapp_id, data, self.user.metadata
-                        )
-                        if error:
-                            return await self.go_to_state("state_error")
+                    self.state_name = AssessmentApplication.NOT_INTERESTED_STATE
                 else:
                     self.state_name = EndlineTermsApplication.START_STATE
 
