@@ -144,6 +144,7 @@ class Application(BaseApplication):
     LATER_STATE = "state_assessment_later_submit"
     REMINDER_STATE = "state_handle_assessment_reminder_response"
     REMINDER_NOT_INTERESTED_STATE = "state_reminder_not_interested"
+    NOT_INTERESTED_STATE = "state_not_interested"
 
     def clean_name(self, name):
         return name.removeprefix("state_").removesuffix("_assessment")

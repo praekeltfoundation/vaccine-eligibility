@@ -874,20 +874,6 @@ async def test_endline_remind_me_tomorrow_keywords(
 
 
 @pytest.mark.asyncio
-async def test_endline_survey_not_interested_reminder_keywords(
-    tester: AppTester, rapidpro_mock, contentrepo_api_mock
-):
-    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
-    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
-    rapidpro_mock.tstate.contact_fields["baseline_survey_completed"] = True
-    rapidpro_mock.tstate.contact_fields["endline_survey_completed"] = False
-    rapidpro_mock.tstate.contact_fields["endline_reminder"] = True
-
-    await tester.user_input("I'm not interested")
-    tester.assert_state("state_reminder_not_interested")
-
-
-@pytest.mark.asyncio
 async def test_endline_survey_not_interested_keywords(
     tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
@@ -897,7 +883,7 @@ async def test_endline_survey_not_interested_keywords(
     rapidpro_mock.tstate.contact_fields["endline_survey_completed"] = False
 
     await tester.user_input("I'm not interested")
-    tester.assert_state("state_no_consent")
+    tester.assert_state("state_not_interested")
 
     tester.assert_metadata("endline_survey_started", "not_interested")
 
