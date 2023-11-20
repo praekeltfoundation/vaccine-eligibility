@@ -622,3 +622,16 @@ async def test_state_assessment_later_submit_endline(tester: AppTester):
     tester.setup_state("state_assessment_later_submit")
 
     tester.assert_metadata("assessment_reminder_name", "locus_of_control_endline")
+
+
+@pytest.mark.asyncio
+async def test_whatsapp_menu_after_not_interested(tester: AppTester, rapidpro_mock):
+    tester.user.metadata["terms_accepted"] = "True"
+    tester.user.metadata["onboarding_completed"] = "True"
+    tester.user.metadata["endline_survey_started"] = "not_interested"
+
+    tester.setup_state("state_not_interested")
+
+    await tester.user_input("menu")
+
+    tester.assert_state("state_mainmenu")

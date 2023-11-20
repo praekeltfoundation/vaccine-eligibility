@@ -470,7 +470,10 @@ class Application(BaseApplication):
                 Choice("menu", self._("Go to the menu")),
                 Choice("aaq", self._("Ask a question")),
             ],
-            next=None,
+            next={
+                "menu": "state_pre_mainmenu",
+                "aaq": AAQApplication.START_STATE,
+            },
             error=self._(get_generic_error()),
         )
 
