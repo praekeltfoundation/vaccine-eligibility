@@ -16,6 +16,8 @@ from yal.utils import get_current_datetime, get_generic_error, normalise_phonenu
 class Application(BaseApplication):
     START_STATE = "state_start_terms"
     NO_CONSENT_STATE = "state_no_consent"
+    ENDLINE_LIMIT_REACHED_STATE = "state_endline_limit_reached"
+
 
     async def state_start_terms(self):
         question = self._(
@@ -346,3 +348,28 @@ class Application(BaseApplication):
         )
         await asyncio.sleep(0.5)
         return await self.go_to_state(EndlineApplication.START_STATE)
+
+    async def state_endline_limit_reached(self):
+
+        question = self._(
+            "\n".join(
+                [
+                    "Eish! It looks like you just missed the cut off for our survey. No worries, we get it, life happens!",
+                    "",
+                    "Stay tuned for more survey opportunities. We appreciate your enthusiasm and hope you can catch the next one.",
+                    "",
+                    "Go ahead and browse the menu or ask us a question.",
+                ]
+            )
+        )
+
+        choices = [
+            Choice("menu", "Go to the menu"),
+            Choice("aaq", "Ask a question"),
+        ]
+
+        return FreeText(
+            self,
+            question=question,
+            next=choices,
+        )

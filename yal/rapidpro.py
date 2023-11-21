@@ -187,3 +187,32 @@ async def get_global_flag(global_name):
                 else:
                     continue
     return is_active
+
+
+async def get_rapidpro_global(global_name):
+    """
+    Fetches a global variable.
+    """
+    async with get_rapidpro_api() as session:
+        is_active = False
+        for i in range(3):
+            try:
+                response = await session.get(
+                    urljoin(
+                        config.RAPIDPRO_URL,
+                        f"/api/v2/globals.json?key={global_name}",
+                    ),
+                )
+                response.raise_for_status()
+                response_body = await response.json()
+
+                rapidpro_global =  str(response_body["results"][0]["value"]).lower()
+
+            except HTTP_EXCEPTIONS as e:
+                if i == 2:
+                    logger.exception(e)
+                    return False
+                else:
+                    continue
+
+    return rapidpro_global

@@ -30,6 +30,10 @@ def get_rapidpro_contact(urn):
         },
     }
 
+def get_rapidpro_group(name):
+    return {"count": 100}
+
+
 
 @pytest.fixture(autouse=True)
 async def rapidpro_mock():
@@ -60,6 +64,40 @@ async def rapidpro_mock():
                 tstate.errors += 1
                 return response.json({}, status=500)
         return response.json({}, status=200)
+
+    @app.route("/api/v2/globals.json", methods=["GET"])
+    def get_rapidpro_global(request):
+        tstate.requests.append(request)
+        assert request.args.get("key") == "endline_max"
+        return response.json(
+            {
+                "next": None,
+                "previous": None,
+                "results": [
+                    {
+                        "key": "endline_max",
+                        "name": "Endline",
+                        "value": 250,
+                        "modified_on": "2023-05-30T07:34:06.216776Z",
+                    }
+                ],
+            },
+            status=200,
+        )
+
+    @app.route("/api/v2/groups.json", methods=["GET"])
+    def get_group(request):
+        tstate.requests.append(request)
+
+        group = [get_rapidpro_group("Endline Survey Completed")]
+
+        return response.json(
+            {
+                "results": group,
+                "next": None,
+            },
+            status=200,
+        )
 
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
@@ -1269,6 +1307,7 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
 
 @pytest.mark.asyncio
 async def test_endline_agree_terms_and_condition(tester: AppTester, rapidpro_mock):
+
     tester.user.metadata["baseline_survey_completed"] = True
     tester.user.metadata["endline_survey_started"] = "Pending"
     tester.user.metadata["terms_accepted"] = True
