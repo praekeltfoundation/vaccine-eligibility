@@ -30,9 +30,9 @@ def get_rapidpro_contact(urn):
         },
     }
 
+
 def get_rapidpro_group(name):
     return {"count": 100}
-
 
 
 @pytest.fixture(autouse=True)
@@ -109,29 +109,21 @@ async def rapidpro_mock():
 
 
 @pytest.mark.asyncio
-async def test_endline_invitation_i_want_to_answer(tester: AppTester, rapidpro_mock):
+@mock.patch("yal.rapidpro.get_group_membership_count")
+async def test_endline_invitation_i_want_to_answer(
+    get_group_membership_count, tester: AppTester, rapidpro_mock
+):
 
-    user = User(
-        addr="278201234567",
-        state=StateData(),
-        session_id=1,
-        metadata={
-            "baseline_survey_completed": True,
-            "endline_survey_started": "Pending",
-        },
-    )
-    app = Application(user)
-    msg = Message(
-        content="Yes, I want to answer",
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
+    get_group_membership_count.return_value = 100
 
-    [reply] = await app.process_message(msg)
+    tester.user.metadata["baseline_survey_completed"] = True
+    tester.user.metadata["endline_survey_started"] = "Pending"
+    tester.user.metadata["terms_accepted"] = True
+    tester.user.metadata["onboarding_completed"] = True
 
-    assert user.state.name == "state_start_terms"
+    await tester.user_input("Yes, I want to answer")
+
+    tester.assert_state("state_start_terms")
 
 
 @pytest.mark.asyncio
@@ -191,29 +183,21 @@ async def test_endline_invitation_not_interested(
 
 
 @pytest.mark.asyncio
-async def test_endline_invitation_answer(tester: AppTester, rapidpro_mock):
+@mock.patch("yal.rapidpro.get_group_membership_count")
+async def test_endline_invitation_answer(
+    get_group_membership_count, tester: AppTester, rapidpro_mock
+):
 
-    user = User(
-        addr="278201234567",
-        state=StateData(),
-        session_id=1,
-        metadata={
-            "baseline_survey_completed": True,
-            "endline_survey_started": "Pending",
-        },
-    )
-    app = Application(user)
-    msg = Message(
-        content="answer",
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
+    get_group_membership_count.return_value = 100
 
-    [reply] = await app.process_message(msg)
+    tester.user.metadata["baseline_survey_completed"] = True
+    tester.user.metadata["endline_survey_started"] = "Pending"
+    tester.user.metadata["terms_accepted"] = True
+    tester.user.metadata["onboarding_completed"] = True
 
-    assert user.state.name == "state_start_terms"
+    await tester.user_input("Yes, I want to answer")
+
+    tester.assert_state("state_start_terms")
 
 
 @pytest.mark.asyncio
@@ -1306,8 +1290,11 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
-async def test_endline_agree_terms_and_condition(tester: AppTester, rapidpro_mock):
-
+@mock.patch("yal.rapidpro.get_group_membership_count")
+async def test_endline_agree_terms_and_condition(
+    get_group_membership_count, tester: AppTester, rapidpro_mock
+):
+    get_group_membership_count.return_value = 100
     tester.user.metadata["baseline_survey_completed"] = True
     tester.user.metadata["endline_survey_started"] = "Pending"
     tester.user.metadata["terms_accepted"] = True

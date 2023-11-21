@@ -194,7 +194,6 @@ async def get_rapidpro_global(global_name):
     Fetches a global variable.
     """
     async with get_rapidpro_api() as session:
-        is_active = False
         for i in range(3):
             try:
                 response = await session.get(
@@ -206,7 +205,7 @@ async def get_rapidpro_global(global_name):
                 response.raise_for_status()
                 response_body = await response.json()
 
-                rapidpro_global =  str(response_body["results"][0]["value"]).lower()
+                rapidpro_global = str(response_body["results"][0]["value"]).lower()
 
             except HTTP_EXCEPTIONS as e:
                 if i == 2:

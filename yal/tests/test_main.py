@@ -21,7 +21,6 @@ from yal.optout import Application as OptoutApplication
 from yal.pleasecallme import Application as PleaseCallMeApplication
 from yal.pushmessages_optin import Application as OptinsApplication
 from yal.quiz import Application as QuizApplication
-from yal.rapidpro import get_group_membership_count
 from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.surveys.baseline import Application as BaselineSurveyApplication
@@ -165,6 +164,7 @@ def get_aaq_response(answers, next=None, prev=None):
         response["prev_page_url"] = f"{prev}?inbound_secret_key=secret_123"
     return response
 
+
 def get_rapidpro_group(name):
     return {"count": 100}
 
@@ -231,7 +231,6 @@ async def rapidpro_mock():
 
     @app.route("/api/v2/globals.json", methods=["GET"])
     def get_rapidpro_global(request):
-        # has_my_marker = "my_marker" in request.node.keywords
         tstate.requests.append(request)
         assert request.args.get("key") == "endline_max"
 
@@ -1588,10 +1587,13 @@ async def test_survey_invite_remind_me_tomorrow(
         }
     }
 
+
 @pytest.mark.asyncio
 @mock.patch("yal.rapidpro.get_group_membership_count")
-async def test_override_fixture_function(get_group_membership_count, tester: AppTester, rapidpro_mock):
-    get_group_membership_count.return_value =250
+async def test_state_endline_limit_reached(
+    get_group_membership_count, tester: AppTester, rapidpro_mock
+):
+    get_group_membership_count.return_value = 250
 
     tester.user.metadata["baseline_survey_completed"] = True
     tester.user.metadata["endline_survey_started"] = "Pending"

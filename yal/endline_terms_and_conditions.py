@@ -18,7 +18,6 @@ class Application(BaseApplication):
     NO_CONSENT_STATE = "state_no_consent"
     ENDLINE_LIMIT_REACHED_STATE = "state_endline_limit_reached"
 
-
     async def state_start_terms(self):
         question = self._(
             "\n".join(
@@ -354,9 +353,11 @@ class Application(BaseApplication):
         question = self._(
             "\n".join(
                 [
-                    "Eish! It looks like you just missed the cut off for our survey. No worries, we get it, life happens!",
+                    "Eish! It looks like you just missed the cut off for our survey. "
+                    "No worries, we get it, life happens!",
                     "",
-                    "Stay tuned for more survey opportunities. We appreciate your enthusiasm and hope you can catch the next one.",
+                    "Stay tuned for more survey opportunities. We appreciate your "
+                    "enthusiasm and hope you can catch the next one.",
                     "",
                     "Go ahead and browse the menu or ask us a question.",
                 ]

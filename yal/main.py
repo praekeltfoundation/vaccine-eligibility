@@ -236,11 +236,13 @@ class Application(
                     endline_max = await rapidpro.get_rapidpro_global("endline_max")
 
                     group_count = await rapidpro.get_group_membership_count(
-                        group_name=f"Endline Survey Completed"
+                        group_name="Endline Survey Completed"
                     )
 
                     if group_count >= int(endline_max):
-                        return await self.go_to_state(EndlineTermsApplication.ENDLINE_LIMIT_REACHED_STATE)
+                        return await self.go_to_state(
+                            EndlineTermsApplication.ENDLINE_LIMIT_REACHED_STATE
+                        )
 
                     self.state_name = EndlineTermsApplication.START_STATE
 
