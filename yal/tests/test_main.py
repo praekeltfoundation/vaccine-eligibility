@@ -242,7 +242,7 @@ async def rapidpro_mock():
                     {
                         "key": "Endline Study Max Participant Count",
                         "name": "endline_study_max_participant_count",
-                        "value": 250,
+                        "value": "250",
                         "modified_on": "2023-05-30T07:34:06.216776Z",
                     }
                 ],
