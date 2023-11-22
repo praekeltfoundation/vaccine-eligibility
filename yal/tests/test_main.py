@@ -165,6 +165,10 @@ def get_aaq_response(answers, next=None, prev=None):
     return response
 
 
+def get_rapidpro_group(name):
+    return {"count": 100}
+
+
 @pytest.fixture
 async def aaq_mock():
     Sanic.test_mode = True
@@ -224,6 +228,41 @@ async def rapidpro_mock():
         tstate.requests.append(request)
         tstate.contact_fields.update(request.json["fields"])
         return response.json({}, status=200)
+
+    @app.route("/api/v2/globals.json", methods=["GET"])
+    def get_global_value(request):
+        tstate.requests.append(request)
+        assert request.args.get("key") == "endline_study_max_participant_count"
+
+        return response.json(
+            {
+                "next": None,
+                "previous": None,
+                "results": [
+                    {
+                        "key": "Endline Study Max Participant Count",
+                        "name": "endline_study_max_participant_count",
+                        "value": 250,
+                        "modified_on": "2023-05-30T07:34:06.216776Z",
+                    }
+                ],
+            },
+            status=200,
+        )
+
+    @app.route("/api/v2/groups.json", methods=["GET"])
+    def get_group(request):
+        tstate.requests.append(request)
+
+        group = [get_rapidpro_group("Endline Survey Completed")]
+
+        return response.json(
+            {
+                "results": group,
+                "next": None,
+            },
+            status=200,
+        )
 
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
@@ -291,7 +330,7 @@ async def test_reset_keyword(tester: AppTester, rapidpro_mock, contentrepo_api_m
     tester.assert_state("state_mainmenu")
     tester.assert_num_messages(2)
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 6
     assert len(contentrepo_api_mock.tstate.requests) == 4
 
 
@@ -407,7 +446,7 @@ async def test_state_start_to_mainmenu(
     tester.assert_state("state_mainmenu")
     tester.assert_num_messages(2)
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 6
     assert len(contentrepo_api_mock.tstate.requests) == 4
 
     tester.assert_metadata("longitude", "28.0251783")
@@ -848,9 +887,12 @@ async def test_state_self_perceived_healthcare_assessment_later(
 
 
 @pytest.mark.asyncio
+@mock.patch("yal.rapidpro.get_group_membership_count")
 async def test_endline_survey_start_keywords(
-    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+    get_group_membership_count, tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
+    get_group_membership_count.return_value = 100
+
     rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
     rapidpro_mock.tstate.contact_fields["baseline_survey_completed"] = True
@@ -1044,7 +1086,7 @@ async def test_push_message_buttons_to_display_page(
     )
     tester.assert_metadata("topics_viewed", ["123"])
     tester.assert_metadata("current_menu_level", 1)
-    assert len(rapidpro_mock.tstate.requests) == 4
+    assert len(rapidpro_mock.tstate.requests) == 7
     assert len(contentrepo_api_mock.tstate.requests) == 2
 
 
@@ -1083,7 +1125,7 @@ async def test_push_message_page_id_buttons_display_page(
     )
     tester.assert_metadata("topics_viewed", ["123"])
     tester.assert_metadata("current_menu_level", 1)
-    assert len(rapidpro_mock.tstate.requests) == 4
+    assert len(rapidpro_mock.tstate.requests) == 7
     assert len(contentrepo_api_mock.tstate.requests) == 2
 
 
@@ -1454,7 +1496,7 @@ async def test_mainmenu_payload(tester: AppTester, rapidpro_mock, contentrepo_ap
     tester.assert_state("state_mainmenu")
     tester.assert_num_messages(2)
 
-    assert len(rapidpro_mock.tstate.requests) == 3
+    assert len(rapidpro_mock.tstate.requests) == 6
     assert len(contentrepo_api_mock.tstate.requests) == 4
 
 
@@ -1544,3 +1586,101 @@ async def test_survey_invite_remind_me_tomorrow(
             "assessment_reminder_type": "endline later 23hours",
         }
     }
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.rapidpro.get_group_membership_count")
+async def test_state_endline_limit_reached(
+    get_group_membership_count, tester: AppTester, rapidpro_mock
+):
+    get_group_membership_count.return_value = 250
+
+    tester.user.metadata["baseline_survey_completed"] = True
+    tester.user.metadata["endline_survey_started"] = "Pending"
+    tester.user.metadata["terms_accepted"] = True
+    tester.user.metadata["onboarding_completed"] = True
+
+    await tester.user_input("Yes, I want to answer")
+    tester.assert_state("state_endline_limit_reached")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.rapidpro.get_group_membership_count")
+async def test_state_endline_limit_reached_menu(
+    get_group_membership_count, tester: AppTester, rapidpro_mock
+):
+    get_group_membership_count.return_value = 250
+
+    tester.user.metadata["baseline_survey_completed"] = True
+    tester.user.metadata["endline_survey_started"] = "Pending"
+    tester.user.metadata["terms_accepted"] = True
+    tester.user.metadata["onboarding_completed"] = True
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_endline_limit_reached"}}
+        },
+    )
+
+    message = "\n".join(
+        [
+            "Eish! It looks like you just missed the cut off for our survey. "
+            "No worries, we get it, life happens!",
+            "",
+            "Stay tuned for more survey opportunities. We appreciate your "
+            "enthusiasm and hope you can catch the next one.",
+            "",
+            "Go ahead and browse the menu or ask us a question.",
+            "",
+            "1. Go to the menu",
+            "2. Ask a question",
+        ]
+    )
+    tester.assert_message(message)
+
+    await tester.user_input("menu")
+
+    tester.assert_state("state_mainmenu")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.askaquestion.config")
+@mock.patch("yal.rapidpro.get_group_membership_count")
+async def test_state_endline_limit_reached_aaq(
+    mock_config, get_group_membership_count, tester: AppTester, rapidpro_mock
+):
+    mock_config.AAQ_URL = "http://aaq-test.com"
+    get_group_membership_count.return_value = 250
+
+    tester.user.metadata["baseline_survey_completed"] = True
+    tester.user.metadata["endline_survey_started"] = "Pending"
+    tester.user.metadata["terms_accepted"] = True
+    tester.user.metadata["onboarding_completed"] = True
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_endline_limit_reached"}}
+        },
+    )
+
+    message = "\n".join(
+        [
+            "Eish! It looks like you just missed the cut off for our survey. "
+            "No worries, we get it, life happens!",
+            "",
+            "Stay tuned for more survey opportunities. We appreciate your "
+            "enthusiasm and hope you can catch the next one.",
+            "",
+            "Go ahead and browse the menu or ask us a question.",
+            "",
+            "1. Go to the menu",
+            "2. Ask a question",
+        ]
+    )
+    tester.assert_message(message)
+
+    await tester.user_input("Ask a question")
+
+    tester.assert_state("state_aaq_start")

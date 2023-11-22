@@ -617,6 +617,7 @@
 | state_platform_review_assessment_endline | False | Text | Review the platform |
 | state_relationship_status_endline | False | Text | endline relationship status |
 | state_submit_terms_and_conditions_endline | False | Text | Endline Terms and Condition Submit |
+| state_endline_limit_reached | False | Text | Endline Maximum reached |
 | state_not_interested | False | Text | Endline Survery not interested |
 | state_monthly_household_income_endline | False | Text | Endline household income |
 | state_start_terms | False | Text | Endline terms and conditions |
