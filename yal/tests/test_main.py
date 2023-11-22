@@ -1639,6 +1639,7 @@ async def test_state_endline_limit_reached_aaq(
 
     tester.assert_state("state_aaq_start")
 
+
 @pytest.mark.asyncio
 @mock.patch("yal.rapidpro.get_group_membership_count")
 async def test_state_endline_limit_reached_pending_menu(
