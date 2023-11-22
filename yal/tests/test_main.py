@@ -891,7 +891,7 @@ async def test_state_self_perceived_healthcare_assessment_later(
 async def test_endline_survey_start_keywords(
     get_group_membership_count, tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
-    get_group_membership_count.return_value = 100
+    get_group_membership_count.return_value = False, 100
 
     rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
@@ -1590,10 +1590,10 @@ async def test_survey_invite_remind_me_tomorrow(
 
 @pytest.mark.asyncio
 @mock.patch("yal.rapidpro.get_group_membership_count")
-async def test_state_endline_limit_reached(
+async def test_state_endline_limit_reached1(
     get_group_membership_count, tester: AppTester, rapidpro_mock
 ):
-    get_group_membership_count.return_value = 250
+    get_group_membership_count.return_value = False, 250
 
     tester.user.metadata["baseline_survey_completed"] = True
     tester.user.metadata["endline_survey_started"] = "Pending"
@@ -1609,7 +1609,7 @@ async def test_state_endline_limit_reached(
 async def test_state_endline_limit_reached_menu(
     get_group_membership_count, tester: AppTester, rapidpro_mock
 ):
-    get_group_membership_count.return_value = 250
+    get_group_membership_count.return_value = False, 250
 
     tester.user.metadata["baseline_survey_completed"] = True
     tester.user.metadata["endline_survey_started"] = "Pending"
@@ -1651,7 +1651,7 @@ async def test_state_endline_limit_reached_aaq(
     mock_config, get_group_membership_count, tester: AppTester, rapidpro_mock
 ):
     mock_config.AAQ_URL = "http://aaq-test.com"
-    get_group_membership_count.return_value = 250
+    get_group_membership_count.return_value = False, 250
 
     tester.user.metadata["baseline_survey_completed"] = True
     tester.user.metadata["endline_survey_started"] = "Pending"

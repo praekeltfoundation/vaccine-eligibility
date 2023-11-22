@@ -239,9 +239,11 @@ class Application(
                         )
                     )
 
-                    group_count = await rapidpro.get_group_membership_count(
+                    error, group_count = await rapidpro.get_group_membership_count(
                         group_name="Endline Survey Completed"
                     )
+                    if error:
+                        return await self.go_to_state("state_error")
 
                     if group_count >= int(endline_study_max_participant_count):
                         return await self.go_to_state(
