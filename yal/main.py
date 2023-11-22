@@ -243,23 +243,22 @@ class Application(
                         group_name="Endline Survey Completed"
                     )
                     if error:
-                        return await self.go_to_state("state_error")
-
-                    if group_count >= int(endline_study_max_participant_count):
-                        return await self.go_to_state(
+                        self.state_name = self.ERROR_STATE
+                    elif group_count >= int(endline_study_max_participant_count):
+                        self.state_name = (
                             EndlineTermsApplication.ENDLINE_LIMIT_REACHED_STATE
                         )
+                    else:
+                        self.state_name = EndlineTermsApplication.START_STATE
 
-                    self.state_name = EndlineTermsApplication.START_STATE
-
-                    data = {
-                        "endline_survey_started": "True",
-                    }
-                    error = await rapidpro.update_profile(
-                        whatsapp_id, data, self.user.metadata
-                    )
-                    if error:
-                        return await self.go_to_state("state_error")
+                        data = {
+                            "endline_survey_started": "True",
+                        }
+                        error = await rapidpro.update_profile(
+                            whatsapp_id, data, self.user.metadata
+                        )
+                        if error:
+                            self.state_name = self.ERROR_STATE
 
             # Fields that RapidPro sets after a feedback push message
             elif feedback_state:
