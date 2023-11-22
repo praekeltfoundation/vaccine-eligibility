@@ -8,6 +8,7 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
+from vaccine.utils import get_display_choices
 from yal import rapidpro
 from yal.surveys.endline import Application as EndlineApplication
 from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
@@ -349,6 +350,10 @@ class Application(BaseApplication):
         return await self.go_to_state(EndlineApplication.START_STATE)
 
     async def state_endline_limit_reached(self):
+        choices = [
+            Choice("menu", "Go to the menu"),
+            Choice("aaq", "Ask a question"),
+        ]
 
         question = self._(
             "\n".join(
@@ -360,17 +365,19 @@ class Application(BaseApplication):
                     "enthusiasm and hope you can catch the next one.",
                     "",
                     "Go ahead and browse the menu or ask us a question.",
+                    "",
+                    get_display_choices(choices),
                 ]
             )
         )
 
-        choices = [
-            Choice("menu", "Go to the menu"),
-            Choice("aaq", "Ask a question"),
-        ]
-
-        return FreeText(
+        return WhatsAppButtonState(
             self,
             question=question,
-            next=choices,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "menu": "state_pre_mainmenu",
+                "aaq": "state_aaq_start",
+            },
         )

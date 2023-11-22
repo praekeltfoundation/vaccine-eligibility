@@ -1606,7 +1606,7 @@ async def test_state_endline_limit_reached(
 
 @pytest.mark.asyncio
 @mock.patch("yal.rapidpro.get_group_membership_count")
-async def test_state_endline_limit_reached_message(
+async def test_state_endline_limit_reached_menu(
     get_group_membership_count, tester: AppTester, rapidpro_mock
 ):
     get_group_membership_count.return_value = 250
@@ -1632,6 +1632,55 @@ async def test_state_endline_limit_reached_message(
             "enthusiasm and hope you can catch the next one.",
             "",
             "Go ahead and browse the menu or ask us a question.",
+            "",
+            "1. Go to the menu",
+            "2. Ask a question",
         ]
     )
     tester.assert_message(message)
+
+    await tester.user_input("menu")
+
+    tester.assert_state("state_mainmenu")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.askaquestion.config")
+@mock.patch("yal.rapidpro.get_group_membership_count")
+async def test_state_endline_limit_reached_aaq(
+    mock_config, get_group_membership_count, tester: AppTester, rapidpro_mock
+):
+    mock_config.AAQ_URL = "http://aaq-test.com"
+    get_group_membership_count.return_value = 250
+
+    tester.user.metadata["baseline_survey_completed"] = True
+    tester.user.metadata["endline_survey_started"] = "Pending"
+    tester.user.metadata["terms_accepted"] = True
+    tester.user.metadata["onboarding_completed"] = True
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_endline_limit_reached"}}
+        },
+    )
+
+    message = "\n".join(
+        [
+            "Eish! It looks like you just missed the cut off for our survey. "
+            "No worries, we get it, life happens!",
+            "",
+            "Stay tuned for more survey opportunities. We appreciate your "
+            "enthusiasm and hope you can catch the next one.",
+            "",
+            "Go ahead and browse the menu or ask us a question.",
+            "",
+            "1. Go to the menu",
+            "2. Ask a question",
+        ]
+    )
+    tester.assert_message(message)
+
+    await tester.user_input("Ask a question")
+
+    tester.assert_state("state_aaq_start")
