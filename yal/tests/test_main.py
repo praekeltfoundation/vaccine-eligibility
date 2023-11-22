@@ -1638,3 +1638,29 @@ async def test_state_endline_limit_reached_aaq(
     await tester.user_input("Ask a question")
 
     tester.assert_state("state_aaq_start")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.rapidpro.get_group_membership_count")
+async def test_state_endline_limit_reached_pending_menu(
+    get_group_membership_count, tester: AppTester, rapidpro_mock
+):
+    get_group_membership_count.return_value = False, 250
+
+    tester.user.metadata["baseline_survey_completed"] = True
+    tester.user.metadata["endline_survey_started"] = "Pending"
+    tester.user.metadata["terms_accepted"] = True
+    tester.user.metadata["onboarding_completed"] = True
+
+    await tester.user_input("Yes, I want to answer")
+    tester.assert_state("state_endline_limit_reached")
+
+    tester.assert_metadata("endline_survey_started", "limit_reached")
+
+    request = rapidpro_mock.tstate.requests[4]
+
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "endline_survey_started": "limit_reached",
+        }
+    }
