@@ -1620,6 +1620,21 @@ async def test_state_endline_limit_reached(
         )
     )
 
+<<<<<<< Updated upstream
+=======
+    message = "\n".join(
+        [
+            "Eish! It looks like you just missed the cut off for our survey. "
+            "No worries, we get it, life happens!",
+            "",
+            "Stay tuned for more survey opportunities. We appreciate your "
+            "enthusiasm and hope you can catch the next one.",
+            "",
+            "Go ahead and browse the menu or ask us a question.",
+        ]
+    )
+    tester.assert_message(message)
+>>>>>>> Stashed changes
 
 @pytest.mark.asyncio
 async def test_state_endline_limit_reached_menu(tester: AppTester, rapidpro_mock):
@@ -1636,7 +1651,36 @@ async def test_state_endline_limit_reached_aaq(
     mock_config, tester: AppTester, rapidpro_mock
 ):
     mock_config.AAQ_URL = "http://aaq-test.com"
+<<<<<<< Updated upstream
     tester.setup_state("state_endline_limit_reached")
+=======
+    get_group_membership_count.return_value = 250
+
+    tester.user.metadata["baseline_survey_completed"] = True
+    tester.user.metadata["endline_survey_started"] = "Pending"
+    tester.user.metadata["terms_accepted"] = True
+    tester.user.metadata["onboarding_completed"] = True
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_endline_limit_reached"}}
+        },
+    )
+
+    message = "\n".join(
+        [
+            "Eish! It looks like you just missed the cut off for our survey. "
+            "No worries, we get it, life happens!",
+            "",
+            "Stay tuned for more survey opportunities. We appreciate your "
+            "enthusiasm and hope you can catch the next one.",
+            "",
+            "Go ahead and browse the menu or ask us a question.",
+        ]
+    )
+    tester.assert_message(message)
+>>>>>>> Stashed changes
 
     await tester.user_input("Ask a question")
 
