@@ -243,7 +243,7 @@ class Application(
                         group_name="Endline Survey Completed"
                     )
 
-                    if group_count >= int(endline_study_max_participant_count):
+                    if int(group_count) >= int(endline_study_max_participant_count):
                         return await self.go_to_state(
                             EndlineTermsApplication.ENDLINE_LIMIT_REACHED_STATE
                         )
