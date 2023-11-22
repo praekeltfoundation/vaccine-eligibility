@@ -114,7 +114,7 @@ async def test_endline_invitation_i_want_to_answer(
     get_group_membership_count, tester: AppTester, rapidpro_mock
 ):
 
-    get_group_membership_count.return_value = 100
+    get_group_membership_count.return_value = False, 100
 
     tester.user.metadata["baseline_survey_completed"] = True
     tester.user.metadata["endline_survey_started"] = "Pending"
@@ -188,7 +188,7 @@ async def test_endline_invitation_answer(
     get_group_membership_count, tester: AppTester, rapidpro_mock
 ):
 
-    get_group_membership_count.return_value = 100
+    get_group_membership_count.return_value = False, 100
 
     tester.user.metadata["baseline_survey_completed"] = True
     tester.user.metadata["endline_survey_started"] = "Pending"
@@ -1294,7 +1294,7 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
 async def test_endline_agree_terms_and_condition(
     get_group_membership_count, tester: AppTester, rapidpro_mock
 ):
-    get_group_membership_count.return_value = 100
+    get_group_membership_count.return_value = False, 100
     tester.user.metadata["baseline_survey_completed"] = True
     tester.user.metadata["endline_survey_started"] = "Pending"
     tester.user.metadata["terms_accepted"] = True
