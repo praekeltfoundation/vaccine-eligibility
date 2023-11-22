@@ -8,7 +8,6 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
-from vaccine.utils import get_display_choices
 from yal import rapidpro
 from yal.surveys.endline import Application as EndlineApplication
 from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
@@ -365,8 +364,6 @@ class Application(BaseApplication):
                     "enthusiasm and hope you can catch the next one.",
                     "",
                     "Go ahead and browse the menu or ask us a question.",
-                    "",
-                    get_display_choices(choices),
                 ]
             )
         )

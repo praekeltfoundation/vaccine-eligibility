@@ -1613,9 +1613,6 @@ async def test_state_endline_limit_reached(
                 "enthusiasm and hope you can catch the next one.",
                 "",
                 "Go ahead and browse the menu or ask us a question.",
-                "",
-                "1. Go to the menu",
-                "2. Ask a question",
             ]
         )
     )
