@@ -1656,11 +1656,17 @@ async def test_state_endline_limit_reached_pending_menu(
     tester.assert_state("state_endline_limit_reached")
 
     tester.assert_metadata("endline_survey_started", "limit_reached")
+    tester.assert_metadata("assessment_reminder", "")
+    tester.assert_metadata("assessment_reminder_sent", "")
+    tester.assert_metadata("assessment_reminder_type", "")
 
     request = rapidpro_mock.tstate.requests[4]
 
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {
             "endline_survey_started": "limit_reached",
+            "assessment_reminder": "",
+            "assessment_reminder_sent": "",
+            "assessment_reminder_type": "",
         }
     }

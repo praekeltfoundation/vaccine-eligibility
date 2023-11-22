@@ -248,15 +248,6 @@ class Application(
                         self.state_name = (
                             EndlineTermsApplication.ENDLINE_LIMIT_REACHED_STATE
                         )
-
-                        data = {
-                            "endline_survey_started": "limit_reached",
-                        }
-                        error = await rapidpro.update_profile(
-                            whatsapp_id, data, self.user.metadata
-                        )
-                        if error:
-                            self.state_name = self.ERROR_STATE
                     else:
                         self.state_name = EndlineTermsApplication.START_STATE
 
