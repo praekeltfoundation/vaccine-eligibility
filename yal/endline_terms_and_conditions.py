@@ -349,6 +349,19 @@ class Application(BaseApplication):
         return await self.go_to_state(EndlineApplication.START_STATE)
 
     async def state_endline_limit_reached(self):
+
+        msisdn = normalise_phonenumber(self.inbound.from_addr)
+        whatsapp_id = msisdn.lstrip(" + ")
+
+        data = {
+            "endline_survey_started": "limit_reached",
+            "assessment_reminder": "",
+            "assessment_reminder_sent": "",
+            "assessment_reminder_type": "",
+        }
+        error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
+        if error:
+            self.state_name = self.ERROR_STATE
         choices = [
             Choice("menu", "Go to the menu"),
             Choice("aaq", "Ask a question"),
