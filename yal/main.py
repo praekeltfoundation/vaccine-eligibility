@@ -233,15 +233,17 @@ class Application(
                 elif keyword == "i m not interested":
                     self.state_name = AssessmentApplication.NOT_INTERESTED_STATE
                 else:
-                    endline_max_limit = await rapidpro.get_rapidpro_global(
-                        "endline_max"
+                    endline_study_max_participant_count = (
+                        await rapidpro.get_global_value(
+                            "endline_study_max_participant_count"
+                        )
                     )
 
                     group_count = await rapidpro.get_group_membership_count(
                         group_name="Endline Survey Completed"
                     )
 
-                    if group_count >= int(endline_max_limit):
+                    if group_count >= int(endline_study_max_participant_count):
                         return await self.go_to_state(
                             EndlineTermsApplication.ENDLINE_LIMIT_REACHED_STATE
                         )

@@ -189,7 +189,7 @@ async def get_global_flag(global_name):
     return is_active
 
 
-async def get_rapidpro_global(global_name):
+async def get_global_value(global_name):
     """
     Fetches a global variable.
     """

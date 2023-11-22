@@ -230,9 +230,9 @@ async def rapidpro_mock():
         return response.json({}, status=200)
 
     @app.route("/api/v2/globals.json", methods=["GET"])
-    def get_rapidpro_global(request):
+    def get_global_value(request):
         tstate.requests.append(request)
-        assert request.args.get("key") == "endline_max"
+        assert request.args.get("key") == "endline_study_max_participant_count"
 
         return response.json(
             {
@@ -240,8 +240,8 @@ async def rapidpro_mock():
                 "previous": None,
                 "results": [
                     {
-                        "key": "endline_max",
-                        "name": "Endline",
+                        "key": "Endline Study Max Participant Count",
+                        "name": "endline_study_max_participant_count",
                         "value": 250,
                         "modified_on": "2023-05-30T07:34:06.216776Z",
                     }
@@ -1602,3 +1602,36 @@ async def test_state_endline_limit_reached(
 
     await tester.user_input("Yes, I want to answer")
     tester.assert_state("state_endline_limit_reached")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.rapidpro.get_group_membership_count")
+async def test_state_endline_limit_reached_message(
+    get_group_membership_count, tester: AppTester, rapidpro_mock
+):
+    get_group_membership_count.return_value = 250
+
+    tester.user.metadata["baseline_survey_completed"] = True
+    tester.user.metadata["endline_survey_started"] = "Pending"
+    tester.user.metadata["terms_accepted"] = True
+    tester.user.metadata["onboarding_completed"] = True
+
+    await tester.user_input(
+        "test",
+        transport_metadata={
+            "message": {"button": {"payload": "state_endline_limit_reached"}}
+        },
+    )
+
+    message = "\n".join(
+        [
+            "Eish! It looks like you just missed the cut off for our survey. "
+            "No worries, we get it, life happens!",
+            "",
+            "Stay tuned for more survey opportunities. We appreciate your "
+            "enthusiasm and hope you can catch the next one.",
+            "",
+            "Go ahead and browse the menu or ask us a question.",
+        ]
+    )
+    tester.assert_message(message)

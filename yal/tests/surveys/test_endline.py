@@ -66,17 +66,17 @@ async def rapidpro_mock():
         return response.json({}, status=200)
 
     @app.route("/api/v2/globals.json", methods=["GET"])
-    def get_rapidpro_global(request):
+    def get_global_value(request):
         tstate.requests.append(request)
-        assert request.args.get("key") == "endline_max"
+        assert request.args.get("key") == "endline_study_max_participant_count"
         return response.json(
             {
                 "next": None,
                 "previous": None,
                 "results": [
                     {
-                        "key": "endline_max",
-                        "name": "Endline",
+                        "key": "Endline Study Max Participant Count",
+                        "name": "endline_study_max_participant_count",
                         "value": 250,
                         "modified_on": "2023-05-30T07:34:06.216776Z",
                     }
