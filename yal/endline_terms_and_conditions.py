@@ -8,7 +8,6 @@ from vaccine.states import (
     WhatsAppButtonState,
     WhatsAppListState,
 )
-from vaccine.utils import get_display_choices
 from yal import rapidpro
 from yal.surveys.endline import Application as EndlineApplication
 from yal.utils import get_current_datetime, get_generic_error, normalise_phonenumber
