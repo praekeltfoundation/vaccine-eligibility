@@ -38,7 +38,7 @@ class Application(BaseApplication):
                     "❓ You can skip any questions you don’t want to answer."
                     " To try improve South Africa’s sexual health we need to "
                     "ask a number of questions that may be sensitive; for instance,"
-                    " we ask about sexual behaviours,sexual orientation and health"
+                    " we ask about sexual behaviours, sexual orientation and health"
                     " status, among other topics.",
                     "",
                     "🔒 You’ve seen and agreed to the BWise privacy policy."
