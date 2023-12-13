@@ -230,6 +230,31 @@ ASSESSMENT_QUESTIONS = {
                     "dont_understand": 0,
                     "skip_question": 0,
                 },
+                "next": "endline_2_q10_self_esteem",
+            },
+            "endline_2_q10_self_esteem": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*At times I think I am no good at all.*",
+                    ]
+                ),
+                "options": [
+                    ("strongly_agree", "Strongly agree"),
+                    ("agree", "Agree"),
+                    ("disagree", "Disagree"),
+                    ("strongly_disagree", "Strongly disagree"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip_question", "Skip question"),
+                ],
+                "scoring": {
+                    "strongly_agree": 0,
+                    "agree": 1,
+                    "disagree": 2,
+                    "strongly_disagree": 3,
+                    "dont_understand": 0,
+                    "skip_question": 0,
+                },
                 "next": None,
             },
         },

@@ -1000,7 +1000,7 @@ async def test_state_alcohol_assessment_endline_end(tester: AppTester):
 
     message = "\n".join(
         [
-            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
             "-----",
             "",
             "You have received a lot of content from BWise.",
@@ -1080,7 +1080,7 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
     # Self Esteem
     message = "\n".join(
         [
-            "◼️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
             "-----",
             "",
             "How do you feel about the following statements?",
@@ -1097,6 +1097,7 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
     await tester.user_input("Disagree")
     await tester.user_input("Agree")
     await tester.user_input("Agree")
+    await tester.user_input("Skip question")
     await tester.user_input("Skip question")
     await tester.user_input("Skip question")
 
@@ -1210,8 +1211,8 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
     await tester.user_input("Yes, improved a lot")
     await tester.user_input("TV / radio")
     await tester.user_input("Yes")
-    await tester.user_input("No")
-    await tester.user_input("No")
+    await tester.user_input("No change")
+    await tester.user_input("No change")
     await tester.user_input("No change")
 
     # Gender
@@ -1277,7 +1278,7 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
     # Platform
     message = "\n".join(
         [
-            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
+            "◼️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️◽️",
             "-----",
             "",
             "You have received a lot of content from BWise.",
