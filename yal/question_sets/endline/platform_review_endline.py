@@ -131,7 +131,7 @@ ASSESSMENT_QUESTIONS = {
                     [
                         "*How many times have you visited a clinic or other health "
                         "facility for your sexual health since joining BWise? (We "
-                        "know it may be hard to remember, we`d appreciate your best "
+                        "know it may be hard to remember, we'd appreciate your best "
                         "guess)*"
                     ]
                 ),
@@ -169,14 +169,14 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    ("where", "Didn`t know where"),
-                    ("time", "Didn`t have time"),
-                    ("money", "Didn`t have money "),
+                    ("where", "Didn't know where"),
+                    ("time", "Didn't have time"),
+                    ("money", "Didn't have money "),
                     ("judgement", "Fear of judgement"),
-                    ("bas_service", "Fear of bad service"),
+                    ("bad_service", "Fear of bad service"),
                     ("elsewhere", "Got help elsewhere"),
                     ("no_need", "No longer needed"),
-                    ("dont_understand", "I don`t understand"),
+                    ("dont_understand", "I don't understand"),
                     ("skip_question", "Skip question"),
                 ],
                 "next": "endline_12_q6e_platform_review",
@@ -191,10 +191,10 @@ ASSESSMENT_QUESTIONS = {
                     ]
                 ),
                 "options": [
-                    ("got_help", "I got help"),
-                    ("no_diagnosis", "Visited, no diagnosis"),
-                    ("no_help", "Didn`t get help"),
-                    ("dont_understand", "I don`t understand"),
+                    ("treated", "Helped, got treated"),
+                    ("no_result", "Helped, no result"),
+                    ("not_seen", "Visited, not seen"),
+                    ("dont_understand", "I don't understand "),
                     ("skip_question", "Skip question"),
                 ],
                 "next": "endline_12_q6e_platform_review",
@@ -214,7 +214,7 @@ ASSESSMENT_QUESTIONS = {
                     ("no_change", "No change"),
                     ("little_less", "Little less likely"),
                     ("lot_less", "A lot less likely"),
-                    ("dont_understand", "I don`t understand"),
+                    ("dont_understand", "I don't understand"),
                     ("skip_question", "Skip question"),
                 ],
                 "next": "endline_12_q7_platform_review",
@@ -295,7 +295,7 @@ ASSESSMENT_QUESTIONS = {
                     [
                         "*Other than using LoveLife, have you visited another mental "
                         "or sexual health counselor (since joining BWise) and if so, "
-                        "how many times? (We know it may be hard to remember, we`d "
+                        "how many times? (We know it may be hard to remember, we'd "
                         "appreciate your best guess)*"
                     ]
                 ),
@@ -339,7 +339,7 @@ ASSESSMENT_QUESTIONS = {
                     ("no_change", "No change"),
                     ("little_less", "Little less likely"),
                     ("lot_less", "A lot less likely"),
-                    ("dont_understand", "I don`t understand"),
+                    ("dont_understand", "I don't understand"),
                     ("skip_question", "Skip question"),
                 ],
                 "next": None,
@@ -348,19 +348,19 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*What was the main reason you didn`t speak to a counsellor "
+                        "*What was the main reason you didn't speak to a counsellor "
                         "about your mental or sexual health?*"
                     ]
                 ),
                 "options": [
-                    ("where", "Didn`t know where"),
-                    ("time", "Didn`t have time"),
-                    ("money", "Didn`t have money "),
+                    ("where", "Didn't know where"),
+                    ("time", "Didn't have time"),
+                    ("money", "Didn't have money "),
                     ("judgement", "Fear of judgement"),
-                    ("bas_service", "Fear of bad service"),
+                    ("bad_service", "Fear of bad service"),
                     ("elsewhere", "Got help elsewhere"),
                     ("no_need", "No longer needed"),
-                    ("dont_understand", "I don`t understand"),
+                    ("dont_understand", "I don't understand"),
                     ("skip_question", "Skip question"),
                 ],
                 "next": "endline_12_q10c_platform_review",
