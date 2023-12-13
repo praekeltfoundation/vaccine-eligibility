@@ -192,6 +192,7 @@ async def test_state_location_province_endline(tester: AppTester, rapidpro_mock)
     await tester.user_input("5")
     tester.assert_state("state_location_area_type_endline")
 
+
 @pytest.mark.asyncio
 async def test_state_location_area_type_endline(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_location_province_endline")
