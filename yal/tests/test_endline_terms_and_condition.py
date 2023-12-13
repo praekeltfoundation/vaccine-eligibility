@@ -119,8 +119,9 @@ async def test_state_accept_consent_reminder(tester: AppTester, rapidpro_mock):
 async def test_state_submit_terms_and_conditions_accept(
     tester: AppTester, rapidpro_mock
 ):
-    tester.setup_state("state_household_number_of_people")
+    tester.setup_state("state_location_area_type_endline")
     await tester.user_input("1")
+    tester.assert_state("state_survey_question")
 
     assert len(rapidpro_mock.tstate.requests) == 3
     request = rapidpro_mock.tstate.requests[0]
@@ -133,10 +134,10 @@ async def test_state_submit_terms_and_conditions_accept(
 async def test_state_household_number_of_people(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_household_number_of_people")
     await tester.user_input("2")
-    message = "\n".join(["◼️◽️◽️◽️", "-----", "", "*I'm my own boss.* 😎"])
+    # message = "\n".join(["◼️◽️◽️◽️", "-----", "", "*I'm my own boss.* 😎"])
 
-    tester.assert_message(message)
-    tester.assert_state("state_survey_question")
+    # tester.assert_message(message)
+    tester.assert_state("state_location_province_endline")
 
 
 @pytest.mark.asyncio
@@ -164,7 +165,56 @@ async def test_state_household_number_of_people_eight_or_more(
 ):
     tester.setup_state("state_household_number_of_people_eight_or_more")
     await tester.user_input("5")
+    # message = "\n".join(["◼️◽️◽️◽️", "-----", "", "*I'm my own boss.* 😎"])
+
+    # tester.assert_message(message)
+    tester.assert_state("state_location_province_endline")
+
+
+@pytest.mark.asyncio
+async def test_state_location_province_endline(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_household_number_of_people_eight_or_more")
+    await tester.user_input("5")
+
+    tester.assert_state("state_location_province_endline")
+    tester.assert_message(
+        "*What province do you live in?*",
+        list_items=[
+            "Eastern Cape",
+            "Freestate",
+            "Gauteng",
+            "Kwazulu-Natal",
+            "Limpopo",
+            "Mpumalanga",
+            "Northern Cape",
+            "North-West",
+            "Western Cape",
+            "Skip question",
+        ],
+    )
+
+    await tester.user_input("5")
+    tester.assert_state("state_location_area_type_endline")
+
+@pytest.mark.asyncio
+async def test_state_location_area_type_endline(tester: AppTester, rapidpro_mock):
+    tester.setup_state("state_location_province_endline")
+    await tester.user_input("1")
+
+    tester.assert_state("state_location_area_type_endline")
+    tester.assert_message(
+        "*What type of area are you living in?*",
+        list_items=[
+            "Traditional/chiefdom",
+            "Urban/town",
+            "Farm/rural",
+            "I don't understand",
+        ],
+    )
+
+    await tester.user_input("1")
+    tester.assert_state("state_survey_question")
+
     message = "\n".join(["◼️◽️◽️◽️", "-----", "", "*I'm my own boss.* 😎"])
 
     tester.assert_message(message)
-    tester.assert_state("state_survey_question")
