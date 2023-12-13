@@ -38,7 +38,7 @@ class Application(BaseApplication):
                     "❓ You can skip any questions you don’t want to answer."
                     " To try improve South Africa’s sexual health we need to "
                     "ask a number of questions that may be sensitive; for instance,"
-                    " we ask about sexual behaviours, sexual orientation and health"
+                    " we ask about sexual behaviours, sexual orientation and health"
                     " status, among other topics.",
                     "",
                     "🔒 You’ve seen and agreed to the BWise privacy policy."
@@ -242,7 +242,7 @@ class Application(BaseApplication):
         async def next_state(choice: Choice):
             if choice.value == "eight_more":
                 return "state_household_number_of_people_eight_or_more"
-            return "state_submit_terms_and_conditions_endline"
+            return "state_location_province_endline"
 
         return WhatsAppListState(
             self,
@@ -295,7 +295,7 @@ class Application(BaseApplication):
             question=question,
             error=error,
             choices=choices,
-            next="state_submit_terms_and_conditions_endline",
+            next="state_location_province_endline",
             button="Choose Option",
         )
 
@@ -330,6 +330,46 @@ class Application(BaseApplication):
             self,
             question=question,
             next=None,
+        )
+
+    async def state_location_province_endline(self):
+        question = "*What province do you live in?*"
+
+        return WhatsAppListState(
+            self,
+            question=question,
+            button="Province",
+            choices=[
+                Choice("EC", "Eastern Cape"),
+                Choice("FS", "Freestate"),
+                Choice("GT", "Gauteng"),
+                Choice("NL", "Kwazulu-Natal"),
+                Choice("LP", "Limpopo"),
+                Choice("MP", "Mpumalanga"),
+                Choice("NC", "Northern Cape"),
+                Choice("NW", "North-West"),
+                Choice("WC", "Western Cape"),
+                Choice("skip", "Skip question"),
+            ],
+            next="state_location_area_type_endline",
+            error=self._(get_generic_error()),
+        )
+
+    async def state_location_area_type_endline(self):
+        question = "*What type of area are you living in?*"
+
+        return WhatsAppListState(
+            self,
+            question=question,
+            button="Area type",
+            choices=[
+                Choice("traditional", "Traditional/chiefdom"),
+                Choice("urban", "Urban/town"),
+                Choice("farm", "Farm/rural"),
+                Choice("dont_understand", "I don't understand"),
+            ],
+            next="state_submit_terms_and_conditions_endline",
+            error=self._(get_generic_error()),
         )
 
     async def state_submit_terms_and_conditions_endline(self):

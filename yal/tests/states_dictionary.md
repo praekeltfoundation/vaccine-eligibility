@@ -254,6 +254,8 @@
 | state_survey_validation                        |        TRUE        |     Text     |            TRUE           | endline survey catch all validation |
 | state_household_number_of_people               |        TRUE        |     Text     |            TRUE           | Endline number of peopleing living in househould |
 | state_household_number_of_people_eight_or_more |        TRUE        |     Text     |            TRUE           | Endline number of peopleing living in househould if more than 8 people |
+| state_location_province_endline                |        TRUE        |     Text     |            TRUE           | Endline user province |
+| state_location_area_type_endline               |        TRUE        |     Text     |            TRUE           | Endline user area type |
 | state_notification_no_submit                   |        FALSE       |              |                           | Updates opted_in with False |
 | state_notification_yes_submit                  |        FALSE       |              |                           | Updates opted_in with True |
 | state_notification_yes_submit_done             |        TRUE        |     Text     |            TRUE           | Displays success message and asks user what they want to do next |
