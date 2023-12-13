@@ -134,9 +134,7 @@ async def test_state_submit_terms_and_conditions_accept(
 async def test_state_household_number_of_people(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_household_number_of_people")
     await tester.user_input("2")
-    # message = "\n".join(["◼️◽️◽️◽️", "-----", "", "*I'm my own boss.* 😎"])
 
-    # tester.assert_message(message)
     tester.assert_state("state_location_province_endline")
 
 
@@ -165,9 +163,7 @@ async def test_state_household_number_of_people_eight_or_more(
 ):
     tester.setup_state("state_household_number_of_people_eight_or_more")
     await tester.user_input("5")
-    # message = "\n".join(["◼️◽️◽️◽️", "-----", "", "*I'm my own boss.* 😎"])
 
-    # tester.assert_message(message)
     tester.assert_state("state_location_province_endline")
 
 
