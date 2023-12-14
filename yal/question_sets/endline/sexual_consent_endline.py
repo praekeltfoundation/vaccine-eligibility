@@ -114,7 +114,7 @@ ASSESSMENT_QUESTIONS = {
                     [
                         "*Do you mind telling us what has most",
                         " influenced your attitudes about sexual",
-                        " relationships and interactions? * ",
+                        " relationships and interactions?*",
                     ]
                 ),
                 "next": None,
