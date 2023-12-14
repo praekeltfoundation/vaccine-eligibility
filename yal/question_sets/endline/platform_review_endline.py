@@ -246,7 +246,7 @@ ASSESSMENT_QUESTIONS = {
                 ),
                 "options": [
                     ("yes_got_help", "Yes, and got help"),
-                    ("yes_got_no_help", "Yes, but wasn't helpful"),
+                    ("yes_got_no_help", "Yes, wasn't helpful"),
                     ("no_too_far", "No, too far away"),
                     ("no_not_relevant", "No, not relevant"),
                     ("no_other_reason", "No, other reasons"),
@@ -281,9 +281,10 @@ ASSESSMENT_QUESTIONS = {
                 ),
                 "options": [
                     ("yes_got_help", "Yes, and I got help"),
-                    ("yes_no_help", "Yes, didn't help"),
+                    ("yes_no_help", "Yes, didn't get help"),
                     ("yes_never_used", "Yes, never used it"),
                     ("no", "No, didn't know that"),
+                    ("no_need", "No, didn't need it"),
                     ("dont_understand", "I don't understand"),
                     ("skip_question", "Skip question"),
                 ],
