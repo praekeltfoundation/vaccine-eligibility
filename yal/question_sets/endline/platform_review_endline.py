@@ -284,8 +284,9 @@ ASSESSMENT_QUESTIONS = {
                     ("yes_no_help", "Yes, didn't get help"),
                     ("yes_never_used", "Yes, never used it"),
                     ("no", "No, didn't know that"),
-                    ("no_need", "No, didn’t need it")
-                    ("dont_understand", "I don't understand"),
+                    ("no_need", "No, didn’t need it")(
+                        "dont_understand", "I don't understand"
+                    ),
                     ("skip_question", "Skip question"),
                 ],
                 "next": "endline_12_q10b_platform_review",
