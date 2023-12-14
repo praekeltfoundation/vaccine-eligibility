@@ -673,26 +673,40 @@
 | state_self_esteem_endline_risk | TRUE | Text | The risk rating for Self Esteem |
 | state_self_esteem_endline_score | TRUE | Text | The score for Self Esteem |
 
+### Endline Self esteem assessment
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| endline_2_q1_self_esteem | TRUE | Text | TRUE | How do you feel about the following statements |
+| endline_2_q2_self_esteem | TRUE | Text | TRUE | I feel that I have a number of good qualities |
+| endline_2_q3_self_esteem | TRUE | Text | TRUE | All in all, I am inclined to feel that I am |
+| endline_2_q4_self_esteem | TRUE | Text | TRUE | I am able to do things as well as most other people |
+| endline_2_q5_self_esteem | TRUE | Text | TRUE | *I feel I do not have much to be proud o |
+| endline_2_q6_self_esteem | TRUE | Text | TRUE | I take a positive attitude toward myself. |
+| endline_2_q7_self_esteem | TRUE | Text | TRUE | On the whole, I am satisfied with myself |
+| endline_2_q8_self_esteem | TRUE | Text | TRUE | I wish I could have more respect for myself |
+| endline_2_q9_self_esteem | TRUE | Text | TRUE | I certainly feel useless at times. |
+| endline_2_q10_self_esteem | TRUE | Text | TRUE | At times I think I am no good at all |
+
 ### Endline Connectedness assessment
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
-| endline_2_q1_connectedness | TRUE | Text | Do you have someone to talk to when you have a worry or problem? |
+| endline_3_q1_connectedness | TRUE | Text | Do you have someone to talk to when you have a worry or problem? |
 | state_connectedness_endline_risk | TRUE | Text | The risk rating for Connectedness |
 | state_connectedness_endline_score | TRUE | Text | The score for Connectedness |
 
 ### Endline Body Image assessment
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
-| endline_3_q1_body_image | TRUE | Text | I feel good about myself. |
-| endline_3_q2_body_image | TRUE | Text | I feel good about my body. |
+| endline_4_q1_body_image | TRUE | Text | I feel good about myself. |
+| endline_4_q2_body_image | TRUE | Text | I feel good about my body. |
 | state_body_image_endline_risk | TRUE | Text | The risk rating for Body Image |
 | state_body_image_endline_score | TRUE | Text | The score for Body Image |
 
 ### Endline Depression assessment
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
-| endline_4_q1_depression | TRUE | Text | Feeling down, depressed or hopeless |
-| endline_4_q2_depression | TRUE | Text | Little interest or pleasure in doing things |
+| endline_6_q1_depression | TRUE | Text | Feeling down, depressed or hopeless |
+| endline_6_q2_depression | TRUE | Text | Little interest or pleasure in doing things |
 | state_depression_endline_risk | TRUE | Text | The risk rating for Depression |
 | state_depression_endline_score | TRUE | Text | The score for Depression |
 
@@ -713,27 +727,53 @@
 ### Endline Self Perceived Healthcare assessment
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
-| endline_6_q1_self_perceived_healthcare | TRUE | Text | How good a job do you feel you are doing in taking care of your health? |
-| endline_6_q2_self_perceived_healthcare | TRUE | Text | In the past 7 days, how many days did you go hungry? |
-| endline_6_q3_self_perceived_healthcare | TRUE | Text | When you have a health need do you go to your closest clinic? |
+| endline_7_q1_self_perceived_healthcare | TRUE | Text | How good a job do you feel you are doing in taking care of your health? |
+| endline_7_q2_self_perceived_healthcare | TRUE | Text | In the past 7 days, how many days did you go hungry? |
+| endline_7_q3_self_perceived_healthcare | TRUE | Text | When you have a health need do you go to your closest clinic? |
 | state_self_perceived_healthcare_endline_risk | TRUE | Text | The risk rating for Self Perceived Healthcare |
 | state_self_perceived_healthcare_endline_score | TRUE | Text | The score for Self Perceived Healthcare |
+
+### Endline sexual health literacy
+| state_name | accepts_user_input | data_type | description |
+| ---------- | ------------------ | --------- | ----------- |
+| endline_8_q1_sexual_health_lit | TRUE | Text | TRUE | Is the following statement true or false? |
+| endline_8_q2_sexual_health_lit | TRUE | Text | TRUE | Is the following statement true or false? |
+| endline_8_q3_sexual_health_lit | TRUE | Text | TRUE | How do you feel about the following statements? |
+| endline_8_q4_sexual_health_lit | TRUE | Text | TRUE | My sexual needs or desires are important |
+| endline_8_q5_sexual_health_lit | TRUE | Text | TRUE | I think it would be important to focus on my own pleasure |
+| endline_8_q6_sexual_health_lit | TRUE | Text | TRUE | I expect to enjoy sex. |
+| endline_8_q7_sexual_health_lit | TRUE | Text | TRUE | The last time you had sex, did you or your partner |
+| endline_8_q8_sexual_health_lit | TRUE | Text | TRUE | Did you use a condom last time you had penetrative sex |
+| endline_8_q9_sexual_health_lit | TRUE | Text | TRUE | What's been the MAIN way you or your partner have |
+| endline_8_q10A_sexual_health_lit | TRUE | Text | TRUE | How many sexual partners did you have over the last |
+| endline_8_q10B_sexual_health_lit | TRUE | Text | TRUE | Please tell me how many sexual partners you had |
+| endline_8_q11_sexual_health_lit | TRUE | Text | TRUE | Have you ever been tested for STIs or HIV |
+| endline_8_q12_sexual_health_lit | TRUE | Text | TRUE | Over the past 5 months, do you think that your |
+| endline_8_q13B_sexual_health_lit | TRUE | Text | TRUE | Do you mind telling us what has most influenced |
+| endline_8_q13_sexual_health_lit | TRUE | Text | TRUE | Which of these has most influenced your knowledge about |
+| endline_8_q14_sexual_health_lit | TRUE | Text | TRUE | Are you planning to have a child within the next year |
+| endline_8_q15_sexual_health_lit | TRUE | Text | TRUE | Do you now plan to use condoms more consistently |
+| endline_8_q16_sexual_health_lit | TRUE | Text | TRUE | Do you now plan to go for STI or HIV tests more often |
+| endline_8_q17B_sexual_health_lit | TRUE | Text | TRUE | Do you mind telling us what has most influenced |
+| endline_8_q17_sexual_health_lit | TRUE | Text | TRUE | Which of these has most influenced your plans to use |
 
 ### Endline Gender Attitude assessment
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
-| endline_8_q1_gender_attitude | TRUE | Text | There are times when a woman deserves to be beaten |
-| endline_8_q2_gender_attitude | TRUE | Text | It’s a woman’s responsibility to avoid getting pregnant. |
-| endline_8_q3_gender_attitude | TRUE | Text | A man and a woman should decide together what type of contraceptive to use. |
-| endline_8_q4_gender_attitude | TRUE | Text | If a guy gets a women pregnant, the child is responsibility of both. |
+| endline_9_q1_gender_attitude | TRUE | Text | TRUE | How do you feel about each of the following statements |
+| endline_9_q2_gender_attitude | TRUE | Text | TRUE | It’s a woman’s responsibility to avoid getting pregnant |
+| endline_9_q3_gender_attitude | TRUE | Text | TRUE | A man and a woman should decide together what type |
+| endline_9_q4_gender_attitude | TRUE | Text | TRUE | If a guy gets a women pregnant, the child is |
 | state_gender_attitude_endline_risk | TRUE | Text | The risk rating for Gender Attitude |
 | state_gender_attitude_endline_score | TRUE | Text | The score for Gender Attitude |
 
 ### Endline Sexual Consent assessment
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
-| endline_9_q1_sexual_consent | TRUE | Text | Robert has the right to force Samantha to have sex. |
-| endline_9_q2_sexual_consent | TRUE | Text | If you're in a relationship, which of these statements describes you best? |
+| endline_10_q1_sexual_consent | TRUE | Text | TRUE | Robert and Samantha have been dating for 5 years and |
+| endline_10_q2_sexual_consent | TRUE | Text | TRUE | If you're in a relationship, which of these statements |
+| endline_10_q3B_sexual_consent | TRUE | Text | TRUE | Do you mind telling us what has most |
+| endline_10_q3_sexual_consent | TRUE | Text | TRUE | If you're in a relationship, which of these statements |
 | state_sexual_consent_endline_risk | TRUE | Text | The risk rating for Sexual Consent |
 | state_sexual_consent_endline_score | TRUE | Text | The score for Sexual Consent |
 
@@ -751,15 +791,23 @@
 ### Endline Platform Review assessment
 | state_name | accepts_user_input | data_type | description |
 | ---------- | ------------------ | --------- | ----------- |
-| endline_12_q1_platfor_review | TRUE | Text | Did BWise send you content that related to your sexual needs? |
-| endline_12_q2_platfor_review | TRUE | Text | For the content that BWise sent you that related to your needs, was the content that BWise sent you interesting? |
-| endline_12_q3_platfor_review | TRUE | Text | How useful did you find the information the BWise sent you for managing your sexual health and relationship needs? |
-| endline_12_q4_platfor_review | TRUE | Text | HDid you know BWise is on Facebook and, if so, have you ever visited? |
-| endline_12_q5_platfor_review | TRUE | Text | Since joining BWise, have you ever felt like you needed to see a medical service about your mental or sexual health? |
-| endline_12_q6_platfor_review | TRUE | Text | Did you know you can use BWise WA to find a clinic for you based on your needs? |
-| endline_12_q7_platfor_review | TRUE | Text | Did you ever go to one of the services that BWise recommended? |
-| endline_12_q8_platfor_review | TRUE | Text | Since joining BWise, have you ever felt like you needed to speak to a counsellor about your mental or sexual health? |
-| endline_12_q9_platfor_review | TRUE | Text | Did you know you can request a callback from a LoveLife counsellor through the B-Wise WhatsApp chatbot? |
+| endline_12_q1_platform_review | TRUE | Text | Did BWise send you content that related to your sexual needs? |
+| endline_12_q2_platform_review | TRUE | Text | For the content that BWise sent you that related to your needs, was the content that BWise sent you interesting? |
+| endline_12_q3_platform_review | TRUE | Text | How useful did you find the information the BWise sent you for managing your sexual health and relationship needs? |
+| endline_12_q4_platform_review | TRUE | Text | HDid you know BWise is on Facebook and, if so, have you ever visited? |
+| endline_12_q5_platform_review | TRUE | Text | Since joining BWise, have you ever felt like you needed to see a medical service about your mental or sexual health? |
+| endline_12_q6_platform_review | TRUE | Text | Did you know you can use BWise WA to find a clinic for you based on your needs? |
+| endline_12_q6a_platform_review | TRUE | Text | TRUE | How many times have you visited a clinic or other health |
+| endline_12_q6c_platform_review | TRUE | Text | TRUE | Was there a reason you didn’t go to the clinic or other |
+| endline_12_q6d_platform_review | TRUE | Text | TRUE | When you visited the clinic or other health facility |
+| endline_12_q6e_platform_review | TRUE | Text | TRUE | Do you think that your time on BWise has changed |
+| endline_12_q7_platform_review | TRUE | Text | Did you ever go to one of the services that BWise recommended? |
+| endline_12_q8_platform_review | TRUE | Text | Since joining BWise, have you ever felt like you needed to speak to a counsellor about your mental or sexual health? |
+| endline_12_q9_platform_review | TRUE | Text | Did you know you can request a callback from a LoveLife counsellor through the B-Wise WhatsApp chatbot? |
+| endline_12_q10_platform_review | TRUE | Text | TRUE | Did you know you can request a callback from a LoveLife |
+| endline_12_q10b_platform_review | TRUE | Text | TRUE | Other than using LoveLife, have you visited another mental |
+| endline_12_q10c_platform_review | TRUE | Text | TRUE | Do you think that your time on BWise has changed how likely |
+| endline_12_q10d_platform_review | TRUE | Text | TRUE | What was the main reason you didn't speak to a counsellor |
 
 
 ## EJAF Location Survey
