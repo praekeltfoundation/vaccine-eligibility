@@ -734,8 +734,8 @@
 | state_self_perceived_healthcare_endline_score | TRUE | Text | The score for Self Perceived Healthcare |
 
 ### Endline sexual health literacy
-| state_name | accepts_user_input | data_type | description |
-| ---------- | ------------------ | --------- | ----------- |
+| state_name | accepts_user_input | data_type | added_to_flow_results_app | description |
+| ---------- | ------------------ | --------- | ------------------------- | ----------- |
 | endline_8_q1_sexual_health_lit | TRUE | Text | TRUE | Is the following statement true or false? |
 | endline_8_q2_sexual_health_lit | TRUE | Text | TRUE | Is the following statement true or false? |
 | endline_8_q3_sexual_health_lit | TRUE | Text | TRUE | How do you feel about the following statements? |
@@ -758,8 +758,8 @@
 | endline_8_q17_sexual_health_lit | TRUE | Text | TRUE | Which of these has most influenced your plans to use |
 
 ### Endline Gender Attitude assessment
-| state_name | accepts_user_input | data_type | description |
-| ---------- | ------------------ | --------- | ----------- |
+| state_name | accepts_user_input | data_type | added_to_flow_results_app | description |
+| ---------- | ------------------ | --------- | ------------------------- | ----------- |
 | endline_9_q1_gender_attitude | TRUE | Text | TRUE | How do you feel about each of the following statements |
 | endline_9_q2_gender_attitude | TRUE | Text | TRUE | It’s a woman’s responsibility to avoid getting pregnant |
 | endline_9_q3_gender_attitude | TRUE | Text | TRUE | A man and a woman should decide together what type |
@@ -768,8 +768,8 @@
 | state_gender_attitude_endline_score | TRUE | Text | The score for Gender Attitude |
 
 ### Endline Sexual Consent assessment
-| state_name | accepts_user_input | data_type | description |
-| ---------- | ------------------ | --------- | ----------- |
+| state_name | accepts_user_input | data_type | added_to_flow_results_app | description |
+| ---------- | ------------------ | --------- | ------------------------- | ----------- |
 | endline_10_q1_sexual_consent | TRUE | Text | TRUE | Robert and Samantha have been dating for 5 years and |
 | endline_10_q2_sexual_consent | TRUE | Text | TRUE | If you're in a relationship, which of these statements |
 | endline_10_q3B_sexual_consent | TRUE | Text | TRUE | Do you mind telling us what has most |
