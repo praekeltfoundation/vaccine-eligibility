@@ -71,14 +71,15 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Did you know BWise is on Facebook and, if so, "
-                        "have you ever visited?*",
+                        "*Did you know BWise is on Facebook and, if so, have you ever "
+                        "visited their page?*",
                     ]
                 ),
                 "options": [
                     ("yes_weekly", "Yes, every week"),
                     ("yes_monthly", "Yes, every month"),
                     ("yes_no_much", "Yes, not that much"),
+                    ("yes_never_user", "Yes, never used it"),
                     ("no", "No, didn't know that"),
                     ("dont_understand", "I don't understand"),
                     ("skip_question", "Skip question"),
@@ -107,13 +108,112 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Since joining BWise, have you ever felt like you needed "
-                        "to see a medical service about your mental or sexual health?*",
+                        "*Since joining BWise, have you ever felt like you needed to "
+                        "visit a health facility about your mental or sexual health?*",
                     ]
                 ),
                 "options": [
                     ("yes", "Yes"),
                     ("no", "No"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip_question", "Skip question"),
+                ],
+                "next": {
+                    "yes": "endline_12_q6a_platform_review",
+                    "no": "endline_12_q6e_platform_review",
+                    "dont_understand": "endline_12_q6e_platform_review",
+                    "skip_question": "endline_12_q6e_platform_review",
+                },
+            },
+            "endline_12_q6a_platform_review": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*How many times have you visited a clinic or other health "
+                        "facility for your sexual health since joining BWise? (We "
+                        "know it may be hard to remember, we'd appreciate your best "
+                        "guess)*"
+                    ]
+                ),
+                "options": [
+                    ("none", "None"),
+                    ("1", "1 time"),
+                    ("2", "2 times"),
+                    ("3", "3 times"),
+                    ("4", "4 times"),
+                    ("5", "5 times"),
+                    ("6", "6 times"),
+                    ("7", "7 times"),
+                    ("8_or_more", "8 or more"),
+                    ("skip_question", "Skip question"),
+                ],
+                "next": {
+                    "none": "endline_12_q6c_platform_review",
+                    "1": "endline_12_q6d_platform_review",
+                    "2": "endline_12_q6d_platform_review",
+                    "3": "endline_12_q6d_platform_review",
+                    "4": "endline_12_q6d_platform_review",
+                    "5": "endline_12_q6d_platform_review",
+                    "6": "endline_12_q6d_platform_review",
+                    "7": "endline_12_q6d_platform_review",
+                    "8_or_more": "endline_12_q6d_platform_review",
+                    "skip_question": "endline_12_q6e_platform_review",
+                },
+            },
+            "endline_12_q6c_platform_review": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*Was there a reason you didn’t go to the clinic or other "
+                        "health facility?*"
+                    ]
+                ),
+                "options": [
+                    ("where", "Didn't know where"),
+                    ("time", "Didn't have time"),
+                    ("money", "Didn't have money "),
+                    ("judgement", "Fear of judgement"),
+                    ("bad_service", "Fear of bad service"),
+                    ("elsewhere", "Got help elsewhere"),
+                    ("no_need", "No longer needed"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip_question", "Skip question"),
+                ],
+                "next": "endline_12_q6e_platform_review",
+            },
+            "endline_12_q6d_platform_review": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*When you visited the clinic or other health facility, what "
+                        "was the outcome? (If you had different experiences, please "
+                        "pick the response that was true most of the time).*"
+                    ]
+                ),
+                "options": [
+                    ("treated", "Helped, got treated"),
+                    ("no_result", "Helped, no result"),
+                    ("not_seen", "Visited, not seen"),
+                    ("dont_understand", "I don't understand "),
+                    ("skip_question", "Skip question"),
+                ],
+                "next": "endline_12_q6e_platform_review",
+            },
+            "endline_12_q6e_platform_review": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*Do you think that your time on BWise has changed how likely "
+                        "you are to visit a clinic or health facility for your sexual "
+                        "and mental health?*"
+                    ]
+                ),
+                "options": [
+                    ("a_lot", "A lot more likely"),
+                    ("little_more", "Little more likely"),
+                    ("no_change", "No change"),
+                    ("little_less", "Little less likely"),
+                    ("lot_less", "A lot less likely"),
                     ("dont_understand", "I don't understand"),
                     ("skip_question", "Skip question"),
                 ],
@@ -175,9 +275,8 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Did you know you can request a callback from a "
-                        "LoveLife counsellor "
-                        "through the B-Wise WhatsApp chatbot?*"
+                        "*Did you know you can request a callback from a LoveLife "
+                        "counsellor through the BWise WhatsApp chatbot?*"
                     ]
                 ),
                 "options": [
@@ -188,7 +287,83 @@ ASSESSMENT_QUESTIONS = {
                     ("dont_understand", "I don't understand"),
                     ("skip_question", "Skip question"),
                 ],
+                "next": "endline_12_q10b_platform_review",
+            },
+            "endline_12_q10b_platform_review": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*Other than using LoveLife, have you visited another mental "
+                        "or sexual health counselor (since joining BWise) and if so, "
+                        "how many times? (We know it may be hard to remember, we'd "
+                        "appreciate your best guess)*"
+                    ]
+                ),
+                "options": [
+                    ("none", "None"),
+                    ("1", "1 time"),
+                    ("2", "2 times"),
+                    ("3", "3 times"),
+                    ("4", "4 times"),
+                    ("5", "5 times"),
+                    ("6_or_more", "6 or more"),
+                    ("none_but_needed", "None but needed to"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip_question", "Skip question"),
+                ],
+                "next": {
+                    "none": "endline_12_q10c_platform_review",
+                    "1": "endline_12_q10c_platform_review",
+                    "2": "endline_12_q10c_platform_review",
+                    "3": "endline_12_q10c_platform_review",
+                    "4": "endline_12_q10c_platform_review",
+                    "5": "endline_12_q10c_platform_review",
+                    "6_or_more": "endline_12_q10c_platform_review",
+                    "none_but_needed": "endline_12_q10d_platform_review",
+                    "dont_understand": "endline_12_q10c_platform_review",
+                    "skip_question": "endline_12_q10c_platform_review",
+                },
+            },
+            "endline_12_q10c_platform_review": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*Do you think that your time on BWise has changed how likely "
+                        "you are to speak to a counsellor about your mental or sexual "
+                        "health?*"
+                    ]
+                ),
+                "options": [
+                    ("a_lot", "A lot more likely"),
+                    ("little_more", "Little more likely"),
+                    ("no_change", "No change"),
+                    ("little_less", "Little less likely"),
+                    ("lot_less", "A lot less likely"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip_question", "Skip question"),
+                ],
                 "next": None,
+            },
+            "endline_12_q10d_platform_review": {
+                "type": "list",
+                "text": "\n".join(
+                    [
+                        "*What was the main reason you didn't speak to a counsellor "
+                        "about your mental or sexual health?*"
+                    ]
+                ),
+                "options": [
+                    ("where", "Didn't know where"),
+                    ("time", "Didn't have time"),
+                    ("money", "Didn't have money "),
+                    ("judgement", "Fear of judgement"),
+                    ("bad_service", "Fear of bad service"),
+                    ("elsewhere", "Got help elsewhere"),
+                    ("no_need", "No longer needed"),
+                    ("dont_understand", "I don't understand"),
+                    ("skip_question", "Skip question"),
+                ],
+                "next": "endline_12_q10c_platform_review",
             },
         },
     },

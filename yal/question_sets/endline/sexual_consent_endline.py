@@ -83,13 +83,14 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*Which of these has most influenced your attitudes "
-                        "about sexual relationships and interactions?*",
+                        "*Which of these has most influenced your attitudes about "
+                        "sexual relationships and interactions?*",
                     ]
                 ),
                 "options": [
                     ("social_media", "Web / social media"),
-                    ("bwise_facebook", "B-Wise / facebook "),
+                    ("bwise_whatsapp", "BWise WhatsApp"),
+                    ("bwise_facebook", "BWise facebook page"),
                     ("friends_partner", "Friends / partner"),
                     ("school_university", "School / university"),
                     ("health_facility", "Health facility"),
@@ -99,6 +100,7 @@ ASSESSMENT_QUESTIONS = {
                 "next": {
                     "other": "endline_10_q3B_sexual_consent",
                     "social_media": None,
+                    "bwise_whatsapp": None,
                     "bwise_facebook": None,
                     "friends_partner": None,
                     "school_university": None,

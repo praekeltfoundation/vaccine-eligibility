@@ -173,6 +173,7 @@ class Application(BaseApplication):
             Choice("R51201_R102 400", self._("R51 201 - R102 400")),
             Choice("R102401_R204 800", self._("R102 401 - R204 800")),
             Choice("R204801_or_more", self._("R204 801 or more")),
+            Choice("not_say", self._("Rather not say")),
             Choice("skip_question", self._("Skip question")),
         ]
 
