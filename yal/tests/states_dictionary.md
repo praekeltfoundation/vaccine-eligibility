@@ -674,8 +674,8 @@
 | state_self_esteem_endline_score | TRUE | Text | The score for Self Esteem |
 
 ### Endline Self esteem assessment
-| state_name | accepts_user_input | data_type | description |
-| ---------- | ------------------ | --------- | ----------- |
+| state_name | accepts_user_input | data_type | added_to_flow_results_app | description |
+| ---------- | ------------------ | --------- | ------------------------- | ----------- |
 | endline_2_q1_self_esteem | TRUE | Text | TRUE | How do you feel about the following statements |
 | endline_2_q2_self_esteem | TRUE | Text | TRUE | I feel that I have a number of good qualities |
 | endline_2_q3_self_esteem | TRUE | Text | TRUE | All in all, I am inclined to feel that I am |
@@ -764,8 +764,8 @@
 | endline_9_q2_gender_attitude | TRUE | Text | TRUE | It’s a woman’s responsibility to avoid getting pregnant |
 | endline_9_q3_gender_attitude | TRUE | Text | TRUE | A man and a woman should decide together what type |
 | endline_9_q4_gender_attitude | TRUE | Text | TRUE | If a guy gets a women pregnant, the child is |
-| state_gender_attitude_endline_risk | TRUE | Text | The risk rating for Gender Attitude |
-| state_gender_attitude_endline_score | TRUE | Text | The score for Gender Attitude |
+| state_gender_attitude_endline_risk | TRUE | Text | TRUE | The risk rating for Gender Attitude |
+| state_gender_attitude_endline_score | TRUE | Text | TRUE | The score for Gender Attitude |
 
 ### Endline Sexual Consent assessment
 | state_name | accepts_user_input | data_type | added_to_flow_results_app | description |
@@ -774,8 +774,8 @@
 | endline_10_q2_sexual_consent | TRUE | Text | TRUE | If you're in a relationship, which of these statements |
 | endline_10_q3B_sexual_consent | TRUE | Text | TRUE | Do you mind telling us what has most |
 | endline_10_q3_sexual_consent | TRUE | Text | TRUE | If you're in a relationship, which of these statements |
-| state_sexual_consent_endline_risk | TRUE | Text | The risk rating for Sexual Consent |
-| state_sexual_consent_endline_score | TRUE | Text | The score for Sexual Consent |
+| state_sexual_consent_endline_risk | TRUE | Text | TRUE | The risk rating for Sexual Consent |
+| state_sexual_consent_endline_score | TRUE | Text | TRUE | The score for Sexual Consent |
 
 ### Endline Alcohol assessment
 | state_name | accepts_user_input | data_type | description |
@@ -789,21 +789,21 @@
 
 
 ### Endline Platform Review assessment
-| state_name | accepts_user_input | data_type | description |
-| ---------- | ------------------ | --------- | ----------- |
-| endline_12_q1_platform_review | TRUE | Text | Did BWise send you content that related to your sexual needs? |
-| endline_12_q2_platform_review | TRUE | Text | For the content that BWise sent you that related to your needs, was the content that BWise sent you interesting? |
-| endline_12_q3_platform_review | TRUE | Text | How useful did you find the information the BWise sent you for managing your sexual health and relationship needs? |
-| endline_12_q4_platform_review | TRUE | Text | HDid you know BWise is on Facebook and, if so, have you ever visited? |
-| endline_12_q5_platform_review | TRUE | Text | Since joining BWise, have you ever felt like you needed to see a medical service about your mental or sexual health? |
-| endline_12_q6_platform_review | TRUE | Text | Did you know you can use BWise WA to find a clinic for you based on your needs? |
+| state_name | accepts_user_input | data_type | added_to_flow_results_app | description |
+| ---------- | ------------------ | --------- | ------------------------- | ----------- |
+| endline_12_q1_platform_review | TRUE | Text | TRUE | Did BWise send you content that related to your sexual needs? |
+| endline_12_q2_platform_review | TRUE | Text | TRUE | For the content that BWise sent you that related to your needs, was the content that BWise sent you interesting? |
+| endline_12_q3_platform_review | TRUE | Text | TRUE | How useful did you find the information the BWise sent you for managing your sexual health and relationship needs? |
+| endline_12_q4_platform_review | TRUE | Text | TRUE | HDid you know BWise is on Facebook and, if so, have you ever visited? |
+| endline_12_q5_platform_review | TRUE | Text | TRUE | Since joining BWise, have you ever felt like you needed to see a medical service about your mental or sexual health? |
+| endline_12_q6_platform_review | TRUE | Text | TRUE | Did you know you can use BWise WA to find a clinic for you based on your needs? |
 | endline_12_q6a_platform_review | TRUE | Text | TRUE | How many times have you visited a clinic or other health |
 | endline_12_q6c_platform_review | TRUE | Text | TRUE | Was there a reason you didn’t go to the clinic or other |
 | endline_12_q6d_platform_review | TRUE | Text | TRUE | When you visited the clinic or other health facility |
 | endline_12_q6e_platform_review | TRUE | Text | TRUE | Do you think that your time on BWise has changed |
-| endline_12_q7_platform_review | TRUE | Text | Did you ever go to one of the services that BWise recommended? |
-| endline_12_q8_platform_review | TRUE | Text | Since joining BWise, have you ever felt like you needed to speak to a counsellor about your mental or sexual health? |
-| endline_12_q9_platform_review | TRUE | Text | Did you know you can request a callback from a LoveLife counsellor through the B-Wise WhatsApp chatbot? |
+| endline_12_q7_platform_review | TRUE | Text | TRUE | Did you ever go to one of the services that BWise recommended? |
+| endline_12_q8_platform_review | TRUE | Text | TRUE | Since joining BWise, have you ever felt like you needed to speak to a counsellor about your mental or sexual health? |
+| endline_12_q9_platform_review | TRUE | Text | TRUE | Did you know you can request a callback from a LoveLife counsellor through the B-Wise WhatsApp chatbot? |
 | endline_12_q10_platform_review | TRUE | Text | TRUE | Did you know you can request a callback from a LoveLife |
 | endline_12_q10b_platform_review | TRUE | Text | TRUE | Other than using LoveLife, have you visited another mental |
 | endline_12_q10c_platform_review | TRUE | Text | TRUE | Do you think that your time on BWise has changed how likely |
