@@ -112,8 +112,8 @@ ASSESSMENT_QUESTIONS = {
                 "type": "text",
                 "text": "\n".join(
                     [
-                        "*Do you mind telling us what has most",
-                        " influenced your attitudes about sexual",
+                        "*Do you mind telling us what has most"
+                        " influenced your attitudes about sexual"
                         " relationships and interactions?*",
                     ]
                 ),
