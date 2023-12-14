@@ -132,9 +132,6 @@ def test_all_states_added_to_docs():
 
     difference = existing_states.difference(documented_states)
 
-    for state in sorted(difference):
-        print(state)
-
     assert (
         len(difference) == 0
     ), f"{len(difference)} states are not documented. List: {difference}"
