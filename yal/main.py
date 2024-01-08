@@ -20,6 +20,7 @@ from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.surveys.baseline import Application as BaselineSurveyApplication
 from yal.surveys.endline import Application as EndlineSurveyApplication
+from yal.surveys.facebook_invite import Application as FacebookInviteApplication
 from yal.surveys.location import Application as LocationSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
@@ -97,6 +98,10 @@ EJAF_LOCATION_SURVEY_KEYWORDS = {
     "start survey",
     "i m not interested",
 }
+FACEBOOK_INVITE_KEYWORDS = {
+    "yes take part",
+    "no thanks",
+}
 
 
 class Application(
@@ -119,6 +124,7 @@ class Application(
     EndlineSurveyApplication,
     EndlineTermsApplication,
     LocationSurveyApplication,
+    FacebookInviteApplication,
 ):
     START_STATE = "state_start"
 
@@ -296,6 +302,26 @@ class Application(
                     self.state_name = LocationSurveyApplication.NOT_INTERESTED_STATE
                 else:
                     self.state_name = LocationSurveyApplication.START_STATE
+            elif (
+                keyword in FACEBOOK_INVITE_KEYWORDS
+                and self.user.metadata.get("facebook_survey_invite_status") == "sent"
+            ):
+                self.user.session_id = None
+                invite_state = "responded_no"
+                if keyword == "no thanks":
+                    self.state_name = FacebookInviteApplication.NOT_INTERESTED_STATE
+                else:
+                    self.state_name = FacebookInviteApplication.START_STATE
+                    invite_state = "responded_yes"
+
+                data = {
+                    "facebook_survey_invite_status": invite_state,
+                }
+                error = await rapidpro.update_profile(
+                    whatsapp_id, data, self.user.metadata
+                )
+                if error:
+                    self.state_name = self.ERROR_STATE
 
         except Exception:
             logger.exception("Application error")

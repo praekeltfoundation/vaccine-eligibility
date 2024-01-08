@@ -24,3 +24,11 @@ SEGMENT_AIRTIME_FLOW_UUID = environ.get("SEGMENT_AIRTIME_FLOW_UUID")
 QA_OVERRIDE_CURRENT_TIMESTAMP = environ.get("QA_OVERRIDE_CURRENT_TIMESTAMP", None)
 STUDY_CONSENT_FORM_PDF = environ.get("STUDY_CONSENT_FORM_PDF", "1/sample.pdf")
 LOCATION_STUDY_GROUP_LIMIT = int(environ.get("LOCATION_STUDY_GROUP_LIMIT", "430"))
+FACEBOOK_SURVEY_INVITE_MEMBERS_URL = environ.get(
+    "FACEBOOK_SURVEY_INVITE_MEMBERS_URL",
+    "https://docs.google.com/forms/d/e/1FAIpQLScjbZEbIjQXMDdHbJTUCjxYnbRVP4D2p6kXQy74tXrIN6Qwww/viewform?usp=sf_link",  # noqa: E501
+)
+FACEBOOK_SURVEY_INVITE_SEEN_FEED_URL = environ.get(
+    "FACEBOOK_SURVEY_INVITE_SEEN_FEED_URL",
+    "https://docs.google.com/forms/d/e/1FAIpQLSe_YlROLiezkGFbdcK7HBA99ABrWvUcvZ20azvAEpQKHwr6kw/viewform?usp=sf_link",  # noqa: E501
+)
