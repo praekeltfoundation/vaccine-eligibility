@@ -829,3 +829,14 @@
 | state_location_decline | FALSE | text | Tells users there are no consequences for not joining study
 | state_location_update_invalid_province | FALSE | text | Updates the ejaf_location_survey_status contact field on rapidpro
 | state_location_invalid_province | FALSE | text | Tells them they are not eligible for the survey
+
+
+## Facebook Survey Invite
+| state_name                    | accepts_user_input | data_type | added_to_flow_results_app | description                                                     |
+| ----------------------------- | ------------------ | --------- | ------------------------- | ----------------------------------------------------------------|
+| state_facebook_member         | TRUE               | Text      | TRUE                      | Asks user if they've been a member of the bwise facebook group. |
+| state_was_a_member            | FALSE              |           |                           | Shows user the relavant survey link                             |
+| state_not_a_member            | TRUE               | Text      | TRUE                      | Asks user if they've seen a bwise post in their FB feed         |
+| state_fb_feed_seen            | FALSE              |           |                           | Shows user the relavant survey link                             |
+| state_fb_feed_not_seen        | FALSE              |           |                           | Tells user they're not eligible                                 |
+| state_facebook_invite_decline | FALSE              |           |                           | Confirmation message                                            |

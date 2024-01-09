@@ -25,6 +25,7 @@ from yal.servicefinder import Application as ServiceFinderApplication
 from yal.servicefinder_feedback_survey import ServiceFinderFeedbackSurveyApplication
 from yal.surveys.baseline import Application as BaselineSurveyApplication
 from yal.surveys.endline import Application as EndlineSurveyApplication
+from yal.surveys.facebook_invite import Application as FacebookInviteApplication
 from yal.surveys.location import Application as LocationSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.tests.test_mainmenu import build_message_detail
@@ -55,6 +56,7 @@ def get_state_sets():
     )
     bs_states = set(s for s in dir(BaselineSurveyApplication) if s.startswith("state_"))
     es_states = set(s for s in dir(EndlineSurveyApplication) if s.startswith("state_"))
+    fi_states = set(s for s in dir(FacebookInviteApplication) if s.startswith("state_"))
     ls_states = set(s for s in dir(LocationSurveyApplication) if s.startswith("state_"))
     ss_states = set(s for s in dir(SegmentSurveyApplication) if s.startswith("state_"))
     wa_fb_states = set(
@@ -78,6 +80,7 @@ def get_state_sets():
         sf_s_states,
         bs_states,
         es_states,
+        fi_states,
         ls_states,
         ss_states,
         wa_fb_states,
