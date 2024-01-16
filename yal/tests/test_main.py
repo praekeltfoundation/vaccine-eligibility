@@ -515,46 +515,12 @@ async def test_assessment_reminder_keywords(
 
 
 @pytest.mark.asyncio
-async def test_endline_catch_all(
-    tester: AppTester, rapidpro_mock, contentrepo_api_mock
-):
-    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
-    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
-    rapidpro_mock.tstate.contact_fields["assessment_reminder_sent"] = True
-    rapidpro_mock.tstate.contact_fields["endline_survey_started"] = "Pending"
-
-    await tester.user_input("this is giberish")
-    tester.assert_state("state_survey_validation")
-
-
-@pytest.mark.asyncio
-async def test_survey_stop(tester: AppTester, rapidpro_mock, contentrepo_api_mock):
-    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
-    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
-    rapidpro_mock.tstate.contact_fields["assessment_reminder_sent"] = True
-    rapidpro_mock.tstate.contact_fields["endline_survey_started"] = "Pending"
-
-    await tester.user_input("stop")
-    tester.assert_state("state_optout")
-
-
-@pytest.mark.asyncio
 async def test_terms_accepted(tester: AppTester, rapidpro_mock, contentrepo_api_mock):
 
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
 
     await tester.user_input("hi")
     tester.assert_state("state_persona_name")
-
-
-@pytest.mark.asyncio
-async def test_endline_terms_accepted(
-    tester: AppTester, rapidpro_mock, contentrepo_api_mock
-):
-    rapidpro_mock.tstate.contact_fields["endline_terms_accepted"] = True
-
-    await tester.user_input("hi")
-    tester.assert_state("state_survey_question")
 
 
 @pytest.mark.asyncio
@@ -895,55 +861,6 @@ async def test_state_self_perceived_healthcare_assessment_later(
         ]
     )
     tester.assert_message(message)
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.rapidpro.get_group_membership_count")
-async def test_endline_survey_start_keywords(
-    get_group_membership_count, tester: AppTester, rapidpro_mock, contentrepo_api_mock
-):
-    get_group_membership_count.return_value = False, 100
-
-    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
-    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
-    rapidpro_mock.tstate.contact_fields["baseline_survey_completed"] = True
-    rapidpro_mock.tstate.contact_fields["endline_survey_completed"] = False
-
-    await tester.user_input("answer")
-    tester.assert_state("state_start_terms")
-
-
-@pytest.mark.asyncio
-async def test_endline_remind_me_tomorrow_keywords(
-    tester: AppTester, rapidpro_mock, contentrepo_api_mock
-):
-    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
-    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
-    rapidpro_mock.tstate.contact_fields["baseline_survey_completed"] = True
-    rapidpro_mock.tstate.contact_fields["endline_survey_completed"] = False
-
-    await tester.user_input("remind me tomorrow")
-    tester.assert_state("state_remind_tomorrow")
-
-
-@pytest.mark.asyncio
-async def test_endline_survey_not_interested_keywords(
-    tester: AppTester, rapidpro_mock, contentrepo_api_mock
-):
-    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
-    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
-    rapidpro_mock.tstate.contact_fields["baseline_survey_completed"] = True
-    rapidpro_mock.tstate.contact_fields["endline_survey_completed"] = False
-
-    await tester.user_input("I'm not interested")
-    tester.assert_state("state_not_interested")
-
-    tester.assert_metadata("endline_survey_started", "not_interested")
-
-    request = rapidpro_mock.tstate.requests[1]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {"endline_survey_started": "not_interested"}
-    }
 
 
 @pytest.mark.asyncio
@@ -1568,116 +1485,4 @@ async def test_whatsapp_user_reactivate(tester: AppTester, rapidpro_mock):
     request = rapidpro_mock.tstate.requests[1]
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"whatsapp_delivery_failed": "False"}
-    }
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.assessments.get_current_datetime")
-async def test_survey_invite_remind_me_tomorrow(
-    get_current_datetime, tester: AppTester, rapidpro_mock
-):
-    get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
-
-    tester.user.metadata["terms_accepted"] = True
-    tester.user.metadata["onboarding_completed"] = True
-    tester.user.metadata["baseline_survey_completed"] = True
-    tester.user.metadata["endline_survey_started"] = "Pending"
-
-    await tester.user_input("remind me tomorrow")
-
-    tester.assert_metadata("assessment_reminder", "2022-06-19T17:30:00")
-    tester.assert_metadata("assessment_reminder_type", "endline later 23hours")
-    tester.assert_metadata("assessment_reminder_hours", "23hours")
-
-    request = rapidpro_mock.tstate.requests[1]
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "assessment_reminder": "2022-06-19T17:30:00",
-            "assessment_reminder_sent": "",
-            "assessment_reminder_type": "endline later 23hours",
-        }
-    }
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.rapidpro.get_group_membership_count")
-async def test_state_endline_limit_reached(
-    get_group_membership_count, tester: AppTester, rapidpro_mock
-):
-    get_group_membership_count.return_value = False, 250
-
-    tester.user.metadata["baseline_survey_completed"] = True
-    tester.user.metadata["endline_survey_started"] = "Pending"
-    tester.user.metadata["terms_accepted"] = True
-    tester.user.metadata["onboarding_completed"] = True
-
-    await tester.user_input("Yes, I want to answer")
-    tester.assert_state("state_endline_limit_reached")
-
-    tester.assert_message(
-        "\n".join(
-            [
-                "Eish! It looks like you just missed the cut off for our survey. "
-                "No worries, we get it, life happens!",
-                "",
-                "Stay tuned for more survey opportunities. We appreciate your "
-                "enthusiasm and hope you can catch the next one.",
-                "",
-                "Go ahead and browse the menu or ask us a question.",
-            ]
-        )
-    )
-
-
-@pytest.mark.asyncio
-async def test_state_endline_limit_reached_menu(tester: AppTester, rapidpro_mock):
-    tester.setup_state("state_endline_limit_reached")
-
-    await tester.user_input("1")
-
-    tester.assert_state("state_mainmenu")
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.askaquestion.config")
-async def test_state_endline_limit_reached_aaq(
-    mock_config, tester: AppTester, rapidpro_mock
-):
-    mock_config.AAQ_URL = "http://aaq-test.com"
-    tester.setup_state("state_endline_limit_reached")
-
-    await tester.user_input("Ask a question")
-
-    tester.assert_state("state_aaq_start")
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.rapidpro.get_group_membership_count")
-async def test_state_endline_limit_reached_pending_menu(
-    get_group_membership_count, tester: AppTester, rapidpro_mock
-):
-    get_group_membership_count.return_value = False, 250
-
-    tester.user.metadata["baseline_survey_completed"] = True
-    tester.user.metadata["endline_survey_started"] = "Pending"
-    tester.user.metadata["terms_accepted"] = True
-    tester.user.metadata["onboarding_completed"] = True
-
-    await tester.user_input("Yes, I want to answer")
-    tester.assert_state("state_endline_limit_reached")
-
-    tester.assert_metadata("endline_survey_started", "limit_reached")
-    tester.assert_metadata("assessment_reminder", "")
-    tester.assert_metadata("assessment_reminder_sent", "")
-    tester.assert_metadata("assessment_reminder_type", "")
-
-    request = rapidpro_mock.tstate.requests[4]
-
-    assert json.loads(request.body.decode("utf-8")) == {
-        "fields": {
-            "endline_survey_started": "limit_reached",
-            "assessment_reminder": "",
-            "assessment_reminder_sent": "",
-            "assessment_reminder_type": "",
-        }
     }
