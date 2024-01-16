@@ -8,7 +8,7 @@ from vaccine.models import Message, StateData, User
 from vaccine.testing import AppTester, TState, run_sanic
 from yal import config
 from yal.main import Application
-from yal.utils import GENERIC_ERROR_OPTIONS, GENERIC_ERRORS, replace_persona_fields
+from yal.utils import GENERIC_ERRORS, replace_persona_fields
 
 
 @pytest.fixture
@@ -106,129 +106,6 @@ async def rapidpro_mock():
         server.tstate = tstate
         yield server
         config.RAPIDPRO_URL = url
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.rapidpro.get_group_membership_count")
-async def test_endline_invitation_i_want_to_answer(
-    get_group_membership_count, tester: AppTester, rapidpro_mock
-):
-
-    get_group_membership_count.return_value = False, 100
-
-    tester.user.metadata["baseline_survey_completed"] = True
-    tester.user.metadata["endline_survey_started"] = "Pending"
-    tester.user.metadata["terms_accepted"] = True
-    tester.user.metadata["onboarding_completed"] = True
-
-    await tester.user_input("Yes, I want to answer")
-
-    tester.assert_state("state_start_terms")
-
-
-@pytest.mark.asyncio
-async def test_endline_invitation_remind_me_tomorrow(
-    tester: AppTester,
-    rapidpro_mock,
-):
-    user = User(
-        addr="278201234567",
-        state=StateData(),
-        session_id=1,
-        metadata={
-            "baseline_survey_completed": True,
-            "endline_survey_started": "Pending",
-        },
-    )
-    app = Application(user)
-    msg = Message(
-        content="Remind me tomorrow",
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-
-    [reply] = await app.process_message(msg)
-
-    assert user.state.name == "state_remind_tomorrow"
-
-
-@pytest.mark.asyncio
-async def test_endline_invitation_not_interested(
-    tester: AppTester,
-    rapidpro_mock,
-):
-    user = User(
-        addr="278201234567",
-        state=StateData(),
-        session_id=1,
-        metadata={
-            "baseline_survey_completed": True,
-            "endline_survey_started": "Pending",
-        },
-    )
-    app = Application(user)
-    msg = Message(
-        content="I'm not interested",
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-
-    [reply] = await app.process_message(msg)
-
-    assert user.state.name == "state_not_interested"
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.rapidpro.get_group_membership_count")
-async def test_endline_invitation_answer(
-    get_group_membership_count, tester: AppTester, rapidpro_mock
-):
-
-    get_group_membership_count.return_value = False, 100
-
-    tester.user.metadata["baseline_survey_completed"] = True
-    tester.user.metadata["endline_survey_started"] = "Pending"
-    tester.user.metadata["terms_accepted"] = True
-    tester.user.metadata["onboarding_completed"] = True
-
-    await tester.user_input("Yes, I want to answer")
-
-    tester.assert_state("state_start_terms")
-
-
-@pytest.mark.asyncio
-async def test_endline_survey_validation(tester: AppTester, rapidpro_mock):
-
-    user = User(
-        addr="278201234567",
-        state=StateData(),
-        session_id=1,
-        metadata={
-            "baseline_survey_completed": True,
-            "endline_survey_started": "Pending",
-        },
-    )
-    app = Application(user)
-    msg = Message(
-        content="this is wrong input",
-        to_addr="27820001002",
-        from_addr="27820001003",
-        transport_name="whatsapp",
-        transport_type=Message.TRANSPORT_TYPE.HTTP_API,
-    )
-
-    [reply] = await app.process_message(msg)
-
-    assert user.state.name == "state_survey_validation"
-    error_content = reply.content
-    if "Umm.." in error_content:
-        error_content = error_content.replace("🤖", "[persona_emoji]")
-
-    assert error_content in GENERIC_ERROR_OPTIONS
 
 
 @pytest.mark.asyncio
@@ -1288,25 +1165,6 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
     )
 
     tester.assert_message(message)
-
-
-@pytest.mark.asyncio
-@mock.patch("yal.rapidpro.get_group_membership_count")
-async def test_endline_agree_terms_and_condition(
-    get_group_membership_count, tester: AppTester, rapidpro_mock
-):
-    get_group_membership_count.return_value = False, 100
-    tester.user.metadata["baseline_survey_completed"] = True
-    tester.user.metadata["endline_survey_started"] = "Pending"
-    tester.user.metadata["terms_accepted"] = True
-    tester.user.metadata["onboarding_completed"] = True
-
-    await tester.user_input("Yes, I want to answer")
-    tester.assert_state("state_start_terms")
-    tester.assert_metadata("endline_survey_started", "True")
-
-    await tester.user_input("Yes, I agree")
-    tester.assert_state("state_accept_consent")
 
 
 @pytest.mark.asyncio

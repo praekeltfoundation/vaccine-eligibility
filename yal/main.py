@@ -88,12 +88,6 @@ FEEDBACK_KEYWORDS = {"feedback"}
 QA_RESET_FEEDBACK_TIMESTAMP_KEYWORDS = {"resetfeedbacktimestampobzvmp"}
 EMERGENCY_KEYWORDS = utils.get_keywords("emergency")
 AAQ_KEYWORDS = {"ask a question"}
-EJAF_ENDLINE_SURVEY_KEYWORDS = {
-    "answer",
-    "yes i want to answer",
-    "remind me tomorrow",
-    "i m not interested",
-}
 EJAF_LOCATION_SURVEY_KEYWORDS = {
     "start survey",
     "i m not interested",
@@ -143,14 +137,6 @@ class Application(
 
             keyword = utils.clean_inbound(message.content)
 
-            baseline_survey_completed = self.user.metadata.get(
-                "baseline_survey_completed"
-            )
-            endline_survey_completed = self.user.metadata.get(
-                "endline_survey_completed"
-            )
-
-            endline_survey_started = self.user.metadata.get("endline_survey_started")
             feedback_state = await self.get_feedback_state()
             payload = utils.get_by_path(
                 message.transport_metadata, "message", "button", "payload"
@@ -225,47 +211,6 @@ class Application(
                 self.user.session_id = None
                 self.state_name = AssessmentApplication.REMINDER_STATE
 
-            elif (
-                keyword in EJAF_ENDLINE_SURVEY_KEYWORDS
-                and baseline_survey_completed
-                and not endline_survey_completed
-            ):
-                self.save_metadata("assessment_reminder_sent", False)
-                self.save_metadata("assessment_reminder_name", "")
-                self.user.session_id = None
-
-                if keyword == "remind me tomorrow":
-                    self.state_name = AssessmentApplication.REMINDER_STATE
-                elif keyword == "i m not interested":
-                    self.state_name = AssessmentApplication.NOT_INTERESTED_STATE
-                else:
-                    endline_study_max_participant_count = (
-                        await rapidpro.get_global_value(
-                            "endline_study_max_participant_count"
-                        )
-                    )
-
-                    error, group_count = await rapidpro.get_group_membership_count(
-                        group_name="Endline Survey Completed"
-                    )
-                    if error:
-                        self.state_name = self.ERROR_STATE
-                    elif group_count >= int(endline_study_max_participant_count):
-                        self.state_name = (
-                            EndlineTermsApplication.ENDLINE_LIMIT_REACHED_STATE
-                        )
-                    else:
-                        self.state_name = EndlineTermsApplication.START_STATE
-
-                        data = {
-                            "endline_survey_started": "True",
-                        }
-                        error = await rapidpro.update_profile(
-                            whatsapp_id, data, self.user.metadata
-                        )
-                        if error:
-                            self.state_name = self.ERROR_STATE
-
             # Fields that RapidPro sets after a feedback push message
             elif feedback_state:
                 if not self.user.session_id:
@@ -287,12 +232,6 @@ class Application(
                 self.save_metadata("push_related_page_id", payload.split("_")[-1])
                 self.state_name = "state_prep_push_msg_related_page"
 
-            elif (
-                endline_survey_started == "Pending"
-                and keyword not in EJAF_ENDLINE_SURVEY_KEYWORDS
-            ):
-                self.user.session_id = None
-                self.state_name = EndlineSurveyApplication.SURVEY_VALIDATION_STATE
             elif (
                 keyword in EJAF_LOCATION_SURVEY_KEYWORDS
                 and self.user.metadata.get("ejaf_location_survey_status") == "pending"
@@ -363,7 +302,6 @@ class Application(
     async def state_start(self):
         terms_accepted = self.user.metadata.get("terms_accepted")
         onboarding_completed = self.user.metadata.get("onboarding_completed")
-        endline_terms_accepted = self.user.metadata.get("endline_terms_accepted")
 
         inbound = utils.clean_inbound(self.inbound.content)
 
@@ -389,8 +327,6 @@ class Application(
                 return await self.go_to_state(MainMenuApplication.START_STATE)
             elif terms_accepted:
                 return await self.go_to_state(OnboardingApplication.START_STATE)
-            elif endline_terms_accepted:
-                return await self.go_to_state(EndlineSurveyApplication.START_STATE)
             else:
                 return await self.go_to_state(TermsApplication.START_STATE)
 
