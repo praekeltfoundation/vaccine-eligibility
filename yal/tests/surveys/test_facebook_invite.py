@@ -1,4 +1,5 @@
 import json
+from unittest import mock
 
 import pytest
 from sanic import Sanic, response
@@ -40,6 +41,27 @@ async def rapidpro_mock():
             status=200,
         )
 
+    @app.route("/api/v2/globals.json", methods=["GET"])
+    def get_global_value(request):
+        tstate.requests.append(request)
+        assert request.args.get("key") == "facebook_survey_status"
+
+        return response.json(
+            {
+                "next": None,
+                "previous": None,
+                "results": [
+                    {
+                        "key": "Facebook Survey Status",
+                        "name": "facebook_survey_status",
+                        "value": tstate.globals["facebook_survey_status"],
+                        "modified_on": "2023-05-30T07:34:06.216776Z",
+                    }
+                ],
+            },
+            status=200,
+        )
+
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
@@ -49,11 +71,36 @@ async def rapidpro_mock():
         config.RAPIDPRO_URL = url
 
 
+@pytest.fixture
+async def contentrepo_api_mock():
+    Sanic.test_mode = True
+    app = Sanic("contentrepo_api_mock")
+    tstate = TState()
+
+    @app.route("/api/v2/pages", methods=["GET"])
+    def get_main_menu(request):
+        tstate.requests.append(request)
+        return response.json(
+            {
+                "count": 0,
+                "results": [],
+            }
+        )
+
+    async with run_sanic(app) as server:
+        url = config.CONTENTREPO_API_URL
+        config.CONTENTREPO_API_URL = f"http://{server.host}:{server.port}"
+        server.tstate = tstate
+        yield server
+        config.CONTENTREPO_API_URL = url
+
+
 @pytest.mark.asyncio
 async def test_facebook_invite_yes(tester: AppTester, rapidpro_mock):
     rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
     rapidpro_mock.tstate.contact_fields["facebook_survey_invite_status"] = "sent"
+    rapidpro_mock.tstate.globals["facebook_survey_status"] = "active"
 
     await tester.user_input("Yes, take part")
     tester.assert_state("state_facebook_member")
@@ -61,6 +108,39 @@ async def test_facebook_invite_yes(tester: AppTester, rapidpro_mock):
     tester.assert_message(
         "Great! Before we get started, have you been a member of the B-Wise Facebook "
         "page since before June 2023?"
+    )
+
+    request = rapidpro_mock.tstate.requests[1]
+
+    assert json.loads(request.body.decode("utf-8")) == {
+        "fields": {
+            "facebook_survey_invite_status": "responded_yes",
+        }
+    }
+
+
+@pytest.mark.asyncio
+async def test_facebook_invite_yes_study_inactive(tester: AppTester, rapidpro_mock):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
+    rapidpro_mock.tstate.contact_fields["facebook_survey_invite_status"] = "sent"
+    rapidpro_mock.tstate.globals["facebook_survey_status"] = "inactive"
+
+    await tester.user_input("Yes, take part")
+    tester.assert_state("state_facebook_study_not_active")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "Eish! It looks like you just missed the cut off for our survey. "
+                "No worries, we get it, life happens!",
+                "",
+                "Stay tuned for more survey opportunities. We appreciate your "
+                "enthusiasm and hope you can catch the next one.",
+                "",
+                "Go ahead and browse the menu or ask us a question.",
+            ]
+        )
     )
 
     request = rapidpro_mock.tstate.requests[1]
@@ -124,8 +204,9 @@ async def test_facebook_invite_not_invited(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
-async def test_state_facebook_member_yes(tester: AppTester):
+async def test_state_facebook_member_yes_active(tester: AppTester, rapidpro_mock):
     tester.setup_state("state_facebook_member")
+    rapidpro_mock.tstate.globals["facebook_survey_status"] = "active"
 
     await tester.user_input("Yes")
 
@@ -144,6 +225,18 @@ async def test_state_facebook_member_yes(tester: AppTester):
             ]
         )
     )
+
+
+@pytest.mark.asyncio
+async def test_state_facebook_member_yes_survey_b_only(
+    tester: AppTester, rapidpro_mock
+):
+    tester.setup_state("state_facebook_member")
+    rapidpro_mock.tstate.globals["facebook_survey_status"] = "study_b_only"
+
+    await tester.user_input("Yes")
+
+    tester.assert_state("state_facebook_study_not_active")
 
 
 @pytest.mark.asyncio
@@ -201,3 +294,25 @@ async def test_state_not_a_member_no(tester: AppTester):
             ]
         )
     )
+
+
+@pytest.mark.asyncio
+async def test_state_facebook_study_not_active_menu(
+    tester: AppTester, contentrepo_api_mock
+):
+    tester.setup_state("state_facebook_study_not_active")
+
+    await tester.user_input("Go to the menu")
+
+    tester.assert_state("state_mainmenu")
+
+
+@pytest.mark.asyncio
+@mock.patch("yal.askaquestion.config")
+async def test_state_facebook_study_not_active_aaq(mock_config, tester: AppTester):
+    mock_config.AAQ_URL = "http://aaq-test.com"
+    tester.setup_state("state_facebook_study_not_active")
+
+    await tester.user_input("Ask a question")
+
+    tester.assert_state("state_aaq_start")
