@@ -1,18 +1,26 @@
 from vaccine.base_application import BaseApplication
 from vaccine.states import Choice, EndState, WhatsAppButtonState
-from yal import config
+from yal import config, rapidpro
 from yal.utils import get_generic_error
 
 
 class Application(BaseApplication):
-    START_STATE = "state_facebook_member"
+    START_STATE = "state_check_study_active"
     NOT_INTERESTED_STATE = "state_facebook_invite_decline"
+
+    async def state_check_study_active(self):
+        status = await rapidpro.get_global_value("facebook_survey_status")
+
+        if status == "inactive":
+            return await self.go_to_state("state_facebook_study_not_active")
+
+        return await self.go_to_state("state_facebook_member")
 
     async def state_facebook_member(self):
         async def _next(choice: Choice):
             if choice.value == "no":
                 return "state_not_a_member"
-            return "state_was_a_member"
+            return "state_check_survey_active"
 
         return WhatsAppButtonState(
             self,
@@ -27,6 +35,14 @@ class Application(BaseApplication):
             next=_next,
             error=self._(get_generic_error()),
         )
+
+    async def state_check_survey_active(self):
+        status = await rapidpro.get_global_value("facebook_survey_status")
+
+        if status == "study_b_only":
+            return await self.go_to_state("state_facebook_study_not_active")
+
+        return await self.go_to_state("state_was_a_member")
 
     async def state_was_a_member(self):
         return EndState(
@@ -114,4 +130,35 @@ class Application(BaseApplication):
                 )
             ),
             next=self.START_STATE,
+        )
+
+    async def state_facebook_study_not_active(self):
+        choices = [
+            Choice("menu", "Go to the menu"),
+            Choice("aaq", "Ask a question"),
+        ]
+
+        question = self._(
+            "\n".join(
+                [
+                    "Eish! It looks like you just missed the cut off for our survey. "
+                    "No worries, we get it, life happens!",
+                    "",
+                    "Stay tuned for more survey opportunities. We appreciate your "
+                    "enthusiasm and hope you can catch the next one.",
+                    "",
+                    "Go ahead and browse the menu or ask us a question.",
+                ]
+            )
+        )
+
+        return WhatsAppButtonState(
+            self,
+            question=question,
+            choices=choices,
+            error=self._(get_generic_error()),
+            next={
+                "menu": "state_pre_mainmenu",
+                "aaq": "state_aaq_start",
+            },
         )
