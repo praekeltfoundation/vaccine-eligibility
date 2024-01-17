@@ -226,8 +226,11 @@ async def test_state_facebook_member_yes_active(tester: AppTester, rapidpro_mock
         )
     )
 
+
 @pytest.mark.asyncio
-async def test_state_facebook_member_yes_survey_b_only(tester: AppTester, rapidpro_mock):
+async def test_state_facebook_member_yes_survey_b_only(
+    tester: AppTester, rapidpro_mock
+):
     tester.setup_state("state_facebook_member")
     rapidpro_mock.tstate.globals["facebook_survey_status"] = "study_b_only"
 
