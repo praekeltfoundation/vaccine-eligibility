@@ -682,10 +682,7 @@ async def test_state_update_bot_emoji_no_emoji(tester: AppTester, rapidpro_mock)
 
 @pytest.mark.asyncio
 async def test_state_update_location_confirm(tester: AppTester, google_api_mock):
-    print(">>> start")
-    print(tester.user.metadata)
     tester.setup_state("state_update_location")
-    print(tester.user.metadata)
 
     await tester.user_input(
         "test location",
@@ -693,7 +690,6 @@ async def test_state_update_location_confirm(tester: AppTester, google_api_mock)
             "message": {"location": {"longitude": 12.34, "latitude": 56.78}}
         },
     )
-    print(tester.user.metadata)
     tester.assert_state("state_update_location_confirm")
 
     tester.assert_metadata("new_latitude", 56.78)
