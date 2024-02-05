@@ -324,17 +324,24 @@ class Application(BaseApplication):
 
     async def state_update_location(self):
         async def store_location_coords(content):
+            logger.debug(">>> store_location_coords")
             if not self.inbound:
+                logger.debug("no inbound")
                 return
             if content and content.lower() == "skip":
+                logger.debug("skipped")
                 return
             loc = self.inbound.transport_metadata.get("message", {}).get("location", {})
             latitude = loc.get("latitude")
             longitude = loc.get("longitude")
+
+            logger.debug(f"{latitude},{longitude}")
             if isinstance(latitude, float) and isinstance(longitude, float):
                 self.save_metadata("new_latitude", latitude)
                 self.save_metadata("new_longitude", longitude)
+                logger.debug("location saved to metadata")
             else:
+                logger.debug("location error")
                 raise ErrorMessage(
                     "\n".join(
                         [
@@ -379,12 +386,16 @@ class Application(BaseApplication):
         )
 
     async def state_get_updated_description_from_coords(self):
+        logger.debug(">>> state_get_updated_description_from_coords")
         if self.user.answers["state_update_location"].lower() == "skip":
+            logger.debug("location skipped")
             return await self.go_to_state("state_display_preferences")
 
         metadata = self.user.metadata
         latitude = metadata.get("latitude")
         longitude = metadata.get("longitude")
+
+        logger.debug(f"{latitude},{longitude}")
 
         async with get_google_api() as session:
             if latitude and longitude:
@@ -405,7 +416,10 @@ class Application(BaseApplication):
                         response.raise_for_status()
                         data = await response.json()
 
+                        logger.debug(data)
+
                         if data["status"] != "OK":
+                            logger.debug("not ok")
                             return await self.go_to_state("state_error")
 
                         first_result = data["results"][0]
@@ -419,6 +433,7 @@ class Application(BaseApplication):
                     except HTTP_EXCEPTIONS as e:
                         if i == 2:
                             logger.exception(e)
+                            logger.debug("http exception")
                             return await self.go_to_state("state_error")
                         else:
                             continue
