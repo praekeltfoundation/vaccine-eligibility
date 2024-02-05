@@ -23,6 +23,7 @@ from yal.utils import (
 )
 from yal.validators import age_validator
 
+logging.basicConfig(level=config.LOG_LEVEL.upper())
 logger = logging.getLogger(__name__)
 
 
