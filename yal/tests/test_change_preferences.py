@@ -1,4 +1,5 @@
 import json
+from urllib import parse
 
 import pytest
 from sanic import Sanic, response
@@ -681,7 +682,10 @@ async def test_state_update_bot_emoji_no_emoji(tester: AppTester, rapidpro_mock)
 
 @pytest.mark.asyncio
 async def test_state_update_location_confirm(tester: AppTester, google_api_mock):
+    print(">>> start")
+    print(tester.user.metadata)
     tester.setup_state("state_update_location")
+    print(tester.user.metadata)
 
     await tester.user_input(
         "test location",
@@ -689,6 +693,7 @@ async def test_state_update_location_confirm(tester: AppTester, google_api_mock)
             "message": {"location": {"longitude": 12.34, "latitude": 56.78}}
         },
     )
+    print(tester.user.metadata)
     tester.assert_state("state_update_location_confirm")
 
     tester.assert_metadata("new_latitude", 56.78)
@@ -701,6 +706,10 @@ async def test_state_update_location_confirm(tester: AppTester, google_api_mock)
     assert [r.path for r in google_api_mock.tstate.requests] == [
         "/maps/api/geocode/json"
     ]
+
+    request = google_api_mock.tstate.requests[0]
+    params = dict(parse.parse_qsl(parse.urlsplit(request.url).query))
+    assert params["latlng"] == "56.78,12.34"
 
     tester.assert_num_messages(1)
     tester.assert_message(
