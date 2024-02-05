@@ -393,8 +393,8 @@ class Application(BaseApplication):
             return await self.go_to_state("state_display_preferences")
 
         metadata = self.user.metadata
-        latitude = metadata.get("latitude")
-        longitude = metadata.get("longitude")
+        latitude = metadata.get("new_latitude")
+        longitude = metadata.get("new_longitude")
 
         logger.debug(f"{latitude},{longitude}")
 

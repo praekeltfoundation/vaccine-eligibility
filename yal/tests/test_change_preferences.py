@@ -1,4 +1,5 @@
 import json
+from urllib import parse
 
 import pytest
 from sanic import Sanic, response
@@ -701,6 +702,10 @@ async def test_state_update_location_confirm(tester: AppTester, google_api_mock)
     assert [r.path for r in google_api_mock.tstate.requests] == [
         "/maps/api/geocode/json"
     ]
+
+    request = google_api_mock.tstate.requests[0]
+    params = dict(parse.parse_qsl(parse.urlsplit(request.url).query))
+    assert params["latlng"] == "56.78,12.34"
 
     tester.assert_num_messages(1)
     tester.assert_message(
