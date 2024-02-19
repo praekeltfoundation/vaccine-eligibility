@@ -5,6 +5,7 @@ from typing import List, Optional, Tuple
 from urllib.parse import urljoin
 
 import aiohttp
+import pkg_resources
 from aiohttp_client_cache import CacheBackend, CachedSession
 
 from vaccine import real411_config as config
@@ -522,7 +523,10 @@ class Application(BaseApplication):
         ) as session:
             for file, file_url in zip(files, file_urls):
                 if file["name"] == "placeholder":
-                    with open("vaccine/data/real411_placeholder.png", "rb") as f:
+                    filename = pkg_resources.resource_filename(
+                        "vaccine", "data/real411_placeholder.png"
+                    )
+                    with open(filename, "rb") as f:
                         file_data = f.read()
                 else:
                     file_data = await get_whatsapp_media(file["name"])
