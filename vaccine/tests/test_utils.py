@@ -62,8 +62,9 @@ class DisplayPhoneNumberTests(TestCase):
 
 class CountriesTests(TestCase):
     def test_search_united_states(self):
-        assert Countries().search_for_country("united states")[0][0] == "UM"
-        assert Countries().search_for_country("united states")[1][0] == "US"
+        assert Countries().search_for_country("united states")[0][0] == "VI"
+        assert Countries().search_for_country("united states")[1][0] == "UM"
+        assert Countries().search_for_country("united states")[2][0] == "US"
 
     def test_search_ireland(self):
         assert Countries().search_for_country("ireland")[0][0] == "IE"

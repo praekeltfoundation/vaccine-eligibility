@@ -259,8 +259,8 @@ async def test_passport_country_search(tester: AppTester):
                 "",
                 "REPLY with a NUMBER from the list below:",
                 "1. Republic of Côte d'Ivoire",
-                "2. British Indian Ocean Territory",
-                "3. Plurinational State of Bolivia",
+                "2. Mayotte",
+                "3. Republic of the Congo",
                 "4. Other",
             ]
         )
@@ -603,16 +603,22 @@ async def test_municipality(evds_mock, tester: AppTester):
                 "",
                 "Please confirm the MUNICIPALITY for the suburb you have given:",
                 "",
-                "1. Buffalo City",
-                "2. Enoch Mgijima",
-                "3. Great Kei",
-                "4. King Sabata Dalindyebo",
-                "5. Nelson Mandela Bay",
-                "6. Raymond Mhlaba",
-                "7. Umzimvubu",
-                "8. Mbizana",
-                "9. Mnquma",
-                "10. Other",
+                "1. Great Kei",
+                "2. King Sabata Dalindyebo",
+                "3. Matatiele",
+                "4. Mbhashe",
+                "5. Mbizana",
+                "6. Amahlathi",
+                "7. Buffalo City",
+                "8. Engcobo",
+                "9. Enoch Mgijima",
+                "10. Nelson Mandela Bay",
+                "11. Ngquza Hill",
+                "12. Raymond Mhlaba",
+                "13. Umzimvubu",
+                "14. Mhlontlo",
+                "15. Nyandeni",
+                "16. Other",
             ]
         )
     )
@@ -784,8 +790,8 @@ async def test_medical_aid_list_1(evds_mock, tester: AppTester):
                 "the list below:",
                 "",
                 "1. Discovery Health Medical Scheme",
-                "2. Aeci Medical Aid Society",
-                "3. BMW Employees Medical Aid Society",
+                "2. Government Employees Medical Scheme (GEMS)",
+                "3. Rhodes University Medical Scheme",
                 "4. None of these",
             ]
         )
@@ -806,8 +812,8 @@ async def test_medical_aid_list_2(evds_mock, tester: AppTester):
                 "the list below:",
                 "",
                 "1. Tsogo Sun Group Medical Scheme",
-                "2. Golden Arrows Employees Medical Benefit Fund",
-                "3. Engen Medical Benefit Fund",
+                "2. Engen Medical Benefit Fund",
+                "3. Food Workers Medical Benefit Fund",
                 "4. None of these",
             ]
         )
@@ -829,7 +835,7 @@ async def test_medical_aid_list_3(evds_mock, tester: AppTester):
                 "",
                 "1. De Beers Benefit Society",
                 "2. BMW Employees Medical Aid Society",
-                "3. Government Employees Medical Scheme (GEMS)",
+                "3. Golden Arrows Employees Medical Benefit Fund",
                 "4. None of these",
             ]
         )

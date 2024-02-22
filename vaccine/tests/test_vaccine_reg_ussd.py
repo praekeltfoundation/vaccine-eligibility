@@ -368,8 +368,8 @@ async def test_passport_country_search():
         [
             "Please choose the best match for your COUNTRY of origin:",
             "1. Republic of Côte d'Ivoire",
-            "2. British Indian Ocean Territ",
-            "3. Plurinational State of Boli",
+            "2. Mayotte",
+            "3. Republic of the Congo",
             "4. Other",
         ]
     )
@@ -924,13 +924,15 @@ async def test_municipality(evds_mock):
     assert reply.content == "\n".join(
         [
             "Please select your municipality",
-            "1. Buffalo City",
-            "2. Enoch Mgijima",
-            "3. Great Kei",
-            "4. King Sabata Dalindyebo",
-            "5. Nelson Mandela Bay",
-            "6. Raymond Mhlaba",
-            "7. Other",
+            "1. Great Kei",
+            "2. King Sabata Dalindyebo",
+            "3. Matatiele",
+            "4. Mbhashe",
+            "5. Mbizana",
+            "6. Amahlathi",
+            "7. Buffalo City",
+            "8. Engcobo",
+            "9. Other",
         ]
     )
     assert u.state.name == "state_municipality"
@@ -946,7 +948,7 @@ async def test_suburb_with_municipality(evds_mock):
     )
     app = Application(u)
     msg = Message(
-        content="Raymond Mhlaba",
+        content="Matatiele",
         to_addr="27820001002",
         from_addr="27820001001",
         transport_name="whatsapp",
@@ -957,7 +959,7 @@ async def test_suburb_with_municipality(evds_mock):
     assert reply.content == "\n".join(
         [
             "Please choose the best match for your location:",
-            "1. Mandela Park, Balfour",
+            "1. Matandela, Matandela",
             "2. Other",
         ]
     )
