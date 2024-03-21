@@ -546,9 +546,9 @@ async def test_assessment_complete(tester: AppTester, rapidpro_mock):
     """
     Start pushmessage optin flow after assessment
     """
-    tester.user.metadata[
-        "assessment_end_state"
-    ] = "state_locus_of_control_assessment_end"
+    tester.user.metadata["assessment_end_state"] = (
+        "state_locus_of_control_assessment_end"
+    )
     tester.user.metadata["assessment_section"] = 2
     tester.setup_state("state_survey_question")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)

@@ -111,9 +111,11 @@ class Message:
             if f in kw:
                 raise TypeError(f"{f} my not be overridden")
         fields = {
-            "session_event": Message.SESSION_EVENT.NONE
-            if continue_session
-            else Message.SESSION_EVENT.CLOSE,
+            "session_event": (
+                Message.SESSION_EVENT.NONE
+                if continue_session
+                else Message.SESSION_EVENT.CLOSE
+            ),
             "to_addr": self.from_addr,
             "from_addr": self.to_addr,
             "group": self.group,
