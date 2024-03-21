@@ -128,9 +128,7 @@ class Application(BaseApplication):
 
         return FreeText(
             self,
-            question="\n".join(
-                ["◼️◼️◼️◻️◻️", "", "How old are you? (Reply with a number)"]
-            ),
+            question="\n".join(["◼️◼️◼️◻️◻️", "", "How old are you? (Reply with a number)"]),
             next="state_location",
             check=check_age,
         )

@@ -755,9 +755,9 @@ async def test_state_update_location_confirm_incorrect(
 async def test_state_update_location_submit(tester: AppTester, rapidpro_mock):
     tester.user.metadata["new_latitude"] = 56.78
     tester.user.metadata["new_longitude"] = 12.34
-    tester.user.metadata[
-        "new_location_description"
-    ] = "277 Bedford Avenue, Brooklyn, NY"
+    tester.user.metadata["new_location_description"] = (
+        "277 Bedford Avenue, Brooklyn, NY"
+    )
     tester.setup_state("state_update_location_confirm")
 
     await tester.user_input("yes")

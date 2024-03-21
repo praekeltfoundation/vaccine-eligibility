@@ -20,9 +20,9 @@ def tester():
 def get_rapidpro_contact(urn):
     return {
         "fields": {
-            "feedback_type": "ask_a_question"
-            if ("27820001001" in urn)
-            else "ask_a_question_2",
+            "feedback_type": (
+                "ask_a_question" if ("27820001001" in urn) else "ask_a_question_2"
+            ),
             "feedback_sent": "TRUE",
         },
     }
