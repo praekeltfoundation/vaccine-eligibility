@@ -126,9 +126,12 @@ class Application(BaseApplication):
             except (ValueError, TypeError, AssertionError):
                 raise ErrorMessage("⚠️  Reply using numbers only. Example *27*")
 
+        progress_bar = "◼️◼️◼️◻️◻️"
         return FreeText(
             self,
-            question="\n".join(["◼️◼️◼️◻️◻️", "", "How old are you? (Reply with a number)"]),
+            question="\n".join(
+                [progress_bar, "", "How old are you? (Reply with a number)"]
+            ),
             next="state_location",
             check=check_age,
         )
