@@ -27,7 +27,7 @@ rapidfuzz = ">=1.4.1,<1.6.0"  # 1.6.0 changes search result ordering
 holidays = "^0.11.2"
 email-validator = "^1.1.3"
 zbar-py = "^1.0.4"
-opencv-python-headless = "^4.5.3"
+opencv-python-headless = "^4.8.1"
 redis = "^4.3.3"
 geopy = "2.2.0"
 emoji = "^2.1.0"
