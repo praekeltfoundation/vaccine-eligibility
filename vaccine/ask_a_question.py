@@ -219,7 +219,7 @@ class Application(BaseApplication):
             question=content,
             choices=[
                 Choice("yes", self._("👍"), ["yes"]),
-                Choice("no", self._("👎︎"), ["no"]),
+                Choice("no", self._("👎︎."), ["no"]),
             ],
             error="",  # Errors redirect to `state_question`
             header=title,
