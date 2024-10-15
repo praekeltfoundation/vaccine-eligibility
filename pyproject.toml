@@ -38,9 +38,7 @@ requests = "^2.32.0"
 websockets = "~10"
 
 [tool.poetry.dev-dependencies]
-black = "^24.3.0"
-isort = "^5.7.0"
-flake8 = "^3.8.4"
+ruff = "^0.6.9"
 pytest = "^7.2.0"
 pytest-cov = "^4.0.0"
 pytest-asyncio = "^0.14.0"
@@ -59,9 +57,50 @@ types-requests = "^2.28.11.8"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
+[tool.ruff]
+extend-exclude = [
+    "*/migrations/*.py",
+    "docs/conf.py",
+
+]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W", # pycodestyle + pyflakes == flake8 - mccabe
+    "I",           # isort
+    "UP",          # pyupgrade
+    "S",           # flake8-bandit
+    "B",           # flake8-bugbear
+    "C4",          # flake8-comprehensions
+    # "DJ",          # flake8-django
+    "PIE",         # flake8-pie
+    # "PT",          # flake8-pytest-style
+    "SIM",         # flake8-simplify
+    "PTH",         # flake8-use-pathlib
+    # "RUF",         # ruff-specific rules
+]
+
+ignore = [
+    "E501",  # TODO: Something about these long lines.
+    "S113",  # TODO: Add request timeouts.
+    "PTH118", # TODO: Switch to pathlib
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = [
+    "S101",  # It's okay to use `assert` in tests.
+]
+
+# TODO: Move this somewhere sensible?
+"**/tests.py" = [
+    "S101",  # It's okay to use `assert` in tests.
+]
+
+"**/config/settings/{test,dev}.py" = [
+    "S104",  # It's okay to bind to all interfaces in tests
+    "F405", # Its okay to import * in settings
+    "S105", # Its okay to have hardcoded secrets in test config
+]
 
 [tool.pytest.ini_options]
 addopts = "--cov=vaccine --cov=yal --ignore=vaccine.testing"
