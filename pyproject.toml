@@ -84,16 +84,36 @@ ignore = [
     "E501",  # TODO: Something about these long lines.
     "S113",  # TODO: Add request timeouts.
     "PTH118", # TODO: Switch to pathlib
+    "B005", # TODO: Using '.strip()' with multi-character strings is misleading
+    "B904", # TODO: Within an 'except' clause, raise exceptions with 'raise ... from err' or 'raise ... from None'
+    "S101", # TODO: Use of 'assert' detected
+    "SIM102", # TODO: Use a single 'if' statement instead of nested 'if' statements
+    "S311", # TODO: Standard pseudo-random generators are not suitable for cryptographic purposes
+    "PTH123", # TODO: 'open()' should be replaced by 'Path.open()'
+    "UP015", # TODO: Unnecessary open mode parameters
+    "B006", # TODO: Do not use mutable data structures for argument defaults
+    "S105", # TODO: Possible hardcoded password assigned to: "RAPIDPRO_TOKEN"
+    "C401", # TODO: Unnecessary generator (rewrite as a 'set' comprehension)
+    "SIM108", # TODO: Use ternary operator instead of 'if'-'else'-block
+    "E721", # TODO: Use 'is' and 'is not' for type comparisons, or 'isinstance()' for isinstance checks
+    "F601", # TODO: Dictionary key literal repeated
+    "SIM118", # TODO: Use 'key in dict' instead of 'key in dict.keys()'
+    "I001", # TODO: Import block is un-sorted or un-formatted
+    "SIM117", # TODO: Use a single 'with' statement with multiple contexts instead of nested 'with' statements
+    "C403", # TODO: Unnecessary 'list' comprehension (rewrite as a 'set' comprehension)
+    "S106", # TODO: Possible hardcoded password assigned to argument
+    "B019", # TODO: Use of 'functools.lru_cache' or 'functools.cache' on methods can lead to memory leaks
+    "B007", # TODO: Loop control variable 'content' not used within loop body
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = [
-    "S101",  # It's okay to use `assert` in tests.
+    "S101",  # It's okay to use 'assert' in tests.
 ]
 
 # TODO: Move this somewhere sensible?
 "**/tests.py" = [
-    "S101",  # It's okay to use `assert` in tests.
+    "S101",  # It's okay to use 'assert' in tests.
 ]
 
 "**/config/settings/{test,dev}.py" = [
