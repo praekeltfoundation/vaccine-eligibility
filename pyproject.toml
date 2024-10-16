@@ -103,7 +103,6 @@ ignore = [
     "C403", # TODO: Unnecessary 'list' comprehension (rewrite as a 'set' comprehension)
     "S106", # TODO: Possible hardcoded password assigned to argument
     "B019", # TODO: Use of 'functools.lru_cache' or 'functools.cache' on methods can lead to memory leaks
-    "B007", # TODO: Loop control variable 'content' not used within loop body
 ]
 
 [tool.ruff.lint.per-file-ignores]
