@@ -15,8 +15,8 @@ jobs:
         ports:
           - 6379:6379
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5.0.0
         with:
           python-version: 3.9.15
       - uses: abatilo/actions-poetry@v2.0.0
@@ -34,3 +34,16 @@ jobs:
       - name: Test
         run: |
           poetry run pytest
+           - name: Check formatting
+        # Lints/tests should always run, even if other lints/tests have failed.
+        if: success() || failure() && steps.install-deps.outcome == 'success'
+        run: |
+          poetry run ruff format --check 
+      - name: Lint
+        if: success() || failure() && steps.install-deps.outcome == 'success'
+        run: |
+          poetry run ruff check 
+      - name: Run tests
+        if: success() || failure() && steps.install-deps.outcome == 'success'
+        run: |
+          poetry run pytest -vv     
