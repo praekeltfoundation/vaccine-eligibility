@@ -542,7 +542,7 @@ class Application(BaseApplication):
         location_description = metadata.get("location_description")
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "location_description": location_description,
             "latitude": latitude,

@@ -97,7 +97,7 @@ class Application(BaseApplication):
     async def state_submit_optout(self):
         """Opt user out of the requested messages/campaigns"""
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = self.reminders_to_be_cleared
 
         error = await rapidpro.update_profile(
@@ -174,7 +174,7 @@ class Application(BaseApplication):
 
     async def state_delete_saved(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         rp_fields = await rapidpro.get_instance_fields()
         rp_field_keys = {rp_field["key"] for rp_field in rp_fields}

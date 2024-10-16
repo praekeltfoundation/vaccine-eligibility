@@ -21,7 +21,7 @@ class Application(BaseApplication):
 
     async def update_suggested_content_details(self, level, suggested_text=None):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {f"last_{level}_time": get_current_datetime().isoformat()}
         if suggested_text:
             data["suggested_text"] = suggested_text
@@ -30,7 +30,7 @@ class Application(BaseApplication):
 
     async def reset_suggested_content_details(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "last_mainmenu_time": "",
             "suggested_text": "",
@@ -327,7 +327,7 @@ class Application(BaseApplication):
         rel_status = self.user.answers.get("state_relationship_status")
         if rel_status != "skip":
             msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-            whatsapp_id = msisdn.lstrip(" + ")
+            whatsapp_id = msisdn.removeprefix("+")
             data = {
                 "relationship_status": rel_status,
             }
@@ -649,7 +649,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         error = await rapidpro.update_profile(
             whatsapp_id, {"push_related_page_id": ""}, self.user.metadata
         )

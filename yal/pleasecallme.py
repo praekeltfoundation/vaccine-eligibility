@@ -269,7 +269,7 @@ class Application(BaseApplication):
 
     async def state_save_time_for_callback_check(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         meta = self.user.metadata
         next_available = meta.get("next_available", get_current_datetime())
@@ -429,7 +429,7 @@ class Application(BaseApplication):
 
     async def state_save_emergency_contact(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "emergency_contact": self.user.answers.get("state_specify_msisdn"),
         }
@@ -467,7 +467,7 @@ class Application(BaseApplication):
 
     async def state_collect_call_feedback(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "last_mainmenu_time": get_current_datetime().isoformat(),
         }
@@ -827,7 +827,7 @@ class Application(BaseApplication):
 
     async def state_got_help(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "callback_abandon_reason": "got help",
         }
@@ -866,7 +866,7 @@ class Application(BaseApplication):
 
     async def state_too_long(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "callback_abandon_reason": "too long",
         }
@@ -909,7 +909,7 @@ class Application(BaseApplication):
 
     async def state_changed_mind(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "callback_abandon_reason": "changed mind",
         }

@@ -125,7 +125,7 @@ class Application(
     async def process_message(self, message):
         try:
             msisdn = utils.normalise_phonenumber(message.from_addr)
-            whatsapp_id = msisdn.lstrip(" + ")
+            whatsapp_id = msisdn.removeprefix("+")
             error, fields = await rapidpro.get_profile(whatsapp_id)
             if error:
                 return await self.go_to_state("state_error")
@@ -385,7 +385,7 @@ class Application(
         risk = "high_risk" if score <= 25 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "sexual_health_lit_risk": risk,
             "sexual_health_lit_score": score,
@@ -459,7 +459,7 @@ class Application(
         risk = "high_risk" if score <= 10 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "depression_and_anxiety_risk": risk,
             "depression_and_anxiety_score": score,
@@ -522,7 +522,7 @@ class Application(
         risk = "high_risk" if score <= 2 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "connectedness_risk": risk,
             "connectedness_score": score,
@@ -599,7 +599,7 @@ class Application(
         risk = "high_risk" if score <= 10 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "gender_attitude_risk": risk,
             "gender_attitude_score": score,
@@ -689,7 +689,7 @@ class Application(
         risk = "high_risk" if score <= 5 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "body_image_risk": risk,
             "body_image_score": score,
@@ -784,7 +784,7 @@ class Application(
         risk = "high_risk" if score <= 5 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "self_perceived_healthcare_risk": risk,
             "self_perceived_healthcare_score": score,

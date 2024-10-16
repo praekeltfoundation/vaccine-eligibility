@@ -25,7 +25,7 @@ class Application(BaseApplication):
 
     async def set_endline_reminder_timer(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         assessment_name = self.user.metadata.get(
             "assessment_name", "locus_of_control_endline"
@@ -58,7 +58,7 @@ class Application(BaseApplication):
         risk = "high_risk" if score <= 12 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "locus_of_control_risk": risk,
             "locus_of_control_score": score,
@@ -88,7 +88,7 @@ class Application(BaseApplication):
         risk = "high_risk" if score <= 14 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "self_esteem_risk": risk,
             "self_esteem_score": score,
@@ -118,7 +118,7 @@ class Application(BaseApplication):
         risk = "high_risk" if score <= 1 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "connectedness_risk": risk,
             "connectedness_score": score,
@@ -149,7 +149,7 @@ class Application(BaseApplication):
         risk = "high_risk" if score <= 4 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "body_image_risk": risk,
             "body_image_score": score,
@@ -181,7 +181,7 @@ class Application(BaseApplication):
         risk = "high_risk" if score >= 3 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "anxiety_risk": risk,
             "anxiety_score": score,
@@ -211,7 +211,7 @@ class Application(BaseApplication):
         risk = "high_risk" if score >= 3 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "depression_risk": risk,
             "depression_score": score,
@@ -245,7 +245,7 @@ class Application(BaseApplication):
         risk = "high_risk" if score <= 6 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "self_perceived_healthcare_risk": risk,
             "self_perceived_healthcare_score": score,
@@ -276,7 +276,7 @@ class Application(BaseApplication):
         risk = "high_risk" if score <= 33 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "sexual_health_lit_risk": risk,
             "sexual_health_lit_score": score,
@@ -307,7 +307,7 @@ class Application(BaseApplication):
         risk = "high_risk" if score <= 8 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "gender_attitude_risk": risk,
             "gender_attitude_score": score,
@@ -338,7 +338,7 @@ class Application(BaseApplication):
         risk = "high_risk" if score <= 6 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "sexual_consent_risk": risk,
             "sexual_consent_score": score,
@@ -369,7 +369,7 @@ class Application(BaseApplication):
         risk = "high_risk" if score >= 13 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "alcohol_risk": risk,
             "alcohol_score": score,
@@ -393,7 +393,7 @@ class Application(BaseApplication):
     # Endline Airtime Incentive
     async def state_submit_endline_completed(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "endline_survey_completed": "True",
             "ejaf_endline_airtime_incentive_sent": "False",

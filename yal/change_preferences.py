@@ -205,7 +205,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_display_preferences")
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         data = {
             "age": self.user.answers.get("state_update_age"),
@@ -311,7 +311,7 @@ class Application(BaseApplication):
 
     async def state_update_relationship_status_submit(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         status = self.user.answers.get("state_update_relationship_status")
 
@@ -478,7 +478,7 @@ class Application(BaseApplication):
         location_description = metadata.get("new_location_description")
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "location_description": location_description,
             "latitude": latitude,
@@ -587,7 +587,7 @@ class Application(BaseApplication):
 
     async def state_update_gender_submit(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         data = {
             "gender": self.user.answers.get("state_update_gender"),
@@ -630,7 +630,7 @@ class Application(BaseApplication):
 
         data = {"persona_name": choice}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
@@ -677,7 +677,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_display_preferences")
         data = {"persona_emoji": extract_first_emoji(choice)}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
@@ -744,7 +744,7 @@ class Application(BaseApplication):
     async def state_update_notifications_turn_off_submit(self):
         data = {"push_message_opt_in": "False"}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
@@ -795,7 +795,7 @@ class Application(BaseApplication):
     async def state_update_notifications_turn_on_submit(self):
         data = {"push_message_opt_in": "True"}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
@@ -882,7 +882,7 @@ class Application(BaseApplication):
     async def study_optout_confirm(self):
         data = {"ejaf_study_optin": "False"}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
