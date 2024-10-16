@@ -492,8 +492,8 @@ class Application(BaseApplication):
         async def validate_age(content):
             try:
                 age = int(content)
-            except DECODE_MESSAGE_EXCEPTIONS:
-                raise ErrorMessage(question)
+            except DECODE_MESSAGE_EXCEPTIONS as e:
+                raise ErrorMessage(question) from e
 
             if age < 1:
                 raise ErrorMessage(question)

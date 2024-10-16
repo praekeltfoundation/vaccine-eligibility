@@ -92,8 +92,8 @@ class SAIDNumber:
             assert len(value) == 13
             assert luhn_checksum(value) == 0
             return value
-        except AssertionError:
-            raise ValueError("Invalid format for SA ID number")
+        except AssertionError as ae:
+            raise ValueError("Invalid format for SA ID number") from ae
 
     def _extract_dob(self):
         try:
@@ -102,8 +102,8 @@ class SAIDNumber:
             if d >= get_today():
                 d = d.replace(year=d.year - 100)
             return d
-        except ValueError:
-            raise ValueError("Invalid date of birth in SA ID number")
+        except ValueError as ve:
+            raise ValueError("Invalid date of birth in SA ID number") from ve
 
     def __init__(self, value):
         self.id_number = self._validate_format(value)
@@ -127,8 +127,8 @@ def normalise_phonenumber(phonenumber):
         assert phonenumbers.is_possible_number(pn)
         assert phonenumbers.is_valid_number(pn)
         return phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.E164)
-    except (phonenumbers.phonenumberutil.NumberParseException, AssertionError):
-        raise ValueError("Invalid phone number")
+    except (phonenumbers.phonenumberutil.NumberParseException, AssertionError) as e:
+        raise ValueError("Invalid phone number") from e
 
 
 def display_phonenumber(phonenumber):

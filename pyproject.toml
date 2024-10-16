@@ -87,7 +87,6 @@ ignore = [
     "PTH123", # TODO: Switch to pathlib
     "B019", # TODO: Use of 'functools.lru_cache' or 'functools.cache' on methods can lead to memory leaks
     "B005", # TODO: Using '.strip()' with multi-character strings is misleading
-    "B904", # TODO: Within an 'except' clause, raise exceptions with 'raise ... from err' or 'raise ... from None'
     "S101", # TODO: Use of 'assert' detected
     "S311", # TODO: Standard pseudo-random generators are not suitable for cryptographic purposes
     

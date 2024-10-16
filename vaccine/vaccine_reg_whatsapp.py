@@ -519,8 +519,8 @@ class Application(BaseApplication):
             if idtype == self.ID_TYPES.rsa_id:
                 try:
                     SAIDNumber(value)
-                except ValueError:
-                    raise ErrorMessage(error_msg)
+                except ValueError as ve:
+                    raise ErrorMessage(error_msg) from ve
             else:
                 await nonempty_validator(error_msg)(value)
 
@@ -702,13 +702,13 @@ class Application(BaseApplication):
                 assert value.isdigit()
                 assert int(value) > get_today().year - config.AMBIGUOUS_MAX_AGE
                 assert int(value) <= get_today().year
-            except AssertionError:
+            except AssertionError as e:
                 raise ErrorMessage(
                     self._(
                         "⚠️  Please TYPE in only the YEAR you were born.\n"
                         "Example _1980_"
                     )
-                )
+                ) from e
 
             idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
             if idtype == self.ID_TYPES.rsa_id:
@@ -789,7 +789,7 @@ class Application(BaseApplication):
                 assert isinstance(value, str)
                 assert value.isdigit()
                 date(dob_year, dob_month, int(value))
-            except (AssertionError, ValueError, OverflowError):
+            except (AssertionError, ValueError, OverflowError) as e:
                 raise ErrorMessage(
                     self._(
                         "⚠️ Please enter a valid calendar DAY for your birth date. "
@@ -803,7 +803,7 @@ class Application(BaseApplication):
                         "📌 Or reply *0* to end this session and return to the main "
                         "*MENU*"
                     )
-                )
+                ) from e
 
         return FreeText(
             self,
@@ -883,13 +883,13 @@ class Application(BaseApplication):
         async def phone_number_validation(content):
             try:
                 normalise_phonenumber(content)
-            except ValueError:
+            except ValueError as ve:
                 raise ErrorMessage(
                     self._(
                         "⚠️ Please type a valid cell phone number.\n"
                         "Example _081234567_"
                     )
-                )
+                ) from ve
 
         return FreeText(
             self,

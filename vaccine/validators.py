@@ -34,8 +34,8 @@ def phone_number_validator(error_text):
     async def validator(value):
         try:
             normalise_phonenumber(value)
-        except ValueError:
-            raise ErrorMessage(error_text)
+        except ValueError as ve:
+            raise ErrorMessage(error_text) from ve
 
     return validator
 
@@ -54,7 +54,7 @@ def email_validator(error_text: str, skip_keywords: Iterable[str] = []):
             )
             await asyncio.wrap_future(future)
         except EmailNotValidError as e:
-            raise ErrorMessage(error_text.format(email_error=e))
+            raise ErrorMessage(error_text.format(email_error=e)) from e
 
     return validator
 
