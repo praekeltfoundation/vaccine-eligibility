@@ -95,7 +95,6 @@ ignore = [
     "S105", # TODO: Possible hardcoded password assigned to: "RAPIDPRO_TOKEN"
     "C401", # TODO: Unnecessary generator (rewrite as a 'set' comprehension)
     "SIM108", # TODO: Use ternary operator instead of 'if'-'else'-block
-    "E721", # TODO: Use 'is' and 'is not' for type comparisons, or 'isinstance()' for isinstance checks
     "B019", # TODO: Use of 'functools.lru_cache' or 'functools.cache' on methods can lead to memory leaks
 ]
 

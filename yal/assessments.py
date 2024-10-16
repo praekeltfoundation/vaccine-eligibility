@@ -305,7 +305,7 @@ class Application(BaseApplication):
         next = None
 
         if question["next"]:
-            if type(question["next"]) == dict:
+            if isinstance(question["next"], dict):
                 next = question["next"][answer]
             else:
                 next = question["next"]

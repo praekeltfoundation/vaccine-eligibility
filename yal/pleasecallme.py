@@ -273,7 +273,7 @@ class Application(BaseApplication):
 
         meta = self.user.metadata
         next_available = meta.get("next_available", get_current_datetime())
-        if type(next_available) == str:
+        if isinstance(next_available, str):
             next_available = datetime.fromisoformat(next_available)
         call_time = next_available + timedelta(hours=2)
 
