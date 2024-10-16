@@ -100,7 +100,6 @@ ignore = [
     "SIM118", # TODO: Use 'key in dict' instead of 'key in dict.keys()'
     "I001", # TODO: Import block is un-sorted or un-formatted
     "SIM117", # TODO: Use a single 'with' statement with multiple contexts instead of nested 'with' statements
-    "C403", # TODO: Unnecessary 'list' comprehension (rewrite as a 'set' comprehension)
     "B019", # TODO: Use of 'functools.lru_cache' or 'functools.cache' on methods can lead to memory leaks
 ]
 
