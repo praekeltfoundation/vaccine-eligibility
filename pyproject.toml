@@ -92,7 +92,6 @@ ignore = [
     "PTH123", # TODO: 'open()' should be replaced by 'Path.open()'
     "UP015", # TODO: Unnecessary open mode parameters
     "B006", # TODO: Do not use mutable data structures for argument defaults
-    "S105", # TODO: Possible hardcoded password assigned to: "RAPIDPRO_TOKEN"
     "B019", # TODO: Use of 'functools.lru_cache' or 'functools.cache' on methods can lead to memory leaks
 ]
 
@@ -100,6 +99,7 @@ ignore = [
 "**/tests/**" = [
     "S101",  # It's okay to use 'assert' in tests.
     "S106", # It's okay to have hardcoded passwords in tests
+    "S105", # It's okay to have hardcoded passwords in tests
 ]
 
 # TODO: Move this somewhere sensible?
