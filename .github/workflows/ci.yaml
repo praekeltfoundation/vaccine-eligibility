@@ -25,15 +25,6 @@ jobs:
       - name: Install dependancies
         run: |
           poetry install
-      - name: Lint
-        run: |
-          poetry run black --check .
-          poetry run isort -c .
-          poetry run mypy .
-          poetry run flake8
-      - name: Test
-        run: |
-          poetry run pytest
       - name: Check formatting
         # Lints/tests should always run, even if other lints/tests have failed.
         if: success() || failure() && steps.install-deps.outcome == 'success'
@@ -46,4 +37,4 @@ jobs:
       - name: Run tests
         if: success() || failure() && steps.install-deps.outcome == 'success'
         run: |
-          poetry run pytest -vv     
+          poetry run pytest -vv          
