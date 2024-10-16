@@ -113,7 +113,6 @@ QUESTIONS = {
     "body_image": BODY_IMAGE_QUESTIONS,
     "self_perceived_healthcare": SELF_PERCEIVED_HEALTHCARE_QUESTIONS,
     "self_esteem": SELF_ESTEEM_QUESTIONS,
-    "body_image": BODY_IMAGE_QUESTIONS,
     "self_esteem_v2": SELF_ESTEEM_QUESTIONS_V2,
     "connectedness_v2": CONNECTEDNESS_QUESTIONS_V2,
     "body_image_v2": BODY_IMAGE_QUESTIONS_V2,
