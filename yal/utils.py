@@ -113,7 +113,7 @@ def replace_persona_fields(text, metadata=None):
 def get_keywords(name):
     keywords = []
     filename = pkg_resources.resource_filename("yal", f"keywords/{name}.csv")
-    with open(filename, mode="r") as keyword_file:
+    with open(filename) as keyword_file:
         csvreader = reader(keyword_file)
         next(csvreader)
         for row in csvreader:

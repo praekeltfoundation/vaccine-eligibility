@@ -90,7 +90,6 @@ ignore = [
     "SIM102", # TODO: Use a single 'if' statement instead of nested 'if' statements
     "S311", # TODO: Standard pseudo-random generators are not suitable for cryptographic purposes
     "PTH123", # TODO: 'open()' should be replaced by 'Path.open()'
-    "UP015", # TODO: Unnecessary open mode parameters
     "B019", # TODO: Use of 'functools.lru_cache' or 'functools.cache' on methods can lead to memory leaks
 ]
 
