@@ -121,7 +121,7 @@ class Application(BaseApplication):
     async def state_language(self):
         self.user.answers = {}
 
-        if random.random() < config.THROTTLE_PERCENTAGE / 100.0:
+        if random.random() < config.THROTTLE_PERCENTAGE / 100.0:  # noqa: S311 - Not being used for crypto
             return await self.go_to_state("state_throttle")
 
         return LanguageState(

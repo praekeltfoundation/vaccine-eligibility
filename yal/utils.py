@@ -51,7 +51,7 @@ PERSONA_DEFAULTS = {"persona_emoji": "🤖", "persona_name": "B-wise"}
 
 
 def get_generic_error():
-    return random.choice(GENERIC_ERRORS)
+    return random.choice(GENERIC_ERRORS)  # noqa: S311 - Not being used for crypto
 
 
 def get_today():
@@ -153,7 +153,7 @@ def is_integer(string: str) -> bool:
 
 
 def get_generic_error_options():
-    return random.choice(GENERIC_ERROR_OPTIONS)
+    return random.choice(GENERIC_ERROR_OPTIONS)  # noqa: S311 - Not being used for crypto
 
 
 async def check_if_baseline_active():
