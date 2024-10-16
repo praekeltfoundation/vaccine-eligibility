@@ -22,17 +22,25 @@ def build_message_detail(
     id,
     title,
     content,
-    tags=[],
+    tags=None,
     has_children=False,
     image=None,
     total_messages=1,
-    quick_replies=[],
-    related_pages=[],
+    quick_replies=None,
+    related_pages=None,
     message=1,
     next_message=None,
     previous_message=None,
-    variations=[],
+    variations=None,
 ):
+    if variations is None:
+        variations = []
+    if related_pages is None:
+        related_pages = []
+    if quick_replies is None:
+        quick_replies = []
+    if tags is None:
+        tags = []
     return {
         "id": id,
         "title": title,

@@ -37,7 +37,9 @@ class Application(BaseApplication):
         }
         return await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
 
-    async def get_suggested_choices(self, parent_topic_links={}):
+    async def get_suggested_choices(self, parent_topic_links=None):
+        if parent_topic_links is None:
+            parent_topic_links = {}
         if self.user.metadata["suggested_content"] == {}:
             topics_viewed = set(
                 self.user.metadata.get(

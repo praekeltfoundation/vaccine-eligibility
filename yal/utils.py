@@ -96,7 +96,9 @@ def extract_first_emoji(persona_emoji):
     return ""
 
 
-def replace_persona_fields(text, metadata={}):
+def replace_persona_fields(text, metadata=None):
+    if metadata is None:
+        metadata = {}
     for key in PERSONA_FIELDS:
         value = metadata.get(key)
         if value and value.lower() not in ["skip", ""]:

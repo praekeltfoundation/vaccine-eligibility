@@ -1516,7 +1516,9 @@ async def test_state_age_years_skip():
 
 @pytest.mark.asyncio
 async def test_state_tracing(eventstore_mock):
-    def get_user(answers={}):
+    def get_user(answers=None):
+        if answers is None:
+            answers = {}
         return User(
             addr="27820001003",
             state=StateData(name="state_tracing"),
@@ -1829,7 +1831,9 @@ async def test_state_tb_prompt_2_low():
 
 
 def test_calculate_risk():
-    def get_user(answers={}):
+    def get_user(answers=None):
+        if answers is None:
+            answers = {}
         return User(
             addr="27820001003",
             state=StateData(name="state_terms"),
