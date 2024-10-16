@@ -35,34 +35,32 @@ from yal.wa_fb_crossover_feedback import Application as WaFbCrossoverFeedbackApp
 
 
 def get_state_sets():
-    m_states = set(s for s in dir(Application) if s.startswith("state_"))
-    mm_states = set(s for s in dir(MainMenuApplication) if s.startswith("state_"))
-    on_states = set(s for s in dir(OnboardingApplication) if s.startswith("state_"))
-    oo_states = set(s for s in dir(OptoutApplication) if s.startswith("state_"))
-    te_states = set(s for s in dir(TermsApplication) if s.startswith("state_"))
-    cp_states = set(
-        s for s in dir(ChangePreferencesApplication) if s.startswith("state_")
-    )
-    q_states = set(s for s in dir(QuizApplication) if s.startswith("state_"))
-    pc_states = set(s for s in dir(PleaseCallMeApplication) if s.startswith("state_"))
-    sf_states = set(s for s in dir(ServiceFinderApplication) if s.startswith("state_"))
-    aaq_states = set(s for s in dir(AaqApplication) if s.startswith("state_"))
-    fb_states = set(s for s in dir(FeedbackApplication) if s.startswith("state_"))
-    c_fb_states = set(
+    m_states = {s for s in dir(Application) if s.startswith("state_")}
+    mm_states = {s for s in dir(MainMenuApplication) if s.startswith("state_")}
+    on_states = {s for s in dir(OnboardingApplication) if s.startswith("state_")}
+    oo_states = {s for s in dir(OptoutApplication) if s.startswith("state_")}
+    te_states = {s for s in dir(TermsApplication) if s.startswith("state_")}
+    cp_states = {s for s in dir(ChangePreferencesApplication) if s.startswith("state_")}
+    q_states = {s for s in dir(QuizApplication) if s.startswith("state_")}
+    pc_states = {s for s in dir(PleaseCallMeApplication) if s.startswith("state_")}
+    sf_states = {s for s in dir(ServiceFinderApplication) if s.startswith("state_")}
+    aaq_states = {s for s in dir(AaqApplication) if s.startswith("state_")}
+    fb_states = {s for s in dir(FeedbackApplication) if s.startswith("state_")}
+    c_fb_states = {
         s for s in dir(ContentFeedbackSurveyApplication) if s.startswith("state_")
-    )
-    sf_s_states = set(
+    }
+    sf_s_states = {
         s for s in dir(ServiceFinderFeedbackSurveyApplication) if s.startswith("state_")
-    )
-    bs_states = set(s for s in dir(BaselineSurveyApplication) if s.startswith("state_"))
-    es_states = set(s for s in dir(EndlineSurveyApplication) if s.startswith("state_"))
-    fi_states = set(s for s in dir(FacebookInviteApplication) if s.startswith("state_"))
-    ls_states = set(s for s in dir(LocationSurveyApplication) if s.startswith("state_"))
-    ss_states = set(s for s in dir(SegmentSurveyApplication) if s.startswith("state_"))
-    wa_fb_states = set(
+    }
+    bs_states = {s for s in dir(BaselineSurveyApplication) if s.startswith("state_")}
+    es_states = {s for s in dir(EndlineSurveyApplication) if s.startswith("state_")}
+    fi_states = {s for s in dir(FacebookInviteApplication) if s.startswith("state_")}
+    ls_states = {s for s in dir(LocationSurveyApplication) if s.startswith("state_")}
+    ss_states = {s for s in dir(SegmentSurveyApplication) if s.startswith("state_")}
+    wa_fb_states = {
         s for s in dir(WaFbCrossoverFeedbackApplication) if s.startswith("state_")
-    )
-    optin_states = set(s for s in dir(OptinsApplication) if s.startswith("state_"))
+    }
+    optin_states = {s for s in dir(OptinsApplication) if s.startswith("state_")}
 
     return [
         m_states,
@@ -129,9 +127,9 @@ def test_all_states_added_to_docs():
     loader = ptr.MarkdownTableFileLoader("yal/tests/states_dictionary.md")
     documented_states = set()
     for data in loader.load():
-        documented_states = documented_states | set(
+        documented_states = documented_states | {
             row["state_name"] for row in data.as_dict()[data.table_name]
-        )
+        }
 
     difference = existing_states.difference(documented_states)
 

@@ -93,7 +93,6 @@ ignore = [
     "UP015", # TODO: Unnecessary open mode parameters
     "B006", # TODO: Do not use mutable data structures for argument defaults
     "S105", # TODO: Possible hardcoded password assigned to: "RAPIDPRO_TOKEN"
-    "C401", # TODO: Unnecessary generator (rewrite as a 'set' comprehension)
     "B019", # TODO: Use of 'functools.lru_cache' or 'functools.cache' on methods can lead to memory leaks
 ]
 
