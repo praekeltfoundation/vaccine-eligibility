@@ -98,7 +98,6 @@ ignore = [
     "E721", # TODO: Use 'is' and 'is not' for type comparisons, or 'isinstance()' for isinstance checks
     "F601", # TODO: Dictionary key literal repeated
     "SIM118", # TODO: Use 'key in dict' instead of 'key in dict.keys()'
-    "I001", # TODO: Import block is un-sorted or un-formatted
     "B019", # TODO: Use of 'functools.lru_cache' or 'functools.cache' on methods can lead to memory leaks
 ]
 

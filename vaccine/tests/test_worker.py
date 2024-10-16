@@ -6,9 +6,8 @@ from io import StringIO
 
 import pytest
 import redis.asyncio as aioredis
-from aio_pika import DeliveryMode, Exchange
+from aio_pika import DeliveryMode, Exchange, Queue, connect_robust
 from aio_pika import Message as AMQPMessage
-from aio_pika import Queue, connect_robust
 from sanic import Sanic, response
 
 from vaccine.models import Answer, Event, Message, StateData, User
