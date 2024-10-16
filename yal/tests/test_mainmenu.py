@@ -151,10 +151,9 @@ async def contentrepo_api_mock():
     @app.route("/api/v2/pages", methods=["GET"])
     def get_main_menu(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
 
         tag = request.args.get("tag")
 

@@ -84,13 +84,13 @@ ignore = [
     "E501",  # TODO: Something about these long lines.
     "S113",  # TODO: Add request timeouts.
     "PTH118", # TODO: Switch to pathlib
+    "PTH123", # TODO: Switch to pathlib
+    "B019", # TODO: Use of 'functools.lru_cache' or 'functools.cache' on methods can lead to memory leaks
     "B005", # TODO: Using '.strip()' with multi-character strings is misleading
     "B904", # TODO: Within an 'except' clause, raise exceptions with 'raise ... from err' or 'raise ... from None'
     "S101", # TODO: Use of 'assert' detected
-    "SIM102", # TODO: Use a single 'if' statement instead of nested 'if' statements
     "S311", # TODO: Standard pseudo-random generators are not suitable for cryptographic purposes
-    "PTH123", # TODO: 'open()' should be replaced by 'Path.open()'
-    "B019", # TODO: Use of 'functools.lru_cache' or 'functools.cache' on methods can lead to memory leaks
+    
 ]
 
 [tool.ruff.lint.per-file-ignores]

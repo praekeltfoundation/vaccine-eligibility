@@ -21,10 +21,12 @@ async def eventstore_mock():
     @app.route("/api/v2/healthcheckuserprofile/<msisdn>/", methods=["GET"])
     def get_userprofile(request, msisdn):
         tstate.requests.append(request)
-        if tstate.userprofile_errormax:
-            if tstate.userprofile_errors < tstate.userprofile_errormax:
-                tstate.userprofile_errors += 1
-                return response.json({}, status=500)
+        if (
+            tstate.userprofile_errormax
+            and tstate.userprofile_errors < tstate.userprofile_errormax
+        ):
+            tstate.userprofile_errors += 1
+            return response.json({}, status=500)
 
         if msisdn in ["+27820001001", "+27820001004"]:
             return response.json(
@@ -42,19 +44,17 @@ async def eventstore_mock():
     @app.route("/api/v2/covid19triagestart/", methods=["POST"])
     def valid_triagestart(request):
         tstate.requests.append(request)
-        if tstate.start_errormax:
-            if tstate.start_errors < tstate.start_errormax:
-                tstate.start_errors += 1
-                return response.json({}, status=500)
+        if tstate.start_errormax and tstate.start_errors < tstate.start_errormax:
+            tstate.start_errors += 1
+            return response.json({}, status=500)
         return response.json({})
 
     @app.route("/api/v3/covid19triage/", methods=["POST"])
     def valid_triage(request):
         tstate.requests.append(request)
-        if tstate.triage_errormax:
-            if tstate.triage_errors < tstate.triage_errormax:
-                tstate.triage_errors += 1
-                return response.json({}, status=500)
+        if tstate.triage_errormax and tstate.triage_errors < tstate.triage_errormax:
+            tstate.triage_errors += 1
+            return response.json({}, status=500)
         return response.json({})
 
     async with run_sanic(app) as server:
@@ -77,10 +77,9 @@ async def google_api_mock():
     @app.route("/maps/api/place/autocomplete/json", methods=["GET"])
     def valid_city(request):
         tstate.requests.append(request)
-        if tstate.api_errormax:
-            if tstate.api_errors < tstate.api_errormax:
-                tstate.api_errors += 1
-                return response.json({}, status=500)
+        if tstate.api_errormax and tstate.api_errors < tstate.api_errormax:
+            tstate.api_errors += 1
+            return response.json({}, status=500)
         if tstate.status == "OK":
             data = {
                 "status": "OK",
@@ -98,10 +97,9 @@ async def google_api_mock():
     @app.route("/maps/api/place/details/json", methods=["GET"])
     def details_lookup(request):
         tstate.requests.append(request)
-        if tstate.api_errormax:
-            if tstate.api_errors < tstate.api_errormax:
-                tstate.api_errors += 1
-                return response.json({}, status=500)
+        if tstate.api_errormax and tstate.api_errors < tstate.api_errormax:
+            tstate.api_errors += 1
+            return response.json({}, status=500)
         if tstate.status == "OK":
             data = {
                 "status": "OK",
@@ -131,10 +129,9 @@ async def rapidpro_mock():
     @app.route("/api/v2/flow_starts.json", methods=["POST"])
     def start_flow(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
         return response.json({}, status=200)
 
     async with run_sanic(app) as server:

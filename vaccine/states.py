@@ -265,9 +265,12 @@ class WhatsAppTextOnlyFreetext(FreeText):
         self.text_only_error = text_only_error
 
     async def process_message(self, message: Message):
-        if self.text_only_error is not None and message.transport_metadata:
-            if message.transport_metadata.get("message", {}).get("type") != "text":
-                return self.app.send_message(self.text_only_error)
+        if (
+            self.text_only_error is not None
+            and message.transport_metadata
+            and message.transport_metadata.get("message", {}).get("type") != "text"
+        ):
+            return self.app.send_message(self.text_only_error)
         return await super().process_message(message)
 
 

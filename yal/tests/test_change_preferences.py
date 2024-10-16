@@ -48,10 +48,9 @@ async def rapidpro_mock():
     @app.route("/api/v2/contacts.json", methods=["GET"])
     def get_contact(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
 
         urn = request.args.get("urn")
         contacts = [get_rapidpro_contact(urn)]
@@ -88,10 +87,9 @@ async def google_api_mock():
     @app.route("/maps/api/geocode/json", methods=["GET"])
     def desc_from_pin(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
         if tstate.status == "OK":
             data = {
                 "status": "OK",

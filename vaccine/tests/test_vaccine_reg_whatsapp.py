@@ -26,10 +26,9 @@ async def evds_mock():
     @app.route("/api/private/evds-sa/person/8/record", methods=["POST"])
     def submit_record(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
         return response.json({}, status=200)
 
     @app.route("/api/private/evds-sa/person/8/lookup/medscheme/1", methods=["GET"])
