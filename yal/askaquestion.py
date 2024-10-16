@@ -55,7 +55,6 @@ class Application(BaseApplication):
     }
 
     async def state_aaq_start(self, question=None, buttons=None):
-
         if not config.AAQ_URL:
             return await self.go_to_state("state_coming_soon")
 
@@ -416,7 +415,6 @@ class Application(BaseApplication):
         )
 
     async def state_yes_question_answered_changes(self):
-
         question = self._(
             "\n".join(
                 [

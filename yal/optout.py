@@ -33,7 +33,6 @@ class Application(BaseApplication):
     }
 
     async def state_optout(self):
-
         inbound = utils.clean_inbound(self.inbound.content)
         question = self._(
             "\n".join(

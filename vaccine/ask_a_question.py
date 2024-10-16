@@ -163,7 +163,6 @@ class Application(BaseApplication):
         return FreeText(self, question=question, check=check, next="state_call_model")
 
     async def state_display_response_choices(self):
-
         responses = json.loads(self.user.answers["model_response"])["top_responses"]
         return RedirectChoiceState(
             self,

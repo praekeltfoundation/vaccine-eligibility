@@ -516,7 +516,6 @@ async def test_assessment_reminder_keywords(
 
 @pytest.mark.asyncio
 async def test_terms_accepted(tester: AppTester, rapidpro_mock, contentrepo_api_mock):
-
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
 
     await tester.user_input("hi")

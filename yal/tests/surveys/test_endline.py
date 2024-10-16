@@ -160,7 +160,6 @@ async def test_state_submit_endline_completed_error(tester: AppTester, rapidpro_
 
 @pytest.mark.asyncio
 async def test_state_endline_end_invalid_input(tester: AppTester):
-
     tester.setup_state("state_endline_end")
 
     await tester.user_input("invalid")
@@ -175,7 +174,6 @@ async def test_state_endline_end_invalid_input(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_self_esteem_assessment_endline(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -192,7 +190,6 @@ async def test_state_self_esteem_assessment_endline(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_self_esteem_assessment_endline_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -221,7 +218,6 @@ async def test_state_self_esteem_assessment_endline_end(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_self_esteem_assessment_end_error(tester: AppTester, rapidpro_mock):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -243,7 +239,6 @@ async def test_state_self_esteem_assessment_end_error(tester: AppTester, rapidpr
 
 @pytest.mark.asyncio
 async def test_state_connectedness_assessment_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -274,7 +269,6 @@ async def test_state_connectedness_assessment_end(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_connectedness_assessment_endline(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -293,7 +287,6 @@ async def test_state_connectedness_assessment_endline(tester: AppTester):
 async def test_state_connectedness_assessment_endline_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -315,7 +308,6 @@ async def test_state_connectedness_assessment_endline_end_error(
 
 @pytest.mark.asyncio
 async def test_state_body_image_assessment_endline(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -332,7 +324,6 @@ async def test_state_body_image_assessment_endline(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_body_image_assessment_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -366,7 +357,6 @@ async def test_state_body_image_assessment_end(tester: AppTester):
 async def test_state_body_image_assessment_endline_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -388,7 +378,6 @@ async def test_state_body_image_assessment_endline_end_error(
 
 @pytest.mark.asyncio
 async def test_state_depression_assessment_endline(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -405,7 +394,6 @@ async def test_state_depression_assessment_endline(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_depression_assessment_endline_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -437,7 +425,6 @@ async def test_depression_assessment_endline_end(tester: AppTester):
 async def test_state_depression_assessment_endline_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -459,7 +446,6 @@ async def test_state_depression_assessment_endline_end_error(
 
 @pytest.mark.asyncio
 async def test_state_anxiety_assessment_endline(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -476,7 +462,6 @@ async def test_state_anxiety_assessment_endline(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_anxiety_assessment_endline_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -559,7 +544,6 @@ async def test_state_depression_and_anxiety_endline_end_error(
 
 @pytest.mark.asyncio
 async def test_state_perceived_healthcare_assessment_endline(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -582,7 +566,6 @@ async def test_state_perceived_healthcare_assessment_endline(tester: AppTester):
 async def test_state_self_perceived_healthcare_assessment_endline_end(
     tester: AppTester,
 ):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -619,7 +602,6 @@ async def test_state_self_perceived_healthcare_assessment_endline_end(
 async def test_state_state_self_perceived_healthcare_assessment_endline_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -641,7 +623,6 @@ async def test_state_state_self_perceived_healthcare_assessment_endline_end_erro
 
 @pytest.mark.asyncio
 async def test_state_sexual_health_lit_assessment_endline(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -660,7 +641,6 @@ async def test_state_sexual_health_lit_assessment_endline(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_sexual_health_lit_assessment_endline_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -693,7 +673,6 @@ async def test_state_sexual_health_lit_assessment_endline_end(tester: AppTester)
 async def test_state_sexual_health_lit_assessment_endline_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -715,7 +694,6 @@ async def test_state_sexual_health_lit_assessment_endline_end_error(
 
 @pytest.mark.asyncio
 async def test_state_gender_attitude_assessment_endline_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -752,7 +730,6 @@ async def test_state_gender_attitude_assessment_endline_end(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_gender_attitudes_assessment_endline(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -773,7 +750,6 @@ async def test_state_gender_attitudes_assessment_endline(tester: AppTester):
 async def test_state_gender_attitude_assessment_endline_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -795,7 +771,6 @@ async def test_state_gender_attitude_assessment_endline_end_error(
 
 @pytest.mark.asyncio
 async def test_state_sexual_consent_assessment_endline(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -814,7 +789,6 @@ async def test_state_sexual_consent_assessment_endline(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_sexual_consent_assessment_endline_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -845,7 +819,6 @@ async def test_state_sexual_consent_assessment_endline_end(tester: AppTester):
 async def test_state_sexual_consent_assessment_endline_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -867,7 +840,6 @@ async def test_state_sexual_consent_assessment_endline_end_error(
 
 @pytest.mark.asyncio
 async def test_state_alcohol_assessment_endline_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -894,7 +866,6 @@ async def test_state_alcohol_assessment_endline_end(tester: AppTester):
 async def test_state_alcohol_assessment_endline_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003", state=StateData(name="state_alcohol_assessment_endline_end")
@@ -1171,7 +1142,6 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
 async def test_state_accept_consent_reminder_lets_do_this(
     tester: AppTester, rapidpro_mock
 ):
-
     tester.user.metadata["baseline_survey_completed"] = True
     tester.user.metadata["endline_survey_started"] = "True"
     tester.user.metadata["terms_accepted"] = True

@@ -384,7 +384,6 @@ class Application(BaseApplication):
         )
 
     async def state_google_places_lookup(self):
-
         async with get_google_api() as session:
             for i in range(3):
                 try:
@@ -684,7 +683,6 @@ class Application(BaseApplication):
         )
 
     async def state_submit_data(self):
-
         if self.user.answers.get("state_tracing") == "restart":
             return await self.go_to_state("state_start")
 

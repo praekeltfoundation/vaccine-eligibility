@@ -271,7 +271,6 @@ async def test_state_optout_survey_skip(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_optout_stop_notifications(tester: AppTester, rapidpro_mock):
-
     tester.setup_state("state_optout")
     await tester.user_input("1")
     tester.assert_state("state_optout_survey")
@@ -311,7 +310,6 @@ async def test_state_optout_delete_saved(
     tester: AppTester,
     rapidpro_mock,
 ):
-
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_optout")
     await tester.user_input("2")

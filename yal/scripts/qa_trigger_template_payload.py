@@ -59,7 +59,9 @@ async def make_request(arguments: argparse.Namespace):
         "User-Agent": "qa-trigger-template-payload-script",
     }
     url = urljoin(arguments.url, "v1/webhook")
-    async with aiohttp.ClientSession() as session, session.post(url=url, headers=headers, data=body) as resp:
+    async with aiohttp.ClientSession() as session, session.post(
+        url=url, headers=headers, data=body
+    ) as resp:
         resp.raise_for_status()
 
 

@@ -380,12 +380,9 @@ class Application(
         await self.publish_message(msg)
         await asyncio.sleep(0.5)
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 25:
-            # score of 0-25 high risk
-            risk = "high_risk"
-        else:
-            # score of 26-30 low risk
-            risk = "low_risk"
+        # score of 0-25 high risk
+        # score of 26-30 low risk
+        risk = "high_risk" if score <= 25 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
@@ -457,12 +454,9 @@ class Application(
 
     async def state_depression_and_anxiety_assessment_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 10:
-            # score of 0-10 high risk
-            risk = "high_risk"
-        else:
-            # score of 11-20 low risk
-            risk = "low_risk"
+        # score of 0-10 high risk
+        # score of 11-20 low risk
+        risk = "high_risk" if score <= 10 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
@@ -523,12 +517,9 @@ class Application(
 
     async def state_connectedness_assessment_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 2:
-            # score of 0-2 high risk
-            risk = "high_risk"
-        else:
-            # score of 3-5 low risk
-            risk = "low_risk"
+        # score of 0-2 high risk
+        # score of 3-5 low risk
+        risk = "high_risk" if score <= 2 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
@@ -603,12 +594,9 @@ class Application(
 
     async def state_gender_attitude_assessment_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 10:
-            # score of 0-10 high risk
-            risk = "high_risk"
-        else:
-            # score of 11-20 low risk
-            risk = "low_risk"
+        # score of 0-10 high risk
+        # score of 11-20 low risk
+        risk = "high_risk" if score <= 10 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
@@ -696,12 +684,9 @@ class Application(
 
     async def state_body_image_assessment_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 5:
-            # score of 0-5 high risk
-            risk = "high_risk"
-        else:
-            # score of 6-10 low risk
-            risk = "low_risk"
+        # score of 0-5 high risk
+        # score of 6-10 low risk
+        risk = "high_risk" if score <= 5 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
@@ -794,12 +779,9 @@ class Application(
 
     async def state_self_perceived_healthcare_assessment_end(self):
         score = self.user.metadata.get("assessment_score", 0)
-        if score <= 5:
-            # score of 0-5 high risk
-            risk = "high_risk"
-        else:
-            # score of 6-10 low risk
-            risk = "low_risk"
+        # score of 0-5 high risk
+        # score of 6-10 low risk
+        risk = "high_risk" if score <= 5 else "low_risk"
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
@@ -873,7 +855,6 @@ class Application(
         await self.worker.publish_message(self.inbound.reply(content))
 
     async def reset_whatsapp_delivery_failure(self, whatsapp_id):
-
         whatsapp_delivery_failed = self.user.metadata.get(
             "whatsapp_delivery_failed", "False"
         )

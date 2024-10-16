@@ -390,7 +390,6 @@ class Application(BaseApplication):
         return await self.go_to_state(EndlineApplication.START_STATE)
 
     async def state_endline_limit_reached(self):
-
         msisdn = normalise_phonenumber(self.inbound.from_addr)
         whatsapp_id = msisdn.lstrip(" + ")
 

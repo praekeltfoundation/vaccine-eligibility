@@ -718,7 +718,6 @@ class Application(BaseApplication):
         return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
     async def state_remind_tomorrow(self):
-
         endline_survey_started = self.user.metadata.get("endline_survey_started")
 
         question = "No problem! I'll remind you tomorrow"
@@ -735,7 +734,6 @@ class Application(BaseApplication):
             )
 
     async def state_reminder_not_interested(self):
-
         choices = [
             Choice("menu", "Go to the menu"),
             Choice("aaq", "Ask a question"),

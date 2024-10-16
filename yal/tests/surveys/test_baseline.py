@@ -120,7 +120,6 @@ async def test_state_submit_baseline_completed_error(tester: AppTester, rapidpro
 
 @pytest.mark.asyncio
 async def test_state_baseline_end_invalid_input(tester: AppTester):
-
     tester.setup_state("state_baseline_end")
 
     await tester.user_input("invalid")
@@ -135,7 +134,6 @@ async def test_state_baseline_end_invalid_input(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_halfway_message(tester: AppTester):
-
     tester.setup_state("state_baseline_halfway_msg")
 
     await tester.user_input("OK Let's do it")
@@ -154,7 +152,6 @@ async def test_state_halfway_message(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_self_esteem_assessment_v2(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -171,7 +168,6 @@ async def test_state_self_esteem_assessment_v2(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_self_esteem_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -200,7 +196,6 @@ async def test_state_self_esteem_assessment_v2_end(tester: AppTester):
 async def test_state_self_esteem_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003", state=StateData(name="state_self_esteem_assessment_v2_end")
@@ -221,7 +216,6 @@ async def test_state_self_esteem_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_connectedness_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -250,7 +244,6 @@ async def test_state_connectedness_assessment_v2_end(tester: AppTester):
 async def test_state_connectedness_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -272,7 +265,6 @@ async def test_state_connectedness_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_body_image_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -302,7 +294,6 @@ async def test_state_body_image_assessment_v2_end(tester: AppTester):
 async def test_state_body_image_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003", state=StateData(name="state_body_image_assessment_v2_end")
@@ -323,7 +314,6 @@ async def test_state_body_image_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_depression_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -350,7 +340,6 @@ async def test_depression_assessment_v2_end(tester: AppTester):
 async def test_state_depression_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003", state=StateData(name="state_depression_assessment_v2_end")
@@ -371,7 +360,6 @@ async def test_state_depression_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_anxiety_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -457,7 +445,6 @@ async def test_state_depression_and_anxiety_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_self_perceived_healthcare_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -494,7 +481,6 @@ async def test_state_self_perceived_healthcare_assessment_v2_end(tester: AppTest
 async def test_state_state_self_perceived_healthcare_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -516,7 +502,6 @@ async def test_state_state_self_perceived_healthcare_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_sexual_health_lit_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -549,7 +534,6 @@ async def test_state_sexual_health_lit_assessment_v2_end(tester: AppTester):
 async def test_state_sexual_health_lit_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -571,7 +555,6 @@ async def test_state_sexual_health_lit_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_gender_attitude_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -610,7 +593,6 @@ async def test_state_gender_attitude_assessment_v2_end(tester: AppTester):
 async def test_state_gender_attitude_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -632,7 +614,6 @@ async def test_state_gender_attitude_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_sexual_consent_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -659,7 +640,6 @@ async def test_state_sexual_consent_assessment_v2_end(tester: AppTester):
 async def test_state_sexual_consent_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -681,7 +661,6 @@ async def test_state_sexual_consent_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_alcohol_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -707,7 +686,6 @@ async def test_state_alcohol_assessment_v2_end(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_alcohol_assessment_v2_end_error(tester: AppTester, rapidpro_mock):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003", state=StateData(name="state_alcohol_assessment_v2_end")
