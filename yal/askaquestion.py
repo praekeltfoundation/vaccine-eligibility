@@ -161,7 +161,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_no_answers")
 
         choices = []
-        for title in answers.keys():
+        for title in answers:
             choices.append(Choice(title, title))
 
         if page == 0:
