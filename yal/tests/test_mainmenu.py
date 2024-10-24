@@ -22,7 +22,7 @@ def build_message_detail(
     id,
     title,
     content,
-    tags=None,
+    tags=(),
     has_children=False,
     image=None,
     total_messages=1,
