@@ -86,7 +86,7 @@ async def rapidpro_mock():
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
-        config.RAPIDPRO_TOKEN = "testtoken"
+        config.RAPIDPRO_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.RAPIDPRO_URL = url

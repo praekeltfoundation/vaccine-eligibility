@@ -16,12 +16,10 @@ jobs:
           - 6379:6379
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5.0.0
+      - uses: actions/setup-python@v5
         with:
-          python-version: 3.9.15
-      - uses: abatilo/actions-poetry@v2.0.0
-        with:
-          poetry-version: 1.4.2
+          python-version: 3.9
+      - uses: abatilo/actions-poetry@v3
       - name: Install dependancies
         run: |
           poetry install
