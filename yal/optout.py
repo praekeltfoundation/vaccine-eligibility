@@ -204,7 +204,7 @@ class Application(BaseApplication):
         # splitting combined dictionary into batches off 100
         # RapidPro can only update 100 fields at a time
         for i in range(0, len(sorted_field_dict), batch_size):
-            batch = list(sorted_field_dict.items())[i : i + batch_size]  # noqa
+            batch = list(sorted_field_dict.items())[i : i + batch_size]
             batches.append(batch)
 
         for batch in batches:

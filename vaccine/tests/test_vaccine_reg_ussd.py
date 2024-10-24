@@ -40,7 +40,7 @@ async def evds_mock():
         password = config.EVDS_PASSWORD
         config.EVDS_URL = f"http://{server.host}:{server.port}"
         config.EVDS_USERNAME = "test"
-        config.EVDS_PASSWORD = "test"
+        config.EVDS_PASSWORD = "test"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.EVDS_URL = url

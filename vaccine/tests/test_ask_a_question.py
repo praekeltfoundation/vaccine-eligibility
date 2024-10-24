@@ -43,7 +43,7 @@ async def model_mock():
         url = config.MODEL_API_URL
         token = config.MODEL_API_TOKEN
         config.MODEL_API_URL = f"http://{server.host}:{server.port}"
-        config.MODEL_API_TOKEN = "testtoken"
+        config.MODEL_API_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.MODEL_API_URL = url

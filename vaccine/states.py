@@ -372,7 +372,7 @@ class CustomChoiceState(BaseWhatsAppChoiceState):
     def __init__(
         self,
         *args,
-        button: str = None,
+        button: Optional[str] = None,
         additional_messages: Optional[List[str]] = None,
         **kwargs,
     ):

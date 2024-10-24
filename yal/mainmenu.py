@@ -91,8 +91,8 @@ class Application(BaseApplication):
                 "🏥 *NEED HELP?*",
                 [
                     Choice(PleaseCallMeApplication.START_STATE, "Talk to a counsellor"),
-                ]
-                + submenu_choices,
+                    *submenu_choices,
+                ],
             )
         ]
 
@@ -520,14 +520,8 @@ class Application(BaseApplication):
                 GET_HELP,
             ]
         )
-        error_parts = [get_generic_error(), ""] + parts
-        parts = [
-            title,
-            "-----",
-            "",
-            body,
-            "",
-        ] + parts
+        error_parts = [get_generic_error(), "", *parts]
+        parts = [title, "-----", "", body, "", *parts]
         question = self._("\n".join([part for part in parts if part is not None]))
         error_text = self._(
             "\n".join([part for part in error_parts if part is not None])
@@ -548,7 +542,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         helper_metadata = {}
-        if "image_path" in metadata and metadata["image_path"]:
+        if metadata.get("image_path"):
             helper_metadata["image"] = metadata["image_path"]
             buttons = None
         else:

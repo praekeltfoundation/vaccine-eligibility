@@ -22,8 +22,8 @@ async def healthcheck_mock():
             {
                 "image": {
                     "id": 1,
-                    "url": "https://sacoronavirus.b-cdn.net/wp-content/uploads/2021/12/13-dec-map.jpg",  # noqa: E501
-                    "image": "https://s3.af-south-1.amazonaws.com/evds-healthcheck-qa-django/13-dec-map.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAUPEZAKIUSYC4ZVEQ%2F20211214%2Faf-south-1%2Fs3%2Faws4_request&X-Amz-Date=20211214T135744Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=a7a7687c3cfb59501502c185be38a14f10c1435772e1ddf83267f09639baefdb",  # noqa: E501
+                    "url": "https://sacoronavirus.b-cdn.net/wp-content/uploads/2021/12/13-dec-map.jpg",
+                    "image": "https://s3.af-south-1.amazonaws.com/evds-healthcheck-qa-django/13-dec-map.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAUPEZAKIUSYC4ZVEQ%2F20211214%2Faf-south-1%2Fs3%2Faws4_request&X-Amz-Date=20211214T135744Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=a7a7687c3cfb59501502c185be38a14f10c1435772e1ddf83267f09639baefdb",
                     "image_size": 107854,
                     "image_width": 960,
                     "image_height": 720,
@@ -94,5 +94,5 @@ async def test_cases(tester: AppTester, healthcheck_mock):
     )
     assert (
         tester.application.messages[0].helper_metadata["image"]
-        == "https://s3.af-south-1.amazonaws.com/evds-healthcheck-qa-django/13-dec-map.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAUPEZAKIUSYC4ZVEQ%2F20211214%2Faf-south-1%2Fs3%2Faws4_request&X-Amz-Date=20211214T135744Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=a7a7687c3cfb59501502c185be38a14f10c1435772e1ddf83267f09639baefdb"  # noqa: E501
+        == "https://s3.af-south-1.amazonaws.com/evds-healthcheck-qa-django/13-dec-map.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAUPEZAKIUSYC4ZVEQ%2F20211214%2Faf-south-1%2Fs3%2Faws4_request&X-Amz-Date=20211214T135744Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=a7a7687c3cfb59501502c185be38a14f10c1435772e1ddf83267f09639baefdb"
     )

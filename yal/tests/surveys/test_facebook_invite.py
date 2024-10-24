@@ -64,7 +64,7 @@ async def rapidpro_mock():
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
-        config.RAPIDPRO_TOKEN = "testtoken"
+        config.RAPIDPRO_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.RAPIDPRO_URL = url
@@ -220,7 +220,7 @@ async def test_state_facebook_member_yes_active(tester: AppTester, rapidpro_mock
                 "To do the survey, click on the link below, answer the questions and "
                 "you’re all done!",
                 "",
-                "https://docs.google.com/forms/d/e/1FAIpQLScjbZEbIjQXMDdHbJTUCjxYnbRVP4D2p6kXQy74tXrIN6Qwww/viewform?usp=sf_link",  # noqa: E501
+                "https://docs.google.com/forms/d/e/1FAIpQLScjbZEbIjQXMDdHbJTUCjxYnbRVP4D2p6kXQy74tXrIN6Qwww/viewform?usp=sf_link",
             ]
         )
     )
@@ -268,7 +268,7 @@ async def test_state_not_a_member_yes(tester: AppTester):
                 "Now on to the survey! Click on the link below, answer the questions "
                 "and you’re all done!",
                 "",
-                "https://docs.google.com/forms/d/e/1FAIpQLSe_YlROLiezkGFbdcK7HBA99ABrWvUcvZ20azvAEpQKHwr6kw/viewform?usp=sf_link",  # noqa: E501
+                "https://docs.google.com/forms/d/e/1FAIpQLSe_YlROLiezkGFbdcK7HBA99ABrWvUcvZ20azvAEpQKHwr6kw/viewform?usp=sf_link",
             ]
         )
     )
