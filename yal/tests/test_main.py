@@ -945,11 +945,12 @@ async def test_tracked_keywords_demand_gen(
 ):
     rapidpro_mock.tstate.contact_fields["onboarding_completed"] = ""
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = ""
-    await tester.user_input("RegisterMe")
-    tester.assert_state("state_start")
+    await tester.user_input("registerme")
+    tester.assert_state("state_welcome")
+
     tester.assert_num_messages(1)
 
-    tester.assert_answer("state_source_tracking", "RegisterMe")
+    tester.assert_answer("state_source_tracking", "registerme")
 
 
 @pytest.mark.asyncio

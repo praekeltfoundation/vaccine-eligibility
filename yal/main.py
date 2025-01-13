@@ -64,7 +64,7 @@ TRACKING_KEYWORDS_ROUND_2 = {
     "i saw this on facebook",
 }
 TRACKING_KEYWORDS_ROUND_3 = {"youth", "yth", "yuth", "yut", "yoth", "yot", "yoh"}
-TRACKING_KEYWORDS_ROUND_4 = {"RegisterMe"}
+TRACKING_KEYWORDS_ROUND_4 = {"registerme"}
 TRACKING_KEYWORDS_TIKTOK = {"sho"}
 OPTOUT_KEYWORDS = {"stop", "opt out", "cancel", "quit"}
 ONBOARDING_REMINDER_KEYWORDS = {
