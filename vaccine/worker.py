@@ -8,9 +8,8 @@ from urllib.parse import urljoin
 import aiohttp
 import redis.asyncio as aioredis
 import sentry_sdk
-from aio_pika import Connection, ExchangeType, IncomingMessage
+from aio_pika import Connection, ExchangeType, IncomingMessage, connect_robust
 from aio_pika import Message as AMQPMessage
-from aio_pika import connect_robust
 from aio_pika.message import DeliveryMode
 from redis.exceptions import LockNotOwnedError
 

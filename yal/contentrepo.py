@@ -161,9 +161,9 @@ async def get_page_details(
                         )
                     else:
                         if "prompt_quiz" in page_details["tags"]:
-                            quiz_tag = [
+                            quiz_tag = next(
                                 i for i in page_details["tags"] if i.startswith("quiz_")
-                            ][0]
+                            )
                             page_details["quiz_tag"] = quiz_tag
 
                         tags = ["aaq", "pleasecallme"]

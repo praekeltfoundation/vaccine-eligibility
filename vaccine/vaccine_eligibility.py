@@ -123,8 +123,8 @@ class Application(BaseApplication):
             try:
                 age = int(content or "")
                 assert age >= 0
-            except (ValueError, TypeError, AssertionError):
-                raise ErrorMessage("⚠️  Reply using numbers only. Example *27*")
+            except (ValueError, TypeError, AssertionError) as e:
+                raise ErrorMessage("⚠️  Reply using numbers only. Example *27*") from e
 
         progress_bar = "◼️◼️◼️◻️◻️"
         return FreeText(

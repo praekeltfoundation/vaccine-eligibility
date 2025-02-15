@@ -284,7 +284,7 @@ class Application(BaseApplication):
 
     async def state_submit_completed_feedback(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         error = await rapidpro.start_flow(whatsapp_id, config.USERTESTING_FLOW_UUID)
         if error:
             return await self.go_to_state("state_error")

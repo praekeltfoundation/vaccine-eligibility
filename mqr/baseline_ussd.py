@@ -43,7 +43,7 @@ class Application(MidlineApplication):
 
     async def state_start(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        urn = f"whatsapp:{msisdn.lstrip(' + ')}"
+        urn = f"whatsapp:{msisdn.removeprefix('+')}"
 
         sms_mqr_contact = False
 
@@ -593,7 +593,7 @@ class Application(MidlineApplication):
 
     async def state_update_rapidpro_contact(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        urn = f"whatsapp:{msisdn.lstrip(' + ')}"
+        urn = f"whatsapp:{msisdn.removeprefix('+')}"
 
         async with get_rapidpro() as session:
             for i in range(3):

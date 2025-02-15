@@ -49,7 +49,7 @@ class Application(BaseApplication):
 
     async def state_pushmessage_optin_no_submit(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "push_message_opt_in": "False",
         }
@@ -74,7 +74,7 @@ class Application(BaseApplication):
 
     async def state_pushmessage_optin_yes_submit(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "push_message_opt_in": "True",
         }
@@ -236,7 +236,7 @@ class Application(BaseApplication):
 
     async def state_study_consent_yes_submit(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "ejaf_study_optin": "True",
         }

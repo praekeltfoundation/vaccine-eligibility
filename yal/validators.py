@@ -17,8 +17,8 @@ def day_validator(dob_year, dob_month, error_text):
 
                 if dob_month != "skip" and dob_year != "skip":
                     date(int(dob_year), int(dob_month), int(value))
-            except (AssertionError, ValueError, OverflowError):
-                raise ErrorMessage(error_text)
+            except (AssertionError, ValueError, OverflowError) as e:
+                raise ErrorMessage(error_text) from e
 
     return validator
 
@@ -31,8 +31,8 @@ def year_validator(error_text):
                 assert value.isdigit()
                 assert int(value) > get_today().year - config.MAX_AGE
                 assert int(value) <= get_today().year
-        except AssertionError:
-            raise ErrorMessage(error_text)
+        except AssertionError as ae:
+            raise ErrorMessage(error_text) from ae
 
     return validator
 
@@ -44,9 +44,9 @@ def phone_number_validator(error_text):
                 normalise_phonenumber(value)
             except ValueError as e:
                 print(e)
-                raise ErrorMessage(error_text)
+                raise ErrorMessage(error_text) from e
         else:
-            raise ErrorMessage(error_text)
+            raise ErrorMessage(error_text) from None
 
     return validator
 
@@ -54,13 +54,12 @@ def phone_number_validator(error_text):
 def age_validator(error_text):
     async def validator(value):
         try:
-            if value:
-                if value.lower() != "skip":
-                    assert isinstance(value, str)
-                    assert value.isdigit()
-                    assert int(value) > 0
-                    assert int(value) <= 100
-        except AssertionError:
-            raise ErrorMessage(error_text)
+            if value and value.lower() != "skip":
+                assert isinstance(value, str)
+                assert value.isdigit()
+                assert int(value) > 0
+                assert int(value) <= 100
+        except AssertionError as ae:
+            raise ErrorMessage(error_text) from ae
 
     return validator

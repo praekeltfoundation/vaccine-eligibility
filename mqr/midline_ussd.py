@@ -30,7 +30,7 @@ class Application(BaseApplication):
         if message.session_event == Message.SESSION_EVENT.CLOSE:
             self.user.session_id = None
             msisdn = normalise_phonenumber(self.user.addr)
-            urn = f"whatsapp:{msisdn.lstrip(' + ')}"
+            urn = f"whatsapp:{msisdn.removeprefix('+')}"
 
             async with get_rapidpro() as session:
                 for i in range(3):
@@ -523,7 +523,7 @@ class Application(BaseApplication):
 
     async def state_update_rapidpro_contact_midline(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        urn = f"whatsapp:{msisdn.lstrip(' + ')}"
+        urn = f"whatsapp:{msisdn.removeprefix('+')}"
 
         async with get_rapidpro() as session:
             for i in range(3):

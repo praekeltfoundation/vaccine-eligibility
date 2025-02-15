@@ -56,7 +56,7 @@ async def rapidpro_mock():
         url = config.RAPIDPRO_URL
         config.SEGMENT_AIRTIME_FLOW_UUID = "segment-airtime-flow-uuid"
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
-        config.RAPIDPRO_TOKEN = "testtoken"
+        config.RAPIDPRO_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.RAPIDPRO_URL = url

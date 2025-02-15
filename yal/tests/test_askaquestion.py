@@ -88,7 +88,7 @@ async def aaq_mock():
     async with run_sanic(app) as server:
         url = config.AAQ_URL
         config.AAQ_URL = f"http://{server.host}:{server.port}"
-        config.AAQ_TOKEN = "testtoken"
+        config.AAQ_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.AAQ_URL = url
@@ -143,7 +143,7 @@ async def rapidpro_mock():
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
-        config.RAPIDPRO_TOKEN = "testtoken"
+        config.RAPIDPRO_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.RAPIDPRO_URL = url
@@ -278,7 +278,7 @@ async def test_state_display_results_choose_an_answer(
     tester.setup_state("state_display_results")
     tester.user.metadata["aaq_page"] = 0
     tester.user.metadata["inbound_id"] = "inbound-id"
-    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"  # noqa: S105 - Fake password/token for test purposes
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
 
     await tester.user_input("FAQ #1 Title")
@@ -324,7 +324,7 @@ async def test_state_display_results_next(tester: AppTester, aaq_mock):
     tester.user.metadata["aaq_page"] = 0
     tester.user.metadata["next_page_url"] = "/inbound/92567/1"
     tester.user.metadata["inbound_id"] = "inbound-id"
-    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"  # noqa: S105 - Fake password/token for test purposes
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
 
     await tester.user_input("See more options")
@@ -424,7 +424,7 @@ async def test_state_display_results_pleasecallme(
     tester.setup_state("state_display_results")
     tester.user.metadata["aaq_page"] = 1
     tester.user.metadata["inbound_id"] = "inbound-id"
-    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"  # noqa: S105 - Fake password/token for test purposes
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_2
 
     await tester.user_input("5")
@@ -445,7 +445,7 @@ async def test_state_display_results_back(tester: AppTester, aaq_mock):
     tester.setup_state("state_display_results")
     tester.user.metadata["aaq_page"] = 1
     tester.user.metadata["inbound_id"] = "inbound-id"
-    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"  # noqa: S105 - Fake password/token for test purposes
     tester.user.metadata["prev_page_url"] = "/inbound/92567/1"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_2
 
@@ -459,7 +459,7 @@ async def test_state_get_content_feedback_question_answered(
     tester: AppTester, rapidpro_mock, aaq_mock
 ):
     tester.user.metadata["inbound_id"] = "inbound-id"
-    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"  # noqa: S105 - Fake password/token for test purposes
     tester.user.metadata["faq_id"] = "1"
     tester.setup_state("state_get_content_feedback")
 
@@ -506,7 +506,7 @@ async def test_state_display_content_question_not_answered(
     tester: AppTester, rapidpro_mock, aaq_mock
 ):
     tester.user.metadata["inbound_id"] = "inbound-id"
-    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"  # noqa: S105 - Fake password/token for test purposes
     tester.user.metadata["faq_id"] = "1"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.user.metadata["aaq_page"] = 0
@@ -601,7 +601,7 @@ async def test_state_display_content_question_back_to_list(
     tester: AppTester, rapidpro_mock, aaq_mock
 ):
     tester.user.metadata["inbound_id"] = "inbound-id"
-    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"  # noqa: S105 - Fake password/token for test purposes
     tester.user.metadata["faq_id"] = "1"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.user.metadata["aaq_page"] = 0
@@ -662,7 +662,7 @@ async def test_state_handle_timeout_handles_type_2_yes(
     tester.setup_user_address("27820001002")
     tester.setup_state("state_handle_timeout_response")
     tester.user.metadata["inbound_id"] = "inbound-id"
-    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"  # noqa: S105 - Fake password/token for test purposes
     tester.user.metadata["faq_id"] = "1"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.user.metadata["aaq_page"] = 0
@@ -712,7 +712,7 @@ async def test_state_handle_timeout_handles_type_2_no(
     tester.setup_user_address("27820001002")
     tester.setup_state("state_handle_timeout_response")
     tester.user.metadata["inbound_id"] = "inbound-id"
-    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"  # noqa: S105 - Fake password/token for test purposes
     tester.user.metadata["faq_id"] = "1"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.user.metadata["aaq_page"] = 0

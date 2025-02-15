@@ -18,10 +18,8 @@ poetry run python vaccine/worker.py
 
 To run autoformatting and linting, run
 ```bash
-poetry run black .
-poetry run isort .
-poetry run mypy .
-poetry run flake8
+poetry run ruff check
+poetry run ruff format
 ```
 
 To run the tests, run

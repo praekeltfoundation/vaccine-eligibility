@@ -55,7 +55,6 @@ class Application(BaseApplication):
     }
 
     async def state_aaq_start(self, question=None, buttons=None):
-
         if not config.AAQ_URL:
             return await self.go_to_state("state_coming_soon")
 
@@ -97,7 +96,7 @@ class Application(BaseApplication):
 
     async def state_set_aaq_timeout_1(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         timeout_time = get_current_datetime() + timedelta(minutes=5)
         data = {
@@ -161,7 +160,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_no_answers")
 
         choices = []
-        for title in answers.keys():
+        for title in answers:
             choices.append(Choice(title, title))
 
         if page == 0:
@@ -257,7 +256,7 @@ class Application(BaseApplication):
             return await self.go_to_state(PleaseCallMeApplication.START_STATE)
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         timeout_time = get_current_datetime() + timedelta(minutes=5)
         data = {
@@ -315,7 +314,7 @@ class Application(BaseApplication):
 
     async def state_is_question_answered(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         data = {
             "feedback_type": "",
@@ -416,7 +415,6 @@ class Application(BaseApplication):
         )
 
     async def state_yes_question_answered_changes(self):
-
         question = self._(
             "\n".join(
                 [
@@ -545,7 +543,7 @@ class Application(BaseApplication):
 
     async def state_handle_timeout_response(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         data = {"feedback_survey_sent": "", "feedback_timestamp": ""}
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)

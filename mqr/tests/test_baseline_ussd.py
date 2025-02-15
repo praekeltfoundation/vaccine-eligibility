@@ -39,10 +39,9 @@ async def rapidpro_mock():
     @app.route("/api/v2/contacts.json", methods=["GET"])
     def get_contact(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
 
         contacts = []
         urn = request.args.get("urn")
@@ -71,7 +70,7 @@ async def rapidpro_mock():
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
-        config.RAPIDPRO_TOKEN = "testtoken"
+        config.RAPIDPRO_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.RAPIDPRO_URL = url
@@ -88,19 +87,20 @@ async def eventstore_mock():
     @app.route("/api/v1/mqrbaselinesurvey/", methods=["POST"])
     def valid_baseline_survey(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
         return response.json({})
 
     @app.route("/api/v1/mqrbaselinesurvey/27820001003/", methods=["GET"])
     def get_baseline_survey_not_found(request):
         tstate.requests.append(request)
-        if tstate.not_found_errormax:
-            if tstate.not_found_errors < tstate.not_found_errormax:
-                tstate.not_found_errors += 1
-                return response.json({}, status=500)
+        if (
+            tstate.not_found_errormax
+            and tstate.not_found_errors < tstate.not_found_errormax
+        ):
+            tstate.not_found_errors += 1
+            return response.json({}, status=500)
         return response.json({"detail": "Not found."}, status=404)
 
     @app.route("/api/v1/mqrbaselinesurvey/27820001004/", methods=["GET"])

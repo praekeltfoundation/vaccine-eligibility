@@ -163,7 +163,6 @@ class Application(BaseApplication):
         return FreeText(self, question=question, check=check, next="state_call_model")
 
     async def state_display_response_choices(self):
-
         responses = json.loads(self.user.answers["model_response"])["top_responses"]
         return RedirectChoiceState(
             self,
@@ -211,12 +210,12 @@ class Application(BaseApplication):
     async def state_display_selected_choice(self):
         responses = json.loads(self.user.answers["model_response"])["top_responses"]
         choice = self.user.answers["state_display_response_choices"]
-        for title, content in responses:
+        for title, _content in responses:
             if choice == title:
                 break
         return WhatsAppRedirectButtonState(
             self,
-            question=content,
+            question=_content,
             choices=[
                 Choice("yes", self._("👍"), ["yes"]),
                 Choice("no", self._("👎︎."), ["no"]),

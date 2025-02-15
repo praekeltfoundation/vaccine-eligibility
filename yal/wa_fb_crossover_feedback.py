@@ -103,7 +103,7 @@ class Application(BaseApplication):
 
     async def state_saw_recent_facebook(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "engaged_on_facebook": "TRUE",
             "last_mainmenu_time": utils.get_current_datetime().isoformat(),
@@ -153,7 +153,7 @@ class Application(BaseApplication):
 
     async def state_not_saw_recent_facebook(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "engaged_on_facebook": "FALSE",
         }
