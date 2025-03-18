@@ -9,6 +9,11 @@ from vaccine.vaccine_reg_ussd import Application as VacRegApp
 
 
 class Application(VacRegApp, HealthCheckApp):
+    """
+    Note: The Vaccine Registration option (VacRegApp.START_STATE) has been decommissioned and 
+    removed as a menu choice as of March 2025. The menu now primarily offers the HealthCheck Symptom Checker 
+    and language selection.
+    """
     START_STATE = "state_language"
 
     async def state_menu(self):
@@ -44,7 +49,6 @@ class Application(VacRegApp, HealthCheckApp):
             ),
             error=self._("ERROR: Please try again"),
             choices=[
-                Choice(VacRegApp.START_STATE, self._("Vaccine Registration")),
                 Choice(
                     HealthCheckApp.START_STATE,
                     self._("HealthCheck Symptom checker [ENG]"),
