@@ -10,10 +10,12 @@ from vaccine.vaccine_reg_ussd import Application as VacRegApp
 
 class Application(VacRegApp, HealthCheckApp):
     """
-    Note: The Vaccine Registration option (VacRegApp.START_STATE) has been decommissioned and 
-    removed as a menu choice as of March 2025. The menu now primarily offers the HealthCheck Symptom Checker 
-    and language selection.
+    Note: The Vaccine Registration option (VacRegApp.START_STATE) has been
+    decommissioned and removed as a menu choice as of March 2025.
+    The menu now primarily offers the HealthCheck Symptom
+    Checker and language selection.
     """
+
     START_STATE = "state_language"
 
     async def state_menu(self):
