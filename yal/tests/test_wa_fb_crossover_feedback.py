@@ -30,7 +30,7 @@ def get_rapidpro_contact(urn):
     }
     if urn == "whatsapp:27820001001":
         contact["fields"] = {
-            "last_mainmenu_time": f"{datetime.now()-timedelta(days=2)}"
+            "last_mainmenu_time": f"{datetime.now() - timedelta(days=2)}"
         }
     return contact
 

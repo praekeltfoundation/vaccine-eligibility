@@ -129,8 +129,7 @@ async def test_state_display_preferences(tester: AppTester, rapidpro_mock):
             [
                 "⚙️CHAT SETTINGS / *Update your info*",
                 "-----",
-                "Here's the info you've saved. *What info would you like to "
-                "change?*",
+                "Here's the info you've saved. *What info would you like to change?*",
                 "",
                 "🍰 *Age*",
                 "22",
@@ -188,8 +187,7 @@ async def test_state_display_preferences_study_false(tester: AppTester, rapidpro
             [
                 "⚙️CHAT SETTINGS / *Update your info*",
                 "-----",
-                "Here's the info you've saved. *What info would you like to "
-                "change?*",
+                "Here's the info you've saved. *What info would you like to change?*",
                 "",
                 "🍰 *Age*",
                 "22",

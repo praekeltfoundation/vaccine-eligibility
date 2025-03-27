@@ -218,7 +218,7 @@ class Application(BaseApplication):
                 "Can we contact you on this number when this changes?\n"
             ).format(minimum_age=config.ELIGIBILITY_AGE_GATE_MIN),
             choices=[Choice("yes", self._("Yes")), Choice("no", self._("No"))],
-            footer=self._("\n" "REPLY with the NUMBER of the option you have chosen."),
+            footer=self._("\nREPLY with the NUMBER of the option you have chosen."),
             error=self._(
                 "⚠️ This service works best when you use the numbered options "
                 "available.\n"
@@ -526,9 +526,7 @@ class Application(BaseApplication):
         return FreeText(
             self,
             question=self._(
-                "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
-                "\n"
-                "Please TYPE in your {id_type}"
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐\n\nPlease TYPE in your {id_type}"
             ).format(id_type=idtype_label),
             next="state_check_id_number",
             check=validate_identification_number,
@@ -704,8 +702,7 @@ class Application(BaseApplication):
             except AssertionError as e:
                 raise ErrorMessage(
                     self._(
-                        "⚠️  Please TYPE in only the YEAR you were born.\n"
-                        "Example _1980_"
+                        "⚠️  Please TYPE in only the YEAR you were born.\nExample _1980_"
                     )
                 ) from e
 
@@ -769,7 +766,7 @@ class Application(BaseApplication):
                 "\n"
                 "In which MONTH were you born?\n"
             ),
-            error_footer=self._("\n" "Reply with the number next to the month."),
+            error_footer=self._("\nReply with the number next to the month."),
         )
 
     async def state_dob_day(self):
@@ -836,7 +833,7 @@ class Application(BaseApplication):
         return ChoiceState(
             self,
             question=self._(
-                "*VACCINE REGISTRATION SECURE CHAT* 🔐\n" "\n" "What is your GENDER?\n"
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐\n\nWhat is your GENDER?\n"
             ),
             choices=[
                 Choice("Male", self._("Male")),
@@ -885,8 +882,7 @@ class Application(BaseApplication):
             except ValueError as ve:
                 raise ErrorMessage(
                     self._(
-                        "⚠️ Please type a valid cell phone number.\n"
-                        "Example _081234567_"
+                        "⚠️ Please type a valid cell phone number.\nExample _081234567_"
                     )
                 ) from ve
 
@@ -990,7 +986,7 @@ class Application(BaseApplication):
                 "REPLY with the NUMBER next to the name of your Medical Aid Provider:\n"
             ),
             error_footer=self._(
-                "\n" "📌 Or reply *0* to end this session and return to the main *MENU*"
+                "\n📌 Or reply *0* to end this session and return to the main *MENU*"
             ),
             next=next_state,
         )

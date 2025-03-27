@@ -204,9 +204,7 @@ class Application(BaseApplication):
             question=self._("Please TYPE the CELL PHONE NUMBER we can contact you on."),
             next="state_get_message_history",
             check=phone_number_validator(
-                self._(
-                    "⚠️ Please type a valid cell phone number.\n" "Example _081234567_"
-                )
+                self._("⚠️ Please type a valid cell phone number.\nExample _081234567_")
             ),
         )
 

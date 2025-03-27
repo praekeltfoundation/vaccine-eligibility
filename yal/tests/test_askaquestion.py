@@ -525,7 +525,7 @@ async def test_state_display_content_question_not_answered(
             "I'll try make sure I have the right information "
             "for you next time.",
             "",
-            "_Just type and send your question again, now._" "",
+            "_Just type and send your question again, now._",
             "-----",
             "*Or reply:*",
             BACK_TO_MAIN,
@@ -736,7 +736,7 @@ async def test_state_handle_timeout_handles_type_2_no(
             "I'll try make sure I have the right information "
             "for you next time.",
             "",
-            "_Just type and send your question again, now._" "",
+            "_Just type and send your question again, now._",
             "-----",
             "*Or reply:*",
             BACK_TO_MAIN,
@@ -768,7 +768,7 @@ async def test_state_yes_question_answered_no_changes(tester: AppTester, rapidpr
         [
             "Thank you so much for your feedback.",
             "",
-            "🤖 *If you have another question, " "you know what to do!* 😉 ",
+            "🤖 *If you have another question, you know what to do!* 😉 ",
             "",
             "*What would you like to do now?*",
             "",

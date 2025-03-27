@@ -1,4 +1,3 @@
-
 from vaccine import vacreg_config as config
 from vaccine.healthcheck_ussd import Application as HealthCheckApp
 from vaccine.models import Message
@@ -64,7 +63,7 @@ class Application(VacRegApp, HealthCheckApp):
             question="NATIONAL DEPT OF HEALTH's COVID-19 Response services\n"
             "\n"
             "Language:",
-            error="ERROR: Please try again\n" "\n" "Language:",
+            error="ERROR: Please try again\n\nLanguage:",
             choices=[
                 Choice("eng", "English"),
                 Choice("zul", "isiZulu"),

@@ -51,7 +51,7 @@ class Suburbs:
         await self.fetch()
         return self._provinces()
 
-    @cache # noqa B019 - TODO: Fix
+    @cache  # noqa B019 - TODO: Fix
     def _provinces(self):
         provinces = [(i["value"], i["text"]) for i in self.data]
         provinces.sort(key=itemgetter(1))
@@ -61,7 +61,7 @@ class Suburbs:
         await self.fetch()
         return self._suburbs_for_province(province_id)
 
-    @cache # noqa B019 - TODO: Fix
+    @cache  # noqa B019 - TODO: Fix
     def _suburbs_for_province(self, province_id):
         for province in self.data:
             if province["value"] == province_id:

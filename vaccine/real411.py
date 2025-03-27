@@ -312,9 +312,7 @@ class Application(BaseApplication):
 
     async def state_first_name(self):
         question = self._(
-            "*REPORT* 📵 Powered by ```Real411.org```\n"
-            "\n"
-            "Reply with your FIRST NAME:"
+            "*REPORT* 📵 Powered by ```Real411.org```\n\nReply with your FIRST NAME:"
         )
         return FreeText(
             self,
@@ -324,7 +322,7 @@ class Application(BaseApplication):
 
     async def state_surname(self):
         question = self._(
-            "*REPORT* 📵 Powered by ```Real411.org```\n" "\n" "Reply with your SURNAME:"
+            "*REPORT* 📵 Powered by ```Real411.org```\n\nReply with your SURNAME:"
         )
         return FreeText(
             self,

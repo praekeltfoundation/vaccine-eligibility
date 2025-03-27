@@ -54,9 +54,9 @@ def main():
     documented_states = get_documented_states()
     server_states = asyncio.run(get_server_states(args))
     difference = documented_states - server_states
-    assert (
-        len(difference) == 0
-    ), f"{len(difference)} states are not in the definition. List: {difference}"
+    assert len(difference) == 0, (
+        f"{len(difference)} states are not in the definition. List: {difference}"
+    )
     print("Done! No missing questions found")
 
 

@@ -179,7 +179,7 @@ async def contentrepo_api_mock():
 
         if child_of in ["1111"]:
             for i in range(5):
-                pages.append({"id": i, "title": f"Sub menu {i+1}"})
+                pages.append({"id": i, "title": f"Sub menu {i + 1}"})
             pages.append({"id": 123, "title": "Sub menu that is very long"})
 
         if child_of == "1231":
@@ -552,8 +552,7 @@ async def test_state_mainmenu_start_suggested_populated(
             "⚙️ *CHAT SETTINGS*",
             "11. Update your information",
             "-----",
-            "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or"
-            " *MENU*.",
+            "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or *MENU*.",
         ]
     )
 

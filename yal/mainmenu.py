@@ -192,7 +192,7 @@ class Application(BaseApplication):
         suggested_choices = await self.get_suggested_choices(parent_topic_links)
         choices.extend(suggested_choices)
         suggested_text = "\n".join(
-            [f"*{i+k}* - {c.label}" for k, c in enumerate(suggested_choices)]
+            [f"*{i + k}* - {c.label}" for k, c in enumerate(suggested_choices)]
         )
         error = await self.update_suggested_content_details("mainmenu", suggested_text)
         if error:
@@ -531,7 +531,7 @@ class Application(BaseApplication):
         suggested_choices = await self.get_suggested_choices()
         choices.extend(suggested_choices)
         suggested_text = "\n".join(
-            [f"*{i+k}* - {c.label}" for k, c in enumerate(suggested_choices)]
+            [f"*{i + k}* - {c.label}" for k, c in enumerate(suggested_choices)]
         )
         self.save_metadata(
             "suggested_choices", [str(i + k) for k in range(len(suggested_choices))]

@@ -202,8 +202,7 @@ async def test_state_servicefinder_start_no_address(tester: AppTester, rapidpro_
                 "",
                 "🤖*(You can share your location by sending me a pin (📍). To do this:*",
                 "",
-                "1️⃣*Tap the + _(plus)_* button or the 📎*_(paperclip)_* button "
-                "below.",
+                "1️⃣*Tap the + _(plus)_* button or the 📎*_(paperclip)_* button below.",
                 "",
                 "2️⃣Next, tap *Location* then select *Send Your Current Location.*",
                 "",
@@ -335,8 +334,7 @@ async def test_state_confirm_existing_address_no(tester: AppTester, rapidpro_moc
                 "🤖*You can change your location by sending me a pin (📍)."
                 " To do this:*",
                 "",
-                "1️⃣Tap the *+ _(plus)_* button or the 📎*_(paperclip)_* button "
-                "below.",
+                "1️⃣Tap the *+ _(plus)_* button or the 📎*_(paperclip)_* button below.",
                 "",
                 "2️⃣Next, tap *Location* then select *Send Your Current Location.*",
                 "",

@@ -354,9 +354,7 @@ class Application(BaseApplication):
             question=question,
             next="state_confirm_specified_msisdn",
             check=phone_number_validator(
-                self._(
-                    "⚠️ Please type a valid cell phone number.\n" "Example _081234567_"
-                )
+                self._("⚠️ Please type a valid cell phone number.\nExample _081234567_")
             ),
         )
 
@@ -887,7 +885,7 @@ class Application(BaseApplication):
                     "",
                     "*What do you want to do next?*",
                     "",
-                    "*1* - Get help another way" "----",
+                    "*1* - Get help another way----",
                     "*Or reply:*",
                     BACK_TO_MAIN,
                 ]
@@ -930,7 +928,7 @@ class Application(BaseApplication):
                     "",
                     "*What do you want to do next?*",
                     "",
-                    "*1* - Get help another way" "----",
+                    "*1* - Get help another way----",
                     "*Or reply:*",
                     BACK_TO_MAIN,
                 ]

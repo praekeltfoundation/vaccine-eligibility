@@ -133,9 +133,9 @@ def test_all_states_added_to_docs():
 
     difference = existing_states.difference(documented_states)
 
-    assert (
-        len(difference) == 0
-    ), f"{len(difference)} states are not documented. List: {difference}"
+    assert len(difference) == 0, (
+        f"{len(difference)} states are not documented. List: {difference}"
+    )
 
 
 @pytest.fixture
@@ -1113,7 +1113,7 @@ async def test_aaq_timeout_response_to_handler(
             "I'll try make sure I have the right information "
             "for you next time.",
             "",
-            "_Just type and send your question again, now._" "",
+            "_Just type and send your question again, now._",
             "-----",
             "*Or reply:*",
             BACK_TO_MAIN,

@@ -126,9 +126,9 @@ async def test_state_baseline_end_invalid_input(tester: AppTester):
     tester.assert_state("state_baseline_end")
 
     [message] = tester.application.messages
-    assert (
-        message.content in get_generic_errors()
-    ), f"Message content not in provided list, it is {message.content}"
+    assert message.content in get_generic_errors(), (
+        f"Message content not in provided list, it is {message.content}"
+    )
 
 
 @pytest.mark.asyncio

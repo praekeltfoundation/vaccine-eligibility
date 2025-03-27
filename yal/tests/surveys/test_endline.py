@@ -166,9 +166,9 @@ async def test_state_endline_end_invalid_input(tester: AppTester):
     tester.assert_state("state_endline_end")
 
     [message] = tester.application.messages
-    assert (
-        message.content in get_generic_errors()
-    ), f"Message content not in provided list, it is {message.content}"
+    assert message.content in get_generic_errors(), (
+        f"Message content not in provided list, it is {message.content}"
+    )
 
 
 @pytest.mark.asyncio
@@ -407,8 +407,7 @@ async def test_depression_assessment_endline_end(tester: AppTester):
             "◼️◽️◽️",
             "-----",
             "",
-            "*How good a job do you feel you are doing in taking"
-            " care of your health?*",
+            "*How good a job do you feel you are doing in taking care of your health?*",
         ]
     )
 
@@ -1018,8 +1017,7 @@ async def test_endline_flow(tester: AppTester, rapidpro_mock):
             "◼️◽️◽️",
             "-----",
             "",
-            "*How good a job do you feel you are doing in taking"
-            " care of your health?*",
+            "*How good a job do you feel you are doing in taking care of your health?*",
         ]
     )
 

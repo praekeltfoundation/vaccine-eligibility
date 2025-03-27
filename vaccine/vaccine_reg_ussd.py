@@ -476,10 +476,7 @@ class Application(BaseApplication):
         return MenuState(
             self,
             question=self._(
-                "Confirm the following:\n"
-                "\n"
-                "{first_name} {surname}\n"
-                "{id_number}\n"
+                "Confirm the following:\n\n{first_name} {surname}\n{id_number}\n"
             ).format(first_name=first_name, surname=surname, id_number=id_number),
             choices=[
                 Choice("state_province_id", self._("Correct")),

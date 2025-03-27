@@ -273,7 +273,7 @@ class Application(BaseApplication):
 
     async def state_another_result(self):
         responses = json.loads(self.user.answers["model_response"])["top_responses"]
-        question = self._("Thank you for confirming.\n" "\n" "Try a different result?")
+        question = self._("Thank you for confirming.\n\nTry a different result?")
 
         async def next_state(choice: Choice):
             self.save_answer("state_display_response_choices", choice.label)

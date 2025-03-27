@@ -179,7 +179,7 @@ class Application(BaseApplication):
             # Add next page option if there is one
             if self.user.metadata.get("next_page_url"):
                 question_list.extend(
-                    ["or", f"*{len(choices)+1}*. See more options", ""]
+                    ["or", f"*{len(choices) + 1}*. See more options", ""]
                 )
                 choices.append(Choice("more", "See more options"))
             # Add footer options
@@ -189,8 +189,7 @@ class Application(BaseApplication):
         else:
             question = "\n".join(
                 [
-                    f"🙋🏿‍♂️ QUESTIONS? / Ask A Question / *2nd {len(answers)} "
-                    "matches*",
+                    f"🙋🏿‍♂️ QUESTIONS? / Ask A Question / *2nd {len(answers)} matches*",
                     "-----",
                     "",
                     "[persona_emoji] Here are some more topics that might answer "
@@ -203,8 +202,8 @@ class Application(BaseApplication):
                     get_display_choices(choices, bold_numbers=True),
                     "",
                     "or",
-                    f"*{len(choices)+1}*. Back to first list",
-                    f"*{len(choices)+2}*. Talk to a counsellor",
+                    f"*{len(choices) + 1}*. Back to first list",
+                    f"*{len(choices) + 2}*. Talk to a counsellor",
                     "",
                     "-----",
                     "*Or reply:*",
@@ -446,7 +445,7 @@ class Application(BaseApplication):
                     "I'll try make sure I have the right information "
                     "for you next time.",
                     "",
-                    "_Just type and send your question again, now._" "",
+                    "_Just type and send your question again, now._",
                     "-----",
                     "*Or reply:*",
                     BACK_TO_MAIN,

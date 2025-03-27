@@ -65,7 +65,7 @@ class Application(BaseApplication):
         question_list = [
             "⚙️CHAT SETTINGS / *Update your info*",
             "-----",
-            "Here's the info you've saved. *What info would you like to " "change?*",
+            "Here's the info you've saved. *What info would you like to change?*",
             "",
             "🍰 *Age*",
             age or "Empty",
@@ -128,7 +128,7 @@ class Application(BaseApplication):
             choices=choices_list,
             next=next_,
             error=self._(get_generic_error()),
-            error_footer=self._("\n" "Reply with the number that matches your choice."),
+            error_footer=self._("\nReply with the number that matches your choice."),
             button="Change Preferences",
         )
 
@@ -364,8 +364,7 @@ class Application(BaseApplication):
                 "[persona_emoji] *You can change your location by sending me a pin "
                 "(📍). To do this:*",
                 "",
-                "1️⃣Tap the *+ _(plus)_* button or the 📎*_(paperclip)_* button "
-                "below.",
+                "1️⃣Tap the *+ _(plus)_* button or the 📎*_(paperclip)_* button below.",
                 "",
                 "2️⃣Next, tap *Location* then select *Send Your Current Location.*",
                 "",
@@ -491,7 +490,7 @@ class Application(BaseApplication):
 
     async def state_update_gender(self):
         gender_text = "\n".join(
-            [f"*{i+1}* - {name}" for i, (code, name) in enumerate(GENDERS.items())]
+            [f"*{i + 1}* - {name}" for i, (code, name) in enumerate(GENDERS.items())]
         )
         gender_choices = [Choice(code, name) for code, name in GENDERS.items()]
         gender_text = f"{gender_text}\n*{len(gender_choices) + 1}* - Skip"

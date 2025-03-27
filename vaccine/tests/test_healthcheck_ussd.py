@@ -621,7 +621,7 @@ async def test_state_city():
     assert len(reply.content) < 160
     assert u.state.name == "state_city"
     assert reply.content == (
-        "Please TYPE the name of your Suburb, Township, Town or " "Village (or nearest)"
+        "Please TYPE the name of your Suburb, Township, Town or Village (or nearest)"
     )
 
     app.messages = []
@@ -636,7 +636,7 @@ async def test_state_city():
     assert len(reply.content) < 160
     assert u.state.name == "state_city"
     assert reply.content == (
-        "Please TYPE the name of your Suburb, Township, Town or " "Village (or nearest)"
+        "Please TYPE the name of your Suburb, Township, Town or Village (or nearest)"
     )
 
 
