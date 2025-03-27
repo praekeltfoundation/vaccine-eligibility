@@ -7,7 +7,7 @@ authors = [
     {name = "Praekelt.org", email = "dev@praekelt.org"},
 ]
 license = {text = "BSD-3-Clause"}
-requires-python = "<4.0,>=3.9"
+requires-python = "<3.10,>=3.9"
 dependencies = [
     "aio-pika<7.0.0,>=6.7.1",
     "sanic~=21.12",
