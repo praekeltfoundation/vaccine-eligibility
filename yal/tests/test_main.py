@@ -936,6 +936,34 @@ async def test_tracked_keywords_saved_for_new_user_ads_round_3(
 
 
 @pytest.mark.asyncio
+async def test_tracked_keywords_demand_gen(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = ""
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = ""
+    await tester.user_input("registerme")
+    tester.assert_state("state_welcome")
+
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_source_tracking", "registerme")
+
+
+@pytest.mark.asyncio
+async def test_tracked_keywords_keready(
+    tester: AppTester, rapidpro_mock, contentrepo_api_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = ""
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = ""
+    await tester.user_input("holdmyhand")
+    tester.assert_state("state_welcome")
+
+    tester.assert_num_messages(1)
+
+    tester.assert_answer("state_source_tracking", "holdmyhand")
+
+
+@pytest.mark.asyncio
 async def test_tracked_keywords_tiktok(
     tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):

@@ -430,7 +430,7 @@ async def test_state_timed_out_timed_out():
 async def test_state_language():
     tester = AppTester(Application)
     tester.setup_state("state_menu")
-    await tester.user_input("3")
+    await tester.user_input("2")
     tester.assert_state("state_language")
 
     await tester.user_input("2")
