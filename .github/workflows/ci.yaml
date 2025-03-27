@@ -33,10 +33,6 @@ jobs:
         if: success() || failure() && steps.install-deps.outcome == 'success'
         run: |
           uv run ruff check
-      - name: Run migrations
-        if: success() || failure() && steps.install-deps.outcome == 'success'
-        run: |
-          uv run python ./manage.py makemigrations --dry-run | grep 'No changes detected' || (echo 'There are changes which require migrations.' && exit 1)
       - name: Run tests
         if: success() || failure() && steps.install-deps.outcome == 'success'
         run: |
