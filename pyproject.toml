@@ -1,67 +1,76 @@
-[tool.poetry]
+[project]
 name = "vaccine"
 version = "0.1.0"
 description = "Demo application for what a vaccine eligibility flow could look like"
-authors = ["Praekelt.org <dev@praekelt.org>"]
-license = "BSD-3-Clause"
 readme = "README.md"
-homepage = "https://github.com/praekeltfoundation/vaccine-eligibility"
-repository = "https://github.com/praekeltfoundation/vaccine-eligibility"
-packages = [
-    { include = "vaccine" },
-    { include = "mqr" },
-    { include = "yal" },
+authors = [
+    {name = "Praekelt.org", email = "dev@praekelt.org"},
+]
+license = {text = "BSD-3-Clause"}
+requires-python = "<4.0,>=3.9"
+dependencies = [
+    "aio-pika<7.0.0,>=6.7.1",
+    "sanic~=21.12",
+    "prometheus-client<1.0.0,>=0.9.0",
+    "aiohttp[speedups]<4.0.0,>=3.10.2",
+    "sentry-sdk<3.0.0,>=2.8.0",
+    "phonenumberslite<9.0.0,>=8.13.9",
+    "pycountry<21.0.0,>=20.7.3",
+    "aiohttp-client-cache<1.0.0,>=0.5.2",
+    "rapidfuzz<1.6.0,>=1.4.1",
+    "holidays<1.0.0,>=0.11.2",
+    "email-validator<2.0.0,>=1.1.3",
+    "zbar-py<2.0.0,>=1.0.4",
+    "opencv-python-headless<5.0.0,>=4.8.1",
+    "redis<5.0.0,>=4.3.3",
+    "geopy==2.2.0",
+    "emoji<3.0.0,>=2.1.0",
+    "types-emoji<3.0.0,>=2.0.1",
+    "pytablereader[md]<1.0.0,>=0.31.3",
+    "setuptools<71.0.0,>=70.0.0",
+    "requests<3.0.0,>=2.32.0",
+    "websockets>=10.0,<11.0",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-aio-pika = "^6.7.1"
-sanic = "~21.12"
-prometheus-client = "^0.9.0"
-aiohttp = {extras = ["speedups"], version = "^3.10.2"}
-sentry-sdk = "^2.8.0"
-phonenumberslite = "^8.13.9"
-pycountry = "^20.7.3"
-aiohttp-client-cache = "^0.5.2"
-rapidfuzz = ">=1.4.1,<1.6.0"  # 1.6.0 changes search result ordering
-holidays = "^0.11.2"
-email-validator = "^1.1.3"
-zbar-py = "^1.0.4"
-opencv-python-headless = "^4.8.1"
-redis = "^4.3.3"
-geopy = "2.2.0"
-emoji = "^2.1.0"
-types-emoji = "^2.0.1"
-pytablereader = {extras = ["md"], version = "^0.31.3"}
-setuptools = "^70.0.0"
-requests = "^2.32.0"
-websockets = "~10"
 
-[tool.poetry.dev-dependencies]
-ruff = "^0.6.9"
-pytest = "^7.2.0"
-pytest-cov = "^4.0.0"
-pytest-asyncio = "^0.14.0"
-Faker = "^8.1.0"
-locust = "^2.23.1"
-sanic-testing = "^0.8.3"
-mypy = "^0.960"
-types-redis = "^4.2.6"
-types-python-dateutil = "^2.8.17"
-types-setuptools = "^65.6.0"
-
-[tool.poetry.group.dev.dependencies]
-types-requests = "^2.28.11.8"
+[project.urls]
+repository = "https://github.com/praekeltfoundation/vaccine-eligibility"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+  "vaccine",
+  "mqr",
+  "yal",
+]
+
+[dependency-groups]
+dev = [
+    "ruff<1.0.0,>=0.6.9",
+    "pytest<8.0.0,>=7.2.0",
+    "pytest-cov<5.0.0,>=4.0.0",
+    "pytest-asyncio<1.0.0,>=0.14.0",
+    "Faker<9.0.0,>=8.1.0",
+    "locust<3.0.0,>=2.23.1",
+    "sanic-testing<1.0.0,>=0.8.3",
+    "mypy<1.0,>=0.960",
+    "types-redis<5.0.0,>=4.2.6",
+    "types-python-dateutil<3.0.0,>=2.8.17",
+    "types-setuptools<66.0.0,>=65.6.0",
+    "types-requests<3.0.0.0,>=2.28.11.8",
+]
+
+[tool.pytest.ini_options]
+filterwarnings = ['ignore::DeprecationWarning',]
+python_files = "test*.py"
+addopts = "--verbose --ds=config.settings.test"
 
 [tool.ruff]
 extend-exclude = [
     "*/migrations/*.py",
-    "docs/conf.py",
-
 ]
 
 [tool.ruff.lint]
@@ -84,38 +93,23 @@ ignore = [
     "E501",  # TODO: Something about these long lines.
     "S113",  # TODO: Add request timeouts.
     "PTH118", # TODO: Switch to pathlib
-    "PTH123", # TODO: Switch to pathlib
-    "B019", # TODO: Use of 'functools.lru_cache' or 'functools.cache' on methods can lead to memory leaks
-    "S101", # TODO: Use of 'assert' detected
+    "PTH100", # TODO: Switch to pathlib
+    "PTH120", # TODO: Switch to pathlib
     "RUF012", # We usually want immutable instance attributes
-    "RUF001", # TODO: Check if we want to change these ambiguous characters
-    
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = [
-    "S101",  # It's okay to use 'assert' in tests.
+    "S101",  # It's okay to use `assert` in tests.
 ]
 
 # TODO: Move this somewhere sensible?
 "**/tests.py" = [
-    "S101",  # It's okay to use 'assert' in tests.
+    "S101",  # It's okay to use `assert` in tests.
 ]
 
 "**/config/settings/{test,dev}.py" = [
     "S104",  # It's okay to bind to all interfaces in tests
     "F405", # Its okay to import * in settings
-
-]
-
-[tool.pytest.ini_options]
-addopts = "--cov=vaccine --cov=yal --ignore=vaccine.testing"
-filterwarnings = [
-    "error::UserWarning:_pytest",  # For PytestUnhandledCoroutineWarning
-    "error::DeprecationWarning",
-    # Various things pass a deprecated loop arg, presumably for python 3.7
-    "default::DeprecationWarning:asyncio",
-    "default::DeprecationWarning:pytest_asyncio",
-    "default::DeprecationWarning:sanic.server:556",
-    "default::DeprecationWarning:sanic.server.runners:133",
+    "S105", # Its okay to have hardcoded secrets in test config
 ]
