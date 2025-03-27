@@ -1,7 +1,7 @@
 import socket
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
-from typing import Any, Callable, List, Optional, Type
+from typing import Any, Callable, Optional
 
 from aio_pika import IncomingMessage
 from sanic import Sanic
@@ -19,7 +19,7 @@ class AppTester:
     DEFAULT_TRANSPORT_TYPE = Message.TRANSPORT_TYPE.HTTP_API
     DEFAULT_SESSION_ID = 1
 
-    def __init__(self, app_class: Type[BaseApplication]):
+    def __init__(self, app_class: type[BaseApplication]):
         self.user = User(addr=self.DEFAULT_USER_ADDRESS)
         self.fake_worker = FakeWorker()
         self.application = app_class(self.user, self.fake_worker)
@@ -116,9 +116,9 @@ class AppTester:
         self,
         content: Optional[str] = None,
         session: Optional[Message.SESSION_EVENT] = None,
-        buttons: Optional[List[str]] = None,
+        buttons: Optional[list[str]] = None,
         button: Optional[str] = None,
-        list_items: Optional[List[str]] = None,
+        list_items: Optional[list[str]] = None,
         header: Optional[str] = None,
         max_length: Optional[int] = None,
     ):
@@ -157,10 +157,10 @@ class AppTester:
 
 class FakeWorker(Worker):
     def __init__(self):
-        self.inbound_messages: List[IncomingMessage] = []
-        self.outbound_messages: List[Message] = []
-        self.events: List[IncomingMessage] = []
-        self.answers: List[Answer] = []
+        self.inbound_messages: list[IncomingMessage] = []
+        self.outbound_messages: list[Message] = []
+        self.events: list[IncomingMessage] = []
+        self.answers: list[Answer] = []
 
     async def setup(self):
         pass

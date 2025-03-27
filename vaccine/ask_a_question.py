@@ -1,7 +1,7 @@
 import json
 import logging
 import re
-from typing import List, Optional
+from typing import Optional
 from urllib.parse import urljoin
 
 import aiohttp
@@ -57,7 +57,7 @@ class WhatsAppRedirectButtonState(WhatsAppButtonState):
 class Application(BaseApplication):
     START_STATE = "state_question"
 
-    async def process_message(self, message: Message) -> List[Message]:
+    async def process_message(self, message: Message) -> list[Message]:
         if message.session_event == Message.SESSION_EVENT.CLOSE:
             self.state_name = "state_timeout"
         keyword = re.sub(r"\W+", " ", message.content or "").strip().lower()

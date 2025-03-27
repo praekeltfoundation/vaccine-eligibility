@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from vaccine.base_application import BaseApplication
 from vaccine.models import Message
@@ -15,7 +15,7 @@ from vaccine.states import (
 class Application(BaseApplication):
     START_STATE = "state_start"
 
-    async def process_message(self, message: Message) -> List[Message]:
+    async def process_message(self, message: Message) -> list[Message]:
         if message.session_event == Message.SESSION_EVENT.CLOSE:
             self.user.session_id = None
             return [

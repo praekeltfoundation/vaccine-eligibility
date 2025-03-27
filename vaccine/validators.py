@@ -1,6 +1,6 @@
 import asyncio
+from collections.abc import Iterable, Optional
 from concurrent.futures import ThreadPoolExecutor
-from typing import Iterable, Optional
 
 from email_validator import EmailNotValidError, caching_resolver, validate_email
 

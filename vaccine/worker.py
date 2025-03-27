@@ -2,7 +2,7 @@ import asyncio
 import importlib
 import logging
 from json import JSONDecodeError
-from typing import Callable, List
+from typing import Callable
 from urllib.parse import urljoin
 
 import aiohttp
@@ -150,7 +150,7 @@ class Worker:
 class AnswerWorker:
     def __init__(self, connection: Connection, url: str, token: str, resource_id: str):
         self.connection = connection
-        self.answers: List[IncomingMessage] = []
+        self.answers: list[IncomingMessage] = []
         self.session = aiohttp.ClientSession(
             raise_for_status=False,
             timeout=aiohttp.ClientTimeout(total=10),
@@ -202,7 +202,7 @@ class AnswerWorker:
             await self._push_results()
 
     async def _submit_answers(
-        self, answers: List[Answer]
+        self, answers: list[Answer]
     ) -> aiohttp.client.ClientResponse:
         data = {
             "data": {
@@ -238,7 +238,7 @@ class AnswerWorker:
 
     async def _push_results(self):
         msgs, self.answers = self.answers, []
-        answers: List[Answer] = []
+        answers: list[Answer] = []
         processed = []
         for msg in msgs:
             answers.append(Answer.from_json(msg.body.decode("utf-8")))

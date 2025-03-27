@@ -1,4 +1,3 @@
-from typing import List
 
 from vaccine import vacreg_config as config
 from vaccine.healthcheck_ussd import Application as HealthCheckApp
@@ -76,7 +75,7 @@ class Application(VacRegApp, HealthCheckApp):
             next="state_menu",
         )
 
-    async def process_message(self, message: Message) -> List[Message]:
+    async def process_message(self, message: Message) -> list[Message]:
         if (
             message.session_event == Message.SESSION_EVENT.NEW
             and self.state_name is not None

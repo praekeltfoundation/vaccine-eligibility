@@ -1,7 +1,6 @@
 import logging
 import re
 from datetime import datetime, timezone
-from typing import List
 from urllib.parse import urljoin
 
 import aiohttp
@@ -91,7 +90,7 @@ def in_office_hours() -> bool:
 class Application(BaseApplication):
     START_STATE = "state_menu"
 
-    async def process_message(self, message: Message) -> List[Message]:
+    async def process_message(self, message: Message) -> list[Message]:
         if message.session_event == Message.SESSION_EVENT.CLOSE:
             if self.state_name == "state_menu":
                 # Reset and don't send a reply

@@ -2,7 +2,6 @@ import base64
 import binascii
 import json
 import re
-from typing import List
 from urllib.parse import ParseResult, urlunparse
 
 import aiohttp
@@ -32,7 +31,7 @@ class Application(BaseApplication):
             )
         )
 
-    async def process_message(self, message: Message) -> List[Message]:
+    async def process_message(self, message: Message) -> list[Message]:
         if message.session_event == Message.SESSION_EVENT.CLOSE:
             self.state_name = "state_timeout"
 

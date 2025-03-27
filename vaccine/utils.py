@@ -2,12 +2,13 @@ import asyncio
 import json
 import re
 import time
+from collections.abc import Awaitable
 from contextlib import asynccontextmanager
 from datetime import date, datetime, timedelta, timezone
 from enum import Enum
 from functools import cached_property
 from logging import Logger
-from typing import TYPE_CHECKING, AnyStr, Awaitable, Callable, Optional
+from typing import TYPE_CHECKING, AnyStr, Callable, Optional
 from uuid import uuid4
 
 import aiohttp

@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, Iterable, List, Tuple
+from collections.abc import Any, Iterable
 from urllib.parse import urljoin
 
 import aiohttp
@@ -45,7 +45,7 @@ def get_study_consent_form_url():
     )
 
 
-async def get_choices_by_tag(tag: str) -> Tuple[bool, List[Choice]]:
+async def get_choices_by_tag(tag: str) -> tuple[bool, list[Choice]]:
     return await get_choices_by_path(f"/api/v2/pages?tag={tag}")
 
 
@@ -72,7 +72,7 @@ async def get_page_detail_by_tag(user, tag):
     return await get_page_details(user, choices[0].value, 1)
 
 
-async def get_choices_by_path(path: str) -> Tuple[bool, List[Choice]]:
+async def get_choices_by_path(path: str) -> tuple[bool, list[Choice]]:
     if not config.CONTENTREPO_API_URL:
         logger.error("CONTENTREPO_API_URL not configured")
         return False, []
@@ -102,11 +102,11 @@ async def get_choices_by_path(path: str) -> Tuple[bool, List[Choice]]:
 
 async def get_page_details(
     user: User, page_id: str, message_id: str, suggested=False
-) -> Tuple[bool, Dict[str, Any]]:
+) -> tuple[bool, dict[str, Any]]:
     if not config.CONTENTREPO_API_URL:
         logger.error("CONTENTREPO_API_URL not configured")
         return False, {}
-    page_details: Dict[str, Any] = {}
+    page_details: dict[str, Any] = {}
     async with get_contentrepo_api() as session:
         for i in range(3):
             try:
@@ -133,7 +133,7 @@ async def get_page_details(
                 page_details["title"] = response_body["title"]
                 page_details["body"] = response_body["body"]["text"]["value"]["message"]
 
-                variations: Dict[str, Any] = {}
+                variations: dict[str, Any] = {}
                 for v in response_body["body"]["text"]["value"].get(
                     "variation_messages", []
                 ):

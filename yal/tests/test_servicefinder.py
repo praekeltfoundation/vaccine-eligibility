@@ -1,7 +1,6 @@
 import json
 from collections import defaultdict
 from datetime import datetime
-from typing import Dict, List
 from unittest import mock
 
 import pytest
@@ -19,18 +18,18 @@ def tester():
 
 
 with open("yal/tests/servicefinder_categories.json") as f:
-    CATEGORIES: List[Dict] = json.loads(f.read())
+    CATEGORIES: list[dict] = json.loads(f.read())
 
 
 def get_processed_categories():
-    categories: Dict[str, Dict] = defaultdict(dict)
+    categories: dict[str, dict] = defaultdict(dict)
     for c in CATEGORIES:
         parent = c["parent"] or "root"
         categories[parent][c["_id"]] = c["name"]
     return dict(categories)
 
 
-FACILITIES: List[Dict] = [
+FACILITIES: list[dict] = [
     {
         "location": {"type": "Point", "coordinates": [28.0151783, -26.1031026]},
         "_id": "62ddcc71981c9d7ba465e67e",
