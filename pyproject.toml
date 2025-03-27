@@ -52,7 +52,8 @@ dev = [
     "ruff<1.0.0,>=0.6.9",
     "pytest<8.0.0,>=7.2.0",
     "pytest-cov<5.0.0,>=4.0.0",
-    "pytest-asyncio<1.0.0,>=0.14.0",
+    #"pytest-asyncio<1.0.0,>=0.14.0",
+    "pytest-asyncio==0.14.0", # TODO: need to resolve this so we can use newer version
     "Faker<9.0.0,>=8.1.0",
     "locust<3.0.0,>=2.23.1",
     "sanic-testing<1.0.0,>=0.8.3",
