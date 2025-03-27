@@ -1,5 +1,6 @@
 import logging
-from collections.abc import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 from urllib.parse import urljoin
 
 import aiohttp
