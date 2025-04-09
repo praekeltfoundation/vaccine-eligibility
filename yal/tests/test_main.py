@@ -1520,5 +1520,7 @@ async def test_whatsapp_user_reactivate(tester: AppTester, rapidpro_mock):
 async def test_update_settings_keyword(tester: AppTester, rapidpro_mock):
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
     rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
+
     await tester.user_input("update settings")
+
     tester.assert_state("state_display_preferences")
