@@ -98,9 +98,8 @@ FACEBOOK_INVITE_KEYWORDS = {
     "yes take part",
     "no thanks",
 }
-UPDATE_SETTINGS = {
-    "update settings"
-}
+UPDATE_SETTINGS = {"update settings"}
+
 
 class Application(
     TermsApplication,

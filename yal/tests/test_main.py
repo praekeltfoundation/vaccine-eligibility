@@ -450,9 +450,9 @@ async def test_state_start_to_mainmenu(
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
     rapidpro_mock.tstate.contact_fields["latitude"] = "-26.2031026"
     rapidpro_mock.tstate.contact_fields["longitude"] = "28.0251783"
-    rapidpro_mock.tstate.contact_fields["location_description"] = (
-        "99 high level, cape town, FS"
-    )
+    rapidpro_mock.tstate.contact_fields[
+        "location_description"
+    ] = "99 high level, cape town, FS"
     await tester.user_input("hi")
     tester.assert_state("state_mainmenu")
     tester.assert_num_messages(2)
@@ -506,9 +506,9 @@ async def test_assessment_reminder_keywords(
     rapidpro_mock.tstate.contact_fields["onboarding_completed"] = True
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
     rapidpro_mock.tstate.contact_fields["assessment_reminder_sent"] = True
-    rapidpro_mock.tstate.contact_fields["assessment_reminder_name"] = (
-        "locus_of_control_endline"
-    )
+    rapidpro_mock.tstate.contact_fields[
+        "assessment_reminder_name"
+    ] = "locus_of_control_endline"
 
     await tester.user_input("continue now")
     tester.assert_state("state_relationship_status_endline")
@@ -1098,9 +1098,9 @@ async def test_aaq_timeout_response_to_handler(
 ):
     rapidpro_mock.tstate.contact_fields["feedback_survey_sent"] = "TRUE"
     rapidpro_mock.tstate.contact_fields["feedback_type"] = "ask_a_question_2"
-    rapidpro_mock.tstate.contact_fields["feedback_timestamp"] = (
-        get_current_datetime().isoformat()
-    )
+    rapidpro_mock.tstate.contact_fields[
+        "feedback_timestamp"
+    ] = get_current_datetime().isoformat()
     tester.user.metadata["inbound_id"] = "inbound-id"
     tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
     tester.user.metadata["faq_id"] = "1"
@@ -1135,9 +1135,9 @@ async def test_content_feedback_response(tester: AppTester, rapidpro_mock):
     If this is in response to a content feedback push message, then it should be handled
     by the content feedback state
     """
-    rapidpro_mock.tstate.contact_fields["feedback_timestamp"] = (
-        get_current_datetime().isoformat()
-    )
+    rapidpro_mock.tstate.contact_fields[
+        "feedback_timestamp"
+    ] = get_current_datetime().isoformat()
     rapidpro_mock.tstate.contact_fields["feedback_type"] = "content"
     rapidpro_mock.tstate.contact_fields["feedback_survey_sent"] = "TRUE"
     await tester.user_input("1")
@@ -1154,9 +1154,9 @@ async def test_facebook_crossover_feedback_response(tester: AppTester, rapidpro_
     by the fb feedback state
     """
     # Test session resume
-    rapidpro_mock.tstate.contact_fields["feedback_timestamp"] = (
-        get_current_datetime().isoformat()
-    )
+    rapidpro_mock.tstate.contact_fields[
+        "feedback_timestamp"
+    ] = get_current_datetime().isoformat()
     rapidpro_mock.tstate.contact_fields["feedback_type"] = "facebook_banner"
     rapidpro_mock.tstate.contact_fields["feedback_survey_sent"] = "TRUE"
     await tester.user_input("yes, I did")
@@ -1173,9 +1173,9 @@ async def test_servicefinder_feedback_response(tester: AppTester, rapidpro_mock)
     handled by the servicefinder feedback application
     """
     rapidpro_mock.tstate.contact_fields["feedback_type"] = "servicefinder"
-    rapidpro_mock.tstate.contact_fields["feedback_timestamp"] = (
-        get_current_datetime().isoformat()
-    )
+    rapidpro_mock.tstate.contact_fields[
+        "feedback_timestamp"
+    ] = get_current_datetime().isoformat()
     rapidpro_mock.tstate.contact_fields["feedback_survey_sent"] = "TRUE"
     # test new session
     await tester.user_input("yes, thanks", session=Message.SESSION_EVENT.NEW)
@@ -1514,6 +1514,7 @@ async def test_whatsapp_user_reactivate(tester: AppTester, rapidpro_mock):
     assert json.loads(request.body.decode("utf-8")) == {
         "fields": {"whatsapp_delivery_failed": "False"}
     }
+
 
 @pytest.mark.asyncio
 async def test_update_settings_keyword(tester: AppTester, rapidpro_mock):
