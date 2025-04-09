@@ -98,7 +98,9 @@ FACEBOOK_INVITE_KEYWORDS = {
     "yes take part",
     "no thanks",
 }
-
+UPDATE_SETTINGS = {
+    "update settings"
+}
 
 class Application(
     TermsApplication,
@@ -265,6 +267,12 @@ class Application(
                 )
                 if error:
                     self.state_name = self.ERROR_STATE
+            elif (
+                keyword in UPDATE_SETTINGS
+                and self.user.metadata.get("terms_accepted") == True
+                and self.user.metadata.get("onboarding_completed") == True
+            ):
+                self.state_name = ChangePreferencesApplication.START_STATE
 
         except Exception:
             logger.exception("Application error")
