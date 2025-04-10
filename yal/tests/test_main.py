@@ -1524,3 +1524,36 @@ async def test_update_settings_keyword(tester: AppTester, rapidpro_mock):
     await tester.user_input("update settings")
 
     tester.assert_state("state_display_preferences")
+
+    tester.assert_message(
+        "\n".join(
+            [
+                "⚙️CHAT SETTINGS / *Update your info*",
+                "-----",
+                "Here's the info you've saved. *What info would you like to change?*",
+                "",
+                "🍰 *Age*",
+                "skip",
+                "",
+                "🌈 *Gender*",
+                "Empty",
+                "",
+                "🤖 *Bot Name+emoji*",
+                "🤖 B-wise",
+                "",
+                "❤️ *Relationship?*",
+                "Empty",
+                "",
+                "📍 *Location*",
+                "Empty",
+                "",
+                "🔔 *Notifications*",
+                "OFF",
+                "",
+                "*-----*",
+                "*Or reply:*",
+                "*0 -* 🏠 Back to Main *MENU*",
+                "*# -* 🆘 Get *HELP*",
+            ]
+        )
+    )

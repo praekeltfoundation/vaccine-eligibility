@@ -151,6 +151,7 @@ class Application(
 
             if (
                 keyword in GREETING_KEYWORDS
+                or keyword in UPDATE_SETTINGS
                 or keyword in TRACKING_KEYWORDS
                 or keyword in TRACKING_KEYWORDS_ROUND_2
                 or keyword in TRACKING_KEYWORDS_ROUND_3
@@ -223,6 +224,9 @@ class Application(
                 message.session_event = Message.SESSION_EVENT.RESUME
                 self.state_name = feedback_state
 
+            if keyword == "Update Settings":
+                self.state_name = ChangePreferencesApplication.START_STATE
+
             # Replies to template push messages
             elif payload and payload.startswith("state_") and payload in dir(self):
                 self.user.session_id = None
@@ -266,12 +270,6 @@ class Application(
                 )
                 if error:
                     self.state_name = self.ERROR_STATE
-            elif (
-                keyword in UPDATE_SETTINGS
-                and self.user.metadata.get("terms_accepted") == "True"
-                and self.user.metadata.get("onboarding_completed") == "True"
-            ):
-                self.state_name = ChangePreferencesApplication.START_STATE
 
         except Exception:
             logger.exception("Application error")
@@ -344,6 +342,9 @@ class Application(
                 return await self.go_to_state(OnboardingApplication.START_STATE)
             else:
                 return await self.go_to_state(TermsApplication.START_STATE)
+
+        if inbound in UPDATE_SETTINGS and terms_accepted and onboarding_completed:
+            return await self.go_to_state(ChangePreferencesApplication.START_STATE)
 
         return await self.go_to_state("state_catch_all")
 
