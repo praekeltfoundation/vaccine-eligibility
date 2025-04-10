@@ -224,7 +224,7 @@ class Application(
                 message.session_event = Message.SESSION_EVENT.RESUME
                 self.state_name = feedback_state
 
-            if keyword in UPDATE_SETTINGS:
+            if keyword in UPDATE_SETTINGS and payload == "state_display_preferences":
                 self.state_name = ChangePreferencesApplication.START_STATE
 
             # Replies to template push messages
