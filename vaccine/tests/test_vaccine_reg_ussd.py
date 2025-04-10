@@ -24,10 +24,9 @@ async def evds_mock():
     @app.route("/api/private/evds-sa/person/8/record", methods=["POST"])
     def submit_record(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
         return response.json({}, status=200)
 
     @app.route("/api/private/evds-sa/person/8/lookup/location/1", methods=["GET"])
@@ -41,7 +40,7 @@ async def evds_mock():
         password = config.EVDS_PASSWORD
         config.EVDS_URL = f"http://{server.host}:{server.port}"
         config.EVDS_USERNAME = "test"
-        config.EVDS_PASSWORD = "test"
+        config.EVDS_PASSWORD = "test"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.EVDS_URL = url

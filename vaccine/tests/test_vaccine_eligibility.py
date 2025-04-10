@@ -30,8 +30,7 @@ async def test_new_user():
         [
             "◼️◻️◻️◻️◻️",
             "",
-            "Which of these positions or job titles describes your current "
-            "employment:",
+            "Which of these positions or job titles describes your current employment:",
         ]
     )
     assert reply.helper_metadata == {
@@ -160,8 +159,7 @@ async def test_occupation_not_sure():
         [
             "◼️◻️◻️◻️◻️",
             "",
-            "Which of these positions or job titles describes your current "
-            "employment:",
+            "Which of these positions or job titles describes your current employment:",
         ]
     )
     assert reply.helper_metadata == {

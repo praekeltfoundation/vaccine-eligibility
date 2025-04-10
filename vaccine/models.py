@@ -3,7 +3,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, time, timezone
 from enum import Enum
 from json import JSONDecodeError
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from vaccine.utils import current_timestamp, random_id
 
@@ -232,7 +232,7 @@ class User:
 @dataclass
 class Answer:
     question: str
-    response: Union[str, int, List[str], float, List[float], datetime, date, time]
+    response: Union[str, int, list[str], float, list[float], datetime, date, time]
     address: Union[str, int]
     session_id: Union[str, int]
     timestamp: datetime = field(default_factory=current_timestamp)

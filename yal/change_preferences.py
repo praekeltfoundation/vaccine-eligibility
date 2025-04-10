@@ -65,7 +65,7 @@ class Application(BaseApplication):
         question_list = [
             "⚙️CHAT SETTINGS / *Update your info*",
             "-----",
-            "Here's the info you've saved. *What info would you like to " "change?*",
+            "Here's the info you've saved. *What info would you like to change?*",
             "",
             "🍰 *Age*",
             age or "Empty",
@@ -128,7 +128,7 @@ class Application(BaseApplication):
             choices=choices_list,
             next=next_,
             error=self._(get_generic_error()),
-            error_footer=self._("\n" "Reply with the number that matches your choice."),
+            error_footer=self._("\nReply with the number that matches your choice."),
             button="Change Preferences",
         )
 
@@ -205,7 +205,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_display_preferences")
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         data = {
             "age": self.user.answers.get("state_update_age"),
@@ -311,7 +311,7 @@ class Application(BaseApplication):
 
     async def state_update_relationship_status_submit(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         status = self.user.answers.get("state_update_relationship_status")
 
@@ -364,8 +364,7 @@ class Application(BaseApplication):
                 "[persona_emoji] *You can change your location by sending me a pin "
                 "(📍). To do this:*",
                 "",
-                "1️⃣Tap the *+ _(plus)_* button or the 📎*_(paperclip)_* button "
-                "below.",
+                "1️⃣Tap the *+ _(plus)_* button or the 📎*_(paperclip)_* button below.",
                 "",
                 "2️⃣Next, tap *Location* then select *Send Your Current Location.*",
                 "",
@@ -478,7 +477,7 @@ class Application(BaseApplication):
         location_description = metadata.get("new_location_description")
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "location_description": location_description,
             "latitude": latitude,
@@ -491,7 +490,7 @@ class Application(BaseApplication):
 
     async def state_update_gender(self):
         gender_text = "\n".join(
-            [f"*{i+1}* - {name}" for i, (code, name) in enumerate(GENDERS.items())]
+            [f"*{i + 1}* - {name}" for i, (code, name) in enumerate(GENDERS.items())]
         )
         gender_choices = [Choice(code, name) for code, name in GENDERS.items()]
         gender_text = f"{gender_text}\n*{len(gender_choices) + 1}* - Skip"
@@ -587,7 +586,7 @@ class Application(BaseApplication):
 
     async def state_update_gender_submit(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         data = {
             "gender": self.user.answers.get("state_update_gender"),
@@ -630,7 +629,7 @@ class Application(BaseApplication):
 
         data = {"persona_name": choice}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
@@ -677,7 +676,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_display_preferences")
         data = {"persona_emoji": extract_first_emoji(choice)}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
@@ -744,7 +743,7 @@ class Application(BaseApplication):
     async def state_update_notifications_turn_off_submit(self):
         data = {"push_message_opt_in": "False"}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
@@ -795,7 +794,7 @@ class Application(BaseApplication):
     async def state_update_notifications_turn_on_submit(self):
         data = {"push_message_opt_in": "True"}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:
@@ -882,7 +881,7 @@ class Application(BaseApplication):
     async def study_optout_confirm(self):
         data = {"ejaf_study_optin": "False"}
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
         if error:

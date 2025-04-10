@@ -103,10 +103,7 @@ class VaccineRegUser(HttpUser):
         # vaccination time
         self.send_message(msisdn, "1")
         # medical aid
-        if registration["medicalAidMember"]:
-            medaid = "1"
-        else:
-            medaid = "2"
+        medaid = "1" if registration["medicalAidMember"] else "2"
         with self.send_message(msisdn, medaid, catch_response=True) as response:
             if "SUCCESSFULLY" not in response.text:
                 response.failure("Did not get registration success message")

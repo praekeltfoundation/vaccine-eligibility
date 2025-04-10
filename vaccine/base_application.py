@@ -1,6 +1,6 @@
 import gettext
 import logging
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from prometheus_client import Counter
 
@@ -24,8 +24,8 @@ class BaseApplication:
     def __init__(self, user: User, worker: Optional[Worker] = None):
         self.user = user
         self.worker = worker
-        self.answer_events: List[Answer] = []
-        self.messages: List[Message] = []
+        self.answer_events: list[Answer] = []
+        self.messages: list[Message] = []
         self.inbound: Optional[Message] = None
         self.set_language(self.user.lang)
 
@@ -61,7 +61,7 @@ class BaseApplication:
         STATE_CHANGE.labels(self.state_name, state).inc()
         self.user.state.name = state
 
-    async def process_message(self, message: Message) -> List[Message]:
+    async def process_message(self, message: Message) -> list[Message]:
         """
         Processes the message, and returns a list of messages to return to the user
         """

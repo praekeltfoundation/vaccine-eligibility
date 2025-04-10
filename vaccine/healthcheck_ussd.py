@@ -324,7 +324,7 @@ class Application(BaseApplication):
         return ChoiceState(
             self,
             question=self._("How old are you?"),
-            error=self._("Please use numbers from list.\n" "\n" "How old are you?"),
+            error=self._("Please use numbers from list.\n\nHow old are you?"),
             choices=[
                 Choice("<18", "<18"),
                 Choice("18-40", "18-39"),
@@ -339,8 +339,8 @@ class Application(BaseApplication):
             return await self.go_to_state("state_city")
         return ChoiceState(
             self,
-            question=self._("Select your province\n" "\n" "Reply:"),
-            error=self._("Select your province\n" "\n" "Reply:"),
+            question=self._("Select your province\n\nReply:"),
+            error=self._("Select your province\n\nReply:"),
             choices=[
                 Choice("ZA-EC", self._("EASTERN CAPE")),
                 Choice("ZA-FS", self._("FREE STATE")),
@@ -384,7 +384,6 @@ class Application(BaseApplication):
         )
 
     async def state_google_places_lookup(self):
-
         async with get_google_api() as session:
             for i in range(3):
                 try:
@@ -493,8 +492,8 @@ class Application(BaseApplication):
         async def validate_age(content):
             try:
                 age = int(content)
-            except DECODE_MESSAGE_EXCEPTIONS:
-                raise ErrorMessage(question)
+            except DECODE_MESSAGE_EXCEPTIONS as e:
+                raise ErrorMessage(question) from e
 
             if age < 1:
                 raise ErrorMessage(question)
@@ -534,7 +533,7 @@ class Application(BaseApplication):
         )
 
     async def state_cough(self):
-        question = self._("Do you have a cough that recently started?\n" "\n" "Reply")
+        question = self._("Do you have a cough that recently started?\n\nReply")
         error = self._(
             "Please use numbers from list.\n"
             "Do you have a cough that recently started?\n"
@@ -553,7 +552,7 @@ class Application(BaseApplication):
         return ChoiceState(
             self,
             question=self._(
-                "Do you have a sore throat, or pain when swallowing?\n" "\n" "Reply"
+                "Do you have a sore throat, or pain when swallowing?\n\nReply"
             ),
             error=self._(
                 "Please use numbers from list.\n"
@@ -684,7 +683,6 @@ class Application(BaseApplication):
         )
 
     async def state_submit_data(self):
-
         if self.user.answers.get("state_tracing") == "restart":
             return await self.go_to_state("state_start")
 

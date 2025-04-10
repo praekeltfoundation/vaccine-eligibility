@@ -6,9 +6,8 @@ from io import StringIO
 
 import pytest
 import redis.asyncio as aioredis
-from aio_pika import DeliveryMode, Exchange
+from aio_pika import DeliveryMode, Exchange, Queue, connect_robust
 from aio_pika import Message as AMQPMessage
-from aio_pika import Queue, connect_robust
 from sanic import Sanic, response
 
 from vaccine.models import Answer, Event, Message, StateData, User
@@ -191,7 +190,7 @@ async def test_setup_answer_worker():
     If the required config fields are set, then the answer worker should be set up
     """
     config.ANSWER_API_URL = "http://example.org"
-    config.ANSWER_API_TOKEN = "testtoken"
+    config.ANSWER_API_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
     config.ANSWER_RESOURCE_ID = "96ac814d-b9b4-48ae-bcef-997a724cdacf"
     config.ANSWER_BATCH_TIME = 0.1
     worker = Worker()
@@ -282,7 +281,7 @@ async def answer_worker(connection, flow_results_mock_server):
     worker = AnswerWorker(
         connection=connection,
         url=url,
-        token="testtoken",
+        token="testtoken",  # noqa: S106 - Fake password/token for test purposes
         resource_id="96ac814d-b9b4-48ae-bcef-997a724cdacf",
     )
     await worker.setup()

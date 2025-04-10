@@ -4,7 +4,6 @@ import re
 from datetime import date
 from email.utils import parseaddr
 from enum import Enum
-from typing import List
 from urllib.parse import urljoin
 
 import aiohttp
@@ -89,7 +88,7 @@ class Application(BaseApplication):
 
         self.ID_TYPES = ID_TYPES
 
-    async def process_message(self, message: Message) -> List[Message]:
+    async def process_message(self, message: Message) -> list[Message]:
         if message.session_event == Message.SESSION_EVENT.CLOSE:
             self.state_name = "state_timeout"
         if re.sub(r"\W+", " ", message.content or "").strip().lower() in EXIT_KEYWORDS:
@@ -121,7 +120,7 @@ class Application(BaseApplication):
     async def state_language(self):
         self.user.answers = {}
 
-        if random.random() < config.THROTTLE_PERCENTAGE / 100.0:
+        if random.random() < config.THROTTLE_PERCENTAGE / 100.0:  # noqa: S311 - Not being used for crypto
             return await self.go_to_state("state_throttle")
 
         return LanguageState(
@@ -219,7 +218,7 @@ class Application(BaseApplication):
                 "Can we contact you on this number when this changes?\n"
             ).format(minimum_age=config.ELIGIBILITY_AGE_GATE_MIN),
             choices=[Choice("yes", self._("Yes")), Choice("no", self._("No"))],
-            footer=self._("\n" "REPLY with the NUMBER of the option you have chosen."),
+            footer=self._("\nREPLY with the NUMBER of the option you have chosen."),
             error=self._(
                 "⚠️ This service works best when you use the numbered options "
                 "available.\n"
@@ -519,17 +518,15 @@ class Application(BaseApplication):
             if idtype == self.ID_TYPES.rsa_id:
                 try:
                     SAIDNumber(value)
-                except ValueError:
-                    raise ErrorMessage(error_msg)
+                except ValueError as ve:
+                    raise ErrorMessage(error_msg) from ve
             else:
                 await nonempty_validator(error_msg)(value)
 
         return FreeText(
             self,
             question=self._(
-                "*VACCINE REGISTRATION SECURE CHAT* 🔐\n"
-                "\n"
-                "Please TYPE in your {id_type}"
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐\n\nPlease TYPE in your {id_type}"
             ).format(id_type=idtype_label),
             next="state_check_id_number",
             check=validate_identification_number,
@@ -702,13 +699,12 @@ class Application(BaseApplication):
                 assert value.isdigit()
                 assert int(value) > get_today().year - config.AMBIGUOUS_MAX_AGE
                 assert int(value) <= get_today().year
-            except AssertionError:
+            except AssertionError as e:
                 raise ErrorMessage(
                     self._(
-                        "⚠️  Please TYPE in only the YEAR you were born.\n"
-                        "Example _1980_"
+                        "⚠️  Please TYPE in only the YEAR you were born.\nExample _1980_"
                     )
-                )
+                ) from e
 
             idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
             if idtype == self.ID_TYPES.rsa_id:
@@ -770,7 +766,7 @@ class Application(BaseApplication):
                 "\n"
                 "In which MONTH were you born?\n"
             ),
-            error_footer=self._("\n" "Reply with the number next to the month."),
+            error_footer=self._("\nReply with the number next to the month."),
         )
 
     async def state_dob_day(self):
@@ -789,7 +785,7 @@ class Application(BaseApplication):
                 assert isinstance(value, str)
                 assert value.isdigit()
                 date(dob_year, dob_month, int(value))
-            except (AssertionError, ValueError, OverflowError):
+            except (AssertionError, ValueError, OverflowError) as e:
                 raise ErrorMessage(
                     self._(
                         "⚠️ Please enter a valid calendar DAY for your birth date. "
@@ -803,7 +799,7 @@ class Application(BaseApplication):
                         "📌 Or reply *0* to end this session and return to the main "
                         "*MENU*"
                     )
-                )
+                ) from e
 
         return FreeText(
             self,
@@ -837,7 +833,7 @@ class Application(BaseApplication):
         return ChoiceState(
             self,
             question=self._(
-                "*VACCINE REGISTRATION SECURE CHAT* 🔐\n" "\n" "What is your GENDER?\n"
+                "*VACCINE REGISTRATION SECURE CHAT* 🔐\n\nWhat is your GENDER?\n"
             ),
             choices=[
                 Choice("Male", self._("Male")),
@@ -883,13 +879,12 @@ class Application(BaseApplication):
         async def phone_number_validation(content):
             try:
                 normalise_phonenumber(content)
-            except ValueError:
+            except ValueError as ve:
                 raise ErrorMessage(
                     self._(
-                        "⚠️ Please type a valid cell phone number.\n"
-                        "Example _081234567_"
+                        "⚠️ Please type a valid cell phone number.\nExample _081234567_"
                     )
-                )
+                ) from ve
 
         return FreeText(
             self,
@@ -991,7 +986,7 @@ class Application(BaseApplication):
                 "REPLY with the NUMBER next to the name of your Medical Aid Provider:\n"
             ),
             error_footer=self._(
-                "\n" "📌 Or reply *0* to end this session and return to the main *MENU*"
+                "\n📌 Or reply *0* to end this session and return to the main *MENU*"
             ),
             next=next_state,
         )

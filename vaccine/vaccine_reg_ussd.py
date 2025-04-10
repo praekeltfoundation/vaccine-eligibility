@@ -85,7 +85,7 @@ class Application(BaseApplication):
     async def state_age_gate(self):
         self.user.answers = {}
 
-        if random.random() < config.THROTTLE_PERCENTAGE / 100.0:
+        if random.random() < config.THROTTLE_PERCENTAGE / 100.0:  # noqa: S311 - Not being used for crypto
             return await self.go_to_state("state_throttle")
 
         return MenuState(
@@ -191,8 +191,8 @@ class Application(BaseApplication):
             if idtype == self.ID_TYPES.rsa_id:
                 try:
                     SAIDNumber(value)
-                except ValueError:
-                    raise ErrorMessage(error_msg)
+                except ValueError as ve:
+                    raise ErrorMessage(error_msg) from ve
             else:
                 await nonempty_validator(error_msg)(value)
 
@@ -334,13 +334,13 @@ class Application(BaseApplication):
                 assert value.isdigit()
                 assert int(value) > get_today().year - config.AMBIGUOUS_MAX_AGE
                 assert int(value) <= get_today().year
-            except AssertionError:
+            except AssertionError as ae:
                 raise ErrorMessage(
                     self._(
                         "REQUIRED: Please TYPE the 4 digits of the YEAR you were born "
                         "(Example: 1980)"
                     )
-                )
+                ) from ae
 
             idtype = self.ID_TYPES[self.user.answers["state_identification_type"]]
             if idtype == self.ID_TYPES.rsa_id:
@@ -411,14 +411,14 @@ class Application(BaseApplication):
                 assert isinstance(value, str)
                 assert value.isdigit()
                 date(dob_year, dob_month, int(value))
-            except (AssertionError, ValueError, OverflowError):
+            except (AssertionError, ValueError, OverflowError) as e:
                 raise ErrorMessage(
                     self._(
                         "ERROR: Please reply with just the DAY of your birthday.\n"
                         "\n"
                         "Example: If you were born on 31 May, type _31_"
                     )
-                )
+                ) from e
 
         return FreeText(
             self,
@@ -476,10 +476,7 @@ class Application(BaseApplication):
         return MenuState(
             self,
             question=self._(
-                "Confirm the following:\n"
-                "\n"
-                "{first_name} {surname}\n"
-                "{id_number}\n"
+                "Confirm the following:\n\n{first_name} {surname}\n{id_number}\n"
             ).format(first_name=first_name, surname=surname, id_number=id_number),
             choices=[
                 Choice("state_province_id", self._("Correct")),
@@ -597,12 +594,12 @@ class Application(BaseApplication):
         async def phone_number_validation(content):
             try:
                 normalise_phonenumber(content)
-            except ValueError:
+            except ValueError as ve:
                 raise ErrorMessage(
                     self._(
                         "ERROR: Please enter a valid mobile number (do not use spaces)"
                     )
-                )
+                ) from ve
 
         return FreeText(
             self,

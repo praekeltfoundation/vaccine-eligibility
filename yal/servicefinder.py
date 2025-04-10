@@ -239,7 +239,7 @@ class Application(BaseApplication):
         categories = metadata["categories"][metadata.get("parent_category", "root")]
 
         category_text = "\n".join(
-            [f"*{i+1}* - {v}" for i, v in enumerate(categories.values())]
+            [f"*{i + 1}* - {v}" for i, v in enumerate(categories.values())]
         )
         category_choices = [Choice(k, v) for k, v in categories.items()]
         category_choices.append(Choice("talk", "Talk to someone"))
@@ -411,8 +411,7 @@ class Application(BaseApplication):
                 "[persona_emoji]*You can change your location by sending me a pin (📍)."
                 " To do this:*",
                 "",
-                "1️⃣Tap the *+ _(plus)_* button or the 📎*_(paperclip)_* button "
-                "below.",
+                "1️⃣Tap the *+ _(plus)_* button or the 📎*_(paperclip)_* button below.",
                 "",
                 "2️⃣Next, tap *Location* then select *Send Your Current Location.*",
                 "",
@@ -542,7 +541,7 @@ class Application(BaseApplication):
         location_description = metadata.get("location_description")
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "location_description": location_description,
             "latitude": latitude,
@@ -555,7 +554,7 @@ class Application(BaseApplication):
 
     async def state_province(self):
         province_text = "\n".join(
-            [f"{i+1} - {name}" for i, (_, name) in enumerate(PROVINCES)]
+            [f"{i + 1} - {name}" for i, (_, name) in enumerate(PROVINCES)]
         )
         province_choices = [Choice(code, name) for code, name in PROVINCES]
         province_choices.append(Choice("skip", "Skip"))

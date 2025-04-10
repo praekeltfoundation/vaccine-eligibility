@@ -21,7 +21,7 @@ class Application(BaseApplication):
 
     async def update_suggested_content_details(self, level, suggested_text=None):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {f"last_{level}_time": get_current_datetime().isoformat()}
         if suggested_text:
             data["suggested_text"] = suggested_text
@@ -30,14 +30,16 @@ class Application(BaseApplication):
 
     async def reset_suggested_content_details(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "last_mainmenu_time": "",
             "suggested_text": "",
         }
         return await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)
 
-    async def get_suggested_choices(self, parent_topic_links={}):
+    async def get_suggested_choices(self, parent_topic_links=None):
+        if parent_topic_links is None:
+            parent_topic_links = {}
         if self.user.metadata["suggested_content"] == {}:
             topics_viewed = set(
                 self.user.metadata.get(
@@ -89,8 +91,8 @@ class Application(BaseApplication):
                 "🏥 *NEED HELP?*",
                 [
                     Choice(PleaseCallMeApplication.START_STATE, "Talk to a counsellor"),
-                ]
-                + submenu_choices,
+                    *submenu_choices,
+                ],
             )
         ]
 
@@ -190,7 +192,7 @@ class Application(BaseApplication):
         suggested_choices = await self.get_suggested_choices(parent_topic_links)
         choices.extend(suggested_choices)
         suggested_text = "\n".join(
-            [f"*{i+k}* - {c.label}" for k, c in enumerate(suggested_choices)]
+            [f"*{i + k}* - {c.label}" for k, c in enumerate(suggested_choices)]
         )
         error = await self.update_suggested_content_details("mainmenu", suggested_text)
         if error:
@@ -325,7 +327,7 @@ class Application(BaseApplication):
         rel_status = self.user.answers.get("state_relationship_status")
         if rel_status != "skip":
             msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-            whatsapp_id = msisdn.lstrip(" + ")
+            whatsapp_id = msisdn.removeprefix("+")
             data = {
                 "relationship_status": rel_status,
             }
@@ -518,14 +520,8 @@ class Application(BaseApplication):
                 GET_HELP,
             ]
         )
-        error_parts = [get_generic_error(), ""] + parts
-        parts = [
-            title,
-            "-----",
-            "",
-            body,
-            "",
-        ] + parts
+        error_parts = [get_generic_error(), "", *parts]
+        parts = [title, "-----", "", body, "", *parts]
         question = self._("\n".join([part for part in parts if part is not None]))
         error_text = self._(
             "\n".join([part for part in error_parts if part is not None])
@@ -535,7 +531,7 @@ class Application(BaseApplication):
         suggested_choices = await self.get_suggested_choices()
         choices.extend(suggested_choices)
         suggested_text = "\n".join(
-            [f"*{i+k}* - {c.label}" for k, c in enumerate(suggested_choices)]
+            [f"*{i + k}* - {c.label}" for k, c in enumerate(suggested_choices)]
         )
         self.save_metadata(
             "suggested_choices", [str(i + k) for k in range(len(suggested_choices))]
@@ -546,7 +542,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         helper_metadata = {}
-        if "image_path" in metadata and metadata["image_path"]:
+        if metadata.get("image_path"):
             helper_metadata["image"] = metadata["image_path"]
             buttons = None
         else:
@@ -647,7 +643,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_error")
 
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         error = await rapidpro.update_profile(
             whatsapp_id, {"push_related_page_id": ""}, self.user.metadata
         )

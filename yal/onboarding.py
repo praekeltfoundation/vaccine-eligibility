@@ -24,7 +24,7 @@ class Application(BaseApplication):
 
     async def update_last_onboarding_time(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "last_onboarding_time": get_current_datetime().isoformat(),
             "onboarding_reminder_type": "5 min",
@@ -298,7 +298,7 @@ class Application(BaseApplication):
 
     async def state_submit_onboarding(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         persona_name = self.user.answers.get("state_persona_name", "")
         persona_emoji = self.user.answers.get("state_persona_emoji", "")
         country = self.user.answers.get("state_country", "")
@@ -390,7 +390,7 @@ class Application(BaseApplication):
 
     async def state_stop_onboarding_reminders(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "onboarding_reminder_sent": "",
             "onboarding_reminder_type": "",
@@ -420,7 +420,7 @@ class Application(BaseApplication):
 
     async def state_reschedule_onboarding_reminders(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "onboarding_reminder_sent": "",  # Reset the field
             "onboarding_reminder_type": "2 hrs",
@@ -453,7 +453,7 @@ class Application(BaseApplication):
         inbound = utils.clean_inbound(self.inbound.content)
         if inbound == "continue":
             msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-            whatsapp_id = msisdn.lstrip(" + ")
+            whatsapp_id = msisdn.removeprefix("+")
             data = {
                 "onboarding_reminder_sent": "",  # Reset the field
             }

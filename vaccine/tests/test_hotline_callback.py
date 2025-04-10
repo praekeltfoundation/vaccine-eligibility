@@ -26,10 +26,9 @@ async def callback_api_mock():
     )
     def callback(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.text("", status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.text("", status=500)
         return response.text("Received Sucessfully")
 
     async with run_sanic(app) as server:
@@ -49,10 +48,9 @@ async def turn_api_mock():
     @app.route("/v1/contacts/<msisdn:int>/messages", methods=["GET"])
     def callback(request, msisdn):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
         return response.json(
             {
                 "messages": [

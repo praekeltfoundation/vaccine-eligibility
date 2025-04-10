@@ -56,16 +56,15 @@ async def rapidpro_mock():
     @app.route("/api/v2/contacts.json", methods=["POST"])
     def update_contact(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
         return response.json({}, status=200)
 
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
-        config.RAPIDPRO_TOKEN = "testtoken"
+        config.RAPIDPRO_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.RAPIDPRO_URL = url
@@ -120,7 +119,6 @@ async def test_state_submit_baseline_completed_error(tester: AppTester, rapidpro
 
 @pytest.mark.asyncio
 async def test_state_baseline_end_invalid_input(tester: AppTester):
-
     tester.setup_state("state_baseline_end")
 
     await tester.user_input("invalid")
@@ -128,14 +126,13 @@ async def test_state_baseline_end_invalid_input(tester: AppTester):
     tester.assert_state("state_baseline_end")
 
     [message] = tester.application.messages
-    assert (
-        message.content in get_generic_errors()
-    ), f"Message content not in provided list, it is {message.content}"
+    assert message.content in get_generic_errors(), (
+        f"Message content not in provided list, it is {message.content}"
+    )
 
 
 @pytest.mark.asyncio
 async def test_state_halfway_message(tester: AppTester):
-
     tester.setup_state("state_baseline_halfway_msg")
 
     await tester.user_input("OK Let's do it")
@@ -154,7 +151,6 @@ async def test_state_halfway_message(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_self_esteem_assessment_v2(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -171,7 +167,6 @@ async def test_state_self_esteem_assessment_v2(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_self_esteem_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -200,7 +195,6 @@ async def test_state_self_esteem_assessment_v2_end(tester: AppTester):
 async def test_state_self_esteem_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003", state=StateData(name="state_self_esteem_assessment_v2_end")
@@ -221,7 +215,6 @@ async def test_state_self_esteem_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_connectedness_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -250,7 +243,6 @@ async def test_state_connectedness_assessment_v2_end(tester: AppTester):
 async def test_state_connectedness_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -272,7 +264,6 @@ async def test_state_connectedness_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_body_image_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -302,7 +293,6 @@ async def test_state_body_image_assessment_v2_end(tester: AppTester):
 async def test_state_body_image_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003", state=StateData(name="state_body_image_assessment_v2_end")
@@ -323,7 +313,6 @@ async def test_state_body_image_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_depression_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -350,7 +339,6 @@ async def test_depression_assessment_v2_end(tester: AppTester):
 async def test_state_depression_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003", state=StateData(name="state_depression_assessment_v2_end")
@@ -371,7 +359,6 @@ async def test_state_depression_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_anxiety_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -457,7 +444,6 @@ async def test_state_depression_and_anxiety_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_self_perceived_healthcare_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -494,7 +480,6 @@ async def test_state_self_perceived_healthcare_assessment_v2_end(tester: AppTest
 async def test_state_state_self_perceived_healthcare_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -516,7 +501,6 @@ async def test_state_state_self_perceived_healthcare_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_sexual_health_lit_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -549,7 +533,6 @@ async def test_state_sexual_health_lit_assessment_v2_end(tester: AppTester):
 async def test_state_sexual_health_lit_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -571,7 +554,6 @@ async def test_state_sexual_health_lit_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_gender_attitude_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -610,7 +592,6 @@ async def test_state_gender_attitude_assessment_v2_end(tester: AppTester):
 async def test_state_gender_attitude_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -632,7 +613,6 @@ async def test_state_gender_attitude_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_sexual_consent_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -659,7 +639,6 @@ async def test_state_sexual_consent_assessment_v2_end(tester: AppTester):
 async def test_state_sexual_consent_assessment_v2_end_error(
     tester: AppTester, rapidpro_mock
 ):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003",
@@ -681,7 +660,6 @@ async def test_state_sexual_consent_assessment_v2_end_error(
 
 @pytest.mark.asyncio
 async def test_state_alcohol_assessment_v2_end(tester: AppTester):
-
     await tester.user_input(
         "test",
         transport_metadata={
@@ -707,7 +685,6 @@ async def test_state_alcohol_assessment_v2_end(tester: AppTester):
 
 @pytest.mark.asyncio
 async def test_state_alcohol_assessment_v2_end_error(tester: AppTester, rapidpro_mock):
-
     rapidpro_mock.tstate.errormax = 3
     u = User(
         addr="27820001003", state=StateData(name="state_alcohol_assessment_v2_end")

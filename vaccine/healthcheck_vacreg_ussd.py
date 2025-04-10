@@ -1,5 +1,3 @@
-from typing import List
-
 from vaccine import vacreg_config as config
 from vaccine.healthcheck_ussd import Application as HealthCheckApp
 from vaccine.models import Message
@@ -65,7 +63,7 @@ class Application(VacRegApp, HealthCheckApp):
             question="NATIONAL DEPT OF HEALTH's COVID-19 Response services\n"
             "\n"
             "Language:",
-            error="ERROR: Please try again\n" "\n" "Language:",
+            error="ERROR: Please try again\n\nLanguage:",
             choices=[
                 Choice("eng", "English"),
                 Choice("zul", "isiZulu"),
@@ -76,7 +74,7 @@ class Application(VacRegApp, HealthCheckApp):
             next="state_menu",
         )
 
-    async def process_message(self, message: Message) -> List[Message]:
+    async def process_message(self, message: Message) -> list[Message]:
         if (
             message.session_event == Message.SESSION_EVENT.NEW
             and self.state_name is not None
