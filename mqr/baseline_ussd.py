@@ -43,7 +43,7 @@ class Application(MidlineApplication):
 
     async def state_start(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        urn = f"whatsapp:{msisdn.lstrip(' + ')}"
+        urn = f"whatsapp:{msisdn.removeprefix('+')}"
 
         sms_mqr_contact = False
 
@@ -110,9 +110,7 @@ class Application(MidlineApplication):
         return await self.go_to_state("state_breastfeed")
 
     async def state_breastfeed(self):
-        question = self._(
-            "1/13\n" "\n" "Do you plan to breastfeed your baby after birth?"
-        )
+        question = self._("1/13\n\nDo you plan to breastfeed your baby after birth?")
         error = self._(
             "Please use numbers from list.\n"
             "\n"
@@ -358,9 +356,7 @@ class Application(MidlineApplication):
 
     async def state_fruit(self):
         question = self._(
-            "7/13 \n"
-            "\n"
-            "Since becoming pregnant, do you eat fruit at least once a day?"
+            "7/13 \n\nSince becoming pregnant, do you eat fruit at least once a day?"
         )
         error = self._(
             "Please use numbers from list.\n"
@@ -409,10 +405,8 @@ class Application(MidlineApplication):
         )
 
     async def state_liver_frequency(self):
-        question = self._("9/13 \n" "\n" "How often do you eat liver?")
-        error = self._(
-            "Please use numbers from list.\n" "\n" "How often do you eat liver?"
-        )
+        question = self._("9/13 \n\nHow often do you eat liver?")
+        error = self._("Please use numbers from list.\n\nHow often do you eat liver?")
         choices = [
             Choice("2_3_times_week", "2-3 times a week"),
             Choice("once_a_week", "Once a week"),
@@ -483,10 +477,8 @@ class Application(MidlineApplication):
         )
 
     async def state_marital_status(self):
-        question = self._("12/13 \n" "\n" "What is your marital status?")
-        error = self._(
-            "Please use numbers from list.\n" "\n" "What is your marital status?"
-        )
+        question = self._("12/13 \n\nWhat is your marital status?")
+        error = self._("Please use numbers from list.\n\nWhat is your marital status?")
         choices = [
             Choice("never_married", "Never married"),
             Choice("married", "Married"),
@@ -506,9 +498,7 @@ class Application(MidlineApplication):
 
     async def state_education_level_question(self):
         question = self._(
-            "13/13 \n"
-            "\n"
-            "Which answer best describes your highest level of education?"
+            "13/13 \n\nWhich answer best describes your highest level of education?"
         )
         error = self._(
             "Please use numbers from list.\n"
@@ -593,7 +583,7 @@ class Application(MidlineApplication):
 
     async def state_update_rapidpro_contact(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        urn = f"whatsapp:{msisdn.lstrip(' + ')}"
+        urn = f"whatsapp:{msisdn.removeprefix('+')}"
 
         async with get_rapidpro() as session:
             for i in range(3):

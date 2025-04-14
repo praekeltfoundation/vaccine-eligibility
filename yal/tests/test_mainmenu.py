@@ -22,17 +22,25 @@ def build_message_detail(
     id,
     title,
     content,
-    tags=[],
+    tags=(),
     has_children=False,
     image=None,
     total_messages=1,
-    quick_replies=[],
-    related_pages=[],
+    quick_replies=None,
+    related_pages=None,
     message=1,
     next_message=None,
     previous_message=None,
-    variations=[],
+    variations=None,
 ):
+    if variations is None:
+        variations = []
+    if related_pages is None:
+        related_pages = []
+    if quick_replies is None:
+        quick_replies = []
+    if tags is None:
+        tags = []
     return {
         "id": id,
         "title": title,
@@ -109,7 +117,7 @@ async def rapidpro_mock():
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
-        config.RAPIDPRO_TOKEN = "testtoken"
+        config.RAPIDPRO_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.RAPIDPRO_URL = url
@@ -143,10 +151,9 @@ async def contentrepo_api_mock():
     @app.route("/api/v2/pages", methods=["GET"])
     def get_main_menu(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
 
         tag = request.args.get("tag")
 
@@ -172,7 +179,7 @@ async def contentrepo_api_mock():
 
         if child_of in ["1111"]:
             for i in range(5):
-                pages.append({"id": i, "title": f"Sub menu {i+1}"})
+                pages.append({"id": i, "title": f"Sub menu {i + 1}"})
             pages.append({"id": 123, "title": "Sub menu that is very long"})
 
         if child_of == "1231":
@@ -390,7 +397,7 @@ async def contentrepo_api_mock():
     async with run_sanic(app) as server:
         url = config.CONTENTREPO_API_URL
         config.CONTENTREPO_API_URL = f"http://{server.host}:{server.port}"
-        config.CONTENTREPO_API_TOKEN = "testtoken"
+        config.CONTENTREPO_API_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.CONTENTREPO_API_URL = url
@@ -545,8 +552,7 @@ async def test_state_mainmenu_start_suggested_populated(
             "⚙️ *CHAT SETTINGS*",
             "11. Update your information",
             "-----",
-            "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or"
-            " *MENU*.",
+            "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or *MENU*.",
         ]
     )
 

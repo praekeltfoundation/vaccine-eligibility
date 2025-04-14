@@ -302,7 +302,7 @@ class Application(BaseApplication):
 
     async def state_set_reminder_timer(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         data = {
             "assessment_reminder": get_current_datetime().isoformat(),
@@ -375,7 +375,7 @@ class Application(BaseApplication):
 
     async def state_submit_terms_and_conditions_endline(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         error = await rapidpro.update_profile(
             whatsapp_id, {"endline_terms_accepted": "True"}, self.user.metadata
@@ -390,9 +390,8 @@ class Application(BaseApplication):
         return await self.go_to_state(EndlineApplication.START_STATE)
 
     async def state_endline_limit_reached(self):
-
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         data = {
             "endline_survey_started": "limit_reached",

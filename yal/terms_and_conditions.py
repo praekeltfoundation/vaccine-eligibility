@@ -167,7 +167,7 @@ class Application(BaseApplication):
 
     async def state_submit_terms_and_conditions(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         error = await rapidpro.update_profile(
             whatsapp_id, {"terms_accepted": "True"}, self.user.metadata

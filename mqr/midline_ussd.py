@@ -30,7 +30,7 @@ class Application(BaseApplication):
         if message.session_event == Message.SESSION_EVENT.CLOSE:
             self.user.session_id = None
             msisdn = normalise_phonenumber(self.user.addr)
-            urn = f"whatsapp:{msisdn.lstrip(' + ')}"
+            urn = f"whatsapp:{msisdn.removeprefix('+')}"
 
             async with get_rapidpro() as session:
                 for i in range(3):
@@ -56,7 +56,7 @@ class Application(BaseApplication):
         return await super().process_message(message)
 
     async def state_eat_fruits(self):
-        question = self._("1/16\n" "\n" "Do you eat fruits at least once a day?")
+        question = self._("1/16\n\nDo you eat fruits at least once a day?")
         error = self._("Please use numbers from list.\n")
         choices = [
             Choice("yes", "Yes"),
@@ -73,7 +73,7 @@ class Application(BaseApplication):
         )
 
     async def state_eat_vegetables(self):
-        question = self._("2/16\n" "\n" "Do you eat vegetables at least once a day?")
+        question = self._("2/16\n\nDo you eat vegetables at least once a day?")
         error = self._("Please use numbers from list.\n")
         choices = [
             Choice("yes", "Yes"),
@@ -90,7 +90,7 @@ class Application(BaseApplication):
         )
 
     async def state_eat_liver(self):
-        question = self._("3/16\n" "\n" "How often do you eat liver?")
+        question = self._("3/16\n\nHow often do you eat liver?")
         error = self._("Please use numbers from list.\n")
         choices = [
             Choice("once_week", "Once a week"),
@@ -179,9 +179,7 @@ class Application(BaseApplication):
 
     async def state_dizzy_weak_symptom_of(self):
         question = self._(
-            "7/16\n"
-            "\n"
-            "What could a mix of feeling dizzy and weak/tired be a symptom of?"
+            "7/16\n\nWhat could a mix of feeling dizzy and weak/tired be a symptom of?"
         )
         error = self._("Please use numbers from list.\n")
         choices = [
@@ -256,9 +254,7 @@ class Application(BaseApplication):
             return "state_important_to_vaccinate"
 
         question = self._(
-            "10/16\n"
-            "\n"
-            "Are you planning on breastfeeding your baby after he/she is born?"
+            "10/16\n\nAre you planning on breastfeeding your baby after he/she is born?"
         )
         error = self._("Please use numbers from list.\n")
         choices = [
@@ -319,9 +315,7 @@ class Application(BaseApplication):
     # split
     async def state_biggest_reason_to_breastfeed_question(self):
         question = self._(
-            "11/16\n"
-            "\n"
-            "What is the biggest reason why you want to breastfeed your baby?"
+            "11/16\n\nWhat is the biggest reason why you want to breastfeed your baby?"
         )
         error = self._("Please use numbers from list.\n")
         choices = [Choice("1", "Next")]
@@ -356,9 +350,7 @@ class Application(BaseApplication):
         )
 
     async def state_when_start_breastfeed(self):
-        question = self._(
-            "12/16\n" "\n" "When do you plan to start breastfeeding your baby?"
-        )
+        question = self._("12/16\n\nWhen do you plan to start breastfeeding your baby?")
         error = self._("Please use numbers from list.\n")
         choices = [
             Choice("within_1_hour", "Within 1 hour of birth"),
@@ -523,7 +515,7 @@ class Application(BaseApplication):
 
     async def state_update_rapidpro_contact_midline(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        urn = f"whatsapp:{msisdn.lstrip(' + ')}"
+        urn = f"whatsapp:{msisdn.removeprefix('+')}"
 
         async with get_rapidpro() as session:
             for i in range(3):

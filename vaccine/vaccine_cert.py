@@ -2,7 +2,6 @@ import base64
 import binascii
 import json
 import re
-from typing import List
 from urllib.parse import ParseResult, urlunparse
 
 import aiohttp
@@ -32,7 +31,7 @@ class Application(BaseApplication):
             )
         )
 
-    async def process_message(self, message: Message) -> List[Message]:
+    async def process_message(self, message: Message) -> list[Message]:
         if message.session_event == Message.SESSION_EVENT.CLOSE:
             self.state_name = "state_timeout"
 
@@ -80,12 +79,12 @@ class Application(BaseApplication):
             try:
                 cert_encoded = json.loads(data)["hcert"]
                 return json.loads(base64.b64decode(cert_encoded).decode())
-            except (json.JSONDecodeError, KeyError, TypeError, binascii.Error):
+            except (json.JSONDecodeError, KeyError, TypeError, binascii.Error) as e:
                 raise ErrorMessage(
                     "Sorry, the QR code is not a valid vaccine certificate QR code. "
                     "Please try sending a photo that contains the vaccine certificate "
                     "QR code, or reply *MENU* to quit."
-                )
+                ) from e
 
         async def image_check(content):
             msg = self.inbound.transport_metadata.get("message", {})

@@ -237,7 +237,7 @@ class Application(BaseApplication):
 
     async def state_location_update_invalid_province(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         error = await rapidpro.update_profile(
             whatsapp_id,
@@ -339,7 +339,7 @@ class Application(BaseApplication):
 
     async def state_location_update_status(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         optin = self.user.answers["state_location_group_invite"]
 

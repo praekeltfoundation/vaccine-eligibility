@@ -22,11 +22,11 @@ def get_documented_states():
     loader = pytablereader.MarkdownTableFileLoader("yal/tests/states_dictionary.md")
     documented_states = set()
     for data in loader.load():
-        documented_states = documented_states | set(
+        documented_states = documented_states | {
             row["state_name"]
             for row in data.as_dict()[data.table_name]
             if row["accepts_user_input"]
-        )
+        }
     return documented_states
 
 
@@ -54,9 +54,9 @@ def main():
     documented_states = get_documented_states()
     server_states = asyncio.run(get_server_states(args))
     difference = documented_states - server_states
-    assert (
-        len(difference) == 0
-    ), f"{len(difference)} states are not in the definition. List: {difference}"
+    assert len(difference) == 0, (
+        f"{len(difference)} states are not in the definition. List: {difference}"
+    )
     print("Done! No missing questions found")
 
 

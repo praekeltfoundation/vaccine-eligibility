@@ -51,7 +51,7 @@ PERSONA_DEFAULTS = {"persona_emoji": "🤖", "persona_name": "B-wise"}
 
 
 def get_generic_error():
-    return random.choice(GENERIC_ERRORS)
+    return random.choice(GENERIC_ERRORS)  # noqa: S311 - Not being used for crypto
 
 
 def get_today():
@@ -85,8 +85,8 @@ def normalise_phonenumber(phonenumber):
             assert phonenumbers.is_possible_number(pn)
             assert phonenumbers.is_valid_number(pn)
             return phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.E164)
-    except (phonenumbers.phonenumberutil.NumberParseException, AssertionError):
-        raise ValueError("Invalid phone number")
+    except (phonenumbers.phonenumberutil.NumberParseException, AssertionError) as e:
+        raise ValueError("Invalid phone number") from e
 
 
 def extract_first_emoji(persona_emoji):
@@ -96,7 +96,9 @@ def extract_first_emoji(persona_emoji):
     return ""
 
 
-def replace_persona_fields(text, metadata={}):
+def replace_persona_fields(text, metadata=None):
+    if metadata is None:
+        metadata = {}
     for key in PERSONA_FIELDS:
         value = metadata.get(key)
         if value and value.lower() not in ["skip", ""]:
@@ -111,7 +113,7 @@ def replace_persona_fields(text, metadata={}):
 def get_keywords(name):
     keywords = []
     filename = pkg_resources.resource_filename("yal", f"keywords/{name}.csv")
-    with open(filename, mode="r") as keyword_file:
+    with open(filename) as keyword_file:
         csvreader = reader(keyword_file)
         next(csvreader)
         for row in csvreader:
@@ -151,7 +153,7 @@ def is_integer(string: str) -> bool:
 
 
 def get_generic_error_options():
-    return random.choice(GENERIC_ERROR_OPTIONS)
+    return random.choice(GENERIC_ERROR_OPTIONS)  # noqa: S311 - Not being used for crypto
 
 
 async def check_if_baseline_active():
