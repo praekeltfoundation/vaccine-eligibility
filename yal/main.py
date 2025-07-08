@@ -98,6 +98,7 @@ FACEBOOK_INVITE_KEYWORDS = {
     "yes take part",
     "no thanks",
 }
+UPDATE_SETTINGS = {"update settings"}
 
 
 class Application(
@@ -150,6 +151,7 @@ class Application(
 
             if (
                 keyword in GREETING_KEYWORDS
+                or keyword in UPDATE_SETTINGS
                 or keyword in TRACKING_KEYWORDS
                 or keyword in TRACKING_KEYWORDS_ROUND_2
                 or keyword in TRACKING_KEYWORDS_ROUND_3
@@ -221,6 +223,9 @@ class Application(
                     self.user.session_id = random_id()
                 message.session_event = Message.SESSION_EVENT.RESUME
                 self.state_name = feedback_state
+
+            if keyword in UPDATE_SETTINGS and payload == "state_display_preferences":
+                self.state_name = ChangePreferencesApplication.START_STATE
 
             # Replies to template push messages
             elif payload and payload.startswith("state_") and payload in dir(self):
@@ -337,6 +342,9 @@ class Application(
                 return await self.go_to_state(OnboardingApplication.START_STATE)
             else:
                 return await self.go_to_state(TermsApplication.START_STATE)
+
+        if inbound in UPDATE_SETTINGS and terms_accepted and onboarding_completed:
+            return await self.go_to_state(ChangePreferencesApplication.START_STATE)
 
         return await self.go_to_state("state_catch_all")
 
