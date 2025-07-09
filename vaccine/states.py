@@ -1,15 +1,11 @@
+from collections.abc import Awaitable, Sequence
 from dataclasses import dataclass, field
 from inspect import iscoroutinefunction, isfunction
 from typing import (
     TYPE_CHECKING,
     Any,
-    Awaitable,
     Callable,
-    Dict,
-    List,
     Optional,
-    Sequence,
-    Tuple,
     Union,
 )
 
@@ -37,7 +33,7 @@ class EndState:
         self.clear_state = clear_state
         self.helper_metadata = helper_metadata
 
-    async def process_message(self, message: Message) -> List[Message]:
+    async def process_message(self, message: Message) -> list[Message]:
         self.app.user.session_id = None
         self.app.state_name = self.next
         if self.clear_state:
@@ -47,7 +43,7 @@ class EndState:
             kwargs["helper_metadata"] = self.helper_metadata
         return self.app.send_message(**kwargs)
 
-    async def display(self, message: Message) -> List[Message]:
+    async def display(self, message: Message) -> list[Message]:
         return await self.process_message(message)
 
 
@@ -55,7 +51,7 @@ class EndState:
 class Choice:
     value: str
     label: str
-    additional_keywords: List[str] = field(default_factory=list)
+    additional_keywords: list[str] = field(default_factory=list)
 
 
 class ChoiceState:
@@ -63,15 +59,15 @@ class ChoiceState:
         self,
         app: "BaseApplication",
         question: str,
-        choices: List[Choice],
+        choices: list[Choice],
         error: str,
-        next: Union[str, Callable, Dict[str, str]],
+        next: Union[str, Callable, dict[str, str]],
         accept_labels: bool = True,
         footer: Optional[str] = None,
         error_footer: Optional[str] = None,
         header: Optional[str] = None,
         error_header: Optional[str] = None,
-        buttons: Optional[List[Choice]] = None,
+        buttons: Optional[list[Choice]] = None,
         helper_metadata: Optional[dict] = None,
         override_answer_name: Optional[str] = None,
     ):
@@ -147,7 +143,7 @@ class ChoiceState:
         return self.app.send_message(text)
 
     async def display(self, message: Message):
-        helper_metadata: Dict[str, Any] = self.helper_metadata or {}
+        helper_metadata: dict[str, Any] = self.helper_metadata or {}
         if self.buttons:
             helper_metadata["buttons"] = [choice.label for choice in self.buttons]
         text = f"{self.question}\n{self._display_choices}"
@@ -169,7 +165,7 @@ class MenuState(ChoiceState):
         self,
         app: "BaseApplication",
         question: str,
-        choices: List[Choice],
+        choices: list[Choice],
         error: str,
         accept_labels: bool = True,
         footer: Optional[str] = None,
@@ -209,10 +205,10 @@ class FreeText:
         next: str,
         check: Union[
             Callable[[Optional[str]], Awaitable],
-            List[Callable[[Optional[str]], Awaitable]],
+            list[Callable[[Optional[str]], Awaitable]],
             None,
         ] = None,
-        buttons: Optional[List[Choice]] = None,
+        buttons: Optional[list[Choice]] = None,
         override_answer_name: Optional[str] = None,
         footer: Optional[str] = None,
         header: Optional[str] = None,
@@ -243,7 +239,7 @@ class FreeText:
         return await state.display(message)
 
     async def display(self, message: Message):
-        helper_metadata: Dict[str, Any] = {}
+        helper_metadata: dict[str, Any] = {}
         if self.buttons:
             helper_metadata["buttons"] = [choice.label for choice in self.buttons]
         text = self.question
@@ -265,9 +261,12 @@ class WhatsAppTextOnlyFreetext(FreeText):
         self.text_only_error = text_only_error
 
     async def process_message(self, message: Message):
-        if self.text_only_error is not None and message.transport_metadata:
-            if message.transport_metadata.get("message", {}).get("type") != "text":
-                return self.app.send_message(self.text_only_error)
+        if (
+            self.text_only_error is not None
+            and message.transport_metadata
+            and message.transport_metadata.get("message", {}).get("type") != "text"
+        ):
+            return self.app.send_message(self.text_only_error)
         return await super().process_message(message)
 
 
@@ -287,7 +286,7 @@ class BaseWhatsAppChoiceState(ChoiceState):
 
 class WhatsAppButtonState(BaseWhatsAppChoiceState):
     async def display(self, message: Message):
-        helper_metadata: Dict[str, Any] = {
+        helper_metadata: dict[str, Any] = {
             "buttons": [choice.label for choice in self.choices]
         }
         if self.header:
@@ -297,7 +296,7 @@ class WhatsAppButtonState(BaseWhatsAppChoiceState):
         return self.app.send_message(self.question, helper_metadata=helper_metadata)
 
     async def display_error(self, message: Message):
-        helper_metadata: Dict[str, Any] = {
+        helper_metadata: dict[str, Any] = {
             "buttons": [choice.label for choice in self.choices]
         }
         if self.error_header:
@@ -333,11 +332,11 @@ class SectionedChoiceState(ChoiceState):
     def __init__(
         self,
         *args,
-        sections: Sequence[Tuple[str, Sequence[Choice]]],
+        sections: Sequence[tuple[str, Sequence[Choice]]],
         separator: Optional[str] = None,
         **kwargs,
     ):
-        choices: List[Choice] = []
+        choices: list[Choice] = []
         for section_choices in sections:
             choices.extend(section_choices[1])
 
@@ -369,8 +368,8 @@ class CustomChoiceState(BaseWhatsAppChoiceState):
     def __init__(
         self,
         *args,
-        button: str = None,
-        additional_messages: Optional[List[str]] = None,
+        button: Optional[str] = None,
+        additional_messages: Optional[list[str]] = None,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
