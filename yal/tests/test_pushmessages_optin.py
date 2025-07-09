@@ -43,10 +43,9 @@ async def rapidpro_mock():
     @app.route("/api/v2/contacts.json", methods=["GET"])
     def get_contact(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
 
         urn = request.args.get("urn")
         contacts = [get_rapidpro_contact(urn)]
@@ -87,7 +86,7 @@ async def rapidpro_mock():
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
-        config.RAPIDPRO_TOKEN = "testtoken"
+        config.RAPIDPRO_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.RAPIDPRO_URL = url

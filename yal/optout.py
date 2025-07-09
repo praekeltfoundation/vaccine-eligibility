@@ -33,7 +33,6 @@ class Application(BaseApplication):
     }
 
     async def state_optout(self):
-
         inbound = utils.clean_inbound(self.inbound.content)
         question = self._(
             "\n".join(
@@ -98,7 +97,7 @@ class Application(BaseApplication):
     async def state_submit_optout(self):
         """Opt user out of the requested messages/campaigns"""
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = self.reminders_to_be_cleared
 
         error = await rapidpro.update_profile(
@@ -175,10 +174,10 @@ class Application(BaseApplication):
 
     async def state_delete_saved(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         rp_fields = await rapidpro.get_instance_fields()
-        rp_field_keys = set([rp_field["key"] for rp_field in rp_fields])
+        rp_field_keys = {rp_field["key"] for rp_field in rp_fields}
         fields_to_update_and_retain = {
             "opted_out": "True",
             "opted_out_timestamp": get_current_datetime().isoformat(),
@@ -205,7 +204,7 @@ class Application(BaseApplication):
         # splitting combined dictionary into batches off 100
         # RapidPro can only update 100 fields at a time
         for i in range(0, len(sorted_field_dict), batch_size):
-            batch = list(sorted_field_dict.items())[i : i + batch_size]  # noqa
+            batch = list(sorted_field_dict.items())[i : i + batch_size]
             batches.append(batch)
 
         for batch in batches:

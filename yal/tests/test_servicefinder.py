@@ -1,7 +1,6 @@
 import json
 from collections import defaultdict
 from datetime import datetime
-from typing import Dict, List
 from unittest import mock
 
 import pytest
@@ -19,18 +18,18 @@ def tester():
 
 
 with open("yal/tests/servicefinder_categories.json") as f:
-    CATEGORIES: List[Dict] = json.loads(f.read())
+    CATEGORIES: list[dict] = json.loads(f.read())
 
 
 def get_processed_categories():
-    categories: Dict[str, Dict] = defaultdict(dict)
+    categories: dict[str, dict] = defaultdict(dict)
     for c in CATEGORIES:
         parent = c["parent"] or "root"
         categories[parent][c["_id"]] = c["name"]
     return dict(categories)
 
 
-FACILITIES: List[Dict] = [
+FACILITIES: list[dict] = [
     {
         "location": {"type": "Point", "coordinates": [28.0151783, -26.1031026]},
         "_id": "62ddcc71981c9d7ba465e67e",
@@ -100,10 +99,9 @@ async def google_api_mock():
     @app.route("/maps/api/place/autocomplete/json", methods=["GET"])
     def valid_city(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
         if tstate.status == "OK":
             data = {
                 "status": "OK",
@@ -121,10 +119,9 @@ async def google_api_mock():
     @app.route("/maps/api/geocode/json", methods=["GET"])
     def desc_from_pin(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
         if tstate.status == "OK":
             data = {
                 "status": "OK",
@@ -143,10 +140,9 @@ async def google_api_mock():
     @app.route("/maps/api/place/details/json", methods=["GET"])
     def details_lookup(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
         if tstate.status == "OK":
             data = {
                 "status": "OK",
@@ -184,7 +180,7 @@ async def rapidpro_mock():
 
     async with run_sanic(app) as server:
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
-        config.RAPIDPRO_TOKEN = "testtoken"
+        config.RAPIDPRO_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
 
@@ -206,8 +202,7 @@ async def test_state_servicefinder_start_no_address(tester: AppTester, rapidpro_
                 "",
                 "🤖*(You can share your location by sending me a pin (📍). To do this:*",
                 "",
-                "1️⃣*Tap the + _(plus)_* button or the 📎*_(paperclip)_* button "
-                "below.",
+                "1️⃣*Tap the + _(plus)_* button or the 📎*_(paperclip)_* button below.",
                 "",
                 "2️⃣Next, tap *Location* then select *Send Your Current Location.*",
                 "",
@@ -339,8 +334,7 @@ async def test_state_confirm_existing_address_no(tester: AppTester, rapidpro_moc
                 "🤖*You can change your location by sending me a pin (📍)."
                 " To do this:*",
                 "",
-                "1️⃣Tap the *+ _(plus)_* button or the 📎*_(paperclip)_* button "
-                "below.",
+                "1️⃣Tap the *+ _(plus)_* button or the 📎*_(paperclip)_* button below.",
                 "",
                 "2️⃣Next, tap *Location* then select *Send Your Current Location.*",
                 "",
@@ -505,7 +499,7 @@ async def test_state_location(
 ):
     tester.setup_state("state_location")
     tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
-    tester.user.metadata["google_session_token"] = "123"
+    tester.user.metadata["google_session_token"] = "123"  # noqa: S105 - Fake password/token for test purposes
 
     await tester.user_input(
         "test location",
@@ -590,7 +584,7 @@ async def test_state_province_skip(
     tester: AppTester, rapidpro_mock, servicefinder_mock, google_api_mock
 ):
     tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
-    tester.user.metadata["google_session_token"] = "123"
+    tester.user.metadata["google_session_token"] = "123"  # noqa: S105 - Fake password/token for test purposes
 
     tester.setup_answer("state_province", "skip")
     tester.setup_state("state_full_address")
@@ -637,7 +631,7 @@ async def test_state_street_name(
     tester: AppTester, servicefinder_mock, google_api_mock, rapidpro_mock
 ):
     tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
-    tester.user.metadata["google_session_token"] = "123"
+    tester.user.metadata["google_session_token"] = "123"  # noqa: S105 - Fake password/token for test purposes
 
     tester.setup_answer("state_province", "FS")
     tester.setup_answer("state_suburb", "test suburb")
@@ -690,7 +684,7 @@ async def test_state_validate_full_address_success(
     tester: AppTester, servicefinder_mock, google_api_mock, rapidpro_mock
 ):
     tester.user.metadata["servicefinder_breadcrumb"] = "*Get help near you*"
-    tester.user.metadata["google_session_token"] = "123"
+    tester.user.metadata["google_session_token"] = "123"  # noqa: S105 - Fake password/token for test purposes
 
     tester.setup_answer("state_province", "FS")
     tester.setup_state("state_full_address")

@@ -113,7 +113,6 @@ QUESTIONS = {
     "body_image": BODY_IMAGE_QUESTIONS,
     "self_perceived_healthcare": SELF_PERCEIVED_HEALTHCARE_QUESTIONS,
     "self_esteem": SELF_ESTEEM_QUESTIONS,
-    "body_image": BODY_IMAGE_QUESTIONS,
     "self_esteem_v2": SELF_ESTEEM_QUESTIONS_V2,
     "connectedness_v2": CONNECTEDNESS_QUESTIONS_V2,
     "body_image_v2": BODY_IMAGE_QUESTIONS_V2,
@@ -177,7 +176,7 @@ class Application(BaseApplication):
             assessment_reminder_type = "endline reengagement 30min"
 
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "assessment_reminder": get_current_datetime().isoformat(),
             "assessment_reminder_name": assessment_name,
@@ -306,7 +305,7 @@ class Application(BaseApplication):
         next = None
 
         if question["next"]:
-            if type(question["next"]) == dict:
+            if isinstance(question["next"], dict):
                 next = question["next"][answer]
             else:
                 next = question["next"]
@@ -333,7 +332,7 @@ class Application(BaseApplication):
 
     async def state_assessment_later_submit(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         survey = ""
         if "assessment_reminder_name" in self.user.metadata:
@@ -377,7 +376,7 @@ class Application(BaseApplication):
     async def state_handle_assessment_reminder_response(self):
         inbound = utils.clean_inbound(self.inbound.content)
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         endline_survey_started = self.user.metadata.get("endline_survey_started")
         survey = "endline " if endline_survey_started == "Pending" else ""
 
@@ -446,7 +445,7 @@ class Application(BaseApplication):
 
     async def state_not_interested(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "endline_survey_started": "not_interested",
         }
@@ -545,7 +544,7 @@ class Application(BaseApplication):
 
     async def state_notification_no_submit(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "push_message_opt_in": "False",
         }
@@ -556,7 +555,7 @@ class Application(BaseApplication):
 
     async def state_notification_yes_submit(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         data = {
             "push_message_opt_in": "True",
         }
@@ -592,7 +591,7 @@ class Application(BaseApplication):
 
     async def state_stop_assessment_reminders_clear_fields(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         assessment_name = None
         assessment_reminder_name = self.user.metadata.get("assessment_reminder_name")
         if assessment_reminder_name:
@@ -672,7 +671,7 @@ class Application(BaseApplication):
 
     async def state_reschedule_assessment_reminder(self):
         msisdn = utils.normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
         assessment_reminder_sent = self.user.metadata["assessment_reminder_sent"]
 
         assessment_name = self.clean_name(
@@ -719,7 +718,6 @@ class Application(BaseApplication):
         return await self.go_to_state("state_generic_what_would_you_like_to_do")
 
     async def state_remind_tomorrow(self):
-
         endline_survey_started = self.user.metadata.get("endline_survey_started")
 
         question = "No problem! I'll remind you tomorrow"
@@ -736,7 +734,6 @@ class Application(BaseApplication):
             )
 
     async def state_reminder_not_interested(self):
-
         choices = [
             Choice("menu", "Go to the menu"),
             Choice("aaq", "Ask a question"),
