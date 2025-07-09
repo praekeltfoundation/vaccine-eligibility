@@ -55,7 +55,6 @@ class Application(BaseApplication):
     }
 
     async def state_aaq_start(self, question=None, buttons=None):
-
         if not config.AAQ_URL:
             return await self.go_to_state("state_coming_soon")
 
@@ -97,7 +96,7 @@ class Application(BaseApplication):
 
     async def state_set_aaq_timeout_1(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         timeout_time = get_current_datetime() + timedelta(minutes=5)
         data = {
@@ -161,7 +160,7 @@ class Application(BaseApplication):
             return await self.go_to_state("state_no_answers")
 
         choices = []
-        for title in answers.keys():
+        for title in answers:
             choices.append(Choice(title, title))
 
         if page == 0:
@@ -180,7 +179,7 @@ class Application(BaseApplication):
             # Add next page option if there is one
             if self.user.metadata.get("next_page_url"):
                 question_list.extend(
-                    ["or", f"*{len(choices)+1}*. See more options", ""]
+                    ["or", f"*{len(choices) + 1}*. See more options", ""]
                 )
                 choices.append(Choice("more", "See more options"))
             # Add footer options
@@ -190,8 +189,7 @@ class Application(BaseApplication):
         else:
             question = "\n".join(
                 [
-                    f"🙋🏿‍♂️ QUESTIONS? / Ask A Question / *2nd {len(answers)} "
-                    "matches*",
+                    f"🙋🏿‍♂️ QUESTIONS? / Ask A Question / *2nd {len(answers)} matches*",
                     "-----",
                     "",
                     "[persona_emoji] Here are some more topics that might answer "
@@ -204,8 +202,8 @@ class Application(BaseApplication):
                     get_display_choices(choices, bold_numbers=True),
                     "",
                     "or",
-                    f"*{len(choices)+1}*. Back to first list",
-                    f"*{len(choices)+2}*. Talk to a counsellor",
+                    f"*{len(choices) + 1}*. Back to first list",
+                    f"*{len(choices) + 2}*. Talk to a counsellor",
                     "",
                     "-----",
                     "*Or reply:*",
@@ -257,7 +255,7 @@ class Application(BaseApplication):
             return await self.go_to_state(PleaseCallMeApplication.START_STATE)
 
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         timeout_time = get_current_datetime() + timedelta(minutes=5)
         data = {
@@ -315,7 +313,7 @@ class Application(BaseApplication):
 
     async def state_is_question_answered(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         data = {
             "feedback_type": "",
@@ -416,7 +414,6 @@ class Application(BaseApplication):
         )
 
     async def state_yes_question_answered_changes(self):
-
         question = self._(
             "\n".join(
                 [
@@ -448,7 +445,7 @@ class Application(BaseApplication):
                     "I'll try make sure I have the right information "
                     "for you next time.",
                     "",
-                    "_Just type and send your question again, now._" "",
+                    "_Just type and send your question again, now._",
                     "-----",
                     "*Or reply:*",
                     BACK_TO_MAIN,
@@ -545,7 +542,7 @@ class Application(BaseApplication):
 
     async def state_handle_timeout_response(self):
         msisdn = normalise_phonenumber(self.inbound.from_addr)
-        whatsapp_id = msisdn.lstrip(" + ")
+        whatsapp_id = msisdn.removeprefix("+")
 
         data = {"feedback_survey_sent": "", "feedback_timestamp": ""}
         error = await rapidpro.update_profile(whatsapp_id, data, self.user.metadata)

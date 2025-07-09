@@ -35,34 +35,32 @@ from yal.wa_fb_crossover_feedback import Application as WaFbCrossoverFeedbackApp
 
 
 def get_state_sets():
-    m_states = set(s for s in dir(Application) if s.startswith("state_"))
-    mm_states = set(s for s in dir(MainMenuApplication) if s.startswith("state_"))
-    on_states = set(s for s in dir(OnboardingApplication) if s.startswith("state_"))
-    oo_states = set(s for s in dir(OptoutApplication) if s.startswith("state_"))
-    te_states = set(s for s in dir(TermsApplication) if s.startswith("state_"))
-    cp_states = set(
-        s for s in dir(ChangePreferencesApplication) if s.startswith("state_")
-    )
-    q_states = set(s for s in dir(QuizApplication) if s.startswith("state_"))
-    pc_states = set(s for s in dir(PleaseCallMeApplication) if s.startswith("state_"))
-    sf_states = set(s for s in dir(ServiceFinderApplication) if s.startswith("state_"))
-    aaq_states = set(s for s in dir(AaqApplication) if s.startswith("state_"))
-    fb_states = set(s for s in dir(FeedbackApplication) if s.startswith("state_"))
-    c_fb_states = set(
+    m_states = {s for s in dir(Application) if s.startswith("state_")}
+    mm_states = {s for s in dir(MainMenuApplication) if s.startswith("state_")}
+    on_states = {s for s in dir(OnboardingApplication) if s.startswith("state_")}
+    oo_states = {s for s in dir(OptoutApplication) if s.startswith("state_")}
+    te_states = {s for s in dir(TermsApplication) if s.startswith("state_")}
+    cp_states = {s for s in dir(ChangePreferencesApplication) if s.startswith("state_")}
+    q_states = {s for s in dir(QuizApplication) if s.startswith("state_")}
+    pc_states = {s for s in dir(PleaseCallMeApplication) if s.startswith("state_")}
+    sf_states = {s for s in dir(ServiceFinderApplication) if s.startswith("state_")}
+    aaq_states = {s for s in dir(AaqApplication) if s.startswith("state_")}
+    fb_states = {s for s in dir(FeedbackApplication) if s.startswith("state_")}
+    c_fb_states = {
         s for s in dir(ContentFeedbackSurveyApplication) if s.startswith("state_")
-    )
-    sf_s_states = set(
+    }
+    sf_s_states = {
         s for s in dir(ServiceFinderFeedbackSurveyApplication) if s.startswith("state_")
-    )
-    bs_states = set(s for s in dir(BaselineSurveyApplication) if s.startswith("state_"))
-    es_states = set(s for s in dir(EndlineSurveyApplication) if s.startswith("state_"))
-    fi_states = set(s for s in dir(FacebookInviteApplication) if s.startswith("state_"))
-    ls_states = set(s for s in dir(LocationSurveyApplication) if s.startswith("state_"))
-    ss_states = set(s for s in dir(SegmentSurveyApplication) if s.startswith("state_"))
-    wa_fb_states = set(
+    }
+    bs_states = {s for s in dir(BaselineSurveyApplication) if s.startswith("state_")}
+    es_states = {s for s in dir(EndlineSurveyApplication) if s.startswith("state_")}
+    fi_states = {s for s in dir(FacebookInviteApplication) if s.startswith("state_")}
+    ls_states = {s for s in dir(LocationSurveyApplication) if s.startswith("state_")}
+    ss_states = {s for s in dir(SegmentSurveyApplication) if s.startswith("state_")}
+    wa_fb_states = {
         s for s in dir(WaFbCrossoverFeedbackApplication) if s.startswith("state_")
-    )
-    optin_states = set(s for s in dir(OptinsApplication) if s.startswith("state_"))
+    }
+    optin_states = {s for s in dir(OptinsApplication) if s.startswith("state_")}
 
     return [
         m_states,
@@ -129,15 +127,15 @@ def test_all_states_added_to_docs():
     loader = ptr.MarkdownTableFileLoader("yal/tests/states_dictionary.md")
     documented_states = set()
     for data in loader.load():
-        documented_states = documented_states | set(
+        documented_states = documented_states | {
             row["state_name"] for row in data.as_dict()[data.table_name]
-        )
+        }
 
     difference = existing_states.difference(documented_states)
 
-    assert (
-        len(difference) == 0
-    ), f"{len(difference)} states are not documented. List: {difference}"
+    assert len(difference) == 0, (
+        f"{len(difference)} states are not documented. List: {difference}"
+    )
 
 
 @pytest.fixture
@@ -206,7 +204,7 @@ async def aaq_mock():
     async with run_sanic(app) as server:
         url = config.AAQ_URL
         config.AAQ_URL = f"http://{server.host}:{server.port}"
-        config.AAQ_TOKEN = "testtoken"
+        config.AAQ_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.AAQ_URL = url
@@ -221,10 +219,9 @@ async def rapidpro_mock():
     @app.route("/api/v2/contacts.json", methods=["GET"])
     def get_contact(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
 
         return response.json(
             {
@@ -278,7 +275,7 @@ async def rapidpro_mock():
     async with run_sanic(app) as server:
         url = config.RAPIDPRO_URL
         config.RAPIDPRO_URL = f"http://{server.host}:{server.port}"
-        config.RAPIDPRO_TOKEN = "testtoken"
+        config.RAPIDPRO_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.RAPIDPRO_URL = url
@@ -516,7 +513,6 @@ async def test_assessment_reminder_keywords(
 
 @pytest.mark.asyncio
 async def test_terms_accepted(tester: AppTester, rapidpro_mock, contentrepo_api_mock):
-
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = True
 
     await tester.user_input("hi")
@@ -1102,7 +1098,7 @@ async def test_aaq_timeout_response_to_handler(
         get_current_datetime().isoformat()
     )
     tester.user.metadata["inbound_id"] = "inbound-id"
-    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"
+    tester.user.metadata["feedback_secret_key"] = "feedback-secret-key"  # noqa: S105 - Fake password/token for test purposes
     tester.user.metadata["faq_id"] = "1"
     tester.user.metadata["model_answers"] = MODEL_ANSWERS_PAGE_1
     tester.user.metadata["aaq_page"] = 0
@@ -1117,7 +1113,7 @@ async def test_aaq_timeout_response_to_handler(
             "I'll try make sure I have the right information "
             "for you next time.",
             "",
-            "_Just type and send your question again, now._" "",
+            "_Just type and send your question again, now._",
             "-----",
             "*Or reply:*",
             BACK_TO_MAIN,

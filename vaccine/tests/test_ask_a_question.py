@@ -22,10 +22,9 @@ async def model_mock():
     @app.route("/inbound/check", methods=["POST"])
     def check(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
         if tstate.no_response:
             return response.json({"top_responses": []})
         return response.file_stream(
@@ -35,17 +34,16 @@ async def model_mock():
     @app.route("/inbound/feedback", methods=["POST"])
     def feedback(request):
         tstate.requests.append(request)
-        if tstate.errormax:
-            if tstate.errors < tstate.errormax:
-                tstate.errors += 1
-                return response.json({}, status=500)
+        if tstate.errormax and tstate.errors < tstate.errormax:
+            tstate.errors += 1
+            return response.json({}, status=500)
         return response.json({})
 
     async with run_sanic(app) as server:
         url = config.MODEL_API_URL
         token = config.MODEL_API_TOKEN
         config.MODEL_API_URL = f"http://{server.host}:{server.port}"
-        config.MODEL_API_TOKEN = "testtoken"
+        config.MODEL_API_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.MODEL_API_URL = url
