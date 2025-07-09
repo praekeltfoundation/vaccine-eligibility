@@ -61,7 +61,7 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*All in all, I am inclined to feel that I am " "a failure.*",
+                        "*All in all, I am inclined to feel that I am a failure.*",
                     ]
                 ),
                 "options": [

@@ -106,7 +106,7 @@ async def real411_mock():
         url = config.REAL411_URL
         token = config.REAL411_TOKEN
         config.REAL411_URL = app.config.SERVER_NAME
-        config.REAL411_TOKEN = "testtoken"
+        config.REAL411_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.REAL411_URL = url
@@ -128,7 +128,7 @@ async def whatsapp_mock():
         url = config.WHATSAPP_URL
         token = config.WHATSAPP_TOKEN
         config.WHATSAPP_URL = f"http://{server.host}:{server.port}"
-        config.WHATSAPP_TOKEN = "testtoken"
+        config.WHATSAPP_TOKEN = "testtoken"  # noqa: S105 - Fake password/token for test purposes
         server.tstate = tstate
         yield server
         config.WHATSAPP_URL = url
