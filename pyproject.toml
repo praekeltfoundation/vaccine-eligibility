@@ -53,7 +53,7 @@ emoji = "^2.1.0"
 types-emoji = "^2.0.1"
 pytablereader = {extras = ["md"], version = "^0.31.3"}
 setuptools = "^70.0.0"
-requests = "^2.32.0"
+requests = "^2.32.4"
 websockets = "~10"
 
 [project.urls]
