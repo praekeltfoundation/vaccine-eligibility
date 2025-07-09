@@ -1,7 +1,7 @@
 import json
 import re
 from asyncio import gather
-from typing import List, Optional, Tuple
+from typing import Optional
 from urllib.parse import urljoin
 
 import aiohttp
@@ -78,8 +78,8 @@ async def submit_real411_form(
     phone: str,
     reason: str,
     email: Optional[str] = None,
-    file_names: Optional[List[dict]] = None,
-) -> Tuple[str, List[str], str]:
+    file_names: Optional[list[dict]] = None,
+) -> tuple[str, list[str], str]:
     complaint_type, language, source = await gather(
         get_real411_single_resource("complaint-type", "DIS"),
         get_real411_single_resource("language", "ENG"),
@@ -160,7 +160,7 @@ async def store_complaint_id(complaint_ref: str, msisdn: str) -> None:
 class Application(BaseApplication):
     START_STATE = "state_start"
 
-    async def process_message(self, message: Message) -> List[Message]:
+    async def process_message(self, message: Message) -> list[Message]:
         if message.session_event == Message.SESSION_EVENT.CLOSE:
             self.state_name = "state_timeout"
 
@@ -312,9 +312,7 @@ class Application(BaseApplication):
 
     async def state_first_name(self):
         question = self._(
-            "*REPORT* 📵 Powered by ```Real411.org```\n"
-            "\n"
-            "Reply with your FIRST NAME:"
+            "*REPORT* 📵 Powered by ```Real411.org```\n\nReply with your FIRST NAME:"
         )
         return FreeText(
             self,
@@ -324,7 +322,7 @@ class Application(BaseApplication):
 
     async def state_surname(self):
         question = self._(
-            "*REPORT* 📵 Powered by ```Real411.org```\n" "\n" "Reply with your SURNAME:"
+            "*REPORT* 📵 Powered by ```Real411.org```\n\nReply with your SURNAME:"
         )
         return FreeText(
             self,
