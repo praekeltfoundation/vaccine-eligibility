@@ -51,7 +51,7 @@ class Suburbs:
         await self.fetch()
         return self._provinces()
 
-    @cache
+    @cache  # noqa B019 - TODO: Fix
     def _provinces(self):
         provinces = [(i["value"], i["text"]) for i in self.data]
         provinces.sort(key=itemgetter(1))
@@ -61,7 +61,7 @@ class Suburbs:
         await self.fetch()
         return self._suburbs_for_province(province_id)
 
-    @cache
+    @cache  # noqa B019 - TODO: Fix
     def _suburbs_for_province(self, province_id):
         for province in self.data:
             if province["value"] == province_id:
@@ -100,7 +100,7 @@ class Suburbs:
     # we call this once when we generate the list of options for the user, and again
     # when we get the user's selection. This caching stops doing that expensive search
     # twice
-    @lru_cache
+    @lru_cache  # noqa B019 - TODO: Fix
     def _search(self, province_id, search_text, municipality_id=None, m_limit=3):
         suburbs = self._suburbs_for_province(province_id)
         if municipality_id is not None:

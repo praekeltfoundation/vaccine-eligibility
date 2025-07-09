@@ -267,8 +267,7 @@ ASSESSMENT_QUESTIONS = {
                 "type": "list",
                 "text": "\n".join(
                     [
-                        "*How many sexual partners did you have over the last "
-                        "month?*",
+                        "*How many sexual partners did you have over the last month?*",
                     ]
                 ),
                 "options": [
