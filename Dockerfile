@@ -1,7 +1,7 @@
 # Adapted from https://github.com/astral-sh/uv-docker-example
 
 # Use a Python image with uv pre-installed
-FROM ghcr.io/astral-sh/uv:python3.10-bookworm AS builder
+FROM ghcr.io/astral-sh/uv:python3.9-bookworm AS builder
 
 # Install the project into `/app`
 WORKDIR /app
@@ -25,7 +25,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
 # Then, use a final image without uv
-FROM python:3.10-slim-bookworm
+FROM python:3.9-slim-bookworm
+RUN useradd -m app
+
 # It is important to use the image that matches the builder, as the path to the
 # Python executable must be the same, e.g., using `python:3.11-slim-bookworm`
 # will fail.
