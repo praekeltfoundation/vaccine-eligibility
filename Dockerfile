@@ -41,5 +41,4 @@ COPY --from=builder --chown=app:app /app /app
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Run the batch recommender by default
-ENV PYTHONPATH="/app/.venv/lib/python3.19/site-packages:/app"
 CMD ["sanic", "--host", "0.0.0.0", "vaccine.main.app"]
