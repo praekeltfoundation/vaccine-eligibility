@@ -505,7 +505,9 @@ async def test_decommission_support_keywords(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
-async def test_decommission_support_keywords_find_support(tester: AppTester, rapidpro_mock):
+async def test_decommission_support_keywords_find_support(
+    tester: AppTester, rapidpro_mock
+):
     rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "TRUE"
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
     await tester.user_input("find support")

@@ -9,6 +9,7 @@ from yal.askaquestion import Application as AaqApplication
 from yal.assessments import Application as AssessmentApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.content_feedback_survey import ContentFeedbackSurveyApplication
+from yal.decomission_support import Application as DecomissionSupportApplication
 from yal.endline_terms_and_conditions import Application as EndlineTermsApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
@@ -24,7 +25,6 @@ from yal.surveys.facebook_invite import Application as FacebookInviteApplication
 from yal.surveys.location import Application as LocationSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
-from yal.decomission_support import Application as DecomissionSupportApplication
 from yal.utils import (
     get_current_datetime,
     get_generic_error,

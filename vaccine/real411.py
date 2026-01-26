@@ -1,7 +1,6 @@
 import json
 import re
 from asyncio import gather
-from importlib.resources import files
 from typing import Optional
 from urllib.parse import urljoin
 
@@ -521,7 +520,9 @@ class Application(BaseApplication):
         ) as session:
             for file, file_url in zip(files, file_urls):
                 if file["name"] == "placeholder":
-                    file_path = files("vaccine").joinpath("data/real411_placeholder.png")
+                    file_path = files("vaccine").joinpath(
+                        "data/real411_placeholder.png"
+                    )
                     with file_path.open("rb") as f:
                         file_data = f.read()
                 else:

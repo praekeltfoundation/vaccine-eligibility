@@ -1,4 +1,5 @@
 import pytest
+
 from vaccine.models import Message
 from vaccine.testing import AppTester
 from yal.decomission_support import Application

@@ -14,7 +14,6 @@ class Application(BaseApplication):
     START_STATE = "state_support_start"
 
     async def state_support_start(self):
-
         choices = [
             Choice("state_pregnancy_care", "🤰 Pregnancy care"),
             Choice("state_hiv_prevention", "🛡️ HIV prevention"),
@@ -47,8 +46,7 @@ class Application(BaseApplication):
             self,
             question=question,
             error=self._(
-                "⚠️ This service works best when you use the numbered options "
-                "available"
+                "⚠️ This service works best when you use the numbered options available"
             ),
             choices=choices,
             next=next_,
@@ -58,17 +56,19 @@ class Application(BaseApplication):
         return EndState(
             self,
             text=self._(
-                "\n".join([
-                    "🤰 *You’ve got this 🤍*",
-                    "",
-                    "If you’re planning a pregnancy, pregnant, or a new mom, *MomConnect* is here for you.",
-                    "",
-                    "Get trusted info, reminders, and support for you and your baby.",
-                    "",
-                    "👉 Go to *MomConnect* 🔗 https://wa.me/2796312456?text=join",
-                    "",
-                    "_Reply ‘Support’ to find more options_",
-                ])
+                "\n".join(
+                    [
+                        "🤰 *You’ve got this 🤍*",
+                        "",
+                        "If you’re planning a pregnancy, pregnant, or a new mom, *MomConnect* is here for you.",
+                        "",
+                        "Get trusted info, reminders, and support for you and your baby.",
+                        "",
+                        "👉 Go to *MomConnect* 🔗 https://wa.me/2796312456?text=join",
+                        "",
+                        "_Reply ‘Support’ to find more options_",
+                    ]
+                )
             ),
         )
 
@@ -76,19 +76,21 @@ class Application(BaseApplication):
         return EndState(
             self,
             text=self._(
-                "\n".join([
-                    "*Staying safe is power* 💪",
-                    "",
-                    "*myPrep.co.za.* helps young people get real info about HIV prevention.",
-                    "",
-                    "Use the tool to see which prevention method could work for you.",
-                    "",
-                    "👉 Visit *myPrep* 🔗 https://www.myprep.co.za",
-                    "OR👉 Take the *PrepMethod Quiz*",
-                    "🔗 https://prepmethodquiz.web.app/#/",
-                    "",
-                    "_Reply ‘Support’ to find more options_",
-                ])
+                "\n".join(
+                    [
+                        "*Staying safe is power* 💪",
+                        "",
+                        "*myPrep.co.za.* helps young people get real info about HIV prevention.",
+                        "",
+                        "Use the tool to see which prevention method could work for you.",
+                        "",
+                        "👉 Visit *myPrep* 🔗 https://www.myprep.co.za",
+                        "OR👉 Take the *PrepMethod Quiz*",
+                        "🔗 https://prepmethodquiz.web.app/#/",
+                        "",
+                        "_Reply ‘Support’ to find more options_",
+                    ]
+                )
             ),
         )
 
@@ -96,18 +98,20 @@ class Application(BaseApplication):
         return EndState(
             self,
             text=self._(
-                "\n".join([
-                    "*Stay informed* 📰",
-                    "",
-                    "*ContactNDOH* shares official health info and updates from South Africa’s National Department of Health.",
-                    "",
-                    "Simple. Reliable. Straight from the source.",
-                    "",
-                    "👉 Go to *ContactNDOH.* 🔗"
-                    "https://wa.me/27600123456?text=HiContactNdoh",
-                    "",
-                    "_Reply ‘Support’ to find more options_",
-                ])
+                "\n".join(
+                    [
+                        "*Stay informed* 📰",
+                        "",
+                        "*ContactNDOH* shares official health info and updates from South Africa’s National Department of Health.",
+                        "",
+                        "Simple. Reliable. Straight from the source.",
+                        "",
+                        "👉 Go to *ContactNDOH.* 🔗"
+                        "https://wa.me/27600123456?text=HiContactNdoh",
+                        "",
+                        "_Reply ‘Support’ to find more options_",
+                    ]
+                )
             ),
         )
 
@@ -115,17 +119,19 @@ class Application(BaseApplication):
         return EndState(
             self,
             text=self._(
-                "\n".join([
-                    "*Curious is normal* 💖",
-                    "",
-                    "For sexual health, relationships, and HIV prevention options, check out *SelfCav*.",
-                    "",
-                    "Learn about PrEP, PEP, relationships, and mental health — all on WhatsApp. 👉"
-                    "",
-                    "Go to SelfCav🔗",
-                    "https://wa.me/27873731548?text=BwiseBot",
-                    "",
-                    "_Reply ‘Support’ to find more options_",
-                ])
-            )
+                "\n".join(
+                    [
+                        "*Curious is normal* 💖",
+                        "",
+                        "For sexual health, relationships, and HIV prevention options, check out *SelfCav*.",
+                        "",
+                        "Learn about PrEP, PEP, relationships, and mental health — all on WhatsApp. 👉"
+                        "",
+                        "Go to SelfCav🔗",
+                        "https://wa.me/27873731548?text=BwiseBot",
+                        "",
+                        "_Reply ‘Support’ to find more options_",
+                    ]
+                )
+            ),
         )
