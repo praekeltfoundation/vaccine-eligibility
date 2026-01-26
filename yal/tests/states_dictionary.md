@@ -843,3 +843,13 @@
 | state_check_study_active        | FALSE              |           |                           | Checks if the study is still active                             |
 | state_facebook_study_not_active | TRUE               | Text      | TRUE                      | Tells user study is not active, give main and aaq buttons       |
 | state_check_survey_active       | FALSE              |           |                           | Checks if the specific survey is still active                   |
+
+
+## Decommission Support
+| state_name                      | accepts_user_input | data_type | added_to_flow_results_app | description                                                     |
+| ------------------------------- | ------------------ | --------- | ------------------------- | ----------------------------------------------------------------|
+| state_support_start             | TRUE               | Text      | TRUE                      | Entry point for support, asks what type of support user needs   |
+| state_pregnancy_care            | FALSE              | Text      | TRUE                      | Provides information about pregnancy care support               |
+| state_hiv_prevention            | FALSE              | Text      | TRUE                      | Provides information about HIV prevention support               |
+| state_health_updates            | FALSE              | Text      | TRUE                      | Provides information about health updates support               |
+| state_sex_health_info           | FALSE              | Text      | TRUE                      | Provides information about sexual health support                |

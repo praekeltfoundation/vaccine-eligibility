@@ -24,6 +24,7 @@ from yal.surveys.facebook_invite import Application as FacebookInviteApplication
 from yal.surveys.location import Application as LocationSurveyApplication
 from yal.terms_and_conditions import Application as TermsApplication
 from yal.usertest_feedback import Application as FeedbackApplication
+from yal.decomission_support import Application as DecomissionSupportApplication
 from yal.utils import (
     get_current_datetime,
     get_generic_error,
@@ -98,6 +99,7 @@ FACEBOOK_INVITE_KEYWORDS = {
     "yes take part",
     "no thanks",
 }
+DECOMMISSION_SUPPORT_KEYWORDS = {"support", "find support"}
 UPDATE_SETTINGS = {"update settings"}
 
 
@@ -122,6 +124,7 @@ class Application(
     EndlineTermsApplication,
     LocationSurveyApplication,
     FacebookInviteApplication,
+    DecomissionSupportApplication,
 ):
     START_STATE = "state_start"
 
@@ -185,6 +188,10 @@ class Application(
             elif keyword in HELP_KEYWORDS:
                 self.user.session_id = None
                 self.state_name = PleaseCallMeApplication.START_STATE
+
+            elif keyword in DECOMMISSION_SUPPORT_KEYWORDS:
+                self.user.session_id = None
+                self.state_name = DecomissionSupportApplication.START_STATE
 
             elif keyword in OPTOUT_KEYWORDS:
                 self.user.session_id = None

@@ -1,11 +1,11 @@
 import json
 import re
 from asyncio import gather
+from importlib.resources import files
 from typing import Optional
 from urllib.parse import urljoin
 
 import aiohttp
-import pkg_resources
 from aiohttp_client_cache import CacheBackend, CachedSession
 
 from vaccine import real411_config as config
@@ -521,10 +521,8 @@ class Application(BaseApplication):
         ) as session:
             for file, file_url in zip(files, file_urls):
                 if file["name"] == "placeholder":
-                    filename = pkg_resources.resource_filename(
-                        "vaccine", "data/real411_placeholder.png"
-                    )
-                    with open(filename, "rb") as f:
+                    file_path = files("vaccine").joinpath("data/real411_placeholder.png")
+                    with file_path.open("rb") as f:
                         file_data = f.read()
                 else:
                     file_data = await get_whatsapp_media(file["name"])
