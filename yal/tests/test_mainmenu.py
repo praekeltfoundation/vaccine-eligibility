@@ -486,6 +486,7 @@ async def test_state_mainmenu_start(
     assert bwise_closing_message.content == "\n".join(
         [
             "Important update: *This B-Wise chatbot will be closing at the end of February.* 💛",
+            "",
             "Send in the word *support* to find the right support for you",
         ]
     )
@@ -564,6 +565,7 @@ async def test_state_mainmenu_start_suggested_populated(
     assert bwise_closing_message.content == "\n".join(
         [
             "Important update: *This B-Wise chatbot will be closing at the end of February.* 💛",
+            "",
             "Send in the word *support* to find the right support for you",
         ]
     )
