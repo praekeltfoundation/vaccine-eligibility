@@ -2,10 +2,10 @@ import random
 import re
 from csv import reader
 from datetime import datetime, timedelta, timezone
+from importlib.resources import files
 from typing import Any, Optional
 
 import phonenumbers
-import pkg_resources
 import pycountry
 from emoji import emoji_list
 from rapidfuzz import fuzz, process
@@ -112,8 +112,8 @@ def replace_persona_fields(text, metadata=None):
 
 def get_keywords(name):
     keywords = []
-    filename = pkg_resources.resource_filename("yal", f"keywords/{name}.csv")
-    with open(filename) as keyword_file:
+    keyword_path = files("yal").joinpath(f"keywords/{name}.csv")
+    with keyword_path.open() as keyword_file:
         csvreader = reader(keyword_file)
         next(csvreader)
         for row in csvreader:

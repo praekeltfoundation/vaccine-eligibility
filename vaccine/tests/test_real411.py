@@ -1,4 +1,5 @@
 import json
+from importlib.resources import files
 
 import email_validator
 import pytest
@@ -630,7 +631,8 @@ async def test_success_no_media(
         "file_names": [{"name": "placeholder", "type": "image/png"}],
         "email": "reporting@praekelt.org",
     }
-    with open("vaccine/data/real411_placeholder.png", "rb") as f:
+    file_path = files("vaccine").joinpath("data/real411_placeholder.png")
+    with file_path.open("rb") as f:
         assert upload.body == f.read()
     assert upload.headers["content-type"] == "image/png"
     assert finalise.json == {"ref": "WDM88J4P"}

@@ -1,11 +1,11 @@
 import json
 import re
 from asyncio import gather
+from importlib.resources import files
 from typing import Optional
 from urllib.parse import urljoin
 
 import aiohttp
-import pkg_resources
 from aiohttp_client_cache import CacheBackend, CachedSession
 
 from vaccine import real411_config as config
@@ -497,15 +497,15 @@ class Application(BaseApplication):
         email = answers["state_email"]
         if email.strip().lower() == "skip":
             email = None
-        files = []
+        file_list = []
         if answers.get("state_description_file"):
             file = json.loads(answers["state_description_file"])
-            files.append({"name": file["id"], "type": file["mime_type"]})
+            file_list.append({"name": file["id"], "type": file["mime_type"]})
         if answers.get("state_media_file"):
             file = json.loads(answers["state_media_file"])
-            files.append({"name": file["id"], "type": file["mime_type"]})
-        if not files:
-            files.append({"name": "placeholder", "type": "image/png"})
+            file_list.append({"name": file["id"], "type": file["mime_type"]})
+        if not file_list:
+            file_list.append({"name": "placeholder", "type": "image/png"})
 
         self.form_reference, file_urls, self.backlink = await submit_real411_form(
             terms=answers["state_terms"] == "yes",
@@ -513,18 +513,18 @@ class Application(BaseApplication):
             phone=normalise_phonenumber(self.user.addr),
             reason=f"{answers['state_description']}\n\n{answers['state_media']}",
             email=email,
-            file_names=files,
+            file_names=file_list,
         )
         await store_complaint_id(self.form_reference, self.user.addr)
         async with aiohttp.ClientSession(
             headers={"User-Agent": "contactndoh-real411"},
         ) as session:
-            for file, file_url in zip(files, file_urls):
+            for file, file_url in zip(file_list, file_urls):
                 if file["name"] == "placeholder":
-                    filename = pkg_resources.resource_filename(
-                        "vaccine", "data/real411_placeholder.png"
+                    file_path = files("vaccine").joinpath(
+                        "data/real411_placeholder.png"
                     )
-                    with open(filename, "rb") as f:
+                    with file_path.open("rb") as f:
                         file_data = f.read()
                 else:
                     file_data = await get_whatsapp_media(file["name"])

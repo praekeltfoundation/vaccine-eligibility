@@ -9,6 +9,7 @@ from yal.askaquestion import Application as AaqApplication
 from yal.assessments import Application as AssessmentApplication
 from yal.change_preferences import Application as ChangePreferencesApplication
 from yal.content_feedback_survey import ContentFeedbackSurveyApplication
+from yal.decomission_support import Application as DecomissionSupportApplication
 from yal.endline_terms_and_conditions import Application as EndlineTermsApplication
 from yal.mainmenu import Application as MainMenuApplication
 from yal.onboarding import Application as OnboardingApplication
@@ -98,6 +99,7 @@ FACEBOOK_INVITE_KEYWORDS = {
     "yes take part",
     "no thanks",
 }
+DECOMMISSION_SUPPORT_KEYWORDS = {"support", "find support"}
 UPDATE_SETTINGS = {"update settings"}
 
 
@@ -122,6 +124,7 @@ class Application(
     EndlineTermsApplication,
     LocationSurveyApplication,
     FacebookInviteApplication,
+    DecomissionSupportApplication,
 ):
     START_STATE = "state_start"
 
@@ -185,6 +188,10 @@ class Application(
             elif keyword in HELP_KEYWORDS:
                 self.user.session_id = None
                 self.state_name = PleaseCallMeApplication.START_STATE
+
+            elif keyword in DECOMMISSION_SUPPORT_KEYWORDS:
+                self.user.session_id = None
+                self.state_name = DecomissionSupportApplication.START_STATE
 
             elif keyword in OPTOUT_KEYWORDS:
                 self.user.session_id = None

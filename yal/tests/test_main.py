@@ -497,6 +497,24 @@ async def test_feedback_keywords(tester: AppTester, rapidpro_mock):
 
 
 @pytest.mark.asyncio
+async def test_decommission_support_keywords(tester: AppTester, rapidpro_mock):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
+    await tester.user_input("support")
+    tester.assert_state("state_support_start")
+
+
+@pytest.mark.asyncio
+async def test_decommission_support_keywords_find_support(
+    tester: AppTester, rapidpro_mock
+):
+    rapidpro_mock.tstate.contact_fields["onboarding_completed"] = "TRUE"
+    rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
+    await tester.user_input("find support")
+    tester.assert_state("state_support_start")
+
+
+@pytest.mark.asyncio
 async def test_assessment_reminder_keywords(
     tester: AppTester, rapidpro_mock, contentrepo_api_mock
 ):
