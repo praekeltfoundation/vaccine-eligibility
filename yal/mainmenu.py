@@ -268,6 +268,13 @@ class Application(BaseApplication):
             ]
             additional_messages.extend(privacy_reminder_messages)
 
+        additional_messages.append(
+            "\n".join([
+                "Important update: *This B-Wise chatbot will be closing at the end of February.* 💛",
+                "Send in the word *support* to find the right support for you"
+            ])
+        )
+
         return CustomChoiceState(
             self,
             question=question,

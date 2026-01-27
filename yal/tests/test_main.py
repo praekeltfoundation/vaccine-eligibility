@@ -336,7 +336,7 @@ async def test_reset_keyword(tester: AppTester, rapidpro_mock, contentrepo_api_m
     tester.setup_state("state_catch_all")
     await tester.user_input("hi")
     tester.assert_state("state_mainmenu")
-    tester.assert_num_messages(2)
+    tester.assert_num_messages(3)
 
     assert len(rapidpro_mock.tstate.requests) == 6
     assert len(contentrepo_api_mock.tstate.requests) == 4
@@ -452,7 +452,7 @@ async def test_state_start_to_mainmenu(
     )
     await tester.user_input("hi")
     tester.assert_state("state_mainmenu")
-    tester.assert_num_messages(2)
+    tester.assert_num_messages(3)
 
     assert len(rapidpro_mock.tstate.requests) == 6
     assert len(contentrepo_api_mock.tstate.requests) == 4
@@ -885,7 +885,7 @@ async def test_tracked_keywords_saved(
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = "TRUE"
     await tester.user_input("howzit")
     tester.assert_state("state_mainmenu")
-    tester.assert_num_messages(2)
+    tester.assert_num_messages(3)
 
     tester.assert_answer("state_source_tracking", "howzit")
 
@@ -909,7 +909,7 @@ async def test_tracked_keywords_saved_ads_round_2(
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = "True"
     await tester.user_input("join")
     tester.assert_state("state_mainmenu")
-    tester.assert_num_messages(2)
+    tester.assert_num_messages(3)
 
     tester.assert_answer("state_source_tracking", "join")
 
@@ -935,7 +935,7 @@ async def test_tracked_keywords_saved_ads_round_3(
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = "True"
     await tester.user_input("youth")
     tester.assert_state("state_mainmenu")
-    tester.assert_num_messages(2)
+    tester.assert_num_messages(3)
 
     tester.assert_answer("state_source_tracking", "youth")
 
@@ -989,7 +989,7 @@ async def test_tracked_keywords_tiktok(
     rapidpro_mock.tstate.contact_fields["terms_accepted"] = "True"
     await tester.user_input("sho")
     tester.assert_state("state_mainmenu")
-    tester.assert_num_messages(2)
+    tester.assert_num_messages(3)
 
     tester.assert_answer("state_source_tracking", "sho")
 
@@ -1501,7 +1501,7 @@ async def test_mainmenu_payload(tester: AppTester, rapidpro_mock, contentrepo_ap
         transport_metadata={"message": {"button": {"payload": "state_pre_mainmenu"}}},
     )
     tester.assert_state("state_mainmenu")
-    tester.assert_num_messages(2)
+    tester.assert_num_messages(3)
 
     assert len(rapidpro_mock.tstate.requests) == 6
     assert len(contentrepo_api_mock.tstate.requests) == 4

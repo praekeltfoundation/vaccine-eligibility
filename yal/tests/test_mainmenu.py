@@ -410,11 +410,11 @@ async def test_mainmenu_show_privacy_policy(
 ):
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
-    tester.assert_num_messages(2)
+    tester.assert_num_messages(3)
 
     assert len(rapidpro_mock.tstate.requests) == 4
     assert rapidpro_mock.tstate.contact_fields["privacy_reminder_sent"] == "True"
-    _, privacy_message = tester.application.messages
+    _, privacy_message, _ = tester.application.messages
     assert privacy_message.content == "\n".join(
         [
             "*This conversation is completely private and confidential.* 🤐",
@@ -436,7 +436,7 @@ async def test_mainmenu_skip_privacy_policy_if_seen(tester: AppTester, rapidpro_
     rapidpro_mock.tstate.contact_fields["privacy_reminder_sent"] = "True"
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
-    tester.assert_num_messages(1)
+    tester.assert_num_messages(2)
     tester.assert_state("state_mainmenu")
 
 
@@ -449,8 +449,8 @@ async def test_state_mainmenu_start(
     get_current_datetime.return_value = datetime(2022, 6, 19, 17, 30)
     tester.setup_state("state_pre_mainmenu")
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
-    tester.assert_num_messages(3)
-    menu, banner, _ = tester.application.messages
+    tester.assert_num_messages(4)
+    menu, banner, privacy_message, bwise_closing_message = tester.application.messages
     assert menu.content == "\n".join(
         [
             "🏡 *MAIN MENU*",
@@ -483,6 +483,12 @@ async def test_state_mainmenu_start(
         ]
     )
     assert banner.content == "Test banner message"
+    assert bwise_closing_message.content == "\n".join(
+        [
+            "Important update: *This B-Wise chatbot will be closing at the end of February.* 💛",
+            "Send in the word *support* to find the right support for you",
+        ]
+    )
 
     assert [r.path for r in contentrepo_api_mock.tstate.requests] == [
         "/api/v2/pages",
@@ -522,8 +528,8 @@ async def test_state_mainmenu_start_suggested_populated(
         "555": "Suggested Content 2",
     }
     await tester.user_input(session=Message.SESSION_EVENT.NEW)
-    tester.assert_num_messages(2)
-    message, _ = tester.application.messages
+    tester.assert_num_messages(3)
+    message, privacy_message, bwise_closing_message = tester.application.messages
     assert message.content == "\n".join(
         [
             "🏡 *MAIN MENU*",
@@ -553,6 +559,12 @@ async def test_state_mainmenu_start_suggested_populated(
             "11. Update your information",
             "-----",
             "💡 *TIP:* _Jump back to this menu at any time by replying_ *0* or *MENU*.",
+        ]
+    )
+    assert bwise_closing_message.content == "\n".join(
+        [
+            "Important update: *This B-Wise chatbot will be closing at the end of February.* 💛",
+            "Send in the word *support* to find the right support for you",
         ]
     )
 
