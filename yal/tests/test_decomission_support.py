@@ -113,7 +113,7 @@ async def test_state_pregnancy_care_content(tester: AppTester):
     message = tester.application.messages[0]
     assert "got this" in message.content
     assert "MomConnect" in message.content
-    assert "wa.me/2796312456" in message.content
+    assert "wa.me/27796312456" in message.content
 
 
 @pytest.mark.asyncio
