@@ -64,7 +64,7 @@ class Application(BaseApplication):
                         "",
                         "Get trusted info, reminders, and support for you and your baby.",
                         "",
-                        "👉 Go to *MomConnect* 🔗 https://wa.me/2796312456?text=join",
+                        "👉 Go to *MomConnect* 🔗 https://wa.me/27796312456?text=join",
                         "",
                         "_Reply ‘Support’ to find more options_",
                     ]
